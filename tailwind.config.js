@@ -7,11 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: '#1a73e8',
-        success: '#2e7d32'
+        black: '#000000',
+        white: '#ffffff'
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif']
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
       }
     }
   },
