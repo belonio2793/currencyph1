@@ -1,62 +1,74 @@
 import { useState, useEffect } from 'react'
 import Header from './components/Header'
-import AddFundsSection from './components/AddFundsSection'
-import BalanceSection from './components/BalanceSection'
-import ProjectsSection from './components/ProjectsSection'
+import BalanceDisplay from './components/BalanceDisplay'
+import DepositSection from './components/DepositSection'
+import TransactionHistory from './components/TransactionHistory'
 import Footer from './components/Footer'
+import { dogTokenAPI, supabase } from './lib/supabaseClient'
 
 export default function App() {
-  const [userBalance, setUserBalance] = useState({ php: 0, tokens: 0, btc: 0, eth: 0 })
-  const [projects, setProjects] = useState([])
+  const [userId, setUserId] = useState(null)
+  const [userEmail, setUserEmail] = useState(null)
+  const [refreshHistory, setRefreshHistory] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Mock data - will be replaced with Supabase calls
-    const mockBalance = {
-      php: 10000,
-      tokens: 1000,
-      btc: 0.005,
-      eth: 0.15
-    }
-    setUserBalance(mockBalance)
-
-    const mockProjects = [
-      {
-        id: 1,
-        name: 'Art Installation',
-        description: 'A community art installation project',
-        goal: 1000000,
-        ownership: 20,
-        current: 250000
-      },
-      {
-        id: 2,
-        name: 'Social Venture',
-        description: 'Community-driven social enterprise',
-        goal: 500000,
-        ownership: 30,
-        current: 150000
-      },
-      {
-        id: 3,
-        name: 'Tech Education',
-        description: 'Free tech education for underserved communities',
-        goal: 750000,
-        ownership: 25,
-        current: 300000
+    const initializeUser = async () => {
+      try {
+        // Check if user is authenticated
+        const { data: { user } } = await supabase.auth.getUser()
+        
+        if (user) {
+          setUserId(user.id)
+          setUserEmail(user.email)
+          // Ensure user exists in our users table
+          await dogTokenAPI.getOrCreateUser(user.email)
+        } else {
+          // For testing: create a test user with email
+          const testEmail = `test-${Math.random().toString(36).substring(7)}@dog.local`
+          const testUser = await dogTokenAPI.getOrCreateUser(testEmail)
+          setUserId(testUser.id)
+          setUserEmail(testEmail)
+        }
+      } catch (err) {
+        console.error('Error initializing user:', err)
+      } finally {
+        setLoading(false)
       }
-    ]
-    setProjects(mockProjects)
-    setLoading(false)
+    }
+
+    initializeUser()
   }, [])
 
+  const handleDepositSuccess = () => {
+    setRefreshHistory(prev => prev + 1)
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="max-w-2xl mx-auto px-4 py-8">
+          <p className="text-gray-500">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-2xl mx-auto px-4 py-8">
         <Header />
-        <AddFundsSection />
-        <BalanceSection balance={userBalance} />
-        <ProjectsSection projects={projects} loading={loading} />
+        
+        {userEmail && (
+          <p className="text-xs text-gray-500 mb-6 text-center">
+            {userEmail}
+          </p>
+        )}
+
+        <BalanceDisplay userId={userId} />
+        <DepositSection userId={userId} onDepositSuccess={handleDepositSuccess} />
+        <TransactionHistory userId={userId} refresh={refreshHistory} />
+        
         <Footer />
       </div>
     </div>
