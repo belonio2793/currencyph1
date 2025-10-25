@@ -16,20 +16,29 @@ export default function CurrencyRates() {
         setLoading(true)
         setError(null)
 
-        // Fetch all rates in parallel
-        const [fiatRates, cryptos, dog] = await Promise.all([
-          currencyAPI.getGlobalRates(),
-          currencyAPI.getCryptoPrices(),
-          dogTokenAPI.calculateDOGPrice()
-        ])
+        // Fetch all rates in parallel, with fallback for DOG price
+        const fiatRates = await currencyAPI.getGlobalRates()
+        const cryptos = await currencyAPI.getCryptoPrices()
+
+        // DOG price calculation has fallback built-in, won't throw
+        const dog = await dogTokenAPI.calculateDOGPrice()
 
         setRates(fiatRates)
         setCryptoPrices(cryptos)
         setDogPrice(dog)
         setLastUpdate(new Date())
       } catch (err) {
-        console.error('Error fetching rates:', err)
-        setError('Failed to load rates')
+        const errorMsg = err instanceof Error ? err.message : String(err)
+        console.error('Error fetching rates:', errorMsg)
+        setError('Some rates unavailable - using fallback data')
+        // Set what we can get
+        try {
+          const fiatRates = await currencyAPI.getGlobalRates()
+          setRates(fiatRates)
+          setLastUpdate(new Date())
+        } catch (e) {
+          console.error('Fallback failed:', e)
+        }
       } finally {
         setLoading(false)
       }
