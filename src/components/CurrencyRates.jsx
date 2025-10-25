@@ -79,8 +79,11 @@ export default function CurrencyRates() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 p-3 rounded text-red-700 text-sm">
-            {error}
+          <div className="bg-yellow-50 border border-yellow-200 p-3 rounded text-yellow-800 text-sm mb-4">
+            <strong>⚠️ {error}</strong>
+            {error.includes('Supabase') && (
+              <p className="text-xs mt-1">Please ensure Supabase tables are set up. Run: <code className="bg-white px-1">bash scripts/setup-supabase.sh</code></p>
+            )}
           </div>
         )}
       </div>
