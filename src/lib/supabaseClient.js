@@ -116,5 +116,55 @@ export const dogTokenAPI = {
       .single()
     if (error) throw error
     return data
+  },
+
+  // Calculate DOG token price: total_deposits / total_dog_supply
+  async calculateDOGPrice() {
+    try {
+      // Get total value of all deposits
+      const { data: deposits, error: depositError } = await supabase
+        .from('deposits')
+        .select('amount')
+
+      if (depositError) throw depositError
+
+      const totalDeposits = (deposits || []).reduce((sum, d) => sum + (d.amount || 0), 0)
+
+      // Get total DOG in circulation (sum of all user balances)
+      const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('dog_balance')
+
+      if (userError) throw userError
+
+      const totalDOGSupply = (users || []).reduce((sum, u) => sum + (u.dog_balance || 0), 0)
+
+      // Avoid division by zero
+      if (totalDOGSupply === 0 || totalDeposits === 0) {
+        return {
+          dogPrice: 0,
+          totalDeposits: 0,
+          totalSupply: 0,
+          marketCap: 0
+        }
+      }
+
+      const dogPrice = totalDeposits / totalDOGSupply
+
+      return {
+        dogPrice: parseFloat(dogPrice.toFixed(4)),
+        totalDeposits: parseFloat(totalDeposits.toFixed(2)),
+        totalSupply: parseFloat(totalDOGSupply.toFixed(2)),
+        marketCap: parseFloat((dogPrice * totalDOGSupply).toFixed(2))
+      }
+    } catch (err) {
+      console.error('Error calculating DOG price:', err)
+      return {
+        dogPrice: 0,
+        totalDeposits: 0,
+        totalSupply: 0,
+        marketCap: 0
+      }
+    }
   }
 }
