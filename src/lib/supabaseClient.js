@@ -126,7 +126,15 @@ export const dogTokenAPI = {
         .from('deposits')
         .select('amount')
 
-      if (depositError) throw depositError
+      if (depositError) {
+        console.error('Error fetching deposits:', {
+          message: depositError.message,
+          code: depositError.code,
+          status: depositError.status,
+          details: depositError.details
+        })
+        throw depositError
+      }
 
       const totalDeposits = (deposits || []).reduce((sum, d) => sum + (d.amount || 0), 0)
 
@@ -135,7 +143,15 @@ export const dogTokenAPI = {
         .from('users')
         .select('dog_balance')
 
-      if (userError) throw userError
+      if (userError) {
+        console.error('Error fetching users:', {
+          message: userError.message,
+          code: userError.code,
+          status: userError.status,
+          details: userError.details
+        })
+        throw userError
+      }
 
       const totalDOGSupply = (users || []).reduce((sum, u) => sum + (u.dog_balance || 0), 0)
 
@@ -158,7 +174,9 @@ export const dogTokenAPI = {
         marketCap: parseFloat((dogPrice * totalDOGSupply).toFixed(2))
       }
     } catch (err) {
-      console.error('Error calculating DOG price:', err)
+      const errorMessage = err instanceof Error ? err.message : JSON.stringify(err)
+      console.error('Error calculating DOG price:', errorMessage)
+      console.warn('Using fallback values: dogPrice=0. This usually means Supabase tables are not set up yet.')
       return {
         dogPrice: 0,
         totalDeposits: 0,
