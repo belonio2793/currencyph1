@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import Header from './components/Header'
+import CurrencyRates from './components/CurrencyRates'
 import BalanceDisplay from './components/BalanceDisplay'
 import DepositSection from './components/DepositSection'
 import TransactionHistory from './components/TransactionHistory'
