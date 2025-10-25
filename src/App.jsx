@@ -56,19 +56,32 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <Header />
-        
+
         {userEmail && (
           <p className="text-xs text-gray-500 mb-6 text-center">
             {userEmail}
           </p>
         )}
 
-        <BalanceDisplay userId={userId} />
-        <DepositSection userId={userId} onDepositSuccess={handleDepositSuccess} />
-        <TransactionHistory userId={userId} refresh={refreshHistory} />
-        
+        {/* Global Currency Rates - Main Feature */}
+        <CurrencyRates />
+
+        {/* User Account Section */}
+        <div className="mt-12 border-t pt-8">
+          <h2 className="text-2xl font-bold text-black mb-6">Your Account</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <BalanceDisplay userId={userId} />
+              <DepositSection userId={userId} onDepositSuccess={handleDepositSuccess} />
+            </div>
+            <div>
+              <TransactionHistory userId={userId} refresh={refreshHistory} />
+            </div>
+          </div>
+        </div>
+
         <Footer />
       </div>
     </div>
