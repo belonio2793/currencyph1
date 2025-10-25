@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f5f5;
+  color: #333;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white px-5 py-2 rounded-lg hover:opacity-90 transition-opacity inline-block m-2.5;
+  }
+
+  .section-card {
+    @apply bg-white p-5 rounded-lg shadow-sm mx-0 my-5;
+  }
+
+  .balance-text {
+    @apply text-2xl text-success font-semibold;
+  }
+
+  .project-grid {
+    @apply grid gap-5 grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .project-card {
+    @apply bg-gray-50 p-4 rounded-lg border border-gray-200;
+  }
+}
