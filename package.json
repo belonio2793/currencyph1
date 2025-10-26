@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "populate-nearby": "node scripts/populate_nearby.js"
+    "populate-nearby": "node scripts/populate_nearby.js",
+    "scrape-tripadvisor": "node scripts/scrape_tripadvisor.js"
   },
   "dependencies": {
     "react": "^18.2.0",
