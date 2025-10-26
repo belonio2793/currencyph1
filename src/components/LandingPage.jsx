@@ -2,6 +2,134 @@ import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
 import { currencyAPI } from '../lib/currencyAPI'
 
+// Searchable Select Component
+function SearchableSelect({ value, onChange, options, placeholder, label }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filtered = options.filter(opt =>
+    (opt.code + ' ' + opt.name).toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const selectedOption = options.find(opt => opt.code === value)
+
+  return (
+    <div className="relative">
+      <label className="block text-sm font-medium text-slate-700 mb-2">
+        {label}
+      </label>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white text-left flex justify-between items-center"
+        >
+          <span>{selectedOption ? `${selectedOption.code} - ${selectedOption.name}` : placeholder}</span>
+          <span className="text-slate-500">▼</span>
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-slate-300 rounded-lg shadow-lg z-50 max-h-80 overflow-hidden flex flex-col">
+            <input
+              type="text"
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="px-4 py-2 border-b border-slate-200 focus:outline-none text-sm sticky top-0 bg-white"
+              autoFocus
+              onClick={e => e.stopPropagation()}
+            />
+            <div className="overflow-y-auto">
+              {filtered.map(opt => (
+                <button
+                  key={opt.code}
+                  type="button"
+                  onClick={() => {
+                    onChange(opt.code)
+                    setIsOpen(false)
+                    setSearchTerm('')
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 ${
+                    value === opt.code ? 'bg-blue-50 text-blue-900 font-medium' : 'text-slate-700'
+                  }`}
+                >
+                  {opt.code} - {opt.name}
+                </button>
+              ))}
+              {filtered.length === 0 && (
+                <div className="px-4 py-3 text-slate-500 text-sm text-center">No currencies found</div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Searchable Crypto Select Component
+function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  const filtered = options.filter(opt =>
+    opt.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  return (
+    <div className="relative">
+      <label className="block text-sm font-medium text-slate-700 mb-2">
+        {label}
+      </label>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={() => setIsOpen(!isOpen)}
+          className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 text-sm font-medium bg-white text-left flex justify-between items-center"
+        >
+          <span>{value} - {prices[value]?.toFixed(2) || '0.00'} PHP</span>
+          <span className="text-slate-500">▼</span>
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border-2 border-slate-300 rounded-lg shadow-lg z-50 max-h-80 overflow-hidden flex flex-col">
+            <input
+              type="text"
+              placeholder="Type to search..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="px-4 py-2 border-b border-slate-200 focus:outline-none text-sm sticky top-0 bg-white"
+              autoFocus
+              onClick={e => e.stopPropagation()}
+            />
+            <div className="overflow-y-auto">
+              {filtered.map(crypto => (
+                <button
+                  key={crypto}
+                  type="button"
+                  onClick={() => {
+                    onChange(crypto)
+                    setIsOpen(false)
+                    setSearchTerm('')
+                  }}
+                  className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 ${
+                    value === crypto ? 'bg-orange-50 text-orange-900 font-medium' : 'text-slate-700'
+                  }`}
+                >
+                  {crypto} - {prices[crypto]?.toFixed(2) || '0.00'} PHP
+                </button>
+              ))}
+              {filtered.length === 0 && (
+                <div className="px-4 py-3 text-slate-500 text-sm text-center">No cryptocurrencies found</div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function LandingPage({ userId, userEmail }) {
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('PHP')
@@ -21,22 +149,51 @@ export default function LandingPage({ userId, userEmail }) {
   const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
   const [addingCrypto, setAddingCrypto] = useState(false)
 
-  const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
+  const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
   const targetCurrency = 'PHP'
 
   // Default crypto prices in PHP (fallback values)
   const defaultCryptoPrices = {
     BTC: 4200000,
     ETH: 180000,
+    LTC: 12000,
     DOGE: 8,
     XRP: 25,
-    ADA: 35
+    ADA: 35,
+    SOL: 18000,
+    AVAX: 40000,
+    MATIC: 50,
+    DOT: 8000,
+    LINK: 2500,
+    UNI: 8000,
+    AAVE: 280000,
+    USDC: 56,
+    USDT: 56
+  }
+
+  // Crypto names for display
+  const cryptoNames = {
+    BTC: 'Bitcoin',
+    ETH: 'Ethereum',
+    LTC: 'Litecoin',
+    DOGE: 'Dogecoin',
+    XRP: 'Ripple',
+    ADA: 'Cardano',
+    SOL: 'Solana',
+    AVAX: 'Avalanche',
+    MATIC: 'Polygon',
+    DOT: 'Polkadot',
+    LINK: 'Chainlink',
+    UNI: 'Uniswap',
+    AAVE: 'Aave',
+    USDC: 'USD Coin',
+    USDT: 'Tether'
   }
 
   const loadCryptoPrices = async () => {
     try {
       const response = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,dogecoin,ripple,cardano&vs_currencies=usd'
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,dogecoin,ripple,cardano,solana,avalanche-2,matic-network,polkadot,chainlink,uniswap,aave,usd-coin,tether&vs_currencies=usd'
       )
       if (!response.ok) throw new Error('Failed to fetch crypto prices')
       
@@ -46,14 +203,67 @@ export default function LandingPage({ userId, userEmail }) {
       const cryptoPricesInPhp = {
         BTC: Math.round(data.bitcoin.usd * phpExchangeRate * 100) / 100,
         ETH: Math.round(data.ethereum.usd * phpExchangeRate * 100) / 100,
+        LTC: Math.round(data.litecoin.usd * phpExchangeRate * 100) / 100,
         DOGE: Math.round(data.dogecoin.usd * phpExchangeRate * 100) / 100,
         XRP: Math.round(data.ripple.usd * phpExchangeRate * 100) / 100,
-        ADA: Math.round(data.cardano.usd * phpExchangeRate * 100) / 100
+        ADA: Math.round(data.cardano.usd * phpExchangeRate * 100) / 100,
+        SOL: Math.round(data.solana.usd * phpExchangeRate * 100) / 100,
+        AVAX: Math.round(data['avalanche-2'].usd * phpExchangeRate * 100) / 100,
+        MATIC: Math.round(data['matic-network'].usd * phpExchangeRate * 100) / 100,
+        DOT: Math.round(data.polkadot.usd * phpExchangeRate * 100) / 100,
+        LINK: Math.round(data.chainlink.usd * phpExchangeRate * 100) / 100,
+        UNI: Math.round(data.uniswap.usd * phpExchangeRate * 100) / 100,
+        AAVE: Math.round(data.aave.usd * phpExchangeRate * 100) / 100,
+        USDC: Math.round(data['usd-coin'].usd * phpExchangeRate * 100) / 100,
+        USDT: Math.round(data.tether.usd * phpExchangeRate * 100) / 100
       }
       setCryptoRates(cryptoPricesInPhp)
     } catch (err) {
       console.error('Error loading crypto prices:', err)
       setCryptoRates(defaultCryptoPrices)
+    }
+  }
+
+  const detectUserCurrency = async () => {
+    try {
+      const response = await fetch('https://ipapi.co/json/')
+      const data = await response.json()
+      const countryCode = data.country_code
+      
+      // Map country codes to currencies
+      const currencyMap = {
+        'PH': 'PHP',
+        'US': 'USD',
+        'CA': 'CAD',
+        'GB': 'GBP',
+        'AU': 'AUD',
+        'JP': 'JPY',
+        'CN': 'CNY',
+        'IN': 'INR',
+        'EU': 'EUR',
+        'CH': 'CHF',
+        'SG': 'SGD',
+        'HK': 'HKD',
+        'TH': 'THB',
+        'ID': 'IDR',
+        'MY': 'MYR',
+        'VN': 'VND',
+        'KR': 'KRW',
+        'ZA': 'ZAR',
+        'BR': 'BRL',
+        'MX': 'MXN',
+        'NO': 'NOK',
+        'DK': 'DKK',
+        'AE': 'AED',
+        'SE': 'SEK',
+        'NZ': 'NZD'
+      }
+      
+      const detectedCurrency = currencyMap[countryCode] || 'PHP'
+      setSelectedCurrency(detectedCurrency)
+    } catch (err) {
+      console.error('Error detecting currency:', err)
+      setSelectedCurrency('PHP')
     }
   }
 
@@ -69,6 +279,7 @@ export default function LandingPage({ userId, userEmail }) {
         loadExchangeRates(),
         loadRecentTransactions()
       ])
+      detectUserCurrency()
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load data')
@@ -179,7 +390,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`Successfully added ${amount} ${selectedCurrency} = ${convertedAmt} PHP`)
+      setSuccess(`Successfully added ${amount} ${selectedCurrency} = ${convertedAmt} ${targetCurrency}`)
       setAmount('')
       setConvertedAmount('0.00')
 
@@ -214,7 +425,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedCryptoAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto} = ${convertedAmt} PHP`)
+      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto} = ${convertedAmt} ${targetCurrency}`)
       setCryptoAmount('')
       setConvertedCryptoAmount('0.00')
 
@@ -296,23 +507,14 @@ export default function LandingPage({ userId, userEmail }) {
             <form onSubmit={handleAddAmount} className="space-y-6">
               <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Fiat Currency</h3>
 
-              {/* Currency Selection Dropdown */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Select Currency
-                </label>
-                <select
-                  value={selectedCurrency}
-                  onChange={e => setSelectedCurrency(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-sm font-medium bg-white"
-                >
-                  {allCurrencies.map(curr => (
-                    <option key={curr.code} value={curr.code}>
-                      {curr.code} - {curr.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Searchable Currency Selection */}
+              <SearchableSelect
+                value={selectedCurrency}
+                onChange={setSelectedCurrency}
+                options={allCurrencies}
+                placeholder="Select currency"
+                label="Select Currency"
+              />
 
               {/* Amount Input */}
               <div>
@@ -361,7 +563,7 @@ export default function LandingPage({ userId, userEmail }) {
                 disabled={adding || !amount}
                 className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {adding ? 'Processing...' : `Add ${convertedAmount} ${targetCurrency}`}
+                {adding ? 'Processing...' : 'Add'}
               </button>
             </form>
 
@@ -369,23 +571,14 @@ export default function LandingPage({ userId, userEmail }) {
             <form onSubmit={handleAddCrypto} className="space-y-6">
               <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Cryptocurrency</h3>
 
-              {/* Cryptocurrency Selection Dropdown */}
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Select Cryptocurrency
-                </label>
-                <select
-                  value={selectedCrypto}
-                  onChange={e => setSelectedCrypto(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-sm font-medium bg-white"
-                >
-                  {cryptos.map(crypto => (
-                    <option key={crypto} value={crypto}>
-                      {crypto} - {getCryptoPrice(crypto)} {targetCurrency}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Searchable Crypto Selection */}
+              <SearchableCryptoSelect
+                value={selectedCrypto}
+                onChange={setSelectedCrypto}
+                options={cryptos}
+                prices={cryptoRates.length === 0 ? defaultCryptoPrices : cryptoRates}
+                label="Select Cryptocurrency"
+              />
 
               {/* Amount Input */}
               <div>
@@ -432,7 +625,7 @@ export default function LandingPage({ userId, userEmail }) {
                 disabled={addingCrypto || !cryptoAmount}
                 className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} ${targetCurrency}`}
+                {addingCrypto ? 'Processing...' : 'Add'}
               </button>
             </form>
           </div>
