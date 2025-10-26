@@ -481,8 +481,21 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
   }
 
   const getRate = (from, to) => {
+    if (from === to) return '1.0000'
     const key = `${from}_${to}`
-    return exchangeRates[key]?.toFixed(4) || '0.0000'
+    const direct = exchangeRates[key]
+    if (typeof direct === 'number') return direct.toFixed(4)
+
+    const usdToFrom = exchangeRates[`USD_${from}`]
+    const usdToTo = exchangeRates[`USD_${to}`]
+    if (typeof usdToFrom === 'number' && typeof usdToTo === 'number' && usdToFrom > 0) {
+      return (usdToTo / usdToFrom).toFixed(4)
+    }
+
+    const reverse = exchangeRates[`${to}_${from}`]
+    if (typeof reverse === 'number' && reverse > 0) return (1 / reverse).toFixed(4)
+
+    return '—'
   }
 
   const getCryptoPrice = (crypto) => {
