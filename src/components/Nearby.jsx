@@ -364,19 +364,57 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
 
       <h3 className="text-lg font-medium mt-4 mb-3">Saved Directory</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {savedListings.map(item => (
-          <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm flex justify-between items-start">
-            <div>
-              <h4 className="font-semibold">{item.name}</h4>
-              {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
-              <div className="mt-2 text-sm text-slate-600">{item.category}{item.rating ? ` • ★ ${item.rating}` : ''}</div>
+        {savedListings.map(item => {
+          const counts = voteCounts[item.tripadvisor_id] || { thumbsUp: 0, thumbsDown: 0 }
+          const userVote = userVotes[item.tripadvisor_id]
+
+          return (
+            <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1">
+                  <h4 className="font-semibold cursor-pointer hover:text-blue-600" onClick={() => {
+                    setCurrentBusinessId(item.tripadvisor_id)
+                    setActiveTab('business')
+                  }}>
+                    {item.name}
+                  </h4>
+                  {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
+                  <div className="mt-2 text-sm text-slate-600">{item.category}{item.rating ? ` • ★ ${item.rating}` : ''}</div>
+                </div>
+              </div>
+
+              {/* Vote buttons */}
+              <div className="flex items-center gap-2 mb-3">
+                <button
+                  onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'up')}
+                  className={`px-2 py-1 text-sm rounded transition-colors ${
+                    userVote === 'up'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-green-100'
+                  }`}
+                  title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
+                >
+                  👍 {counts.thumbsUp}
+                </button>
+                <button
+                  onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
+                  className={`px-2 py-1 text-sm rounded transition-colors ${
+                    userVote === 'down'
+                      ? 'bg-red-600 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-red-100'
+                  }`}
+                  title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
+                >
+                  👎 {counts.thumbsDown}
+                </button>
+              </div>
+
+              <div className="flex flex-col items-end gap-2">
+                <button onClick={() => deleteListing(item.tripadvisor_id)} className="px-3 py-1 bg-red-600 text-white rounded text-sm w-full">Delete</button>
+              </div>
             </div>
-            <div className="flex flex-col items-end gap-2">
-              <button onClick={() => saveItem(item)} className="px-3 py-1 bg-indigo-600 text-white rounded text-sm">Update</button>
-              <button onClick={() => deleteListing(item.tripadvisor_id)} className="px-3 py-1 bg-red-600 text-white rounded text-sm">Delete</button>
-            </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {savedListings.length === 0 && <p className="text-sm text-slate-500 mt-6">No saved listings yet.</p>}
