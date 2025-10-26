@@ -246,14 +246,17 @@ export default function Rates({ globalCurrency }) {
   }
 
   const next = (type) => {
-    const items = listItems().filter(i => i.type === type)
+    const items = type === 'fiat'
+      ? allCurrencies.filter(c => c.code !== globalCurrency).map(c => ({ code: c.code, name: c.name }))
+      : cryptos.map(c => ({ code: c, name: c }))
+
     if (type === 'fiat') {
-      if (!selectedFiat) return
+      if (!selectedFiat || items.length === 0) return
       const idx = items.findIndex(i => i.code === selectedFiat.code)
       const nextIdx = (idx + 1) % items.length
       setSelectedFiat({ code: items[nextIdx].code, name: items[nextIdx].name })
     } else {
-      if (!selectedCrypto) return
+      if (!selectedCrypto || items.length === 0) return
       const idx = items.findIndex(i => i.code === selectedCrypto.code)
       const nextIdx = (idx + 1) % items.length
       setSelectedCrypto({ code: items[nextIdx].code, name: items[nextIdx].name })
@@ -261,14 +264,17 @@ export default function Rates({ globalCurrency }) {
   }
 
   const prev = (type) => {
-    const items = listItems().filter(i => i.type === type)
+    const items = type === 'fiat'
+      ? allCurrencies.filter(c => c.code !== globalCurrency).map(c => ({ code: c.code, name: c.name }))
+      : cryptos.map(c => ({ code: c, name: c }))
+
     if (type === 'fiat') {
-      if (!selectedFiat) return
+      if (!selectedFiat || items.length === 0) return
       const idx = items.findIndex(i => i.code === selectedFiat.code)
       const prevIdx = (idx - 1 + items.length) % items.length
       setSelectedFiat({ code: items[prevIdx].code, name: items[prevIdx].name })
     } else {
-      if (!selectedCrypto) return
+      if (!selectedCrypto || items.length === 0) return
       const idx = items.findIndex(i => i.code === selectedCrypto.code)
       const prevIdx = (idx - 1 + items.length) % items.length
       setSelectedCrypto({ code: items[prevIdx].code, name: items[prevIdx].name })
