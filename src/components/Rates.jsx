@@ -34,47 +34,40 @@ export default function Rates({ globalCurrency }) {
     loadRates()
     const interval = setInterval(loadRates, 60000)
 
-    // Realtime subscription to Supabase currency_rates table
-    const insertSub = supabase
-      .from('currency_rates')
-      .on('INSERT', payload => {
+    // Realtime subscription to Supabase currency_rates table (v2 realtime)
+    const channel = supabase
+      .channel('public:currency_rates')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'currency_rates' }, payload => {
         setExchangeRates(prev => ({
           ...prev,
           [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
         }))
         setLastUpdated(new Date())
       })
-      .subscribe()
-
-    const updateSub = supabase
-      .from('currency_rates')
-      .on('UPDATE', payload => {
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'currency_rates' }, payload => {
         setExchangeRates(prev => ({
           ...prev,
           [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
         }))
         setLastUpdated(new Date())
       })
-      .subscribe()
-
-    const deleteSub = supabase
-      .from('currency_rates')
-      .on('DELETE', payload => {
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'currency_rates' }, payload => {
         setExchangeRates(prev => {
           const copy = { ...prev }
-          delete copy[`${payload.old.from_currency}_${payload.old.to_currency}`]
+          // payload.old should contain the previous record
+          const key = `${payload.old.from_currency}_${payload.old.to_currency}`
+          delete copy[key]
           return copy
         })
         setLastUpdated(new Date())
       })
-      .subscribe()
+
+    channel.subscribe()
 
     return () => {
       clearInterval(interval)
       try {
-        insertSub.unsubscribe()
-        updateSub.unsubscribe()
-        deleteSub.unsubscribe()
+        supabase.removeChannel(channel)
       } catch (e) {
         // ignore
       }
