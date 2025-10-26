@@ -343,6 +343,40 @@ export default function Rates({ globalCurrency }) {
               {/* Always show fiat on top, crypto below */}
               {renderFiatCard(true)}
               {renderCryptoCard(false)}
+
+              {/* Calculator: convert between selected fiat and selected crypto */}
+              <div className="bg-white rounded-lg p-4 border border-slate-100 w-full mt-4">
+                <h4 className="text-sm font-medium text-slate-700 mb-2">Quick Converter</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs text-slate-500">{selectedFiat ? selectedFiat.code : 'Fiat'} amount</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={fiatInput}
+                      onChange={(e) => onChangeFiat(e.target.value)}
+                      className="w-full mt-1 px-3 py-2 border rounded"
+                      placeholder="0.00"
+                      disabled={!selectedFiat || !selectedCrypto || getRate(globalCurrency, selectedFiat ? selectedFiat.code : '') == null}
+                    />
+                    <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '—'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-slate-500">{selectedCrypto ? selectedCrypto.code : 'Crypto'} amount</label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={cryptoInput}
+                      onChange={(e) => onChangeCrypto(e.target.value)}
+                      className="w-full mt-1 px-3 py-2 border rounded"
+                      placeholder="0.00"
+                      disabled={!selectedFiat || !selectedCrypto || cryptoRates[selectedCrypto ? selectedCrypto.code : ''] == null}
+                    />
+                    <p className="text-xs text-slate-400 mt-1">Convert {selectedCrypto ? selectedCrypto.code : '—'} → {selectedFiat ? selectedFiat.code : '—'}</p>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
