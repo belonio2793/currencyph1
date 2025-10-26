@@ -125,10 +125,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
           <div className="flex items-center gap-6 mb-8 flex-wrap">
             <div className="flex items-center gap-3">
               {/* SVG-based rating, no emojis */}
-              {(() => {
-                const StarRating = require('./StarRating').default
-                return <StarRating value={listing.rating} size="lg" />
-              })()}
+              <StarRating value={listing.rating} size="lg" />
               <div>
                 <span className="font-bold text-xl md:text-2xl text-slate-900">{listing.rating.toFixed(1)}</span>
                 <span className="text-slate-600 ml-2">({listing.reviewCount.toLocaleString()} reviews)</span>
@@ -227,10 +224,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
                     <p className="text-sm text-slate-500">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
                   <div className="flex">
-                    {(() => {
-                      const StarRating = require('./StarRating').default
-                      return <StarRating value={review.rating} size="md" />
-                    })()}
+                    <StarRating value={review.rating} size="md" />
                   </div>
                 </div>
                 <p className="text-slate-700 text-base leading-relaxed">{review.text}</p>
