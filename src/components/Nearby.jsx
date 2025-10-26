@@ -201,6 +201,11 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
     checkAuthStatus()
     loadSavedIds()
     loadSavedListings()
+
+    // Auto-populate Manila listings if not already populated
+    checkAndPopulateManilaListings().catch((err) => {
+      console.warn('Failed to auto-populate Manila listings:', err)
+    })
   }, [])
 
   async function checkAuthStatus() {
