@@ -15,11 +15,11 @@ CREATE TABLE IF NOT EXISTS nearby_listings (
 );
 
 -- Create indexes for performance
-CREATE INDEX idx_nearby_listings_name ON nearby_listings(name);
-CREATE INDEX idx_nearby_listings_address ON nearby_listings USING GIN(to_tsvector('english', address));
-CREATE INDEX idx_nearby_listings_rating ON nearby_listings(rating DESC);
-CREATE INDEX idx_nearby_listings_category ON nearby_listings(category);
-CREATE INDEX idx_nearby_listings_tripadvisor_id ON nearby_listings(tripadvisor_id);
+CREATE INDEX IF NOT EXISTS idx_nearby_listings_name ON nearby_listings(name);
+CREATE INDEX IF NOT EXISTS idx_nearby_listings_address ON nearby_listings USING GIN(to_tsvector('english', address));
+CREATE INDEX IF NOT EXISTS idx_nearby_listings_rating ON nearby_listings(rating DESC);
+CREATE INDEX IF NOT EXISTS idx_nearby_listings_category ON nearby_listings(category);
+CREATE INDEX IF NOT EXISTS idx_nearby_listings_tripadvisor_id ON nearby_listings(tripadvisor_id);
 
 -- Create listing_votes table for voting functionality
 CREATE TABLE IF NOT EXISTS listing_votes (
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS listing_votes (
 );
 
 -- Create index for vote queries
-CREATE INDEX idx_listing_votes_listing ON listing_votes(listing_id);
-CREATE INDEX idx_listing_votes_user ON listing_votes(user_id);
+CREATE INDEX IF NOT EXISTS idx_listing_votes_listing ON listing_votes(listing_id);
+CREATE INDEX IF NOT EXISTS idx_listing_votes_user ON listing_votes(user_id);
 
 -- Create pending_listings table for user submissions
 CREATE TABLE IF NOT EXISTS pending_listings (
