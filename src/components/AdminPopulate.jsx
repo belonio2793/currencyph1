@@ -144,6 +144,23 @@ export default function AdminPopulate() {
             >
               {loading ? 'Populating...' : 'Start Full Population'}
             </button>
+
+            {progress && loading && (
+              <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                <p className="text-sm font-medium text-slate-900 mb-2">
+                  {progress.message}
+                </p>
+                <div className="w-full bg-slate-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(100, (progress.current / progress.total) * 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-600 mt-2">
+                  Progress: {progress.current} / {progress.total}
+                </p>
+              </div>
+            )}
           </div>
         )}
 
