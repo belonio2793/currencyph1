@@ -203,6 +203,10 @@ export default function LandingPage({ userId, userEmail }) {
     return exchangeRates[key]?.toFixed(4) || '0.0000'
   }
 
+  const getCryptoPrice = (crypto) => {
+    return (cryptoRates[crypto] || defaultCryptoPrices[crypto] || 0).toFixed(2)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
