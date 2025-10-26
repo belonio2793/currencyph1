@@ -143,7 +143,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`✓ Successfully added ${amount} ${selectedCurrency} = ⚡${convertedAmt} GOD`)
+      setSuccess(`Successfully added ${amount} ${selectedCurrency} = ${convertedAmt} GOD`)
       setAmount('')
       setConvertedAmount('0.00')
 
@@ -178,7 +178,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedCryptoAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`✓ Successfully added ${cryptoAmount} ${selectedCrypto} = ⚡${convertedAmt} GOD`)
+      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto} = ${convertedAmt} GOD`)
       setCryptoAmount('')
       setConvertedCryptoAmount('0.00')
 
@@ -308,7 +308,7 @@ export default function LandingPage({ userId, userEmail }) {
                   <div className="text-right">
                     <p className="text-slate-600 text-sm mb-1">You get</p>
                     <p className="text-2xl font-light text-blue-600">
-                      ⚡{convertedAmount} GOD
+                      {convertedAmount} GOD
                     </p>
                   </div>
                 </div>
@@ -326,7 +326,7 @@ export default function LandingPage({ userId, userEmail }) {
               disabled={adding || !amount}
               className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {adding ? 'Processing...' : `Add ⚡${convertedAmount} GOD`}
+              {adding ? 'Processing...' : `Add ${convertedAmount} GOD`}
             </button>
           </form>
         </div>
@@ -358,7 +358,7 @@ export default function LandingPage({ userId, userEmail }) {
                   >
                     <div>{crypto}</div>
                     <div className="text-xs font-normal text-slate-500 mt-1">
-                      ⚡{getCryptoPrice(crypto)}
+                      {getCryptoPrice(crypto)}
                     </div>
                   </button>
                 ))}
@@ -394,7 +394,7 @@ export default function LandingPage({ userId, userEmail }) {
                   <div className="text-right">
                     <p className="text-slate-600 text-sm mb-1">You get</p>
                     <p className="text-2xl font-light text-orange-600">
-                      ⚡{convertedCryptoAmount} GOD
+                      {convertedCryptoAmount} GOD
                     </p>
                   </div>
                 </div>
@@ -410,7 +410,7 @@ export default function LandingPage({ userId, userEmail }) {
               disabled={addingCrypto || !cryptoAmount}
               className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {addingCrypto ? 'Processing...' : `Add ⚡${convertedCryptoAmount} GOD`}
+              {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} GOD`}
             </button>
           </form>
         </div>

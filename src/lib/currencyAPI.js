@@ -6,31 +6,31 @@ const FALLBACK_API = 'https://open.er-api.com/v6/latest'
 
 // List of all global currencies to track
 const CURRENCIES = [
-  { code: 'USD', symbol: '$', name: 'US Dollar', flag: '🇺🇸' },
-  { code: 'EUR', symbol: '€', name: 'Euro', flag: '🇪🇺' },
-  { code: 'GBP', symbol: '£', name: 'British Pound', flag: '🇬🇧' },
-  { code: 'JPY', symbol: '¥', name: 'Japanese Yen', flag: '🇯🇵' },
-  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan', flag: '🇨🇳' },
-  { code: 'INR', symbol: '₹', name: 'Indian Rupee', flag: '🇮🇳' },
-  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar', flag: '🇨🇦' },
-  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar', flag: '🇦🇺' },
-  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc', flag: '🇨🇭' },
-  { code: 'SEK', symbol: 'kr', name: 'Swedish Krona', flag: '🇸🇪' },
-  { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar', flag: '🇳🇿' },
-  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar', flag: '🇸🇬' },
-  { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Dollar', flag: '🇭🇰' },
-  { code: 'PHP', symbol: '₱', name: 'Philippine Peso', flag: '🇵🇭' },
-  { code: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah', flag: '🇮🇩' },
-  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit', flag: '🇲🇾' },
-  { code: 'THB', symbol: '฿', name: 'Thai Baht', flag: '🇹🇭' },
-  { code: 'VND', symbol: '₫', name: 'Vietnamese Dong', flag: '🇻🇳' },
-  { code: 'KRW', symbol: '₩', name: 'South Korean Won', flag: '🇰🇷' },
-  { code: 'ZAR', symbol: 'R', name: 'South African Rand', flag: '🇿🇦' },
-  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real', flag: '🇧🇷' },
-  { code: 'MXN', symbol: '$', name: 'Mexican Peso', flag: '🇲🇽' },
-  { code: 'NOK', symbol: 'kr', name: 'Norwegian Krone', flag: '🇳🇴' },
-  { code: 'DKK', symbol: 'kr', name: 'Danish Krone', flag: '🇩🇰' },
-  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham', flag: '🇦🇪' },
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: 'EUR', name: 'Euro' },
+  { code: 'GBP', symbol: 'GBP', name: 'British Pound' },
+  { code: 'JPY', symbol: 'JPY', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: 'CNY', name: 'Chinese Yuan' },
+  { code: 'INR', symbol: 'INR', name: 'Indian Rupee' },
+  { code: 'CAD', symbol: 'CAD', name: 'Canadian Dollar' },
+  { code: 'AUD', symbol: 'AUD', name: 'Australian Dollar' },
+  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' },
+  { code: 'SEK', symbol: 'SEK', name: 'Swedish Krona' },
+  { code: 'NZD', symbol: 'NZD', name: 'New Zealand Dollar' },
+  { code: 'SGD', symbol: 'SGD', name: 'Singapore Dollar' },
+  { code: 'HKD', symbol: 'HKD', name: 'Hong Kong Dollar' },
+  { code: 'PHP', symbol: 'PHP', name: 'Philippine Peso' },
+  { code: 'IDR', symbol: 'IDR', name: 'Indonesian Rupiah' },
+  { code: 'MYR', symbol: 'MYR', name: 'Malaysian Ringgit' },
+  { code: 'THB', symbol: 'THB', name: 'Thai Baht' },
+  { code: 'VND', symbol: 'VND', name: 'Vietnamese Dong' },
+  { code: 'KRW', symbol: 'KRW', name: 'South Korean Won' },
+  { code: 'ZAR', symbol: 'ZAR', name: 'South African Rand' },
+  { code: 'BRL', symbol: 'BRL', name: 'Brazilian Real' },
+  { code: 'MXN', symbol: 'MXN', name: 'Mexican Peso' },
+  { code: 'NOK', symbol: 'NOK', name: 'Norwegian Krone' },
+  { code: 'DKK', symbol: 'DKK', name: 'Danish Krone' },
+  { code: 'AED', symbol: 'AED', name: 'UAE Dirham' },
 ]
 
 // Crypto to USD rates from free APIs
@@ -96,19 +96,19 @@ export const currencyAPI = {
       return {
         BTC: {
           name: 'Bitcoin',
-          symbol: '₿',
+          symbol: 'BTC',
           prices: data.bitcoin,
           lastUpdated: new Date()
         },
         ETH: {
           name: 'Ethereum',
-          symbol: 'Ξ',
+          symbol: 'ETH',
           prices: data.ethereum,
           lastUpdated: new Date()
         },
         DOGE: {
           name: 'Dogecoin',
-          symbol: 'Ð',
+          symbol: 'DOGE',
           prices: data.dogecoin,
           lastUpdated: new Date()
         }
