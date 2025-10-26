@@ -206,22 +206,26 @@ export default function Rates({ globalCurrency }) {
     return null
   }
 
-  // UI state for single-item view + search/list
-  const [viewMode, setViewMode] = useState('fiat') // 'fiat' or 'crypto'
-  const [selected, setSelected] = useState(null)
+  // UI state for stacked fiat + crypto view
+  const [viewMode, setViewMode] = useState('fiat') // controls the right-side list
   const [search, setSearch] = useState('')
+  const [selectedFiat, setSelectedFiat] = useState(null)
+  const [selectedCrypto, setSelectedCrypto] = useState(null)
+  const [primaryTopIs, setPrimaryTopIs] = useState('fiat') // 'fiat' or 'crypto' controls which card is visually primary
 
   useEffect(() => {
-    // set sensible default selected after rates load
-    if (!loading && !selected) {
-      if (viewMode === 'fiat' && allCurrencies && allCurrencies.length) {
-        const first = allCurrencies.find(c => c.code !== globalCurrency) || allCurrencies[0]
-        setSelected({ type: 'fiat', code: first.code, name: first.name })
-      } else if (viewMode === 'crypto') {
-        setSelected({ type: 'crypto', code: cryptos[0], name: cryptos[0] })
+    // sensible defaults after rates load
+    if (!loading) {
+      if (!selectedFiat && allCurrencies && allCurrencies.length) {
+        const php = allCurrencies.find(c => c.code === 'PHP')
+        const first = php || allCurrencies.find(c => c.code !== globalCurrency) || allCurrencies[0]
+        setSelectedFiat({ code: first.code, name: first.name })
+      }
+      if (!selectedCrypto) {
+        setSelectedCrypto({ code: 'BTC', name: 'Bitcoin' })
       }
     }
-  }, [loading, viewMode, allCurrencies, selected, globalCurrency])
+  }, [loading, allCurrencies, selectedFiat, selectedCrypto, globalCurrency])
 
   const listItems = () => {
     if (viewMode === 'fiat') {
@@ -237,66 +241,83 @@ export default function Rates({ globalCurrency }) {
   })
 
   const onSelect = (item) => {
-    setSelected(item)
+    if (item.type === 'fiat') setSelectedFiat({ code: item.code, name: item.name })
+    else setSelectedCrypto({ code: item.code, name: item.name })
   }
 
-  const next = () => {
-    const items = listItems()
-    if (!selected) return
-    const idx = items.findIndex(i => i.code === selected.code && i.type === selected.type)
-    const nextIdx = (idx + 1) % items.length
-    setSelected(items[nextIdx])
-  }
-
-  const prev = () => {
-    const items = listItems()
-    if (!selected) return
-    const idx = items.findIndex(i => i.code === selected.code && i.type === selected.type)
-    const prevIdx = (idx - 1 + items.length) % items.length
-    setSelected(items[prevIdx])
-  }
-
-  const renderSelectedCard = () => {
-    if (!selected) return null
-    if (selected.type === 'fiat') {
-      const rate = getRate(globalCurrency, selected.code)
-      return (
-        <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 w-full">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h3 className="text-2xl font-medium">{selected.code}</h3>
-              <p className="text-xs text-slate-500">{selected.name}</p>
-            </div>
-            <div className="text-right">
-              <div className="text-3xl font-light text-slate-900">{rate != null ? rate.toFixed(4) : '—'}</div>
-              <div className="text-xs text-slate-500">1 {globalCurrency}</div>
-            </div>
-          </div>
-          <div className="flex gap-2 mt-4">
-            <button onClick={prev} className="px-3 py-2 bg-white border rounded">Prev</button>
-            <button onClick={next} className="px-3 py-2 bg-white border rounded">Next</button>
-          </div>
-        </div>
-      )
+  const next = (type) => {
+    const items = listItems().filter(i => i.type === type)
+    if (type === 'fiat') {
+      if (!selectedFiat) return
+      const idx = items.findIndex(i => i.code === selectedFiat.code)
+      const nextIdx = (idx + 1) % items.length
+      setSelectedFiat({ code: items[nextIdx].code, name: items[nextIdx].name })
+    } else {
+      if (!selectedCrypto) return
+      const idx = items.findIndex(i => i.code === selectedCrypto.code)
+      const nextIdx = (idx + 1) % items.length
+      setSelectedCrypto({ code: items[nextIdx].code, name: items[nextIdx].name })
     }
+  }
 
-    // crypto
-    const price = cryptoRates[selected.code] || defaultCryptoPrices[selected.code] * (exchangeRates[`USD_${globalCurrency}`] || 1)
+  const prev = (type) => {
+    const items = listItems().filter(i => i.type === type)
+    if (type === 'fiat') {
+      if (!selectedFiat) return
+      const idx = items.findIndex(i => i.code === selectedFiat.code)
+      const prevIdx = (idx - 1 + items.length) % items.length
+      setSelectedFiat({ code: items[prevIdx].code, name: items[prevIdx].name })
+    } else {
+      if (!selectedCrypto) return
+      const idx = items.findIndex(i => i.code === selectedCrypto.code)
+      const prevIdx = (idx - 1 + items.length) % items.length
+      setSelectedCrypto({ code: items[prevIdx].code, name: items[prevIdx].name })
+    }
+  }
+
+  const swapPositions = () => setPrimaryTopIs(prev => (prev === 'fiat' ? 'crypto' : 'fiat'))
+
+  const renderFiatCard = (isPrimary) => {
+    if (!selectedFiat) return null
+    const rate = getRate(globalCurrency, selectedFiat.code)
     return (
-      <div className="bg-orange-50 rounded-lg p-8 border border-orange-200 w-full">
-        <div className="flex items-center justify-between mb-3">
+      <div onClick={() => setPrimaryTopIs('fiat')} className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'} cursor-pointer`}>
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-2xl font-medium">{selected.code}</h3>
-            <p className="text-xs text-slate-500">{selected.name}</p>
+            <h3 className="text-xl font-medium">{selectedFiat.code}</h3>
+            <p className="text-xs text-slate-500">{selectedFiat.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
-            <div className="text-xs text-slate-500">{globalCurrency} per {selected.code}</div>
+            <div className="text-2xl font-light text-slate-900">{rate != null ? rate.toFixed(4) : '—'}</div>
+            <div className="text-xs text-slate-500">1 {globalCurrency}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <button onClick={prev} className="px-3 py-2 bg-white border rounded">Prev</button>
-          <button onClick={next} className="px-3 py-2 bg-white border rounded">Next</button>
+          <button onClick={() => prev('fiat')} className="px-3 py-2 bg-white border rounded">Prev</button>
+          <button onClick={() => next('fiat')} className="px-3 py-2 bg-white border rounded">Next</button>
+        </div>
+      </div>
+    )
+  }
+
+  const renderCryptoCard = (isPrimary) => {
+    if (!selectedCrypto) return null
+    const price = cryptoRates[selectedCrypto.code] || defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1)
+    return (
+      <div onClick={() => setPrimaryTopIs('crypto')} className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'} cursor-pointer`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-xl font-medium">{selectedCrypto.code}</h3>
+            <p className="text-xs text-slate-500">{selectedCrypto.name}</p>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
+            <div className="text-xs text-slate-500">{globalCurrency} per {selectedCrypto.code}</div>
+          </div>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button onClick={() => prev('crypto')} className="px-3 py-2 bg-white border rounded">Prev</button>
+          <button onClick={() => next('crypto')} className="px-3 py-2 bg-white border rounded">Next</button>
         </div>
       </div>
     )
