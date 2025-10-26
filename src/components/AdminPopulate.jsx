@@ -111,17 +111,17 @@ export default function AdminPopulate() {
         {activeTab === 'full' && (
           <div>
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-900 font-semibold mb-2">Before starting:</p>
-              <ol className="text-sm text-blue-900 space-y-2 list-decimal list-inside">
-                <li>Go to your Supabase project: <a href="https://app.supabase.com" className="underline text-blue-600 hover:text-blue-700" target="_blank" rel="noopener noreferrer">supabase.com</a></li>
-                <li>Go to "SQL Editor" and run the migration: <span className="bg-white px-2 py-1 rounded font-mono text-xs">supabase/migrations/create_nearby_listings.sql</span></li>
-                <li>This creates the necessary tables for listings and votes</li>
-                <li>Come back here and click "Start Population"</li>
-              </ol>
+              <p className="text-sm text-blue-900 font-semibold mb-2">✓ Full Philippines Listing Population</p>
+              <ul className="text-sm text-blue-900 space-y-1 list-disc list-inside">
+                <li>Populates listings from all major Philippine cities</li>
+                <li>Includes attractions, parks, museums, and historical sites</li>
+                <li>Automatic ratings and review counts included</li>
+                <li>Direct database insertion with no external API calls</li>
+              </ul>
             </div>
 
             <p className="text-sm text-slate-600 mb-6">
-              This will fetch listings from TripAdvisor API for all 100+ Philippine cities and save them to the database. This may take a few minutes.
+              This will populate listings for all major Philippine cities and save them to the database. This may take a few seconds depending on database performance.
             </p>
 
             <button
