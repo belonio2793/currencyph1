@@ -1,7 +1,7 @@
+@import './styles/listing-theme.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './styles/listing-theme.css';
 
 * {
   margin: 0;
