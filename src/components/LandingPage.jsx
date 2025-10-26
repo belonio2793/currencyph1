@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
 import { currencyAPI } from '../lib/currencyAPI'
+import { supabase } from '../lib/supabaseClient'
 import Rates from './Rates'
 
 // Searchable Select Component
