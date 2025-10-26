@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { getImagesForListing, getDefaultImagesForCity } from './fetchTripadvisorImages'
 
 const PHILIPPINES_CITIES = [
   'Manila', 'Cebu', 'Davao', 'Baguio', 'Iloilo', 'Bacolod', 'Cagayan de Oro',
