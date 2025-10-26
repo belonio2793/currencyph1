@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { checkAndPopulateManilaListings } from '../lib/populateManillaListings'
+import StarRating from './StarRating'
 import FeaturedListings from './FeaturedListings'
 
 const TOP_10_CITIES = [
@@ -536,7 +537,12 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                         <h4 className="text-lg font-medium text-slate-900">{item.name}</h4>
                         {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
                         <div className="mt-2 flex items-center gap-3">
-                          {item.rating && <span className="text-sm text-yellow-500">★ {item.rating}</span>}
+                          {item.rating && (
+                            <span className="flex items-center gap-2 text-sm text-slate-700">
+                              <StarRating value={Number(item.rating)} size="sm" />
+                              <span>{Number(item.rating).toFixed(1)}</span>
+                            </span>
+                          )}
                           {item.category && <span className="text-sm text-slate-600">{item.category}</span>}
                         </div>
 
@@ -550,8 +556,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                                 : 'bg-slate-100 text-slate-600 hover:bg-green-100'
                             }`}
                             title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
-                          >
-                            👍 {counts.thumbsUp}
+>
+                            Upvote {counts.thumbsUp}
                           </button>
                           <button
                             onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
@@ -561,8 +567,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                                 : 'bg-slate-100 text-slate-600 hover:bg-red-100'
                             }`}
                             title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
-                          >
-                            👎 {counts.thumbsDown}
+>
+                            Downvote {counts.thumbsDown}
                           </button>
                         </div>
                       </div>
@@ -641,7 +647,15 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                     {item.name}
                   </h4>
                   {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
-                  <div className="mt-2 text-sm text-slate-600">{item.category}{item.rating ? ` • ★ ${item.rating}` : ''}</div>
+                  <div className="mt-2 text-sm text-slate-600">
+                    {item.category}
+                    {item.rating ? (
+                      <span className="inline-flex items-center gap-1 ml-2 align-middle">
+                        <StarRating value={Number(item.rating)} size="sm" />
+                        <span>{Number(item.rating).toFixed(1)}</span>
+                      </span>
+                    ) : ''}
+                  </div>
                 </div>
               </div>
 
@@ -655,8 +669,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                       : 'bg-slate-100 text-slate-600 hover:bg-green-100'
                   }`}
                   title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
-                >
-                  👍 {counts.thumbsUp}
+>
+                  Upvote {counts.thumbsUp}
                 </button>
                 <button
                   onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
@@ -666,8 +680,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                       : 'bg-slate-100 text-slate-600 hover:bg-red-100'
                   }`}
                   title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
-                >
-                  👎 {counts.thumbsDown}
+>
+                  Downvote {counts.thumbsDown}
                 </button>
               </div>
 
