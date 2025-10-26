@@ -156,6 +156,15 @@ export default function App() {
                     </select>
                   </div>
                   <button
+                    onClick={() => {
+                      setShowAuth(true)
+                      window.history.replaceState(null, '', '/login')
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Login
+                  </button>
+                  <button
                     onClick={() => setActiveTab('dashboard')}
                     className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
