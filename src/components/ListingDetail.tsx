@@ -104,7 +104,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
             <h2 className="section-title">Photo Gallery</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {listing.images.map((imageUrl, idx) => (
-                <div key={idx} className="gallery-tile aspect-[4/3] group">
+                <div key={idx} className="gallery-tile aspect-square sm:aspect-[4/3] group">
                   <img
                     src={imageUrl}
                     alt={`${listing.name} - Photo ${idx + 1}`}
