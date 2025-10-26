@@ -331,8 +331,29 @@ export default function Rates({ globalCurrency }) {
       </div>
 
       <div className="flex gap-6">
-        {/* Left: selected card */}
-        <div className="flex-1">{loading ? <div className="text-slate-500">Loading...</div> : renderSelectedCard()}</div>
+        {/* Left: stacked selected cards */}
+        <div className="flex-1">
+          {loading ? (
+            <div className="text-slate-500">Loading...</div>
+          ) : (
+            <div className="space-y-4">
+              {primaryTopIs === 'fiat' ? (
+                <>
+                  {renderFiatCard(true)}
+                  {renderCryptoCard(false)}
+                </>
+              ) : (
+                <>
+                  {renderCryptoCard(true)}
+                  {renderFiatCard(false)}
+                </>
+              )}
+              <div className="mt-2 flex items-center gap-2">
+                <button onClick={swapPositions} className="px-3 py-2 border rounded bg-white">Swap</button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Right: Dropdown search list */}
         <div style={{ width: 320 }} className="border border-slate-100 rounded-lg p-3">
