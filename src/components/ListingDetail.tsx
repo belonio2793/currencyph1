@@ -73,8 +73,8 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Navigation */}
-      <div className="sticky top-0 z-10 bg-white border-b border-slate-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div className="sticky top-0 z-10 bg-white/95 backdrop-blur border-b border-slate-100">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <button
             onClick={onBack}
             className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
@@ -93,15 +93,15 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10 theme-container">
         {/* Photo Gallery Section */}
         {listing.images && listing.images.length > 0 && (
-          <section className="mb-14">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Photo Gallery</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <section className="section">
+            <h2 className="section-title">Photo Gallery</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {listing.images.map((imageUrl, idx) => (
-                <div key={idx} className="relative overflow-hidden rounded-lg bg-slate-200 aspect-square group">
+                <div key={idx} className="gallery-tile aspect-[4/3] group">
                   <img
                     src={imageUrl}
                     alt={`${listing.name} - Photo ${idx + 1}`}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="gallery-img group-hover:scale-[1.03] transition-transform duration-300"
                     loading="lazy"
                   />
                 </div>
@@ -113,9 +113,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         {/* Header Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-200">
-              {listing.category}
-            </span>
+            <span className="pill pill-blue">{listing.category}</span>
             <span className="text-sm text-slate-500">Manila, Philippines</span>
           </div>
 
@@ -133,7 +131,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
             </div>
           </div>
 
-          <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-8 max-w-3xl">
+          <p className="lead mb-8 max-w-3xl">
             {listing.description}
           </p>
 
@@ -182,8 +180,8 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         </div>
 
         {/* Highlights Section */}
-        <section className="mb-14">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Highlights</h2>
+        <section className="section">
+          <h2 className="section-title">Highlights</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {listing.highlights.map((highlight, idx) => (
               <div
@@ -198,8 +196,8 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         </section>
 
         {/* Best For Section */}
-        <section className="mb-14">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Best For</h2>
+        <section className="section">
+          <h2 className="section-title">Best For</h2>
           <div className="flex flex-wrap gap-3">
             {listing.bestFor.map((tag, idx) => (
               <span
@@ -213,8 +211,8 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         </section>
 
         {/* Reviews Section */}
-        <section className="mb-14">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Visitor Reviews</h2>
+        <section className="section">
+          <h2 className="section-title">Visitor Reviews</h2>
           <div className="space-y-5">
             {listing.reviews.map((review, idx) => (
               <div key={idx} className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow">
@@ -235,8 +233,8 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
         {/* Related Listings Section */}
         {relatedListings.length > 0 && (
-          <section className="mb-14">
-            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">More to Explore in Manila</h2>
+          <section className="section">
+            <h2 className="section-title">More to Explore in Manila</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedListings.map((related) => (
                 <ListingCard
