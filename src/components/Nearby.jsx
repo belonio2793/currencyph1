@@ -306,88 +306,165 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
         </form>
       )}
 
-      <form onSubmit={handleSearch} className="flex gap-2 mb-6">
-        <input
-          className="flex-1 px-4 py-2 border rounded-lg"
-          placeholder="Search TripAdvisor (e.g. Manila hotels, Boracay restaurants)"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button className="px-4 py-2 bg-blue-600 text-white rounded-lg" type="submit" disabled={loading}>
-          {loading ? 'Searching...' : 'Search'}
-        </button>
-      </form>
+      <div className="mb-8">
+        <h3 className="text-lg font-semibold text-slate-900 mb-4">Filter by City</h3>
+
+        {/* Alphabetical filter */}
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <button
+            onClick={() => setAlphabetFilter('All')}
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              alphabetFilter === 'All'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            All
+          </button>
+          {['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'].map(letter => (
+            <button
+              key={letter}
+              onClick={() => setAlphabetFilter(letter)}
+              className={`px-2 py-1 rounded text-sm transition-colors ${
+                alphabetFilter === letter
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              {letter}
+            </button>
+          ))}
+        </div>
+
+        {/* Popular cities grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          {getFilteredCities().map(city => (
+            <button
+              key={city}
+              onClick={() => {
+                setSelectedCity(city)
+                setCityPage(1)
+                loadCityListings(city, 1)
+              }}
+              className={`p-4 rounded-lg font-medium text-center transition-all ${
+                selectedCity === city
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-white border border-slate-200 text-slate-900 hover:border-blue-300 hover:shadow'
+              }`}
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600">{error}</div>}
 
-      {results.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          {results.map(item => {
-            const id = item.tripadvisor_id || item.id
-            const counts = voteCounts[id] || { thumbsUp: 0, thumbsDown: 0 }
-            const userVote = userVotes[id]
+      {selectedCity && (
+        <div>
+          <div className="mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-slate-900">Listings in {selectedCity}</h3>
+            {loading && <span className="text-sm text-slate-500">Loading...</span>}
+          </div>
 
-            return (
-              <div key={id} className="bg-white border rounded-lg p-4 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-medium text-slate-900">{item.name}</h3>
-                    {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
-                    <div className="mt-2 flex items-center gap-3">
-                      {item.rating && <span className="text-sm text-yellow-500">★ {item.rating}</span>}
-                      {item.category && <span className="text-sm text-slate-600">{item.category}</span>}
-                    </div>
+          {cityListings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+              {cityListings.map(item => {
+                const counts = voteCounts[item.tripadvisor_id] || { thumbsUp: 0, thumbsDown: 0 }
+                const userVote = userVotes[item.tripadvisor_id]
 
-                    {/* Vote buttons */}
-                    <div className="mt-3 flex items-center gap-2">
-                      <button
-                        onClick={() => handleVote(id, 'search', 'up')}
-                        className={`px-2 py-1 text-sm rounded transition-colors ${
-                          userVote === 'up'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-slate-100 text-slate-600 hover:bg-green-100'
-                        }`}
-                        title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
-                      >
-                        👍 {counts.thumbsUp}
-                      </button>
-                      <button
-                        onClick={() => handleVote(id, 'search', 'down')}
-                        className={`px-2 py-1 text-sm rounded transition-colors ${
-                          userVote === 'down'
-                            ? 'bg-red-600 text-white'
-                            : 'bg-slate-100 text-slate-600 hover:bg-red-100'
-                        }`}
-                        title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
-                      >
-                        👎 {counts.thumbsDown}
-                      </button>
+                return (
+                  <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-1">
+                        <h4 className="text-lg font-medium text-slate-900">{item.name}</h4>
+                        {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
+                        <div className="mt-2 flex items-center gap-3">
+                          {item.rating && <span className="text-sm text-yellow-500">★ {item.rating}</span>}
+                          {item.category && <span className="text-sm text-slate-600">{item.category}</span>}
+                        </div>
+
+                        {/* Vote buttons */}
+                        <div className="mt-3 flex items-center gap-2">
+                          <button
+                            onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'up')}
+                            className={`px-2 py-1 text-sm rounded transition-colors ${
+                              userVote === 'up'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-green-100'
+                            }`}
+                            title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
+                          >
+                            👍 {counts.thumbsUp}
+                          </button>
+                          <button
+                            onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
+                            className={`px-2 py-1 text-sm rounded transition-colors ${
+                              userVote === 'down'
+                                ? 'bg-red-600 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-red-100'
+                            }`}
+                            title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
+                          >
+                            👎 {counts.thumbsDown}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex flex-col gap-2">
+                          <button
+                            onClick={() => saveItem(item)}
+                            className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
+                            disabled={savedIds.has(item.tripadvisor_id?.toString())}
+                          >
+                            {savedIds.has(item.tripadvisor_id?.toString()) ? 'Saved' : 'Save'}
+                          </button>
+                          <button
+                            onClick={() => {
+                              setCurrentBusinessId(item.tripadvisor_id?.toString())
+                              setActiveTab('business')
+                            }}
+                            className="px-3 py-1 bg-slate-100 text-slate-700 rounded-md text-sm"
+                          >
+                            View
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => saveItem(item)}
-                        className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
-                        disabled={savedIds.has(id?.toString())}
-                      >
-                        {savedIds.has(id?.toString()) ? 'Saved' : 'Save'}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCurrentBusinessId(id?.toString())
-                          setActiveTab('business')
-                        }}
-                        className="px-3 py-1 bg-slate-100 text-slate-700 rounded-md text-sm"
-                      >
-                        View
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+                )
+              })}
+            </div>
+          ) : loading ? (
+            <div className="text-center py-8 text-slate-500">Loading listings...</div>
+          ) : (
+            <div className="text-center py-8 text-slate-500">No listings found for {selectedCity}</div>
+          )}
+
+          {/* Pagination */}
+          <div className="flex gap-2 justify-center mt-6">
+            <button
+              onClick={() => {
+                setCityPage(p => Math.max(1, p - 1))
+                loadCityListings(selectedCity, Math.max(1, cityPage - 1))
+              }}
+              disabled={cityPage === 1}
+              className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span className="px-4 py-2 text-slate-700">Page {cityPage}</span>
+            <button
+              onClick={() => {
+                setCityPage(p => p + 1)
+                loadCityListings(selectedCity, cityPage + 1)
+              }}
+              disabled={cityListings.length < 12}
+              className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 
