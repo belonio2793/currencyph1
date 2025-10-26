@@ -156,6 +156,17 @@ export default function Rates({ globalCurrency }) {
         500
       )
 
+      if (!data) {
+        console.warn('Coingecko fetch failed, using defaults scaled by global rate')
+        const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+        const defaults = {}
+        Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
+          defaults[key] = Math.round(value * globalExchangeRate * 100) / 100
+        })
+        setCryptoRates(defaults)
+        return
+      }
+
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
 
       const cryptoPricesInGlobalCurrency = {
@@ -382,7 +393,7 @@ export default function Rates({ globalCurrency }) {
             <p className="text-xs text-slate-500">{selectedCrypto.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '���'}</div>
+            <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
             <div className="text-xs text-slate-500">{globalCurrency} per {selectedCrypto.code}</div>
           </div>
         </div>
