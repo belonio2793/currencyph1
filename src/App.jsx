@@ -81,9 +81,6 @@ export default function App() {
     )
   }
 
-  if (showAuth) {
-    return <Auth onAuthSuccess={handleAuthSuccess} />
-  }
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -117,9 +114,9 @@ export default function App() {
 
       {/* Main Content */}
       <main>
-        {activeTab === 'home' && (
+        {(activeTab === 'home' || showAuth) && (
           <>
-            {/* Home Page Navbar */}
+            {/* Home Page Navbar (also shown during auth for a persistent header) */}
             <nav className="bg-white border-b border-slate-100">
               <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 <h1 className="text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
@@ -176,15 +173,21 @@ export default function App() {
                 </div>
               </div>
             </nav>
-            <LandingPage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />
+            {!showAuth && <LandingPage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />}
           </>
         )}
-        {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
-        {activeTab === 'wallet' && <Wallet userId={userId} />}
-        {activeTab === 'send' && <SendMoney userId={userId} />}
-        {activeTab === 'bills' && <BillPayments userId={userId} />}
-        {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
-        {activeTab === 'profile' && <Profile userId={userId} />}
+        {showAuth ? (
+          <Auth onAuthSuccess={handleAuthSuccess} />
+        ) : (
+          <>
+            {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
+            {activeTab === 'wallet' && <Wallet userId={userId} />}
+            {activeTab === 'send' && <SendMoney userId={userId} />}
+            {activeTab === 'bills' && <BillPayments userId={userId} />}
+            {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
+            {activeTab === 'profile' && <Profile userId={userId} />}
+          </>
+        )}
       </main>
 
       {/* Footer - Only on non-home pages */}
