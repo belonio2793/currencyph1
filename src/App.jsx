@@ -37,10 +37,19 @@ export default function App() {
 
   const handleRouting = () => {
     const path = window.location.pathname
+    const hash = window.location.hash
+
     if (path === '/login' || path === '/register') {
       setShowAuth(true)
     } else {
       setShowAuth(false)
+    }
+
+    // Handle listing detail routes
+    if (hash.startsWith('#/listing/')) {
+      const slug = hash.replace('#/listing/', '')
+      setCurrentListingSlug(slug)
+      setActiveTab('listing')
     }
   }
 
