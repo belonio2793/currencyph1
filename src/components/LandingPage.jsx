@@ -410,7 +410,7 @@ export default function LandingPage({ userId, userEmail }) {
               disabled={addingCrypto || !cryptoAmount}
               className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} USD`}
+              {addingCrypto ? 'Processing...' : `Add ⚡${convertedCryptoAmount} GOD`}
             </button>
           </form>
         </div>
