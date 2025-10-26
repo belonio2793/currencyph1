@@ -326,7 +326,7 @@ export default function LandingPage({ userId, userEmail }) {
               disabled={adding || !amount}
               className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {adding ? 'Processing...' : `Add ${convertedAmount} GOD`}
+              {adding ? 'Processing...' : `Add ${convertedAmount} PHP`}
             </button>
           </form>
         </div>
