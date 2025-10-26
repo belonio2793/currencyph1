@@ -34,16 +34,12 @@ export default function AdminPopulate() {
     setResult(null)
 
     try {
-      const { data, error: fnError } = await supabase.functions.invoke('populate-tripadvisor', {
-        method: 'POST'
-      })
-
-      if (fnError) {
-        setError(`Function error: ${fnError.message}`)
-        return
+      const result = await populateTripadvisorListings()
+      if (result.success) {
+        setResult(result)
+      } else {
+        setError(result.message)
       }
-
-      setResult(data)
     } catch (err) {
       setError(`Error: ${err.message}`)
     } finally {
