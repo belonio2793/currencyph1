@@ -29,8 +29,6 @@ export default function AdminPopulate() {
     }
   }
 
-  const [progress, setProgress] = useState(null)
-
   async function handlePopulate() {
     setLoading(true)
     setError('')
