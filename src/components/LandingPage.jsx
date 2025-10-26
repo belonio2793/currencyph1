@@ -90,6 +90,14 @@ export default function LandingPage({ userId, userEmail }) {
     }
   }, [amount, selectedCurrency, exchangeRates])
 
+  useEffect(() => {
+    if (cryptoAmount && selectedCrypto) {
+      calculateCryptoConversion()
+    } else {
+      setConvertedCryptoAmount('0.00')
+    }
+  }, [cryptoAmount, selectedCrypto, cryptoRates])
+
   const calculateConversion = () => {
     const numAmount = parseFloat(amount) || 0
     if (numAmount <= 0) {
