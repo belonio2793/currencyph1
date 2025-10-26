@@ -350,7 +350,9 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9731,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Fort_Santiago_Park%2C_Manila.jpg/1280px-Fort_Santiago_Park%2C_Manila.jpg",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1"
     ],
     description: "Fort Santiago is a historic Spanish colonial fortress located within Intramuros, Manila. Built in 1571, it's one of the most significant historical sites in the Philippines and the birthplace of national hero Dr. Jose Rizal. The fort features beautifully preserved structures and museums.",
     highlights: [
