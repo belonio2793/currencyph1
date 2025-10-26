@@ -96,6 +96,35 @@ export default function Business({ businessId, onBack, userId }) {
         <div className="bg-white border rounded-lg p-6">
           {data.address && <p className="mb-3 text-sm text-slate-600">{data.address}</p>}
 
+          {/* Vote Section */}
+          <div className="mb-6 pb-6 border-b">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium text-slate-700">Community Rating:</span>
+              <button
+                onClick={() => handleVote('up')}
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  userVote === 'up'
+                    ? 'bg-green-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-green-100'
+                }`}
+                title={userId ? 'Like this business' : 'Log in to vote'}
+              >
+                👍 {voteCounts.thumbsUp}
+              </button>
+              <button
+                onClick={() => handleVote('down')}
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  userVote === 'down'
+                    ? 'bg-red-600 text-white'
+                    : 'bg-slate-100 text-slate-600 hover:bg-red-100'
+                }`}
+                title={userId ? 'Dislike this business' : 'Log in to vote'}
+              >
+                👎 {voteCounts.thumbsDown}
+              </button>
+            </div>
+          </div>
+
           {data.latitude && data.longitude && (
             <div className="mb-4">
               <iframe
