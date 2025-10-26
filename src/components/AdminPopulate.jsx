@@ -1,10 +1,31 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { populateManilaListings } from '../lib/populateManillaListings'
 
 export default function AdminPopulate() {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
+  const [activeTab, setActiveTab] = useState('manila')
+
+  async function handlePopulateManila() {
+    setLoading(true)
+    setError('')
+    setResult(null)
+
+    try {
+      const result = await populateManilaListings()
+      if (result.success) {
+        setResult(result)
+      } else {
+        setError(result.message)
+      }
+    } catch (err) {
+      setError(`Error: ${err.message}`)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   async function handlePopulate() {
     setLoading(true)
