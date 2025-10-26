@@ -10,6 +10,7 @@ import BillPayments from './components/BillPayments'
 import TransactionHistoryNew from './components/TransactionHistoryNew'
 import Profile from './components/Profile'
 import Auth from './components/Auth'
+import Nearby from './components/Nearby'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
@@ -196,6 +197,7 @@ export default function App() {
             {activeTab === 'bills' && <BillPayments userId={userId} />}
             {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
             {activeTab === 'profile' && <Profile userId={userId} />}
+            {activeTab === 'nearby' && <Nearby userId={userId} /> }
           </>
         )}
       </main>

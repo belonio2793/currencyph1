@@ -5,6 +5,7 @@ export default function Navbar({ activeTab, onTabChange }) {
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard' },
+    { id: 'nearby', label: 'Nearby' },
     { id: 'wallet', label: 'Wallets' },
     { id: 'send', label: 'Send' },
     { id: 'bills', label: 'Bills' },
