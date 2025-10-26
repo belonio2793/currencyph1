@@ -313,54 +313,6 @@ export const MANILA_LISTINGS: Listing[] = [
     ]
   },
   {
-    id: "luneta-park",
-    name: "Rizal Park (Luneta Park)",
-    slug: "rizal-park-luneta",
-    rating: 4.3,
-    reviewCount: 2234,
-    category: "Park",
-    address: "Roxas Boulevard, Manila, Philippines",
-    latitude: 14.5893,
-    longitude: 120.9888,
-    image: "https://media.tacdn.com/media/attractions-splice-spp-360x240/02/52/c3/ab.jpg",
-    description: "Rizal Park, also known as Luneta Park, is the largest urban park in the Philippines. This sprawling green space honors national hero Dr. Jose Rizal and features gardens, museums, monuments, and recreational facilities for the whole family.",
-    highlights: [
-      "Iconic Rizal Monument",
-      "Japanese Garden",
-      "Chinese Garden",
-      "Planetarium and Science Museum",
-      "Open-air concerts venue",
-      "Beautiful landscaped gardens",
-      "Children's playground"
-    ],
-    bestFor: [
-      "Families",
-      "Nature lovers",
-      "History buffs",
-      "Jogging and exercise",
-      "Picnics",
-      "Photography",
-      "Relaxation"
-    ],
-    hours: "Open 24/7",
-    admission: "Free (museum entries vary)",
-    phone: "+63 2 555 2873",
-    reviews: [
-      {
-        author: "Luis P.",
-        rating: 5,
-        text: "A beautiful urban park with so much to see and do. Perfect for families and a great way to spend a day in Manila.",
-        date: "2024-01-19"
-      },
-      {
-        author: "Isabella R.",
-        rating: 4,
-        text: "Great place for morning walks and to learn about Filipino history. Very accessible and well-maintained.",
-        date: "2024-01-12"
-      }
-    ]
-  },
-  {
     id: "fort-santiago",
     name: "Fort Santiago",
     slug: "fort-santiago-manila",
