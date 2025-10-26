@@ -17,9 +17,40 @@
     @apply bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow;
   }
   .theme-card-title {
-    @apply text-xs md:text-sm font-semibold text-slate-900 mb-2 uppercase tracking-wide;
+    @apply text-xs md:text-sm font-bold text-slate-900 mb-2 uppercase tracking-wide;
   }
   .theme-card-text {
     @apply text-sm text-slate-700;
+  }
+
+  .reviews-slider-container {
+    @apply w-full overflow-hidden;
+  }
+
+  .reviews-slider {
+    @apply flex gap-4 overflow-x-auto pb-4 scroll-smooth;
+    scroll-behavior: smooth;
+  }
+
+  .reviews-slider::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .reviews-slider::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  .reviews-slider::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  .reviews-slider::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  .review-card {
+    @apply flex-shrink-0 w-80 bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow;
   }
 }
