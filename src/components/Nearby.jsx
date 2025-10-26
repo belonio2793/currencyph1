@@ -51,8 +51,30 @@ export default function Nearby({ userId }) {
       const lng = null
       const res = await searchPlaces(query + ' Philippines', lat, lng, 25)
       if (!res) {
-        setError('TripAdvisor API key not configured or API call failed.')
-        setResults([])
+        // TripAdvisor request failed (likely CORS or network). Fallback to local DB search.
+        const { data, error } = await supabase
+          .from('nearby_listings')
+          .select('*')
+          .or(`name.ilike.%${query}%,address.ilike.%${query}%`)
+          .limit(50)
+        if (error) {
+          console.warn('Local DB fallback failed', error)
+          setError('Search failed. Check console for details.')
+          setResults([])
+          return
+        }
+        setError('Using local directory fallback (TripAdvisor unavailable)')
+        setResults((data || []).map(d => ({
+          id: d.tripadvisor_id,
+          tripadvisor_id: d.tripadvisor_id,
+          name: d.name,
+          address: d.address,
+          latitude: d.latitude,
+          longitude: d.longitude,
+          rating: d.rating,
+          category: d.category,
+          raw: d.raw
+        })))
         return
       }
       setResults(res)
