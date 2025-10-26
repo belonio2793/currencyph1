@@ -39,45 +39,50 @@ const CRYPTO_API = 'https://api.coingecko.com/api/v3'
 export const currencyAPI = {
   // Get all currency rates relative to USD
   async getGlobalRates() {
-    try {
-      // Try primary API
-      const response = await fetch(`${FIXER_API}/USD`)
-      
-      if (!response.ok) {
-        throw new Error('Primary API failed, trying fallback')
-      }
+    // Try multiple public endpoints to maximize chance of full coverage
+    const endpoints = [
+      'https://api.exchangerate.host/latest?base=USD', // broad coverage, no key
+      `${FIXER_API}/USD`, // exchangerate-api.com
+      `${FALLBACK_API}/USD` // open.er-api.com
+    ]
 
-      const data = await response.json()
-      
-      if (!data.rates) {
-        throw new Error('No rates in response')
-      }
+    let data = null
+    let lastErr = null
 
-      // Build rates object with formatted data
-      const rates = {}
-      
-      CURRENCIES.forEach(currency => {
-        if (currency.code === 'USD') {
-          rates[currency.code] = {
-            ...currency,
-            rate: 1,
-            lastUpdated: new Date()
-          }
-        } else {
-          rates[currency.code] = {
-            ...currency,
-            rate: data.rates[currency.code] || 0,
-            lastUpdated: new Date()
-          }
+    for (const url of endpoints) {
+      try {
+        const resp = await fetch(url)
+        if (!resp.ok) throw new Error(`HTTP ${resp.status} from ${url}`)
+        const json = await resp.json()
+        // Normalise responses which provide rates under different keys
+        if (json && (json.rates || json.conversion_rates)) {
+          data = { rates: json.rates || json.conversion_rates }
+          break
         }
-      })
+      } catch (err) {
+        lastErr = err
+        // try next
+      }
+    }
 
-      return rates
-    } catch (error) {
-      console.warn('Error fetching rates:', error)
-      // Return fallback cached rates
+    if (!data || !data.rates) {
+      console.warn('All currency endpoints failed, falling back to cached rates', lastErr)
       return this.getFallbackRates()
     }
+
+    const rates = {}
+    const now = new Date()
+
+    CURRENCIES.forEach(currency => {
+      if (currency.code === 'USD') {
+        rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
+        return
+      }
+      const rateVal = data.rates[currency.code]
+      rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
+    })
+
+    return rates
   },
 
   // Get Bitcoin and Ethereum prices in USD and other currencies
