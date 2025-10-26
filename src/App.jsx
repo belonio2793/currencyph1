@@ -192,6 +192,16 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => {
+                      setActiveTab('admin-populate')
+                      setShowAuth(false)
+                      window.history.replaceState(null, '', '/admin')
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Admin
+                  </button>
+                  <button
+                    onClick={() => {
                       setShowAuth(true)
                       window.history.replaceState(null, '', '/login')
                     }}
