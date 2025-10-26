@@ -240,21 +240,23 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         {/* Reviews Section */}
         <section className="section border-t border-slate-100 pt-8">
           <h2 className="section-title">Visitor Reviews</h2>
-          <div className="space-y-5">
-            {listing.reviews.map((review, idx) => (
-              <div key={idx} className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
-                  <div>
-                    <h4 className="font-bold text-slate-900 text-lg">{review.author}</h4>
-                    <p className="text-sm text-slate-500">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <div className="reviews-slider-container">
+            <div className="reviews-slider">
+              {listing.reviews.map((review, idx) => (
+                <div key={idx} className="review-card">
+                  <div className="flex items-start justify-between mb-4 flex-col gap-2">
+                    <div className="w-full">
+                      <h4 className="font-bold text-slate-900">{review.author}</h4>
+                      <p className="text-xs text-slate-500">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</p>
+                    </div>
+                    <div className="flex">
+                      <StarRating value={review.rating} size="md" />
+                    </div>
                   </div>
-                  <div className="flex">
-                    <StarRating value={review.rating} size="md" />
-                  </div>
+                  <p className="text-slate-700 text-sm leading-relaxed">{review.text}</p>
                 </div>
-                <p className="text-slate-700 text-base leading-relaxed">{review.text}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
