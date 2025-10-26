@@ -27,6 +27,12 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
             alt={listing.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement
+              if ((img as any).dataset.fallbackApplied) return
+              ;(img as any).dataset.fallbackApplied = '1'
+              img.src = 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop'
+            }}
           />
         </div>
         <div className="p-3">
@@ -55,6 +61,12 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
           alt={listing.name}
           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
+          onError={(e) => {
+            const img = e.currentTarget as HTMLImageElement
+            if ((img as any).dataset.fallbackApplied) return
+            ;(img as any).dataset.fallbackApplied = '1'
+            img.src = 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop'
+          }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
         <span className="absolute top-3 right-3 inline-block px-2 py-1 bg-white/90 text-slate-900 rounded text-xs font-semibold">
