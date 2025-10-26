@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { populateManilaListings } from '../lib/populateManillaListings'
+import { populateTripadvisorListings } from '../lib/populateTripadvisorListings'
 
 export default function AdminPopulate() {
   const [loading, setLoading] = useState(false)
