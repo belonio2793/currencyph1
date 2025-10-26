@@ -1,4 +1,3 @@
-import { supabase } from '../lib/supabaseClient'
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
@@ -69,7 +68,7 @@ export default function Nearby({ userId }) {
   async function saveItem(item) {
     try {
       const payload = {
-        tripadvisor_id: item.id?.toString() || null,
+        tripadvisor_id: item.tripadvisor_id || item.id?.toString() || null,
         name: item.name || null,
         address: item.address || null,
         latitude: item.latitude || null,
@@ -79,7 +78,6 @@ export default function Nearby({ userId }) {
         raw: item.raw ? item.raw : item
       }
       if (!payload.tripadvisor_id) {
-        // generate a synthetic id for manual entries
         payload.tripadvisor_id = `manual-${Date.now()}-${Math.random().toString(36).slice(2,8)}`
       }
       const { error } = await supabase.from('nearby_listings').upsert(payload, { onConflict: 'tripadvisor_id' })
@@ -172,7 +170,7 @@ export default function Nearby({ userId }) {
       {results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
           {results.map(item => (
-            <div key={item.id} className="bg-white border rounded-lg p-4 shadow-sm">
+            <div key={item.id || item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm">
               <div className="flex items-start gap-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-medium text-slate-900">{item.name}</h3>
@@ -186,9 +184,9 @@ export default function Nearby({ userId }) {
                   <button
                     onClick={() => saveItem(item)}
                     className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
-                    disabled={savedIds.has(item.id?.toString())}
+                    disabled={savedIds.has((item.id || item.tripadvisor_id)?.toString())}
                   >
-                    {savedIds.has(item.id?.toString()) ? 'Saved' : 'Save'}
+                    {savedIds.has((item.id || item.tripadvisor_id)?.toString()) ? 'Saved' : 'Save'}
                   </button>
                 </div>
               </div>
