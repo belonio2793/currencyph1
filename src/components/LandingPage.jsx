@@ -159,6 +159,41 @@ export default function LandingPage({ userId, userEmail }) {
     }
   }
 
+  const handleAddCrypto = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    setAddingCrypto(true)
+
+    try {
+      const numAmount = parseFloat(cryptoAmount)
+      if (!numAmount || numAmount <= 0) {
+        throw new Error('Please enter a valid amount')
+      }
+
+      if (!selectedCrypto) {
+        throw new Error('Please select a cryptocurrency')
+      }
+
+      const convertedAmt = parseFloat(convertedCryptoAmount)
+
+      await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
+      setSuccess(`✓ Successfully added ${cryptoAmount} ${selectedCrypto} (${targetCurrency} ${convertedAmt})`)
+      setCryptoAmount('')
+      setConvertedCryptoAmount('0.00')
+
+      setTimeout(() => {
+        setSuccess('')
+        loadWallets()
+        loadRecentTransactions()
+      }, 2000)
+    } catch (err) {
+      setError(err.message || 'Failed to add crypto')
+    } finally {
+      setAddingCrypto(false)
+    }
+  }
+
   const getTotalBalance = () => {
     return wallets.reduce((sum, w) => sum + (w.balance || 0), 0).toFixed(2)
   }
