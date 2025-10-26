@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { getListingBySlug, getRelatedListings, Listing } from '../data/manila-listings'
 import ListingCard from './ListingCard'
+import StarRating from './StarRating'
 
 interface ListingDetailProps {
   slug: string
