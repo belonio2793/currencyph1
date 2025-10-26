@@ -17,8 +17,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [voteCounts, setVoteCounts] = useState({})
   const [userVotes, setUserVotes] = useState({})
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
-  const [populatingTripadvisor, setPopulatingTripadvisor] = useState(false)
-  const [populateProgress, setPopulateProgress] = useState('')
 
   useEffect(() => {
     checkAuthStatus()
