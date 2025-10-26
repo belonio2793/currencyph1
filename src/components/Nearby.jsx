@@ -203,13 +203,26 @@ export default function Nearby({ userId }) {
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <button
-                    onClick={() => saveItem(item)}
-                    className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
-                    disabled={savedIds.has((item.id || item.tripadvisor_id)?.toString())}
-                  >
-                    {savedIds.has((item.id || item.tripadvisor_id)?.toString()) ? 'Saved' : 'Save'}
-                  </button>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={() => saveItem(item)}
+                      className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
+                      disabled={savedIds.has((item.id || item.tripadvisor_id)?.toString())}
+                    >
+                      {savedIds.has((item.id || item.tripadvisor_id)?.toString()) ? 'Saved' : 'Save'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        const id = (item.id || item.tripadvisor_id)?.toString()
+                        if (!id) return
+                        if (typeof setCurrentBusinessId === 'function') setCurrentBusinessId(id)
+                        if (typeof setActiveTab === 'function') setActiveTab('business')
+                      }}
+                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-md text-sm"
+                    >
+                      View
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
