@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import fetch from 'node-fetch'
 
 const PROJECT_URL = process.env.PROJECT_URL || process.env.VITE_SUPABASE_URL || process.env.VITE_PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
