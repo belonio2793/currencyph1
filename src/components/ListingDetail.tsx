@@ -78,7 +78,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
             onClick={onBack}
             className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
-            <span>←</span> Back to Nearby
+            <span>���</span> Back to Nearby
           </button>
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-600">Manila Tourism Guide</span>
@@ -86,32 +86,13 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         </div>
       </div>
 
-      {/* Hero Image with Breadcrumb */}
-      <div className="relative w-full h-96 bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden">
-        <img
-          src={listing.image}
-          alt={listing.name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-black/20" />
-        
-        {/* Breadcrumb */}
-        <div className="absolute top-4 left-6 text-white text-sm">
-          <nav className="flex gap-2 items-center">
-            <span>Manila</span>
-            <span>›</span>
-            <span>{listing.category}</span>
-          </nav>
-        </div>
-      </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-6 py-12">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
         {/* Photo Gallery Section */}
         {listing.images && listing.images.length > 0 && (
           <section className="mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-8">Photo Gallery</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Photo Gallery</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {listing.images.map((imageUrl, idx) => (
                 <div key={idx} className="relative overflow-hidden rounded-lg bg-slate-200 aspect-square group">
@@ -136,24 +117,24 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
             <span className="text-sm text-slate-500">📍 Manila, Philippines</span>
           </div>
 
-          <h1 className="text-5xl font-bold text-slate-900 mb-4 leading-tight">{listing.name}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">{listing.name}</h1>
 
           {/* Rating Section */}
           <div className="flex items-center gap-6 mb-8 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="flex text-yellow-400 text-2xl">
+              <div className="flex text-yellow-400 text-xl md:text-2xl">
                 {[...Array(5)].map((_, i) => (
                   <span key={i}>{i < Math.floor(listing.rating) ? '★' : '☆'}</span>
                 ))}
               </div>
               <div>
-                <span className="font-bold text-2xl text-slate-900">{listing.rating.toFixed(1)}</span>
+                <span className="font-bold text-xl md:text-2xl text-slate-900">{listing.rating.toFixed(1)}</span>
                 <span className="text-slate-600 ml-2">({listing.reviewCount.toLocaleString()} reviews)</span>
               </div>
             </div>
           </div>
 
-          <p className="text-lg text-slate-700 leading-relaxed mb-8 max-w-3xl">
+          <p className="text-base md:text-lg text-slate-700 leading-relaxed mb-8 max-w-3xl">
             {listing.description}
           </p>
 
@@ -211,7 +192,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
         {/* Highlights Section */}
         <section className="mb-14">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8">Highlights</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Highlights</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {listing.highlights.map((highlight, idx) => (
               <div
@@ -227,7 +208,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
         {/* Best For Section */}
         <section className="mb-14">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8">Best For</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Best For</h2>
           <div className="flex flex-wrap gap-3">
             {listing.bestFor.map((tag, idx) => (
               <span
@@ -242,7 +223,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
         {/* Reviews Section */}
         <section className="mb-14">
-          <h2 className="text-3xl font-bold text-slate-900 mb-8">Visitor Reviews</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">Visitor Reviews</h2>
           <div className="space-y-5">
             {listing.reviews.map((review, idx) => (
               <div key={idx} className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow">
@@ -266,7 +247,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         {/* Related Listings Section */}
         {relatedListings.length > 0 && (
           <section className="mb-14">
-            <h2 className="text-3xl font-bold text-slate-900 mb-8">More to Explore in Manila</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-8">More to Explore in Manila</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedListings.map((related) => (
                 <ListingCard
@@ -282,9 +263,9 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         )}
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-10 text-center text-white mb-12">
-          <h2 className="text-3xl font-bold mb-3">Plan Your Visit</h2>
-          <p className="mb-8 text-blue-100 text-lg">
+        <section className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-6 md:p-10 text-center text-white mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">Plan Your Visit</h2>
+          <p className="mb-8 text-blue-100 text-base md:text-lg">
             Save your favorite Manila attractions and create your personalized travel itinerary
           </p>
           <button

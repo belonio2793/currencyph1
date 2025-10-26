@@ -97,10 +97,6 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
           )}
         </div>
 
-        {/* CTA Button */}
-        <button className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm">
-          Learn More →
-        </button>
       </div>
     </div>
   )
