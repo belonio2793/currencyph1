@@ -12,6 +12,13 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
   const [listing, setListing] = useState<Listing | null>(null)
   const [relatedListings, setRelatedListings] = useState<Listing[]>([])
 
+  const onImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget as HTMLImageElement
+    if ((img as any).dataset.fallbackApplied) return
+    ;(img as any).dataset.fallbackApplied = '1'
+    img.src = listing?.image || ''
+  }
+
   useEffect(() => {
     const listingData = getListingBySlug(slug)
     if (listingData) {
@@ -103,6 +110,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
                     alt={`${listing.name} - Photo ${idx + 1}`}
                     className="gallery-img group-hover:scale-[1.03] transition-transform duration-300"
                     loading="lazy"
+                    onError={onImgError}
                   />
                 </div>
               ))}
@@ -111,7 +119,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         )}
 
         {/* Header Section */}
-        <div className="mb-12">
+        <div className="mb-12 border-t border-slate-100 pt-8">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
             <span className="pill pill-blue">{listing.category}</span>
             <span className="text-sm text-slate-500">Manila, Philippines</span>
@@ -182,23 +190,20 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         {/* Highlights Section */}
         <section className="section">
           <h2 className="section-title">Highlights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {listing.highlights.map((highlight, idx) => (
-              <div
-                key={idx}
-                className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow"
-              >
-                <span className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" aria-hidden="true"></span>
-                <p className="text-slate-700 font-medium">{highlight}</p>
-              </div>
+              <li key={idx} className="flex items-start gap-3">
+                <span className="mt-2 h-1.5 w-1.5 rounded-full bg-blue-500 flex-shrink-0" aria-hidden="true"></span>
+                <span className="text-slate-700">{highlight}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </section>
 
         {/* Best For Section */}
-        <section className="section">
+        <section className="section border-t border-slate-100 pt-8">
           <h2 className="section-title">Best For</h2>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-2">
             {listing.bestFor.map((tag, idx) => (
               <span
                 key={idx}
@@ -211,7 +216,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         </section>
 
         {/* Reviews Section */}
-        <section className="section">
+        <section className="section border-t border-slate-100 pt-8">
           <h2 className="section-title">Visitor Reviews</h2>
           <div className="space-y-5">
             {listing.reviews.map((review, idx) => (
@@ -233,7 +238,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
         {/* Related Listings Section */}
         {relatedListings.length > 0 && (
-          <section className="section">
+          <section className="section border-t border-slate-100 pt-8">
             <h2 className="section-title">More to Explore in Manila</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {relatedListings.map((related) => (
