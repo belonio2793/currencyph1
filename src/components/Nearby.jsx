@@ -318,7 +318,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
         </button>
       </form>
 
-      {error && <div className="mb-4 text-sm text-red-600">{error}</div>}
+      {error && <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-600">{error}</div>}
+
+      {populateProgress && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-700">
+          {populateProgress}
+        </div>
+      )}
 
       {results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
