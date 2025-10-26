@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { currencyAPI } from '../lib/currencyAPI'
 
 export default function LandingPage({ userId, userEmail }) {
   const [amount, setAmount] = useState('')
@@ -12,6 +13,7 @@ export default function LandingPage({ userId, userEmail }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [recentTransactions, setRecentTransactions] = useState([])
+  const [allCurrencies, setAllCurrencies] = useState([])
 
   const [cryptoAmount, setCryptoAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('BTC')
@@ -19,7 +21,6 @@ export default function LandingPage({ userId, userEmail }) {
   const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
   const [addingCrypto, setAddingCrypto] = useState(false)
 
-  const currencies = ['PHP', 'CAD', 'USD', 'EUR', 'GBP']
   const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
   const targetCurrency = 'PHP'
 
@@ -38,10 +39,10 @@ export default function LandingPage({ userId, userEmail }) {
         'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,dogecoin,ripple,cardano&vs_currencies=usd'
       )
       if (!response.ok) throw new Error('Failed to fetch crypto prices')
-
+      
       const data = await response.json()
       const phpExchangeRate = exchangeRates['USD_PHP'] || 56
-
+      
       const cryptoPricesInPhp = {
         BTC: Math.round(data.bitcoin.usd * phpExchangeRate * 100) / 100,
         ETH: Math.round(data.ethereum.usd * phpExchangeRate * 100) / 100,
@@ -62,6 +63,7 @@ export default function LandingPage({ userId, userEmail }) {
 
   const loadInitialData = async () => {
     try {
+      setAllCurrencies(currencyAPI.getCurrencies())
       await Promise.all([
         loadWallets(),
         loadExchangeRates(),
@@ -255,7 +257,7 @@ export default function LandingPage({ userId, userEmail }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Main Hero Section */}
-      <div className="max-w-4xl mx-auto px-6 py-16">
+      <div className="max-w-7xl mx-auto px-6 py-16">
         {/* Welcome Message */}
         <div className="mb-12 text-center">
           <h1 className="text-5xl font-light text-slate-900 mb-3 tracking-tight">
@@ -284,169 +286,156 @@ export default function LandingPage({ userId, userEmail }) {
           <div className="mb-8 text-center">
             <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
             <h2 className="text-5xl font-light text-slate-900">
-              ${getTotalBalance()}
+              {getTotalBalance()}
             </h2>
           </div>
 
-          {/* Amount Input Form */}
-          <form onSubmit={handleAddAmount} className="space-y-6">
-            {/* Currency Selection */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-3">
-                Enter Amount In
-              </label>
-              <div className="grid grid-cols-5 gap-3">
-                {currencies.map(curr => (
-                  <button
-                    key={curr}
-                    type="button"
-                    onClick={() => setSelectedCurrency(curr)}
-                    className={`py-3 px-4 rounded-lg border-2 transition-all font-medium text-sm ${
-                      selectedCurrency === curr
-                        ? 'border-blue-600 bg-blue-50 text-blue-900'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                    }`}
-                  >
-                    {curr}
-                  </button>
-                ))}
+          {/* Side by Side Forms */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Fiat Currency Form */}
+            <form onSubmit={handleAddAmount} className="space-y-6">
+              <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Fiat Currency</h3>
+
+              {/* Currency Selection Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Select Currency
+                </label>
+                <select
+                  value={selectedCurrency}
+                  onChange={e => setSelectedCurrency(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-sm font-medium bg-white"
+                >
+                  {allCurrencies.map(curr => (
+                    <option key={curr.code} value={curr.code}>
+                      {curr.code} - {curr.name}
+                    </option>
+                  ))}
+                </select>
               </div>
-            </div>
 
-            {/* Amount Input */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Amount ({selectedCurrency})
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
-                placeholder="Enter amount"
-                className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
-              />
-            </div>
-
-            {/* Conversion Preview */}
-            {amount && (
-              <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg p-6 border border-blue-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-slate-600 text-sm mb-1">You send</p>
-                    <p className="text-2xl font-light text-slate-900">
-                      {amount} {selectedCurrency}
-                    </p>
-                  </div>
-                  <div className="text-2xl text-slate-400">→</div>
-                  <div className="text-right">
-                    <p className="text-slate-600 text-sm mb-1">You get</p>
-                    <p className="text-2xl font-light text-blue-600">
-                      {convertedAmount} PHP
-                    </p>
-                  </div>
-                </div>
-                {getRate(selectedCurrency, targetCurrency) && (
-                  <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-blue-200">
-                    Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} PHP
-                  </p>
-                )}
+              {/* Amount Input */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Amount ({selectedCurrency})
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={amount}
+                  onChange={e => setAmount(e.target.value)}
+                  placeholder="Enter amount"
+                  className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
+                />
               </div>
-            )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={adding || !amount}
-              className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {adding ? 'Processing...' : `Add ${convertedAmount} PHP`}
-            </button>
-          </form>
-        </div>
-
-        {/* Cryptocurrency Form */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
-          <h3 className="text-2xl font-light text-slate-900 mb-8 tracking-tight">
-            Add Cryptocurrency
-          </h3>
-
-          {/* Form */}
-          <form onSubmit={handleAddCrypto} className="space-y-6">
-            {/* Cryptocurrency Selection */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-3">
-                Select Cryptocurrency
-              </label>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-                {cryptos.map(crypto => (
-                  <button
-                    key={crypto}
-                    type="button"
-                    onClick={() => setSelectedCrypto(crypto)}
-                    className={`py-3 px-4 rounded-lg border-2 transition-all font-medium text-sm ${
-                      selectedCrypto === crypto
-                        ? 'border-orange-600 bg-orange-50 text-orange-900'
-                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                    }`}
-                  >
-                    <div>{crypto}</div>
-                    <div className="text-xs font-normal text-slate-500 mt-1">
-                      {getCryptoPrice(crypto)}
+              {/* Conversion Preview */}
+              {amount && (
+                <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg p-6 border border-blue-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-600 text-sm mb-1">You send</p>
+                      <p className="text-2xl font-light text-slate-900">
+                        {amount} {selectedCurrency}
+                      </p>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Amount Input */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Amount ({selectedCrypto})
-              </label>
-              <input
-                type="number"
-                step="0.00000001"
-                value={cryptoAmount}
-                onChange={e => setCryptoAmount(e.target.value)}
-                placeholder="Enter amount"
-                className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
-              />
-            </div>
-
-            {/* Conversion Preview */}
-            {cryptoAmount && (
-              <div className="bg-gradient-to-br from-orange-50 to-slate-50 rounded-lg p-6 border border-orange-100">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-slate-600 text-sm mb-1">You send</p>
-                    <p className="text-2xl font-light text-slate-900">
-                      {cryptoAmount} {selectedCrypto}
-                    </p>
+                    <div className="text-2xl text-slate-400">→</div>
+                    <div className="text-right">
+                      <p className="text-slate-600 text-sm mb-1">You get</p>
+                      <p className="text-2xl font-light text-blue-600">
+                        {convertedAmount} {targetCurrency}
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-2xl text-slate-400">→</div>
-                  <div className="text-right">
-                    <p className="text-slate-600 text-sm mb-1">You get</p>
-                    <p className="text-2xl font-light text-orange-600">
-                      {convertedCryptoAmount} PHP
+                  {getRate(selectedCurrency, targetCurrency) && (
+                    <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-blue-200">
+                      Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} {targetCurrency}
                     </p>
-                  </div>
+                  )}
                 </div>
-                <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-orange-200">
-                  Rate: 1 {selectedCrypto} = ${getCryptoPrice(selectedCrypto)} USD
-                </p>
-              </div>
-            )}
+              )}
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={addingCrypto || !cryptoAmount}
-              className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} PHP`}
-            </button>
-          </form>
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={adding || !amount}
+                className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {adding ? 'Processing...' : `Add ${convertedAmount} ${targetCurrency}`}
+              </button>
+            </form>
+
+            {/* Cryptocurrency Form */}
+            <form onSubmit={handleAddCrypto} className="space-y-6">
+              <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Cryptocurrency</h3>
+
+              {/* Cryptocurrency Selection Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Select Cryptocurrency
+                </label>
+                <select
+                  value={selectedCrypto}
+                  onChange={e => setSelectedCrypto(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-sm font-medium bg-white"
+                >
+                  {cryptos.map(crypto => (
+                    <option key={crypto} value={crypto}>
+                      {crypto} - {getCryptoPrice(crypto)} {targetCurrency}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Amount Input */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Amount ({selectedCrypto})
+                </label>
+                <input
+                  type="number"
+                  step="0.00000001"
+                  value={cryptoAmount}
+                  onChange={e => setCryptoAmount(e.target.value)}
+                  placeholder="Enter amount"
+                  className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
+                />
+              </div>
+
+              {/* Conversion Preview */}
+              {cryptoAmount && (
+                <div className="bg-gradient-to-br from-orange-50 to-slate-50 rounded-lg p-6 border border-orange-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-slate-600 text-sm mb-1">You send</p>
+                      <p className="text-2xl font-light text-slate-900">
+                        {cryptoAmount} {selectedCrypto}
+                      </p>
+                    </div>
+                    <div className="text-2xl text-slate-400">→</div>
+                    <div className="text-right">
+                      <p className="text-slate-600 text-sm mb-1">You get</p>
+                      <p className="text-2xl font-light text-orange-600">
+                        {convertedCryptoAmount} {targetCurrency}
+                      </p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-orange-200">
+                    Rate: 1 {selectedCrypto} = {getCryptoPrice(selectedCrypto)} {targetCurrency}
+                  </p>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={addingCrypto || !cryptoAmount}
+                className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} ${targetCurrency}`}
+              </button>
+            </form>
+          </div>
         </div>
 
         {/* Recent Transactions */}
@@ -469,7 +458,7 @@ export default function LandingPage({ userId, userEmail }) {
                         : 'text-emerald-600'
                     }`}>
                       {txn.transaction_type.includes('sent') || txn.transaction_type === 'bill_payment' ? '-' : '+'}
-                      ${txn.amount.toFixed(2)}
+                      {txn.amount.toFixed(2)}
                     </p>
                     <p className="text-xs text-slate-500">{txn.currency_code}</p>
                   </div>
@@ -482,7 +471,7 @@ export default function LandingPage({ userId, userEmail }) {
 
       {/* Footer */}
       <footer className="bg-white border-t border-slate-100 mt-16">
-        <div className="max-w-4xl mx-auto px-6 py-8 text-center">
+        <div className="max-w-7xl mx-auto px-6 py-8 text-center">
           <p className="text-slate-500 text-sm">
             &copy; 2024 currency.ph • Secure • Real-time Rates • Global Payments
           </p>
