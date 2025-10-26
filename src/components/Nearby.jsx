@@ -533,6 +533,18 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                 return (
                   <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm">
                     <div className="flex items-start gap-4">
+                      {(item.raw?.image || item.image) && (
+                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-slate-200">
+                          <img
+                            src={item.raw?.image || item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = `https://via.placeholder.com/600x400?text=${encodeURIComponent(item.name)}`
+                            }}
+                          />
+                        </div>
+                      )}
                       <div className="flex-1">
                         <h4 className="text-lg font-medium text-slate-900">{item.name}</h4>
                         {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
