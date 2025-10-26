@@ -253,7 +253,10 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
 
       {addMode && (
         <form onSubmit={handleAddSubmit} className="mb-6 bg-white p-4 rounded-md border">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div className="mb-2 text-sm text-slate-600">
+            Submit a new business for community review and approval
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
             <input required value={newListing.name} onChange={e => setNewListing(s => ({ ...s, name: e.target.value }))} placeholder="Business name" className="px-3 py-2 border rounded" />
             <input value={newListing.address} onChange={e => setNewListing(s => ({ ...s, address: e.target.value }))} placeholder="Address" className="px-3 py-2 border rounded" />
             <input value={newListing.category} onChange={e => setNewListing(s => ({ ...s, category: e.target.value }))} placeholder="Category (e.g. Restaurant)" className="px-3 py-2 border rounded" />
@@ -261,8 +264,15 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
             <input value={newListing.longitude} onChange={e => setNewListing(s => ({ ...s, longitude: e.target.value }))} placeholder="Longitude" className="px-3 py-2 border rounded" />
             <input value={newListing.rating} onChange={e => setNewListing(s => ({ ...s, rating: e.target.value }))} placeholder="Rating (1-5)" className="px-3 py-2 border rounded" />
           </div>
+          <textarea
+            value={newListing.description}
+            onChange={e => setNewListing(s => ({ ...s, description: e.target.value }))}
+            placeholder="Description (optional)"
+            className="w-full px-3 py-2 border rounded"
+            rows="3"
+          />
           <div className="mt-3">
-            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded">Save Business</button>
+            <button type="submit" className="px-4 py-2 bg-green-600 text-white rounded">Submit for Approval</button>
           </div>
         </form>
       )}
