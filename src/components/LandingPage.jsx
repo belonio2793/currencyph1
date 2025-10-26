@@ -112,6 +112,18 @@ export default function LandingPage({ userId, userEmail }) {
     setConvertedAmount(converted)
   }
 
+  const calculateCryptoConversion = () => {
+    const numAmount = parseFloat(cryptoAmount) || 0
+    if (numAmount <= 0) {
+      setConvertedCryptoAmount('0.00')
+      return
+    }
+
+    const price = cryptoRates[selectedCrypto] || defaultCryptoPrices[selectedCrypto] || 0
+    const converted = (numAmount * price).toFixed(2)
+    setConvertedCryptoAmount(converted)
+  }
+
   const handleAddAmount = async (e) => {
     e.preventDefault()
     setError('')
