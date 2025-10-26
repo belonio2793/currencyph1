@@ -127,9 +127,19 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         {/* Photo Gallery Section */}
         {galleryImages.length > 0 && (
           <section className="section">
-            <h2 className="section-title">Photo Gallery</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="section-title mb-0">Photo Gallery</h2>
+              {galleryImages.length > 6 && (
+                <button
+                  onClick={() => setIsGalleryModalOpen(true)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+                >
+                  View All ({galleryImages.length})
+                </button>
+              )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {galleryImages.map((imageUrl, idx) => (
+              {galleryImages.slice(0, 6).map((imageUrl, idx) => (
                 <div key={idx} className="gallery-tile aspect-square sm:aspect-[4/3] group">
                   <img
                     src={imageUrl}
