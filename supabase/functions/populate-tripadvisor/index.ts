@@ -1,167 +1,23 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const PHILIPPINE_CITIES = [
-  "Alaminos",
-  "Angeles",
-  "Antipolo",
-  "Bacolod",
-  "Bacoor",
-  "Bago",
-  "Baguio",
-  "Bais",
-  "Balanga",
-  "Baliwag",
-  "Batac",
-  "Batangas City",
-  "Bayawan",
-  "Baybay",
-  "Bayugan",
-  "Biñan",
-  "Bislig",
-  "Bogo",
-  "Borongan",
-  "Butuan",
-  "Cabadbaran",
-  "Cabanatuan",
-  "Cabuyao",
-  "Cadiz",
-  "Cagayan de Oro",
-  "Calaca",
-  "Calamba",
-  "Calapan",
-  "Calbayog",
-  "Caloocan",
-  "Candon",
-  "Canlaon",
-  "Carcar",
-  "Carmona",
-  "Catbalogan",
-  "Cauayan",
-  "Cavite City",
-  "Cebu City",
-  "Cotabato City",
-  "Dagupan",
-  "Danao",
-  "Dapitan",
-  "Dasmariñas",
-  "Davao City",
-  "Digos",
-  "Dipolog",
-  "Dumaguete",
-  "El Salvador",
-  "Escalante",
-  "Gapan",
-  "General Santos",
-  "General Trias",
-  "Gingoog",
-  "Guihulngan",
-  "Himamaylan",
-  "Ilagan",
-  "Iligan",
-  "Iloilo City",
-  "Imus",
-  "Iriga",
-  "Isabela",
-  "Kabankalan",
-  "Kidapawan",
-  "Koronadal",
-  "La Carlota",
-  "Lamitan",
-  "Laoag",
-  "Lapu-Lapu",
-  "Las Piñas",
-  "Legazpi",
-  "Ligao",
-  "Lipa",
-  "Lucena",
-  "Maasin",
-  "Mabalacat",
-  "Makati",
-  "Malabon",
-  "Malaybalay",
-  "Malolos",
-  "Mandaluyong",
-  "Mandaue",
+const CATEGORIES = [
+  "hotels",
+  "restaurants",
+  "attractions",
+  "things-to-do"
+];
+
+const CITIES = [
   "Manila",
-  "Marawi",
-  "Marikina",
-  "Masbate City",
-  "Mati",
-  "Meycauayan",
-  "Muñoz",
-  "Muntinlupa",
-  "Naga (Camarines Sur)",
-  "Naga (Cebu)",
-  "Navotas",
-  "Olongapo",
-  "Ormoc",
-  "Oroquieta",
-  "Ozamiz",
-  "Pagadian",
-  "Palayan",
-  "Panabo",
-  "Parañaque",
-  "Pasay",
-  "Pasig",
-  "Passi",
-  "Puerto Princesa",
+  "Cebu City",
+  "Davao City",
   "Quezon City",
-  "Roxas",
-  "Sagay",
-  "Samal",
-  "San Carlos (Negros Occidental)",
-  "San Carlos (Pangasinan)",
-  "San Fernando (La Union)",
-  "San Fernando (Pampanga)",
-  "San Jose",
-  "San Jose del Monte",
-  "San Juan",
-  "San Pablo",
-  "San Pedro",
-  "Santa Rosa",
-  "Santiago",
-  "Santo Tomas",
-  "Silay",
-  "Sipalay",
-  "Sorsogon City",
-  "Surigao City",
-  "Tabaco",
-  "Tabuk",
-  "Tacloban",
-  "Tacurong",
-  "Tagaytay",
-  "Tagbilaran",
-  "Taguig",
-  "Tagum",
-  "Talisay (Cebu)",
-  "Talisay (Negros Occidental)",
-  "Tanauan",
-  "Tandag",
-  "Tangub",
-  "Tanjay",
-  "Tarlac City",
-  "Tayabas",
-  "Toledo",
-  "Trece Martires",
-  "Tuguegarao",
-  "Urdaneta",
-  "Valencia",
-  "Valenzuela",
-  "Victorias",
-  "Vigan",
-  "Zamboanga City",
-  // Additional tourist hotspots (non-official cities but popular TripAdvisor search terms for attractions)
-  "Camiguin (tourist)",  // Island for hot springs and volcanoes
-  "General Luna (tourist)",  // Siargao hub for surfing
-  "Moalboal (tourist)",  // Cebu diving spot
-  "Pagudpud (tourist)",  // Northern Luzon beaches
-  "San Juan La Union (tourist)",  // Surfing capital
-  "Siargao (tourist)",  // Surfing paradise
-  "Siquijor (tourist)",  // Mystical island
-  "Batangas (tourist)",  // Ferry port and beaches
-  "Caticlan (tourist)",  // Boracay gateway
-  "Coron (tourist)",  // Palawan wreck diving
-  "Port Barton (tourist)"  // Palawan backpacker spot
+  "Makati",
+  "Baguio",
+  "Boracay",
+  "Puerto Princesa",
+  "Iloilo City",
+  "Pasig"
 ];
 
 function sleep(ms: number) {
@@ -174,6 +30,9 @@ async function fetchPlacesFor(query: string, tripKey: string, limit = 50) {
   params.append("limit", String(limit));
 
   const url = `https://api.tripadvisor.com/api/partner/2.0/search?${params.toString()}`;
+  
+  console.log(`Fetching: ${url}`);
+  
   const res = await fetch(url, {
     headers: {
       "X-TripAdvisor-API-Key": tripKey,
@@ -183,11 +42,16 @@ async function fetchPlacesFor(query: string, tripKey: string, limit = 50) {
 
   if (!res.ok) {
     const text = await res.text();
-    throw new Error(`TripAdvisor API error: ${res.status} ${text}`);
+    console.error(`API Error ${res.status}: ${text}`);
+    throw new Error(`TripAdvisor API error: ${res.status}`);
   }
 
   const json = await res.json();
-  const items = (json.data || json.results || json || []) as any[];
+  console.log(`Response keys: ${Object.keys(json)}`);
+  console.log(`Full response:`, JSON.stringify(json, null, 2));
+  
+  const items = (json.data || json.results || []) as any[];
+  console.log(`Found ${items.length} items`);
 
   return (items || []).map((it) => {
     const addr = it.address_obj
@@ -213,11 +77,14 @@ async function fetchPlacesFor(query: string, tripKey: string, limit = 50) {
 async function upsertBatch(supabase: any, rows: any[]) {
   if (!rows || rows.length === 0) return 0;
 
-  const chunkSize = 100;
+  const chunkSize = 50;
   let upsertedCount = 0;
 
   for (let i = 0; i < rows.length; i += chunkSize) {
     const chunk = rows.slice(i, i + chunkSize);
+    
+    console.log(`Upserting chunk ${i / chunkSize + 1}/${Math.ceil(rows.length / chunkSize)} (${chunk.length} rows)`);
+    
     const { error } = await supabase
       .from("nearby_listings")
       .upsert(chunk, { onConflict: "tripadvisor_id" });
@@ -227,17 +94,18 @@ async function upsertBatch(supabase: any, rows: any[]) {
       throw error;
     } else {
       upsertedCount += chunk.length;
+      console.log(`Upserted ${chunk.length} rows (total: ${upsertedCount})`);
     }
 
-    await sleep(100);
+    await sleep(200);
   }
 
   return upsertedCount;
 }
 
 Deno.serve(async (req) => {
-  // Only allow POST requests
-  if (req.method !== "POST") {
+  // Allow both POST and GET for testing
+  if (req.method !== "POST" && req.method !== "GET") {
     return new Response("Method not allowed", { status: 405 });
   }
 
@@ -245,10 +113,17 @@ Deno.serve(async (req) => {
   const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const tripKey = Deno.env.get("VITE_TRIPADVISOR") || Deno.env.get("TRIPADVISOR");
 
+  console.log(`Supabase URL: ${supabaseUrl}`);
+  console.log(`Trip Key exists: ${!!tripKey}`);
+  console.log(`Service Key exists: ${!!supabaseServiceKey}`);
+
   if (!supabaseUrl || !supabaseServiceKey || !tripKey) {
     return new Response(
       JSON.stringify({
         error: "Missing environment variables",
+        supabaseUrl: !!supabaseUrl,
+        supabaseServiceKey: !!supabaseServiceKey,
+        tripKey: !!tripKey,
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
@@ -260,18 +135,28 @@ Deno.serve(async (req) => {
     const allRows: any[] = [];
     let totalFetched = 0;
 
-    for (const city of PHILIPPINE_CITIES) {
-      try {
-        console.log(`Fetching for ${city}...`);
-        const rows = await fetchPlacesFor(`${city} Philippines`, tripKey, 50);
-        totalFetched += rows.length;
-        allRows.push(...rows);
-        console.log(`Fetched ${rows.length} items for ${city}`);
-      } catch (err) {
-        console.error(`Failed fetch for ${city}:`, (err as any).message);
-      }
+    // Start with Manila only for testing
+    const testCities = ["Manila"];
 
-      await sleep(1000);
+    for (const city of testCities) {
+      console.log(`\n========== Processing ${city} ==========`);
+      
+      for (const category of CATEGORIES) {
+        try {
+          const query = `${category} in ${city} Philippines`;
+          console.log(`\nFetching: ${query}`);
+          
+          const rows = await fetchPlacesFor(query, tripKey, 50);
+          totalFetched += rows.length;
+          allRows.push(...rows);
+          
+          console.log(`✓ Fetched ${rows.length} items for "${query}"`);
+        } catch (err) {
+          console.error(`✗ Failed for "${category} in ${city}":`, (err as any).message);
+        }
+
+        await sleep(2000); // Rate limiting
+      }
     }
 
     // Dedupe by tripadvisor_id
@@ -281,24 +166,40 @@ Deno.serve(async (req) => {
     }
     const unique = Object.values(dedup);
 
-    console.log(`Total unique items to upsert: ${unique.length}`);
+    console.log(`\n========== Results ==========`);
+    console.log(`Total items fetched: ${totalFetched}`);
+    console.log(`Unique items: ${unique.length}`);
 
-    const upserted = await upsertBatch(supabase, unique);
+    if (unique.length > 0) {
+      const upserted = await upsertBatch(supabase, unique);
+      console.log(`Successfully upserted: ${upserted}`);
 
-    return new Response(
-      JSON.stringify({
-        success: true,
-        totalFetched,
-        uniqueSaved: upserted,
-        message: `Fetched ${totalFetched} total, saved ${upserted} unique listings`,
-      }),
-      { headers: { "Content-Type": "application/json" } }
-    );
+      return new Response(
+        JSON.stringify({
+          success: true,
+          totalFetched,
+          uniqueSaved: upserted,
+          message: `Fetched ${totalFetched} total, saved ${upserted} unique listings to database`,
+        }),
+        { headers: { "Content-Type": "application/json" } }
+      );
+    } else {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          totalFetched: 0,
+          uniqueSaved: 0,
+          message: "No listings found. Check TripAdvisor API key and response.",
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
   } catch (err) {
     console.error("Populate failed:", err);
     return new Response(
       JSON.stringify({
         error: (err as any).message || "Failed to populate",
+        details: String(err),
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
