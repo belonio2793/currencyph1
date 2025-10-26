@@ -42,6 +42,8 @@ export default function App() {
         setUserId(user.id)
         setUserEmail(user.email)
         await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+        setShowAuth(false)
+        window.history.replaceState(null, '', '/')
       } else {
         const testEmail = `test-${Math.random().toString(36).substring(7)}@currency.local`
         const testUser = await wisegcashAPI.getOrCreateUser(testEmail, 'Test User')
@@ -54,6 +56,15 @@ export default function App() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleAuthSuccess = async (user) => {
+    setUserId(user.id)
+    setUserEmail(user.email)
+    await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+    setShowAuth(false)
+    window.history.replaceState(null, '', '/')
+    setActiveTab('home')
   }
 
   if (loading) {
