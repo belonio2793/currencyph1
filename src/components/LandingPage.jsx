@@ -186,7 +186,8 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       }
     }
-    throw lastErr
+    console.warn('fetchWithRetries failed for', url, lastErr)
+    return null
   }
 
   const loadCryptoPrices = async () => {
