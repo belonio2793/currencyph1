@@ -55,8 +55,8 @@ CREATE TABLE IF NOT EXISTS pending_listings (
 );
 
 -- Create index for pending queries
-CREATE INDEX idx_pending_listings_status ON pending_listings(status);
-CREATE INDEX idx_pending_listings_user ON pending_listings(submitted_by_user_id);
+CREATE INDEX IF NOT EXISTS idx_pending_listings_status ON pending_listings(status);
+CREATE INDEX IF NOT EXISTS idx_pending_listings_user ON pending_listings(submitted_by_user_id);
 
 -- Create approval_votes table for community moderation
 CREATE TABLE IF NOT EXISTS approval_votes (
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS approval_votes (
 );
 
 -- Create index for approval votes
-CREATE INDEX idx_approval_votes_pending ON approval_votes(pending_listing_id);
-CREATE INDEX idx_approval_votes_user ON approval_votes(user_id);
+CREATE INDEX IF NOT EXISTS idx_approval_votes_pending ON approval_votes(pending_listing_id);
+CREATE INDEX IF NOT EXISTS idx_approval_votes_user ON approval_votes(user_id);
 
 -- Enable RLS for listing_votes
 ALTER TABLE listing_votes ENABLE ROW LEVEL SECURITY;
