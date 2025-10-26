@@ -3,7 +3,7 @@ import { wisegcashAPI } from '../lib/wisegcashAPI'
 
 export default function LandingPage({ userId, userEmail }) {
   const [amount, setAmount] = useState('')
-  const [selectedCurrency, setSelectedCurrency] = useState('GOD')
+  const [selectedCurrency, setSelectedCurrency] = useState('PHP')
   const [exchangeRates, setExchangeRates] = useState({})
   const [wallets, setWallets] = useState([])
   const [convertedAmount, setConvertedAmount] = useState('0.00')
@@ -21,7 +21,7 @@ export default function LandingPage({ userId, userEmail }) {
 
   const currencies = ['GOD', 'PHP', 'USD', 'EUR', 'GBP']
   const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
-  const targetCurrency = 'GOD'
+  const targetCurrency = 'PHP'
 
   // Sample crypto prices (in GOD)
   const defaultCryptoPrices = {
@@ -261,7 +261,7 @@ export default function LandingPage({ userId, userEmail }) {
               <label className="block text-sm font-medium text-slate-700 mb-3">
                 Enter Amount In
               </label>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="grid grid-cols-5 gap-3">
                 {currencies.map(curr => (
                   <button
                     key={curr}
@@ -308,13 +308,13 @@ export default function LandingPage({ userId, userEmail }) {
                   <div className="text-right">
                     <p className="text-slate-600 text-sm mb-1">You get</p>
                     <p className="text-2xl font-light text-blue-600">
-                      {convertedAmount} GOD
+                      {convertedAmount} PHP
                     </p>
                   </div>
                 </div>
                 {getRate(selectedCurrency, targetCurrency) && (
                   <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-blue-200">
-                    Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} GOD
+                    Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} PHP
                   </p>
                 )}
               </div>
