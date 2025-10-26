@@ -426,6 +426,9 @@ export default function Rates({ globalCurrency }) {
                       disabled={!selectedFiat || !selectedCrypto || getRate(globalCurrency, selectedFiat ? selectedFiat.code : '') == null}
                     />
                     <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '—'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
+                    {cryptoInput !== '' && (
+                      <p className="text-xs text-slate-400 mt-1">= {formatNumber(cryptoInput, 8)} {selectedCrypto.code}</p>
+                    )}
                   </div>
 
                   <div>
