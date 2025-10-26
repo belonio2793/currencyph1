@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { nearbyUtils } from '../lib/nearbyUtils'
 
-export default function Business({ businessId, onBack }) {
+export default function Business({ businessId, onBack, userId }) {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(null)
   const [error, setError] = useState('')
+  const [voteCounts, setVoteCounts] = useState({ thumbsUp: 0, thumbsDown: 0 })
+  const [userVote, setUserVote] = useState(null)
 
   useEffect(() => {
     if (!businessId) return
     fetchBusiness(businessId)
+    loadVotes(businessId)
   }, [businessId])
 
   async function fetchBusiness(id) {
