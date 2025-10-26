@@ -196,7 +196,8 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9878,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/National_Museum_of_Fine_Arts%2C_Manila%2C_Philippines.jpg/1280px-National_Museum_of_Fine_Arts%2C_Manila%2C_Philippines.jpg"
     ],
     description: "The National Museum of the Philippines is the premier museum of the country, featuring world-class collections of natural history, fine art, and anthropology. It showcases the country's rich cultural heritage.",
     highlights: [
