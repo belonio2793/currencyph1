@@ -467,7 +467,7 @@ export default function Rates({ globalCurrency }) {
         </div>
 
         {/* Right: Dropdown search list */}
-        <div style={{ width: 320 }} className="border border-slate-100 rounded-lg p-3">
+        <div className="w-full sm:w-80 border border-slate-100 rounded-lg p-3">
           <div className="flex gap-2 mb-3">
             <button onClick={() => setViewMode('fiat')} className={`flex-1 py-2 rounded ${viewMode === 'fiat' ? 'bg-blue-600 text-white' : 'bg-white'}`}>Fiat</button>
             <button onClick={() => setViewMode('crypto')} className={`flex-1 py-2 rounded ${viewMode === 'crypto' ? 'bg-blue-600 text-white' : 'bg-white'}`}>Crypto</button>
