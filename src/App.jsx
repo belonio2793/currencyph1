@@ -13,6 +13,7 @@ import Auth from './components/Auth'
 import Nearby from './components/Nearby'
 import Business from './components/Business'
 import CommunityManagement from './components/CommunityManagement'
+import AdminPopulate from './components/AdminPopulate'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
