@@ -38,7 +38,7 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "Intramuros, Manila 1002, Philippines",
     latitude: 14.5951,
     longitude: 120.9731,
-    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=600&h=400&s=1",
     images: [
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1",
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
