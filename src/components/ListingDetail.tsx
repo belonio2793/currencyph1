@@ -108,6 +108,25 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-12">
+        {/* Photo Gallery Section */}
+        {listing.images && listing.images.length > 0 && (
+          <section className="mb-14">
+            <h2 className="text-3xl font-bold text-slate-900 mb-8">Photo Gallery</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {listing.images.map((imageUrl, idx) => (
+                <div key={idx} className="relative overflow-hidden rounded-lg bg-slate-200 aspect-square group">
+                  <img
+                    src={imageUrl}
+                    alt={`${listing.name} - Photo ${idx + 1}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Header Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
