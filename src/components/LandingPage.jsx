@@ -134,8 +134,9 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
 
 export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' }) {
   const [geo, setGeo] = useState({ lat: null, lon: null, city: null, region: null, country: null, ip: null, source: null })
+  const [geoAvailable, setGeoAvailable] = useState(null) // null=not asked yet, true=granted, false=denied/unavailable
 
-  // Attempt to get precise geolocation, fallback to IP-based lookup
+  // Attempt to get precise geolocation, do NOT auto-fallback to IP — require explicit user action
   useEffect(() => {
     let didCancel = false
 
@@ -160,15 +161,11 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
     }
 
     if (navigator.geolocation) {
-      const timer = setTimeout(() => {
-        // if geolocation takes too long, fallback to IP
-        setFromIP()
-      }, 5000)
-
+      // Ask for permission; do not fallback automatically
       navigator.geolocation.getCurrentPosition(
         async (position) => {
-          clearTimeout(timer)
           if (didCancel) return
+          setGeoAvailable(true)
           const { latitude, longitude } = position.coords
           // try reverse geocode via nominatim
           try {
@@ -187,21 +184,21 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
               return
             }
           } catch (e) {
-            // fallback to IP
+            // fallback: set coords only
           }
-          // fallback: set coords only
           setGeo({ lat: latitude, lon: longitude, city: null, region: null, country: null, ip: null, source: 'geo' })
         },
         (err) => {
-          // permission denied or error -> fallback to IP
-          setFromIP()
+          // permission denied or error -> mark as denied; do NOT auto-use IP
+          setGeoAvailable(false)
         },
         { enableHighAccuracy: false, timeout: 7000 }
       )
 
       return () => { didCancel = true }
     } else {
-      setFromIP()
+      // Geolocation API not available
+      setGeoAvailable(false)
     }
   }, [])
 
@@ -219,6 +216,26 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         </div>
       </div>
     )
+  }
+
+  const handleUseIP = async () => {
+    try {
+      const resp = await fetch('https://ipapi.co/json/')
+      if (!resp.ok) return
+      const j = await resp.json()
+      setGeo({
+        lat: j.latitude || null,
+        lon: j.longitude || null,
+        city: j.city || null,
+        region: j.region || null,
+        country: j.country_name || j.country || null,
+        ip: j.ip || null,
+        source: 'ip'
+      })
+      setGeoAvailable('ip')
+    } catch (e) {
+      // ignore
+    }
   }
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('PHP')
@@ -802,7 +819,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
                         {cryptoAmount} {selectedCrypto}
                       </p>
                     </div>
-                    <div className="text-2xl text-slate-400">→</div>
+                    <div className="text-2xl text-slate-400">��</div>
                     <div className="text-right">
                       <p className="text-slate-600 text-sm mb-1">You get</p>
                       <p className="text-2xl font-light text-orange-600">
