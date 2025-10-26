@@ -94,24 +94,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
     }
   }
 
-  async function loadVotesForResults() {
-    if (results.length === 0) return
-
-    const votes = {}
-    const counts = {}
-    for (const item of results) {
-      const id = item.tripadvisor_id || item.id
-      const voteData = await nearbyUtils.getListingVoteCounts(id, 'search')
-      counts[id] = voteData
-
-      if (userId) {
-        const userVote = await nearbyUtils.getListingVote(id, 'search', userId)
-        votes[id] = userVote
-      }
-    }
-    setVoteCounts(prev => ({ ...prev, ...counts }))
-    setUserVotes(prev => ({ ...prev, ...votes }))
-  }
 
   async function handleVote(listingId, listingType, voteType) {
     if (!userId) {
