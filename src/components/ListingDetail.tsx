@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { getListingBySlug, getRelatedListings, Listing } from '../data/manila-listings'
+import ListingCard from './ListingCard'
 
 interface ListingDetailProps {
   slug: string
@@ -15,13 +16,39 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
     if (listingData) {
       setListing(listingData)
       setRelatedListings(getRelatedListings(slug, 3))
-      
+
       // Set page title and meta tags for SEO
       document.title = `${listingData.name} - Manila Tourism Guide | Currency.ph`
-      
+
+      // Update meta description
       const metaDescription = document.querySelector('meta[name="description"]')
       if (metaDescription) {
-        metaDescription.setAttribute('content', `Discover ${listingData.name} in Manila. ${listingData.description.slice(0, 150)}...`)
+        metaDescription.setAttribute(
+          'content',
+          `Discover ${listingData.name} in Manila. Rating: ${listingData.rating}/5 (${listingData.reviewCount} reviews). ${listingData.description.slice(0, 120)}...`
+        )
+      }
+
+      // Add open graph tags for social sharing
+      const metaOG = document.querySelector('meta[property="og:title"]') || document.createElement('meta')
+      metaOG.setAttribute('property', 'og:title')
+      metaOG.setAttribute('content', `${listingData.name} - Manila Tourism Guide`)
+      if (!document.querySelector('meta[property="og:title"]')) {
+        document.head.appendChild(metaOG)
+      }
+
+      const metaOGDesc = document.querySelector('meta[property="og:description"]') || document.createElement('meta')
+      metaOGDesc.setAttribute('property', 'og:description')
+      metaOGDesc.setAttribute('content', listingData.description.slice(0, 160))
+      if (!document.querySelector('meta[property="og:description"]')) {
+        document.head.appendChild(metaOGDesc)
+      }
+
+      const metaOGImage = document.querySelector('meta[property="og:image"]') || document.createElement('meta')
+      metaOGImage.setAttribute('property', 'og:image')
+      metaOGImage.setAttribute('content', listingData.image)
+      if (!document.querySelector('meta[property="og:image"]')) {
+        document.head.appendChild(metaOGImage)
       }
     }
   }, [slug])
@@ -33,7 +60,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
           <p className="text-slate-600 text-lg mb-4">Listing not found</p>
           <button
             onClick={onBack}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Go Back
           </button>
@@ -46,10 +73,10 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
     <div className="min-h-screen bg-slate-50">
       {/* Navigation */}
       <div className="sticky top-0 z-10 bg-white border-b border-slate-100 shadow-sm">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
           >
             <span>←</span> Back to Nearby
           </button>
@@ -59,162 +86,193 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         </div>
       </div>
 
-      {/* Hero Image */}
-      <div className="w-full h-96 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center overflow-hidden">
-        <img 
-          src={listing.image} 
+      {/* Hero Image with Breadcrumb */}
+      <div className="relative w-full h-96 bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden">
+        <img
+          src={listing.image}
           alt={listing.name}
           className="w-full h-full object-cover"
           loading="lazy"
         />
+        <div className="absolute inset-0 bg-black/20" />
+        
+        {/* Breadcrumb */}
+        <div className="absolute top-4 left-6 text-white text-sm">
+          <nav className="flex gap-2 items-center">
+            <span>Manila</span>
+            <span>›</span>
+            <span>{listing.category}</span>
+          </nav>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-6xl mx-auto px-6 py-12">
         {/* Header Section */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-4 flex-wrap">
+            <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
               {listing.category}
             </span>
-            <span className="text-sm text-slate-500">Manila, Philippines</span>
+            <span className="text-sm text-slate-500">📍 Manila, Philippines</span>
           </div>
-          
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">{listing.name}</h1>
-          
-          <div className="flex items-center gap-6 mb-6">
-            <div className="flex items-center gap-2">
-              <div className="flex text-yellow-400">
+
+          <h1 className="text-5xl font-bold text-slate-900 mb-4 leading-tight">{listing.name}</h1>
+
+          {/* Rating Section */}
+          <div className="flex items-center gap-6 mb-8 flex-wrap">
+            <div className="flex items-center gap-3">
+              <div className="flex text-yellow-400 text-2xl">
                 {[...Array(5)].map((_, i) => (
                   <span key={i}>{i < Math.floor(listing.rating) ? '★' : '☆'}</span>
                 ))}
               </div>
-              <span className="font-semibold text-slate-900">{listing.rating.toFixed(1)}</span>
-              <span className="text-slate-500">({listing.reviewCount.toLocaleString()} reviews)</span>
+              <div>
+                <span className="font-bold text-2xl text-slate-900">{listing.rating.toFixed(1)}</span>
+                <span className="text-slate-600 ml-2">({listing.reviewCount.toLocaleString()} reviews)</span>
+              </div>
             </div>
           </div>
 
-          <p className="text-lg text-slate-700 leading-relaxed mb-6">
+          <p className="text-lg text-slate-700 leading-relaxed mb-8 max-w-3xl">
             {listing.description}
           </p>
 
-          {/* Key Info Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            <div className="bg-white rounded-lg border border-slate-200 p-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-2">📍 Address</h3>
-              <p className="text-slate-700">{listing.address}</p>
-            </div>
-            
-            <div className="bg-white rounded-lg border border-slate-200 p-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-2">🕒 Hours</h3>
-              <p className="text-slate-700">{listing.hours}</p>
-            </div>
-            
-            <div className="bg-white rounded-lg border border-slate-200 p-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-2">🎫 Admission</h3>
-              <p className="text-slate-700">{listing.admission}</p>
-            </div>
-            
-            <div className="bg-white rounded-lg border border-slate-200 p-4">
-              <h3 className="text-sm font-semibold text-slate-900 mb-2">📞 Contact</h3>
-              {listing.phone && <p className="text-slate-700">{listing.phone}</p>}
-              {listing.website && (
-                <a href={listing.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-700">
-                  Visit Website →
-                </a>
-              )}
-            </div>
+          {/* Key Info Cards - Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {listing.address && (
+              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
+                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                  <span className="text-xl">📍</span> Address
+                </h3>
+                <p className="text-sm text-slate-700">{listing.address}</p>
+              </div>
+            )}
+
+            {listing.hours && (
+              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
+                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                  <span className="text-xl">🕒</span> Hours
+                </h3>
+                <p className="text-sm text-slate-700">{listing.hours}</p>
+              </div>
+            )}
+
+            {listing.admission && (
+              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
+                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                  <span className="text-xl">🎫</span> Admission
+                </h3>
+                <p className="text-sm text-slate-700">{listing.admission}</p>
+              </div>
+            )}
+
+            {(listing.phone || listing.website) && (
+              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
+                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
+                  <span className="text-xl">📞</span> Contact
+                </h3>
+                <div className="text-sm text-slate-700 space-y-1">
+                  {listing.phone && <p>{listing.phone}</p>}
+                  {listing.website && (
+                    <a
+                      href={listing.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-700 font-medium block"
+                    >
+                      Visit Website →
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Highlights */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Highlights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Highlights Section */}
+        <section className="mb-14">
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Highlights</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {listing.highlights.map((highlight, idx) => (
-              <div key={idx} className="flex items-start gap-3 bg-white rounded-lg border border-slate-200 p-4">
-                <span className="text-xl flex-shrink-0">✨</span>
-                <p className="text-slate-700">{highlight}</p>
+              <div
+                key={idx}
+                className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow"
+              >
+                <span className="text-3xl flex-shrink-0">✨</span>
+                <p className="text-slate-700 font-medium">{highlight}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Best For */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Best For</h2>
+        {/* Best For Section */}
+        <section className="mb-14">
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Best For</h2>
           <div className="flex flex-wrap gap-3">
             {listing.bestFor.map((tag, idx) => (
-              <span key={idx} className="inline-block px-4 py-2 bg-blue-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200">
+              <span
+                key={idx}
+                className="inline-block px-5 py-3 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-full text-sm font-semibold border border-blue-200 hover:shadow-sm transition-shadow"
+              >
                 {tag}
               </span>
             ))}
           </div>
         </section>
 
-        {/* Reviews */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">Visitor Reviews</h2>
-          <div className="space-y-4">
+        {/* Reviews Section */}
+        <section className="mb-14">
+          <h2 className="text-3xl font-bold text-slate-900 mb-8">Visitor Reviews</h2>
+          <div className="space-y-5">
             {listing.reviews.map((review, idx) => (
-              <div key={idx} className="bg-white rounded-lg border border-slate-200 p-6">
-                <div className="flex items-start justify-between mb-3">
+              <div key={idx} className="bg-white rounded-lg border border-slate-200 p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-start justify-between mb-4 flex-wrap gap-2">
                   <div>
-                    <h4 className="font-semibold text-slate-900">{review.author}</h4>
-                    <p className="text-sm text-slate-500">{review.date}</p>
+                    <h4 className="font-bold text-slate-900 text-lg">{review.author}</h4>
+                    <p className="text-sm text-slate-500">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
-                  <div className="flex text-yellow-400">
+                  <div className="flex text-yellow-400 text-lg">
                     {[...Array(5)].map((_, i) => (
                       <span key={i}>{i < review.rating ? '★' : '☆'}</span>
                     ))}
                   </div>
                 </div>
-                <p className="text-slate-700">{review.text}</p>
+                <p className="text-slate-700 text-base leading-relaxed">{review.text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Related Listings */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-slate-900 mb-6">More to Explore in Manila</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {relatedListings.map((related) => (
-              <div 
-                key={related.id}
-                onClick={() => window.location.hash = `#/listing/${related.slug}`}
-                className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-              >
-                <div className="h-48 bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center overflow-hidden">
-                  <img 
-                    src={related.image}
-                    alt={related.name}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-slate-900 mb-2">{related.name}</h3>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-yellow-400">★</span>
-                    <span className="text-sm text-slate-700">{related.rating.toFixed(1)}</span>
-                  </div>
-                  <p className="text-sm text-slate-600">{related.category}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Related Listings Section */}
+        {relatedListings.length > 0 && (
+          <section className="mb-14">
+            <h2 className="text-3xl font-bold text-slate-900 mb-8">More to Explore in Manila</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedListings.map((related) => (
+                <ListingCard
+                  key={related.id}
+                  listing={related}
+                  onViewDetails={(slug) => {
+                    window.location.hash = `#/listing/${slug}`
+                  }}
+                />
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* CTA Section */}
-        <section className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg p-8 text-center text-white mb-12">
-          <h2 className="text-2xl font-bold mb-3">Ready to Explore?</h2>
-          <p className="mb-6 text-blue-100">Save your favorite Manila attractions to your personal directory</p>
-          <button 
+        <section className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-10 text-center text-white mb-12">
+          <h2 className="text-3xl font-bold mb-3">Plan Your Visit</h2>
+          <p className="mb-8 text-blue-100 text-lg">
+            Save your favorite Manila attractions and create your personalized travel itinerary
+          </p>
+          <button
             onClick={onBack}
-            className="inline-block px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            className="inline-block px-8 py-3 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50 transition-colors text-lg"
           >
-            Browse More Listings
+            Explore More Attractions
           </button>
         </section>
       </div>
@@ -222,27 +280,36 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
       {/* Schema.org JSON-LD for SEO */}
       <script type="application/ld+json">
         {JSON.stringify({
-          "@context": "https://schema.org/",
-          "@type": "TouristAttractionResult",
-          "name": listing.name,
-          "description": listing.description,
-          "image": listing.image,
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": listing.address,
-            "addressLocality": "Manila",
-            "addressCountry": "PH"
+          '@context': 'https://schema.org/',
+          '@type': 'TouristAttraction',
+          name: listing.name,
+          description: listing.description,
+          image: listing.image,
+          address: {
+            '@type': 'PostalAddress',
+            streetAddress: listing.address,
+            addressLocality: 'Manila',
+            addressRegion: 'Metro Manila',
+            postalCode: '1000',
+            addressCountry: 'PH',
           },
-          "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": listing.rating,
-            "reviewCount": listing.reviewCount
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: listing.rating,
+            reviewCount: listing.reviewCount,
           },
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": listing.latitude,
-            "longitude": listing.longitude
-          }
+          geo: {
+            '@type': 'GeoCoordinates',
+            latitude: listing.latitude,
+            longitude: listing.longitude,
+          },
+          telephone: listing.phone || undefined,
+          url: listing.website || undefined,
+          openingHoursSpecification: {
+            '@type': 'OpeningHoursSpecification',
+            description: listing.hours,
+          },
+          priceRange: listing.admission ? listing.admission.split(':')[0] : undefined,
         })}
       </script>
     </div>
