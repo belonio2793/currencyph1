@@ -38,7 +38,12 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "Intramuros, Manila 1002, Philippines",
     latitude: 14.5951,
     longitude: 120.9731,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Intramuros%2C_Manila_by_Dominic_Sansone.jpg/1280px-Intramuros%2C_Manila_by_Dominic_Sansone.jpg",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1"
+    ],
     description: "Intramuros is the historic walled city of Manila, known as the 'City Within the City.' This 16th-century fortress has been home to Spanish colonial architecture for over 400 years. Today, it stands as a testament to Manila's rich history and cultural heritage with well-preserved Spanish colonial architecture, museums, and cultural landmarks.",
     highlights: [
       "Fort Santiago - Spanish colonial fortress",
@@ -92,7 +97,10 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "Cabildo Street, Intramuros, Manila, Philippines",
     latitude: 14.5980,
     longitude: 120.9707,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Manila_Cathedral_2015.jpg/1280px-Manila_Cathedral_2015.jpg",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1"
+    ],
     description: "The Manila Cathedral is a Roman Catholic cathedral and one of the oldest churches in the Philippines. Built in 1588, this magnificent Gothic structure has been rebuilt several times due to earthquakes and war damage.",
     highlights: [
       "Stunning Gothic architecture",
@@ -136,7 +144,10 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "Roxas Boulevard, Manila, Philippines",
     latitude: 14.5893,
     longitude: 120.9888,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Luneta_Park_Rizal_Monument.JPG/1280px-Luneta_Park_Rizal_Monument.JPG",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1"
+    ],
     description: "The Rizal Monument is a marble monument erected to commemorate Dr. Jose Rizal, a national hero of the Philippines. Located in Rizal Park, this iconic monument has been a symbol of patriotism and independence since its dedication in 1913.",
     highlights: [
       "Iconic statue of Dr. Jose Rizal",
@@ -180,7 +191,10 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "P. Burgos Drive, Rizal Park, Manila, Philippines",
     latitude: 14.5883,
     longitude: 120.9878,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/National_Museum_of_Fine_Arts%2C_Manila%2C_Philippines.jpg/1280px-National_Museum_of_Fine_Arts%2C_Manila%2C_Philippines.jpg",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1"
+    ],
     description: "The National Museum of the Philippines is the premier museum of the country, featuring world-class collections of natural history, fine art, and anthropology. It showcases the country's rich cultural heritage.",
     highlights: [
       "Fine art collection",
@@ -225,7 +239,10 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "General Luna Street, Intramuros, Manila, Philippines",
     latitude: 14.5952,
     longitude: 120.9655,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/San_Agustin_Church_07.jpg/1280px-San_Agustin_Church_07.jpg",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1"
+    ],
     description: "San Agustin Church is the oldest stone church in the Philippines, built in the 16th century. It's an architectural gem and UNESCO World Heritage Site, showcasing the fusion of Baroque and Oriental design.",
     highlights: [
       "Oldest stone church in the Philippines",
@@ -270,7 +287,10 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "Makati Avenue, Makati City, Philippines",
     latitude: 14.5550,
     longitude: 121.0177,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ayala_Museum_Makati_City.jpg/1280px-Ayala_Museum_Makati_City.jpg",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=300&h=300&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=300&h=300&s=1"
+    ],
     description: "The Ayala Museum is a premier museum in Metro Manila featuring world-class exhibitions of Philippine cultural heritage, ancient jewelry, historical artifacts, and contemporary art. Located in Makati, it showcases the country's most treasured collections.",
     highlights: [
       "Pre-Hispanic gold jewelry collection",
@@ -323,7 +343,10 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "General Luna Street, Intramuros, Manila, Philippines",
     latitude: 14.5952,
     longitude: 120.9731,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Fort_Santiago_Park%2C_Manila.jpg/1280px-Fort_Santiago_Park%2C_Manila.jpg",
+    image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1",
+    images: [
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1"
+    ],
     description: "Fort Santiago is a historic Spanish colonial fortress located within Intramuros, Manila. Built in 1571, it's one of the most significant historical sites in the Philippines and the birthplace of national hero Dr. Jose Rizal. The fort features beautifully preserved structures and museums.",
     highlights: [
       "Spanish stone fortress",
