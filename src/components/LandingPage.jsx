@@ -308,7 +308,7 @@ export default function LandingPage({ userId, userEmail }) {
                   <div className="text-right">
                     <p className="text-slate-600 text-sm mb-1">You get</p>
                     <p className="text-2xl font-light text-blue-600">
-                      ${convertedAmount}
+                      ⚡{convertedAmount} GOD
                     </p>
                   </div>
                 </div>
