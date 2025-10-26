@@ -13,8 +13,24 @@ export default function LandingPage({ userId, userEmail }) {
   const [success, setSuccess] = useState('')
   const [recentTransactions, setRecentTransactions] = useState([])
 
+  const [cryptoAmount, setCryptoAmount] = useState('')
+  const [selectedCrypto, setSelectedCrypto] = useState('BTC')
+  const [cryptoRates, setCryptoRates] = useState({})
+  const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
+  const [addingCrypto, setAddingCrypto] = useState(false)
+
   const currencies = ['PHP', 'USD', 'EUR', 'GBP']
+  const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
   const targetCurrency = 'USD'
+
+  // Sample crypto prices (in USD)
+  const defaultCryptoPrices = {
+    BTC: 43200,
+    ETH: 2280,
+    DOGE: 0.38,
+    XRP: 2.15,
+    ADA: 0.98
+  }
 
   useEffect(() => {
     loadInitialData()
