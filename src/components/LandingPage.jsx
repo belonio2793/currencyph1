@@ -133,6 +133,93 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
 }
 
 export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' }) {
+  const [geo, setGeo] = useState({ lat: null, lon: null, city: null, region: null, country: null, ip: null, source: null })
+
+  // Attempt to get precise geolocation, fallback to IP-based lookup
+  useEffect(() => {
+    let didCancel = false
+
+    const setFromIP = async () => {
+      try {
+        const resp = await fetch('https://ipapi.co/json/')
+        if (!resp.ok) return
+        const j = await resp.json()
+        if (didCancel) return
+        setGeo({
+          lat: j.latitude || null,
+          lon: j.longitude || null,
+          city: j.city || null,
+          region: j.region || null,
+          country: j.country_name || j.country || null,
+          ip: j.ip || null,
+          source: 'ip'
+        })
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    if (navigator.geolocation) {
+      const timer = setTimeout(() => {
+        // if geolocation takes too long, fallback to IP
+        setFromIP()
+      }, 5000)
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          clearTimeout(timer)
+          if (didCancel) return
+          const { latitude, longitude } = position.coords
+          // try reverse geocode via nominatim
+          try {
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
+            if (r.ok) {
+              const data = await r.json()
+              setGeo({
+                lat: latitude,
+                lon: longitude,
+                city: data.address?.city || data.address?.town || data.address?.village || null,
+                region: data.address?.state || null,
+                country: data.address?.country || null,
+                ip: null,
+                source: 'geo'
+              })
+              return
+            }
+          } catch (e) {
+            // fallback to IP
+          }
+          // fallback: set coords only
+          setGeo({ lat: latitude, lon: longitude, city: null, region: null, country: null, ip: null, source: 'geo' })
+        },
+        (err) => {
+          // permission denied or error -> fallback to IP
+          setFromIP()
+        },
+        { enableHighAccuracy: false, timeout: 7000 }
+      )
+
+      return () => { didCancel = true }
+    } else {
+      setFromIP()
+    }
+  }, [])
+
+  // small component to render geo marker
+  function GeoMarker() {
+    if (!geo || (!geo.country && !geo.lat && !geo.ip)) return null
+    return (
+      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-slate-100 rounded-lg p-3 text-xs w-44 shadow-sm">
+        <div className="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2v2m0 16v2m8-10h2M2 12H4m15.5 6.5l1.5 1.5M4.5 4.5L6 6m12.02 0L18 6M6 18l1.5 1.5"/></svg>
+          <div>
+            <div className="font-medium text-slate-900">{geo.city ? `${geo.city}, ${geo.region || ''}` : geo.country || 'Unknown'}</div>
+            <div className="text-slate-500">{geo.ip ? geo.ip : `${geo.lat ? geo.lat.toFixed(2) : '—'}, ${geo.lon ? geo.lon.toFixed(2) : '—'}`}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('PHP')
   const [exchangeRates, setExchangeRates] = useState({})
