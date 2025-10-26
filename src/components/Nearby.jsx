@@ -119,6 +119,29 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
     }
   }
 
+  async function handlePopulateTripAdvisor() {
+    if (!confirm('This will fetch all TripAdvisor listings for major Philippine cities. This may take 1-2 minutes. Continue?')) {
+      return
+    }
+
+    setPopulatingTripadvisor(true)
+    setPopulateProgress('Starting...')
+    setError('')
+
+    try {
+      const result = await populateAllTripAdvisorListings((msg) => {
+        setPopulateProgress(msg)
+      })
+      setPopulateProgress(result.message)
+      loadSavedListings(1)
+    } catch (err) {
+      console.error('Error populating TripAdvisor:', err)
+      setError(`Failed to populate: ${err.message}`)
+    } finally {
+      setPopulatingTripadvisor(false)
+    }
+  }
+
   async function handleSearch(e) {
     if (e) e.preventDefault()
     if (!query) return setError('Enter a search term')
