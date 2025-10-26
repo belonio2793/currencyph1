@@ -15,6 +15,7 @@ export async function populateManilaListings() {
         slug: listing.slug,
         description: listing.description,
         image: listing.image,
+        images: listing.images || [],
         highlights: listing.highlights,
         bestFor: listing.bestFor,
         hours: listing.hours,
