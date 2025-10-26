@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { nearbyUtils } from '../lib/nearbyUtils'
+import StarRating from './StarRating'
 
 export default function Business({ businessId, onBack, userId }) {
   const [loading, setLoading] = useState(true)
@@ -82,11 +83,18 @@ export default function Business({ businessId, onBack, userId }) {
     <div className="max-w-3xl mx-auto px-6 py-10">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <button onClick={onBack} className="text-sm text-blue-600 hover:underline">← Back</button>
+          <button onClick={onBack} className="text-sm text-blue-600 hover:underline" aria-label="Back">Back</button>
           <h1 className="text-2xl font-semibold mt-2">{data?.name || 'Business'}</h1>
           {data?.category && <div className="text-sm text-slate-600">{data.category}</div>}
         </div>
-        <div className="text-right text-sm text-slate-500">{data?.rating ? `★ ${data.rating}` : ''}</div>
+        <div className="text-right text-sm text-slate-500">
+          {data?.rating ? (
+            <div className="flex items-center justify-end gap-2">
+              <StarRating value={Number(data.rating)} size="sm" />
+              <span>{Number(data.rating).toFixed(1)}</span>
+            </div>
+          ) : ''}
+        </div>
       </div>
 
       {loading && <p className="text-sm text-slate-500">Loading...</p>}
@@ -108,8 +116,8 @@ export default function Business({ businessId, onBack, userId }) {
                     : 'bg-slate-100 text-slate-600 hover:bg-green-100'
                 }`}
                 title={userId ? 'Like this business' : 'Log in to vote'}
-              >
-                👍 {voteCounts.thumbsUp}
+>
+                Upvote {voteCounts.thumbsUp}
               </button>
               <button
                 onClick={() => handleVote('down')}
@@ -119,8 +127,8 @@ export default function Business({ businessId, onBack, userId }) {
                     : 'bg-slate-100 text-slate-600 hover:bg-red-100'
                 }`}
                 title={userId ? 'Dislike this business' : 'Log in to vote'}
-              >
-                👎 {voteCounts.thumbsDown}
+>
+                Downvote {voteCounts.thumbsDown}
               </button>
             </div>
           </div>
