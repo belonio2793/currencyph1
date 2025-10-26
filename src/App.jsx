@@ -246,6 +246,11 @@ export default function App() {
             {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
             {activeTab === 'community' && <CommunityManagement userId={userId} /> }
             {activeTab === 'admin-populate' && <AdminPopulate /> }
+            {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
+              setActiveTab('nearby')
+              setCurrentListingSlug(null)
+              window.history.replaceState(null, '', '/nearby')
+            }} /> }
           </>
         )}
       </main>
