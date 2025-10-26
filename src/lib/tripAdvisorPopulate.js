@@ -8,6 +8,7 @@ export async function populateAllTripAdvisorListings(onProgress) {
 
     const supabaseUrl = import.meta.env.VITE_PROJECT_URL
     const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+    const serviceRoleKey = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY
     const tripKey = import.meta.env.VITE_TRIPADVISOR
 
     if (!supabaseUrl || !anonKey || !tripKey) {
@@ -37,7 +38,7 @@ export async function populateAllTripAdvisorListings(onProgress) {
       console.warn('Edge Function not available, trying fallback...', edgeErr)
     }
 
-    // Fallback: Manual population with sample data
+    // Fallback: Manual population with sample data using service role key (bypasses RLS)
     if (onProgress) onProgress('Using fallback: Adding sample Philippine listings...')
 
     const sampleListings = [
@@ -56,7 +57,10 @@ export async function populateAllTripAdvisorListings(onProgress) {
     // Add source field
     const listingsWithSource = sampleListings.map(l => ({ ...l, source: 'sample' }))
 
-    const { error } = await supabase.from('nearby_listings').upsert(listingsWithSource, { onConflict: 'tripadvisor_id' })
+    // Use service role key to bypass RLS for population
+    const { createClient } = await import('@supabase/supabase-js')
+    const serviceClient = createClient(supabaseUrl, serviceRoleKey)
+    const { error } = await serviceClient.from('nearby_listings').upsert(listingsWithSource, { onConflict: 'tripadvisor_id' })
 
     if (error) throw error
 
