@@ -193,7 +193,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [voteCounts, setVoteCounts] = useState({})
   const [userVotes, setUserVotes] = useState({})
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
-  const [alphabetFilter, setAlphabetFilter] = useState('All')
+  const [alphabetFilter, setAlphabetFilter] = useState('Featured')
 
   useEffect(() => {
     checkAuthStatus()
@@ -324,6 +324,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   }
 
   function getFilteredCities() {
+    if (alphabetFilter === 'Featured') return TOP_10_CITIES
     if (alphabetFilter === 'All') return POPULAR_CITIES
     return POPULAR_CITIES.filter(city => city.charAt(0).toUpperCase() === alphabetFilter)
   }
@@ -444,32 +445,18 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Filter by City</h3>
 
-        {/* Featured Cities */}
-        <div className="mb-6">
-          <p className="text-sm text-slate-600 mb-3">Popular destinations:</p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-6">
-            {TOP_10_CITIES.map(city => (
-              <button
-                key={city}
-                onClick={() => {
-                  setSelectedCity(city)
-                  setCityPage(1)
-                  loadCityListings(city, 1)
-                }}
-                className={`p-4 rounded-lg font-semibold text-center transition-all shadow-sm hover:shadow ${
-                  selectedCity === city
-                    ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
-                    : 'bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900 hover:from-slate-100 hover:to-slate-200'
-                }`}
-              >
-                {city}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Alphabetical filter */}
-        <div className="flex gap-2 mb-4 flex-wrap">
+        {/* Filter buttons */}
+        <div className="flex gap-2 mb-6 flex-wrap">
+          <button
+            onClick={() => setAlphabetFilter('Featured')}
+            className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              alphabetFilter === 'Featured'
+                ? 'bg-blue-600 text-white'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+            }`}
+          >
+            Featured
+          </button>
           <button
             onClick={() => setAlphabetFilter('All')}
             className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
