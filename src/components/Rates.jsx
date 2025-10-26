@@ -306,14 +306,31 @@ export default function Rates({ globalCurrency }) {
   const [fiatInput, setFiatInput] = useState('')
   const [cryptoInput, setCryptoInput] = useState('')
 
+  const formatNumber = (v, decimals = 2) => {
+    if (v == null || Number.isNaN(Number(v))) return '—'
+    try {
+      return Number(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: decimals })
+    } catch (e) {
+      return Number(v).toFixed(decimals)
+    }
+  }
+
   const onChangeFiat = (val) => {
+    // accept empty input
+    if (val === '' || val === null) {
+      setFiatInput('')
+      setCryptoInput('')
+      return
+    }
+
+    // keep raw input as user types
     setFiatInput(val)
     const num = parseFloat(val)
     if (isNaN(num) || !selectedFiat || !selectedCrypto) {
       setCryptoInput('')
       return
     }
-    const rate = getRate(globalCurrency, selectedFiat.code) // selected per global
+    const rate = getRate(globalCurrency, selectedFiat.code) // 1 global = rate selected
     const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1))
     if (!rate || !cryptoPrice) {
       setCryptoInput('')
@@ -322,10 +339,17 @@ export default function Rates({ globalCurrency }) {
     // selected -> global: global = selected / rate
     const globalAmount = num / rate
     const cryptoAmount = globalAmount / cryptoPrice
-    setCryptoInput(cryptoAmount ? cryptoAmount.toString() : '')
+    // set formatted value with sensible precision for crypto
+    setCryptoInput(isFinite(cryptoAmount) ? Number(cryptoAmount).toFixed(8) : '')
   }
 
   const onChangeCrypto = (val) => {
+    if (val === '' || val === null) {
+      setCryptoInput('')
+      setFiatInput('')
+      return
+    }
+
     setCryptoInput(val)
     const num = parseFloat(val)
     if (isNaN(num) || !selectedFiat || !selectedCrypto) {
@@ -342,7 +366,7 @@ export default function Rates({ globalCurrency }) {
     const globalAmount = num * cryptoPrice
     // global -> selected: selected = global * rate
     const selectedAmount = globalAmount * rate
-    setFiatInput(selectedAmount ? selectedAmount.toString() : '')
+    setFiatInput(isFinite(selectedAmount) ? Number(selectedAmount).toFixed(2) : '')
   }
 
   const renderCryptoCard = (isPrimary) => {
