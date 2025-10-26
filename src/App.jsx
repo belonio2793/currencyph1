@@ -16,6 +16,7 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [globalCurrency, setGlobalCurrency] = useState('PHP')
 
   useEffect(() => {
     initializeUser()
