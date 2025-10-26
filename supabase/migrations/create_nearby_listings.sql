@@ -76,7 +76,12 @@ CREATE INDEX IF NOT EXISTS idx_approval_votes_user ON approval_votes(user_id);
 -- Enable RLS for listing_votes
 ALTER TABLE listing_votes ENABLE ROW LEVEL SECURITY;
 
--- Create policy for listing_votes
+-- Create policy for listing_votes (drop if exists to avoid conflicts)
+DROP POLICY IF EXISTS "Users can view all votes" ON listing_votes;
+DROP POLICY IF EXISTS "Users can vote" ON listing_votes;
+DROP POLICY IF EXISTS "Users can update own votes" ON listing_votes;
+DROP POLICY IF EXISTS "Users can delete own votes" ON listing_votes;
+
 CREATE POLICY "Users can view all votes" ON listing_votes
   FOR SELECT USING (true);
 
