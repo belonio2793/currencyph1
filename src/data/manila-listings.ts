@@ -269,7 +269,7 @@ export const MANILA_LISTINGS: Listing[] = [
     address: "Makati Avenue, Makati City, Philippines",
     latitude: 14.5550,
     longitude: 121.0177,
-    image: "https://media.tacdn.com/media/attractions-splice-spp-360x240/0a/6a/7b/ce.jpg",
+    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ayala_Museum_Makati_City.jpg/1280px-Ayala_Museum_Makati_City.jpg",
     description: "The Ayala Museum is a premier museum in Metro Manila featuring world-class exhibitions of Philippine cultural heritage, ancient jewelry, historical artifacts, and contemporary art. Located in Makati, it showcases the country's most treasured collections.",
     highlights: [
       "Pre-Hispanic gold jewelry collection",
@@ -501,55 +501,6 @@ export const MANILA_LISTINGS: Listing[] = [
         rating: 5,
         text: "Intimate and well-preserved. This gives you a real sense of how Manila's colonial elite lived.",
         date: "2024-01-07"
-      }
-    ]
-  },
-  {
-    id: "ayala-museum",
-    name: "Ayala Museum",
-    slug: "ayala-museum-makati",
-    rating: 4.4,
-    reviewCount: 1943,
-    category: "Museum",
-    address: "Makati Avenue, Makati City, Philippines",
-    latitude: 14.5550,
-    longitude: 121.0177,
-    image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ayala_Museum_Makati_City.jpg/1280px-Ayala_Museum_Makati_City.jpg",
-    description: "The Metropolitan Museum of Manila showcases world-class contemporary and traditional Philippine art. Located in Metro Manila, it features rotating exhibitions, permanent collections, and hosts various cultural events throughout the year.",
-    highlights: [
-      "Contemporary art galleries",
-      "Traditional Philippine art",
-      "Rotating international exhibitions",
-      "Sculpture garden",
-      "Photography exhibits",
-      "Decorative arts collection",
-      "Cultural events and workshops"
-    ],
-    bestFor: [
-      "Art lovers",
-      "Culture enthusiasts",
-      "Students",
-      "Photography buffs",
-      "Families",
-      "Collectors",
-      "Creative professionals"
-    ],
-    hours: "10:00 AM - 5:30 PM (Closed Mondays)",
-    admission: "₱250 (adults), ₱125 (students/seniors)",
-    website: "https://www.metmuseum.org.ph",
-    phone: "+63 2 888 1244",
-    reviews: [
-      {
-        author: "Nicole T.",
-        rating: 5,
-        text: "Exceptional collection of contemporary Filipino art. The exhibitions are well-curated and the venue is beautiful.",
-        date: "2024-01-15"
-      },
-      {
-        author: "Carlos R.",
-        rating: 4,
-        text: "Great place to discover modern and traditional Filipino artists. Always has something new on display.",
-        date: "2024-01-06"
       }
     ]
   },
