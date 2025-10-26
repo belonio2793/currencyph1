@@ -3,13 +3,36 @@ import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
 
+const POPULAR_CITIES = [
+  'Manila',
+  'Cebu',
+  'Davao',
+  'Baguio',
+  'Iloilo',
+  'Bacolod',
+  'Cagayan de Oro',
+  'Zamboanga',
+  'Boracay',
+  'Puerto Princesa',
+  'El Nido',
+  'Tagbilaran',
+  'General Luna',
+  'Olongapo',
+  'San Juan La Union',
+  'Vigan',
+  'Legazpi',
+  'Tagaytay',
+  'Bohol',
+  'Coron'
+]
+
 export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState([])
+  const [selectedCity, setSelectedCity] = useState(null)
+  const [cityListings, setCityListings] = useState([])
+  const [cityPage, setCityPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [savedIds, setSavedIds] = useState(new Set())
-  const [page, setPage] = useState(1)
   const [savedListings, setSavedListings] = useState([])
   const [listingPage, setListingPage] = useState(1)
   const [addMode, setAddMode] = useState(false)
@@ -17,6 +40,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [voteCounts, setVoteCounts] = useState({})
   const [userVotes, setUserVotes] = useState({})
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
+  const [alphabetFilter, setAlphabetFilter] = useState('All')
 
   useEffect(() => {
     checkAuthStatus()
