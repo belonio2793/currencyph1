@@ -394,7 +394,7 @@ export default function LandingPage({ userId, userEmail }) {
                   <div className="text-right">
                     <p className="text-slate-600 text-sm mb-1">You get</p>
                     <p className="text-2xl font-light text-orange-600">
-                      {convertedCryptoAmount} GOD
+                      {convertedCryptoAmount} PHP
                     </p>
                   </div>
                 </div>
@@ -410,7 +410,7 @@ export default function LandingPage({ userId, userEmail }) {
               disabled={addingCrypto || !cryptoAmount}
               className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} GOD`}
+              {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} PHP`}
             </button>
           </form>
         </div>
