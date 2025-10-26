@@ -23,6 +23,9 @@ export default function App() {
   useEffect(() => {
     initializeUser()
     handleRouting()
+
+    window.addEventListener('popstate', handleRouting)
+    return () => window.removeEventListener('popstate', handleRouting)
   }, [])
 
   const handleRouting = () => {
