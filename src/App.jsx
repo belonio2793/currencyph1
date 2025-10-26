@@ -224,6 +224,7 @@ export default function App() {
             {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} /> }
             {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
             {activeTab === 'community' && <CommunityManagement userId={userId} /> }
+            {activeTab === 'admin-populate' && <AdminPopulate /> }
           </>
         )}
       </main>
