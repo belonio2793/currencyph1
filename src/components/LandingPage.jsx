@@ -207,6 +207,51 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
   useEffect(() => {
     loadInitialData()
+
+    // Realtime subscription to currency_rates so landing page shows up-to-date rates
+    const insertSub = supabase
+      .from('currency_rates')
+      .on('INSERT', payload => {
+        setExchangeRates(prev => ({
+          ...prev,
+          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+        }))
+        setTimeout(() => loadCryptoPrices(), 50)
+      })
+      .subscribe()
+
+    const updateSub = supabase
+      .from('currency_rates')
+      .on('UPDATE', payload => {
+        setExchangeRates(prev => ({
+          ...prev,
+          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+        }))
+        setTimeout(() => loadCryptoPrices(), 50)
+      })
+      .subscribe()
+
+    const deleteSub = supabase
+      .from('currency_rates')
+      .on('DELETE', payload => {
+        setExchangeRates(prev => {
+          const copy = { ...prev }
+          delete copy[`${payload.old.from_currency}_${payload.old.to_currency}`]
+          return copy
+        })
+        setTimeout(() => loadCryptoPrices(), 50)
+      })
+      .subscribe()
+
+    return () => {
+      try {
+        insertSub.unsubscribe()
+        updateSub.unsubscribe()
+        deleteSub.unsubscribe()
+      } catch (e) {
+        // ignore
+      }
+    }
   }, [userId])
 
   useEffect(() => {
