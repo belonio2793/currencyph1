@@ -13,6 +13,8 @@ interface ListingDetailProps {
 export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
   const [listing, setListing] = useState<Listing | null>(null)
   const [relatedListings, setRelatedListings] = useState<Listing[]>([])
+  const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false)
+  const [isReviewsModalOpen, setIsReviewsModalOpen] = useState(false)
 
   // Normalize a URL to compare images regardless of size query params
   const canonicalize = (u: string) => {
