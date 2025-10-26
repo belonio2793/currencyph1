@@ -331,6 +331,90 @@ export default function LandingPage({ userId, userEmail }) {
           </form>
         </div>
 
+        {/* Cryptocurrency Form */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
+          <h3 className="text-2xl font-light text-slate-900 mb-8 tracking-tight">
+            Add Cryptocurrency
+          </h3>
+
+          {/* Form */}
+          <form onSubmit={handleAddCrypto} className="space-y-6">
+            {/* Cryptocurrency Selection */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-3">
+                Select Cryptocurrency
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {cryptos.map(crypto => (
+                  <button
+                    key={crypto}
+                    type="button"
+                    onClick={() => setSelectedCrypto(crypto)}
+                    className={`py-3 px-4 rounded-lg border-2 transition-all font-medium text-sm ${
+                      selectedCrypto === crypto
+                        ? 'border-orange-600 bg-orange-50 text-orange-900'
+                        : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <div>{crypto}</div>
+                    <div className="text-xs font-normal text-slate-500 mt-1">
+                      ${getCryptoPrice(crypto)}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Amount Input */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Amount ({selectedCrypto})
+              </label>
+              <input
+                type="number"
+                step="0.00000001"
+                value={cryptoAmount}
+                onChange={e => setCryptoAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
+              />
+            </div>
+
+            {/* Conversion Preview */}
+            {cryptoAmount && (
+              <div className="bg-gradient-to-br from-orange-50 to-slate-50 rounded-lg p-6 border border-orange-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-slate-600 text-sm mb-1">You send</p>
+                    <p className="text-2xl font-light text-slate-900">
+                      {cryptoAmount} {selectedCrypto}
+                    </p>
+                  </div>
+                  <div className="text-2xl text-slate-400">→</div>
+                  <div className="text-right">
+                    <p className="text-slate-600 text-sm mb-1">You get</p>
+                    <p className="text-2xl font-light text-orange-600">
+                      ${convertedCryptoAmount}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-orange-200">
+                  Rate: 1 {selectedCrypto} = ${getCryptoPrice(selectedCrypto)} USD
+                </p>
+              </div>
+            )}
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={addingCrypto || !cryptoAmount}
+              className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {addingCrypto ? 'Processing...' : `Add ${convertedCryptoAmount} USD`}
+            </button>
+          </form>
+        </div>
+
         {/* Recent Transactions */}
         {recentTransactions.length > 0 && (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
