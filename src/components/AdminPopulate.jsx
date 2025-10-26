@@ -28,20 +28,29 @@ export default function AdminPopulate() {
     }
   }
 
+  const [progress, setProgress] = useState(null)
+
   async function handlePopulate() {
     setLoading(true)
     setError('')
     setResult(null)
+    setProgress({ current: 0, total: 100, message: 'Starting...' })
 
     try {
-      const result = await populateTripadvisorListings()
+      const result = await populateTripadvisorListings((progressData) => {
+        setProgress(progressData)
+      })
+
       if (result.success) {
         setResult(result)
+        setProgress(null)
       } else {
         setError(result.message)
+        setProgress(null)
       }
     } catch (err) {
       setError(`Error: ${err.message}`)
+      setProgress(null)
     } finally {
       setLoading(false)
     }
