@@ -33,7 +33,52 @@ export default function Rates({ globalCurrency }) {
   useEffect(() => {
     loadRates()
     const interval = setInterval(loadRates, 60000)
-    return () => clearInterval(interval)
+
+    // Realtime subscription to Supabase currency_rates table
+    const insertSub = supabase
+      .from('currency_rates')
+      .on('INSERT', payload => {
+        setExchangeRates(prev => ({
+          ...prev,
+          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+        }))
+        setLastUpdated(new Date())
+      })
+      .subscribe()
+
+    const updateSub = supabase
+      .from('currency_rates')
+      .on('UPDATE', payload => {
+        setExchangeRates(prev => ({
+          ...prev,
+          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+        }))
+        setLastUpdated(new Date())
+      })
+      .subscribe()
+
+    const deleteSub = supabase
+      .from('currency_rates')
+      .on('DELETE', payload => {
+        setExchangeRates(prev => {
+          const copy = { ...prev }
+          delete copy[`${payload.old.from_currency}_${payload.old.to_currency}`]
+          return copy
+        })
+        setLastUpdated(new Date())
+      })
+      .subscribe()
+
+    return () => {
+      clearInterval(interval)
+      try {
+        insertSub.unsubscribe()
+        updateSub.unsubscribe()
+        deleteSub.unsubscribe()
+      } catch (e) {
+        // ignore
+      }
+    }
   }, [globalCurrency])
 
   const loadRates = async () => {
