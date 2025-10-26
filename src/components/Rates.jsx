@@ -143,7 +143,6 @@ export default function Rates({ globalCurrency }) {
       }
     }
     // All retries failed — return null and let caller handle fallback (avoids unhandled exceptions)
-    console.warn('fetchWithRetries failed for', url, lastErr)
     return null
   }
 
