@@ -141,52 +141,56 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   }
 
 
-  async function handleSearch(e) {
-    if (e) e.preventDefault()
-    if (!query) return setError('Enter a search term')
+  async function loadCityListings(city, pageNum = 1) {
+    if (!city) return
+
     setLoading(true)
     setError('')
     try {
-      const lat = null
-      const lng = null
-      const res = await searchPlaces(query + ' Philippines', lat, lng, 25)
-      if (!res) {
-        // TripAdvisor request failed (likely CORS or network). Fallback to local DB search.
-        const { data, error } = await supabase
-          .from('nearby_listings')
-          .select('*')
-          .or(`name.ilike.%${query}%,address.ilike.%${query}%`)
-          .limit(50)
-        if (error) {
-          console.warn('Local DB fallback failed', error)
-          setError('Search failed. Check console for details.')
-          setResults([])
-          return
-        }
-        setError('Using local directory fallback (TripAdvisor unavailable)')
-        setResults((data || []).map(d => ({
-          id: d.tripadvisor_id,
-          tripadvisor_id: d.tripadvisor_id,
-          name: d.name,
-          address: d.address,
-          latitude: d.latitude,
-          longitude: d.longitude,
-          rating: d.rating,
-          category: d.category,
-          raw: d.raw
-        })))
+      const perPage = 12
+      const from = (pageNum - 1) * perPage
+      const to = from + perPage - 1
+
+      const { data, error } = await supabase
+        .from('nearby_listings')
+        .select('*')
+        .ilike('address', `%${city}%`)
+        .order('rating', { ascending: false })
+        .range(from, to)
+
+      if (error) {
+        console.warn('Failed to load city listings:', error.message)
+        setCityListings([])
         return
       }
-      setResults(res)
-      // Load votes for results
-      setTimeout(loadVotesForResults, 100)
+
+      setCityListings(data || [])
+
+      // Load vote counts
+      const counts = {}
+      const votes = {}
+      for (const listing of (data || [])) {
+        const voteData = await nearbyUtils.getListingVoteCounts(listing.tripadvisor_id, 'nearby')
+        counts[listing.tripadvisor_id] = voteData
+
+        if (userId) {
+          const userVote = await nearbyUtils.getListingVote(listing.tripadvisor_id, 'nearby', userId)
+          votes[listing.tripadvisor_id] = userVote
+        }
+      }
+      setVoteCounts(counts)
+      setUserVotes(votes)
     } catch (err) {
-      console.error(err)
-      setError('Search failed. Check console for details.')
-      setResults([])
+      console.error('Failed to load city listings:', err)
+      setError('Failed to load listings')
     } finally {
       setLoading(false)
     }
+  }
+
+  function getFilteredCities() {
+    if (alphabetFilter === 'All') return POPULAR_CITIES
+    return POPULAR_CITIES.filter(city => city.charAt(0).toUpperCase() === alphabetFilter)
   }
 
   async function saveItem(item) {
