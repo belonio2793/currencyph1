@@ -396,6 +396,9 @@ export const MANILA_LISTINGS: Listing[] = [
     latitude: 14.5965,
     longitude: 120.9808,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg/1280px-Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg",
+    images: [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg/1280px-Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg"
+    ],
     description: "Quiapo Church, officially the Minor Basilica of the Black Nazarene, is one of the oldest churches in Manila and one of the most visited religious sites in the Philippines. Its iconic black statue attracts millions of devotees annually.",
     highlights: [
       "Iconic Black Nazarene statue",
@@ -443,6 +446,9 @@ export const MANILA_LISTINGS: Listing[] = [
     latitude: 14.5956,
     longitude: 120.9668,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg/1280px-Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg",
+    images: [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg/1280px-Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg"
+    ],
     description: "Casa Manila is a restored 18th-century townhouse museum located in Intramuros. It offers visitors an intimate glimpse into the daily life of Manila's Spanish colonial upper class with period furniture, decorations, and authentic architectural details.",
     highlights: [
       "18th-century Spanish colonial mansion",
@@ -491,6 +497,9 @@ export const MANILA_LISTINGS: Listing[] = [
     latitude: 14.6099,
     longitude: 121.0087,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chinese_Cemetery_Manila_4.jpg/1280px-Chinese_Cemetery_Manila_4.jpg",
+    images: [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chinese_Cemetery_Manila_4.jpg/1280px-Chinese_Cemetery_Manila_4.jpg"
+    ],
     description: "The Chinese Cemetery of Manila is one of the oldest and most historically significant Chinese cemeteries in the world. It features ornate family tombs, mausoleums, and monuments that reflect centuries of Chinese-Filipino heritage and architecture.",
     highlights: [
       "Historic Chinese tombs and mausoleums",
@@ -539,6 +548,9 @@ export const MANILA_LISTINGS: Listing[] = [
     latitude: 14.5740,
     longitude: 121.0299,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Marikina_Shoe_Museum.jpg/1280px-Marikina_Shoe_Museum.jpg",
+    images: [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Marikina_Shoe_Museum.jpg/1280px-Marikina_Shoe_Museum.jpg"
+    ],
     description: "The Marikina Shoe Museum showcases the world's largest personal collection of shoes. This unique museum features thousands of footwear pieces from around the world and tells the story of Marikina's renowned shoe-making heritage.",
     highlights: [
       "World's largest personal shoe collection",
@@ -587,6 +599,9 @@ export const MANILA_LISTINGS: Listing[] = [
     latitude: 14.5870,
     longitude: 120.9878,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/National_Library_of_the_Philippines_building.jpg/1280px-National_Library_of_the_Philippines_building.jpg",
+    images: [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/National_Library_of_the_Philippines_building.jpg/1280px-National_Library_of_the_Philippines_building.jpg"
+    ],
     description: "The National Library of the Philippines is an important institution housing extensive collections of Philippine books, manuscripts, rare documents, and historical records. It serves as a repository of the nation's literary and cultural heritage.",
     highlights: [
       "Extensive book collection",
@@ -635,6 +650,9 @@ export const MANILA_LISTINGS: Listing[] = [
     latitude: 14.5870,
     longitude: 120.9888,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Manila_Planetarium.jpg/1280px-Manila_Planetarium.jpg",
+    images: [
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Manila_Planetarium.jpg/1280px-Manila_Planetarium.jpg"
+    ],
     description: "The Manila Planetarium in Rizal Park offers immersive shows about the cosmos, celestial bodies, and astronomy. It's an educational and entertaining destination for families and students interested in space science and astronomy.",
     highlights: [
       "Planetarium shows",
