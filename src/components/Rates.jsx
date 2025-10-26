@@ -142,7 +142,9 @@ export default function Rates({ globalCurrency }) {
         }
       }
     }
-    throw lastErr
+    // All retries failed — return null and let caller handle fallback (avoids unhandled exceptions)
+    console.warn('fetchWithRetries failed for', url, lastErr)
+    return null
   }
 
   const loadCryptoPrices = async () => {
@@ -380,7 +382,7 @@ export default function Rates({ globalCurrency }) {
             <p className="text-xs text-slate-500">{selectedCrypto.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
+            <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '���'}</div>
             <div className="text-xs text-slate-500">{globalCurrency} per {selectedCrypto.code}</div>
           </div>
         </div>
