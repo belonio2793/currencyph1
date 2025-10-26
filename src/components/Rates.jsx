@@ -303,6 +303,48 @@ export default function Rates({ globalCurrency }) {
     )
   }
 
+  const [fiatInput, setFiatInput] = useState('')
+  const [cryptoInput, setCryptoInput] = useState('')
+
+  const onChangeFiat = (val) => {
+    setFiatInput(val)
+    const num = parseFloat(val)
+    if (isNaN(num) || !selectedFiat || !selectedCrypto) {
+      setCryptoInput('')
+      return
+    }
+    const rate = getRate(globalCurrency, selectedFiat.code) // selected per global
+    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1))
+    if (!rate || !cryptoPrice) {
+      setCryptoInput('')
+      return
+    }
+    // selected -> global: global = selected / rate
+    const globalAmount = num / rate
+    const cryptoAmount = globalAmount / cryptoPrice
+    setCryptoInput(cryptoAmount ? cryptoAmount.toString() : '')
+  }
+
+  const onChangeCrypto = (val) => {
+    setCryptoInput(val)
+    const num = parseFloat(val)
+    if (isNaN(num) || !selectedFiat || !selectedCrypto) {
+      setFiatInput('')
+      return
+    }
+    const rate = getRate(globalCurrency, selectedFiat.code)
+    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1))
+    if (!rate || !cryptoPrice) {
+      setFiatInput('')
+      return
+    }
+    // crypto -> global
+    const globalAmount = num * cryptoPrice
+    // global -> selected: selected = global * rate
+    const selectedAmount = globalAmount * rate
+    setFiatInput(selectedAmount ? selectedAmount.toString() : '')
+  }
+
   const renderCryptoCard = (isPrimary) => {
     if (!selectedCrypto) return null
     const price = cryptoRates[selectedCrypto.code] || defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1)
