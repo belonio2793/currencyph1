@@ -153,6 +153,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
         return
       }
       setResults(res)
+      // Load votes for results
+      setTimeout(loadVotesForResults, 100)
     } catch (err) {
       console.error(err)
       setError('Search failed. Check console for details.')
