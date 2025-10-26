@@ -9,6 +9,7 @@ export interface Listing {
   latitude: number;
   longitude: number;
   image: string;
+  images?: string[];
   description: string;
   highlights: string[];
   bestFor: string[];
