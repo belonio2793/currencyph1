@@ -48,11 +48,11 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
       className="bg-white rounded-lg border border-slate-200 overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
     >
       {/* Image */}
-      <div className="relative h-48 bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden">
+      <div className="relative h-48 aspect-video bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden">
         <img
           src={listing.image}
           alt={listing.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
           loading="lazy"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
