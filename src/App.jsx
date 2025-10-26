@@ -168,6 +168,16 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => {
+                      setActiveTab('nearby')
+                      setShowAuth(false)
+                      window.history.replaceState(null, '', '/nearby')
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Nearby
+                  </button>
+                  <button
+                    onClick={() => {
                       setShowAuth(true)
                       window.history.replaceState(null, '', '/login')
                     }}
