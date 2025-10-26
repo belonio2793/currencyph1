@@ -100,7 +100,8 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9707,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Manila_Cathedral_2015.jpg/1280px-Manila_Cathedral_2015.jpg"
     ],
     description: "The Manila Cathedral is a Roman Catholic cathedral and one of the oldest churches in the Philippines. Built in 1588, this magnificent Gothic structure has been rebuilt several times due to earthquakes and war damage.",
     highlights: [
