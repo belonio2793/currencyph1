@@ -171,14 +171,32 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
     USDT: 56
   }
 
+  // Helper: fetch with retries
+  const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
+    let lastErr
+    for (let i = 0; i <= retries; i++) {
+      try {
+        const resp = await fetch(url, options)
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+        return await resp.json()
+      } catch (err) {
+        lastErr = err
+        if (i < retries) {
+          await new Promise(r => setTimeout(r, backoff * (i + 1)))
+        }
+      }
+    }
+    throw lastErr
+  }
+
   const loadCryptoPrices = async () => {
     try {
-      const response = await fetch(
-        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,dogecoin,ripple,cardano,solana,avalanche-2,matic-network,polkadot,chainlink,uniswap,aave,usd-coin,tether&vs_currencies=usd'
+      const data = await fetchWithRetries(
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,dogecoin,ripple,cardano,solana,avalanche-2,matic-network,polkadot,chainlink,uniswap,aave,usd-coin,tether&vs_currencies=usd',
+        {},
+        2,
+        500
       )
-      if (!response.ok) throw new Error('Failed to fetch crypto prices')
-
-      const data = await response.json()
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
 
       const cryptoPricesInGlobalCurrency = {
