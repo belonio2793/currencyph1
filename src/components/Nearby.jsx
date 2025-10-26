@@ -283,42 +283,72 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
 
       {results.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          {results.map(item => (
-            <div key={item.id || item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-medium text-slate-900">{item.name}</h3>
-                  {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
-                  <div className="mt-2 flex items-center gap-3">
-                    {item.rating && <span className="text-sm text-yellow-500">★ {item.rating}</span>}
-                    {item.category && <span className="text-sm text-slate-600">{item.category}</span>}
+          {results.map(item => {
+            const id = item.tripadvisor_id || item.id
+            const counts = voteCounts[id] || { thumbsUp: 0, thumbsDown: 0 }
+            const userVote = userVotes[id]
+
+            return (
+              <div key={id} className="bg-white border rounded-lg p-4 shadow-sm">
+                <div className="flex items-start gap-4">
+                  <div className="flex-1">
+                    <h3 className="text-lg font-medium text-slate-900">{item.name}</h3>
+                    {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
+                    <div className="mt-2 flex items-center gap-3">
+                      {item.rating && <span className="text-sm text-yellow-500">★ {item.rating}</span>}
+                      {item.category && <span className="text-sm text-slate-600">{item.category}</span>}
+                    </div>
+
+                    {/* Vote buttons */}
+                    <div className="mt-3 flex items-center gap-2">
+                      <button
+                        onClick={() => handleVote(id, 'search', 'up')}
+                        className={`px-2 py-1 text-sm rounded transition-colors ${
+                          userVote === 'up'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-green-100'
+                        }`}
+                        title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
+                      >
+                        👍 {counts.thumbsUp}
+                      </button>
+                      <button
+                        onClick={() => handleVote(id, 'search', 'down')}
+                        className={`px-2 py-1 text-sm rounded transition-colors ${
+                          userVote === 'down'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-slate-100 text-slate-600 hover:bg-red-100'
+                        }`}
+                        title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
+                      >
+                        👎 {counts.thumbsDown}
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <div className="flex flex-col gap-2">
-                    <button
-                      onClick={() => saveItem(item)}
-                      className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
-                      disabled={savedIds.has((item.id || item.tripadvisor_id)?.toString())}
-                    >
-                      {savedIds.has((item.id || item.tripadvisor_id)?.toString()) ? 'Saved' : 'Save'}
-                    </button>
-                    <button
-                      onClick={() => {
-                        const id = (item.id || item.tripadvisor_id)?.toString()
-                        if (!id) return
-                        if (typeof setCurrentBusinessId === 'function') setCurrentBusinessId(id)
-                        if (typeof setActiveTab === 'function') setActiveTab('business')
-                      }}
-                      className="px-3 py-1 bg-slate-100 text-slate-700 rounded-md text-sm"
-                    >
-                      View
-                    </button>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => saveItem(item)}
+                        className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
+                        disabled={savedIds.has(id?.toString())}
+                      >
+                        {savedIds.has(id?.toString()) ? 'Saved' : 'Save'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentBusinessId(id?.toString())
+                          setActiveTab('business')
+                        }}
+                        className="px-3 py-1 bg-slate-100 text-slate-700 rounded-md text-sm"
+                      >
+                        View
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
