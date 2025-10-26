@@ -19,7 +19,7 @@ export default function LandingPage({ userId, userEmail }) {
   const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
   const [addingCrypto, setAddingCrypto] = useState(false)
 
-  const currencies = ['PHP', 'USD', 'EUR', 'GBP']
+  const currencies = ['PHP', 'CAD', 'USD', 'EUR', 'GBP']
   const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
   const targetCurrency = 'PHP'
 
