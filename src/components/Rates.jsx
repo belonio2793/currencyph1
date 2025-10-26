@@ -206,63 +206,150 @@ export default function Rates({ globalCurrency }) {
     return null
   }
 
-  return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-3xl font-light text-slate-900 tracking-tight">Exchange Rates</h2>
-        <div className="text-xs text-slate-500">
-          Last updated: {lastUpdated.toLocaleTimeString()}
+  // UI state for single-item view + search/list
+  const [viewMode, setViewMode] = useState('fiat') // 'fiat' or 'crypto'
+  const [selected, setSelected] = useState(null)
+  const [search, setSearch] = useState('')
+
+  useEffect(() => {
+    // set sensible default selected after rates load
+    if (!loading && !selected) {
+      if (viewMode === 'fiat' && allCurrencies && allCurrencies.length) {
+        const first = allCurrencies.find(c => c.code !== globalCurrency) || allCurrencies[0]
+        setSelected({ type: 'fiat', code: first.code, name: first.name })
+      } else if (viewMode === 'crypto') {
+        setSelected({ type: 'crypto', code: cryptos[0], name: cryptos[0] })
+      }
+    }
+  }, [loading, viewMode, allCurrencies, selected, globalCurrency])
+
+  const listItems = () => {
+    if (viewMode === 'fiat') {
+      return allCurrencies.filter(c => c.code !== globalCurrency).map(c => ({ type: 'fiat', code: c.code, name: c.name }))
+    }
+    return cryptos.map(c => ({ type: 'crypto', code: c, name: c }))
+  }
+
+  const filtered = listItems().filter(item => {
+    if (!search) return true
+    const s = search.toLowerCase()
+    return item.code.toLowerCase().includes(s) || item.name.toLowerCase().includes(s)
+  })
+
+  const onSelect = (item) => {
+    setSelected(item)
+  }
+
+  const next = () => {
+    const items = listItems()
+    if (!selected) return
+    const idx = items.findIndex(i => i.code === selected.code && i.type === selected.type)
+    const nextIdx = (idx + 1) % items.length
+    setSelected(items[nextIdx])
+  }
+
+  const prev = () => {
+    const items = listItems()
+    if (!selected) return
+    const idx = items.findIndex(i => i.code === selected.code && i.type === selected.type)
+    const prevIdx = (idx - 1 + items.length) % items.length
+    setSelected(items[prevIdx])
+  }
+
+  const renderSelectedCard = () => {
+    if (!selected) return null
+    if (selected.type === 'fiat') {
+      const rate = getRate(globalCurrency, selected.code)
+      return (
+        <div className="bg-slate-50 rounded-lg p-8 border border-slate-200 w-full">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h3 className="text-2xl font-medium">{selected.code}</h3>
+              <p className="text-xs text-slate-500">{selected.name}</p>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-light text-slate-900">{rate != null ? rate.toFixed(4) : '—'}</div>
+              <div className="text-xs text-slate-500">1 {globalCurrency}</div>
+            </div>
+          </div>
+          <div className="flex gap-2 mt-4">
+            <button onClick={prev} className="px-3 py-2 bg-white border rounded">Prev</button>
+            <button onClick={next} className="px-3 py-2 bg-white border rounded">Next</button>
+          </div>
+        </div>
+      )
+    }
+
+    // crypto
+    const price = cryptoRates[selected.code] || defaultCryptoPrices[selected.code] * (exchangeRates[`USD_${globalCurrency}`] || 1)
+    return (
+      <div className="bg-orange-50 rounded-lg p-8 border border-orange-200 w-full">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h3 className="text-2xl font-medium">{selected.code}</h3>
+            <p className="text-xs text-slate-500">{selected.name}</p>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
+            <div className="text-xs text-slate-500">{globalCurrency} per {selected.code}</div>
+          </div>
+        </div>
+        <div className="flex gap-2 mt-4">
+          <button onClick={prev} className="px-3 py-2 bg-white border rounded">Prev</button>
+          <button onClick={next} className="px-3 py-2 bg-white border rounded">Next</button>
         </div>
       </div>
+    )
+  }
 
-      {loading ? (
-        <div className="text-center py-8">
-          <p className="text-slate-500">Loading rates...</p>
-        </div>
-      ) : (
-        <div className="space-y-8">
-          {/* Fiat Currency Rates */}
-          <div>
-            <h3 className="text-lg font-medium text-slate-900 mb-4">Fiat Currency Rates</h3>
-            <p className="text-sm text-slate-600 mb-4">1 {globalCurrency} =</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {allCurrencies.map(curr => {
-                if (curr.code === globalCurrency) return null
-                const rate = getRate(globalCurrency, curr.code)
-                return (
-                  <div key={curr.code} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-900">{curr.code}</span>
-                      <span className="text-slate-600 font-light">{rate != null ? rate.toFixed(4) : '—'}</span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">{curr.name}</p>
-                  </div>
-                )
-              })}
-            </div>
+  return (
+    <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-light text-slate-900">Exchange Rates</h2>
+        <div className="text-xs text-slate-500">Last updated: {lastUpdated.toLocaleTimeString()}</div>
+      </div>
+
+      <div className="flex gap-6">
+        {/* Left: selected card */}
+        <div className="flex-1">{loading ? <div className="text-slate-500">Loading...</div> : renderSelectedCard()}</div>
+
+        {/* Right: Dropdown search list */}
+        <div style={{ width: 320 }} className="border border-slate-100 rounded-lg p-3">
+          <div className="flex gap-2 mb-3">
+            <button onClick={() => setViewMode('fiat')} className={`flex-1 py-2 rounded ${viewMode === 'fiat' ? 'bg-blue-600 text-white' : 'bg-white'}`}>Fiat</button>
+            <button onClick={() => setViewMode('crypto')} className={`flex-1 py-2 rounded ${viewMode === 'crypto' ? 'bg-blue-600 text-white' : 'bg-white'}`}>Crypto</button>
           </div>
 
-          {/* Cryptocurrency Rates */}
-          <div>
-            <h3 className="text-lg font-medium text-slate-900 mb-4">Cryptocurrency Rates</h3>
-            <p className="text-sm text-slate-600 mb-4">Current prices in {globalCurrency}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {cryptos.map(crypto => {
-                const price = cryptoRates[crypto] || defaultCryptoPrices[crypto] * (exchangeRates[`USD_${globalCurrency}`] || 1)
-                return (
-                  <div key={crypto} className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium text-slate-900">{crypto}</span>
-                      <span className="text-orange-600 font-light">{price?.toFixed(2) || '0.00'}</span>
-                    </div>
-                    <p className="text-xs text-slate-500 mt-1">{globalCurrency} per {crypto}</p>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search code or name"
+            className="w-full px-3 py-2 border rounded mb-3 text-sm"
+          />
+
+          <div className="h-72 overflow-auto">
+            {filtered.length === 0 ? (
+              <div className="text-sm text-slate-500">No results</div>
+            ) : (
+              filtered.map(item => (
+                <div key={`${item.type}-${item.code}`} onClick={() => onSelect(item)} className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between ${selected && selected.code === item.code ? 'bg-slate-100' : ''}`}>
+                  <div>
+                    <div className="font-medium">{item.code}</div>
+                    <div className="text-xs text-slate-500">{item.name}</div>
                   </div>
-                )
-              })}
-            </div>
+                  <div className="text-sm text-slate-600">
+                    {item.type === 'fiat' ? (
+                      (() => { const r = getRate(globalCurrency, item.code); return r != null ? r.toFixed(4) : '—' })()
+                    ) : (
+                      (() => { const p = cryptoRates[item.code] || defaultCryptoPrices[item.code] * (exchangeRates[`USD_${globalCurrency}`] || 1); return p ? p.toFixed(2) : '—' })()
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
