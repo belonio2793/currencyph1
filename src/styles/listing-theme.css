@@ -2,6 +2,17 @@
   .theme-container {
     color: #0f172a;
   }
+  .section { @apply mb-14; }
+  .section-title { @apply text-2xl md:text-3xl font-bold text-slate-900 mb-6; }
+  .muted { @apply text-slate-600; }
+  .lead { @apply text-base md:text-lg text-slate-700 leading-relaxed; }
+
+  .pill { @apply inline-block rounded-full border px-3 py-1 text-xs font-semibold; }
+  .pill-blue { @apply border-blue-200 bg-blue-50 text-blue-700; }
+
+  .gallery-tile { @apply relative overflow-hidden rounded-lg bg-slate-200 ring-1 ring-slate-200; }
+  .gallery-img { @apply w-full h-full object-cover; }
+
   .theme-card {
     @apply bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow;
   }
