@@ -294,7 +294,8 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 121.0177,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=300&h=300&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=300&h=300&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=300&h=300&s=1",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ayala_Museum_Makati_City.jpg/1280px-Ayala_Museum_Makati_City.jpg"
     ],
     description: "The Ayala Museum is a premier museum in Metro Manila featuring world-class exhibitions of Philippine cultural heritage, ancient jewelry, historical artifacts, and contemporary art. Located in Makati, it showcases the country's most treasured collections.",
     highlights: [
