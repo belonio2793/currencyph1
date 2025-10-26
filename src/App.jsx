@@ -1,90 +1,131 @@
 import { useState, useEffect } from 'react'
-import Header from './components/Header'
-import CurrencyRates from './components/CurrencyRates'
-import BalanceDisplay from './components/BalanceDisplay'
-import DepositSection from './components/DepositSection'
-import TransactionHistory from './components/TransactionHistory'
-import Footer from './components/Footer'
-import { dogTokenAPI, supabase } from './lib/supabaseClient'
+import { supabase } from './lib/supabaseClient'
+import { wisegcashAPI } from './lib/wisegcashAPI'
+import Navbar from './components/Navbar'
+import Dashboard from './components/Dashboard'
+import Wallet from './components/Wallet'
+import SendMoney from './components/SendMoney'
+import BillPayments from './components/BillPayments'
+import TransactionHistoryNew from './components/TransactionHistoryNew'
+import Profile from './components/Profile'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
   const [userEmail, setUserEmail] = useState(null)
-  const [refreshHistory, setRefreshHistory] = useState(0)
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    const initializeUser = async () => {
-      try {
-        // Check if user is authenticated
-        const { data: { user } } = await supabase.auth.getUser()
-        
-        if (user) {
-          setUserId(user.id)
-          setUserEmail(user.email)
-          // Ensure user exists in our users table
-          await dogTokenAPI.getOrCreateUser(user.email)
-        } else {
-          // For testing: create a test user with email
-          const testEmail = `test-${Math.random().toString(36).substring(7)}@dog.local`
-          const testUser = await dogTokenAPI.getOrCreateUser(testEmail)
-          setUserId(testUser.id)
-          setUserEmail(testEmail)
-        }
-      } catch (err) {
-        console.error('Error initializing user:', err)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     initializeUser()
   }, [])
 
-  const handleDepositSuccess = () => {
-    setRefreshHistory(prev => prev + 1)
+  const initializeUser = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        setUserId(user.id)
+        setUserEmail(user.email)
+        await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+      } else {
+        const testEmail = `test-${Math.random().toString(36).substring(7)}@wisegcash.local`
+        const testUser = await wisegcashAPI.getOrCreateUser(testEmail, 'Test User')
+        setUserId(testUser.id)
+        setUserEmail(testEmail)
+      }
+    } catch (err) {
+      console.error('Error initializing user:', err)
+      setError('Failed to initialize application')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
-        <div className="max-w-2xl mx-auto px-4 py-8">
-          <p className="text-gray-500">Loading...</p>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">💰</div>
+          <p className="text-gray-600 text-lg">Loading WiseGCash...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="max-w-6xl mx-auto px-4 py-8">
-        <Header />
+    <div className="min-h-screen bg-gray-50">
+      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
 
-        {userEmail && (
-          <p className="text-xs text-gray-500 mb-6 text-center">
-            {userEmail}
+      {/* User Info Bar */}
+      <div className="bg-blue-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <p className="text-sm">
+            Logged in as: <span className="font-semibold">{userEmail}</span>
           </p>
-        )}
-
-        {/* Global Currency Rates - Main Feature */}
-        <CurrencyRates />
-
-        {/* User Account Section */}
-        <div className="mt-12 border-t pt-8">
-          <h2 className="text-2xl font-bold text-black mb-6">Your Account</h2>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <BalanceDisplay userId={userId} />
-              <DepositSection userId={userId} onDepositSuccess={handleDepositSuccess} />
-            </div>
-            <div>
-              <TransactionHistory userId={userId} refresh={refreshHistory} />
-            </div>
+          <div className="text-sm">
+            <span className="text-blue-100">Account ID: {userId?.substring(0, 8)}...</span>
           </div>
         </div>
-
-        <Footer />
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border-b border-red-200">
+          <div className="max-w-7xl mx-auto px-4 py-3">
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main>
+        {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
+        {activeTab === 'wallet' && <Wallet userId={userId} />}
+        {activeTab === 'send' && <SendMoney userId={userId} />}
+        {activeTab === 'bills' && <BillPayments userId={userId} />}
+        {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
+        {activeTab === 'profile' && <Profile userId={userId} />}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-300 mt-20">
+        <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <h3 className="text-white font-bold mb-4">💰 WiseGCash</h3>
+              <p className="text-sm">Your financial companion for global money transfers and bill payments.</p>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Product</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Send Money</a></li>
+                <li><a href="#" className="hover:text-white">Pay Bills</a></li>
+                <li><a href="#" className="hover:text-white">Multi-Currency</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Company</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">About</a></li>
+                <li><a href="#" className="hover:text-white">Blog</a></li>
+                <li><a href="#" className="hover:text-white">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-white font-bold mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm">
+                <li><a href="#" className="hover:text-white">Privacy</a></li>
+                <li><a href="#" className="hover:text-white">Terms</a></li>
+                <li><a href="#" className="hover:text-white">Security</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-gray-800 pt-8 text-center text-sm">
+            <p>&copy; 2024 WiseGCash. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
