@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
 import { currencyAPI } from '../lib/currencyAPI'
+import Rates from './Rates'
 
 // Searchable Select Component
 function SearchableSelect({ value, onChange, options, placeholder, label }) {
@@ -87,7 +88,7 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 text-sm font-medium bg-white text-left flex justify-between items-center"
         >
-          <span>{value} - {prices[value]?.toFixed(2) || '0.00'} PHP</span>
+          <span>{value} - {prices[value]?.toFixed(2) || '0.00'}</span>
           <span className="text-slate-500">▼</span>
         </button>
 
@@ -116,7 +117,7 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
                     value === crypto ? 'bg-orange-50 text-orange-900 font-medium' : 'text-slate-700'
                   }`}
                 >
-                  {crypto} - {prices[crypto]?.toFixed(2) || '0.00'} PHP
+                  {crypto} - {prices[crypto]?.toFixed(2) || '0.00'}
                 </button>
               ))}
               {filtered.length === 0 && (
@@ -130,12 +131,12 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
   )
 }
 
-export default function LandingPage({ userId, userEmail }) {
+export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' }) {
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('PHP')
   const [exchangeRates, setExchangeRates] = useState({})
   const [wallets, setWallets] = useState([])
-  const [convertedAmount, setConvertedAmount] = useState('0.00')
+  const [convertedAmounts, setConvertedAmounts] = useState({})
   const [loading, setLoading] = useState(true)
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState('')
@@ -146,13 +147,11 @@ export default function LandingPage({ userId, userEmail }) {
   const [cryptoAmount, setCryptoAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('BTC')
   const [cryptoRates, setCryptoRates] = useState({})
-  const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
+  const [cryptoConvertedAmounts, setCryptoConvertedAmounts] = useState({})
   const [addingCrypto, setAddingCrypto] = useState(false)
 
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
-  const targetCurrency = 'PHP'
 
-  // Default crypto prices in PHP (fallback values)
   const defaultCryptoPrices = {
     BTC: 4200000,
     ETH: 180000,
@@ -171,105 +170,47 @@ export default function LandingPage({ userId, userEmail }) {
     USDT: 56
   }
 
-  // Crypto names for display
-  const cryptoNames = {
-    BTC: 'Bitcoin',
-    ETH: 'Ethereum',
-    LTC: 'Litecoin',
-    DOGE: 'Dogecoin',
-    XRP: 'Ripple',
-    ADA: 'Cardano',
-    SOL: 'Solana',
-    AVAX: 'Avalanche',
-    MATIC: 'Polygon',
-    DOT: 'Polkadot',
-    LINK: 'Chainlink',
-    UNI: 'Uniswap',
-    AAVE: 'Aave',
-    USDC: 'USD Coin',
-    USDT: 'Tether'
-  }
-
   const loadCryptoPrices = async () => {
     try {
       const response = await fetch(
         'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,litecoin,dogecoin,ripple,cardano,solana,avalanche-2,matic-network,polkadot,chainlink,uniswap,aave,usd-coin,tether&vs_currencies=usd'
       )
       if (!response.ok) throw new Error('Failed to fetch crypto prices')
-      
+
       const data = await response.json()
-      const phpExchangeRate = exchangeRates['USD_PHP'] || 56
-      
-      const cryptoPricesInPhp = {
-        BTC: Math.round(data.bitcoin.usd * phpExchangeRate * 100) / 100,
-        ETH: Math.round(data.ethereum.usd * phpExchangeRate * 100) / 100,
-        LTC: Math.round(data.litecoin.usd * phpExchangeRate * 100) / 100,
-        DOGE: Math.round(data.dogecoin.usd * phpExchangeRate * 100) / 100,
-        XRP: Math.round(data.ripple.usd * phpExchangeRate * 100) / 100,
-        ADA: Math.round(data.cardano.usd * phpExchangeRate * 100) / 100,
-        SOL: Math.round(data.solana.usd * phpExchangeRate * 100) / 100,
-        AVAX: Math.round(data['avalanche-2'].usd * phpExchangeRate * 100) / 100,
-        MATIC: Math.round(data['matic-network'].usd * phpExchangeRate * 100) / 100,
-        DOT: Math.round(data.polkadot.usd * phpExchangeRate * 100) / 100,
-        LINK: Math.round(data.chainlink.usd * phpExchangeRate * 100) / 100,
-        UNI: Math.round(data.uniswap.usd * phpExchangeRate * 100) / 100,
-        AAVE: Math.round(data.aave.usd * phpExchangeRate * 100) / 100,
-        USDC: Math.round(data['usd-coin'].usd * phpExchangeRate * 100) / 100,
-        USDT: Math.round(data.tether.usd * phpExchangeRate * 100) / 100
+      const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+
+      const cryptoPricesInGlobalCurrency = {
+        BTC: Math.round(data.bitcoin.usd * globalExchangeRate * 100) / 100,
+        ETH: Math.round(data.ethereum.usd * globalExchangeRate * 100) / 100,
+        LTC: Math.round(data.litecoin.usd * globalExchangeRate * 100) / 100,
+        DOGE: Math.round(data.dogecoin.usd * globalExchangeRate * 100) / 100,
+        XRP: Math.round(data.ripple.usd * globalExchangeRate * 100) / 100,
+        ADA: Math.round(data.cardano.usd * globalExchangeRate * 100) / 100,
+        SOL: Math.round(data.solana.usd * globalExchangeRate * 100) / 100,
+        AVAX: Math.round(data['avalanche-2'].usd * globalExchangeRate * 100) / 100,
+        MATIC: Math.round(data['matic-network'].usd * globalExchangeRate * 100) / 100,
+        DOT: Math.round(data.polkadot.usd * globalExchangeRate * 100) / 100,
+        LINK: Math.round(data.chainlink.usd * globalExchangeRate * 100) / 100,
+        UNI: Math.round(data.uniswap.usd * globalExchangeRate * 100) / 100,
+        AAVE: Math.round(data.aave.usd * globalExchangeRate * 100) / 100,
+        USDC: Math.round(data['usd-coin'].usd * globalExchangeRate * 100) / 100,
+        USDT: Math.round(data.tether.usd * globalExchangeRate * 100) / 100
       }
-      setCryptoRates(cryptoPricesInPhp)
+      setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
       console.error('Error loading crypto prices:', err)
       setCryptoRates(defaultCryptoPrices)
     }
   }
 
-  const detectUserCurrency = async () => {
-    try {
-      const response = await fetch('https://ipapi.co/json/')
-      const data = await response.json()
-      const countryCode = data.country_code
-      
-      // Map country codes to currencies
-      const currencyMap = {
-        'PH': 'PHP',
-        'US': 'USD',
-        'CA': 'CAD',
-        'GB': 'GBP',
-        'AU': 'AUD',
-        'JP': 'JPY',
-        'CN': 'CNY',
-        'IN': 'INR',
-        'EU': 'EUR',
-        'CH': 'CHF',
-        'SG': 'SGD',
-        'HK': 'HKD',
-        'TH': 'THB',
-        'ID': 'IDR',
-        'MY': 'MYR',
-        'VN': 'VND',
-        'KR': 'KRW',
-        'ZA': 'ZAR',
-        'BR': 'BRL',
-        'MX': 'MXN',
-        'NO': 'NOK',
-        'DK': 'DKK',
-        'AE': 'AED',
-        'SE': 'SEK',
-        'NZ': 'NZD'
-      }
-      
-      const detectedCurrency = currencyMap[countryCode] || 'PHP'
-      setSelectedCurrency(detectedCurrency)
-    } catch (err) {
-      console.error('Error detecting currency:', err)
-      setSelectedCurrency('PHP')
-    }
-  }
-
   useEffect(() => {
     loadInitialData()
   }, [userId])
+
+  useEffect(() => {
+    setSelectedCurrency(globalCurrency)
+  }, [globalCurrency])
 
   const loadInitialData = async () => {
     try {
@@ -279,7 +220,6 @@ export default function LandingPage({ userId, userEmail }) {
         loadExchangeRates(),
         loadRecentTransactions()
       ])
-      detectUserCurrency()
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load data')
@@ -322,53 +262,72 @@ export default function LandingPage({ userId, userEmail }) {
 
   useEffect(() => {
     if (amount && selectedCurrency) {
-      calculateConversion()
+      calculateMultiCurrencyConversion()
     } else {
-      setConvertedAmount('0.00')
+      setConvertedAmounts({})
     }
-  }, [amount, selectedCurrency, exchangeRates])
+  }, [amount, selectedCurrency, exchangeRates, globalCurrency])
 
   useEffect(() => {
     if (cryptoAmount && selectedCrypto) {
-      calculateCryptoConversion()
+      calculateCryptoMultiConversion()
     } else {
-      setConvertedCryptoAmount('0.00')
+      setCryptoConvertedAmounts({})
     }
-  }, [cryptoAmount, selectedCrypto, cryptoRates])
+  }, [cryptoAmount, selectedCrypto, cryptoRates, globalCurrency])
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (Object.keys(exchangeRates).length > 0) {
         loadCryptoPrices()
       }
-    }, 300000)
+    }, 60000)
     return () => clearInterval(interval)
-  }, [exchangeRates])
+  }, [exchangeRates, globalCurrency])
 
-  const calculateConversion = () => {
+  const calculateMultiCurrencyConversion = () => {
     const numAmount = parseFloat(amount) || 0
     if (numAmount <= 0) {
-      setConvertedAmount('0.00')
+      setConvertedAmounts({})
       return
     }
 
-    const rateKey = `${selectedCurrency}_${targetCurrency}`
-    const rate = exchangeRates[rateKey] || 1
+    const conversions = {}
+    const allCurrencyList = currencyAPI.getCurrencies()
 
-    const converted = (numAmount * rate).toFixed(2)
-    setConvertedAmount(converted)
+    allCurrencyList.forEach(curr => {
+      if (curr.code !== selectedCurrency) {
+        const rateKey = `${selectedCurrency}_${curr.code}`
+        const rate = exchangeRates[rateKey] || 1
+        conversions[curr.code] = (numAmount * rate).toFixed(2)
+      }
+    })
+
+    setConvertedAmounts(conversions)
   }
 
-  const calculateCryptoConversion = () => {
+  const calculateCryptoMultiConversion = () => {
     const numAmount = parseFloat(cryptoAmount) || 0
     if (numAmount <= 0) {
-      setConvertedCryptoAmount('0.00')
+      setCryptoConvertedAmounts({})
       return
     }
 
-    const price = cryptoRates[selectedCrypto] || defaultCryptoPrices[selectedCrypto] || 0
-    const converted = (numAmount * price).toFixed(2)
-    setConvertedCryptoAmount(converted)
+    const conversions = {}
+    const allCurrencyList = currencyAPI.getCurrencies()
+    const cryptoPrice = cryptoRates[selectedCrypto] || defaultCryptoPrices[selectedCrypto] || 0
+
+    // Value in global currency first
+    const valueInGlobalCurrency = numAmount * cryptoPrice
+
+    // Then convert to other currencies
+    allCurrencyList.forEach(curr => {
+      const rateKey = `${globalCurrency}_${curr.code}`
+      const rate = exchangeRates[rateKey] || 1
+      conversions[curr.code] = (valueInGlobalCurrency * rate).toFixed(2)
+    })
+
+    setCryptoConvertedAmounts(conversions)
   }
 
   const handleAddAmount = async (e) => {
@@ -387,12 +346,12 @@ export default function LandingPage({ userId, userEmail }) {
         throw new Error('Please select a currency')
       }
 
-      const convertedAmt = parseFloat(convertedAmount)
+      const convertedAmt = convertedAmounts[globalCurrency] || (numAmount * (exchangeRates[`${selectedCurrency}_${globalCurrency}`] || 1)).toFixed(2)
 
-      await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`Successfully added ${amount} ${selectedCurrency} = ${convertedAmt} ${targetCurrency}`)
+      await wisegcashAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
+      setSuccess(`Successfully added ${amount} ${selectedCurrency}`)
       setAmount('')
-      setConvertedAmount('0.00')
+      setConvertedAmounts({})
 
       setTimeout(() => {
         setSuccess('')
@@ -422,12 +381,12 @@ export default function LandingPage({ userId, userEmail }) {
         throw new Error('Please select a cryptocurrency')
       }
 
-      const convertedAmt = parseFloat(convertedCryptoAmount)
+      const convertedAmt = cryptoConvertedAmounts[globalCurrency] || (numAmount * (cryptoRates[selectedCrypto] || 0)).toFixed(2)
 
-      await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto} = ${convertedAmt} ${targetCurrency}`)
+      await wisegcashAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
+      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto}`)
       setCryptoAmount('')
-      setConvertedCryptoAmount('0.00')
+      setCryptoConvertedAmounts({})
 
       setTimeout(() => {
         setSuccess('')
@@ -497,7 +456,7 @@ export default function LandingPage({ userId, userEmail }) {
           <div className="mb-8 text-center">
             <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
             <h2 className="text-5xl font-light text-slate-900">
-              {getTotalBalance()}
+              {getTotalBalance()} {globalCurrency}
             </h2>
           </div>
 
@@ -531,10 +490,10 @@ export default function LandingPage({ userId, userEmail }) {
                 />
               </div>
 
-              {/* Conversion Preview */}
-              {amount && (
+              {/* Conversion Preview - Show global currency value */}
+              {amount && convertedAmounts[globalCurrency] && (
                 <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg p-6 border border-blue-100">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
                       <p className="text-slate-600 text-sm mb-1">You send</p>
                       <p className="text-2xl font-light text-slate-900">
@@ -545,14 +504,31 @@ export default function LandingPage({ userId, userEmail }) {
                     <div className="text-right">
                       <p className="text-slate-600 text-sm mb-1">You get</p>
                       <p className="text-2xl font-light text-blue-600">
-                        {convertedAmount} {targetCurrency}
+                        {convertedAmounts[globalCurrency]} {globalCurrency}
                       </p>
                     </div>
                   </div>
-                  {getRate(selectedCurrency, targetCurrency) && (
-                    <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-blue-200">
-                      Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} {targetCurrency}
+                  {getRate(selectedCurrency, globalCurrency) && (
+                    <p className="text-xs text-slate-500 border-t border-blue-200 pt-3">
+                      Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, globalCurrency)} {globalCurrency}
                     </p>
+                  )}
+
+                  {/* Other currency conversions */}
+                  {Object.keys(convertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-blue-200">
+                      <p className="text-xs font-medium text-slate-600 mb-2">Also worth approximately:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(convertedAmounts)
+                          .filter(([code]) => code !== globalCurrency && code !== selectedCurrency)
+                          .slice(0, 4)
+                          .map(([code, value]) => (
+                            <div key={code} className="text-xs text-slate-600">
+                              <span className="font-medium">{code}</span>: {value}
+                            </div>
+                          ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
@@ -595,10 +571,10 @@ export default function LandingPage({ userId, userEmail }) {
                 />
               </div>
 
-              {/* Conversion Preview */}
-              {cryptoAmount && (
+              {/* Conversion Preview - Show global currency value */}
+              {cryptoAmount && cryptoConvertedAmounts[globalCurrency] && (
                 <div className="bg-gradient-to-br from-orange-50 to-slate-50 rounded-lg p-6 border border-orange-100">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between mb-4">
                     <div>
                       <p className="text-slate-600 text-sm mb-1">You send</p>
                       <p className="text-2xl font-light text-slate-900">
@@ -609,13 +585,30 @@ export default function LandingPage({ userId, userEmail }) {
                     <div className="text-right">
                       <p className="text-slate-600 text-sm mb-1">You get</p>
                       <p className="text-2xl font-light text-orange-600">
-                        {convertedCryptoAmount} {targetCurrency}
+                        {cryptoConvertedAmounts[globalCurrency]} {globalCurrency}
                       </p>
                     </div>
                   </div>
-                  <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-orange-200">
-                    Rate: 1 {selectedCrypto} = {getCryptoPrice(selectedCrypto)} {targetCurrency}
+                  <p className="text-xs text-slate-500 border-t border-orange-200 pt-3">
+                    Rate: 1 {selectedCrypto} = {getCryptoPrice(selectedCrypto)} {globalCurrency}
                   </p>
+
+                  {/* Other currency conversions */}
+                  {Object.keys(cryptoConvertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-orange-200">
+                      <p className="text-xs font-medium text-slate-600 mb-2">Also worth approximately:</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(cryptoConvertedAmounts)
+                          .filter(([code]) => code !== globalCurrency)
+                          .slice(0, 4)
+                          .map(([code, value]) => (
+                            <div key={code} className="text-xs text-slate-600">
+                              <span className="font-medium">{code}</span>: {value}
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -631,9 +624,12 @@ export default function LandingPage({ userId, userEmail }) {
           </div>
         </div>
 
+        {/* Rates Section */}
+        <Rates globalCurrency={globalCurrency} />
+
         {/* Recent Transactions */}
         {recentTransactions.length > 0 && (
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200 mt-8">
             <h3 className="text-xl font-light text-slate-900 mb-6 tracking-tight">Recent Transactions</h3>
             <div className="space-y-3">
               {recentTransactions.slice(0, 5).map(txn => (
