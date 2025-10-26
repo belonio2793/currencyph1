@@ -314,7 +314,7 @@ export default function LandingPage({ userId, userEmail }) {
                 </div>
                 {getRate(selectedCurrency, targetCurrency) && (
                   <p className="text-xs text-slate-500 mt-3 pt-3 border-t border-blue-200">
-                    Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} {targetCurrency}
+                    Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, targetCurrency)} GOD
                   </p>
                 )}
               </div>
