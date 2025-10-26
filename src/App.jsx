@@ -91,17 +91,53 @@ export default function App() {
           <>
             {/* Home Page Navbar */}
             <nav className="bg-white border-b border-slate-100">
-              <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
+              <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                 <h1 className="text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
-                <button
-                  onClick={() => setActiveTab('dashboard')}
-                  className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                >
-                  More Tools
-                </button>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-slate-700">Display Currency:</label>
+                    <select
+                      value={globalCurrency}
+                      onChange={(e) => setGlobalCurrency(e.target.value)}
+                      className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white"
+                    >
+                      <option value="PHP">PHP - Philippine Peso</option>
+                      <option value="USD">USD - US Dollar</option>
+                      <option value="CAD">CAD - Canadian Dollar</option>
+                      <option value="EUR">EUR - Euro</option>
+                      <option value="GBP">GBP - British Pound</option>
+                      <option value="JPY">JPY - Japanese Yen</option>
+                      <option value="CNY">CNY - Chinese Yuan</option>
+                      <option value="INR">INR - Indian Rupee</option>
+                      <option value="AUD">AUD - Australian Dollar</option>
+                      <option value="CHF">CHF - Swiss Franc</option>
+                      <option value="SEK">SEK - Swedish Krona</option>
+                      <option value="NZD">NZD - New Zealand Dollar</option>
+                      <option value="SGD">SGD - Singapore Dollar</option>
+                      <option value="HKD">HKD - Hong Kong Dollar</option>
+                      <option value="IDR">IDR - Indonesian Rupiah</option>
+                      <option value="MYR">MYR - Malaysian Ringgit</option>
+                      <option value="THB">THB - Thai Baht</option>
+                      <option value="VND">VND - Vietnamese Dong</option>
+                      <option value="KRW">KRW - South Korean Won</option>
+                      <option value="ZAR">ZAR - South African Rand</option>
+                      <option value="BRL">BRL - Brazilian Real</option>
+                      <option value="MXN">MXN - Mexican Peso</option>
+                      <option value="NOK">NOK - Norwegian Krone</option>
+                      <option value="DKK">DKK - Danish Krone</option>
+                      <option value="AED">AED - UAE Dirham</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('dashboard')}
+                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    More Tools
+                  </button>
+                </div>
               </div>
             </nav>
-            <LandingPage userId={userId} userEmail={userEmail} />
+            <LandingPage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />
           </>
         )}
         {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
