@@ -352,6 +352,20 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
           priceRange: listing.admission ? listing.admission.split(':')[0] : undefined,
         })}
       </script>
+
+      {/* Modals */}
+      <GalleryModal
+        images={[listing.image, ...galleryImages]}
+        listingName={listing.name}
+        isOpen={isGalleryModalOpen}
+        onClose={() => setIsGalleryModalOpen(false)}
+      />
+      <ReviewsModal
+        reviews={listing.reviews}
+        listingName={listing.name}
+        isOpen={isReviewsModalOpen}
+        onClose={() => setIsReviewsModalOpen(false)}
+      />
     </div>
   )
 }
