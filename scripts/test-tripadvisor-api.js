@@ -1,4 +1,18 @@
-import fetch from 'node-fetch';
+// Use built-in fetch (Node 18+) or node-fetch
+let fetch;
+try {
+  // Node 18+ has built-in fetch
+  fetch = globalThis.fetch;
+} catch (e) {
+  try {
+    // Fallback to node-fetch if available
+    const module = await import('node-fetch');
+    fetch = module.default;
+  } catch (e2) {
+    console.error('Error: fetch not available. Requires Node 18+ or node-fetch package');
+    process.exit(1);
+  }
+}
 
 const TRIP_KEY = process.env.VITE_TRIPADVISOR || process.env.TRIPADVISOR;
 
