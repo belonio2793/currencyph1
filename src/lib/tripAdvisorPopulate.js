@@ -6,7 +6,7 @@ export async function populateAllTripAdvisorListings(onProgress) {
   try {
     if (onProgress) onProgress('Starting TripAdvisor population via CORS proxy...')
 
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+    const supabaseUrl = import.meta.env.VITE_PROJECT_URL
     const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
     const tripKey = import.meta.env.VITE_TRIPADVISOR
 
