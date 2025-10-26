@@ -19,9 +19,19 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
 
   useEffect(() => {
+    checkAuthStatus()
     loadSavedIds()
     loadSavedListings()
   }, [])
+
+  async function checkAuthStatus() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      setIsAuthenticatedUser(!!user)
+    } catch (err) {
+      setIsAuthenticatedUser(false)
+    }
+  }
 
   async function loadSavedIds() {
     try {
