@@ -3,6 +3,19 @@ import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
 
+const TOP_10_CITIES = [
+  'Manila',
+  'Cebu City',
+  'Davao City',
+  'Quezon City',
+  'Makati',
+  'Baguio',
+  'Boracay',
+  'Puerto Princesa',
+  'Iloilo City',
+  'Pasig'
+]
+
 const POPULAR_CITIES = [
   'Alaminos',
   'Angeles',
