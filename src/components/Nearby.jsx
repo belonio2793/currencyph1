@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
+import { populateAllTripAdvisorListings } from '../lib/tripAdvisorPopulate'
 
 export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [query, setQuery] = useState('')
@@ -17,6 +18,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [voteCounts, setVoteCounts] = useState({})
   const [userVotes, setUserVotes] = useState({})
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
+  const [populatingTripadvisor, setPopulatingTripadvisor] = useState(false)
+  const [populateProgress, setPopulateProgress] = useState('')
 
   useEffect(() => {
     checkAuthStatus()
