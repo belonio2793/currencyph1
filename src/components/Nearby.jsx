@@ -441,6 +441,29 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
         </form>
       )}
 
+      <div className="mb-12">
+        <h3 className="text-2xl font-bold text-slate-900 mb-6">Featured Cities</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+          {TOP_10_CITIES.map(city => (
+            <button
+              key={city}
+              onClick={() => {
+                setSelectedCity(city)
+                setCityPage(1)
+                loadCityListings(city, 1)
+              }}
+              className={`p-6 rounded-lg font-semibold text-center transition-all shadow-md hover:shadow-lg ${
+                selectedCity === city
+                  ? 'bg-gradient-to-br from-blue-600 to-blue-700 text-white'
+                  : 'bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900 hover:from-slate-100 hover:to-slate-200'
+              }`}
+            >
+              {city}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="mb-8">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Filter by City</h3>
 
