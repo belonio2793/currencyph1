@@ -25,6 +25,7 @@ export default function App() {
   const [globalCurrency, setGlobalCurrency] = useState('PHP')
   const [showAuth, setShowAuth] = useState(false)
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
+  const [currentListingSlug, setCurrentListingSlug] = useState(null)
 
   useEffect(() => {
     initializeUser()
