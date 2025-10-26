@@ -1,100 +1,225 @@
 import { supabase } from './supabaseClient'
-import { getImagesForListing, getDefaultImagesForCity } from './fetchTripadvisorImages'
 
+// Comprehensive list of Philippine cities and municipalities
 const PHILIPPINES_CITIES = [
-  'Manila', 'Cebu', 'Davao', 'Baguio', 'Iloilo', 'Bacolod', 'Cagayan de Oro',
-  'Zamboanga', 'Boracay', 'Puerto Princesa', 'El Nido', 'Tagbilaran',
-  'General Luna', 'Olongapo', 'San Juan', 'Vigan', 'Legazpi', 'Tagaytay',
-  'Bohol', 'Coron', 'Palawan', 'Quezon City', 'Makati', 'Pasig', 'Taguig',
-  'Caloocan', 'Las Piñas', 'Parañaque', 'Marikina', 'Mandaluyong', 'San Juan',
-  'Malabon', 'Navotas', 'Valenzuela', 'Maynila', 'Antipolo', 'Cainta', 'Tanay',
-  'Paete', 'Angono', 'Montalban', 'Norzagaray', 'Novaliches', 'Bulakan',
-  'Malolos', 'San Fernando', 'Plaridel', 'Meycauayan', 'Obando', 'Hagonoy',
-  'Calumpit', 'Apalit', 'San Luis', 'Guagua', 'Porac', 'Floridablanca',
-  'Dinalupihan', 'Masinloc', 'Palauig', 'Iba', 'Subic', 'Olongapo',
-  'Limay', 'Hermosa', 'Abucay', 'Samal', 'Orion', 'Balanga', 'Orani',
-  'Pilar', 'Nataasan', 'Cabanatuan', 'Science City', 'Muñoz', 'Gapan',
-  'Talugtug', 'Pantabangan', 'Santo Domingo'
+  // Metro Manila
+  'Manila', 'Quezon City', 'Makati', 'Pasig', 'Taguig', 'Caloocan', 'Las Piñas', 'Parañaque', 'Marikina', 'Mandaluyong', 'San Juan', 'Malabon', 'Navotas', 'Valenzuela',
+  // NCR nearby
+  'Antipolo', 'Cainta', 'Tanay', 'Paete', 'Angono', 'Rizal', 'Montalban', 'Norzagaray', 'Bulakan', 'Malolos', 'San Fernando', 'Plaridel', 'Meycauayan', 'Obando', 'Hagonoy', 'Calumpit', 'Apalit', 'San Luis', 'Guagua', 'Porac', 'Floridablanca', 'Dinalupihan', 'Masinloc', 'Palauig', 'Iba', 'Subic', 'Olongapo', 'Limay', 'Hermosa', 'Abucay', 'Samal', 'Orion', 'Balanga', 'Orani', 'Pilar', 'Nataasan',
+  // Tagalog Region
+  'Baguio', 'Tagaytay', 'Cabanatuan', 'Muñoz', 'Gapan', 'Talugtug', 'Pantabangan', 'Santo Domingo', 'Lipa', 'Nasugbu', 'Calatagan', 'Mataas na Kahoy', 'Tanauan', 'Sariaya', 'Lucena', 'Tayabas', 'Quezon', 'Candelaria', 'Silian', 'Mulanay', 'Macalelon', 'Real', 'Infanta', 'Baler', 'Casiguran', 'Dingalan',
+  // Visayas
+  'Cebu', 'Iloilo', 'Bacolod', 'Boracay', 'Aklan', 'Kalibo', 'Capiz', 'Roxas', 'Antique', 'San Jose de Buenavista', 'Guimaras', 'Jordan', 'Negros Oriental', 'Dumaguete', 'Siquijor', 'Tagbilaran', 'Bohol',
+  // Mindanao
+  'Davao', 'Cagayan de Oro', 'Zamboanga', 'Butuan', 'Cotabato', 'General Santos', 'Iligan', 'Marawi', 'Kota Kinabalu', 'Surigao', 'Tandag', 'Bislig', 'Butuan', 'Agusan', 'Dinatuan', 'Lianga', 'Carrascal',
+  // Palawan
+  'Puerto Princesa', 'El Nido', 'Coron', 'Busuanga', 'Linapacan', 'Araceli', 'Dumaran', 'Culion', 'Balabac', 'Calamian'
 ]
 
-// Mock TripAdvisor attraction data for testing/development
-const MOCK_ATTRACTIONS_BY_CITY = {
-  Manila: [
-    { name: 'Intramuros', rating: 4.1, category: 'Historical Site', reviewCount: 3645 },
-    { name: 'Rizal Park', rating: 4.5, category: 'Park', reviewCount: 29795 },
-    { name: 'Manila Cathedral', rating: 4.2, category: 'Religious Site', reviewCount: 1176 },
-    { name: 'National Museum of Fine Arts', rating: 4.7, category: 'Museum', reviewCount: 8865 },
-    { name: 'Fort Santiago', rating: 4.5, category: 'Historical Site', reviewCount: 11922 }
-  ],
-  Cebu: [
-    { name: 'Magellan\'s Cross', rating: 4.3, category: 'Historical Site', reviewCount: 4200 },
-    { name: 'Cebu Cathedral', rating: 4.4, category: 'Religious Site', reviewCount: 2100 },
-    { name: 'Tops Lookout', rating: 4.5, category: 'Viewpoint', reviewCount: 5300 }
-  ],
-  Davao: [
-    { name: 'People\'s Park', rating: 4.2, category: 'Park', reviewCount: 2800 },
-    { name: 'Samal Island', rating: 4.6, category: 'Island', reviewCount: 8900 },
-    { name: 'Crocodile Park', rating: 4.1, category: 'Zoo', reviewCount: 3200 }
-  ]
+// TripAdvisor API categories to search
+const SEARCH_CATEGORIES = [
+  'attractions',
+  'things to do',
+  'museums',
+  'historical sites',
+  'parks',
+  'beaches',
+  'hotels',
+  'restaurants',
+  'churches'
+]
+
+// High-quality mock data for key attractions (fallback when API fails)
+const PREMIUM_ATTRACTIONS = {
+  'Intramuros': { rating: 4.5, category: 'Historical Site', reviewCount: 5000 },
+  'Manila Cathedral': { rating: 4.3, category: 'Religious Site', reviewCount: 2100 },
+  'Rizal Park': { rating: 4.6, category: 'Park', reviewCount: 12000 },
+  'National Museum': { rating: 4.7, category: 'Museum', reviewCount: 8000 },
+  'Fort Santiago': { rating: 4.4, category: 'Historical Site', reviewCount: 6000 },
+  'Boracay Beach': { rating: 4.8, category: 'Beach', reviewCount: 25000 },
+  'Cebu Cathedral': { rating: 4.3, category: 'Religious Site', reviewCount: 3000 },
+  'Magellan Cross': { rating: 4.2, category: 'Historical Site', reviewCount: 4500 },
+  'Chocolate Hills': { rating: 4.7, category: 'Natural Wonder', reviewCount: 18000 },
+  'Mayon Volcano': { rating: 4.6, category: 'Natural Wonder', reviewCount: 9000 }
 }
 
-export async function populateTripadvisorListings() {
+/**
+ * Fetch listings from TripAdvisor API or use mock data
+ */
+async function fetchTripAdvisorListings(query, limit = 20) {
   try {
-    const allListings = []
-    const totalCities = PHILIPPINES_CITIES.length
-
-    for (let i = 0; i < totalCities; i++) {
-      const city = PHILIPPINES_CITIES[i]
-      
-      // Get mock attractions for this city (or empty array if not in mock data)
-      const attractions = MOCK_ATTRACTIONS_BY_CITY[city] || generateMockAttractionsForCity(city)
-      
-      // Convert attractions to listings format
-      const cityListings = attractions.map((attr, idx) => {
-        // Generate slug from city and attraction name
-        const slug = `${city.toLowerCase().replace(/\s+/g, '-')}-${attr.name.toLowerCase().replace(/\s+/g, '-')}`
-
-        // Get images for this listing (either from known sources or defaults)
-        const images = getImagesForListing(slug)
-        const imageToUse = images.length > 0 ? images[0] : `https://via.placeholder.com/600x400?text=${encodeURIComponent(attr.name)}`
-
-        return {
-          tripadvisor_id: slug,
-          name: attr.name,
-          address: `${attr.name}, ${city}, Philippines`,
-          latitude: generateRandomLatitude(),
-          longitude: generateRandomLongitude(),
-          rating: attr.rating,
-          category: attr.category,
-          raw: {
-            slug: slug,
-            city: city,
-            description: `${attr.name} is a popular attraction in ${city}, Philippines. ${attr.category} with a rating of ${attr.rating}/5 based on ${attr.reviewCount} reviews.`,
-            reviews: [],
-            highlights: ['Popular attraction', 'Highly rated', 'Worth visiting'],
-            bestFor: ['Tourism', 'Photography', 'Learning'],
-            hours: '9:00 AM - 6:00 PM',
-            admission: 'Variable',
-            image: imageToUse,
-            images: images,
-            phone: null,
-            website: null,
-            reviewCount: attr.reviewCount
-          },
-          updated_at: new Date().toISOString()
-        }
-      })
-
-      allListings.push(...cityListings)
+    const apiKey = import.meta.env.VITE_TRIPADVISOR || process.env.VITE_TRIPADVISOR
+    
+    if (!apiKey) {
+      console.warn('TripAdvisor API key not available, using enhanced mock data')
+      return []
     }
 
-    // Insert in batches to avoid overwhelming the database
-    const batchSize = 100
+    const params = new URLSearchParams()
+    params.append('query', query)
+    params.append('limit', String(limit))
+
+    const response = await fetch(
+      `https://api.tripadvisor.com/api/partner/2.0/search?${params.toString()}`,
+      {
+        headers: {
+          'X-TripAdvisor-API-Key': apiKey,
+          'Accept': 'application/json'
+        },
+        timeout: 10000
+      }
+    )
+
+    if (!response.ok) {
+      return []
+    }
+
+    const data = await response.json()
+    const items = data.data || []
+
+    return items.map(item => ({
+      tripadvisor_id: String(item.location_id || item.id || Math.random()),
+      name: item.name,
+      address: item.address || '',
+      latitude: item.latitude || item.address_obj?.latitude || null,
+      longitude: item.longitude || item.address_obj?.longitude || null,
+      rating: item.rating ? Number(item.rating) : 4.0,
+      category: item.subcategory || item.category?.name || 'Attraction',
+      reviewCount: item.review_count || 0,
+      raw: item
+    }))
+  } catch (err) {
+    console.error('TripAdvisor API error:', err.message)
+    return []
+  }
+}
+
+/**
+ * Generate enhanced mock attractions with realistic data
+ */
+function generateEnhancedMockAttractionsForCity(city, category) {
+  const categories = {
+    'attractions': ['Temple', 'Museum', 'Park', 'Monument'],
+    'things to do': ['Adventure Tour', 'Water Sports', 'Local Experience', 'Cultural Tour'],
+    'historical sites': ['Historic Building', 'Fort', 'Ancient Site', 'Historic District'],
+    'parks': ['National Park', 'City Park', 'Nature Reserve', 'Botanical Garden'],
+    'beaches': ['Beach Resort', 'Beach Club', 'Beach', 'Cove'],
+    'museums': ['Art Museum', 'History Museum', 'Science Museum', 'Maritime Museum'],
+    'restaurants': ['Fine Dining', 'Local Restaurant', 'Seafood Restaurant', 'Cafe'],
+    'churches': ['Cathedral', 'Basilica', 'Church', 'Shrine']
+  }
+
+  const categoryList = categories[category] || ['Attraction']
+  const attractions = []
+
+  for (let i = 1; i <= 3; i++) {
+    const catIndex = Math.floor(Math.random() * categoryList.length)
+    const attractionCategory = categoryList[catIndex]
+    attractions.push({
+      tripadvisor_id: `${city.toLowerCase().replace(/\s+/g, '-')}-${category}-${i}-${Date.now()}`,
+      name: `${attractionCategory} in ${city}`,
+      address: `${attractionCategory}, ${city}, Philippines`,
+      latitude: parseFloat((Math.random() * 14 + 5).toFixed(4)),
+      longitude: parseFloat((Math.random() * 7 + 120).toFixed(4)),
+      rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
+      category: attractionCategory,
+      reviewCount: Math.floor(Math.random() * 5000) + 200,
+      raw: {
+        source: 'mock_data',
+        city,
+        category,
+        description: `Popular ${attractionCategory.toLowerCase()} in ${city}. A must-visit attraction with excellent ratings and reviews.`
+      }
+    })
+  }
+
+  return attractions
+}
+
+/**
+ * Main population function
+ */
+export async function populateTripadvisorListings(onProgress = null) {
+  try {
+    const allListings = new Map() // Use Map to avoid duplicates
+    let processedCount = 0
+    const totalCities = PHILIPPINES_CITIES.length
+    const totalCategories = SEARCH_CATEGORIES.length
+    const totalOperations = totalCities * totalCategories
+
+    console.log(`Starting population of ${totalOperations} city-category combinations`)
+
+    for (let cityIdx = 0; cityIdx < totalCities; cityIdx++) {
+      const city = PHILIPPINES_CITIES[cityIdx]
+
+      for (let catIdx = 0; catIdx < totalCategories; catIdx++) {
+        const category = SEARCH_CATEGORIES[catIdx]
+        processedCount++
+
+        // Progress callback
+        if (onProgress) {
+          onProgress({
+            current: processedCount,
+            total: totalOperations,
+            message: `Fetching ${category} in ${city}...`
+          })
+        }
+
+        try {
+          // Try API first
+          const searchQuery = `${category} in ${city} Philippines`
+          let listings = await fetchTripAdvisorListings(searchQuery, 10)
+
+          // Fallback to enhanced mock data if API returns nothing
+          if (listings.length === 0) {
+            listings = generateEnhancedMockAttractionsForCity(city, category)
+          }
+
+          // Add to map (key is tripadvisor_id to avoid duplicates)
+          for (const listing of listings) {
+            allListings.set(listing.tripadvisor_id, {
+              ...listing,
+              updated_at: new Date().toISOString()
+            })
+          }
+
+          // Rate limiting - be nice to the API
+          await new Promise(resolve => setTimeout(resolve, 300))
+        } catch (err) {
+          console.error(`Error processing ${category} in ${city}:`, err.message)
+          // Continue with next category
+        }
+      }
+    }
+
+    const listingsToInsert = Array.from(allListings.values())
+    console.log(`Total unique listings to insert: ${listingsToInsert.length}`)
+
+    if (listingsToInsert.length === 0) {
+      return {
+        success: false,
+        message: 'No listings were collected',
+        totalFetched: 0,
+        uniqueSaved: 0,
+        inserted: 0
+      }
+    }
+
+    // Insert in batches
+    const batchSize = 50
     let totalInserted = 0
 
-    for (let i = 0; i < allListings.length; i += batchSize) {
-      const batch = allListings.slice(i, i + batchSize)
-      
+    for (let i = 0; i < listingsToInsert.length; i += batchSize) {
+      const batch = listingsToInsert.slice(i, i + batchSize)
+
+      if (onProgress) {
+        onProgress({
+          current: totalOperations + (i / batchSize),
+          total: totalOperations + (listingsToInsert.length / batchSize),
+          message: `Saving batch ${Math.floor(i / batchSize) + 1}/${Math.ceil(listingsToInsert.length / batchSize)}...`
+        })
+      }
+
       const { data, error } = await supabase
         .from('nearby_listings')
         .upsert(batch, { onConflict: 'tripadvisor_id' })
@@ -104,19 +229,22 @@ export async function populateTripadvisorListings() {
         console.error(`Error inserting batch ${i / batchSize + 1}:`, error)
         return {
           success: false,
-          message: `Error at batch ${i / batchSize + 1}: ${error.message}`,
-          totalFetched: allListings.length,
+          message: `Error saving batch: ${error.message}`,
+          totalFetched: listingsToInsert.length,
           inserted: totalInserted
         }
       }
 
       totalInserted += data?.length || 0
+
+      // Small delay between batches
+      await new Promise(resolve => setTimeout(resolve, 200))
     }
 
     return {
       success: true,
-      message: `Successfully populated ${totalInserted} listings from ${totalCities} Philippine cities`,
-      totalFetched: allListings.length,
+      message: `Successfully populated ${totalInserted} unique listings from ${totalCities} Philippine cities across ${totalCategories} categories`,
+      totalFetched: listingsToInsert.length,
       uniqueSaved: totalInserted,
       inserted: totalInserted
     }
@@ -129,32 +257,4 @@ export async function populateTripadvisorListings() {
       inserted: 0
     }
   }
-}
-
-function generateMockAttractionsForCity(city) {
-  // Generate 2-4 mock attractions for cities not in our predefined list
-  const count = Math.floor(Math.random() * 3) + 2
-  const categories = ['Park', 'Museum', 'Religious Site', 'Historical Site', 'Beach', 'Market']
-  const attractions = []
-
-  for (let i = 0; i < count; i++) {
-    attractions.push({
-      name: `${city} Attraction ${i + 1}`,
-      rating: (Math.random() * 2 + 3).toFixed(1),
-      category: categories[Math.floor(Math.random() * categories.length)],
-      reviewCount: Math.floor(Math.random() * 5000) + 500
-    })
-  }
-
-  return attractions
-}
-
-function generateRandomLatitude() {
-  // Philippines latitude range: approximately 5°N to 19°N
-  return (Math.random() * 14 + 5).toFixed(4)
-}
-
-function generateRandomLongitude() {
-  // Philippines longitude range: approximately 120°E to 127°E
-  return (Math.random() * 7 + 120).toFixed(4)
 }
