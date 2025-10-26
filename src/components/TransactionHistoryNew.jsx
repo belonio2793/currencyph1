@@ -25,17 +25,17 @@ export default function TransactionHistory({ userId }) {
   const getTransactionIcon = (type) => {
     switch (type) {
       case 'transfer_sent':
-        return '📤'
+        return '→'
       case 'transfer_received':
-        return '📥'
+        return '←'
       case 'add_funds':
-        return '➕'
+        return '+'
       case 'bill_payment':
-        return '📋'
+        return '•'
       case 'withdrawal':
-        return '💸'
+        return '↓'
       default:
-        return '📊'
+        return '•'
     }
   }
 
@@ -66,25 +66,25 @@ export default function TransactionHistory({ userId }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center text-gray-500">Loading transactions...</div>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="text-center text-slate-500">Loading transactions...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold text-gray-900 mb-8">📊 Transaction History</h2>
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">Transaction History</h2>
 
       {/* Filters */}
-      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-8">
+      <div className="bg-white border border-slate-200 rounded-xl p-6 mb-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Transaction Type</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Transaction Type</label>
             <select
               value={filter}
               onChange={e => setFilter(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             >
               <option value="all">All Types</option>
               <option value="transfer_sent">Money Sent</option>
@@ -95,11 +95,11 @@ export default function TransactionHistory({ userId }) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Currency</label>
+            <label className="block text-sm font-medium text-slate-700 mb-2">Currency</label>
             <select
               value={selectedCurrency}
               onChange={e => setSelectedCurrency(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
             >
               <option value="all">All Currencies</option>
               {currencies.map(curr => (
@@ -112,42 +112,48 @@ export default function TransactionHistory({ userId }) {
 
       {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-xl p-12 text-center">
-          <p className="text-gray-500 text-lg">No transactions found</p>
+        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center">
+          <p className="text-slate-500 text-sm">No transactions found</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {filteredTransactions.map(transaction => (
-            <div key={transaction.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div key={transaction.id} className="bg-white border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="text-3xl">{getTransactionIcon(transaction.transaction_type)}</div>
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-light text-lg ${
+                    transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment'
+                      ? 'bg-red-100 text-red-600'
+                      : 'bg-emerald-100 text-emerald-600'
+                  }`}>
+                    {getTransactionIcon(transaction.transaction_type)}
+                  </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{getTransactionLabel(transaction.transaction_type)}</p>
-                    <p className="text-sm text-gray-500">{transaction.description}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {new Date(transaction.created_at).toLocaleDateString()} {new Date(transaction.created_at).toLocaleTimeString()}
+                    <p className="font-medium text-slate-900 text-sm">{getTransactionLabel(transaction.transaction_type)}</p>
+                    <p className="text-xs text-slate-500 mt-1">{transaction.description}</p>
+                    <p className="text-xs text-slate-400 mt-1">
+                      {new Date(transaction.created_at).toLocaleDateString()} {new Date(transaction.created_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <p className={`text-lg font-bold ${
+                  <p className={`text-lg font-light ${
                     transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment'
                       ? 'text-red-600'
-                      : 'text-green-600'
+                      : 'text-emerald-600'
                   }`}>
                     {transaction.transaction_type.includes('sent') || transaction.transaction_type === 'bill_payment' ? '-' : '+'}
                     {transaction.currency_code === 'PHP' ? '₱' : transaction.currency_code === 'EUR' ? '€' : transaction.currency_code === 'GBP' ? '£' : '$'}
                     {transaction.amount.toFixed(2)}
                   </p>
-                  <p className="text-xs text-gray-500">{transaction.currency_code}</p>
+                  <p className="text-xs text-slate-500">{transaction.currency_code}</p>
                 </div>
               </div>
 
               {transaction.reference_number && (
-                <div className="mt-3 pt-3 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">Ref: {transaction.reference_number}</p>
+                <div className="mt-3 pt-3 border-t border-slate-100">
+                  <p className="text-xs text-slate-500">Ref: {transaction.reference_number}</p>
                 </div>
               )}
             </div>

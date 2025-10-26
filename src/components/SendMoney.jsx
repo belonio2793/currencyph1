@@ -119,48 +119,47 @@ export default function SendMoney({ userId }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="text-center text-gray-500">Loading...</div>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="text-center text-slate-500">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold text-gray-900 mb-8">📤 Send Money</h2>
+    <div className="max-w-7xl mx-auto px-6 py-12">
+      <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">Send Money</h2>
 
-      {error && <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg">{error}</div>}
-      {success && <div className="mb-4 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">{success}</div>}
+      {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
+      {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Send Form */}
         <div className="lg:col-span-2">
-          <div className="bg-white border border-gray-200 rounded-xl p-8">
-            <form onSubmit={handleSendMoney} className="space-y-6">
+          <div className="bg-white border border-slate-200 rounded-xl p-8">
+            <form onSubmit={handleSendMoney} className="space-y-8">
               {/* Step Indicator */}
-              <div className="flex items-center space-x-4 mb-8">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                  1
-                </div>
-                <div className="flex-1 h-1 bg-gray-200"></div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                  2
-                </div>
-                <div className="flex-1 h-1 bg-gray-200"></div>
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                  3
-                </div>
+              <div className="flex items-center space-x-4">
+                {[1, 2, 3].map((s) => (
+                  <div key={s} className="flex items-center flex-1">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                      s <= step ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
+                    }`}>
+                      {s}
+                    </div>
+                    {s < 3 && <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-blue-600' : 'bg-slate-200'}`}></div>}
+                  </div>
+                ))}
               </div>
 
               {step === 1 && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-gray-900">Select Sender Account</h3>
+                  <h3 className="text-lg font-medium text-slate-900">Select Sender Account</h3>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">From Account</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">From Account</label>
                     <select
                       value={selectedSender}
                       onChange={e => setSelectedSender(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     >
                       {wallets.map(wallet => (
                         <option key={wallet.id} value={wallet.currency_code}>
@@ -172,7 +171,7 @@ export default function SendMoney({ userId }) {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                   >
                     Next
                   </button>
@@ -181,25 +180,25 @@ export default function SendMoney({ userId }) {
 
               {step === 2 && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-gray-900">Recipient & Currency</h3>
+                  <h3 className="text-lg font-medium text-slate-900">Recipient & Currency</h3>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Recipient Email</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Recipient Email</label>
                     <input
                       type="email"
                       value={recipientEmail}
                       onChange={e => setRecipientEmail(e.target.value)}
                       placeholder="recipient@example.com"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Recipient Currency</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Recipient Currency</label>
                     <select
                       value={recipientCurrency}
                       onChange={e => setRecipientCurrency(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                     >
                       {currencies.map(curr => (
                         <option key={curr} value={curr}>
@@ -213,14 +212,14 @@ export default function SendMoney({ userId }) {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                      className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
                     >
                       Back
                     </button>
                     <button
                       type="button"
                       onClick={() => setStep(3)}
-                      className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                      className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                     >
                       Next
                     </button>
@@ -230,10 +229,10 @@ export default function SendMoney({ userId }) {
 
               {step === 3 && (
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold text-gray-900">Enter Amount</h3>
+                  <h3 className="text-lg font-medium text-slate-900">Enter Amount</h3>
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
                       Amount ({selectedSender})
                     </label>
                     <input
@@ -242,37 +241,37 @@ export default function SendMoney({ userId }) {
                       value={amount}
                       onChange={e => setAmount(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-lg"
+                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
                     />
                   </div>
 
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600 mb-1">Recipient Receives</p>
-                    <p className="text-2xl font-bold text-gray-900">
+                  <div className="bg-slate-50 p-4 rounded-lg">
+                    <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-1">Recipient Receives</p>
+                    <p className="text-3xl font-light text-slate-900">
                       {receiverAmount} {recipientCurrency}
                     </p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      Exchange Rate: 1 {selectedSender} = {exchangeRate.toFixed(4)} {recipientCurrency}
+                    <p className="text-xs text-slate-500 mt-2">
+                      Rate: 1 {selectedSender} = {exchangeRate.toFixed(4)} {recipientCurrency}
                     </p>
                   </div>
 
-                  <div className="bg-blue-50 p-4 rounded-lg">
-                    <p className="text-sm font-semibold text-gray-700">Fee</p>
-                    <p className="text-lg font-bold text-gray-900">1% + {selectedSender}</p>
+                  <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg">
+                    <p className="text-sm font-medium text-slate-700">Transfer Fee</p>
+                    <p className="text-lg font-light text-slate-900 mt-1">1% of amount</p>
                   </div>
 
                   <div className="flex space-x-4">
                     <button
                       type="button"
                       onClick={() => setStep(2)}
-                      className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                      className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
                     >
                       Back
                     </button>
                     <button
                       type="submit"
                       disabled={sending}
-                      className="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors font-semibold disabled:opacity-50"
+                      className="flex-1 bg-emerald-600 text-white py-3 rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50"
                     >
                       {sending ? 'Sending...' : 'Send Money'}
                     </button>
@@ -285,12 +284,11 @@ export default function SendMoney({ userId }) {
 
         {/* Beneficiaries Sidebar */}
         <div className="space-y-6">
-          {/* Quick Beneficiaries */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Recent Recipients</h3>
+          <div className="bg-white border border-slate-200 rounded-xl p-6">
+            <h3 className="text-lg font-medium text-slate-900 mb-4">Recent Recipients</h3>
             <div className="space-y-2">
               {beneficiaries.length === 0 ? (
-                <p className="text-gray-500 text-sm">No saved beneficiaries yet</p>
+                <p className="text-slate-500 text-sm">No saved recipients yet</p>
               ) : (
                 beneficiaries.slice(0, 5).map(b => (
                   <button
@@ -299,28 +297,27 @@ export default function SendMoney({ userId }) {
                       setRecipientEmail(b.recipient_email)
                       setStep(2)
                     }}
-                    className="w-full text-left p-3 bg-gray-50 rounded-lg hover:bg-blue-50 transition-colors"
+                    className="w-full text-left p-3 bg-slate-50 rounded-lg hover:bg-blue-50 transition-colors text-sm"
                   >
-                    <p className="font-semibold text-gray-900 text-sm">{b.recipient_name}</p>
-                    <p className="text-xs text-gray-500">{b.recipient_email}</p>
+                    <p className="font-medium text-slate-900">{b.recipient_name}</p>
+                    <p className="text-xs text-slate-500 mt-1">{b.recipient_email}</p>
                   </button>
                 ))
               )}
             </div>
           </div>
 
-          {/* Add New Beneficiary */}
-          <div className="bg-white border border-gray-200 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Add Beneficiary</h3>
+          <div className="bg-white border border-slate-200 rounded-xl p-6">
+            <h3 className="text-lg font-medium text-slate-900 mb-4">Add Recipient</h3>
             <form onSubmit={handleAddBeneficiary} className="space-y-3">
               <input
                 type="email"
                 placeholder="Email address"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm"
               />
               <button
                 type="submit"
-                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-sm"
+                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
               >
                 Add
               </button>
