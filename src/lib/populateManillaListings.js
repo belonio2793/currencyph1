@@ -3,30 +3,37 @@ import { MANILA_LISTINGS } from '../data/manila-listings'
 
 export async function populateManilaListings() {
   try {
-    const listingsToInsert = MANILA_LISTINGS.map((listing) => ({
-      tripadvisor_id: listing.id,
-      name: listing.name,
-      address: listing.address,
-      latitude: listing.latitude,
-      longitude: listing.longitude,
-      rating: listing.rating,
-      category: listing.category,
-      raw: {
-        slug: listing.slug,
-        description: listing.description,
-        image: listing.image,
-        images: listing.images || [],
-        highlights: listing.highlights,
-        bestFor: listing.bestFor,
-        hours: listing.hours,
-        admission: listing.admission,
-        website: listing.website,
-        phone: listing.phone,
-        reviews: listing.reviews,
-        reviewCount: listing.reviewCount,
-      },
-      updated_at: new Date().toISOString(),
-    }))
+    const listingsToInsert = MANILA_LISTINGS.map((listing) => {
+      // Use listing images or fall back to main image
+      const images = listing.images && listing.images.length > 0
+        ? listing.images
+        : [listing.image]
+
+      return {
+        tripadvisor_id: listing.id,
+        name: listing.name,
+        address: listing.address,
+        latitude: listing.latitude,
+        longitude: listing.longitude,
+        rating: listing.rating,
+        category: listing.category,
+        raw: {
+          slug: listing.slug,
+          description: listing.description,
+          image: listing.image,
+          images: images,
+          highlights: listing.highlights,
+          bestFor: listing.bestFor,
+          hours: listing.hours,
+          admission: listing.admission,
+          website: listing.website,
+          phone: listing.phone,
+          reviews: listing.reviews,
+          reviewCount: listing.reviewCount,
+        },
+        updated_at: new Date().toISOString(),
+      }
+    })
 
     // Use upsert to avoid duplicates
     const { data, error } = await supabase
