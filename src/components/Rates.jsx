@@ -374,7 +374,7 @@ export default function Rates({ globalCurrency }) {
               <div className="text-sm text-slate-500">No results</div>
             ) : (
               filtered.map(item => (
-                <div key={`${item.type}-${item.code}`} onClick={() => onSelect(item)} className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between ${selected && selected.code === item.code ? 'bg-slate-100' : ''}`}>
+                <div key={`${item.type}-${item.code}`} onClick={() => onSelect(item)} className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between ${item.type === 'fiat' ? (selectedFiat && selectedFiat.code === item.code ? 'bg-slate-100' : '') : (selectedCrypto && selectedCrypto.code === item.code ? 'bg-slate-100' : '')}`}>
                   <div>
                     <div className="font-medium">{item.code}</div>
                     <div className="text-xs text-slate-500">{item.name}</div>
