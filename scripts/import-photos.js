@@ -132,7 +132,7 @@ async function uploadToSupabaseStorage(filePath, bucketPath) {
       .from(BUCKET_NAME)
       .upload(bucketPath, fileBuffer, {
         contentType: mimeType,
-        upsert: false
+        upsert: true
       })
     
     if (error) {
