@@ -3,7 +3,7 @@ import { wisegcashAPI } from '../lib/wisegcashAPI'
 
 export default function LandingPage({ userId, userEmail }) {
   const [amount, setAmount] = useState('')
-  const [selectedCurrency, setSelectedCurrency] = useState('PHP')
+  const [selectedCurrency, setSelectedCurrency] = useState('GOD')
   const [exchangeRates, setExchangeRates] = useState({})
   const [wallets, setWallets] = useState([])
   const [convertedAmount, setConvertedAmount] = useState('0.00')
@@ -19,9 +19,9 @@ export default function LandingPage({ userId, userEmail }) {
   const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
   const [addingCrypto, setAddingCrypto] = useState(false)
 
-  const currencies = ['PHP', 'USD', 'EUR', 'GBP']
+  const currencies = ['GOD', 'PHP', 'USD', 'EUR', 'GBP']
   const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
-  const targetCurrency = 'USD'
+  const targetCurrency = 'GOD'
 
   // Sample crypto prices (in USD)
   const defaultCryptoPrices = {
