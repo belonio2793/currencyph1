@@ -8,6 +8,7 @@ export default function AdminPopulate() {
   const [result, setResult] = useState(null)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('manila')
+  const [progress, setProgress] = useState(null)
 
   async function handlePopulateManila() {
     setLoading(true)
