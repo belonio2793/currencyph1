@@ -40,10 +40,12 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9731,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=600&h=400&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=600&h=400&s=1",
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/Intramuros%2C_Manila_by_Dominic_Sansone.jpg/1280px-Intramuros%2C_Manila_by_Dominic_Sansone.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/55/8f/10/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/00/0b/20/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/00/2a/8c/caption.jpg?w=600&h=400&s=1"
     ],
     description: "Intramuros is the historic walled city of Manila, known as the 'City Within the City.' This 16th-century fortress has been home to Spanish colonial architecture for over 400 years. Today, it stands as a testament to Manila's rich history and cultural heritage with well-preserved Spanish colonial architecture, museums, and cultural landmarks.",
     highlights: [
