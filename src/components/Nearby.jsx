@@ -274,6 +274,9 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
         <div className="flex gap-2">
           <button onClick={() => { setAddMode(!addMode) }} className="px-3 py-2 bg-indigo-600 text-white rounded-md">{addMode ? 'Cancel' : 'Add Business'}</button>
           <button onClick={() => loadSavedListings(1)} className="px-3 py-2 bg-slate-100 rounded-md">Refresh Saved</button>
+          <button onClick={handlePopulateTripAdvisor} disabled={populatingTripadvisor} className="px-3 py-2 bg-blue-600 text-white rounded-md disabled:opacity-50">
+            {populatingTripadvisor ? 'Populating...' : 'Load TripAdvisor'}
+          </button>
         </div>
       </div>
 
