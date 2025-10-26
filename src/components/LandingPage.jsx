@@ -358,7 +358,7 @@ export default function LandingPage({ userId, userEmail }) {
                   >
                     <div>{crypto}</div>
                     <div className="text-xs font-normal text-slate-500 mt-1">
-                      ${getCryptoPrice(crypto)}
+                      ⚡{getCryptoPrice(crypto)}
                     </div>
                   </button>
                 ))}
