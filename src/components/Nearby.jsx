@@ -189,19 +189,34 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
 
   async function handleAddSubmit(e) {
     e.preventDefault()
-    const payload = {
-      tripadvisor_id: `manual-${Date.now()}-${Math.random().toString(36).slice(2,8)}`,
-      name: newListing.name || null,
-      address: newListing.address || null,
-      latitude: newListing.latitude ? Number(newListing.latitude) : null,
-      longitude: newListing.longitude ? Number(newListing.longitude) : null,
-      rating: newListing.rating ? Number(newListing.rating) : null,
-      category: newListing.category || null,
-      raw: { createdBy: userId || null }
+
+    if (!userId) {
+      setError('Please log in to submit a business')
+      return
     }
-    await saveItem(payload)
-    setNewListing({ name: '', address: '', latitude: '', longitude: '', rating: '', category: '' })
-    setAddMode(false)
+
+    try {
+      await nearbyUtils.submitPendingListing(userId, {
+        name: newListing.name,
+        address: newListing.address,
+        latitude: newListing.latitude,
+        longitude: newListing.longitude,
+        rating: newListing.rating,
+        category: newListing.category,
+        description: newListing.description,
+        raw: {}
+      })
+
+      setNewListing({ name: '', address: '', latitude: '', longitude: '', rating: '', category: '', description: '' })
+      setAddMode(false)
+      setError('')
+
+      // Show success message
+      alert('Business submitted successfully! Community members will review and approve it.')
+    } catch (err) {
+      console.error('Error submitting business:', err)
+      setError('Failed to submit business')
+    }
   }
 
   async function deleteListing(id) {
