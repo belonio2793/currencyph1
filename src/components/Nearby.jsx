@@ -50,8 +50,69 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
       const { data, error } = await supabase.from('nearby_listings').select('*').order('updated_at', { ascending: false }).range(from, to)
       if (error) return console.warn('loadSavedListings:', error.message)
       setSavedListings(data || [])
+
+      // Load vote counts for saved listings
+      const votes = {}
+      const counts = {}
+      for (const listing of (data || [])) {
+        const voteData = await nearbyUtils.getListingVoteCounts(listing.tripadvisor_id, 'nearby')
+        counts[listing.tripadvisor_id] = voteData
+
+        if (userId) {
+          const userVote = await nearbyUtils.getListingVote(listing.tripadvisor_id, 'nearby', userId)
+          votes[listing.tripadvisor_id] = userVote
+        }
+      }
+      setVoteCounts(counts)
+      setUserVotes(votes)
     } catch (err) {
       console.error('Failed to load saved listings', err)
+    }
+  }
+
+  async function loadVotesForResults() {
+    if (results.length === 0) return
+
+    const votes = {}
+    const counts = {}
+    for (const item of results) {
+      const id = item.tripadvisor_id || item.id
+      const voteData = await nearbyUtils.getListingVoteCounts(id, 'search')
+      counts[id] = voteData
+
+      if (userId) {
+        const userVote = await nearbyUtils.getListingVote(id, 'search', userId)
+        votes[id] = userVote
+      }
+    }
+    setVoteCounts(prev => ({ ...prev, ...counts }))
+    setUserVotes(prev => ({ ...prev, ...votes }))
+  }
+
+  async function handleVote(listingId, listingType, voteType) {
+    if (!userId) {
+      setError('Please log in to vote')
+      return
+    }
+
+    try {
+      const currentVote = userVotes[listingId]
+      if (currentVote === voteType) {
+        // Remove vote if clicking same button
+        await nearbyUtils.removeListingVote(listingId, listingType, userId)
+        setUserVotes(prev => ({ ...prev, [listingId]: null }))
+      } else {
+        // Submit or update vote
+        await nearbyUtils.submitListingVote(listingId, listingType, userId, voteType)
+        setUserVotes(prev => ({ ...prev, [listingId]: voteType }))
+      }
+
+      // Reload vote counts
+      const voteData = await nearbyUtils.getListingVoteCounts(listingId, listingType)
+      setVoteCounts(prev => ({ ...prev, [listingId]: voteData }))
+    } catch (err) {
+      console.error('Error voting:', err)
+      setError('Failed to submit vote')
     }
   }
 
