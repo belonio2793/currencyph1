@@ -29,7 +29,7 @@ export default function App() {
         setUserEmail(user.email)
         await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
       } else {
-        const testEmail = `test-${Math.random().toString(36).substring(7)}@wisegcash.local`
+        const testEmail = `test-${Math.random().toString(36).substring(7)}@currency.local`
         const testUser = await wisegcashAPI.getOrCreateUser(testEmail, 'Test User')
         setUserId(testUser.id)
         setUserEmail(testEmail)
@@ -44,36 +44,33 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl mb-4">💰</div>
-          <p className="text-gray-600 text-lg">Loading WiseGCash...</p>
+          <div className="text-6xl font-light mb-4 text-white">currency.ph</div>
+          <p className="text-slate-300 text-sm tracking-wide">Loading...</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* User Info Bar */}
-      <div className="bg-blue-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <p className="text-sm">
-            Logged in as: <span className="font-semibold">{userEmail}</span>
+      {/* Minimalist User Status Bar */}
+      <div className="bg-white border-b border-slate-100">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <p className="text-xs text-slate-500 tracking-wide">
+            <span className="text-slate-400">Account:</span> {userEmail}
           </p>
-          <div className="text-sm">
-            <span className="text-blue-100">Account ID: {userId?.substring(0, 8)}...</span>
-          </div>
         </div>
       </div>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border-b border-red-200">
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <p className="text-red-700 text-sm">{error}</p>
+        <div className="bg-red-50 border-b border-red-100">
+          <div className="max-w-7xl mx-auto px-6 py-3">
+            <p className="text-red-600 text-sm">{error}</p>
           </div>
         </div>
       )}
@@ -88,41 +85,41 @@ export default function App() {
         {activeTab === 'profile' && <Profile userId={userId} />}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-gray-300 mt-20">
-        <div className="max-w-7xl mx-auto px-4 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      {/* Sophisticated Footer */}
+      <footer className="bg-white border-t border-slate-100 mt-20">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             <div>
-              <h3 className="text-white font-bold mb-4">💰 WiseGCash</h3>
-              <p className="text-sm">Your financial companion for global money transfers and bill payments.</p>
+              <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">Your modern platform for global financial management.</p>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Send Money</a></li>
-                <li><a href="#" className="hover:text-white">Pay Bills</a></li>
-                <li><a href="#" className="hover:text-white">Multi-Currency</a></li>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Multi-Currency</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">About</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Company</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">About</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Careers</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-bold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Legal</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Privacy</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Terms</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-sm">
-            <p>&copy; 2024 WiseGCash. All rights reserved.</p>
+          <div className="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 tracking-wide">
+            <p>&copy; 2024 currency.ph. All rights reserved.</p>
           </div>
         </div>
       </footer>
