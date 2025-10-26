@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
+import { nearbyUtils } from '../lib/nearbyUtils'
 
-export default function Nearby({ userId }) {
+export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState([])
   const [loading, setLoading] = useState(false)
@@ -12,7 +13,10 @@ export default function Nearby({ userId }) {
   const [savedListings, setSavedListings] = useState([])
   const [listingPage, setListingPage] = useState(1)
   const [addMode, setAddMode] = useState(false)
-  const [newListing, setNewListing] = useState({ name: '', address: '', latitude: '', longitude: '', rating: '', category: '' })
+  const [newListing, setNewListing] = useState({ name: '', address: '', latitude: '', longitude: '', rating: '', category: '', description: '' })
+  const [voteCounts, setVoteCounts] = useState({})
+  const [userVotes, setUserVotes] = useState({})
+  const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
 
   useEffect(() => {
     loadSavedIds()
