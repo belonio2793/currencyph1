@@ -19,17 +19,41 @@ export default function LandingPage({ userId, userEmail }) {
   const [convertedCryptoAmount, setConvertedCryptoAmount] = useState('0.00')
   const [addingCrypto, setAddingCrypto] = useState(false)
 
-  const currencies = ['GOD', 'PHP', 'USD', 'EUR', 'GBP']
+  const currencies = ['PHP', 'USD', 'EUR', 'GBP']
   const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
   const targetCurrency = 'PHP'
 
-  // Sample crypto prices (in GOD)
+  // Default crypto prices in PHP (fallback values)
   const defaultCryptoPrices = {
-    BTC: 1500000,
-    ETH: 85000,
-    DOGE: 15,
-    XRP: 85,
-    ADA: 42
+    BTC: 4200000,
+    ETH: 180000,
+    DOGE: 8,
+    XRP: 25,
+    ADA: 35
+  }
+
+  const loadCryptoPrices = async () => {
+    try {
+      const response = await fetch(
+        'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,dogecoin,ripple,cardano&vs_currencies=usd'
+      )
+      if (!response.ok) throw new Error('Failed to fetch crypto prices')
+
+      const data = await response.json()
+      const phpExchangeRate = exchangeRates['USD_PHP'] || 56
+
+      const cryptoPricesInPhp = {
+        BTC: Math.round(data.bitcoin.usd * phpExchangeRate * 100) / 100,
+        ETH: Math.round(data.ethereum.usd * phpExchangeRate * 100) / 100,
+        DOGE: Math.round(data.dogecoin.usd * phpExchangeRate * 100) / 100,
+        XRP: Math.round(data.ripple.usd * phpExchangeRate * 100) / 100,
+        ADA: Math.round(data.cardano.usd * phpExchangeRate * 100) / 100
+      }
+      setCryptoRates(cryptoPricesInPhp)
+    } catch (err) {
+      console.error('Error loading crypto prices:', err)
+      setCryptoRates(defaultCryptoPrices)
+    }
   }
 
   useEffect(() => {
@@ -68,6 +92,7 @@ export default function LandingPage({ userId, userEmail }) {
         ratesMap[`${r.from_currency}_${r.to_currency}`] = r.rate
       })
       setExchangeRates(ratesMap)
+      setTimeout(() => loadCryptoPrices(), 100)
     } catch (err) {
       console.error('Error loading exchange rates:', err)
     }
@@ -97,6 +122,15 @@ export default function LandingPage({ userId, userEmail }) {
       setConvertedCryptoAmount('0.00')
     }
   }, [cryptoAmount, selectedCrypto, cryptoRates])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (Object.keys(exchangeRates).length > 0) {
+        loadCryptoPrices()
+      }
+    }, 300000)
+    return () => clearInterval(interval)
+  }, [exchangeRates])
 
   const calculateConversion = () => {
     const numAmount = parseFloat(amount) || 0
