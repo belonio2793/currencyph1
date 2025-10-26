@@ -34,7 +34,7 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
             {listing.name}
           </h3>
           <div className="flex items-center gap-2">
-            <span className="text-yellow-400 text-xs">★</span>
+            <StarRating value={listing.rating} size="sm" />
             <span className="text-xs font-semibold text-slate-900">{listing.rating.toFixed(1)}</span>
             <span className="text-xs text-slate-500">({listing.reviewCount})</span>
           </div>
