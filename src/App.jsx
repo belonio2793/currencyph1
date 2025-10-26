@@ -18,10 +18,21 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [globalCurrency, setGlobalCurrency] = useState('PHP')
+  const [showAuth, setShowAuth] = useState(false)
 
   useEffect(() => {
     initializeUser()
+    handleRouting()
   }, [])
+
+  const handleRouting = () => {
+    const path = window.location.pathname
+    if (path === '/login' || path === '/register') {
+      setShowAuth(true)
+    } else {
+      setShowAuth(false)
+    }
+  }
 
   const initializeUser = async () => {
     try {
