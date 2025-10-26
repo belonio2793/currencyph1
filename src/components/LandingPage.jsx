@@ -198,6 +198,13 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         2,
         500
       )
+
+      if (!data) {
+        console.warn('Coingecko fetch failed in LandingPage, using defaults')
+        setCryptoRates(defaultCryptoPrices)
+        return
+      }
+
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
 
       const cryptoPricesInGlobalCurrency = {
