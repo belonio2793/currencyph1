@@ -211,7 +211,6 @@ export default function Rates({ globalCurrency }) {
   const [search, setSearch] = useState('')
   const [selectedFiat, setSelectedFiat] = useState(null)
   const [selectedCrypto, setSelectedCrypto] = useState(null)
-  const [primaryTopIs, setPrimaryTopIs] = useState('fiat') // 'fiat' or 'crypto' controls which card is visually primary
 
   useEffect(() => {
     // sensible defaults after rates load
@@ -281,13 +280,11 @@ export default function Rates({ globalCurrency }) {
     }
   }
 
-  const swapPositions = () => setPrimaryTopIs(prev => (prev === 'fiat' ? 'crypto' : 'fiat'))
-
   const renderFiatCard = (isPrimary) => {
     if (!selectedFiat) return null
     const rate = getRate(globalCurrency, selectedFiat.code)
     return (
-      <div onClick={() => setPrimaryTopIs('fiat')} className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'} cursor-pointer`}>
+      <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-medium">{selectedFiat.code}</h3>
@@ -310,7 +307,7 @@ export default function Rates({ globalCurrency }) {
     if (!selectedCrypto) return null
     const price = cryptoRates[selectedCrypto.code] || defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1)
     return (
-      <div onClick={() => setPrimaryTopIs('crypto')} className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'} cursor-pointer`}>
+      <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-medium">{selectedCrypto.code}</h3>
@@ -343,20 +340,9 @@ export default function Rates({ globalCurrency }) {
             <div className="text-slate-500">Loading...</div>
           ) : (
             <div className="space-y-4">
-              {primaryTopIs === 'fiat' ? (
-                <>
-                  {renderFiatCard(true)}
-                  {renderCryptoCard(false)}
-                </>
-              ) : (
-                <>
-                  {renderCryptoCard(true)}
-                  {renderFiatCard(false)}
-                </>
-              )}
-              <div className="mt-2 flex items-center gap-2">
-                <button onClick={swapPositions} className="px-3 py-2 border rounded bg-white">Swap</button>
-              </div>
+              {/* Always show fiat on top, crypto below */}
+              {renderFiatCard(true)}
+              {renderCryptoCard(false)}
             </div>
           )}
         </div>
