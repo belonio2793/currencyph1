@@ -253,10 +253,20 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
         {/* Reviews Section */}
         <section className="section border-t border-slate-100 pt-8">
-          <h2 className="section-title">Visitor Reviews</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title mb-0">Visitor Reviews</h2>
+            {listing.reviews.length > 0 && (
+              <button
+                onClick={() => setIsReviewsModalOpen(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+              >
+                View All ({listing.reviews.length})
+              </button>
+            )}
+          </div>
           <div className="reviews-slider-container">
             <div className="reviews-slider">
-              {listing.reviews.map((review, idx) => (
+              {listing.reviews.slice(0, 3).map((review, idx) => (
                 <div key={idx} className="review-card">
                   <div className="flex items-start justify-between mb-4 flex-col gap-2">
                     <div className="w-full">
