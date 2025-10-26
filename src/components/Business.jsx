@@ -35,6 +35,47 @@ export default function Business({ businessId, onBack, userId }) {
     }
   }
 
+  async function loadVotes(id) {
+    try {
+      const counts = await nearbyUtils.getListingVoteCounts(id, 'nearby')
+      setVoteCounts(counts)
+
+      if (userId) {
+        const vote = await nearbyUtils.getListingVote(id, 'nearby', userId)
+        setUserVote(vote)
+      }
+    } catch (err) {
+      console.error('Error loading votes:', err)
+    }
+  }
+
+  async function handleVote(voteType) {
+    if (!userId) {
+      setError('Please log in to vote')
+      return
+    }
+
+    try {
+      const currentVote = userVote
+      if (currentVote === voteType) {
+        // Remove vote if clicking same button
+        await nearbyUtils.removeListingVote(businessId, 'nearby', userId)
+        setUserVote(null)
+      } else {
+        // Submit or update vote
+        await nearbyUtils.submitListingVote(businessId, 'nearby', userId, voteType)
+        setUserVote(voteType)
+      }
+
+      // Reload vote counts
+      const counts = await nearbyUtils.getListingVoteCounts(businessId, 'nearby')
+      setVoteCounts(counts)
+    } catch (err) {
+      console.error('Error voting:', err)
+      setError('Failed to submit vote')
+    }
+  }
+
   if (!businessId) return null
 
   return (
