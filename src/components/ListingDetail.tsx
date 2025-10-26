@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { getListingBySlug, getRelatedListings, Listing } from '../data/manila-listings'
 import ListingCard from './ListingCard'
 import StarRating from './StarRating'
@@ -11,6 +11,28 @@ interface ListingDetailProps {
 export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
   const [listing, setListing] = useState<Listing | null>(null)
   const [relatedListings, setRelatedListings] = useState<Listing[]>([])
+
+  // Normalize a URL to compare images regardless of size query params
+  const canonicalize = (u: string) => {
+    try {
+      const url = new URL(u)
+      return url.origin + url.pathname
+    } catch {
+      return (u || '').split('?')[0]
+    }
+  }
+
+  const galleryImages = useMemo(() => {
+    if (!listing) return [] as string[]
+    const primary = canonicalize(listing.image)
+    const seen = new Set<string>()
+    return (listing.images || []).filter((u) => {
+      const c = canonicalize(u)
+      if (c === primary || seen.has(c)) return false
+      seen.add(c)
+      return true
+    })
+  }, [listing])
 
   const onImgError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget as HTMLImageElement
@@ -99,11 +121,11 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10 theme-container">
         {/* Photo Gallery Section */}
-        {listing.images && listing.images.length > 0 && (
+        {galleryImages.length > 0 && (
           <section className="section">
             <h2 className="section-title">Photo Gallery</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {listing.images.map((imageUrl, idx) => (
+              {galleryImages.map((imageUrl, idx) => (
                 <div key={idx} className="gallery-tile aspect-square sm:aspect-[4/3] group">
                   <img
                     src={imageUrl}
