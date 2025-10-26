@@ -290,7 +290,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       }
     }
-    console.warn('fetchWithRetries failed for', url, lastErr)
     return null
   }
 
