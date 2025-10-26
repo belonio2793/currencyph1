@@ -221,7 +221,8 @@ export default function App() {
             {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
             {activeTab === 'profile' && <Profile userId={userId} />}
             {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} /> }
-            {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} /> }
+            {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
+            {activeTab === 'community' && <CommunityManagement userId={userId} /> }
           </>
         )}
       </main>
