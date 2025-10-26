@@ -1,0 +1,17 @@
+@tailwind utilities;
+@tailwind components;
+
+@layer components {
+  .theme-container {
+    color: #0f172a;
+  }
+  .theme-card {
+    @apply bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow;
+  }
+  .theme-card-title {
+    @apply text-sm font-semibold text-slate-900 mb-2 uppercase tracking-wide;
+  }
+  .theme-card-text {
+    @apply text-sm text-slate-700;
+  }
+}

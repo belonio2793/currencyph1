@@ -1,5 +1,6 @@
 import React from 'react'
 import { Listing } from '../data/manila-listings'
+import StarRating from './StarRating'
 
 interface ListingCardProps {
   listing: Listing
@@ -69,13 +70,7 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
 
         {/* Rating */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <span key={i} className="text-sm">
-                {i < Math.floor(listing.rating) ? '★' : '☆'}
-              </span>
-            ))}
-          </div>
+          <StarRating value={listing.rating} size="sm" />
           <span className="text-sm font-semibold text-slate-900">{listing.rating.toFixed(1)}</span>
           <span className="text-xs text-slate-500">({listing.reviewCount.toLocaleString()})</span>
         </div>

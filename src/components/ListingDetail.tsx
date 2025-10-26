@@ -76,9 +76,10 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            className="text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            aria-label="Back to Nearby"
           >
-            <span>���</span> Back to Nearby
+            Back to Nearby
           </button>
           <div className="flex items-center gap-2">
             <span className="text-sm text-slate-600">Manila Tourism Guide</span>
@@ -88,7 +89,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
 
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-10 theme-container">
         {/* Photo Gallery Section */}
         {listing.images && listing.images.length > 0 && (
           <section className="mb-14">
@@ -111,10 +112,10 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
         {/* Header Section */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4 flex-wrap">
-            <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">
+            <span className="inline-block px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-semibold border border-blue-200">
               {listing.category}
             </span>
-            <span className="text-sm text-slate-500">📍 Manila, Philippines</span>
+            <span className="text-sm text-slate-500">Manila, Philippines</span>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4 leading-tight">{listing.name}</h1>
@@ -122,11 +123,11 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
           {/* Rating Section */}
           <div className="flex items-center gap-6 mb-8 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="flex text-yellow-400 text-xl md:text-2xl">
-                {[...Array(5)].map((_, i) => (
-                  <span key={i}>{i < Math.floor(listing.rating) ? '★' : '☆'}</span>
-                ))}
-              </div>
+              {/* SVG-based rating, no emojis */}
+              {(() => {
+                const StarRating = require('./StarRating').default
+                return <StarRating value={listing.rating} size="lg" />
+              })()}
               <div>
                 <span className="font-bold text-xl md:text-2xl text-slate-900">{listing.rating.toFixed(1)}</span>
                 <span className="text-slate-600 ml-2">({listing.reviewCount.toLocaleString()} reviews)</span>
@@ -141,37 +142,29 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
           {/* Key Info Cards - Grid Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {listing.address && (
-              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-                  <span className="text-xl">📍</span> Address
-                </h3>
-                <p className="text-sm text-slate-700">{listing.address}</p>
+              <div className="theme-card">
+                <h3 className="theme-card-title">Address</h3>
+                <p className="theme-card-text">{listing.address}</p>
               </div>
             )}
 
             {listing.hours && (
-              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-                  <span className="text-xl">🕒</span> Hours
-                </h3>
-                <p className="text-sm text-slate-700">{listing.hours}</p>
+              <div className="theme-card">
+                <h3 className="theme-card-title">Hours</h3>
+                <p className="theme-card-text">{listing.hours}</p>
               </div>
             )}
 
             {listing.admission && (
-              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-                  <span className="text-xl">🎫</span> Admission
-                </h3>
-                <p className="text-sm text-slate-700">{listing.admission}</p>
+              <div className="theme-card">
+                <h3 className="theme-card-title">Admission</h3>
+                <p className="theme-card-text">{listing.admission}</p>
               </div>
             )}
 
             {(listing.phone || listing.website) && (
-              <div className="bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow">
-                <h3 className="text-sm font-bold text-slate-900 mb-2 flex items-center gap-2">
-                  <span className="text-xl">📞</span> Contact
-                </h3>
+              <div className="theme-card">
+                <h3 className="theme-card-title">Contact</h3>
                 <div className="text-sm text-slate-700 space-y-1">
                   {listing.phone && <p>{listing.phone}</p>}
                   {listing.website && (
@@ -181,7 +174,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:text-blue-700 font-medium block"
                     >
-                      Visit Website →
+                      Visit Website
                     </a>
                   )}
                 </div>
@@ -199,7 +192,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
                 key={idx}
                 className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow"
               >
-                <span className="text-3xl flex-shrink-0">✨</span>
+                <span className="mt-1 h-2 w-2 rounded-full bg-blue-500 flex-shrink-0" aria-hidden="true"></span>
                 <p className="text-slate-700 font-medium">{highlight}</p>
               </div>
             ))}
@@ -232,10 +225,11 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
                     <h4 className="font-bold text-slate-900 text-lg">{review.author}</h4>
                     <p className="text-sm text-slate-500">{new Date(review.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                   </div>
-                  <div className="flex text-yellow-400 text-lg">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i}>{i < review.rating ? '★' : '☆'}</span>
-                    ))}
+                  <div className="flex">
+                    {(() => {
+                      const StarRating = require('./StarRating').default
+                      return <StarRating value={review.rating} size="md" />
+                    })()}
                   </div>
                 </div>
                 <p className="text-slate-700 text-base leading-relaxed">{review.text}</p>
