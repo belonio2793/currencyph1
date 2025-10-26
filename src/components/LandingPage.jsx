@@ -23,13 +23,13 @@ export default function LandingPage({ userId, userEmail }) {
   const cryptos = ['BTC', 'ETH', 'DOGE', 'XRP', 'ADA']
   const targetCurrency = 'GOD'
 
-  // Sample crypto prices (in USD)
+  // Sample crypto prices (in GOD)
   const defaultCryptoPrices = {
-    BTC: 43200,
-    ETH: 2280,
-    DOGE: 0.38,
-    XRP: 2.15,
-    ADA: 0.98
+    BTC: 1500000,
+    ETH: 85000,
+    DOGE: 15,
+    XRP: 85,
+    ADA: 42
   }
 
   useEffect(() => {
