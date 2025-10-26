@@ -9,6 +9,7 @@ import SendMoney from './components/SendMoney'
 import BillPayments from './components/BillPayments'
 import TransactionHistoryNew from './components/TransactionHistoryNew'
 import Profile from './components/Profile'
+import Auth from './components/Auth'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
