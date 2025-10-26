@@ -274,14 +274,15 @@ async function processListing(listing, index, total) {
         .from('nearby_listings')
         .update({
           image_urls: uploadedUrls,
+          primary_image_url: uploadedUrls[0],
           updated_at: new Date().toISOString()
         })
         .eq('id', listing.id)
-      
+
       if (error) {
         log.warn(`Failed to update listing ${listing.id}: ${error.message}`)
       }
-      
+
       log.success(`Updated "${listing.name}" with ${uploadedUrls.length} images`)
       return { success: true, count: uploadedUrls.length }
     } else {
