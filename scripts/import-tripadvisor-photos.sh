@@ -216,16 +216,17 @@ upload_to_bucket() {
 update_listing_images() {
   local listing_id=$1
   local image_urls=$2
-  
-  # Convert image URLs to JSON array
-  local image_json=$(echo "$image_urls" | jq -R 'select(length > 0)' | jq -s '.' || echo '[]')
-  
+
+  # Convert image URLs to JSON array for PostgreSQL
+  local image_array=$(echo "$image_urls" | jq -R 'select(length > 0)' | jq -s . || echo '[]')
+  local primary_url=$(echo "$image_urls" | head -n 1)
+
   local update_response=$(curl -s -X PATCH \
     "${PROJECT_URL}/rest/v1/nearby_listings?id=eq.${listing_id}" \
     -H "Authorization: Bearer ${SERVICE_ROLE_KEY}" \
     -H "Content-Type: application/json" \
-    -d "{\"image_urls\": $image_json, \"updated_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}")
-  
+    -d "{\"image_urls\": $image_array, \"primary_image_url\": \"$primary_url\", \"updated_at\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}")
+
   if [ $? -eq 0 ]; then
     return 0
   else
