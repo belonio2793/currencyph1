@@ -148,7 +148,8 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9888,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Luneta_Park_Rizal_Monument.JPG/1280px-Luneta_Park_Rizal_Monument.JPG"
     ],
     description: "The Rizal Monument is a marble monument erected to commemorate Dr. Jose Rizal, a national hero of the Philippines. Located in Rizal Park, this iconic monument has been a symbol of patriotism and independence since its dedication in 1913.",
     highlights: [
