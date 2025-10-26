@@ -186,8 +186,24 @@ export default function Rates({ globalCurrency }) {
   }
 
   const getRate = (from, to) => {
+    if (from === to) return 1
     const key = `${from}_${to}`
-    return exchangeRates[key] || 1
+    const direct = exchangeRates[key]
+    if (typeof direct === 'number') return direct
+
+    // Try compute via USD if possible: rate from->to = (USD->to) / (USD->from)
+    const usdToFrom = exchangeRates[`USD_${from}`]
+    const usdToTo = exchangeRates[`USD_${to}`]
+    if (typeof usdToFrom === 'number' && typeof usdToTo === 'number' && usdToFrom > 0) {
+      return usdToTo / usdToFrom
+    }
+
+    // Try reverse pair if stored
+    const reverse = exchangeRates[`${to}_${from}`]
+    if (typeof reverse === 'number' && reverse > 0) return 1 / reverse
+
+    // Not available
+    return null
   }
 
   return (
