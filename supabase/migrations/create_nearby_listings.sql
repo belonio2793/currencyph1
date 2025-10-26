@@ -40,7 +40,7 @@ CREATE INDEX idx_listing_votes_user ON listing_votes(user_id);
 -- Create pending_listings table for user submissions
 CREATE TABLE IF NOT EXISTS pending_listings (
   id BIGSERIAL PRIMARY KEY,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  submitted_by_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   name VARCHAR(255) NOT NULL,
   address TEXT,
   latitude DECIMAL(10, 8),
@@ -49,13 +49,29 @@ CREATE TABLE IF NOT EXISTS pending_listings (
   category VARCHAR(255),
   description TEXT,
   status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+  raw JSONB,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- Create index for pending queries
 CREATE INDEX idx_pending_listings_status ON pending_listings(status);
-CREATE INDEX idx_pending_listings_user ON pending_listings(user_id);
+CREATE INDEX idx_pending_listings_user ON pending_listings(submitted_by_user_id);
+
+-- Create approval_votes table for community moderation
+CREATE TABLE IF NOT EXISTS approval_votes (
+  id BIGSERIAL PRIMARY KEY,
+  pending_listing_id BIGINT NOT NULL REFERENCES pending_listings(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  vote VARCHAR(50) NOT NULL, -- 'approve' or 'reject'
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW(),
+  UNIQUE(pending_listing_id, user_id)
+);
+
+-- Create index for approval votes
+CREATE INDEX idx_approval_votes_pending ON approval_votes(pending_listing_id);
+CREATE INDEX idx_approval_votes_user ON approval_votes(user_id);
 
 -- Enable RLS for listing_votes
 ALTER TABLE listing_votes ENABLE ROW LEVEL SECURITY;
