@@ -32,26 +32,29 @@ export const MANILA_LISTINGS: Listing[] = [
     name: "Intramuros",
     slug: "intramuros-manila",
     rating: 4.5,
-    reviewCount: 2847,
+    reviewCount: 3847,
     category: "Historical Site",
     address: "Intramuros, Manila 1002, Philippines",
     latitude: 14.5951,
     longitude: 120.9731,
     image: "https://media.tacdn.com/media/attractions-splice-spp-360x240/06/6e/e2/11.jpg",
-    description: "Intramuros is the historic walled city of Manila, known as the 'City Within the City.' This 16th-century fortress has been home to Spanish colonial architecture for over 400 years. Today, it stands as a testament to Manila's rich history and cultural heritage.",
+    description: "Intramuros is the historic walled city of Manila, known as the 'City Within the City.' This 16th-century fortress has been home to Spanish colonial architecture for over 400 years. Today, it stands as a testament to Manila's rich history and cultural heritage with well-preserved Spanish colonial architecture, museums, and cultural landmarks.",
     highlights: [
       "Fort Santiago - Spanish colonial fortress",
       "Manila Cathedral - Stunning Gothic architecture",
       "San Agustin Church - Oldest stone church",
       "Rizal Monument - National monument",
-      "Walls and ramparts - Historic fortifications"
+      "Walls and ramparts - Historic fortifications",
+      "Casa Manila - Colonial house museum",
+      "Quiapo Church - Historic church"
     ],
     bestFor: [
       "History enthusiasts",
       "Culture and heritage lovers",
       "Photography",
       "Educational visits",
-      "Family outings"
+      "Family outings",
+      "Walking tours"
     ],
     hours: "Open daily, 8:00 AM - 6:00 PM",
     admission: "Fort Santiago: ₱50 (adults), ₱25 (students/seniors)",
@@ -69,6 +72,12 @@ export const MANILA_LISTINGS: Listing[] = [
         rating: 4,
         text: "Great location for history buffs. The walks are long but rewarding. Bring comfortable shoes and water.",
         date: "2024-01-10"
+      },
+      {
+        author: "Maria Santos",
+        rating: 5,
+        text: "A must-visit destination for anyone interested in Philippine history. The atmosphere and heritage sites are incredible!",
+        date: "2024-01-05"
       }
     ]
   },
