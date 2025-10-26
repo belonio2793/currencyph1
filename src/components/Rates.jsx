@@ -233,7 +233,7 @@ export default function Rates({ globalCurrency }) {
                   <div key={curr.code} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
                     <div className="flex items-center justify-between">
                       <span className="font-medium text-slate-900">{curr.code}</span>
-                      <span className="text-slate-600 font-light">{rate?.toFixed(4) || '0.0000'}</span>
+                      <span className="text-slate-600 font-light">{rate != null ? rate.toFixed(4) : '—'}</span>
                     </div>
                     <p className="text-xs text-slate-500 mt-1">{curr.name}</p>
                   </div>
