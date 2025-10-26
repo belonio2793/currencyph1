@@ -157,6 +157,16 @@ export default function App() {
                   </div>
                   <button
                     onClick={() => {
+                      setActiveTab('home')
+                      setShowAuth(false)
+                      window.history.replaceState(null, '', '/')
+                    }}
+                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Home
+                  </button>
+                  <button
+                    onClick={() => {
                       setShowAuth(true)
                       window.history.replaceState(null, '', '/login')
                     }}
