@@ -143,7 +143,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`Successfully added ${amount} ${selectedCurrency} = ${convertedAmt} GOD`)
+      setSuccess(`Successfully added ${amount} ${selectedCurrency} = ${convertedAmt} PHP`)
       setAmount('')
       setConvertedAmount('0.00')
 
@@ -178,7 +178,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedCryptoAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto} = ${convertedAmt} GOD`)
+      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto} = ${convertedAmt} PHP`)
       setCryptoAmount('')
       setConvertedCryptoAmount('0.00')
 
