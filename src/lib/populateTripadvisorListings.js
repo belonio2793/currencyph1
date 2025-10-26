@@ -50,30 +50,40 @@ export async function populateTripadvisorListings() {
       const attractions = MOCK_ATTRACTIONS_BY_CITY[city] || generateMockAttractionsForCity(city)
       
       // Convert attractions to listings format
-      const cityListings = attractions.map((attr, idx) => ({
-        tripadvisor_id: `${city.toLowerCase().replace(/\s+/g, '-')}-${idx}-${Date.now()}`,
-        name: attr.name,
-        address: `${attr.name}, ${city}, Philippines`,
-        latitude: generateRandomLatitude(),
-        longitude: generateRandomLongitude(),
-        rating: attr.rating,
-        category: attr.category,
-        raw: {
-          city: city,
-          description: `${attr.name} is a popular attraction in ${city}, Philippines. ${attr.category} with a rating of ${attr.rating}/5 based on ${attr.reviewCount} reviews.`,
-          reviews: [],
-          highlights: ['Popular attraction', 'Highly rated', 'Worth visiting'],
-          bestFor: ['Tourism', 'Photography', 'Learning'],
-          hours: '9:00 AM - 6:00 PM',
-          admission: 'Variable',
-          image: `https://via.placeholder.com/600x400?text=${encodeURIComponent(attr.name)}`,
-          images: [],
-          phone: null,
-          website: null,
-          reviewCount: attr.reviewCount
-        },
-        updated_at: new Date().toISOString()
-      }))
+      const cityListings = attractions.map((attr, idx) => {
+        // Generate slug from city and attraction name
+        const slug = `${city.toLowerCase().replace(/\s+/g, '-')}-${attr.name.toLowerCase().replace(/\s+/g, '-')}`
+
+        // Get images for this listing (either from known sources or defaults)
+        const images = getImagesForListing(slug)
+        const imageToUse = images.length > 0 ? images[0] : `https://via.placeholder.com/600x400?text=${encodeURIComponent(attr.name)}`
+
+        return {
+          tripadvisor_id: slug,
+          name: attr.name,
+          address: `${attr.name}, ${city}, Philippines`,
+          latitude: generateRandomLatitude(),
+          longitude: generateRandomLongitude(),
+          rating: attr.rating,
+          category: attr.category,
+          raw: {
+            slug: slug,
+            city: city,
+            description: `${attr.name} is a popular attraction in ${city}, Philippines. ${attr.category} with a rating of ${attr.rating}/5 based on ${attr.reviewCount} reviews.`,
+            reviews: [],
+            highlights: ['Popular attraction', 'Highly rated', 'Worth visiting'],
+            bestFor: ['Tourism', 'Photography', 'Learning'],
+            hours: '9:00 AM - 6:00 PM',
+            admission: 'Variable',
+            image: imageToUse,
+            images: images,
+            phone: null,
+            website: null,
+            reviewCount: attr.reviewCount
+          },
+          updated_at: new Date().toISOString()
+        }
+      })
 
       allListings.push(...cityListings)
     }
