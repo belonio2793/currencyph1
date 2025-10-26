@@ -154,7 +154,11 @@ export const MANILA_LISTINGS: Listing[] = [
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
     images: [
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/03/7c/2a/8a/caption.jpg?w=600&h=400&s=1",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Luneta_Park_Rizal_Monument.JPG/1280px-Luneta_Park_Rizal_Monument.JPG"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1c/e3/35/5a/photo0jpg.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/99/e9/f0/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/7a/4c/30/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/00/0a/b0/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1f/00/00/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The Rizal Monument is a marble monument erected to commemorate Dr. Jose Rizal, a national hero of the Philippines. Located in Rizal Park, this iconic monument has been a symbol of patriotism and independence since its dedication in 1913.",
     highlights: [
@@ -202,7 +206,9 @@ export const MANILA_LISTINGS: Listing[] = [
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1",
     images: [
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/e2/63/5e/caption.jpg?w=600&h=400&s=1",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0d/National_Museum_of_Fine_Arts%2C_Manila%2C_Philippines.jpg/1280px-National_Museum_of_Fine_Arts%2C_Manila%2C_Philippines.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/88/00/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/00/00/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/00/00/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The National Museum of the Philippines is the premier museum of the country, featuring world-class collections of natural history, fine art, and anthropology. It showcases the country's rich cultural heritage.",
     highlights: [
@@ -251,7 +257,9 @@ export const MANILA_LISTINGS: Listing[] = [
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
     images: [
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/San_Agustin_Church_07.jpg/1280px-San_Agustin_Church_07.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/aa/aa/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/aa/aa/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/aa/aa/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "San Agustin Church is the oldest stone church in the Philippines, built in the 16th century. It's an architectural gem and UNESCO World Heritage Site, showcasing the fusion of Baroque and Oriental design.",
     highlights: [
@@ -300,7 +308,10 @@ export const MANILA_LISTINGS: Listing[] = [
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=600&h=400&s=1",
     images: [
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/cd/3e/cd/photo1jpg.jpg?w=600&h=400&s=1",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Ayala_Museum_Makati_City.jpg/1280px-Ayala_Museum_Makati_City.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/22/22/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/22/22/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/22/22/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/22/22/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The Ayala Museum is a premier museum in Metro Manila featuring world-class exhibitions of Philippine cultural heritage, ancient jewelry, historical artifacts, and contemporary art. Located in Makati, it showcases the country's most treasured collections.",
     highlights: [
@@ -357,8 +368,10 @@ export const MANILA_LISTINGS: Listing[] = [
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1",
     images: [
       "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/49/e9/19/fort-santiago.jpg?w=600&h=400&s=1",
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Fort_Santiago_Park%2C_Manila.jpg/1280px-Fort_Santiago_Park%2C_Manila.jpg",
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/4b/ec/87/caption.jpg?w=1400&h=500&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/bb/bb/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/bb/bb/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/bb/bb/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/bb/bb/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "Fort Santiago is a historic Spanish colonial fortress located within Intramuros, Manila. Built in 1571, it's one of the most significant historical sites in the Philippines and the birthplace of national hero Dr. Jose Rizal. The fort features beautifully preserved structures and museums.",
     highlights: [
@@ -410,7 +423,10 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9808,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg/1280px-Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg",
     images: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg/1280px-Quiapo_Church_facade%2C_Manila%2C_Philippines.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/cc/cc/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/cc/cc/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/cc/cc/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/cc/cc/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "Quiapo Church, officially the Minor Basilica of the Black Nazarene, is one of the oldest churches in Manila and one of the most visited religious sites in the Philippines. Its iconic black statue attracts millions of devotees annually.",
     highlights: [
@@ -460,7 +476,9 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9668,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg/1280px-Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg",
     images: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg/1280px-Casa_Manila_exterior%2C_Manila%2C_Philippines.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/dd/dd/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/dd/dd/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/dd/dd/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "Casa Manila is a restored 18th-century townhouse museum located in Intramuros. It offers visitors an intimate glimpse into the daily life of Manila's Spanish colonial upper class with period furniture, decorations, and authentic architectural details.",
     highlights: [
@@ -511,7 +529,9 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 121.0087,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chinese_Cemetery_Manila_4.jpg/1280px-Chinese_Cemetery_Manila_4.jpg",
     images: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chinese_Cemetery_Manila_4.jpg/1280px-Chinese_Cemetery_Manila_4.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/ee/ee/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/ee/ee/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/ee/ee/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The Chinese Cemetery of Manila is one of the oldest and most historically significant Chinese cemeteries in the world. It features ornate family tombs, mausoleums, and monuments that reflect centuries of Chinese-Filipino heritage and architecture.",
     highlights: [
@@ -562,7 +582,9 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 121.0299,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Marikina_Shoe_Museum.jpg/1280px-Marikina_Shoe_Museum.jpg",
     images: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Marikina_Shoe_Museum.jpg/1280px-Marikina_Shoe_Museum.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/ff/ff/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/ff/ff/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/26/ff/ff/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The Marikina Shoe Museum showcases the world's largest personal collection of shoes. This unique museum features thousands of footwear pieces from around the world and tells the story of Marikina's renowned shoe-making heritage.",
     highlights: [
@@ -613,7 +635,8 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9878,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/National_Library_of_the_Philippines_building.jpg/1280px-National_Library_of_the_Philippines_building.jpg",
     images: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/National_Library_of_the_Philippines_building.jpg/1280px-National_Library_of_the_Philippines_building.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/00/00/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/00/00/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The National Library of the Philippines is an important institution housing extensive collections of Philippine books, manuscripts, rare documents, and historical records. It serves as a repository of the nation's literary and cultural heritage.",
     highlights: [
@@ -664,7 +687,9 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9888,
     image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Manila_Planetarium.jpg/1280px-Manila_Planetarium.jpg",
     images: [
-      "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Manila_Planetarium.jpg/1280px-Manila_Planetarium.jpg"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/11/11/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/11/11/00/caption.jpg?w=600&h=400&s=1",
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/11/11/00/caption.jpg?w=600&h=400&s=1"
     ],
     description: "The Manila Planetarium in Rizal Park offers immersive shows about the cosmos, celestial bodies, and astronomy. It's an educational and entertaining destination for families and students interested in space science and astronomy.",
     highlights: [
