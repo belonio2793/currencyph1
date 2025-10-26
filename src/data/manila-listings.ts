@@ -245,7 +245,8 @@ export const MANILA_LISTINGS: Listing[] = [
     longitude: 120.9655,
     image: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
     images: [
-      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1"
+      "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/fd/8a/58/photo0jpg.jpg?w=600&h=400&s=1",
+      "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/San_Agustin_Church_07.jpg/1280px-San_Agustin_Church_07.jpg"
     ],
     description: "San Agustin Church is the oldest stone church in the Philippines, built in the 16th century. It's an architectural gem and UNESCO World Heritage Site, showcasing the fusion of Baroque and Oriental design.",
     highlights: [
