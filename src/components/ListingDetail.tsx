@@ -202,7 +202,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
             {listing.bestFor.map((tag, idx) => (
               <span
                 key={idx}
-                className="inline-block px-5 py-3 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-full text-sm font-semibold border border-blue-200 hover:shadow-sm transition-shadow"
+                className="pill pill-blue"
               >
                 {tag}
               </span>
