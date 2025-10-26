@@ -32,7 +32,11 @@ export default function App() {
     handleRouting()
 
     window.addEventListener('popstate', handleRouting)
-    return () => window.removeEventListener('popstate', handleRouting)
+    window.addEventListener('hashchange', handleRouting)
+    return () => {
+      window.removeEventListener('popstate', handleRouting)
+      window.removeEventListener('hashchange', handleRouting)
+    }
   }, [])
 
   const handleRouting = () => {
