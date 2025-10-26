@@ -143,7 +143,7 @@ export default function LandingPage({ userId, userEmail }) {
       const convertedAmt = parseFloat(convertedAmount)
 
       await wisegcashAPI.addFunds(userId, targetCurrency, convertedAmt)
-      setSuccess(`✓ Successfully added ${amount} ${selectedCurrency} (${targetCurrency} ${convertedAmt})`)
+      setSuccess(`✓ Successfully added ${amount} ${selectedCurrency} = ⚡${convertedAmt} GOD`)
       setAmount('')
       setConvertedAmount('0.00')
 
