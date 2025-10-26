@@ -209,7 +209,8 @@ export default function App() {
             {activeTab === 'bills' && <BillPayments userId={userId} />}
             {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
             {activeTab === 'profile' && <Profile userId={userId} />}
-            {activeTab === 'nearby' && <Nearby userId={userId} /> }
+            {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} /> }
+            {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} /> }
           </>
         )}
       </main>
