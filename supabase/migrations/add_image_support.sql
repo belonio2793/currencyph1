@@ -22,9 +22,14 @@ ON nearby_listings(rating DESC NULLS LAST);
 CREATE INDEX IF NOT EXISTS idx_listings_category 
 ON nearby_listings(category);
 
-CREATE INDEX IF NOT EXISTS idx_listings_coordinates 
-ON nearby_listings USING GIST (ll_to_earth(latitude, longitude))
-WHERE latitude IS NOT NULL AND longitude IS NOT NULL;
+-- Simple BRIN index for coordinates (doesn't require extensions)
+CREATE INDEX IF NOT EXISTS idx_listings_latitude
+ON nearby_listings(latitude)
+WHERE latitude IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_listings_longitude
+ON nearby_listings(longitude)
+WHERE longitude IS NOT NULL;
 
 -- Add trigger to auto-update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_timestamp()
@@ -47,6 +52,31 @@ ON nearby_listings USING GIN(to_tsvector('english', name));
 
 CREATE INDEX IF NOT EXISTS idx_listings_address_search 
 ON nearby_listings USING GIN(to_tsvector('english', address));
+
+-- Helper function to calculate distance using Haversine formula (works without extensions)
+CREATE OR REPLACE FUNCTION haversine_distance(
+  lat1 FLOAT8, lon1 FLOAT8,
+  lat2 FLOAT8, lon2 FLOAT8
+)
+RETURNS FLOAT8 AS $$
+DECLARE
+  earth_radius_km FLOAT8 := 6371.0;
+  dLat FLOAT8;
+  dLon FLOAT8;
+  a FLOAT8;
+  c FLOAT8;
+BEGIN
+  dLat := RADIANS(lat2 - lat1);
+  dLon := RADIANS(lon2 - lon1);
+  
+  a := SIN(dLat/2) * SIN(dLat/2) +
+       COS(RADIANS(lat1)) * COS(RADIANS(lat2)) * SIN(dLon/2) * SIN(dLon/2);
+  
+  c := 2 * ATAN2(SQRT(a), SQRT(1-a));
+  
+  RETURN earth_radius_km * c;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
 
 -- Add helper function to get listings by distance
 CREATE OR REPLACE FUNCTION get_nearby_listings(
@@ -79,12 +109,12 @@ BEGIN
     nl.rating,
     nl.category,
     nl.stored_image_path,
-    (earth_distance(ll_to_earth(lat, lon), ll_to_earth(nl.latitude, nl.longitude)) * 1.609344)::FLOAT AS distance_km
+    haversine_distance(lat, lon, nl.latitude, nl.longitude)::FLOAT AS distance_km
   FROM nearby_listings nl
   WHERE nl.latitude IS NOT NULL 
     AND nl.longitude IS NOT NULL
-    AND earth_distance(ll_to_earth(lat, lon), ll_to_earth(nl.latitude, nl.longitude)) < (distance_km / 1.609344)
-  ORDER BY distance_km
+    AND haversine_distance(lat, lon, nl.latitude, nl.longitude) <= distance_km
+  ORDER BY haversine_distance(lat, lon, nl.latitude, nl.longitude)
   LIMIT limit_count;
 END;
 $$ LANGUAGE plpgsql;
@@ -121,7 +151,7 @@ BEGIN
     ts_rank(
       to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')),
       plainto_tsquery('english', search_query)
-    ) AS relevance
+    )::FLOAT AS relevance
   FROM nearby_listings nl
   WHERE to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')) @@ plainto_tsquery('english', search_query)
   ORDER BY relevance DESC, nl.rating DESC NULLS LAST
@@ -135,3 +165,6 @@ COMMENT ON COLUMN nearby_listings.stored_image_path IS 'Path to image stored in 
 COMMENT ON COLUMN nearby_listings.image_url IS 'Original image URL from TripAdvisor';
 COMMENT ON COLUMN nearby_listings.image_downloaded_at IS 'Timestamp when image was downloaded and stored';
 COMMENT ON COLUMN nearby_listings.source IS 'Data source (e.g., tripadvisor)';
+COMMENT ON FUNCTION haversine_distance IS 'Calculate distance between two coordinates using Haversine formula (result in km)';
+COMMENT ON FUNCTION get_nearby_listings IS 'Get listings within a specified distance from coordinates';
+COMMENT ON FUNCTION search_listings IS 'Full-text search listings by name and address';
