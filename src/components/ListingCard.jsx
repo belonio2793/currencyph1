@@ -102,7 +102,13 @@ export default function ListingCard({
 
         {/* Address */}
         {listing.address && (
-          <p className="text-sm text-slate-600 mb-3 line-clamp-1">{listing.address}</p>
+          <p className="text-sm text-slate-600 mb-1 line-clamp-1">{listing.address}</p>
+        )}
+        {/* City/Country */}
+        {(listing.city || listing.country) && (
+          <p className="text-xs text-slate-500 mb-3 line-clamp-1">
+            {[listing.city, listing.country].filter(Boolean).join(', ')}
+          </p>
         )}
 
         {/* Rating */}

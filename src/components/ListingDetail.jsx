@@ -174,7 +174,18 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Title and Badges */}
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-1">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">{listing.name}</h1>
+            <h1 className="text-4xl font-bold text-slate-900 mb-1">{listing.name}</h1>
+            {(listing.city || listing.country || listing.timezone || listing.currency) && (
+              <div className="text-sm text-slate-600 mb-3">
+                {[listing.city, listing.country].filter(Boolean).join(', ')}
+                {(listing.timezone || listing.currency) && (
+                  <span className="text-slate-400"> • </span>
+                )}
+                {listing.timezone && <span>{listing.timezone}</span>}
+                {listing.timezone && listing.currency && <span className="text-slate-400"> • </span>}
+                {listing.currency && <span>{listing.currency}</span>}
+              </div>
+            )}
             <div className="flex flex-wrap gap-2 mb-4">
               {listing.location_type && (
                 <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
@@ -232,6 +243,48 @@ export default function ListingDetail({ slug, onBack }) {
               <p className="text-sm text-slate-500 mt-2">
                 📌 {(listing.latitude || listing.lat).toFixed(4)}, {(listing.longitude || listing.lng).toFixed(4)}
               </p>
+            )}
+          </div>
+        )}
+
+        {/* Meta */}
+        {(listing.city || listing.country || listing.region_name || listing.currency || listing.timezone || listing.last_synced) && (
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {listing.city && (
+              <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="text-xs text-slate-500">City</div>
+                <div className="font-medium text-slate-900">{listing.city}</div>
+              </div>
+            )}
+            {listing.country && (
+              <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="text-xs text-slate-500">Country</div>
+                <div className="font-medium text-slate-900">{listing.country}</div>
+              </div>
+            )}
+            {listing.region_name && (
+              <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="text-xs text-slate-500">Region</div>
+                <div className="font-medium text-slate-900">{listing.region_name}</div>
+              </div>
+            )}
+            {listing.currency && (
+              <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="text-xs text-slate-500">Currency</div>
+                <div className="font-medium text-slate-900">{listing.currency}</div>
+              </div>
+            )}
+            {listing.timezone && (
+              <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="text-xs text-slate-500">Timezone</div>
+                <div className="font-medium text-slate-900">{listing.timezone}</div>
+              </div>
+            )}
+            {listing.last_synced && (
+              <div className="border border-slate-200 rounded-lg p-4 bg-white">
+                <div className="text-xs text-slate-500">Last Synced</div>
+                <div className="font-medium text-slate-900">{new Date(listing.last_synced).toLocaleString()}</div>
+              </div>
             )}
           </div>
         )}
