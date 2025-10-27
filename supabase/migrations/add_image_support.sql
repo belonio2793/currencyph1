@@ -54,6 +54,7 @@ CREATE INDEX IF NOT EXISTS idx_listings_address_search
 ON nearby_listings USING GIN(to_tsvector('english', address));
 
 -- Helper function to calculate distance using Haversine formula (works without extensions)
+-- This function is IMMUTABLE so it can be used in indexes
 CREATE OR REPLACE FUNCTION haversine_distance(
   lat1 FLOAT8, lon1 FLOAT8,
   lat2 FLOAT8, lon2 FLOAT8
@@ -76,12 +77,13 @@ BEGIN
   
   RETURN earth_radius_km * c;
 END;
-$$ LANGUAGE plpgsql IMMUTABLE;
+$$ LANGUAGE plpgsql IMMUTABLE STRICT;
 
 -- Add helper function to get listings by distance
+-- NOTE: Changed output column name from distance_km to calculated_distance_km to avoid parameter name conflict
 CREATE OR REPLACE FUNCTION get_nearby_listings(
-  lat FLOAT8,
-  lon FLOAT8,
+  lat_input FLOAT8,
+  lon_input FLOAT8,
   distance_km FLOAT8 DEFAULT 10,
   limit_count INT DEFAULT 50
 )
@@ -90,12 +92,12 @@ RETURNS TABLE (
   tripadvisor_id TEXT,
   name TEXT,
   address TEXT,
-  latitude FLOAT,
-  longitude FLOAT,
-  rating FLOAT,
+  latitude FLOAT8,
+  longitude FLOAT8,
+  rating FLOAT8,
   category TEXT,
   stored_image_path TEXT,
-  distance_km FLOAT
+  calculated_distance_km FLOAT8
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -109,15 +111,15 @@ BEGIN
     nl.rating,
     nl.category,
     nl.stored_image_path,
-    haversine_distance(lat, lon, nl.latitude, nl.longitude)::FLOAT AS distance_km
+    haversine_distance(lat_input, lon_input, nl.latitude, nl.longitude)::FLOAT8
   FROM nearby_listings nl
   WHERE nl.latitude IS NOT NULL 
     AND nl.longitude IS NOT NULL
-    AND haversine_distance(lat, lon, nl.latitude, nl.longitude) <= distance_km
-  ORDER BY haversine_distance(lat, lon, nl.latitude, nl.longitude)
+    AND haversine_distance(lat_input, lon_input, nl.latitude, nl.longitude) <= distance_km
+  ORDER BY haversine_distance(lat_input, lon_input, nl.latitude, nl.longitude)
   LIMIT limit_count;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE;
 
 -- Add helper function to search listings
 CREATE OR REPLACE FUNCTION search_listings(
@@ -129,12 +131,12 @@ RETURNS TABLE (
   tripadvisor_id TEXT,
   name TEXT,
   address TEXT,
-  latitude FLOAT,
-  longitude FLOAT,
-  rating FLOAT,
+  latitude FLOAT8,
+  longitude FLOAT8,
+  rating FLOAT8,
   category TEXT,
   stored_image_path TEXT,
-  relevance FLOAT
+  relevance FLOAT8
 ) AS $$
 BEGIN
   RETURN QUERY
@@ -151,13 +153,17 @@ BEGIN
     ts_rank(
       to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')),
       plainto_tsquery('english', search_query)
-    )::FLOAT AS relevance
+    )::FLOAT8
   FROM nearby_listings nl
   WHERE to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')) @@ plainto_tsquery('english', search_query)
-  ORDER BY relevance DESC, nl.rating DESC NULLS LAST
+  ORDER BY ts_rank(
+      to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')),
+      plainto_tsquery('english', search_query)
+    ) DESC, 
+    nl.rating DESC NULLS LAST
   LIMIT limit_count;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql STABLE;
 
 -- Add comment to document schema
 COMMENT ON TABLE nearby_listings IS 'TripAdvisor Philippines listings with images and ratings';
@@ -165,6 +171,6 @@ COMMENT ON COLUMN nearby_listings.stored_image_path IS 'Path to image stored in 
 COMMENT ON COLUMN nearby_listings.image_url IS 'Original image URL from TripAdvisor';
 COMMENT ON COLUMN nearby_listings.image_downloaded_at IS 'Timestamp when image was downloaded and stored';
 COMMENT ON COLUMN nearby_listings.source IS 'Data source (e.g., tripadvisor)';
-COMMENT ON FUNCTION haversine_distance IS 'Calculate distance between two coordinates using Haversine formula (result in km)';
-COMMENT ON FUNCTION get_nearby_listings IS 'Get listings within a specified distance from coordinates';
-COMMENT ON FUNCTION search_listings IS 'Full-text search listings by name and address';
+COMMENT ON FUNCTION haversine_distance(FLOAT8, FLOAT8, FLOAT8, FLOAT8) IS 'Calculate distance between two coordinates using Haversine formula (result in km)';
+COMMENT ON FUNCTION get_nearby_listings(FLOAT8, FLOAT8, FLOAT8, INT) IS 'Get listings within a specified distance from coordinates';
+COMMENT ON FUNCTION search_listings(TEXT, INT) IS 'Full-text search listings by name and address';
