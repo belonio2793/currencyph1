@@ -11,7 +11,8 @@
     "fetch-tripadvisor": "node scripts/update-listings-from-tripadvisor.js",
     "fetch-philippines": "node scripts/fetch-philippines-listings.js",
     "import-photos": "node scripts/import-photos.js",
-    "populate-all": "node scripts/populate-all-listings.js"
+    "populate-all": "node scripts/populate-all-listings.js",
+    "sync-tripadvisor": "node scripts/sync-tripadvisor-locally.js"
   },
   "dependencies": {
     "react": "^18.2.0",
