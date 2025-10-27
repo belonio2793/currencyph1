@@ -517,6 +517,238 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
       {/* Featured Manila Attractions Section */}
       <FeaturedListings />
 
+      {/* Stats Section */}
+      {listingStats && (
+        <div className="mb-8 grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+            <div className="text-2xl font-bold text-blue-900">{listingStats.total}</div>
+            <div className="text-sm text-blue-700">Total Listings</div>
+          </div>
+          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+            <div className="text-2xl font-bold text-green-900">{listingStats.cities}</div>
+            <div className="text-sm text-green-700">Cities</div>
+          </div>
+          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+            <div className="text-2xl font-bold text-purple-900">{listingStats.categories}</div>
+            <div className="text-sm text-purple-700">Categories</div>
+          </div>
+          <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 border border-amber-200">
+            <div className="text-2xl font-bold text-amber-900">{listingStats.avgRating}</div>
+            <div className="text-sm text-amber-700">Avg Rating</div>
+          </div>
+          <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-4 border border-pink-200">
+            <div className="text-2xl font-bold text-pink-900">{listingStats.withRatings}</div>
+            <div className="text-sm text-pink-700">Rated</div>
+          </div>
+        </div>
+      )}
+
+      {/* Search Section */}
+      <div className="mb-8">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search listings by name, address, or category..."
+            className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            type="submit"
+            disabled={isSearching}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {isSearching ? 'Searching...' : 'Search'}
+          </button>
+        </form>
+
+        {/* Search Results */}
+        {searchResults.length > 0 && (
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold mb-4">Search Results ({searchResults.length})</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {searchResults.map(item => {
+                const counts = voteCounts[item.tripadvisor_id] || { thumbsUp: 0, thumbsDown: 0 }
+                const userVote = userVotes[item.tripadvisor_id]
+
+                return (
+                  <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                    {(item.raw?.image || item.image) && (
+                      <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-slate-200">
+                        <img
+                          src={item.raw?.image || item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://via.placeholder.com/600x400?text=${encodeURIComponent(item.name)}`
+                          }}
+                        />
+                      </div>
+                    )}
+                    <h4 className="font-semibold text-slate-900 mb-1">{item.name}</h4>
+                    {item.address && <p className="text-sm text-slate-500 mb-2">{item.address}</p>}
+                    <div className="flex items-center gap-2 mb-2">
+                      {item.rating && (
+                        <>
+                          <StarRating value={Number(item.rating)} size="sm" />
+                          <span className="text-sm font-semibold">{Number(item.rating).toFixed(1)}</span>
+                        </>
+                      )}
+                      {item.category && <span className="text-xs text-slate-600">{item.category}</span>}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => saveItem(item)}
+                        className="px-3 py-1 bg-green-600 text-white rounded text-sm flex-1 hover:bg-green-700"
+                      >
+                        {savedIds.has(item.tripadvisor_id?.toString()) ? 'Saved' : 'Save'}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCurrentBusinessId(item.tripadvisor_id?.toString())
+                          setActiveTab('business')
+                        }}
+                        className="px-3 py-1 bg-slate-100 text-slate-700 rounded text-sm flex-1 hover:bg-slate-200"
+                      >
+                        View
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Browse by Category Section */}
+      {allCategories.length > 0 && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-slate-900 mb-4">Browse by Category</h3>
+          <div className="flex gap-2 mb-6 flex-wrap">
+            {allCategories.map(category => (
+              <button
+                key={category}
+                onClick={() => {
+                  setSelectedCategory(category)
+                  setCityPage(1)
+                  loadCategoryListings(category, 1)
+                }}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  selectedCategory === category
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+
+          {selectedCategory && (
+            <div>
+              <div className="mb-4 flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-slate-900">{selectedCategory} Listings</h3>
+                {loading && <span className="text-sm text-slate-500">Loading...</span>}
+              </div>
+
+              {cityListings.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                  {cityListings.map(item => {
+                    const counts = voteCounts[item.tripadvisor_id] || { thumbsUp: 0, thumbsDown: 0 }
+                    const userVote = userVotes[item.tripadvisor_id]
+
+                    return (
+                      <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                        {(item.raw?.image || item.image) && (
+                          <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-slate-200">
+                            <img
+                              src={item.raw?.image || item.image}
+                              alt={item.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = `https://via.placeholder.com/600x400?text=${encodeURIComponent(item.name)}`
+                              }}
+                            />
+                          </div>
+                        )}
+                        <h4 className="font-semibold text-slate-900 mb-1">{item.name}</h4>
+                        {item.address && <p className="text-sm text-slate-500 mb-2">{item.address}</p>}
+                        <div className="flex items-center gap-2 mb-3">
+                          {item.rating && (
+                            <>
+                              <StarRating value={Number(item.rating)} size="sm" />
+                              <span className="text-sm font-semibold">{Number(item.rating).toFixed(1)}</span>
+                            </>
+                          )}
+                        </div>
+                        <div className="flex gap-2 mb-2">
+                          <button
+                            onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'up')}
+                            className={`px-2 py-1 text-sm rounded flex-1 transition-colors ${
+                              userVote === 'up'
+                                ? 'bg-green-600 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-green-100'
+                            }`}
+                          >
+                            👍 {counts.thumbsUp}
+                          </button>
+                          <button
+                            onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
+                            className={`px-2 py-1 text-sm rounded flex-1 transition-colors ${
+                              userVote === 'down'
+                                ? 'bg-red-600 text-white'
+                                : 'bg-slate-100 text-slate-600 hover:bg-red-100'
+                            }`}
+                          >
+                            👎 {counts.thumbsDown}
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => saveItem(item)}
+                          className="w-full px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                        >
+                          {savedIds.has(item.tripadvisor_id?.toString()) ? '✓ Saved' : 'Save'}
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : loading ? (
+                <div className="text-center py-8 text-slate-500">Loading listings...</div>
+              ) : (
+                <div className="text-center py-8 text-slate-500">No listings found</div>
+              )}
+
+              {/* Pagination */}
+              <div className="flex gap-2 justify-center mt-6">
+                <button
+                  onClick={() => {
+                    setCityPage(p => Math.max(1, p - 1))
+                    loadCategoryListings(selectedCategory, Math.max(1, cityPage - 1))
+                  }}
+                  disabled={cityPage === 1}
+                  className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200"
+                >
+                  Previous
+                </button>
+                <span className="px-4 py-2 text-slate-700">Page {cityPage}</span>
+                <button
+                  onClick={() => {
+                    setCityPage(p => p + 1)
+                    loadCategoryListings(selectedCategory, cityPage + 1)
+                  }}
+                  disabled={cityListings.length < 12}
+                  className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">Nearby Listings</h2>
