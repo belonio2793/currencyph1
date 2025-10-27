@@ -901,39 +901,56 @@ async function performAdvancedScrape(supabase: any) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method !== "POST" && req.method !== "GET") {
-    return new Response("Method not allowed", { status: 405 });
-  }
-
-  const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return new Response(
-      JSON.stringify({
-        error: "Missing Supabase environment variables",
-      }),
-      { status: 500, headers: { "Content-Type": "application/json" } }
-    );
-  }
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
   try {
+    if (req.method !== "POST" && req.method !== "GET") {
+      return new Response(
+        JSON.stringify({ success: false, error: "Method not allowed" }),
+        { status: 405, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Missing Supabase environment variables",
+          timestamp: new Date().toISOString()
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const result = await performAdvancedScrape(supabase);
 
+    if (!result || typeof result !== 'object') {
+      return new Response(
+        JSON.stringify({
+          success: false,
+          error: "Invalid result from scrape",
+          timestamp: new Date().toISOString()
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const statusCode = result.success === true ? 200 : 500;
     return new Response(JSON.stringify(result), {
-      status: 200,
+      status: statusCode,
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    const errorMsg = err && typeof err === 'object' && 'message' in err ? (err as any).message : String(err);
-    console.error("Advanced scrape failed:", errorMsg);
+    const errorMsg = (err && typeof err === 'object' && 'message' in err) ? (err as any).message : String(err);
+    console.error("Handler error:", errorMsg);
+    console.error("Full error:", err);
+
     return new Response(
       JSON.stringify({
         success: false,
-        error: errorMsg || "Advanced scrape failed",
-        details: String(err),
+        error: errorMsg || "Unknown handler error",
         timestamp: new Date().toISOString()
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
