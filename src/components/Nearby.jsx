@@ -225,9 +225,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
-      {/* Featured Listings Section */}
-      <FeaturedListings onNavigateToListing={handleNavigateToListing} />
-
       {/* Stats Section */}
       {listingStats && (
         <div className="mb-8 grid grid-cols-2 md:grid-cols-5 gap-4">
