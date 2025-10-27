@@ -572,46 +572,54 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                 const userVote = userVotes[item.tripadvisor_id]
 
                 return (
-                  <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                  <div key={item.tripadvisor_id} className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group">
                     {(item.raw?.image || item.image) && (
-                      <div className="w-full h-32 rounded-lg overflow-hidden mb-3 bg-slate-200">
+                      <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '200px' }}>
                         <img
                           src={item.raw?.image || item.image}
                           alt={item.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           onError={(e) => {
                             e.currentTarget.src = `https://via.placeholder.com/600x400?text=${encodeURIComponent(item.name)}`
                           }}
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        {item.category && (
+                          <span className="absolute top-3 left-3 inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-sm">
+                            {item.category}
+                          </span>
+                        )}
                       </div>
                     )}
-                    <h4 className="font-semibold text-slate-900 mb-1">{item.name}</h4>
-                    {item.address && <p className="text-sm text-slate-500 mb-2">{item.address}</p>}
-                    <div className="flex items-center gap-2 mb-2">
-                      {item.rating && (
-                        <>
-                          <StarRating value={Number(item.rating)} size="sm" />
-                          <span className="text-sm font-semibold">{Number(item.rating).toFixed(1)}</span>
-                        </>
-                      )}
-                      {item.category && <span className="text-xs text-slate-600">{item.category}</span>}
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => saveItem(item)}
-                        className="px-3 py-1 bg-green-600 text-white rounded text-sm flex-1 hover:bg-green-700"
-                      >
-                        {savedIds.has(item.tripadvisor_id?.toString()) ? 'Saved' : 'Save'}
-                      </button>
-                      <button
-                        onClick={() => {
-                          setCurrentBusinessId(item.tripadvisor_id?.toString())
-                          setActiveTab('business')
-                        }}
-                        className="px-3 py-1 bg-slate-100 text-slate-700 rounded text-sm flex-1 hover:bg-slate-200"
-                      >
-                        View
-                      </button>
+                    <div className="p-4">
+                      <h4 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{item.name}</h4>
+                      {item.address && <p className="text-sm text-slate-600 mb-3">{item.address}</p>}
+                      <div className="flex items-center gap-3 mb-4">
+                        {item.rating && (
+                          <>
+                            <StarRating value={Number(item.rating)} size="sm" />
+                            <span className="text-sm font-semibold text-slate-900">{Number(item.rating).toFixed(1)}</span>
+                            <span className="text-xs text-slate-500">({item.reviewCount || '0'})</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => saveItem(item)}
+                          className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        >
+                          {savedIds.has(item.tripadvisor_id?.toString()) ? '✓ Saved' : 'Save'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setCurrentBusinessId(item.tripadvisor_id?.toString())
+                            setActiveTab('business')
+                          }}
+                          className="flex-1 px-3 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-200 transition-colors"
+                        >
+                          View
+                        </button>
+                      </div>
                     </div>
                   </div>
                 )
@@ -708,7 +716,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                           onClick={() => saveItem(item)}
                           className="w-full px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
                         >
-                          {savedIds.has(item.tripadvisor_id?.toString()) ? '✓ Saved' : 'Save'}
+                          {savedIds.has(item.tripadvisor_id?.toString()) ? '��� Saved' : 'Save'}
                         </button>
                       </div>
                     )
