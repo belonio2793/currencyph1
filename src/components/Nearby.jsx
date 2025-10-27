@@ -81,6 +81,23 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
+  async function loadFeaturedListings() {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('nearby_listings')
+        .select('*')
+        .not('rating', 'is', null)
+        .order('rating', { ascending: false })
+        .limit(6)
+
+      if (fetchError) throw fetchError
+
+      setFeaturedListings(data || [])
+    } catch (err) {
+      console.error('Error loading featured listings:', err)
+    }
+  }
+
   async function loadListings() {
     setLoading(true)
     setError('')
