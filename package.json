@@ -15,12 +15,14 @@
     "sync-tripadvisor": "node scripts/sync-tripadvisor-locally.js",
     "scrape-tripadvisor-bee": "node scripts/scrape-tripadvisor-scrapingbee.js",
     "fetch-all-cities": "bash scripts/fetch-all-cities.sh",
-    "fetch-all-cities-node": "node scripts/fetch-all-cities-listings.js"
+    "fetch-all-cities-node": "node scripts/fetch-all-cities-listings.js",
+    "fetch-all-cities-v2": "node scripts/fetch-all-cities-listings-v2.js",
+    "populate-demo": "node scripts/populate-demo-listings.js",
+    "test-api": "node scripts/test-tripadvisor-api.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
     "cheerio": "^1.0.0-rc.12",
-    "node-fetch": "^2.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
