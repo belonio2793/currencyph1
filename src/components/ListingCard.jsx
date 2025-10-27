@@ -144,7 +144,7 @@ export default function ListingCard({
           <div className="flex items-center gap-2 mb-3 pb-3 border-b border-slate-100">
             <StarRating value={Number(listing.rating)} size="sm" />
             <span className="text-xs text-slate-600">
-              {listing.review_count || listing.reviewCount || '0'} {(listing.review_count || listing.reviewCount) === 1 ? 'review' : 'reviews'}
+              {(listing.review_count ?? listing.reviewCount ?? listing.num_reviews ?? 0)} {(listing.review_count ?? listing.reviewCount ?? listing.num_reviews ?? 0) === 1 ? 'review' : 'reviews'}
             </span>
           </div>
         )}
