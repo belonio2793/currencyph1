@@ -303,19 +303,25 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
       const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/sync-tripadvisor-hourly`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${anonKey}`
-          }
+      if (!supabaseUrl || !anonKey) {
+        throw new Error('Supabase credentials not configured. Check environment variables.')
+      }
+
+      const functionUrl = `${supabaseUrl}/functions/v1/sync-tripadvisor-hourly`
+
+      console.log('Calling edge function:', functionUrl)
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
         }
-      )
+      })
 
       if (!response.ok) {
-        throw new Error(`Edge function error: ${response.status}`)
+        const errorText = await response.text()
+        throw new Error(`Edge function error: ${response.status} - ${errorText}`)
       }
 
       const result = await response.json()
@@ -329,8 +335,9 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
       await loadStats()
       await loadSavedListings(1)
     } catch (err) {
-      console.error('Error fetching:', err)
-      setError(`Failed to fetch: ${err.message}`)
+      console.error('Error fetching listings:', err)
+      const errorMsg = err?.message || err?.toString?.() || 'Unknown error'
+      setError(`Failed to fetch: ${errorMsg}`)
     } finally {
       setIsFetching(false)
       setFetchProgress(null)

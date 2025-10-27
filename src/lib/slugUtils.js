@@ -67,7 +67,7 @@ export async function populateSlugsForListings(supabaseClient) {
           .eq('tripadvisor_id', update.tripadvisor_id)
 
         if (updateError) {
-          console.error(`Error updating slug for ${update.tripadvisor_id}:`, updateError)
+          console.error(`Error updating slug for ${update.tripadvisor_id}:`, updateError?.message || JSON.stringify(updateError))
           continue
         }
         totalUpdated++
