@@ -362,13 +362,13 @@ async function performAdvancedScrape(supabase: any) {
   let successCount = 0;
   let errorCount = 0;
 
-  const apiKey = Deno.env.get("TRIPADVISOR_API_KEY");
+  const apiKey = Deno.env.get("TRIPADVISOR") || Deno.env.get("TRIPADVISOR_API_KEY");
 
   if (!apiKey) {
-    console.error("TRIPADVISOR_API_KEY environment variable not set");
+    console.error("TRIPADVISOR or TRIPADVISOR_API_KEY environment variable not set");
     return {
       success: false,
-      error: "TRIPADVISOR_API_KEY not configured",
+      error: "TRIPADVISOR API key not configured",
       totalScraped: 0,
       uniqueListings: 0,
       upserted: 0,
