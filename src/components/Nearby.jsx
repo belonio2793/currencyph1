@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import ListingCard from './ListingCard'
-import FeaturedListings from './FeaturedListings'
-import StarRating from './StarRating'
 
 const CATEGORIES = ['attractions', 'hotels', 'restaurants', 'beaches', 'things to do']
 
