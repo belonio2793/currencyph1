@@ -1,105 +1,96 @@
 #!/usr/bin/env node
 
-const TRIP_KEY = process.env.VITE_TRIPADVISOR || process.env.TRIPADVISOR;
+const apiKey = process.env.TRIPADVISOR || process.env.VITE_TRIPADVISOR;
 
-if (!TRIP_KEY) {
-  console.error('ERROR: VITE_TRIPADVISOR or TRIPADVISOR env var not set');
-  console.error('Set it: export VITE_TRIPADVISOR=your_api_key');
-  process.exit(1);
-}
+console.log('\n🔍 TripAdvisor API Diagnostic Test');
+console.log('==================================\n');
+console.log('API Key Status:', apiKey ? '✓ Set (' + apiKey.substring(0, 10) + '...)' : '✗ NOT SET');
+console.log('');
 
-console.log('✓ TripAdvisor API Key found');
-
-const CATEGORIES = [
-  'hotels',
-  'restaurants',
-  'attractions',
-  'things-to-do'
-];
-
-async function testAPI(query) {
-  const params = new URLSearchParams();
-  params.append('query', query);
-  params.append('limit', '20');
-
-  const url = `https://api.tripadvisor.com/api/partner/2.0/search?${params.toString()}`;
-  
-  console.log(`\n📡 Fetching: ${url}`);
-  
+async function testEndpoints() {
+  // Test 1: Private API - Search
+  console.log('1️⃣ Testing Private API Search Endpoint:');
   try {
-    const res = await fetch(url, {
+    const url = `https://api.tripadvisor.com/api/private/2.1/locations/search?query=Manila&key=${apiKey}`;
+    const response = await fetch(url);
+    console.log(`   Status: ${response.status}`);
+    const data = await response.json();
+    if (response.ok) {
+      console.log(`   ✓ Success! Found ${data.data?.length || 0} results`);
+    } else {
+      console.log(`   ✗ Error: ${data.error || response.statusText}`);
+    }
+  } catch (e) {
+    console.log(`   ✗ Error: ${e.message}`);
+  }
+
+  console.log('');
+
+  // Test 2: Private API - Location Details
+  console.log('2️⃣ Testing Private API Location Details:');
+  try {
+    const url = `https://api.tripadvisor.com/api/private/2.1/locations/298573?key=${apiKey}`;
+    const response = await fetch(url);
+    console.log(`   Status: ${response.status}`);
+    const data = await response.json();
+    if (response.ok) {
+      console.log(`   ✓ Success! Got location: ${data.name}`);
+    } else {
+      console.log(`   ✗ Error: ${data.error || response.statusText}`);
+    }
+  } catch (e) {
+    console.log(`   ✗ Error: ${e.message}`);
+  }
+
+  console.log('');
+
+  // Test 3: Public API
+  console.log('3️⃣ Testing Public API (Partner API):');
+  try {
+    const url = `https://api.tripadvisor.com/api/partner/2.0/locations/search?query=Manila&limit=5`;
+    const response = await fetch(url, {
       headers: {
-        'X-TripAdvisor-API-Key': TRIP_KEY,
-        'Accept': 'application/json'
+        'X-TripAdvisor-API-Key': apiKey
       }
     });
-
-    console.log(`Status: ${res.status}`);
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error(`❌ Error ${res.status}: ${text}`);
-      return null;
+    console.log(`   Status: ${response.status}`);
+    const data = await response.json();
+    if (response.ok) {
+      console.log(`   ✓ Success! Found ${data.data?.length || 0} results`);
+      if (data.data && data.data.length > 0) {
+        console.log(`   First result: ${data.data[0].name}`);
+      }
+    } else {
+      console.log(`   ✗ Error: ${data.error || response.statusText}`);
     }
-
-    const json = await res.json();
-    
-    console.log(`Response structure:`, Object.keys(json));
-    
-    const items = json.data || json.results || [];
-    console.log(`✓ Found ${items.length} results`);
-
-    if (items.length > 0) {
-      console.log('\nFirst 3 results:');
-      items.slice(0, 3).forEach((item, idx) => {
-        console.log(`\n  ${idx + 1}. ${item.name}`);
-        console.log(`     Rating: ${item.rating || 'N/A'}`);
-        console.log(`     Category: ${item.subcategory || item.category?.name || 'N/A'}`);
-        console.log(`     Address: ${item.address || 'N/A'}`);
-        console.log(`     ID: ${item.location_id || item.id || 'N/A'}`);
-      });
-    }
-
-    return items;
-  } catch (err) {
-    console.error(`❌ Fetch failed: ${err.message}`);
-    return null;
+  } catch (e) {
+    console.log(`   ✗ Error: ${e.message}`);
   }
+
+  console.log('');
+
+  // Test 4: Basic connectivity
+  console.log('4️⃣ Testing Basic Connectivity:');
+  try {
+    const response = await fetch('https://api.tripadvisor.com/');
+    console.log(`   Status: ${response.status}`);
+    console.log(`   ✓ TripAdvisor API is reachable`);
+  } catch (e) {
+    console.log(`   ✗ Cannot reach TripAdvisor API: ${e.message}`);
+  }
+
+  console.log('\n📋 Diagnosis Summary:');
+  console.log('====================');
+  console.log('If all tests failed:');
+  console.log('  1. Check that TRIPADVISOR env var is set correctly');
+  console.log('  2. Verify API key is valid (not expired)');
+  console.log('  3. Check API key permissions');
+  console.log('  4. Verify network connectivity');
+  console.log('');
+  console.log('Current environment variables:');
+  console.log('  TRIPADVISOR:', process.env.TRIPADVISOR ? '✓ Set' : '✗ Not set');
+  console.log('  VITE_TRIPADVISOR:', process.env.VITE_TRIPADVISOR ? '✓ Set' : '✗ Not set');
+  console.log('');
 }
 
-async function main() {
-  console.log('========================================');
-  console.log('TripAdvisor API Test - Manila Categories');
-  console.log('========================================');
-
-  let totalFound = 0;
-
-  for (const category of CATEGORIES) {
-    const query = `${category} in Manila Philippines`;
-    console.log(`\n--- Testing: "${query}" ---`);
-    
-    const results = await testAPI(query);
-    if (results) {
-      totalFound += results.length;
-    }
-
-    // Rate limiting
-    console.log('⏳ Waiting 2 seconds before next request...');
-    await new Promise(resolve => setTimeout(resolve, 2000));
-  }
-
-  console.log(`\n========================================`);
-  console.log(`Total results found: ${totalFound}`);
-  console.log('========================================');
-
-  if (totalFound === 0) {
-    console.log('\n⚠️  No results found. Possible issues:');
-    console.log('  1. Invalid API key');
-    console.log('  2. API quota exceeded');
-    console.log('  3. TripAdvisor API endpoint changed');
-  } else {
-    console.log('\n✓ API is working! You can now populate the database.');
-  }
-}
-
-main().catch(console.error);
+testEndpoints().catch(console.error);
