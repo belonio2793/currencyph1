@@ -639,6 +639,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
                       setCurrentBusinessId(item.tripadvisor_id?.toString())
                       setActiveTab('business')
                     }}
+                    onNavigateToDetail={handleNavigateToListing}
                     isSaved={savedIds.has(item.tripadvisor_id?.toString())}
                     isAuthenticated={isAuthenticatedUser}
                     voteCounts={counts}
