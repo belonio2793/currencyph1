@@ -38,10 +38,18 @@ class ImageManager {
       }
     }
 
-    // Fall back to original image URL
-    if (listing.image_url) {
-      this.urlCache.set(listing.tripadvisor_id, listing.image_url)
-      return listing.image_url
+    // Fall back to image fields in schema
+    const candidates = []
+    if (listing.image_url) candidates.push(listing.image_url)
+    if (listing.primary_image_url) candidates.push(listing.primary_image_url)
+    if (listing.featured_image_url) candidates.push(listing.featured_image_url)
+    if (Array.isArray(listing.image_urls) && listing.image_urls.length) candidates.push(listing.image_urls[0])
+    if (Array.isArray(listing.photo_urls) && listing.photo_urls.length) candidates.push(listing.photo_urls[0])
+
+    const chosen = candidates.find(Boolean) || null
+    if (chosen) {
+      this.urlCache.set(listing.tripadvisor_id, chosen)
+      return chosen
     }
 
     // Return null if no image available
