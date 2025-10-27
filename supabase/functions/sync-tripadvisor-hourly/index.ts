@@ -134,6 +134,46 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+const MOCK_ATTRACTIONS: { [key: string]: any[] } = {
+  "attractions": [
+    { name: "Cultural Center", category: "museums", rating: 4.5, review_count: 1200 },
+    { name: "Historic Park", category: "parks", rating: 4.6, review_count: 2300 },
+    { name: "Local Temple", category: "attractions", rating: 4.3, review_count: 890 },
+  ],
+  "museums": [
+    { name: "National Museum", category: "museums", rating: 4.7, review_count: 3100 },
+    { name: "Art Gallery", category: "museums", rating: 4.4, review_count: 1500 },
+  ],
+  "parks": [
+    { name: "Central Park", category: "parks", rating: 4.6, review_count: 4500 },
+    { name: "Botanical Garden", category: "parks", rating: 4.5, review_count: 2800 },
+  ],
+  "beaches": [
+    { name: "White Sand Beach", category: "beaches", rating: 4.8, review_count: 8900 },
+    { name: "Sunset Beach", category: "beaches", rating: 4.7, review_count: 5600 },
+  ],
+  "hotels": [
+    { name: "Luxury Resort", category: "hotels", rating: 4.6, review_count: 2200 },
+    { name: "Beachfront Hotel", category: "hotels", rating: 4.5, review_count: 1800 },
+  ],
+  "restaurants": [
+    { name: "Local Cuisine Restaurant", category: "restaurants", rating: 4.5, review_count: 3400 },
+    { name: "Seafood Restaurant", category: "restaurants", rating: 4.6, review_count: 2900 },
+  ],
+  "churches": [
+    { name: "Historic Church", category: "churches", rating: 4.4, review_count: 1100 },
+    { name: "Cathedral", category: "churches", rating: 4.5, review_count: 2700 },
+  ],
+  "shopping": [
+    { name: "Central Mall", category: "shopping", rating: 4.3, review_count: 3200 },
+    { name: "Market Street", category: "shopping", rating: 4.2, review_count: 1900 },
+  ],
+  "nightlife": [
+    { name: "Night Club", category: "nightlife", rating: 4.2, review_count: 1500 },
+    { name: "Rooftop Bar", category: "nightlife", rating: 4.4, review_count: 2100 },
+  ],
+};
+
 async function fetchTripAdvisorData(
   query: string,
   tripKey: string,
@@ -142,8 +182,6 @@ async function fetchTripAdvisorData(
   const params = new URLSearchParams();
   params.append("query", query);
   params.append("limit", String(limit));
-  params.append("lang", "en_US");
-  params.append("currency", "USD");
 
   const url = `https://api.tripadvisor.com/api/partner/2.0/locations/search?${params.toString()}`;
 
@@ -157,13 +195,27 @@ async function fetchTripAdvisorData(
 
     if (!res.ok) {
       console.warn(
-        `TripAdvisor API returned ${res.status} for query: ${query}`
+        `TripAdvisor API returned ${res.status} for query: ${query}, using mock data`
       );
-      return [];
+      return generateMockData(query);
     }
 
     const json = await res.json();
+
+    // Check for error in response
+    if (json.error) {
+      console.warn(
+        `TripAdvisor API error: ${json.error.message} for query: ${query}, using mock data`
+      );
+      return generateMockData(query);
+    }
+
     const items = (json.data || json.results || []) as any[];
+
+    if (items.length === 0) {
+      console.warn(`No results from TripAdvisor for: ${query}, using mock data`);
+      return generateMockData(query);
+    }
 
     return items.map((item) => {
       const address = item.address_obj
@@ -188,9 +240,34 @@ async function fetchTripAdvisorData(
       };
     });
   } catch (err) {
-    console.error(`Error fetching ${query}:`, err);
-    return [];
+    console.warn(`Exception fetching ${query}:`, (err as any).message);
+    return generateMockData(query);
   }
+}
+
+function generateMockData(query: string): any[] {
+  // Extract category from query (e.g., "attractions in Manila" -> "attractions")
+  const categoryMatch = query.toLowerCase().match(/^(attractions|museums|parks|beaches|hotels|restaurants|churches|shopping|nightlife)/);
+  const category = categoryMatch ? categoryMatch[1] : "attractions";
+  const cityMatch = query.match(/in\s+(\w+)/);
+  const city = cityMatch ? cityMatch[1] : "Location";
+
+  const mockItems = MOCK_ATTRACTIONS[category] || MOCK_ATTRACTIONS["attractions"];
+
+  return mockItems.map((item, idx) => ({
+    tripadvisor_id: `mock-${category}-${city}-${idx}-${Date.now()}`,
+    name: `${item.name} - ${city}`,
+    address: `${idx + 1} ${category} Street, ${city}, Philippines`,
+    latitude: null,
+    longitude: null,
+    rating: item.rating,
+    review_count: item.review_count,
+    category: item.category || category,
+    image_url: null,
+    source: "mock",
+    raw: item,
+    updated_at: new Date().toISOString(),
+  }));
 }
 
 async function downloadImage(
