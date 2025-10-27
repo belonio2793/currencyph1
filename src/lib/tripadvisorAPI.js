@@ -10,8 +10,10 @@ export async function searchPlaces(query, lat = null, lng = null, limit = 20) {
     params.append('lon', String(lng))
   }
 
-  // Common TripAdvisor Content API search endpoint patterns may vary; try partner v2 search
-  const url = `https://api.tripadvisor.com/api/partner/2.0/search?${params.toString()}`
+  // TripAdvisor Content API locations search endpoint
+  params.append('lang', 'en_US')
+  params.append('currency', 'USD')
+  const url = `https://api.tripadvisor.com/api/partner/2.0/locations/search?${params.toString()}`
 
   try {
     const res = await fetch(url, {
