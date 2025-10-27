@@ -38,6 +38,7 @@ function groupCitiesByLetter(cities) {
 export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) {
   const [selectedCity, setSelectedCity] = useState(null)
   const [listings, setListings] = useState([])
+  const [featuredListings, setFeaturedListings] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -50,6 +51,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
   useEffect(() => {
     loadStats()
+    loadFeaturedListings()
   }, [])
 
   async function loadStats() {
