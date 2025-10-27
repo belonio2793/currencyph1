@@ -189,8 +189,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       // Refresh stats and listings
       await loadStats()
-      await loadCities()
-      await loadCategories()
+      await loadFeaturedListings()
       await loadListings()
       setPage(1)
     } catch (err) {
