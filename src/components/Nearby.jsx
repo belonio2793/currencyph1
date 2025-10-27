@@ -531,8 +531,30 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           <p className="text-blue-100 text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
 
           <div className="mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">📍 Browse by City</h3>
-            <p className="text-blue-100 mb-4">Select a letter to see all cities starting with that letter</p>
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2">📍 Browse by City</h3>
+                <p className="text-blue-100 mb-4">Select a letter to see all cities starting with that letter</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleFetchComprehensiveListings}
+                  disabled={isFetching}
+                  className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-semibold disabled:opacity-50"
+                  title="Fetch all cities/categories from TripAdvisor"
+                >
+                  Populate All (TripAdvisor)
+                </button>
+                <button
+                  onClick={handleDownloadAllImages}
+                  disabled={isFetching}
+                  className="px-3 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-sm font-semibold disabled:opacity-50"
+                  title="Download and store photos for all listings"
+                >
+                  Download Photos
+                </button>
+              </div>
+            </div>
 
             {/* Prominent A-Z Alphabet Selector */}
             <div className="bg-transparent rounded-xl p-2 max-w-4xl mx-auto">
