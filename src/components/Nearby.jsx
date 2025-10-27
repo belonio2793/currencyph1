@@ -206,6 +206,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
+  const [isFetching, setIsFetching] = useState(false)
+  const [fetchProgress, setFetchProgress] = useState(null)
 
   useEffect(() => {
     checkAuthStatus()
