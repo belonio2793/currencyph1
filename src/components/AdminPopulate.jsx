@@ -109,7 +109,7 @@ export default function AdminPopulate() {
         <h2 className="text-2xl font-semibold text-slate-900 mb-6">Admin: Populate TripAdvisor Listings</h2>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-slate-200">
+        <div className="flex gap-2 mb-6 border-b border-slate-200 flex-wrap">
           <button
             onClick={() => setActiveTab('manila')}
             className={`px-4 py-3 font-medium border-b-2 transition-colors ${
@@ -118,7 +118,17 @@ export default function AdminPopulate() {
                 : 'border-transparent text-slate-600 hover:text-slate-900'
             }`}
           >
-            Manila Attractions (Recommended)
+            Manila Attractions
+          </button>
+          <button
+            onClick={() => setActiveTab('philippines')}
+            className={`px-4 py-3 font-medium border-b-2 transition-colors ${
+              activeTab === 'philippines'
+                ? 'border-green-600 text-green-600'
+                : 'border-transparent text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Fetch Philippines
           </button>
           <button
             onClick={() => setActiveTab('full')}
