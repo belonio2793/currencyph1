@@ -15,7 +15,6 @@ import Auth from './components/Auth'
 import Nearby from './components/Nearby'
 import Business from './components/Business'
 import CommunityManagement from './components/CommunityManagement'
-import AdminPopulate from './components/AdminPopulate'
 import ListingDetail from './components/ListingDetail'
 
 export default function App() {
@@ -57,6 +56,13 @@ export default function App() {
     if (path === '/login' || path === '/register') {
       setShowAuth(true)
     } else {
+      setShowAuth(false)
+    }
+
+    // Redirect legacy admin route to home
+    if (path === '/admin') {
+      window.history.replaceState(null, '', '/')
+      setActiveTab('home')
       setShowAuth(false)
     }
 
@@ -225,16 +231,6 @@ export default function App() {
                   </button>
                   <button
                     onClick={() => {
-                      setActiveTab('admin-populate')
-                      setShowAuth(false)
-                      window.history.replaceState(null, '', '/admin')
-                    }}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Admin
-                  </button>
-                  <button
-                    onClick={() => {
                       setShowAuth(true)
                       window.history.replaceState(null, '', '/login')
                     }}
@@ -267,7 +263,6 @@ export default function App() {
             {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
             {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
             {activeTab === 'community' && <CommunityManagement userId={userId} /> }
-            {activeTab === 'admin-populate' && <AdminPopulate /> }
             {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
               setActiveTab('nearby')
               setCurrentListingSlug(null)
