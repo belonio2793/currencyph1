@@ -7,7 +7,6 @@
     "build": "vite build",
     "preview": "vite preview",
     "populate-nearby": "node scripts/populate_nearby.js",
-    "scrape-tripadvisor": "node scripts/scrape_tripadvisor.js",
     "fetch-tripadvisor": "node scripts/update-listings-from-tripadvisor.js",
     "fetch-philippines": "node scripts/fetch-philippines-listings.js",
     "import-photos": "node scripts/import-photos.js",
@@ -19,6 +18,7 @@
     "fetch-all-cities-node": "node scripts/fetch-all-cities-listings.js",
     "fetch-all-cities-v2": "node scripts/fetch-all-cities-listings-v2.js",
     "scrape-tripadvisor": "node scripts/scrape-tripadvisor-ph.js",
+    "fetch-comprehensive": "node scripts/fetch-all-philippines-comprehensive.js",
     "populate-demo": "node scripts/populate-demo-listings.js",
     "test-api": "node scripts/test-tripadvisor-api.js"
   },
