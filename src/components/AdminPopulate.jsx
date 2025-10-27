@@ -173,6 +173,57 @@ export default function AdminPopulate() {
           </div>
         )}
 
+        {/* Philippines Fetcher Tab */}
+        {activeTab === 'philippines' && (
+          <div>
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-900 font-semibold mb-2">🇵🇭 Fetch All Philippines Cities</p>
+              <ul className="text-sm text-green-900 space-y-1 list-disc list-inside">
+                <li>Fetches listings from 50+ Philippine cities</li>
+                <li>Uses TripAdvisor API for real data</li>
+                <li>Includes ratings, reviews, categories, and coordinates</li>
+                <li>Smart deduplication to avoid duplicates</li>
+                <li>Rate-limited to avoid API throttling</li>
+              </ul>
+            </div>
+
+            <p className="text-sm text-slate-600 mb-6">
+              This will fetch and save listings from all major Philippine cities and tourist destinations.
+              The process includes rate limiting to work reliably with the TripAdvisor API.
+            </p>
+
+            <button
+              onClick={handleFetchPhilippines}
+              disabled={loading}
+              className={`px-6 py-2 rounded-lg font-medium text-white transition-colors ${
+                loading
+                  ? 'bg-slate-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700'
+              }`}
+            >
+              {loading ? 'Fetching...' : 'Fetch Philippines Listings'}
+            </button>
+
+            {progress && loading && (
+              <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                <p className="text-sm font-medium text-slate-900 mb-2">
+                  {progress.message}
+                </p>
+                <div className="w-full bg-slate-200 rounded-full h-2">
+                  <div
+                    className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${Math.min(100, (progress.current / progress.total) * 100)}%` }}
+                  />
+                </div>
+                <p className="text-xs text-slate-600 mt-2">
+                  Progress: {progress.current} / {progress.total} cities
+                  {progress.totalCollected > 0 && ` · Total: ${progress.totalCollected} listings`}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Full API Tab */}
         {activeTab === 'full' && (
           <div>
