@@ -62,6 +62,9 @@ export default function Navbar({ activeTab, onTabChange }) {
         {/* Mobile navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 border-t border-slate-100">
+            <div className="mb-3 px-3 py-2">
+              <HeaderMap />
+            </div>
             <div className="space-y-2">
               {tabs.map(tab => (
                 <button
