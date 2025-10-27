@@ -3,19 +3,20 @@ import { supabase } from '../lib/supabaseClient'
 import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { checkAndPopulateManilaListings } from '../lib/populateManillaListings'
+import tripadvisorSync from '../lib/tripadvisorSync'
 import StarRating from './StarRating'
 import FeaturedListings from './FeaturedListings'
 
 const TOP_10_CITIES = [
   'Manila',
-  'Cebu City',
-  'Davao City',
+  'Cebu',
+  'Davao',
   'Quezon City',
   'Makati',
   'Baguio',
   'Boracay',
   'Puerto Princesa',
-  'Iloilo City',
+  'Iloilo',
   'Pasig'
 ]
 
