@@ -2,10 +2,14 @@ import React from 'react'
 import { MANILA_LISTINGS } from '../data/manila-listings'
 import ListingCard from './ListingCard'
 
-export default function FeaturedListings() {
+export default function FeaturedListings({ onNavigateToListing }) {
   const handleNavigateToListing = (slug) => {
-    window.history.pushState(null, '', `/nearby/${slug}`)
-    window.location.reload()
+    if (onNavigateToListing) {
+      onNavigateToListing(slug)
+    } else {
+      window.history.pushState(null, '', `/nearby/${slug}`)
+      window.location.reload()
+    }
   }
 
   // Show only the top 6 featured listings
