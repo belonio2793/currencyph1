@@ -55,52 +55,6 @@ export default function AdminPopulate() {
     }
   }
 
-  async function handleFetchPhilippines() {
-    setLoading(true)
-    setError('')
-    setResult(null)
-
-    try {
-      const cities = tripadvisorPhilippinesFetcher.getPhilippineCities()
-
-      // Get current count
-      const { count: beforeCount } = await supabase
-        .from('nearby_listings')
-        .select('*', { count: 'exact', head: true })
-
-      setProgress({ current: 0, total: cities.length, message: 'Starting fetch...' })
-
-      const result = await tripadvisorPhilippinesFetcher.fetchAndSaveListings(cities, (progress) => {
-        setProgress({
-          current: progress.current,
-          total: progress.total,
-          message: progress.error ? `❌ ${progress.city}` : `✓ ${progress.city} (${progress.found || 0} found)`,
-          city: progress.city,
-          totalCollected: progress.totalCollected || 0
-        })
-      })
-
-      const { count: afterCount } = await supabase
-        .from('nearby_listings')
-        .select('*', { count: 'exact', head: true })
-
-      setResult({
-        success: true,
-        message: 'Philippines listings fetched and saved',
-        ...result,
-        beforeCount: beforeCount || 0,
-        afterCount: afterCount || 0,
-        newListings: (afterCount || 0) - (beforeCount || 0)
-      })
-
-      setProgress(null)
-    } catch (err) {
-      setError(`Error: ${err.message}`)
-      setProgress(null)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
@@ -198,7 +152,7 @@ export default function AdminPopulate() {
             </div>
 
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-900 font-semibold mb-2">�� Quick Steps</p>
+              <p className="text-sm text-amber-900 font-semibold mb-2">⚡ Quick Steps</p>
               <ol className="text-sm text-amber-900 space-y-2 list-decimal list-inside">
                 <li>Open your terminal/command prompt</li>
                 <li>Navigate to your project directory</li>
