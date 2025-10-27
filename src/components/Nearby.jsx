@@ -7,6 +7,7 @@ import tripadvisorSync from '../lib/tripadvisorSync'
 import { imageManager } from '../lib/imageManager'
 import StarRating from './StarRating'
 import FeaturedListings from './FeaturedListings'
+import ListingCard from './ListingCard'
 
 const TOP_10_CITIES = [
   'Manila',
