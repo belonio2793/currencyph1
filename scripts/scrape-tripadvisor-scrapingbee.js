@@ -32,7 +32,7 @@ const CUSTOM_CITIES = customCitiesArg ? customCitiesArg.split(',').map(s=>s.trim
 
 async function beeFetch(url, opts = {}) {
   async function doFetch(renderJs) {
-    const params = new URLSearchParams({ url, render_js: renderJs ? 'true' : 'false', country_code: 'ph', wait: '3000', block_resources: 'false' })
+    const params = new URLSearchParams({ url, render_js: renderJs ? 'true' : 'false', country_code: 'ph', wait: '4000', block_resources: 'false', premium_proxy: 'true' })
     if (opts.params) Object.entries(opts.params).forEach(([k,v])=>params.set(k,String(v)))
     const resp = await fetch(`https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(SCRAPINGBEE_API_KEY)}&${params.toString()}`)
     if (!resp.ok) {
