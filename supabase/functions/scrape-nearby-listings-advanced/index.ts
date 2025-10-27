@@ -534,7 +534,13 @@ async function fetchListingDetails(
       return null;
     }
 
-    const location = await response.json();
+    let location: TripAdvisorLocation;
+    try {
+      location = await response.json();
+    } catch (e) {
+      console.warn(`Failed to parse JSON response for location ${locationId}`);
+      return null;
+    }
 
     if (!location || !location.name) {
       console.warn(`Invalid location data for ${locationId}`);
@@ -699,21 +705,31 @@ async function fetchLocationsFromTripAdvisor(
       return listings;
     }
 
-    for (const locationSummary of searchData.data) {
+    const data = searchData.data || [];
+    if (!Array.isArray(data)) {
+      console.warn(`Invalid data format for ${cityName}/${category}`);
+      return listings;
+    }
+
+    for (const locationSummary of data) {
       const locationId = String(locationSummary.location_id || "");
       if (!locationId) continue;
 
-      const detailedListing = await fetchListingDetails(
-        locationId,
-        cityId,
-        cityName,
-        category,
-        apiKey
-      );
+      try {
+        const detailedListing = await fetchListingDetails(
+          locationId,
+          cityId,
+          cityName,
+          category,
+          apiKey
+        );
 
-      if (detailedListing) {
-        listings.push(detailedListing);
-        console.log(`✓ Complete: ${detailedListing.name}\n`);
+        if (detailedListing) {
+          listings.push(detailedListing);
+          console.log(`✓ Complete: ${detailedListing.name}\n`);
+        }
+      } catch (err) {
+        console.warn(`Error fetching details for location ${locationId}:`, (err as any).message);
       }
 
       await sleep(500);
@@ -739,15 +755,21 @@ async function upsertListings(supabase: any, listings: NearbyListing[]): Promise
   for (let i = 0; i < listings.length; i += chunkSize) {
     const chunk = listings.slice(i, i + chunkSize);
 
-    const { error } = await supabase
-      .from("nearby_listings")
-      .upsert(chunk, { onConflict: "tripadvisor_id" });
+    try {
+      const response = await supabase
+        .from("nearby_listings")
+        .upsert(chunk, { onConflict: "tripadvisor_id" });
 
-    if (error) {
-      console.error(`Error upserting chunk ${i / chunkSize + 1}:`, error.message);
-    } else {
-      upsertedCount += chunk.length;
-      console.log(`✓ Upserted chunk ${i / chunkSize + 1}: ${chunk.length} listings`);
+      const error = response?.error;
+      if (error) {
+        const errorMsg = typeof error === 'string' ? error : error.message || JSON.stringify(error);
+        console.error(`Error upserting chunk ${Math.floor(i / chunkSize) + 1}:`, errorMsg);
+      } else {
+        upsertedCount += chunk.length;
+        console.log(`✓ Upserted chunk ${Math.floor(i / chunkSize) + 1}: ${chunk.length} listings`);
+      }
+    } catch (err) {
+      console.error(`Exception upserting chunk ${Math.floor(i / chunkSize) + 1}:`, (err as any).message);
     }
 
     await sleep(200);
@@ -871,11 +893,14 @@ Deno.serve(async (req) => {
       headers: { "Content-Type": "application/json" },
     });
   } catch (err) {
-    console.error("Advanced scrape failed:", err);
+    const errorMsg = err && typeof err === 'object' && 'message' in err ? (err as any).message : String(err);
+    console.error("Advanced scrape failed:", errorMsg);
     return new Response(
       JSON.stringify({
-        error: (err as any).message || "Advanced scrape failed",
+        success: false,
+        error: errorMsg || "Advanced scrape failed",
         details: String(err),
+        timestamp: new Date().toISOString()
       }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     );
