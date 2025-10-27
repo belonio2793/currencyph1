@@ -398,23 +398,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
           </div>
 
-          {/* Stats */}
-          {listingStats && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-                <div className="text-3xl font-bold text-white">{listingStats.total.toLocaleString()}</div>
-                <div className="text-blue-100 text-sm">Total Listings</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-                <div className="text-3xl font-bold text-white">{listingStats.cities}</div>
-                <div className="text-blue-100 text-sm">Philippine Cities</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-lg p-4">
-                <div className="text-3xl font-bold text-white">⭐ {listingStats.avgRating}</div>
-                <div className="text-blue-100 text-sm">Avg Rating</div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
