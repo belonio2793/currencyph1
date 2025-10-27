@@ -140,16 +140,16 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
   RETURN QUERY
-  SELECT 
+  SELECT
     nl.id,
-    nl.tripadvisor_id,
-    nl.name,
-    nl.address,
-    nl.latitude,
-    nl.longitude,
-    nl.rating,
-    nl.category,
-    nl.stored_image_path,
+    nl.tripadvisor_id::TEXT,
+    nl.name::TEXT,
+    nl.address::TEXT,
+    nl.latitude::FLOAT8,
+    nl.longitude::FLOAT8,
+    nl.rating::FLOAT8,
+    nl.category::TEXT,
+    nl.stored_image_path::TEXT,
     ts_rank(
       to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')),
       plainto_tsquery('english', search_query)
@@ -159,7 +159,7 @@ BEGIN
   ORDER BY ts_rank(
       to_tsvector('english', nl.name || ' ' || COALESCE(nl.address, '')),
       plainto_tsquery('english', search_query)
-    ) DESC, 
+    ) DESC,
     nl.rating DESC NULLS LAST
   LIMIT limit_count;
 END;
