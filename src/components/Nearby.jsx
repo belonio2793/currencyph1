@@ -333,12 +333,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       </div>
 
       {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-slate-900">
-          {searchResults.length > 0 ? 'Search Results' : selectedCity ? `Listings in ${selectedCity}` : 'All Listings'}
-        </h2>
-        <p className="text-sm text-slate-500">Listings from nearby_listings table, powered by TripAdvisor scraper.</p>
-      </div>
+      {(searchResults.length > 0 || selectedCity) && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-slate-900">
+            {searchResults.length > 0 ? 'Search Results' : selectedCity ? `Listings in ${selectedCity}` : ''}
+          </h2>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
