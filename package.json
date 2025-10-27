@@ -14,9 +14,11 @@
     "populate-all": "node scripts/populate-all-listings.js",
     "sync-tripadvisor": "node scripts/sync-tripadvisor-locally.js",
     "scrape-tripadvisor-bee": "node scripts/scrape-tripadvisor-scrapingbee.js",
+    "fetch-all": "bash scripts/fetch-all.sh",
     "fetch-all-cities": "bash scripts/fetch-all-cities.sh",
     "fetch-all-cities-node": "node scripts/fetch-all-cities-listings.js",
     "fetch-all-cities-v2": "node scripts/fetch-all-cities-listings-v2.js",
+    "scrape-tripadvisor": "node scripts/scrape-tripadvisor-ph.js",
     "populate-demo": "node scripts/populate-demo-listings.js",
     "test-api": "node scripts/test-tripadvisor-api.js"
   },
