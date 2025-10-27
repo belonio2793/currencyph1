@@ -72,7 +72,7 @@ export default function ListingDetail({ slug, onBack }) {
         <div className="text-center py-20">
           <div className="text-red-600 mb-4">{error}</div>
           <button
-            onClick={() => setActiveTab('nearby')}
+            onClick={handleBack}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             Back to Nearby
@@ -86,7 +86,7 @@ export default function ListingDetail({ slug, onBack }) {
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Header */}
       <button
-        onClick={() => setActiveTab('nearby')}
+        onClick={handleBack}
         className="mb-6 px-3 py-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
       >
         ← Back to Nearby
