@@ -809,16 +809,41 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">Nearby Listings</h2>
           <p className="text-sm text-slate-500">Search TripAdvisor and save businesses to your directory for the Philippines.</p>
         </div>
-        <div className="flex gap-2">
-          <button onClick={() => { setAddMode(!addMode) }} className="px-3 py-2 bg-indigo-600 text-white rounded-md">{addMode ? 'Cancel' : 'Add Business'}</button>
-          <button onClick={() => loadSavedListings(1)} className="px-3 py-2 bg-slate-100 rounded-md">Refresh Saved</button>
+        <div className="flex gap-2 flex-wrap">
+          <button
+            onClick={handleFetchPhilippinesListings}
+            disabled={isFetching}
+            className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            title="Fetch fresh listings from TripAdvisor Philippines"
+          >
+            {isFetching ? 'Fetching...' : '🔄 Fetch Philippines'}
+          </button>
+          <button onClick={() => { setAddMode(!addMode) }} className="px-3 py-2 bg-indigo-600 text-white rounded-md text-sm">{addMode ? 'Cancel' : '+ Add Business'}</button>
+          <button onClick={() => loadSavedListings(1)} className="px-3 py-2 bg-slate-100 rounded-md text-sm">⟲ Refresh Saved</button>
         </div>
       </div>
+
+      {/* Fetch Progress */}
+      {isFetching && fetchProgress && (
+        <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm font-medium text-blue-900 mb-2">{fetchProgress.message}</p>
+          <div className="w-full bg-blue-200 rounded-full h-2">
+            <div
+              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              style={{ width: `${Math.min(100, (fetchProgress.current / fetchProgress.total) * 100)}%` }}
+            />
+          </div>
+          <p className="text-xs text-blue-700 mt-2">
+            Progress: {fetchProgress.current} / {fetchProgress.total} cities
+            {fetchProgress.totalCollected > 0 && ` · Total: ${fetchProgress.totalCollected} listings`}
+          </p>
+        </div>
+      )}
 
       {addMode && (
         <form onSubmit={handleAddSubmit} className="mb-6 bg-white p-4 rounded-md border">
@@ -984,7 +1009,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                         className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                         disabled={savedIds.has(item.tripadvisor_id?.toString())}
                       >
-                        {savedIds.has(item.tripadvisor_id?.toString()) ? '�� Saved' : 'Save'}
+                        {savedIds.has(item.tripadvisor_id?.toString()) ? '✓ Saved' : 'Save'}
                       </button>
                     </div>
                   </div>
