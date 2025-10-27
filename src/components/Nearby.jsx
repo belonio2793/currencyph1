@@ -321,7 +321,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
           {/* Stats */}
           {listingStats && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-white/10 backdrop-blur rounded-lg p-4">
                 <div className="text-3xl font-bold text-white">{listingStats.total.toLocaleString()}</div>
                 <div className="text-blue-100 text-sm">Total Listings</div>
@@ -336,6 +336,24 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
               </div>
             </div>
           )}
+
+          {/* Fetch Actions */}
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={handleFetchAdvancedListings}
+              disabled={isFetching}
+              className="px-6 py-3 bg-white/20 hover:bg-white/30 disabled:opacity-50 text-white font-semibold rounded-lg transition-all duration-200 backdrop-blur border border-white/20"
+            >
+              {isFetching ? '⏳ Fetching...' : '🔄 Refresh (5 Cities)'}
+            </button>
+            <button
+              onClick={handleFetchComprehensiveListings}
+              disabled={isFetching}
+              className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 text-white font-semibold rounded-lg transition-all duration-200 flex items-center gap-2"
+            >
+              {isFetching ? '⏳ Fetching...' : '🌍 Fetch ALL Cities (70+)'}
+            </button>
+          </div>
         </div>
       </div>
 
