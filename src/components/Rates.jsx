@@ -98,32 +98,38 @@ export default function Rates({ globalCurrency }) {
         rates.forEach(r => {
           ratesMap[`${r.from_currency}_${r.to_currency}`] = r.rate
         })
+        setExchangeRates(ratesMap)
       } else {
         // If DB has no rates, fetch from external currency API and build pairs
-        const globalRates = await currencyAPI.getGlobalRates()
-        // globalRates: { CODE: { rate: <number> } } where rate is USD -> CODE
-        const codes = Object.keys(globalRates)
-        codes.forEach(code => {
-          const usdToCode = globalRates[code].rate || 0
-          // USD -> CODE
-          ratesMap[`USD_${code}`] = usdToCode
-        })
-        // Build pairwise rates: from A to B = (USD->B) / (USD->A)
-        codes.forEach(from => {
-          codes.forEach(to => {
-            if (from === to) return
-            const usdToFrom = globalRates[from].rate || 0
-            const usdToTo = globalRates[to].rate || 0
-            if (usdToFrom > 0 && usdToTo > 0) {
-              ratesMap[`${from}_${to}`] = usdToTo / usdToFrom
-            }
+        try {
+          const globalRates = await currencyAPI.getGlobalRates()
+          // globalRates: { CODE: { rate: <number> } } where rate is USD -> CODE
+          const codes = Object.keys(globalRates)
+          codes.forEach(code => {
+            const usdToCode = globalRates[code].rate || 0
+            // USD -> CODE
+            ratesMap[`USD_${code}`] = usdToCode
           })
-        })
+          // Build pairwise rates: from A to B = (USD->B) / (USD->A)
+          codes.forEach(from => {
+            codes.forEach(to => {
+              if (from === to) return
+              const usdToFrom = globalRates[from].rate || 0
+              const usdToTo = globalRates[to].rate || 0
+              if (usdToFrom > 0 && usdToTo > 0) {
+                ratesMap[`${from}_${to}`] = usdToTo / usdToFrom
+              }
+            })
+          })
+          setExchangeRates(ratesMap)
+        } catch (apiErr) {
+          console.debug('External currency API unavailable, using empty rates:', apiErr)
+          setExchangeRates(ratesMap)
+        }
       }
-
-      setExchangeRates(ratesMap)
     } catch (err) {
-      console.error('Error loading exchange rates:', err)
+      console.debug('Error loading exchange rates, continuing with fallback:', err)
+      setExchangeRates({})
     }
   }
 
