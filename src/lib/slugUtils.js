@@ -15,6 +15,50 @@ export function generateSlug(str) {
 }
 
 /**
+ * Generate unique slug by checking for duplicates and appending suffix
+ * @param {Object} supabaseClient - Supabase client instance
+ * @param {string} baseSlug - The base slug from the listing name
+ * @param {string} tripadvisorId - The TripAdvisor ID for fallback uniqueness
+ * @returns {Promise<string>} - A unique slug
+ */
+async function generateUniqueSlug(supabaseClient, baseSlug, tripadvisorId) {
+  if (!baseSlug) {
+    // Fallback: use tripadvisor_id if no name available
+    return `listing-${tripadvisorId.slice(-8)}`.toLowerCase()
+  }
+
+  // First, try the base slug
+  const { data: existing } = await supabaseClient
+    .from('nearby_listings')
+    .select('tripadvisor_id')
+    .eq('slug', baseSlug)
+    .limit(1)
+
+  if (!existing || existing.length === 0) {
+    return baseSlug
+  }
+
+  // If base slug exists, append tripadvisor_id suffix for uniqueness
+  const idSuffix = tripadvisorId.slice(-6).toLowerCase()
+  const uniqueSlug = `${baseSlug}-${idSuffix}`
+
+  // Double-check this combination doesn't exist
+  const { data: stillExists } = await supabaseClient
+    .from('nearby_listings')
+    .select('tripadvisor_id')
+    .eq('slug', uniqueSlug)
+    .neq('tripadvisor_id', tripadvisorId)
+    .limit(1)
+
+  if (stillExists && stillExists.length > 0) {
+    // If still collision, use full ID hash
+    return `${baseSlug}-${tripadvisorId}`.substring(0, 200)
+  }
+
+  return uniqueSlug
+}
+
+/**
  * Populate slugs for all nearby_listings that don't have them
  * @param {Object} supabaseClient - Supabase client instance
  * @returns {Promise<Object>} - Result with count of updated listings
@@ -37,20 +81,25 @@ export async function populateSlugsForListings(supabaseClient) {
       }
     }
 
-    // Generate slugs for listings that need them
-    const updates = listings
-      .filter(listing => !listing.slug)
-      .map(listing => ({
-        tripadvisor_id: listing.tripadvisor_id,
-        slug: generateSlug(listing.name),
-      }))
+    const listingsNeedingSlug = listings.filter(listing => !listing.slug)
 
-    if (updates.length === 0) {
+    if (listingsNeedingSlug.length === 0) {
       return {
         success: true,
         updated: 0,
         message: 'All listings already have slugs',
       }
+    }
+
+    // Generate unique slugs for each listing
+    const updates = []
+    for (const listing of listingsNeedingSlug) {
+      const baseSlug = generateSlug(listing.name)
+      const uniqueSlug = await generateUniqueSlug(supabaseClient, baseSlug, listing.tripadvisor_id)
+      updates.push({
+        tripadvisor_id: listing.tripadvisor_id,
+        slug: uniqueSlug,
+      })
     }
 
     // Update listings in batches
@@ -59,7 +108,7 @@ export async function populateSlugsForListings(supabaseClient) {
 
     for (let i = 0; i < updates.length; i += batchSize) {
       const batch = updates.slice(i, i + batchSize)
-      
+
       for (const update of batch) {
         const { error: updateError } = await supabaseClient
           .from('nearby_listings')
