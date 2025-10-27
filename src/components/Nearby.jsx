@@ -324,7 +324,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             <p className="text-blue-100 mb-4">Select a letter to see all cities starting with that letter</p>
 
             {/* Prominent A-Z Alphabet Selector */}
-            <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm max-w-4xl mx-auto">
+            <div className="bg-transparent rounded-xl p-2 max-w-4xl mx-auto">
               <div className="flex flex-wrap gap-2 justify-center">
                 {/* All Button */}
                 <button
@@ -335,8 +335,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                   }}
                   className={`px-3 py-2 rounded-md font-bold text-sm transition-all duration-200 ${
                     expandedLetter === null && selectedCity === null
-                      ? 'bg-white text-blue-700 shadow-lg scale-105'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      ? 'bg-white/20 text-white shadow-lg scale-105'
+                      : 'bg-white/5 text-white hover:bg-white/10'
                   }`}
                 >
                   All
@@ -353,8 +353,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                     }}
                     className={`w-9 h-9 rounded-md font-bold text-sm transition-all duration-200 flex items-center justify-center ${
                       expandedLetter === letter
-                        ? 'bg-white text-blue-700 shadow-lg scale-110'
-                        : 'bg-slate-100 text-slate-700 hover:bg-blue-500 hover:text-white hover:scale-105'
+                        ? 'bg-white/25 text-white shadow-lg scale-110'
+                        : 'bg-white/5 text-white hover:bg-white/10 hover:scale-105'
                     }`}
                     title={`Cities starting with ${letter}`}
                   >
@@ -369,7 +369,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
               <div className="mt-4 animate-fadeIn">
                 <div className="mb-2 flex items-center gap-3">
                   <h4 className="text-lg font-bold text-white">
-                    Cities Starting with <span className="bg-white text-blue-700 px-2 py-1 rounded-md">{expandedLetter}</span>
+                    Cities Starting with <span className="bg-white/20 text-white px-2 py-1 rounded-md">{expandedLetter}</span>
                   </h4>
                   <span className="bg-white/10 text-white px-2 py-1 rounded-full text-sm font-semibold">
                     {citiesByLetter[expandedLetter].length} cities
@@ -385,8 +385,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                       }}
                       className={`px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-left border-2 ${
                         selectedCity === city
-                          ? 'bg-white text-blue-700 border-white shadow'
-                          : 'bg-white/10 text-white border-white/20 hover:border-white/40 hover:bg-white/5'
+                          ? 'bg-white/20 text-white border-white/20 shadow'
+                          : 'bg-transparent text-white border-white/20 hover:border-white/40 hover:bg-white/5'
                       }`}
                     >
                       <span className="block">{city}</span>
