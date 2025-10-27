@@ -256,13 +256,10 @@ export default function ListingDetail({ slug, onBack }) {
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {relatedListings.map((related) => (
-              <div
+              <a
                 key={related.tripadvisor_id}
-                onClick={() => {
-                  window.history.pushState(null, '', `/nearby/${related.slug}`)
-                  window.location.reload()
-                }}
-                className="bg-white border rounded-lg overflow-hidden hover:shadow-lg cursor-pointer transition-all"
+                href={`/nearby/${related.slug}`}
+                className="bg-white border rounded-lg overflow-hidden hover:shadow-lg cursor-pointer transition-all block"
               >
                 {related.image_url && (
                   <div className="h-40 overflow-hidden bg-slate-200">
@@ -284,7 +281,7 @@ export default function ListingDetail({ slug, onBack }) {
                     </span>
                   </div>
                 </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
