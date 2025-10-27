@@ -9,6 +9,7 @@
     "populate-nearby": "node scripts/populate_nearby.js",
     "scrape-tripadvisor": "node scripts/scrape_tripadvisor.js",
     "fetch-tripadvisor": "node scripts/update-listings-from-tripadvisor.js",
+    "fetch-philippines": "node scripts/fetch-philippines-listings.js",
     "import-photos": "node scripts/import-photos.js",
     "populate-all": "node scripts/populate-all-listings.js"
   },
