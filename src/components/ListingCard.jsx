@@ -7,6 +7,7 @@ export default function ListingCard({
   onSave,
   onView,
   onVote,
+  onNavigateToDetail,
   isSaved = false,
   isAuthenticated = false,
   voteCounts = { thumbsUp: 0, thumbsDown: 0 },
