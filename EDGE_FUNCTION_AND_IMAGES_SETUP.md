@@ -13,7 +13,7 @@ Complete setup guide for hourly TripAdvisor data fetching with automatic image d
 - Rate-limited API calls (300ms between requests)
 - Automatic hourly scheduling via cron job
 
-### 2. **Image Storage Bucket** (`listing-images`)
+### 2. **Image Storage Bucket** (`nearby_listings`)
 - Public access for all images
 - Automatic image download and storage
 - Lazy loading with fallbacks
