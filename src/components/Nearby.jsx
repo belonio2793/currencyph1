@@ -56,6 +56,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     loadCities()
     loadStats()
     loadFeaturedListings()
+    loadListings()
   }, [])
 
   async function loadStats() {
