@@ -289,30 +289,47 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           All Cities
         </button>
 
-        {Object.entries(groupCitiesByLetter(PHILIPPINE_CITIES)).map(([letter, cities]) => (
-          <div key={letter} className="mb-4">
-            <h4 className="text-sm font-bold text-slate-700 bg-slate-50 px-3 py-2 rounded-lg inline-block mb-2">
+        <div className="flex gap-2 flex-wrap">
+          {Object.keys(groupCitiesByLetter(PHILIPPINE_CITIES)).map(letter => (
+            <button
+              key={letter}
+              onClick={() => {
+                setExpandedLetters(prev => ({
+                  ...prev,
+                  [letter]: !prev[letter]
+                }))
+              }}
+              className="px-3 py-2 rounded-lg text-sm font-bold transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
+            >
               {letter}
-            </h4>
-            <div className="flex gap-2 flex-wrap">
-              {cities.map(city => (
-                <button
-                  key={city}
-                  onClick={() => {
-                    setSelectedCity(city)
-                    setPage(1)
-                  }}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    selectedCity === city
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  {city}
-                </button>
-              ))}
+            </button>
+          ))}
+        </div>
+
+        {Object.entries(groupCitiesByLetter(PHILIPPINE_CITIES)).map(([letter, cities]) => (
+          expandedLetters[letter] && (
+            <div key={letter} className="mt-4 p-4 bg-slate-50 rounded-lg">
+              <h4 className="text-sm font-bold text-slate-900 mb-3">Cities starting with {letter}</h4>
+              <div className="flex gap-2 flex-wrap">
+                {cities.map(city => (
+                  <button
+                    key={city}
+                    onClick={() => {
+                      setSelectedCity(city)
+                      setPage(1)
+                    }}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      selectedCity === city
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                    }`}
+                  >
+                    {city}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )
         ))}
       </div>
 
