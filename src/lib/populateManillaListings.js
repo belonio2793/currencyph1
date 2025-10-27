@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient'
 import { MANILA_LISTINGS } from '../data/manila-listings'
+import { generateSlug } from './slugUtils'
 
 export async function populateManilaListings() {
   try {
@@ -17,6 +18,7 @@ export async function populateManilaListings() {
         longitude: listing.longitude,
         rating: listing.rating,
         category: listing.category,
+        slug: listing.slug || generateSlug(listing.name),
         raw: {
           slug: listing.slug,
           description: listing.description,
