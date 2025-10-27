@@ -32,11 +32,15 @@ export default function App() {
     initializeUser()
     handleRouting()
 
+    // Start background sync for TripAdvisor listings
+    backgroundSync.start(24) // Sync every 24 hours
+
     window.addEventListener('popstate', handleRouting)
     window.addEventListener('hashchange', handleRouting)
     return () => {
       window.removeEventListener('popstate', handleRouting)
       window.removeEventListener('hashchange', handleRouting)
+      backgroundSync.stop()
     }
   }, [])
 
