@@ -303,7 +303,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             >
               All Categories
             </button>
-            {allCategories.map(category => (
+            {[...allCategories].sort().map(category => (
               <button
                 key={category}
                 onClick={() => {
