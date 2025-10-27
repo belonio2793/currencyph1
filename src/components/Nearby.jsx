@@ -297,25 +297,31 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
     }
 
     setIsFetching(true)
-    setFetchProgress({ message: 'Starting fetch...', current: 0, total: 50 })
+    setFetchProgress({ message: 'Starting fetch via edge function...', current: 0, total: 100 })
 
     try {
-      const cities = tripadvisorPhilippinesFetcher.getPhilippineCities()
+      const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-      const result = await tripadvisorPhilippinesFetcher.fetchAndSaveListings(
-        cities,
-        (progress) => {
-          setFetchProgress({
-            message: progress.error ? `❌ ${progress.city}` : `✓ ${progress.city}`,
-            current: progress.current,
-            total: progress.total,
-            totalCollected: progress.totalCollected || 0
-          })
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/sync-tripadvisor-hourly`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${anonKey}`
+          }
         }
       )
 
+      if (!response.ok) {
+        throw new Error(`Edge function error: ${response.status}`)
+      }
+
+      const result = await response.json()
+
       setError('')
-      alert(`✅ Fetch complete!\n\n✓ Cities processed: ${result.successCount}\n⚠️ Cities failed: ${result.errorCount}\n📝 Total listings: ${result.total}`)
+      alert(`✅ Fetch complete!\n\n✓ Total Fetched: ${result.totalFetched}\n📝 Unique Listings: ${result.uniqueListings}\n✓ Upserted: ${result.upserted}\n⚠️ Success: ${result.successCount}, Errors: ${result.errorCount}`)
 
       // Refresh stats
       await loadAllCities()
