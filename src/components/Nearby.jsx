@@ -435,6 +435,14 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
     }
   }
 
+  function handleNavigateToListing(slug) {
+    if (setCurrentListingSlug) {
+      setCurrentListingSlug(slug)
+    }
+    setActiveTab('listing')
+    window.history.pushState(null, '', `/nearby/${slug}`)
+  }
+
 
   async function loadCityListings(city, pageNum = 1) {
     if (!city) return
