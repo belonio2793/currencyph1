@@ -782,6 +782,25 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
         </div>
       )}
 
+      {/* Edge Function Error Help */}
+      {error && error.includes('Failed to fetch') && (
+        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+          <h4 className="font-semibold text-amber-900 mb-2">⚠️ Edge Function Not Accessible</h4>
+          <p className="text-sm text-amber-800 mb-3">
+            The TripAdvisor sync edge function is not responding. This may happen in development or if the function isn't deployed.
+          </p>
+          <p className="text-sm text-amber-800 mb-3">
+            <strong>Alternative:</strong> Run this command in your terminal:
+          </p>
+          <div className="bg-amber-100 p-3 rounded text-xs font-mono text-amber-900 mb-3 overflow-x-auto">
+            npm run sync-tripadvisor
+          </div>
+          <p className="text-xs text-amber-700">
+            This will run a local Node.js script that performs the same sync without relying on the edge function.
+          </p>
+        </div>
+      )}
+
       {addMode && (
         <form onSubmit={handleAddSubmit} className="mb-6 bg-white p-4 rounded-md border">
           <div className="mb-2 text-sm text-slate-600">
