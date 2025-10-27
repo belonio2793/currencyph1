@@ -198,15 +198,37 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [userVotes, setUserVotes] = useState({})
   const [isAuthenticatedUser, setIsAuthenticatedUser] = useState(false)
   const [alphabetFilter, setAlphabetFilter] = useState('Featured')
+  const [allCities, setAllCities] = useState([])
+  const [allCategories, setAllCategories] = useState([])
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [listingStats, setListingStats] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [isSearching, setIsSearching] = useState(false)
 
   useEffect(() => {
     checkAuthStatus()
     loadSavedIds()
     loadSavedListings()
+    loadAllCities()
+    loadAllCategories()
+    loadStats()
 
     // Auto-populate Manila listings if not already populated
     checkAndPopulateManilaListings().catch((err) => {
       console.warn('Failed to auto-populate Manila listings:', err)
+    })
+
+    // Check if sync is needed and perform it
+    tripadvisorSync.shouldSync().then(shouldSync => {
+      if (shouldSync) {
+        console.log('Syncing with TripAdvisor...')
+        tripadvisorSync.syncWithTripAdvisor().then(() => {
+          console.log('Sync complete')
+          loadAllCities()
+          loadStats()
+        })
+      }
     })
   }, [])
 
