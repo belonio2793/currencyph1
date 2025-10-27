@@ -7,6 +7,7 @@ export default function ListingDetail({ slug, onBack }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [relatedListings, setRelatedListings] = useState([])
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
 
   useEffect(() => {
     loadListing()
@@ -82,6 +83,10 @@ export default function ListingDetail({ slug, onBack }) {
     )
   }
 
+  const displayImage = listing.photo_urls && listing.photo_urls.length > 0
+    ? listing.photo_urls[selectedPhotoIndex]
+    : listing.image_url
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Header */}
@@ -93,14 +98,36 @@ export default function ListingDetail({ slug, onBack }) {
       </button>
 
       <div className="mb-8">
-        {/* Hero Image */}
-        {listing.image_url && (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96">
+        {/* Hero Image Gallery */}
+        {displayImage && (
+          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-slate-200">
             <img
-              src={listing.image_url}
+              src={displayImage}
               alt={listing.name}
               className="w-full h-96 object-cover"
             />
+            {/* Photo Navigation */}
+            {listing.photo_urls && listing.photo_urls.length > 1 && (
+              <div className="flex justify-between items-center px-4 py-3 bg-black bg-opacity-50">
+                <button
+                  onClick={() => setSelectedPhotoIndex(Math.max(0, selectedPhotoIndex - 1))}
+                  disabled={selectedPhotoIndex === 0}
+                  className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
+                >
+                  ←
+                </button>
+                <span className="text-white text-sm">
+                  {selectedPhotoIndex + 1} / {listing.photo_urls.length}
+                </span>
+                <button
+                  onClick={() => setSelectedPhotoIndex(Math.min(listing.photo_urls.length - 1, selectedPhotoIndex + 1))}
+                  disabled={selectedPhotoIndex === listing.photo_urls.length - 1}
+                  className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
+                >
+                  →
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -108,32 +135,39 @@ export default function ListingDetail({ slug, onBack }) {
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-1">
             <h1 className="text-4xl font-bold text-slate-900 mb-2">{listing.name}</h1>
-            {listing.location_type && (
-              <span className="inline-block px-3 py-1 bg-slate-200 text-slate-700 rounded-full text-sm font-medium mb-4">
-                {listing.location_type}
-              </span>
-            )}
+            <div className="flex flex-wrap gap-2 mb-4">
+              {listing.location_type && (
+                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                  {listing.location_type}
+                </span>
+              )}
+              {listing.ranking_in_city && (
+                <span className="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+                  Ranked {listing.ranking_in_city}
+                </span>
+              )}
+              {listing.price_level && (
+                <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  {'$'.repeat(listing.price_level)}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Rating and Reviews */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-6 mb-6">
           <div className="flex items-center gap-2">
             <StarRating rating={listing.rating} size="md" />
-            <span className="text-lg font-semibold text-slate-900">{listing.rating}</span>
-            <span className="text-slate-600">({listing.review_count?.toLocaleString()} reviews)</span>
+            <span className="text-lg font-semibold text-slate-900">{listing.rating || 'N/A'}</span>
+            <span className="text-slate-600">({listing.review_count?.toLocaleString() || 0} reviews)</span>
           </div>
-          {listing.rank_in_category && (
-            <span className="text-sm text-slate-600 border-l pl-4">
-              {listing.rank_in_category}
-            </span>
-          )}
         </div>
 
         {/* Address */}
         {listing.address && (
-          <div className="mb-6 p-4 bg-slate-50 rounded-lg">
-            <div className="font-semibold text-slate-900 mb-1">Address</div>
+          <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+            <div className="font-semibold text-slate-900 mb-1">📍 Address</div>
             <p className="text-slate-700">{listing.address}</p>
           </div>
         )}
@@ -158,10 +192,10 @@ export default function ListingDetail({ slug, onBack }) {
               <div className="text-2xl font-bold text-purple-900">{listing.photo_count.toLocaleString()}</div>
             </div>
           )}
-          {listing.duration && (
+          {listing.admission_fee && (
             <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-4 rounded-lg border border-amber-200">
-              <div className="text-sm text-amber-700 font-medium">Duration</div>
-              <div className="text-2xl font-bold text-amber-900">{listing.duration}</div>
+              <div className="text-sm text-amber-700 font-medium">Admission</div>
+              <div className="text-sm font-bold text-amber-900">{listing.admission_fee}</div>
             </div>
           )}
         </div>
@@ -174,14 +208,46 @@ export default function ListingDetail({ slug, onBack }) {
           </div>
         )}
 
+        {/* Highlights */}
+        {listing.highlights && listing.highlights.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Highlights</h2>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {listing.highlights.map((highlight, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-slate-700">
+                  <span className="text-blue-600 font-bold mt-1">✓</span>
+                  <span>{highlight}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Best For */}
+        {listing.best_for && listing.best_for.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Best For</h2>
+            <div className="flex flex-wrap gap-2">
+              {listing.best_for.map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Hours of Operation */}
         {listing.hours_of_operation && Object.keys(listing.hours_of_operation).length > 0 && (
-          <div className="mb-8 bg-slate-50 p-6 rounded-lg">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Hours of Operation</h2>
+          <div className="mb-8 bg-slate-50 p-6 rounded-lg border border-slate-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">🕒 Hours of Operation</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(listing.hours_of_operation).map(([day, hours]) => (
-                <div key={day} className="flex justify-between">
-                  <span className="font-medium text-slate-700 capitalize">{day}:</span>
+                <div key={day} className="flex justify-between text-slate-700">
+                  <span className="font-medium capitalize">{day}:</span>
                   <span className="text-slate-600">{hours || 'Closed'}</span>
                 </div>
               ))}
@@ -189,11 +255,44 @@ export default function ListingDetail({ slug, onBack }) {
           </div>
         )}
 
+        {/* Amenities */}
+        {listing.amenities && listing.amenities.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Amenities</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {listing.amenities.map((amenity, idx) => (
+                <div key={idx} className="flex items-center gap-2 text-slate-700">
+                  <span className="text-green-600">✓</span>
+                  <span>{typeof amenity === 'string' ? amenity : amenity.name}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Accessibility */}
+        {listing.accessibility_info && Object.keys(listing.accessibility_info).length > 0 && (
+          <div className="mb-8 bg-blue-50 p-6 rounded-lg border border-blue-200">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">♿ Accessibility</h2>
+            <div className="space-y-2">
+              {listing.accessibility_info.wheelchair_accessible && (
+                <p className="text-slate-700">
+                  <span className="font-medium">Wheelchair Accessible:</span>{' '}
+                  {listing.accessibility_info.wheelchair_accessible ? '✓ Yes' : '✗ No'}
+                </p>
+              )}
+              {listing.accessibility_info.details && (
+                <p className="text-slate-700">{listing.accessibility_info.details}</p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Contact Information */}
         <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           {listing.phone_number && (
-            <div>
-              <h3 className="font-semibold text-slate-900 mb-2">Phone</h3>
+            <div className="border border-slate-200 p-4 rounded-lg">
+              <h3 className="font-semibold text-slate-900 mb-2">📞 Phone</h3>
               <a
                 href={`tel:${listing.phone_number}`}
                 className="text-blue-600 hover:underline"
@@ -203,28 +302,28 @@ export default function ListingDetail({ slug, onBack }) {
             </div>
           )}
           {listing.website && (
-            <div>
-              <h3 className="font-semibold text-slate-900 mb-2">Website</h3>
+            <div className="border border-slate-200 p-4 rounded-lg">
+              <h3 className="font-semibold text-slate-900 mb-2">🌐 Website</h3>
               <a
                 href={listing.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline truncate"
+                className="text-blue-600 hover:underline break-all"
               >
                 Visit Website →
               </a>
             </div>
           )}
           {listing.web_url && (
-            <div className="md:col-span-2">
-              <h3 className="font-semibold text-slate-900 mb-2">TripAdvisor</h3>
+            <div className="md:col-span-2 border border-slate-200 p-4 rounded-lg">
+              <h3 className="font-semibold text-slate-900 mb-2">🏆 TripAdvisor</h3>
               <a
                 href={listing.web_url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline inline-flex items-center gap-1"
               >
-                View on TripAdvisor ↗
+                View Full Profile on TripAdvisor ↗
               </a>
             </div>
           )}
@@ -233,7 +332,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Awards */}
         {listing.awards && listing.awards.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Awards & Recognition</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">🏆 Awards & Recognition</h2>
             <div className="flex flex-wrap gap-3">
               {listing.awards.map((award, idx) => (
                 <span
@@ -242,6 +341,50 @@ export default function ListingDetail({ slug, onBack }) {
                 >
                   🏆 {award}
                 </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Nearby Attractions */}
+        {listing.nearby_attractions && listing.nearby_attractions.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">📍 Nearby Attractions</h2>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {listing.nearby_attractions.slice(0, 10).map((attraction, idx) => (
+                <li key={idx} className="flex items-start gap-2 text-slate-700">
+                  <span className="text-purple-600 mt-1">●</span>
+                  <span>{attraction}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Recent Reviews */}
+        {listing.review_details && listing.review_details.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">⭐ Recent Reviews</h2>
+            <div className="space-y-4">
+              {listing.review_details.slice(0, 5).map((review, idx) => (
+                <div key={idx} className="border border-slate-200 p-4 rounded-lg">
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h4 className="font-semibold text-slate-900">{review.author}</h4>
+                      <div className="flex items-center gap-2 text-sm">
+                        <StarRating rating={review.rating} size="sm" />
+                        <span className="text-slate-500">{review.rating}/5</span>
+                      </div>
+                    </div>
+                    {review.date && (
+                      <span className="text-sm text-slate-500">{new Date(review.date).toLocaleDateString()}</span>
+                    )}
+                  </div>
+                  <p className="text-slate-700 text-sm">{review.text}</p>
+                  {review.helpful_count > 0 && (
+                    <p className="text-xs text-slate-500 mt-2">👍 {review.helpful_count} found this helpful</p>
+                  )}
+                </div>
               ))}
             </div>
           </div>
