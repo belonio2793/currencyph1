@@ -142,8 +142,10 @@ async function fetchTripAdvisorData(
   const params = new URLSearchParams();
   params.append("query", query);
   params.append("limit", String(limit));
+  params.append("lang", "en_US");
+  params.append("currency", "USD");
 
-  const url = `https://api.tripadvisor.com/api/partner/2.0/search?${params.toString()}`;
+  const url = `https://api.tripadvisor.com/api/partner/2.0/locations/search?${params.toString()}`;
 
   try {
     const res = await fetch(url, {
