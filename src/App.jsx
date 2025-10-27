@@ -33,6 +33,11 @@ export default function App() {
     initializeUser()
     handleRouting()
 
+    // Populate slugs for listings if needed (one-time operation)
+    populateSlugsForListings(supabase).catch((err) => {
+      console.warn('Could not populate slugs:', err)
+    })
+
     // Start background sync for TripAdvisor listings
     backgroundSync.start(24) // Sync every 24 hours
 
