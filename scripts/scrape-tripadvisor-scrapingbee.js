@@ -258,7 +258,7 @@ async function upsertBatch(rows){
 }
 
 async function run(){
-  const cities = limitCities ? DEFAULT_CITIES.slice(0, limitCities) : DEFAULT_CITIES
+  const cities = CUSTOM_CITIES || (limitCities ? DEFAULT_CITIES.slice(0, limitCities) : DEFAULT_CITIES)
   let collected = 0
   for (const city of cities){
     try{
