@@ -4,6 +4,7 @@ import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { checkAndPopulateManilaListings } from '../lib/populateManillaListings'
 import tripadvisorSync from '../lib/tripadvisorSync'
+import { imageManager } from '../lib/imageManager'
 import StarRating from './StarRating'
 import FeaturedListings from './FeaturedListings'
 
