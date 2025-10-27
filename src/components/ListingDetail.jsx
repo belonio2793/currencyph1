@@ -363,14 +363,17 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Categories</h2>
             <div className="flex flex-wrap gap-2">
-              {listing.best_for.map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
+              {listing.best_for.map((tag, idx) => {
+                const tagText = typeof tag === 'string' ? tag : (tag.category || tag.name || 'Category')
+                return (
+                  <span
+                    key={idx}
+                    className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
+                  >
+                    {tagText}
+                  </span>
+                )
+              })}
             </div>
           </div>
         )}
