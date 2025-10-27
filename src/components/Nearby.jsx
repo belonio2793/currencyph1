@@ -365,34 +365,33 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
               </div>
             </div>
 
-            {/* City List for Selected Letter (compact, appears below header) */}
+            {/* City Dropdown for Selected Letter */}
             {expandedLetter && citiesByLetter[expandedLetter] && (
               <div className="mt-4 animate-fadeIn">
-                <div className="mb-2 flex items-center gap-3">
+                <div className="mb-3 flex items-center gap-3">
                   <h4 className="text-lg font-bold text-white">
-                    Cities Starting with <span className="bg-white/20 text-white px-2 py-1 rounded-md">{expandedLetter}</span>
+                    Cities starting with <span className="bg-white/20 text-white px-2 py-1 rounded-md">{expandedLetter}</span>
                   </h4>
                   <span className="bg-white/10 text-white px-2 py-1 rounded-full text-sm font-semibold">
                     {citiesByLetter[expandedLetter].length} cities
                   </span>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-                  {citiesByLetter[expandedLetter].map(city => (
-                    <button
-                      key={city}
-                      onClick={() => {
-                        setSelectedCity(city)
-                        setPage(1)
-                      }}
-                      className={`px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-left border-2 ${
-                        selectedCity === city
-                          ? 'bg-white/20 text-white border-white/20 shadow'
-                          : 'bg-transparent text-white border-white/20 hover:border-white/40 hover:bg-white/5'
-                      }`}
-                    >
-                      <span className="block">{city}</span>
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3">
+                  <label className="text-white/90 text-sm">Choose a city:</label>
+                  <select
+                    className="px-3 py-2 rounded-md bg-white/90 text-slate-900 text-sm shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    value={selectedCity || ''}
+                    onChange={(e) => {
+                      const val = e.target.value || null
+                      setSelectedCity(val)
+                      setPage(1)
+                    }}
+                  >
+                    <option value="">— Select —</option>
+                    {citiesByLetter[expandedLetter].map((city) => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
             )}
@@ -404,26 +403,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-10">
-        {/* Featured Listings Section */}
-        {featuredListings.length > 0 && (
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-2">
-              <h2 className="text-3xl font-bold text-slate-900">⭐ Featured</h2>
-              <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">Top Rated</span>
-            </div>
-            <p className="text-slate-600 mb-6">The highest-rated listings across the Philippines</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredListings.map(listing => (
-                <ListingCard
-                  key={listing.tripadvisor_id}
-                  listing={listing}
-                  onNavigateToDetail={handleNavigateToListing}
-                  hideImage={false}
-                />
-              ))}
-            </div>
-          </div>
-        )}
 
       {/* Search Section */}
       <div className="mb-8">
@@ -464,11 +443,20 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       {/* Browse by City Section - Enhanced Alphabet Selector */}
 
       {/* Header */}
-      {(searchResults.length > 0 || selectedCity) && (
-        <div className="mb-6">
+      {(searchResults.length > 0 || selectedCity || expandedLetter) && (
+        <div className="mb-6 flex items-center gap-3">
           <h2 className="text-2xl font-semibold text-slate-900">
-            {searchResults.length > 0 ? 'Search Results' : selectedCity ? `Listings in ${selectedCity}` : ''}
+            {searchResults.length > 0
+              ? 'Search Results'
+              : selectedCity
+              ? `Listings in ${selectedCity}`
+              : expandedLetter
+              ? `Cities starting with ${expandedLetter}`
+              : ''}
           </h2>
+          {selectedCity && (
+            <span className="text-sm text-slate-600">Page {page}</span>
+          )}
         </div>
       )}
 
