@@ -434,8 +434,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
 
   function getFilteredCities() {
     if (alphabetFilter === 'Featured') return TOP_10_CITIES
-    if (alphabetFilter === 'All') return POPULAR_CITIES
-    return POPULAR_CITIES.filter(city => city.charAt(0).toUpperCase() === alphabetFilter)
+    if (alphabetFilter === 'All') return allCities.length > 0 ? allCities : POPULAR_CITIES
+    return (allCities.length > 0 ? allCities : POPULAR_CITIES).filter(city => city.charAt(0).toUpperCase() === alphabetFilter)
   }
 
   async function saveItem(item) {
