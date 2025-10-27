@@ -375,6 +375,36 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
+  // Download and store photos for all listings
+  async function handleDownloadAllImages() {
+    if (!confirm('Download and store photos for all listings now? This may take a long time and use bandwidth. Continue?')) return
+    setIsFetching(true)
+    try {
+      const pageSize = 200
+      let offset = 0
+      let all = []
+      while (true) {
+        const { data, error } = await supabase
+          .from('nearby_listings')
+          .select('*')
+          .range(offset, offset + pageSize - 1)
+        if (error) throw error
+        if (!data || data.length === 0) break
+        all = all.concat(data)
+        offset += pageSize
+        await new Promise(r => setTimeout(r, 200))
+      }
+
+      await imageManager.batchDownloadImages(all)
+      alert(`Queued photos for ${all.length} listings`)
+    } catch (err) {
+      console.error('Error downloading images:', err)
+      setError(`Failed to download images: ${err.message}`)
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
   function handleNavigateToListing(slug) {
     if (setCurrentListingSlug) {
       setCurrentListingSlug(slug)
