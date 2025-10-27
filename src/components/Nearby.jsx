@@ -310,7 +310,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         {Object.entries(groupCitiesByLetter(PHILIPPINE_CITIES)).map(([letter, cities]) => (
           expandedLetters[letter] && (
             <div key={letter} className="mt-4 p-4 bg-slate-50 rounded-lg">
-              <h4 className="text-sm font-bold text-slate-900 mb-3">Cities starting with {letter}</h4>
               <div className="flex gap-2 flex-wrap">
                 {cities.map(city => (
                   <button
