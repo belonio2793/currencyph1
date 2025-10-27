@@ -1,137 +1,47 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-interface ListingData {
-  tripadvisor_id: string;
-  name: string;
-  address: string | null;
-  latitude: number | null;
-  longitude: number | null;
-  rating: number | null;
-  category: string | null;
-  review_count?: number;
-  image_url?: string;
-  stored_image_path?: string;
-  source: string;
-  raw: Record<string, any>;
-  updated_at?: string;
-}
-
 const PHILIPPINES_CITIES = [
-  "Manila",
-  "Cebu",
-  "Davao",
-  "Quezon City",
-  "Makati",
-  "Baguio",
-  "Boracay",
-  "Puerto Princesa",
-  "Iloilo",
-  "Pasig",
-  "Taguig",
-  "Caloocan",
-  "Las Piñas",
-  "Parañaque",
-  "Marikina",
-  "Muntinlupa",
-  "Navotas",
-  "Malabon",
-  "Valenzuela",
-  "Antipolo",
-  "Cabanatuan",
-  "Dagupan",
-  "Lucena",
-  "Batangas City",
-  "Bacoor",
-  "Kawit",
-  "Cavite City",
-  "Tagaytay",
-  "Batangas",
-  "Calapan",
-  "Puerto Galera",
-  "Bohol",
-  "Tagbilaran",
-  "Dumaguete",
-  "Surigao City",
-  "Butuan",
-  "Cagayan de Oro",
-  "Zamboanga City",
-  "Zamboanga",
-  "General Santos",
-  "Koronadal",
-  "Cotabato City",
-  "Iligan",
-  "Marawi",
-  "Tacloban",
-  "Ormoc",
-  "Palawan",
-  "Coron",
-  "Bauan",
-  "San Juan La Union",
-  "Vigan",
-  "Lingayen",
-  "Agoo",
-  "Cabadbaran",
-  "Butuan",
-  "Surigao",
-  "Laoag",
-  "Batac",
-  "Tuguegarao",
-  "Cabanatuan",
-  "Imus",
-  "Bacolod",
-  "Silay",
-  "Cadiz",
-  "Escalante",
-  "Kabankalan",
-  "La Carlota",
-  "Sagay",
-  "San Carlos",
-  "Victorias",
-  "Himamaylan",
-  "Iloilo City",
-  "Passi",
-  "Roxas",
-  "Antique",
-  "Caticlan",
-  "Moalboal",
-  "Malabuyoc",
-  "Osmeña",
-  "Oslob",
-  "Siargao",
-  "General Luna",
-  "Siquijor",
-  "Camiguin",
-  "Tabuk",
-  "Bayombong",
-  "Cabanatuan",
-  "Aurora",
-  "Dipolog",
-  "Dapitan",
-  "Oroquieta",
-  "Tangub",
-  "Misamis Occidental",
-  "Bukidnon",
-  "Malaybalay",
-  "Gingoog",
-  "Camiguin",
-  "Mindoro Oriental",
-  "Mindoro Occidental",
+  "Manila", "Cebu", "Davao", "Quezon City", "Makati", "Baguio", "Boracay",
+  "Puerto Princesa", "Iloilo", "Pasig", "Taguig", "Caloocan", "Las Piñas",
+  "Parañaque", "Marikina", "Muntinlupa", "Navotas", "Malabon", "Valenzuela",
+  "Antipolo", "Cabanatuan", "Dagupan", "Lucena", "Batangas City", "Bacoor",
+  "Kawit", "Cavite City", "Tagaytay", "Batangas", "Calapan", "Puerto Galera",
+  "Bohol", "Tagbilaran", "Dumaguete", "Surigao City", "Butuan", "Cagayan de Oro",
+  "Zamboanga City", "Zamboanga", "General Santos", "Koronadal", "Cotabato City",
+  "Iligan", "Marawi", "Tacloban", "Ormoc", "Palawan", "Coron", "Bauan",
+  "San Juan La Union", "Vigan", "Lingayen", "Agoo", "Cabadbaran", "Surigao",
+  "Laoag", "Batac", "Tuguegarao", "Imus", "Bacolod", "Silay", "Cadiz",
+  "Escalante", "Kabankalan", "La Carlota", "Sagay", "San Carlos", "Victorias",
+  "Himamaylan", "Iloilo City", "Passi", "Roxas", "Antique", "Caticlan",
+  "Moalboal", "Malabuyoc", "Osmeña", "Oslob", "Siargao", "General Luna",
+  "Siquijor", "Camiguin", "Tabuk", "Bayombong", "Aurora", "Dipolog", "Dapitan",
+  "Oroquieta", "Tangub", "Misamis Occidental", "Bukidnon", "Malaybalay", "Gingoog"
 ];
 
 const CATEGORIES = [
-  "attractions",
-  "museums",
-  "parks",
-  "beaches",
-  "hotels",
-  "restaurants",
-  "churches",
-  "shopping",
-  "nightlife",
+  "attractions", "museums", "parks", "beaches", "hotels",
+  "restaurants", "churches", "shopping", "nightlife"
 ];
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function generateSlug(name: string, tripadvisorId: string): string {
+  if (!name) {
+    return `listing-${tripadvisorId.slice(-6)}`.toLowerCase();
+  }
+  
+  const baseSlug = name
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  
+  // Append last 6 characters of tripadvisor_id for uniqueness
+  const idSuffix = tripadvisorId.slice(-6).toLowerCase();
+  return `${baseSlug}-${idSuffix}`.substring(0, 200);
 }
 
 async function fetchTripAdvisorData(
@@ -149,14 +59,12 @@ async function fetchTripAdvisorData(
     const res = await fetch(url, {
       headers: {
         "X-TripAdvisor-API-Key": tripKey,
-        Accept: "application/json",
+        "Accept": "application/json",
       },
     });
 
     if (!res.ok) {
-      console.warn(
-        `TripAdvisor API returned ${res.status} for query: ${query}`
-      );
+      console.warn(`TripAdvisor API returned ${res.status} for query: ${query}`);
       return [];
     }
 
@@ -171,36 +79,7 @@ async function fetchTripAdvisorData(
         : item.address || item.address_string || "";
 
       const name = item.name || item.title || "";
-      const locationType = item.type || item.location_type || (item.subcategory || item.category?.name || "Attraction");
-
-      // Generate slug from name
-      const slug = name
-        .toLowerCase()
-        .trim()
-        .replace(/[^\w\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-");
-
-      // Parse hours of operation if available
-      let hoursOfOperation = {};
-      if (item.hours && Array.isArray(item.hours)) {
-        const daysMap = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-        hoursOfOperation = item.hours.reduce(
-          (acc, hour, idx) => {
-            if (daysMap[idx]) {
-              acc[daysMap[idx]] = hour;
-            }
-            return acc;
-          },
-          {}
-        );
-      }
-
       const tripadvisorId = String(item.location_id || item.id || Math.random());
-      // Append a small part of the tripadvisor_id to the slug for uniqueness
-      // This handles cases where multiple locations have the same name
-      const idSuffix = tripadvisorId.slice(-6).toLowerCase();
-      const uniqueSlug = slug ? `${slug}-${idSuffix}` : `listing-${idSuffix}`;
 
       return {
         tripadvisor_id: tripadvisorId,
@@ -213,21 +92,18 @@ async function fetchTripAdvisorData(
         category: item.subcategory || item.category?.name || null,
         image_url: item.photo?.images?.large?.url || item.image_url || null,
         web_url: item.web_url || `https://www.tripadvisor.com/Attraction_Review-g298573-d${item.location_id || "0"}`,
-        location_type: locationType,
+        location_type: item.type || item.location_type || "Attraction",
         phone_number: item.phone || item.phone_number || null,
         website: item.website || item.web_url || null,
         description: item.description || item.about || null,
-        hours_of_operation: hoursOfOperation || {},
+        hours_of_operation: item.hours || {},
         photo_count: item.photo_count || item.num_photos || null,
-        rank_in_category: item.ranking || item.rank_in_category || null,
+        ranking_in_city: item.ranking || null,
         awards: item.awards || item.award_types || [],
-        price_range: item.price_range || null,
-        duration: item.duration || null,
-        traveler_type: item.traveler_type || null,
-        best_for_type: item.best_for || null,
-        visibility_score: item.visibility_score || null,
-        slug: uniqueSlug,
+        price_level: item.price_range ? parseInt(item.price_range) : null,
+        slug: generateSlug(name, tripadvisorId),
         source: "tripadvisor",
+        verified: true,
         raw: item,
         updated_at: new Date().toISOString(),
       };
@@ -238,55 +114,7 @@ async function fetchTripAdvisorData(
   }
 }
 
-async function downloadImage(
-  supabase: any,
-  imageUrl: string,
-  listingId: string
-): Promise<string | null> {
-  if (!imageUrl) return null;
-
-  try {
-    const response = await fetch(imageUrl, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    });
-
-    if (!response.ok) {
-      console.warn(`Failed to download image from ${imageUrl}`);
-      return null;
-    }
-
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = new Uint8Array(arrayBuffer);
-
-    // Get file extension from URL or default to jpg
-    const urlParts = imageUrl.split(".");
-    const ext = urlParts[urlParts.length - 1]?.split("?")[0] || "jpg";
-    const fileName = `listings/${listingId}.${ext}`;
-
-    // Upload to storage
-    const { data, error } = await supabase.storage
-      .from("nearby_listings")
-      .upload(fileName, buffer, { upsert: true });
-
-    if (error) {
-      console.warn(`Error uploading image for ${listingId}:`, error);
-      return null;
-    }
-
-    return fileName;
-  } catch (err) {
-    console.warn(`Error downloading image for ${listingId}:`, err);
-    return null;
-  }
-}
-
-async function upsertListings(
-  supabase: any,
-  listings: ListingData[]
-): Promise<number> {
+async function upsertListings(supabase: any, listings: any[]): Promise<number> {
   if (!listings || listings.length === 0) return 0;
 
   const chunkSize = 50;
@@ -300,10 +128,7 @@ async function upsertListings(
       .upsert(chunk, { onConflict: "tripadvisor_id" });
 
     if (error) {
-      console.error(
-        `Error upserting chunk ${i / chunkSize + 1}:`,
-        error.message
-      );
+      console.error(`Error upserting chunk ${i / chunkSize + 1}:`, error.message);
     } else {
       upsertedCount += chunk.length;
     }
@@ -312,6 +137,80 @@ async function upsertListings(
   }
 
   return upsertedCount;
+}
+
+async function performSync(supabase: any, tripKey: string, cityLimit: number | null = null) {
+  const allListings: any[] = [];
+  let totalFetched = 0;
+  let successCount = 0;
+  let errorCount = 0;
+
+  const citiesToProcess = cityLimit 
+    ? PHILIPPINES_CITIES.slice(0, cityLimit)
+    : PHILIPPINES_CITIES;
+
+  console.log(
+    `Starting sync for ${citiesToProcess.length} cities × ${CATEGORIES.length} categories = ${citiesToProcess.length * CATEGORIES.length} queries`
+  );
+
+  for (const city of citiesToProcess) {
+    for (const category of CATEGORIES) {
+      try {
+        const query = `${category} in ${city} Philippines`;
+        const listings = await fetchTripAdvisorData(query, tripKey, 30);
+
+        if (listings.length > 0) {
+          allListings.push(...listings);
+          totalFetched += listings.length;
+          successCount++;
+          console.log(`✓ Fetched ${listings.length} items: ${query}`);
+        }
+
+        // Rate limiting: wait 300ms between requests
+        await sleep(300);
+      } catch (err) {
+        errorCount++;
+        console.warn(`✗ Error fetching ${category} in ${city}:`, (err as any).message);
+      }
+    }
+  }
+
+  // Deduplicate by tripadvisor_id, keeping better ratings
+  const uniqueMap = new Map();
+  for (const listing of allListings) {
+    if (!uniqueMap.has(listing.tripadvisor_id)) {
+      uniqueMap.set(listing.tripadvisor_id, listing);
+    } else {
+      const existing = uniqueMap.get(listing.tripadvisor_id);
+      if (listing.rating && (!existing.rating || listing.rating > existing.rating)) {
+        uniqueMap.set(listing.tripadvisor_id, listing);
+      }
+    }
+  }
+
+  const uniqueListings = Array.from(uniqueMap.values());
+
+  console.log(`Total fetched: ${totalFetched}`);
+  console.log(`Unique listings: ${uniqueListings.length}`);
+  console.log(`Success: ${successCount}, Errors: ${errorCount}`);
+
+  // Upsert all listings
+  let upsertedCount = 0;
+  if (uniqueListings.length > 0) {
+    upsertedCount = await upsertListings(supabase, uniqueListings);
+    console.log(`Successfully upserted: ${upsertedCount}`);
+  }
+
+  return {
+    success: true,
+    totalFetched,
+    uniqueListings: uniqueListings.length,
+    upserted: upsertedCount,
+    successCount,
+    errorCount,
+    message: `Synced ${upsertedCount} listings from ${successCount} successful queries`,
+    timestamp: new Date().toISOString(),
+  };
 }
 
 Deno.serve(async (req) => {
@@ -332,97 +231,35 @@ Deno.serve(async (req) => {
     );
   }
 
+  if (!tripKey) {
+    return new Response(
+      JSON.stringify({
+        error: "Missing TripAdvisor API key",
+      }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
+    );
+  }
+
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {
-    const allListings: ListingData[] = [];
-    let totalFetched = 0;
-    let successCount = 0;
-    let errorCount = 0;
-
-    console.log(
-      `Starting sync for ${PHILIPPINES_CITIES.length} cities × ${CATEGORIES.length} categories`
-    );
-
-    // Process all cities and categories
-    for (const city of PHILIPPINES_CITIES) {
-      for (const category of CATEGORIES) {
-        try {
-          const query = `${category} in ${city} Philippines`;
-
-          const listings = await fetchTripAdvisorData(query, tripKey, 30);
-
-          if (listings.length > 0) {
-            allListings.push(...listings);
-            totalFetched += listings.length;
-            successCount++;
-            console.log(
-              `✓ Fetched ${listings.length} items: ${query}`
-            );
-          }
-
-          await sleep(300); // Rate limiting
-        } catch (err) {
-          errorCount++;
-          console.warn(
-            `✗ Error fetching ${category} in ${city}:`,
-            (err as any).message
-          );
-        }
+    // Parse request body for custom parameters
+    let cityLimit: number | null = null;
+    if (req.method === "POST") {
+      try {
+        const body = await req.json();
+        cityLimit = body.cityLimit || null;
+      } catch {
+        // Ignore parse errors, use defaults
       }
     }
 
-    // Deduplicate by tripadvisor_id
-    const uniqueMap = new Map<string, ListingData>();
-    for (const listing of allListings) {
-      if (!uniqueMap.has(listing.tripadvisor_id)) {
-        uniqueMap.set(listing.tripadvisor_id, listing);
-      } else {
-        // Update if newer data
-        const existing = uniqueMap.get(listing.tripadvisor_id)!;
-        if (listing.rating && (!existing.rating || listing.rating > existing.rating)) {
-          uniqueMap.set(listing.tripadvisor_id, listing);
-        }
-      }
-    }
+    const result = await performSync(supabase, tripKey, cityLimit);
 
-    const uniqueListings = Array.from(uniqueMap.values());
-
-    console.log(`Total fetched: ${totalFetched}`);
-    console.log(`Unique listings: ${uniqueListings.length}`);
-    console.log(`Success: ${successCount}, Errors: ${errorCount}`);
-
-    // Upsert all listings
-    if (uniqueListings.length > 0) {
-      const upsertedCount = await upsertListings(supabase, uniqueListings);
-
-      console.log(`Successfully upserted: ${upsertedCount}`);
-
-      return new Response(
-        JSON.stringify({
-          success: true,
-          totalFetched,
-          uniqueListings: uniqueListings.length,
-          upserted: upsertedCount,
-          successCount,
-          errorCount,
-          message: `Synced ${upsertedCount} listings from ${successCount} successful queries`,
-          timestamp: new Date().toISOString(),
-        }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
-      );
-    } else {
-      return new Response(
-        JSON.stringify({
-          success: false,
-          totalFetched: 0,
-          message: "No listings found. Check TripAdvisor API key.",
-          successCount,
-          errorCount,
-        }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (err) {
     console.error("Sync failed:", err);
     return new Response(
