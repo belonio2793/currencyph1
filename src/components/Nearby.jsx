@@ -70,10 +70,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     try {
       let query = supabase.from('nearby_listings').select('*')
 
-      if (selectedCategory) {
-        query = query.eq('category', selectedCategory)
-      }
-
       if (selectedCity) {
         query = query.ilike('address', `%${selectedCity}%`)
       }
