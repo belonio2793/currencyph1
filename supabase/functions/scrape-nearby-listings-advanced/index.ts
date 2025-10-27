@@ -250,6 +250,39 @@ async function scrapeComprehensiveListings(
     //   }
     // });
 
+    const priceRanges = ["$", "$$", "$$$", "$$$$"];
+    const travelTypes = ["Families", "Couples", "Solo", "Groups", "Business"];
+    const bestForCategories = ["History", "Photography", "Budget", "Luxury", "Adventure", "Nature"];
+    const awards = [
+      { name: "Travelers' Choice", year: 2025 },
+      { name: "Top Rated", year: 2024 },
+      { name: "Hidden Gem", year: 2024 },
+    ];
+
+    const imageUrls = [
+      "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=500&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=500&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1469022563149-aa64dbd37dae?w=500&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1495566066924-e7c5c9b3ce32?w=500&h=300&fit=crop",
+      "https://images.unsplash.com/photo-1552882657-accea4c3b527?w=500&h=300&fit=crop",
+    ];
+
+    const descriptions = [
+      "A must-visit destination offering unique experiences and memorable moments for travelers.",
+      "Highly recommended by local visitors and international tourists alike.",
+      "Known for its exceptional service and outstanding attractions.",
+      "Offers a perfect blend of tradition and modernity.",
+      "Popular destination featuring diverse attractions and activities.",
+    ];
+
+    const amenitiesOptions: Record<string, string[]> = {
+      hotels: ["WiFi", "Pool", "Restaurant", "Bar", "Gym", "Spa", "Parking", "Room Service"],
+      restaurants: ["WiFi", "Outdoor Seating", "Parking", "Delivery", "Takeout", "Alcohol", "Vegetarian Options"],
+      attractions: ["Parking", "WiFi", "Restroom", "Information Center", "Gift Shop", "Cafe", "Photography"],
+      parks: ["Parking", "Restroom", "Picnic Area", "Walking Trails", "Benches"],
+      beaches: ["Parking", "Restroom", "Food Stalls", "Rental Equipment", "Lifeguard", "Shower"],
+    };
+
     // For demonstration, generate synthetic data
     const listingNames = generateListingNames(category);
     for (let i = 0; i < 3; i++) {
@@ -257,24 +290,86 @@ async function scrapeComprehensiveListings(
       const tripadvisorId = generateUniqueId(city, category, i, "advanced_scraper");
       const coords = getApproximateCoordinates(city, i);
 
+      const rating = 3.8 + Math.random() * 1.2;
+      const reviewCount = Math.floor(Math.random() * 300) + 50;
+      const photoCount = Math.floor(Math.random() * 100) + 10;
+      const priceLevel = Math.floor(Math.random() * 4) + 1;
+      const priceRange = priceRanges[Math.floor(Math.random() * priceRanges.length)];
+
+      const categoryAmenities = (amenitiesOptions as any)[category] || ["WiFi", "Parking", "Restroom"];
+      const selectedAmenities = categoryAmenities.slice(0, Math.floor(Math.random() * 3) + 2);
+
+      const numImages = Math.floor(Math.random() * 4) + 2;
+      const selectedImages = imageUrls.slice(0, numImages);
+      const primaryImage = selectedImages[0] || null;
+
+      const hoursOfOperation: Record<string, any> = {};
+      const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+      days.forEach((day) => {
+        hoursOfOperation[day] = {
+          open: `${8 + Math.floor(Math.random() * 3)}:00`,
+          close: `${18 + Math.floor(Math.random() * 5)}:00`,
+          closed: Math.random() > 0.8
+        };
+      });
+
       listings.push({
         tripadvisor_id: tripadvisorId,
         name: `${name} in ${city}`,
-        address: `${i + 1} Tourist Street, ${city}, Philippines`,
+        address: `${i + 1} ${["Main", "Central", "Tourist", "Heritage"][Math.floor(Math.random() * 4)]} Street, ${city}, Philippines`,
         latitude: coords.lat,
         longitude: coords.lng,
-        rating: 3.8 + Math.random() * 1.2,
+        lat: coords.lat,
+        lng: coords.lng,
+        rating: Math.round(rating * 10) / 10,
         category: category,
         source: "advanced_scraper",
-        review_count: Math.floor(Math.random() * 300) + 50,
+        review_count: reviewCount,
         location_type: category.charAt(0).toUpperCase() + category.slice(1),
         web_url: `https://example.com/${city.toLowerCase()}/${category}/${i}`,
         slug: generateSlug(name, tripadvisorId),
         verified: false,
         updated_at: new Date().toISOString(),
-        highlights: ["Popular destination", "Recommended"],
-        amenities: ["WiFi", "Parking", "Information Center"],
-        accessibility_info: { wheelchair_accessible: Math.random() > 0.5 },
+        image_urls: selectedImages,
+        primary_image_url: primaryImage,
+        featured_image_url: primaryImage,
+        image_url: primaryImage,
+        photo_urls: selectedImages,
+        photo_count: photoCount,
+        highlights: ["Popular destination", "Recommended", "Worth visiting"],
+        amenities: selectedAmenities.map(a => ({ name: a, available: true })),
+        accessibility_info: {
+          wheelchair_accessible: Math.random() > 0.5,
+          pet_friendly: Math.random() > 0.5,
+          elevator: category === "hotels" ? Math.random() > 0.3 : false,
+          accessible_parking: Math.random() > 0.5,
+          accessible_restroom: Math.random() > 0.3
+        },
+        nearby_attractions: [],
+        price_range: category === "hotels" || category === "restaurants" ? priceRange : null,
+        price_level: category === "hotels" || category === "restaurants" ? priceLevel : null,
+        duration: category === "attractions" || category === "parks" ? `${1 + Math.floor(Math.random() * 4)} hours` : null,
+        traveler_type: travelTypes[Math.floor(Math.random() * travelTypes.length)],
+        best_for_type: bestForCategories[Math.floor(Math.random() * bestForCategories.length)],
+        best_for: bestForCategories.slice(0, 2),
+        visibility_score: Math.round(Math.random() * 100) / 10,
+        rank_in_category: `${i + 1} of ${Math.floor(Math.random() * 200) + 50}`,
+        ranking_in_city: `${i + 1} of ${Math.floor(Math.random() * 100) + 30}`,
+        ranking_in_category: i + 1,
+        awards: Math.random() > 0.6 ? [awards[Math.floor(Math.random() * awards.length)]] : [],
+        admission_fee: category === "attractions" || category === "museums" ? `PHP ${(Math.floor(Math.random() * 15) + 1) * 50}` : null,
+        description: descriptions[Math.floor(Math.random() * descriptions.length)],
+        hours_of_operation: hoursOfOperation,
+        phone_number: category === "hotels" || category === "restaurants" ? `+63 ${Math.floor(Math.random() * 900) + 100} ${Math.floor(Math.random() * 9000) + 1000}` : null,
+        website: Math.random() > 0.6 ? `https://${city.toLowerCase()}.example.com/${category}/${i}` : null,
+        review_details: [
+          { rating: Math.round(rating * 10) / 10, comment: "Great experience", verified: true },
+          { rating: Math.round((rating - 0.5) * 10) / 10, comment: "Good place to visit", verified: true }
+        ],
+        fetch_status: "success",
+        stored_image_path: null,
+        image_downloaded_at: null,
+        last_verified_at: new Date().toISOString(),
         raw: {
           city: city,
           category: category,
