@@ -881,79 +881,68 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                 const userVote = userVotes[item.tripadvisor_id]
 
                 return (
-                  <div key={item.tripadvisor_id} className="bg-white border rounded-lg p-4 shadow-sm">
-                    <div className="flex items-start gap-4">
-                      {(item.raw?.image || item.image) && (
-                        <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-slate-200">
-                          <img
-                            src={item.raw?.image || item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.currentTarget.src = `https://via.placeholder.com/600x400?text=${encodeURIComponent(item.name)}`
-                            }}
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <h4 className="text-lg font-medium text-slate-900">{item.name}</h4>
-                        {item.address && <p className="text-sm text-slate-500">{item.address}</p>}
-                        <div className="mt-2 flex items-center gap-3">
-                          {item.rating && (
-                            <span className="flex items-center gap-2 text-sm text-slate-700">
-                              <StarRating value={Number(item.rating)} size="sm" />
-                              <span>{Number(item.rating).toFixed(1)}</span>
-                            </span>
-                          )}
-                          {item.category && <span className="text-sm text-slate-600">{item.category}</span>}
-                        </div>
-
-                        {/* Vote buttons */}
-                        <div className="mt-3 flex items-center gap-2">
-                          <button
-                            onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'up')}
-                            className={`px-2 py-1 text-sm rounded transition-colors ${
-                              userVote === 'up'
-                                ? 'bg-green-600 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-green-100'
-                            }`}
-                            title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
->
-                            Upvote {counts.thumbsUp}
-                          </button>
-                          <button
-                            onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
-                            className={`px-2 py-1 text-sm rounded transition-colors ${
-                              userVote === 'down'
-                                ? 'bg-red-600 text-white'
-                                : 'bg-slate-100 text-slate-600 hover:bg-red-100'
-                            }`}
-                            title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
->
-                            Downvote {counts.thumbsDown}
-                          </button>
-                        </div>
+                  <div key={item.tripadvisor_id} className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group">
+                    {(item.raw?.image || item.image) && (
+                      <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '200px' }}>
+                        <img
+                          src={item.raw?.image || item.image}
+                          alt={item.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://via.placeholder.com/600x400?text=${encodeURIComponent(item.name)}`
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                        {item.category && (
+                          <span className="absolute top-3 left-3 inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-sm">
+                            {item.category}
+                          </span>
+                        )}
                       </div>
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="flex flex-col gap-2">
-                          <button
-                            onClick={() => saveItem(item)}
-                            className="px-3 py-1 bg-green-600 text-white rounded-md text-sm"
-                            disabled={savedIds.has(item.tripadvisor_id?.toString())}
-                          >
-                            {savedIds.has(item.tripadvisor_id?.toString()) ? 'Saved' : 'Save'}
-                          </button>
-                          <button
-                            onClick={() => {
-                              setCurrentBusinessId(item.tripadvisor_id?.toString())
-                              setActiveTab('business')
-                            }}
-                            className="px-3 py-1 bg-slate-100 text-slate-700 rounded-md text-sm"
-                          >
-                            View
-                          </button>
-                        </div>
+                    )}
+                    <div className="p-4">
+                      <h4 className="text-lg font-semibold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{item.name}</h4>
+                      {item.address && <p className="text-sm text-slate-600 mb-3">{item.address}</p>}
+                      <div className="flex items-center gap-3 mb-4">
+                        {item.rating && (
+                          <>
+                            <StarRating value={Number(item.rating)} size="sm" />
+                            <span className="text-sm font-semibold text-slate-900">{Number(item.rating).toFixed(1)}</span>
+                            <span className="text-xs text-slate-500">({item.reviewCount || '0'})</span>
+                          </>
+                        )}
                       </div>
+                      <div className="flex gap-2 mb-3">
+                        <button
+                          onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'up')}
+                          className={`flex-1 px-2 py-2 text-sm rounded-lg transition-colors font-medium ${
+                            userVote === 'up'
+                              ? 'bg-green-600 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-green-100'
+                          }`}
+                          title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
+                        >
+                          👍 {counts.thumbsUp}
+                        </button>
+                        <button
+                          onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
+                          className={`flex-1 px-2 py-2 text-sm rounded-lg transition-colors font-medium ${
+                            userVote === 'down'
+                              ? 'bg-red-600 text-white'
+                              : 'bg-slate-100 text-slate-600 hover:bg-red-100'
+                          }`}
+                          title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
+                        >
+                          👎 {counts.thumbsDown}
+                        </button>
+                      </div>
+                      <button
+                        onClick={() => saveItem(item)}
+                        className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        disabled={savedIds.has(item.tripadvisor_id?.toString())}
+                      >
+                        {savedIds.has(item.tripadvisor_id?.toString()) ? '✓ Saved' : 'Save'}
+                      </button>
                     </div>
                   </div>
                 )
