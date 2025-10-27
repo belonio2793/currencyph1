@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { generateSlug } from './slugUtils'
 
 export const nearbyUtils = {
   // Get vote for a listing by current user
