@@ -65,6 +65,7 @@ export const tripadvisorPhilippinesFetcher = {
         .map(item => ({
           tripadvisor_id: String(item.location_id),
           name: item.name,
+          slug: generateSlug(item.name),
           address: item.address || item.address_string || null,
           latitude: item.latitude || item.address_obj?.latitude || null,
           longitude: item.longitude || item.address_obj?.longitude || null,
