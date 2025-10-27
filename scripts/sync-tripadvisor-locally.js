@@ -53,15 +53,20 @@ async function fetchTripAdvisorData(query, tripKey, limit = 30) {
       const name = item.name || item.title || "";
       const locationType = item.type || item.location_type || (item.subcategory || item.category?.name || "Attraction");
 
-      const slug = name
+      const baseSlug = name
         .toLowerCase()
         .trim()
         .replace(/[^\w\s-]/g, "")
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
 
+      const tripadvisorId = String(item.location_id || item.id || Math.random());
+      // Append a small part of the tripadvisor_id to the slug for uniqueness
+      const idSuffix = tripadvisorId.slice(-6).toLowerCase();
+      const slug = baseSlug ? `${baseSlug}-${idSuffix}` : `listing-${idSuffix}`;
+
       return {
-        tripadvisor_id: String(item.location_id || item.id || Math.random()),
+        tripadvisor_id: tripadvisorId,
         name: name,
         address: address || null,
         latitude: item.latitude || item.lat || null,
