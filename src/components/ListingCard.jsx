@@ -64,32 +64,34 @@ export default function ListingCard({
       onClick={handleCardClick}
     >
       {/* Image */}
-      <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '200px' }}>
-        {imageLoading && (
-          <div className="absolute inset-0 bg-slate-200 animate-pulse" />
-        )}
-        <img
-          src={imageUrl}
-          alt={listing.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          onError={(e) => {
-            if (!imageError) {
-              e.currentTarget.src =
-                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
-              setImageError(true)
-            }
-          }}
-          loading="lazy"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+      {!hideImage && (
+        <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '200px' }}>
+          {imageLoading && (
+            <div className="absolute inset-0 bg-slate-200 animate-pulse" />
+          )}
+          <img
+            src={imageUrl}
+            alt={listing.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            onError={(e) => {
+              if (!imageError) {
+                e.currentTarget.src =
+                  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+                setImageError(true)
+              }
+            }}
+            loading="lazy"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
 
-        {/* Category Badge */}
-        {listing.category && (
-          <span className="absolute top-3 left-3 inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-sm">
-            {listing.category}
-          </span>
-        )}
-      </div>
+          {/* Category Badge */}
+          {listing.category && (
+            <span className="absolute top-3 left-3 inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-sm">
+              {listing.category}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Content */}
       <div className="p-4">
