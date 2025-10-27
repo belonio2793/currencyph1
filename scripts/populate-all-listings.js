@@ -78,7 +78,6 @@ async function fetchTripAdvisor(query) {
       longitude: item.longitude || item.address_obj?.longitude || null,
       rating: item.rating ? Number(item.rating) : 4.0,
       category: item.subcategory || item.category?.name || 'Attraction',
-      reviewCount: item.review_count || 0,
       raw: item,
       updated_at: new Date().toISOString()
     }))
@@ -101,7 +100,6 @@ function generateMockAttractions(city, category) {
       longitude: parseFloat((Math.random() * 7 + 120).toFixed(4)),
       rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
       category: category,
-      reviewCount: Math.floor(Math.random() * 5000) + 200,
       raw: { source: 'mock', city, category },
       updated_at: new Date().toISOString()
     })
