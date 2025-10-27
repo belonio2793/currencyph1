@@ -137,6 +137,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       if (selectedCity) {
         query = query.eq('city', selectedCity)
+      } else if (expandedLetter) {
+        query = query.ilike('city', `${expandedLetter}%`)
       }
 
       const from = (page - 1) * itemsPerPage
@@ -288,10 +290,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   }
 
   useEffect(() => {
-    if (selectedCity || page > 1) {
-      loadListings()
-    }
-  }, [selectedCity, page])
+    loadListings()
+  }, [selectedCity, expandedLetter, page])
 
   const displayListings = searchResults.length > 0 ? searchResults : listings
 
@@ -348,7 +348,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                   <button
                     key={letter}
                     onClick={() => {
-                      setExpandedLetter(expandedLetter === letter ? null : letter)
+                      const next = expandedLetter === letter ? null : letter
+                      setExpandedLetter(next)
                       setSelectedCity(null)
                       setPage(1)
                     }}
@@ -365,33 +366,34 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
               </div>
             </div>
 
-            {/* City Dropdown for Selected Letter */}
+            {/* City List for Selected Letter (buttons) */}
             {expandedLetter && citiesByLetter[expandedLetter] && (
               <div className="mt-4 animate-fadeIn">
-                <div className="mb-3 flex items-center gap-3">
+                <div className="mb-2 flex items-center gap-3">
                   <h4 className="text-lg font-bold text-white">
-                    Cities starting with <span className="bg-white/20 text-white px-2 py-1 rounded-md">{expandedLetter}</span>
+                    Cities Starting with <span className="bg-white/20 text-white px-2 py-1 rounded-md">{expandedLetter}</span>
                   </h4>
                   <span className="bg-white/10 text-white px-2 py-1 rounded-full text-sm font-semibold">
                     {citiesByLetter[expandedLetter].length} cities
                   </span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <label className="text-white/90 text-sm">Choose a city:</label>
-                  <select
-                    className="px-3 py-2 rounded-md bg-white/90 text-slate-900 text-sm shadow focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    value={selectedCity || ''}
-                    onChange={(e) => {
-                      const val = e.target.value || null
-                      setSelectedCity(val)
-                      setPage(1)
-                    }}
-                  >
-                    <option value="">— Select —</option>
-                    {citiesByLetter[expandedLetter].map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
-                  </select>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                  {citiesByLetter[expandedLetter].map(city => (
+                    <button
+                      key={city}
+                      onClick={() => {
+                        setSelectedCity(city)
+                        setPage(1)
+                      }}
+                      className={`px-3 py-2 rounded-md text-sm font-semibold transition-all duration-200 text-left border-2 ${
+                        selectedCity === city
+                          ? 'bg-white/20 text-white border-white/20 shadow'
+                          : 'bg-transparent text-white border-white/20 hover:border-white/40 hover:bg-white/5'
+                      }`}
+                    >
+                      <span className="block">{city}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             )}
