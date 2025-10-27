@@ -187,40 +187,27 @@ export default function AdminPopulate() {
               </ul>
             </div>
 
-            <p className="text-sm text-slate-600 mb-6">
-              This will fetch and save listings from all major Philippine cities and tourist destinations.
-              The process includes rate limiting to work reliably with the TripAdvisor API.
-            </p>
-
-            <button
-              onClick={handleFetchPhilippines}
-              disabled={loading}
-              className={`px-6 py-2 rounded-lg font-medium text-white transition-colors ${
-                loading
-                  ? 'bg-slate-400 cursor-not-allowed'
-                  : 'bg-green-600 hover:bg-green-700'
-              }`}
-            >
-              {loading ? 'Fetching...' : 'Fetch Philippines Listings'}
-            </button>
-
-            {progress && loading && (
-              <div className="mt-6 p-4 bg-slate-50 border border-slate-200 rounded-lg">
-                <p className="text-sm font-medium text-slate-900 mb-2">
-                  {progress.message}
-                </p>
-                <div className="w-full bg-slate-200 rounded-full h-2">
-                  <div
-                    className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min(100, (progress.current / progress.total) * 100)}%` }}
-                  />
-                </div>
-                <p className="text-xs text-slate-600 mt-2">
-                  Progress: {progress.current} / {progress.total} cities
-                  {progress.totalCollected > 0 && ` · Total: ${progress.totalCollected} listings`}
-                </p>
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900 font-semibold mb-3">📝 How to Fetch Philippines Listings</p>
+              <p className="text-sm text-blue-900 mb-3">Use the command line to fetch listings from TripAdvisor Philippines:</p>
+              <div className="bg-slate-900 text-slate-100 p-3 rounded font-mono text-xs mb-3 overflow-x-auto">
+                npm run fetch-philippines
               </div>
-            )}
+              <p className="text-xs text-blue-800">
+                <strong>Note:</strong> This command will fetch from all 50+ Philippine cities and populate your database with 2,000-4,000 listings. The process takes 5-10 minutes.
+              </p>
+            </div>
+
+            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-900 font-semibold mb-2">⚡ Quick Steps</p>
+              <ol className="text-sm text-amber-900 space-y-2 list-decimal list-inside">
+                <li>Open your terminal/command prompt</li>
+                <li>Navigate to your project directory</li>
+                <li>Run: <code className="bg-amber-100 px-2 py-1 rounded">npm run fetch-philippines</code></li>
+                <li>Watch the progress in real-time</li>
+                <li>Check /nearby for new listings when complete</li>
+              </ol>
+            </div>
           </div>
         )}
 
