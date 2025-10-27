@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { populateManilaListings } from '../lib/populateManillaListings'
 import { populateTripadvisorListings } from '../lib/populateTripadvisorListings'
-import { tripadvisorPhilippinesFetcher } from '../lib/tripadvisorPhilippinesFetcher'
 
 export default function AdminPopulate() {
   const [loading, setLoading] = useState(false)
@@ -199,7 +198,7 @@ export default function AdminPopulate() {
             </div>
 
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-900 font-semibold mb-2">⚡ Quick Steps</p>
+              <p className="text-sm text-amber-900 font-semibold mb-2">�� Quick Steps</p>
               <ol className="text-sm text-amber-900 space-y-2 list-decimal list-inside">
                 <li>Open your terminal/command prompt</li>
                 <li>Navigate to your project directory</li>
