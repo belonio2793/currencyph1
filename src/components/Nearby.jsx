@@ -23,6 +23,13 @@ const PHILIPPINE_CITIES = [
   'Toledo', 'Trece Martires', 'Tuguegarao', 'Urdaneta', 'Valenzuela', 'Victorias', 'Vigan', 'Virac', 'Zamboanga City'
 ]
 
+// Extra destinations to ensure coverage in the A–Z browser
+const EXTRA_CITIES = [
+  'Boracay', 'Baguio', 'Bohol', 'Coron', 'El Nido', 'Makati', 'Palawan', 'Siargao', 'Valencia'
+]
+
+const ALL_CITIES = Array.from(new Set([...PHILIPPINE_CITIES, ...EXTRA_CITIES]))
+
 function groupCitiesByLetter(cities) {
   const grouped = {}
   cities.forEach(city => {
