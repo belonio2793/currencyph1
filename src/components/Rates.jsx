@@ -80,7 +80,7 @@ export default function Rates({ globalCurrency }) {
       await Promise.all([loadExchangeRates(), loadCryptoPrices()])
       setLastUpdated(new Date())
     } catch (err) {
-      console.error('Error loading rates:', err)
+      console.debug('Error loading rates (using fallbacks):', err)
     } finally {
       setLoading(false)
     }
