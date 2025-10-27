@@ -48,9 +48,12 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [isFetching, setIsFetching] = useState(false)
   const [page, setPage] = useState(1)
   const [expandedLetter, setExpandedLetter] = useState(null)
+  const [cities, setCities] = useState([])
+  const [citiesByLetter, setCitiesByLetter] = useState({})
   const itemsPerPage = 12
 
   useEffect(() => {
+    loadCities()
     loadStats()
     loadFeaturedListings()
   }, [])
@@ -73,12 +76,38 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       setListingStats({
         total: countData?.count || 0,
-        cities: PHILIPPINE_CITIES.length,
+        cities: cities.length,
         avgRating: avgRating,
         withRatings: ratingData?.length || 0
       })
     } catch (err) {
       console.error('Error loading stats:', err)
+    }
+  }
+
+  async function loadCities() {
+    try {
+      const { data, error } = await supabase
+        .from('nearby_listings')
+        .select('city, country')
+        .not('city', 'is', null)
+        .order('city', { ascending: true })
+        .limit(10000)
+
+      if (error) throw error
+
+      const unique = new Map()
+      ;(data || []).forEach((row) => {
+        const city = (row.city || '').trim()
+        if (!city) return
+        if (!unique.has(city)) unique.set(city, row.country || null)
+      })
+      const cityList = Array.from(unique.keys())
+      setCities(cityList)
+      setCitiesByLetter(groupCitiesByLetter(cityList))
+      setListingStats((prev) => (prev ? { ...prev, cities: cityList.length } : prev))
+    } catch (err) {
+      console.error('Error loading cities:', err)
     }
   }
 
@@ -106,7 +135,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       let query = supabase.from('nearby_listings').select('*')
 
       if (selectedCity) {
-        query = query.ilike('address', `%${selectedCity}%`)
+        query = query.eq('city', selectedCity)
       }
 
       const from = (page - 1) * itemsPerPage
@@ -140,7 +169,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         .from('nearby_listings')
         .select('*')
         .or(
-          `name.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`
+          `name.ilike.%${searchQuery}%,address.ilike.%${searchQuery}%,category.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%,city.ilike.%${searchQuery}%,country.ilike.%${searchQuery}%`
         )
         .limit(50)
 
@@ -291,7 +320,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         </button>
 
         <div className="flex gap-2 flex-wrap">
-          {Object.keys(groupCitiesByLetter(PHILIPPINE_CITIES)).map(letter => (
+          {Object.keys(citiesByLetter).map(letter => (
             <button
               key={letter}
               onClick={() => {
@@ -308,10 +337,10 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           ))}
         </div>
 
-        {expandedLetter && groupCitiesByLetter(PHILIPPINE_CITIES)[expandedLetter] && (
+        {expandedLetter && citiesByLetter[expandedLetter] && (
           <div className="mt-4 p-4 bg-slate-50 rounded-lg">
             <div className="flex gap-2 flex-wrap">
-              {groupCitiesByLetter(PHILIPPINE_CITIES)[expandedLetter].map(city => (
+              {citiesByLetter[expandedLetter].map(city => (
                 <button
                   key={city}
                   onClick={() => {
