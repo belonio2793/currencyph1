@@ -12,6 +12,7 @@ export default function ListingCard({
   isAuthenticated = false,
   voteCounts = { thumbsUp: 0, thumbsDown: 0 },
   userVote = null,
+  hideImage = false,
 }) {
   const [imageUrl, setImageUrl] = useState(null)
   const [imageLoading, setImageLoading] = useState(true)
