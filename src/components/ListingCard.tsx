@@ -69,7 +69,7 @@ export default function ListingCard({ listing, onViewDetails, compact = false }:
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-        <span className="absolute top-3 right-3 inline-block px-2 py-1 bg-white/90 text-slate-900 rounded text-xs font-semibold">
+        <span className="absolute top-3 left-3 inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-sm">
           {listing.category}
         </span>
       </div>
