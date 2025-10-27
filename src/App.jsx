@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { wisegcashAPI } from './lib/wisegcashAPI'
+import backgroundSync from './lib/backgroundSync'
 import Navbar from './components/Navbar'
 import LandingPage from './components/LandingPage'
 import Dashboard from './components/Dashboard'
