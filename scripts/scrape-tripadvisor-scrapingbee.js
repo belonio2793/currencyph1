@@ -29,18 +29,31 @@ const limitCities = Number((argv.match(/--limitCities=(\d+)/)||[])[1]||0)
 const perCity = Number((argv.match(/--perCity=(\d+)/)||[])[1]||20)
 
 async function beeFetch(url, opts = {}) {
-  const params = new URLSearchParams({ url, render_js: 'false', country_code: 'ph' })
-  if (opts.params) Object.entries(opts.params).forEach(([k,v])=>params.set(k,String(v)))
-  const resp = await fetch(`https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(SCRAPINGBEE_API_KEY)}&${params.toString()}`)
-  if (!resp.ok) {
-    if (resp.status === 429 || resp.status === 520 || resp.status === 503) {
-      await sleep(1500)
-      return beeFetch(url, opts)
+  async function doFetch(renderJs) {
+    const params = new URLSearchParams({ url, render_js: renderJs ? 'true' : 'false', country_code: 'ph' })
+    if (opts.params) Object.entries(opts.params).forEach(([k,v])=>params.set(k,String(v)))
+    const resp = await fetch(`https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(SCRAPINGBEE_API_KEY)}&${params.toString()}`)
+    if (!resp.ok) {
+      const txt = await resp.text().catch(()=> '')
+      const err = new Error(`Bee ${resp.status} ${resp.statusText}: ${txt.slice(0,200)}`)
+      err.status = resp.status
+      throw err
     }
-    const txt = await resp.text().catch(()=> '')
-    throw new Error(`Bee ${resp.status} ${resp.statusText}: ${txt.slice(0,200)}`)
+    return await resp.text()
   }
-  return await resp.text()
+  try {
+    return await doFetch(true)
+  } catch (e) {
+    if (e.status && e.status >= 500) {
+      await sleep(1200)
+      return await doFetch(false)
+    }
+    if (e.status === 429) {
+      await sleep(1500)
+      return await doFetch(true)
+    }
+    throw e
+  }
 }
 
 function parseSearch(html) {
