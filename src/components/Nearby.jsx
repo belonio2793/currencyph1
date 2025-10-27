@@ -205,8 +205,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [isSearching, setIsSearching] = useState(false)
-  const [isFetching, setIsFetching] = useState(false)
-  const [fetchProgress, setFetchProgress] = useState(null)
 
   useEffect(() => {
     checkAuthStatus()
@@ -749,7 +747,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                                   : 'bg-slate-100 text-slate-600 hover:bg-green-100'
                               }`}
                             >
-                              ��� {counts.thumbsUp}
+                              👍 {counts.thumbsUp}
                             </button>
                             <button
                               onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
