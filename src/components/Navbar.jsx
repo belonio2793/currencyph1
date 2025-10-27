@@ -17,7 +17,7 @@ export default function Navbar({ activeTab, onTabChange }) {
   return (
     <nav className="bg-white border-b border-slate-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           <div className="flex items-center space-x-12">
             <h1 className="text-xl font-light text-slate-900 tracking-wide">currency.ph</h1>
             <div className="hidden md:flex space-x-1">
@@ -38,6 +38,10 @@ export default function Navbar({ activeTab, onTabChange }) {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="hidden md:flex">
+            <HeaderMap />
           </div>
 
           {/* Mobile menu button */}
