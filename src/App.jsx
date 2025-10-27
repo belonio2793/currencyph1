@@ -271,7 +271,7 @@ export default function App() {
             {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
               setActiveTab('nearby')
               setCurrentListingSlug(null)
-              window.history.replaceState(null, '', '/nearby')
+              window.history.pushState(null, '', '/nearby')
             }} /> }
           </>
         )}
