@@ -674,12 +674,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
                 </div>
               )
             })()
-          ) : (
-            <div className="w-full mb-6 rounded-lg overflow-hidden border border-slate-200 shadow-sm p-6 text-center text-slate-500">
-              <div className="text-sm font-medium">Location unavailable</div>
-              <div className="text-xs mt-2">Allow geolocation or check network to see your location on the map.</div>
-            </div>
-          )}
+          ) : null}
         </div>
 
         {/* Welcome Message */}
