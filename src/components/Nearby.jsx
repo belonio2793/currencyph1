@@ -695,6 +695,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
                         listing={item}
                         onSave={() => saveItem(item)}
                         onVote={(id, vote) => handleVote(id, 'nearby', vote)}
+                        onNavigateToDetail={handleNavigateToListing}
                         isSaved={savedIds.has(item.tripadvisor_id?.toString())}
                         isAuthenticated={isAuthenticatedUser}
                         voteCounts={counts}
