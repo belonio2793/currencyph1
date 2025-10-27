@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import StarRating from './StarRating'
 
-export default function ListingDetail({ slug, setActiveTab }) {
+export default function ListingDetail({ slug, onBack }) {
   const [listing, setListing] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -11,6 +11,14 @@ export default function ListingDetail({ slug, setActiveTab }) {
   useEffect(() => {
     loadListing()
   }, [slug])
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack()
+    } else {
+      window.history.back()
+    }
+  }
 
   async function loadListing() {
     setLoading(true)
