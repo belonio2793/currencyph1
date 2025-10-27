@@ -45,6 +45,7 @@ export default function ListingDetail({ slug, onBack }) {
           .select('*')
           .eq('category', data.category)
           .neq('slug', slug)
+          .order('rating', { ascending: false })
           .limit(6)
 
         setRelatedListings(related || [])
@@ -83,9 +84,45 @@ export default function ListingDetail({ slug, onBack }) {
     )
   }
 
-  const displayImage = listing.photo_urls && listing.photo_urls.length > 0
-    ? listing.photo_urls[selectedPhotoIndex]
-    : listing.image_url
+  // Get best image from various sources
+  const getImageArray = () => {
+    if (listing.photo_urls && Array.isArray(listing.photo_urls) && listing.photo_urls.length > 0) {
+      return listing.photo_urls
+    }
+    if (listing.image_urls && Array.isArray(listing.image_urls) && listing.image_urls.length > 0) {
+      return listing.image_urls
+    }
+    if (listing.featured_image_url) return [listing.featured_image_url]
+    if (listing.primary_image_url) return [listing.primary_image_url]
+    if (listing.image_url) return [listing.image_url]
+    return []
+  }
+
+  const imageArray = getImageArray()
+  const displayImage = imageArray.length > 0 ? imageArray[selectedPhotoIndex] : null
+
+  // Format hours of operation
+  const formatHours = (hours) => {
+    if (!hours) return null
+    if (typeof hours === 'string') {
+      return hours
+    }
+    if (typeof hours === 'object') {
+      const parts = []
+      Object.entries(hours).forEach(([day, timeRange]) => {
+        if (timeRange && timeRange !== 'Closed' && typeof timeRange === 'object') {
+          const open = timeRange.open || 'N/A'
+          const close = timeRange.close || 'N/A'
+          const isClosed = timeRange.closed ? ' (Closed)' : ''
+          parts.push(`${day}: ${open} - ${close}${isClosed}`)
+        } else if (timeRange) {
+          parts.push(`${day}: ${timeRange}`)
+        }
+      })
+      return parts.join('\n')
+    }
+    return null
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -105,9 +142,12 @@ export default function ListingDetail({ slug, onBack }) {
               src={displayImage}
               alt={listing.name}
               className="w-full h-96 object-cover"
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+              }}
             />
             {/* Photo Navigation */}
-            {listing.photo_urls && listing.photo_urls.length > 1 && (
+            {imageArray.length > 1 && (
               <div className="flex justify-between items-center px-4 py-3 bg-black bg-opacity-50">
                 <button
                   onClick={() => setSelectedPhotoIndex(Math.max(0, selectedPhotoIndex - 1))}
@@ -117,11 +157,11 @@ export default function ListingDetail({ slug, onBack }) {
                   ←
                 </button>
                 <span className="text-white text-sm">
-                  {selectedPhotoIndex + 1} / {listing.photo_urls.length}
+                  {selectedPhotoIndex + 1} / {imageArray.length}
                 </span>
                 <button
-                  onClick={() => setSelectedPhotoIndex(Math.min(listing.photo_urls.length - 1, selectedPhotoIndex + 1))}
-                  disabled={selectedPhotoIndex === listing.photo_urls.length - 1}
+                  onClick={() => setSelectedPhotoIndex(Math.min(imageArray.length - 1, selectedPhotoIndex + 1))}
+                  disabled={selectedPhotoIndex === imageArray.length - 1}
                   className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
                 >
                   →
@@ -131,7 +171,7 @@ export default function ListingDetail({ slug, onBack }) {
           </div>
         )}
 
-        {/* Title and Badge */}
+        {/* Title and Badges */}
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-1">
             <h1 className="text-4xl font-bold text-slate-900 mb-2">{listing.name}</h1>
@@ -151,17 +191,36 @@ export default function ListingDetail({ slug, onBack }) {
                   {'$'.repeat(listing.price_level)}
                 </span>
               )}
+              {listing.price_range && (
+                <span className="inline-block px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  {listing.price_range}
+                </span>
+              )}
+              {listing.verified && (
+                <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
+                  ✓ Verified
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Rating and Reviews */}
-        <div className="flex items-center gap-6 mb-6">
+        <div className="flex items-center gap-6 mb-6 flex-wrap">
           <div className="flex items-center gap-2">
-            <StarRating rating={listing.rating} size="md" />
-            <span className="text-lg font-semibold text-slate-900">{listing.rating || 'N/A'}</span>
-            <span className="text-slate-600">({listing.review_count?.toLocaleString() || 0} reviews)</span>
+            {listing.rating && <StarRating value={listing.rating} size="md" />}
+            {listing.rating && (
+              <>
+                <span className="text-lg font-semibold text-slate-900">{Number(listing.rating).toFixed(1)}</span>
+                <span className="text-slate-600">({(listing.review_count || 0).toLocaleString()} reviews)</span>
+              </>
+            )}
           </div>
+          {listing.visibility_score !== undefined && (
+            <div className="text-slate-600">
+              <span className="font-medium">Visibility Score:</span> {listing.visibility_score}/100
+            </div>
+          )}
         </div>
 
         {/* Address */}
@@ -169,6 +228,11 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
             <div className="font-semibold text-slate-900 mb-1">📍 Address</div>
             <p className="text-slate-700">{listing.address}</p>
+            {(listing.latitude || listing.lat) && (
+              <p className="text-sm text-slate-500 mt-2">
+                📌 {(listing.latitude || listing.lat).toFixed(4)}, {(listing.longitude || listing.lng).toFixed(4)}
+              </p>
+            )}
           </div>
         )}
 
@@ -177,19 +241,19 @@ export default function ListingDetail({ slug, onBack }) {
           {listing.rating && (
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
               <div className="text-sm text-blue-700 font-medium">Rating</div>
-              <div className="text-2xl font-bold text-blue-900">{listing.rating}/5</div>
+              <div className="text-2xl font-bold text-blue-900">{Number(listing.rating).toFixed(1)}/5</div>
             </div>
           )}
           {listing.review_count && (
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
               <div className="text-sm text-green-700 font-medium">Reviews</div>
-              <div className="text-2xl font-bold text-green-900">{listing.review_count.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-green-900">{(listing.review_count || 0).toLocaleString()}</div>
             </div>
           )}
           {listing.photo_count && (
             <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
               <div className="text-sm text-purple-700 font-medium">Photos</div>
-              <div className="text-2xl font-bold text-purple-900">{listing.photo_count.toLocaleString()}</div>
+              <div className="text-2xl font-bold text-purple-900">{(listing.photo_count || 0).toLocaleString()}</div>
             </div>
           )}
           {listing.admission_fee && (
@@ -205,6 +269,24 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">About</h2>
             <p className="text-slate-700 leading-relaxed">{listing.description}</p>
+          </div>
+        )}
+
+        {/* Duration and Traveler Type */}
+        {(listing.duration || listing.traveler_type) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            {listing.duration && (
+              <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <h3 className="font-semibold text-slate-900 mb-1">⏱️ Duration</h3>
+                <p className="text-slate-700">{listing.duration}</p>
+              </div>
+            )}
+            {listing.traveler_type && (
+              <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
+                <h3 className="font-semibold text-slate-900 mb-1">👥 Best For</h3>
+                <p className="text-slate-700">{listing.traveler_type}</p>
+              </div>
+            )}
           </div>
         )}
 
@@ -226,7 +308,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Best For */}
         {listing.best_for && listing.best_for.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Best For</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Categories</h2>
             <div className="flex flex-wrap gap-2">
               {listing.best_for.map((tag, idx) => (
                 <span
@@ -245,10 +327,16 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8 bg-slate-50 p-6 rounded-lg border border-slate-200">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">🕒 Hours of Operation</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {Object.entries(listing.hours_of_operation).map(([day, hours]) => (
-                <div key={day} className="flex justify-between text-slate-700">
+              {Object.entries(listing.hours_of_operation).map(([day, hours], idx) => (
+                <div key={idx} className="flex justify-between text-slate-700">
                   <span className="font-medium capitalize">{day}:</span>
-                  <span className="text-slate-600">{hours || 'Closed'}</span>
+                  <span className="text-slate-600">
+                    {typeof hours === 'object' && hours.closed
+                      ? 'Closed'
+                      : typeof hours === 'object'
+                      ? `${hours.open || 'N/A'} - ${hours.close || 'N/A'}`
+                      : hours || 'Closed'}
+                  </span>
                 </div>
               ))}
             </div>
@@ -258,12 +346,12 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Amenities */}
         {listing.amenities && listing.amenities.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">Amenities</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">🛎️ Amenities</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {listing.amenities.map((amenity, idx) => (
                 <div key={idx} className="flex items-center gap-2 text-slate-700">
                   <span className="text-green-600">✓</span>
-                  <span>{typeof amenity === 'string' ? amenity : amenity.name}</span>
+                  <span>{typeof amenity === 'string' ? amenity : amenity.name || amenity}</span>
                 </div>
               ))}
             </div>
@@ -275,14 +363,35 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8 bg-blue-50 p-6 rounded-lg border border-blue-200">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">♿ Accessibility</h2>
             <div className="space-y-2">
-              {listing.accessibility_info.wheelchair_accessible && (
+              {listing.accessibility_info.wheelchair_accessible !== undefined && (
                 <p className="text-slate-700">
                   <span className="font-medium">Wheelchair Accessible:</span>{' '}
                   {listing.accessibility_info.wheelchair_accessible ? '✓ Yes' : '✗ No'}
                 </p>
               )}
-              {listing.accessibility_info.details && (
-                <p className="text-slate-700">{listing.accessibility_info.details}</p>
+              {listing.accessibility_info.pet_friendly !== undefined && (
+                <p className="text-slate-700">
+                  <span className="font-medium">Pet Friendly:</span>{' '}
+                  {listing.accessibility_info.pet_friendly ? '✓ Yes' : '✗ No'}
+                </p>
+              )}
+              {listing.accessibility_info.elevator !== undefined && (
+                <p className="text-slate-700">
+                  <span className="font-medium">Elevator:</span>{' '}
+                  {listing.accessibility_info.elevator ? '✓ Yes' : '✗ No'}
+                </p>
+              )}
+              {listing.accessibility_info.accessible_parking !== undefined && (
+                <p className="text-slate-700">
+                  <span className="font-medium">Accessible Parking:</span>{' '}
+                  {listing.accessibility_info.accessible_parking ? '✓ Yes' : '✗ No'}
+                </p>
+              )}
+              {listing.accessibility_info.accessible_restroom !== undefined && (
+                <p className="text-slate-700">
+                  <span className="font-medium">Accessible Restroom:</span>{' '}
+                  {listing.accessibility_info.accessible_restroom ? '✓ Yes' : '✗ No'}
+                </p>
               )}
             </div>
           </div>
@@ -334,14 +443,14 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">🏆 Awards & Recognition</h2>
             <div className="flex flex-wrap gap-3">
-              {listing.awards.map((award, idx) => (
-                <span
-                  key={idx}
-                  className="px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-medium"
-                >
-                  🏆 {award}
-                </span>
-              ))}
+              {listing.awards.map((award, idx) => {
+                const awardText = typeof award === 'string' ? award : award.name || award
+                return (
+                  <span key={idx} className="px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
+                    🏆 {awardText}
+                  </span>
+                )
+              })}
             </div>
           </div>
         )}
@@ -370,23 +479,31 @@ export default function ListingDetail({ slug, onBack }) {
                 <div key={idx} className="border border-slate-200 p-4 rounded-lg">
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <h4 className="font-semibold text-slate-900">{review.author}</h4>
+                      <h4 className="font-semibold text-slate-900">{review.author || 'Reviewer'}</h4>
                       <div className="flex items-center gap-2 text-sm">
-                        <StarRating rating={review.rating} size="sm" />
-                        <span className="text-slate-500">{review.rating}/5</span>
+                        {review.rating && <StarRating value={review.rating} size="sm" />}
+                        {review.rating && <span className="text-slate-500">{review.rating}/5</span>}
                       </div>
                     </div>
                     {review.date && (
                       <span className="text-sm text-slate-500">{new Date(review.date).toLocaleDateString()}</span>
                     )}
                   </div>
-                  <p className="text-slate-700 text-sm">{review.text}</p>
+                  {review.comment && <p className="text-slate-700 text-sm">{review.comment}</p>}
+                  {review.text && <p className="text-slate-700 text-sm">{review.text}</p>}
                   {review.helpful_count > 0 && (
                     <p className="text-xs text-slate-500 mt-2">👍 {review.helpful_count} found this helpful</p>
                   )}
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Last Updated */}
+        {listing.updated_at && (
+          <div className="mb-8 p-4 bg-gray-50 rounded-lg text-sm text-slate-500">
+            <p>Last updated: {new Date(listing.updated_at).toLocaleDateString()} at {new Date(listing.updated_at).toLocaleTimeString()}</p>
           </div>
         )}
       </div>
@@ -404,12 +521,15 @@ export default function ListingDetail({ slug, onBack }) {
                 href={`/nearby/${related.slug}`}
                 className="bg-white border rounded-lg overflow-hidden hover:shadow-lg cursor-pointer transition-all block"
               >
-                {related.image_url && (
+                {(related.photo_urls?.[0] || related.image_urls?.[0] || related.image_url) && (
                   <div className="h-40 overflow-hidden bg-slate-200">
                     <img
-                      src={related.image_url}
+                      src={related.photo_urls?.[0] || related.image_urls?.[0] || related.image_url}
                       alt={related.name}
                       className="w-full h-full object-cover hover:scale-105 transition-transform"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+                      }}
                     />
                   </div>
                 )}
@@ -418,10 +538,12 @@ export default function ListingDetail({ slug, onBack }) {
                     {related.name}
                   </h3>
                   <div className="flex items-center gap-2">
-                    <StarRating rating={related.rating} size="sm" />
-                    <span className="text-sm font-medium text-slate-700">
-                      {related.rating}
-                    </span>
+                    {related.rating && <StarRating value={related.rating} size="sm" />}
+                    {related.rating && (
+                      <span className="text-sm font-medium text-slate-700">
+                        {Number(related.rating).toFixed(1)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </a>
