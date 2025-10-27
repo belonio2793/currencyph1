@@ -289,6 +289,46 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
     }
   }
 
+  async function handleFetchPhilippinesListings() {
+    if (!confirm('Fetch fresh listings from TripAdvisor Philippines?\n\nThis may take 5-10 minutes.')) {
+      return
+    }
+
+    setIsFetching(true)
+    setFetchProgress({ message: 'Starting fetch...', current: 0, total: 50 })
+
+    try {
+      const cities = tripadvisorPhilippinesFetcher.getPhilippineCities()
+
+      const result = await tripadvisorPhilippinesFetcher.fetchAndSaveListings(
+        cities,
+        (progress) => {
+          setFetchProgress({
+            message: progress.error ? `❌ ${progress.city}` : `✓ ${progress.city}`,
+            current: progress.current,
+            total: progress.total,
+            totalCollected: progress.totalCollected || 0
+          })
+        }
+      )
+
+      setError('')
+      alert(`✅ Fetch complete!\n\n✓ Cities processed: ${result.successCount}\n⚠️ Cities failed: ${result.errorCount}\n📝 Total listings: ${result.total}`)
+
+      // Refresh stats
+      await loadAllCities()
+      await loadAllCategories()
+      await loadStats()
+      await loadSavedListings(1)
+    } catch (err) {
+      console.error('Error fetching:', err)
+      setError(`Failed to fetch: ${err.message}`)
+    } finally {
+      setIsFetching(false)
+      setFetchProgress(null)
+    }
+  }
+
   async function loadCategoryListings(category, pageNum = 1) {
     if (!category) return
 
@@ -944,7 +984,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                         className="w-full px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                         disabled={savedIds.has(item.tripadvisor_id?.toString())}
                       >
-                        {savedIds.has(item.tripadvisor_id?.toString()) ? '✓ Saved' : 'Save'}
+                        {savedIds.has(item.tripadvisor_id?.toString()) ? '�� Saved' : 'Save'}
                       </button>
                     </div>
                   </div>
