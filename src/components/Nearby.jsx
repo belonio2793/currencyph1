@@ -2,14 +2,27 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import ListingCard from './ListingCard'
 
-const CATEGORIES = ['attractions', 'hotels', 'restaurants', 'beaches', 'things to do']
+const PHILIPPINE_CITIES = [
+  'Abuyog', 'Alaminos', 'Alcala', 'Angeles', 'Antipolo', 'Aroroy', 'Bacolod', 'Bacoor', 'Bago', 'Bais',
+  'Balanga', 'Baliuag', 'Bangued', 'Bansalan', 'Bantayan', 'Bataan', 'Batac', 'Batangas City', 'Bayambang', 'Bayawan',
+  'Baybay', 'Bayugan', 'Biñan', 'Bislig', 'Bocaue', 'Bogo', 'Borongan', 'Borong', 'Butuan', 'Cabadbaran',
+  'Cabanatuan', 'Cabuyao', 'Cadiz', 'Cagayan de Oro', 'Calamba', 'Calapan', 'Calbayog', 'Caloocan', 'Camiling', 'Canlaon',
+  'Caoayan', 'Capiz', 'Caraga', 'Carmona', 'Catbalogan', 'Cauayan', 'Cavite City', 'Cebu City', 'Cotabato City', 'Dagupan',
+  'Danao', 'Dapitan', 'Daraga', 'Dasmariñas', 'Davao City', 'Davao del Norte', 'Davao del Sur', 'Davao Oriental', 'Dipolog', 'Dumaguete',
+  'General Santos', 'General Trias', 'Gingoog', 'Guihulngan', 'Himamaylan', 'Ilagan', 'Iligan', 'Iloilo City', 'Imus', 'Isabela',
+  'Isulan', 'Kabankalan', 'Kidapawan', 'Koronadal', 'La Carlota', 'Laoag', 'Lapu-Lapu', 'Las Piñas', 'Laoang', 'Legazpi',
+  'Ligao', 'Limay', 'Lucena', 'Maasin', 'Mabalacat', 'Malabon', 'Malaybalay', 'Malolos', 'Mandaluyong', 'Mandaue',
+  'Manila', 'Marawi', 'Marilao', 'Masbate City', 'Mati', 'Meycauayan', 'Muntinlupa', 'Naga (Camarines Sur)', 'Navotas', 'Olongapo',
+  'Ormoc', 'Oroquieta', 'Ozamiz', 'Pagadian', 'Palo', 'Parañaque', 'Pasay', 'Pasig', 'Passi', 'Puerto Princesa',
+  'Quezon City', 'Roxas', 'Sagay', 'Samal', 'San Carlos (Negros Occidental)', 'San Carlos (Pangasinan)', 'San Fernando (La Union)', 'San Fernando (Pampanga)', 'San Jose (Antique)', 'San Jose del Monte',
+  'San Juan', 'San Pablo', 'San Pedro', 'Santiago', 'Silay', 'Sipalay', 'Sorsogon City', 'Surigao City', 'Tabaco', 'Tabuk',
+  'Tacurong', 'Tagaytay', 'Tagbilaran', 'Taguig', 'Tacloban', 'Talisay (Cebu)', 'Talisay (Negros Occidental)', 'Tanjay', 'Tarlac City', 'Tayabas',
+  'Toledo', 'Trece Martires', 'Tuguegarao', 'Urdaneta', 'Valenzuela', 'Victorias', 'Vigan', 'Virac', 'Zamboanga City'
+]
 
 export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) {
   const [selectedCity, setSelectedCity] = useState(null)
-  const [selectedCategory, setSelectedCategory] = useState(null)
   const [listings, setListings] = useState([])
-  const [allCities, setAllCities] = useState([])
-  const [allCategories, setAllCategories] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
@@ -22,8 +35,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
   useEffect(() => {
     loadStats()
-    loadCities()
-    loadCategories()
   }, [])
 
   async function loadStats() {
@@ -32,11 +43,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         .from('nearby_listings')
         .select('*', { count: 'exact' })
         .limit(0)
-
-      const { data: categoryData } = await supabase
-        .from('nearby_listings')
-        .select('category')
-      const uniqueCategories = new Set(categoryData?.map(d => d.category).filter(c => c))
 
       const { data: ratingData } = await supabase
         .from('nearby_listings')
@@ -49,52 +55,12 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       setListingStats({
         total: countData?.count || 0,
-        cities: 10,
-        categories: uniqueCategories.size || 0,
+        cities: PHILIPPINE_CITIES.length,
         avgRating: avgRating,
         withRatings: ratingData?.length || 0
       })
     } catch (err) {
       console.error('Error loading stats:', err)
-    }
-  }
-
-  async function loadCities() {
-    try {
-      const { data } = await supabase
-        .from('nearby_listings')
-        .select('address')
-      
-      if (data) {
-        const cities = new Set()
-        data.forEach(d => {
-          if (d.address) {
-            const parts = d.address.split(',')
-            if (parts.length > 0) {
-              const city = parts[parts.length - 2]?.trim() || parts[parts.length - 1]?.trim()
-              if (city) cities.add(city)
-            }
-          }
-        })
-        setAllCities(Array.from(cities).sort())
-      }
-    } catch (err) {
-      console.error('Error loading cities:', err)
-    }
-  }
-
-  async function loadCategories() {
-    try {
-      const { data } = await supabase
-        .from('nearby_listings')
-        .select('category')
-      
-      if (data) {
-        const categories = new Set(data.map(d => d.category).filter(c => c))
-        setAllCategories(Array.from(categories).sort())
-      }
-    } catch (err) {
-      console.error('Error loading categories:', err)
     }
   }
 
