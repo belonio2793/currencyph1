@@ -175,6 +175,7 @@ export const nearbyUtils = {
       .insert([{
         tripadvisor_id: `pending-${pendingListingId}-${Date.now()}`,
         name: pending.name,
+        slug: generateSlug(pending.name),
         address: pending.address,
         latitude: pending.latitude,
         longitude: pending.longitude,
