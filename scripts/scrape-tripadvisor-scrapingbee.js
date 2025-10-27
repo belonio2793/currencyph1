@@ -27,6 +27,8 @@ const DEFAULT_CITIES = [
 const argv = process.argv.slice(2).join(' ')
 const limitCities = Number((argv.match(/--limitCities=(\d+)/)||[])[1]||0)
 const perCity = Number((argv.match(/--perCity=(\d+)/)||[])[1]||20)
+const customCitiesArg = (argv.match(/--cities=([^\n]+)/)||[])[1]
+const CUSTOM_CITIES = customCitiesArg ? customCitiesArg.split(',').map(s=>s.trim()).filter(Boolean) : null
 
 async function beeFetch(url, opts = {}) {
   async function doFetch(renderJs) {
