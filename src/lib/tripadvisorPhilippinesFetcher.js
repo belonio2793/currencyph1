@@ -39,9 +39,11 @@ export const tripadvisorPhilippinesFetcher = {
       const params = new URLSearchParams()
       params.append('query', `${city} Philippines`)
       params.append('limit', String(Math.min(limit, 30)))
+      params.append('lang', 'en_US')
+      params.append('currency', 'USD')
 
       const response = await fetch(
-        `https://api.tripadvisor.com/api/partner/2.0/search?${params.toString()}`,
+        `https://api.tripadvisor.com/api/partner/2.0/locations/search?${params.toString()}`,
         {
           headers: {
             'X-TripAdvisor-API-Key': TRIPADVISOR_KEY,
