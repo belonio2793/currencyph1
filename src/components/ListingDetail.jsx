@@ -207,6 +207,16 @@ export default function ListingDetail({ slug, onBack }) {
                   {listing.price_range}
                 </span>
               )}
+              {listing.ranking_string && (
+                <span className="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+                  {listing.ranking_string}
+                </span>
+              )}
+              {listing.rank_in_category && (
+                <span className="inline-block px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-sm font-medium">
+                  Rank: {listing.rank_in_category}
+                </span>
+              )}
               {listing.verified && (
                 <span className="inline-block px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
                   ✓ Verified
@@ -220,10 +230,12 @@ export default function ListingDetail({ slug, onBack }) {
         <div className="flex items-center gap-6 mb-6 flex-wrap">
           <div className="flex items-center gap-2">
             {listing.rating && <StarRating value={listing.rating} size="md" />}
-            {listing.rating && (
+            {(listing.rating || (listing.review_count ?? listing.num_reviews)) && (
               <>
-                <span className="text-lg font-semibold text-slate-900">{Number(listing.rating).toFixed(1)}</span>
-                <span className="text-slate-600">({(listing.review_count || 0).toLocaleString()} reviews)</span>
+                {listing.rating && (
+                  <span className="text-lg font-semibold text-slate-900">{Number(listing.rating).toFixed(1)}</span>
+                )}
+                <span className="text-slate-600">({((listing.review_count ?? listing.num_reviews ?? 0)).toLocaleString()} reviews)</span>
               </>
             )}
           </div>
@@ -414,6 +426,37 @@ export default function ListingDetail({ slug, onBack }) {
           </div>
         )}
 
+        {/* Cuisine / Features */}
+        {(listing.cuisine || listing.features) && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">🍽️ Cuisine & Features</h2>
+            <div className="flex flex-wrap gap-2">
+              {(Array.isArray(listing.cuisine) ? listing.cuisine : []).map((c, i) => (
+                <span key={`c-${i}`} className="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-sm font-medium">
+                  {typeof c === 'string' ? c : c.name || c.category || 'Cuisine'}
+                </span>
+              ))}
+              {(Array.isArray(listing.features) ? listing.features : []).map((f, i) => (
+                <span key={`f-${i}`} className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">
+                  {typeof f === 'string' ? f : f.name || f.category || 'Feature'}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Fetch status */}
+        {(listing.fetch_status || listing.fetch_error_message) && (
+          <div className="mb-8 p-4 bg-slate-50 rounded-lg border border-slate-200 text-sm">
+            <div className="text-slate-700">
+              <span className="font-medium">Fetch status:</span> {listing.fetch_status || 'unknown'}
+            </div>
+            {listing.fetch_error_message && (
+              <div className="text-red-600 mt-1 break-all">{listing.fetch_error_message}</div>
+            )}
+          </div>
+        )}
+
         {/* Accessibility */}
         {listing.accessibility_info && Object.keys(listing.accessibility_info).length > 0 && (
           <div className="mb-8 bg-blue-50 p-6 rounded-lg border border-blue-200">
@@ -455,14 +498,22 @@ export default function ListingDetail({ slug, onBack }) {
 
         {/* Contact Information */}
         <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {listing.phone_number && (
+          {(listing.phone_number || listing.phone) && (
             <div className="border border-slate-200 p-4 rounded-lg">
               <h3 className="font-semibold text-slate-900 mb-2">📞 Phone</h3>
               <a
-                href={`tel:${listing.phone_number}`}
+                href={`tel:${listing.phone_number || listing.phone}`}
                 className="text-blue-600 hover:underline"
               >
-                {listing.phone_number}
+                {listing.phone_number || listing.phone}
+              </a>
+            </div>
+          )}
+          {listing.email && (
+            <div className="border border-slate-200 p-4 rounded-lg">
+              <h3 className="font-semibold text-slate-900 mb-2">✉️ Email</h3>
+              <a href={`mailto:${listing.email}`} className="text-blue-600 hover:underline break-all">
+                {listing.email}
               </a>
             </div>
           )}
