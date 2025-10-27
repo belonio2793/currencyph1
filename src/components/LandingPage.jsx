@@ -339,7 +339,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       }
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
-      console.error('Error loading crypto prices:', err)
+      console.debug('Crypto prices API unavailable in LandingPage, using default prices:', err)
       setCryptoRates(defaultCryptoPrices)
     }
   }
