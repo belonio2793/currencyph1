@@ -19,6 +19,7 @@
     "fetch-all-cities-v2": "node scripts/fetch-all-cities-listings-v2.js",
     "scrape-tripadvisor": "node scripts/scrape-tripadvisor-ph.js",
     "fetch-comprehensive": "node scripts/fetch-all-philippines-comprehensive.js",
+    "populate-direct": "node scripts/populate-philippines-direct.js",
     "populate-demo": "node scripts/populate-demo-listings.js",
     "test-api": "node scripts/test-tripadvisor-api.js"
   },
