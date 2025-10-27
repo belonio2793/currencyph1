@@ -117,7 +117,7 @@ export default function ListingCard({
                   ? 'bg-green-600 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-green-100'
               }`}
-              title={isAuthenticatedUser ? 'Like this listing' : 'Log in to vote'}
+              title={isAuthenticated ? 'Like this listing' : 'Log in to vote'}
             >
               👍 {voteCounts.thumbsUp || 0}
             </button>
@@ -128,7 +128,7 @@ export default function ListingCard({
                   ? 'bg-red-600 text-white'
                   : 'bg-slate-100 text-slate-600 hover:bg-red-100'
               }`}
-              title={isAuthenticatedUser ? 'Dislike this listing' : 'Log in to vote'}
+              title={isAuthenticated ? 'Dislike this listing' : 'Log in to vote'}
             >
               👎 {voteCounts.thumbsDown || 0}
             </button>
