@@ -4,7 +4,6 @@ import { searchPlaces } from '../lib/tripadvisorAPI'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { checkAndPopulateManilaListings } from '../lib/populateManillaListings'
 import tripadvisorSync from '../lib/tripadvisorSync'
-import { tripadvisorPhilippinesFetcher } from '../lib/tripadvisorPhilippinesFetcher'
 import StarRating from './StarRating'
 import FeaturedListings from './FeaturedListings'
 
@@ -750,7 +749,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
                                   : 'bg-slate-100 text-slate-600 hover:bg-green-100'
                               }`}
                             >
-                              👍 {counts.thumbsUp}
+                              ��� {counts.thumbsUp}
                             </button>
                             <button
                               onClick={() => handleVote(item.tripadvisor_id, 'nearby', 'down')}
