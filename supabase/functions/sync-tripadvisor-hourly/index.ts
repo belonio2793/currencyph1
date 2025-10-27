@@ -170,9 +170,35 @@ async function fetchTripAdvisorData(
             .join(", ")
         : item.address || item.address_string || "";
 
+      const name = item.name || item.title || "";
+      const locationType = item.type || item.location_type || (item.subcategory || item.category?.name || "Attraction");
+
+      // Generate slug from name
+      const slug = name
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+
+      // Parse hours of operation if available
+      let hoursOfOperation = {};
+      if (item.hours && Array.isArray(item.hours)) {
+        const daysMap = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+        hoursOfOperation = item.hours.reduce(
+          (acc, hour, idx) => {
+            if (daysMap[idx]) {
+              acc[daysMap[idx]] = hour;
+            }
+            return acc;
+          },
+          {}
+        );
+      }
+
       return {
         tripadvisor_id: String(item.location_id || item.id || Math.random()),
-        name: item.name || item.title || "",
+        name: name,
         address: address || null,
         latitude: item.latitude || item.lat || null,
         longitude: item.longitude || item.lon || null,
@@ -180,6 +206,21 @@ async function fetchTripAdvisorData(
         review_count: item.review_count || item.num_reviews || null,
         category: item.subcategory || item.category?.name || null,
         image_url: item.photo?.images?.large?.url || item.image_url || null,
+        web_url: item.web_url || `https://www.tripadvisor.com/Attraction_Review-g298573-d${item.location_id || "0"}`,
+        location_type: locationType,
+        phone_number: item.phone || item.phone_number || null,
+        website: item.website || item.web_url || null,
+        description: item.description || item.about || null,
+        hours_of_operation: hoursOfOperation || {},
+        photo_count: item.photo_count || item.num_photos || null,
+        rank_in_category: item.ranking || item.rank_in_category || null,
+        awards: item.awards || item.award_types || [],
+        price_range: item.price_range || null,
+        duration: item.duration || null,
+        traveler_type: item.traveler_type || null,
+        best_for_type: item.best_for || null,
+        visibility_score: item.visibility_score || null,
+        slug: slug,
         source: "tripadvisor",
         raw: item,
         updated_at: new Date().toISOString(),
