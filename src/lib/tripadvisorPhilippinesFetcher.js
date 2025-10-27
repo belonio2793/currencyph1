@@ -1,4 +1,5 @@
 import { supabase } from './supabaseClient'
+import { generateSlug } from './slugUtils'
 
 const TRIPADVISOR_KEY = import.meta.env.VITE_TRIPADVISOR || process.env.VITE_TRIPADVISOR
 
