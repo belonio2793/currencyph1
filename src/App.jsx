@@ -55,9 +55,16 @@ export default function App() {
       setShowAuth(false)
     }
 
-    // Handle listing detail routes
+    // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
+      setCurrentListingSlug(slug)
+      setActiveTab('listing')
+    }
+
+    // Handle listing detail routes via pathname
+    if (path.startsWith('/nearby/') && path !== '/nearby') {
+      const slug = path.replace('/nearby/', '')
       setCurrentListingSlug(slug)
       setActiveTab('listing')
     }
