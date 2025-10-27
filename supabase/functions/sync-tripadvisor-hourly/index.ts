@@ -192,6 +192,7 @@ async function fetchTripAdvisorData(
 }
 
 async function downloadImage(
+  supabase: any,
   imageUrl: string,
   listingId: string
 ): Promise<string | null> {
@@ -218,7 +219,17 @@ async function downloadImage(
     const ext = urlParts[urlParts.length - 1]?.split("?")[0] || "jpg";
     const fileName = `listings/${listingId}.${ext}`;
 
-    return { buffer, fileName };
+    // Upload to storage
+    const { data, error } = await supabase.storage
+      .from("nearby_listings")
+      .upload(fileName, buffer, { upsert: true });
+
+    if (error) {
+      console.warn(`Error uploading image for ${listingId}:`, error);
+      return null;
+    }
+
+    return fileName;
   } catch (err) {
     console.warn(`Error downloading image for ${listingId}:`, err);
     return null;
