@@ -32,7 +32,7 @@ const CUSTOM_CITIES = customCitiesArg ? customCitiesArg.split(',').map(s=>s.trim
 
 async function beeFetch(url, opts = {}) {
   async function doFetch(renderJs) {
-    const params = new URLSearchParams({ url, render_js: renderJs ? 'true' : 'false', country_code: 'ph' })
+    const params = new URLSearchParams({ url, render_js: renderJs ? 'true' : 'false', country_code: 'ph', wait: '3000', block_resources: 'false' })
     if (opts.params) Object.entries(opts.params).forEach(([k,v])=>params.set(k,String(v)))
     const resp = await fetch(`https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(SCRAPINGBEE_API_KEY)}&${params.toString()}`)
     if (!resp.ok) {
@@ -61,7 +61,12 @@ async function beeFetch(url, opts = {}) {
 function parseSearch(html) {
   const $ = cheerio.load(html)
   const links = new Set()
-  $('a[href^="/Attraction_Review"], a[href^="/Restaurant_Review"], a[href^="/Hotel_Review"]').each((_, a)=>{
+  $('a[href^="/Attraction_Review"], a[href^="/Restaurant_Review"], a[href^="/Hotel_Review"], a[data-test-target="review-score"] ~ a[href*="-d"]').each((_, a)=>{
+    const href = $(a).attr('href')
+    if (href && /-d\d+-/.test(href)) links.add(`https://www.tripadvisor.com.ph${href.split('?')[0]}`)
+  })
+  // More robust: capture anchors in result cards
+  $('[data-testid="results-list"] a[href*="-d"]').each((_, a)=>{
     const href = $(a).attr('href')
     if (href && /-d\d+-/.test(href)) links.add(`https://www.tripadvisor.com.ph${href.split('?')[0]}`)
   })
