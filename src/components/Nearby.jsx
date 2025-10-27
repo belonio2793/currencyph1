@@ -230,6 +230,54 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
+  async function handleFetchComprehensiveListings() {
+    if (!confirm('Fetch ALL listings from TripAdvisor for every Philippine city?\n\nThis will take 10-20 minutes and may use significant API calls.\n\nContinue?')) {
+      return
+    }
+
+    setIsFetching(true)
+    try {
+      const supabaseUrl = import.meta.env.VITE_PROJECT_URL
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
+      if (!supabaseUrl || !anonKey) {
+        throw new Error('Supabase credentials not configured')
+      }
+
+      const functionUrl = `${supabaseUrl}/functions/v1/scrape-nearby-listings-comprehensive`
+
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({ limit: 30 })
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`Edge function error: ${response.status} - ${errorText}`)
+      }
+
+      const result = await response.json()
+
+      alert(`✅ Comprehensive Fetch Complete!\n\nCities Covered: ${result.totalCities}\nCategories: ${result.totalCategories}\nTotal Combinations: ${result.totalCombinations}\n\nTotal Scraped: ${result.totalScraped}\nUnique Listings: ${result.uniqueListings}\nUpserted: ${result.upserted}\n\nSuccess: ${result.successCount}, Errors: ${result.errorCount}`)
+
+      // Refresh stats and listings
+      await loadStats()
+      await loadCities()
+      await loadFeaturedListings()
+      await loadListings()
+      setPage(1)
+    } catch (err) {
+      console.error('Error fetching comprehensive listings:', err)
+      setError(`Failed to fetch: ${err.message}`)
+    } finally {
+      setIsFetching(false)
+    }
+  }
+
   function handleNavigateToListing(slug) {
     if (setCurrentListingSlug) {
       setCurrentListingSlug(slug)
