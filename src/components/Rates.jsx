@@ -164,8 +164,8 @@ export default function Rates({ globalCurrency }) {
         500
       )
 
-      if (!data) {
-        console.warn('Coingecko fetch failed, using defaults scaled by global rate')
+      if (!data || !data.cryptoPrices) {
+        console.warn('Fetch rates endpoint failed, using defaults scaled by global rate')
         const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
         const defaults = {}
         Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
@@ -176,23 +176,24 @@ export default function Rates({ globalCurrency }) {
       }
 
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+      const cryptoData = data.cryptoPrices
 
       const cryptoPricesInGlobalCurrency = {
-        BTC: Math.round(data.bitcoin.usd * globalExchangeRate * 100) / 100,
-        ETH: Math.round(data.ethereum.usd * globalExchangeRate * 100) / 100,
-        LTC: Math.round(data.litecoin.usd * globalExchangeRate * 100) / 100,
-        DOGE: Math.round(data.dogecoin.usd * globalExchangeRate * 100) / 100,
-        XRP: Math.round(data.ripple.usd * globalExchangeRate * 100) / 100,
-        ADA: Math.round(data.cardano.usd * globalExchangeRate * 100) / 100,
-        SOL: Math.round(data.solana.usd * globalExchangeRate * 100) / 100,
-        AVAX: Math.round(data['avalanche-2'].usd * globalExchangeRate * 100) / 100,
-        MATIC: Math.round(data['matic-network'].usd * globalExchangeRate * 100) / 100,
-        DOT: Math.round(data.polkadot.usd * globalExchangeRate * 100) / 100,
-        LINK: Math.round(data.chainlink.usd * globalExchangeRate * 100) / 100,
-        UNI: Math.round(data.uniswap.usd * globalExchangeRate * 100) / 100,
-        AAVE: Math.round(data.aave.usd * globalExchangeRate * 100) / 100,
-        USDC: Math.round(data['usd-coin'].usd * globalExchangeRate * 100) / 100,
-        USDT: Math.round(data.tether.usd * globalExchangeRate * 100) / 100
+        BTC: Math.round((cryptoData.bitcoin?.usd || defaultCryptoPrices.BTC) * globalExchangeRate * 100) / 100,
+        ETH: Math.round((cryptoData.ethereum?.usd || defaultCryptoPrices.ETH) * globalExchangeRate * 100) / 100,
+        LTC: Math.round((cryptoData.litecoin?.usd || defaultCryptoPrices.LTC) * globalExchangeRate * 100) / 100,
+        DOGE: Math.round((cryptoData.dogecoin?.usd || defaultCryptoPrices.DOGE) * globalExchangeRate * 100) / 100,
+        XRP: Math.round((cryptoData.ripple?.usd || defaultCryptoPrices.XRP) * globalExchangeRate * 100) / 100,
+        ADA: Math.round((cryptoData.cardano?.usd || defaultCryptoPrices.ADA) * globalExchangeRate * 100) / 100,
+        SOL: Math.round((cryptoData.solana?.usd || defaultCryptoPrices.SOL) * globalExchangeRate * 100) / 100,
+        AVAX: Math.round((cryptoData['avalanche-2']?.usd || defaultCryptoPrices.AVAX) * globalExchangeRate * 100) / 100,
+        MATIC: Math.round((cryptoData['matic-network']?.usd || defaultCryptoPrices.MATIC) * globalExchangeRate * 100) / 100,
+        DOT: Math.round((cryptoData.polkadot?.usd || defaultCryptoPrices.DOT) * globalExchangeRate * 100) / 100,
+        LINK: Math.round((cryptoData.chainlink?.usd || defaultCryptoPrices.LINK) * globalExchangeRate * 100) / 100,
+        UNI: Math.round((cryptoData.uniswap?.usd || defaultCryptoPrices.UNI) * globalExchangeRate * 100) / 100,
+        AAVE: Math.round((cryptoData.aave?.usd || defaultCryptoPrices.AAVE) * globalExchangeRate * 100) / 100,
+        USDC: Math.round((cryptoData['usd-coin']?.usd || defaultCryptoPrices.USDC) * globalExchangeRate * 100) / 100,
+        USDT: Math.round((cryptoData.tether?.usd || defaultCryptoPrices.USDT) * globalExchangeRate * 100) / 100
       }
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
