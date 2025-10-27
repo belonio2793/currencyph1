@@ -51,8 +51,17 @@ export default function ListingCard({
     }
   }
 
+  const handleCardClick = () => {
+    if (onNavigateToDetail && listing?.slug) {
+      onNavigateToDetail(listing.slug)
+    }
+  }
+
   return (
-    <div className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group">
+    <div
+      className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer group"
+      onClick={handleCardClick}
+    >
       {/* Image */}
       <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '200px' }}>
         {imageLoading && (
