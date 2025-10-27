@@ -134,8 +134,10 @@ function extractImages(location: TripAdvisorLocation): string[] {
   if (location.photos && Array.isArray(location.photos)) {
     for (const photoObj of location.photos) {
       try {
-        const imageUrl = photoObj?.photo?.images?.medium?.url;
-        if (imageUrl) {
+        const imageUrl = photoObj?.photo?.images?.medium?.url || 
+                        photoObj?.photo?.images?.large?.url ||
+                        photoObj?.photo?.images?.original?.url;
+        if (imageUrl && !images.includes(imageUrl)) {
           images.push(imageUrl);
         }
       } catch (e) {
@@ -151,14 +153,15 @@ function parseReviews(location: TripAdvisorLocation): any[] {
   const reviews: any[] = [];
 
   if (location.reviews && Array.isArray(location.reviews)) {
-    for (const review of location.reviews.slice(0, 10)) {
+    for (const review of location.reviews.slice(0, 15)) {
       reviews.push({
         author: review.reviewer?.username || "Anonymous",
         rating: review.rating || location.rating,
         comment: review.text || review.title || "",
-        date: review.review_datetime_utc,
+        date: review.review_datetime_utc || review.published_date,
         verified: !!review.is_traveler_reviewed,
-        helpful_count: review.helpful_votes || 0
+        helpful_count: review.helpful_votes || 0,
+        country: review.reviewer?.country
       });
     }
   }
@@ -235,6 +238,112 @@ function extractAwards(location: TripAdvisorLocation): string[] {
   return awards;
 }
 
+function extractHighlights(location: TripAdvisorLocation, category: string): string[] {
+  const highlights: string[] = [];
+
+  if (location.description) {
+    if (location.description.length > 0) {
+      highlights.push("Detailed description available");
+    }
+  }
+
+  if (location.amenities && location.amenities.length > 0) {
+    highlights.push(`${location.amenities.length} amenities`);
+  }
+
+  if (location.awards && location.awards.length > 0) {
+    highlights.push("Award-winning");
+  }
+
+  if (location.photo_count && location.photo_count > 100) {
+    highlights.push(`${location.photo_count} verified photos`);
+  }
+
+  if (location.review_count || location.num_reviews) {
+    highlights.push("Highly reviewed");
+  }
+
+  const categoryHighlights: Record<string, string[]> = {
+    attractions: ["Cultural significance", "Popular destination", "Well-maintained"],
+    hotels: ["Comfortable accommodation", "Quality service", "Good reviews"],
+    restaurants: ["Local cuisine", "Dining experience", "Recommended"],
+    beaches: ["Scenic views", "Water activities", "Family-friendly"],
+    "things to do": ["Adventure activities", "Tourist attraction", "Memorable experience"]
+  };
+
+  const categorySpecific = categoryHighlights[category];
+  if (categorySpecific) {
+    highlights.push(...categorySpecific.slice(0, 2));
+  }
+
+  return highlights.filter((h, i, a) => a.indexOf(h) === i).slice(0, 10);
+}
+
+async function scrapeWebPageDetails(
+  url: string,
+  listingName: string
+): Promise<Partial<NearbyListing> | null> {
+  try {
+    console.log(`Scraping web page for ${listingName}...`);
+    
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+      }
+    });
+
+    if (!response.ok) {
+      console.warn(`Failed to scrape ${url}: ${response.status}`);
+      return null;
+    }
+
+    const html = await response.text();
+    const enhancements: Partial<NearbyListing> = {};
+
+    const phoneMatch = html.match(/\+63\s?\d{1,3}[\s\-]?\d{3,4}[\s\-]?\d{4}|\(\d{2,3}\)\s?\d{3,4}[\s\-]?\d{4}/);
+    if (phoneMatch && !enhancements.phone_number) {
+      enhancements.phone_number = phoneMatch[0];
+    }
+
+    const hoursMatch = html.match(/(?:hours?|open|closed)[\s:]*([^<]+?(?:am|pm|AM|PM)[^<]*)/gi);
+    if (hoursMatch && Object.keys(enhancements.hours_of_operation || {}).length === 0) {
+      enhancements.hours_of_operation = {
+        note: hoursMatch.slice(0, 3).join(" | ")
+      };
+    }
+
+    const admissionMatch = html.match(/(?:admission|entry|entrance|fee|price)[\s:]*(?:₱|php|peso)?\s*([\d,]+(?:\.\d{2})?[^<]*)/gi);
+    if (admissionMatch && !enhancements.admission_fee) {
+      enhancements.admission_fee = admissionMatch[0].replace(/^[^₱php]+/, "").trim();
+    }
+
+    const websiteMatch = html.match(/(?:href=|visit\s+)?(?:https?:\/\/)?(?:www\.)?([a-zA-Z0-9\-_.]+\.[a-z]{2,})/i);
+    if (websiteMatch && !enhancements.website) {
+      const domain = websiteMatch[1];
+      if (!domain.includes("tripadvisor")) {
+        enhancements.website = `https://${domain}`;
+      }
+    }
+
+    const accessibilityTerms = ["wheelchair", "accessible", "disability", "pet friendly"];
+    const accessibilityMatches = html.toLowerCase().match(new RegExp(accessibilityTerms.join("|"), "g"));
+    if (accessibilityMatches) {
+      enhancements.accessibility_info = {
+        wheelchair_accessible: html.toLowerCase().includes("wheelchair"),
+        pet_friendly: html.toLowerCase().includes("pet friendly") || html.toLowerCase().includes("pets allowed"),
+        elevator: html.toLowerCase().includes("elevator"),
+        accessible_parking: html.toLowerCase().includes("accessible parking"),
+        accessible_restroom: html.toLowerCase().includes("accessible restroom")
+      };
+    }
+
+    return Object.keys(enhancements).length > 0 ? enhancements : null;
+  } catch (err) {
+    console.warn(`Web scraping failed for ${listingName}:`, (err as any).message);
+    return null;
+  }
+}
+
 async function fetchListingDetails(
   locationId: string,
   cityId: string,
@@ -243,15 +352,14 @@ async function fetchListingDetails(
   apiKey: string
 ): Promise<NearbyListing | null> {
   try {
-    // Fetch detailed information for the listing
     const detailsUrl = `https://api.tripadvisor.com/api/private/2.1/locations/${locationId}?key=${apiKey}`;
 
-    console.log(`Fetching details for location ${locationId} (${category} in ${cityName})...`);
+    console.log(`Fetching API details for location ${locationId} (${category} in ${cityName})...`);
 
     const response = await fetch(detailsUrl);
 
     if (!response.ok) {
-      console.warn(`Failed to fetch details for location ${locationId}: ${response.status}`);
+      console.warn(`Failed to fetch API details for location ${locationId}: ${response.status}`);
       return null;
     }
 
@@ -276,7 +384,6 @@ async function fetchListingDetails(
     const primaryImage = images.length > 0 ? images[0] : undefined;
     
     const reviews = parseReviews(location);
-
     const priceLevel = location.price_level ? parseInt(String(location.price_level), 10) : undefined;
     const website = location.website || undefined;
     const phone = location.phone || undefined;
@@ -284,25 +391,23 @@ async function fetchListingDetails(
     const description = location.description || 
       `${name} is a popular ${mapCategoryToType(category).toLowerCase()} destination in ${cityName}, Philippines. ${reviewCount > 0 ? `Rated ${rating}/5 based on ${reviewCount} reviews.` : "Discover this amazing destination."}`;
 
-    const highlights = [
-      "Popular destination",
-      "Well-reviewed",
-      reviewCount > 100 ? "Highly recommended" : "Worth visiting"
-    ];
+    const highlights = extractHighlights(location, category);
 
     const bestFor = [];
-    if (category === "attractions") bestFor.push("Culture", "History");
-    if (category === "hotels") bestFor.push("Comfort", "Convenience");
-    if (category === "restaurants") bestFor.push("Food", "Experience");
-    if (category === "beaches") bestFor.push("Relaxation", "Nature");
-    if (category === "things to do") bestFor.push("Adventure", "Fun");
+    if (category === "attractions") bestFor.push("Culture", "History", "Tourism");
+    if (category === "hotels") bestFor.push("Comfort", "Convenience", "Business");
+    if (category === "restaurants") bestFor.push("Food", "Dining", "Experience");
+    if (category === "beaches") bestFor.push("Relaxation", "Nature", "Swimming");
+    if (category === "things to do") bestFor.push("Adventure", "Fun", "Recreation");
 
     const amenities = extractAmenities(location);
     const awards = extractAwards(location);
     const hours = parseHours(location.hours);
 
     const tripadvisorId = locationId_str;
-    const listing: NearbyListing = {
+    const webUrl = `https://www.tripadvisor.com/Attraction_Review-g${cityId}-d${locationId_str}-Reviews.html`;
+    
+    let listing: NearbyListing = {
       tripadvisor_id: tripadvisorId,
       name: name,
       address: address,
@@ -315,7 +420,7 @@ async function fetchListingDetails(
       source: "tripadvisor_api",
       review_count: reviewCount,
       location_type: mapCategoryToType(category),
-      web_url: `https://www.tripadvisor.com/Attraction_Review-g${cityId}-d${locationId_str}-Reviews.html`,
+      web_url: webUrl,
       slug: generateSlug(name, tripadvisorId),
       verified: true,
       updated_at: new Date().toISOString(),
@@ -343,7 +448,7 @@ async function fetchListingDetails(
         priceLevel === 3 ? "$$$" :
         "$$$$"
         : undefined,
-      duration: category === "attractions" ? "2-4 hours" : undefined,
+      duration: category === "attractions" ? "2-4 hours" : category === "restaurants" ? "1-2 hours" : undefined,
       traveler_type: "Families",
       best_for_type: "Experience",
       best_for: bestFor.length > 0 ? bestFor : ["Visit"],
@@ -366,11 +471,23 @@ async function fetchListingDetails(
       raw: {
         city: cityName,
         category: category,
-        source: "tripadvisor_api",
+        source: "tripadvisor_api_enhanced",
         scraped_at: new Date().toISOString(),
         raw_location: location
       }
     };
+
+    await sleep(200);
+
+    const webEnhancements = await scrapeWebPageDetails(webUrl, name);
+    if (webEnhancements) {
+      listing = {
+        ...listing,
+        ...webEnhancements,
+        source: "tripadvisor_api_enhanced"
+      };
+      console.log(`✓ Enhanced with web data: ${name}`);
+    }
 
     return listing;
   } catch (err) {
@@ -388,7 +505,6 @@ async function fetchLocationsFromTripAdvisor(
   const listings: NearbyListing[] = [];
 
   try {
-    // First, get the list of locations in this category
     const searchUrl = `https://api.tripadvisor.com/api/private/2.1/locations?location_id=${cityId}&category=${category}&key=${apiKey}`;
 
     console.log(`Searching for ${category} in ${cityName}...`);
@@ -407,12 +523,10 @@ async function fetchLocationsFromTripAdvisor(
       return listings;
     }
 
-    // Fetch details for each location
     for (const locationSummary of searchData.data) {
       const locationId = String(locationSummary.location_id || "");
       if (!locationId) continue;
 
-      // Fetch complete details for this location
       const detailedListing = await fetchListingDetails(
         locationId,
         cityId,
@@ -423,15 +537,14 @@ async function fetchLocationsFromTripAdvisor(
 
       if (detailedListing) {
         listings.push(detailedListing);
-        console.log(`✓ Fetched details: ${detailedListing.name}`);
+        console.log(`✓ Fetched and enhanced: ${detailedListing.name}`);
       }
 
-      // Rate limiting - be respectful to the API
-      await sleep(100);
+      await sleep(150);
     }
 
     if (listings.length > 0) {
-      console.log(`✓ Fetched ${listings.length} complete ${category} listings from ${cityName}`);
+      console.log(`✓ Fetched ${listings.length} complete ${category} listings from ${cityName}\n`);
     }
 
     return listings;
@@ -490,9 +603,10 @@ async function performAdvancedScrape(supabase: any) {
     };
   }
 
-  console.log(`\n========== Starting TripAdvisor API Scrape ==========`);
+  console.log(`\n========== Starting Enhanced TripAdvisor Scrape ==========`);
+  console.log(`Method: API + Web Scraping (Hybrid)`);
   console.log(`Fetching ${PHILIPPINES_CITIES.length} cities × ${CATEGORIES.length} categories`);
-  console.log(`Each location will be fetched with complete details\n`);
+  console.log(`Each location will fetch: Full API data + Web page enrichment\n`);
 
   for (const city of PHILIPPINES_CITIES) {
     for (const category of CATEGORIES) {
@@ -508,11 +622,10 @@ async function performAdvancedScrape(supabase: any) {
           allListings.push(...listings);
           totalScraped += listings.length;
           successCount++;
-          console.log(`✓ Completed ${category} in ${city.name}: ${listings.length} listings\n`);
+          console.log(`✓ Completed ${category} in ${city.name}: ${listings.length} enhanced listings\n`);
         }
 
-        // Rate limiting between category fetches
-        await sleep(500);
+        await sleep(800);
       } catch (err) {
         errorCount++;
         console.warn(`✗ Error fetching ${category} in ${city.name}:`, (err as any).message);
@@ -527,15 +640,16 @@ async function performAdvancedScrape(supabase: any) {
 
   const uniqueListings = Array.from(uniqueMap.values());
 
-  console.log(`\n========== TripAdvisor API Scrape Results ==========`);
+  console.log(`\n========== Enhanced Scrape Results ==========`);
   console.log(`Total fetched: ${totalScraped}`);
   console.log(`Unique listings: ${uniqueListings.length}`);
   console.log(`Categories processed: ${successCount}`);
-  console.log(`Errors: ${errorCount}\n`);
+  console.log(`Errors: ${errorCount}`);
+  console.log(`Data sources: TripAdvisor API + Web Page Scraping\n`);
 
   let upsertedCount = 0;
   if (uniqueListings.length > 0) {
-    console.log(`Upserting ${uniqueListings.length} listings to database...`);
+    console.log(`Upserting ${uniqueListings.length} enhanced listings to database...`);
     upsertedCount = await upsertListings(supabase, uniqueListings);
     console.log(`✓ Successfully upserted: ${upsertedCount}\n`);
   }
@@ -547,7 +661,8 @@ async function performAdvancedScrape(supabase: any) {
     upserted: upsertedCount,
     successCount,
     errorCount,
-    message: `TripAdvisor API scraping completed: fetched ${upsertedCount} complete listings with all details`,
+    message: `Enhanced scraping completed: fetched ${upsertedCount} listings with complete API + web data (amenities, hours, phone, admission fees, accessibility, etc.)`,
+    dataSource: "tripadvisor_api_enhanced",
     timestamp: new Date().toISOString(),
   };
 }
