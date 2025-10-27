@@ -259,8 +259,8 @@ export default function ListingDetail({ slug, onBack }) {
               <div
                 key={related.tripadvisor_id}
                 onClick={() => {
-                  setActiveTab('nearby')
-                  window.location.hash = `#listing/${related.slug}`
+                  window.history.pushState(null, '', `/nearby/${related.slug}`)
+                  window.location.reload()
                 }}
                 className="bg-white border rounded-lg overflow-hidden hover:shadow-lg cursor-pointer transition-all"
               >
