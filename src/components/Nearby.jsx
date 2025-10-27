@@ -176,10 +176,10 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   }
 
   useEffect(() => {
-    if (selectedCategory || selectedCity || page > 1) {
+    if (selectedCity || page > 1) {
       loadListings()
     }
-  }, [selectedCategory, selectedCity, page])
+  }, [selectedCity, page])
 
   const displayListings = searchResults.length > 0 ? searchResults : listings
 
