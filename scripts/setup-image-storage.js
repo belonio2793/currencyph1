@@ -23,11 +23,11 @@ async function setupStorage() {
       return;
     }
 
-    const bucketExists = buckets?.some(b => b.name === 'listing-images');
+    const bucketExists = buckets?.some(b => b.name === 'nearby_listings');
 
     if (!bucketExists) {
-      console.log('Creating listing-images bucket...');
-      const { data, error } = await supabase.storage.createBucket('listing-images', {
+      console.log('Creating nearby_listings bucket...');
+      const { data, error } = await supabase.storage.createBucket('nearby_listings', {
         public: true,
         allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
       });
@@ -45,7 +45,7 @@ async function setupStorage() {
     // Set up public access policy
     console.log('Setting up public access policy...');
     const { error: policyError } = await supabase.storage
-      .from('listing-images')
+      .from('nearby_listings')
       .createSignedUrl('test.txt', 60);
 
     if (policyError?.message?.includes('not found')) {
@@ -54,9 +54,9 @@ async function setupStorage() {
     }
 
     console.log('\n✅ Storage setup complete!');
-    console.log('Bucket: listing-images');
+    console.log('Bucket: nearby_listings');
     console.log('Access: Public (anyone can view)');
-    console.log('Usage: supabase.storage.from("listing-images").getPublicUrl(path)');
+    console.log('Usage: supabase.storage.from("nearby_listings").getPublicUrl(path)');
   } catch (err) {
     console.error('Setup failed:', err);
     process.exit(1);
