@@ -754,22 +754,37 @@ async function upsertListings(supabase: any, listings: NearbyListing[]): Promise
 
   for (let i = 0; i < listings.length; i += chunkSize) {
     const chunk = listings.slice(i, i + chunkSize);
+    const chunkNum = Math.floor(i / chunkSize) + 1;
 
     try {
-      const response = await supabase
-        .from("nearby_listings")
-        .upsert(chunk, { onConflict: "tripadvisor_id" });
+      let response: any;
+      try {
+        response = await supabase
+          .from("nearby_listings")
+          .upsert(chunk, { onConflict: "tripadvisor_id" });
+      } catch (fetchErr) {
+        const msg = fetchErr && typeof fetchErr === 'object' && 'message' in fetchErr ? (fetchErr as any).message : String(fetchErr);
+        console.error(`Supabase call error for chunk ${chunkNum}:`, msg);
+        continue;
+      }
 
-      const error = response?.error;
-      if (error) {
-        const errorMsg = typeof error === 'string' ? error : error.message || JSON.stringify(error);
-        console.error(`Error upserting chunk ${Math.floor(i / chunkSize) + 1}:`, errorMsg);
+      if (!response) {
+        console.warn(`No response from Supabase for chunk ${chunkNum}`);
+        continue;
+      }
+
+      if (response.error) {
+        const errorMsg = typeof response.error === 'string' ? response.error :
+                        (response.error && typeof response.error === 'object' && 'message' in response.error) ? response.error.message :
+                        JSON.stringify(response.error);
+        console.error(`Error upserting chunk ${chunkNum}:`, errorMsg);
       } else {
         upsertedCount += chunk.length;
-        console.log(`✓ Upserted chunk ${Math.floor(i / chunkSize) + 1}: ${chunk.length} listings`);
+        console.log(`✓ Upserted chunk ${chunkNum}: ${chunk.length} listings`);
       }
     } catch (err) {
-      console.error(`Exception upserting chunk ${Math.floor(i / chunkSize) + 1}:`, (err as any).message);
+      const msg = err && typeof err === 'object' && 'message' in err ? (err as any).message : String(err);
+      console.error(`Exception upserting chunk ${chunkNum}:`, msg);
     }
 
     await sleep(200);
@@ -779,91 +794,110 @@ async function upsertListings(supabase: any, listings: NearbyListing[]): Promise
 }
 
 async function performAdvancedScrape(supabase: any) {
-  const allListings: NearbyListing[] = [];
-  let totalScraped = 0;
-  let successCount = 0;
-  let errorCount = 0;
+  try {
+    const allListings: NearbyListing[] = [];
+    let totalScraped = 0;
+    let successCount = 0;
+    let errorCount = 0;
 
-  const apiKey = Deno.env.get("TRIPADVISOR") || Deno.env.get("TRIPADVISOR_API_KEY");
+    const apiKey = Deno.env.get("TRIPADVISOR") || Deno.env.get("TRIPADVISOR_API_KEY");
 
-  if (!apiKey) {
-    console.error("TRIPADVISOR or TRIPADVISOR_API_KEY environment variable not set");
+    if (!apiKey) {
+      console.error("TRIPADVISOR or TRIPADVISOR_API_KEY environment variable not set");
+      return {
+        success: false,
+        error: "TRIPADVISOR API key not configured",
+        totalScraped: 0,
+        uniqueListings: 0,
+        upserted: 0,
+        successCount: 0,
+        errorCount: PHILIPPINES_CITIES.length * CATEGORIES.length,
+        message: "Failed: Missing TripAdvisor API key",
+        timestamp: new Date().toISOString(),
+      };
+    }
+
+    console.log(`\n========== Starting FULL PAGE TripAdvisor Scrape ==========`);
+    console.log(`Method: TripAdvisor API + Complete Page Download & Parse`);
+    console.log(`Fetching ${PHILIPPINES_CITIES.length} cities × ${CATEGORIES.length} categories`);
+    console.log(`Each listing: Full API data + Complete HTML page download + Comprehensive parsing\n`);
+    console.log(`Data extracted: amenities, hours, phone, admission fees, website, accessibility, photos, reviews, nearby attractions, awards\n`);
+
+    for (const city of PHILIPPINES_CITIES) {
+      for (const category of CATEGORIES) {
+        try {
+          const listings = await fetchLocationsFromTripAdvisor(
+            city.id,
+            city.name,
+            category,
+            apiKey
+          );
+
+          if (listings && listings.length > 0) {
+            allListings.push(...listings);
+            totalScraped += listings.length;
+            successCount++;
+          }
+
+          await sleep(1000);
+        } catch (err) {
+          errorCount++;
+          const msg = err && typeof err === 'object' && 'message' in err ? (err as any).message : String(err);
+          console.warn(`✗ Error fetching ${category} in ${city.name}:`, msg);
+        }
+      }
+    }
+
+    const uniqueMap = new Map();
+    for (const listing of allListings) {
+      if (listing && listing.tripadvisor_id) {
+        uniqueMap.set(listing.tripadvisor_id, listing);
+      }
+    }
+
+    const uniqueListings = Array.from(uniqueMap.values());
+
+    console.log(`\n========== Full Page Scrape Results ==========`);
+    console.log(`Total fetched: ${totalScraped}`);
+    console.log(`Unique listings: ${uniqueListings.length}`);
+    console.log(`Categories processed: ${successCount}`);
+    console.log(`Errors: ${errorCount}`);
+    console.log(`Data sources: TripAdvisor API + Full Page HTML Downloads\n`);
+
+    let upsertedCount = 0;
+    if (uniqueListings.length > 0) {
+      console.log(`Upserting ${uniqueListings.length} fully enhanced listings to database...`);
+      upsertedCount = await upsertListings(supabase, uniqueListings);
+      console.log(`✓ Successfully upserted: ${upsertedCount}\n`);
+    }
+
+    return {
+      success: true,
+      totalScraped,
+      uniqueListings: uniqueListings.length,
+      upserted: upsertedCount,
+      successCount,
+      errorCount,
+      message: `Full page scraping completed: ${upsertedCount} listings with comprehensive data (amenities, hours, phone, admission, website, accessibility, photos, reviews, nearby attractions, awards)`,
+      dataSource: "tripadvisor_api_enhanced_fullpage",
+      scrapeMethod: "Hybrid: API + HTML Page Download + Parsing",
+      timestamp: new Date().toISOString(),
+    };
+  } catch (mainErr) {
+    const msg = mainErr && typeof mainErr === 'object' && 'message' in mainErr ? (mainErr as any).message : String(mainErr);
+    console.error("Error in performAdvancedScrape:", msg);
     return {
       success: false,
-      error: "TRIPADVISOR API key not configured",
+      error: msg,
       totalScraped: 0,
       uniqueListings: 0,
       upserted: 0,
       successCount: 0,
-      errorCount: PHILIPPINES_CITIES.length * CATEGORIES.length,
-      message: "Failed: Missing TripAdvisor API key",
+      errorCount: 1,
+      message: `Scrape failed: ${msg}`,
       timestamp: new Date().toISOString(),
     };
   }
-
-  console.log(`\n========== Starting FULL PAGE TripAdvisor Scrape ==========`);
-  console.log(`Method: TripAdvisor API + Complete Page Download & Parse`);
-  console.log(`Fetching ${PHILIPPINES_CITIES.length} cities × ${CATEGORIES.length} categories`);
-  console.log(`Each listing: Full API data + Complete HTML page download + Comprehensive parsing\n`);
-  console.log(`Data extracted: amenities, hours, phone, admission fees, website, accessibility, photos, reviews, nearby attractions, awards\n`);
-
-  for (const city of PHILIPPINES_CITIES) {
-    for (const category of CATEGORIES) {
-      try {
-        const listings = await fetchLocationsFromTripAdvisor(
-          city.id,
-          city.name,
-          category,
-          apiKey
-        );
-
-        if (listings.length > 0) {
-          allListings.push(...listings);
-          totalScraped += listings.length;
-          successCount++;
-        }
-
-        await sleep(1000);
-      } catch (err) {
-        errorCount++;
-        console.warn(`✗ Error fetching ${category} in ${city.name}:`, (err as any).message);
-      }
-    }
-  }
-
-  const uniqueMap = new Map();
-  for (const listing of allListings) {
-    uniqueMap.set(listing.tripadvisor_id, listing);
-  }
-
-  const uniqueListings = Array.from(uniqueMap.values());
-
-  console.log(`\n========== Full Page Scrape Results ==========`);
-  console.log(`Total fetched: ${totalScraped}`);
-  console.log(`Unique listings: ${uniqueListings.length}`);
-  console.log(`Categories processed: ${successCount}`);
-  console.log(`Errors: ${errorCount}`);
-  console.log(`Data sources: TripAdvisor API + Full Page HTML Downloads\n`);
-
-  let upsertedCount = 0;
-  if (uniqueListings.length > 0) {
-    console.log(`Upserting ${uniqueListings.length} fully enhanced listings to database...`);
-    upsertedCount = await upsertListings(supabase, uniqueListings);
-    console.log(`✓ Successfully upserted: ${upsertedCount}\n`);
-  }
-
-  return {
-    success: true,
-    totalScraped,
-    uniqueListings: uniqueListings.length,
-    upserted: upsertedCount,
-    successCount,
-    errorCount,
-    message: `Full page scraping completed: ${upsertedCount} listings with comprehensive data (amenities, hours, phone, admission, website, accessibility, photos, reviews, nearby attractions, awards)`,
-    dataSource: "tripadvisor_api_enhanced_fullpage",
-    scrapeMethod: "Hybrid: API + HTML Page Download + Parsing",
-    timestamp: new Date().toISOString(),
-  };
 }
 
 Deno.serve(async (req) => {
