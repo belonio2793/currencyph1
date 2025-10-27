@@ -3,8 +3,9 @@ import { MANILA_LISTINGS } from '../data/manila-listings'
 import ListingCard from './ListingCard'
 
 export default function FeaturedListings() {
-  const handleViewListing = (slug) => {
-    window.location.hash = `#/listing/${slug}`
+  const handleNavigateToListing = (slug) => {
+    window.history.pushState(null, '', `/nearby/${slug}`)
+    window.location.reload()
   }
 
   // Show only the top 6 featured listings
@@ -22,7 +23,7 @@ export default function FeaturedListings() {
           <ListingCard
             key={listing.id}
             listing={listing}
-            onViewDetails={handleViewListing}
+            onNavigateToDetail={handleNavigateToListing}
           />
         ))}
       </div>
@@ -30,7 +31,7 @@ export default function FeaturedListings() {
       {/* View All Button */}
       <div className="mt-10 text-center">
         <button
-          onClick={() => window.location.hash = '#/listing/intramuros-manila'}
+          onClick={() => handleNavigateToListing('intramuros-manila')}
           className="inline-block px-8 py-3 border-2 border-blue-600 text-blue-600 rounded-lg font-bold hover:bg-blue-50 transition-colors text-lg"
         >
           Browse All Manila Attractions
