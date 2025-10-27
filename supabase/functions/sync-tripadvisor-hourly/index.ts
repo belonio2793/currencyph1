@@ -196,8 +196,14 @@ async function fetchTripAdvisorData(
         );
       }
 
+      const tripadvisorId = String(item.location_id || item.id || Math.random());
+      // Append a small part of the tripadvisor_id to the slug for uniqueness
+      // This handles cases where multiple locations have the same name
+      const idSuffix = tripadvisorId.slice(-6).toLowerCase();
+      const uniqueSlug = slug ? `${slug}-${idSuffix}` : `listing-${idSuffix}`;
+
       return {
-        tripadvisor_id: String(item.location_id || item.id || Math.random()),
+        tripadvisor_id: tripadvisorId,
         name: name,
         address: address || null,
         latitude: item.latitude || item.lat || null,
@@ -220,7 +226,7 @@ async function fetchTripAdvisorData(
         traveler_type: item.traveler_type || null,
         best_for_type: item.best_for || null,
         visibility_score: item.visibility_score || null,
-        slug: slug,
+        slug: uniqueSlug,
         source: "tripadvisor",
         raw: item,
         updated_at: new Date().toISOString(),
