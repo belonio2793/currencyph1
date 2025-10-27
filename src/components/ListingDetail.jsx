@@ -511,7 +511,7 @@ export default function ListingDetail({ slug, onBack }) {
           )}
           {listing.email && (
             <div className="border border-slate-200 p-4 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">✉️ Email</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">✉�� Email</h3>
               <a href={`mailto:${listing.email}`} className="text-blue-600 hover:underline break-all">
                 {listing.email}
               </a>
@@ -613,6 +613,42 @@ export default function ListingDetail({ slug, onBack }) {
             <p>Last updated: {new Date(listing.updated_at).toLocaleDateString()} at {new Date(listing.updated_at).toLocaleTimeString()}</p>
           </div>
         )}
+      </div>
+
+      {/* All Fields (dynamic) */}
+      <div className="mt-12 pt-8 border-t">
+        <h2 className="text-2xl font-bold text-slate-900 mb-4">All Fields</h2>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200 bg-white border rounded-lg">
+            <tbody className="divide-y divide-slate-100">
+              {Object.entries(listing)
+                .filter(([k]) => !['raw'].includes(k))
+                .map(([key, value]) => (
+                  <tr key={key} className="align-top">
+                    <td className="px-4 py-2 text-xs font-semibold text-slate-600 whitespace-nowrap">{key}</td>
+                    <td className="px-4 py-2 text-sm text-slate-800 break-words">
+                      {Array.isArray(value)
+                        ? (value.length === 0 ? '—' : (
+                            <div className="flex flex-wrap gap-1">
+                              {value.slice(0, 20).map((v, i) => (
+                                <span key={i} className="px-2 py-0.5 bg-slate-100 rounded text-xs">
+                                  {typeof v === 'string' ? v : JSON.stringify(v).slice(0, 120)}
+                                </span>
+                              ))}
+                              {value.length > 20 && (
+                                <span className="px-2 py-0.5 bg-slate-50 rounded text-xs text-slate-500">+{value.length - 20} more</span>
+                              )}
+                            </div>
+                          ))
+                        : (typeof value === 'object' && value !== null)
+                        ? <pre className="text-xs text-slate-700 bg-slate-50 rounded p-2 overflow-x-auto">{JSON.stringify(value, null, 2)}</pre>
+                        : (value ?? '—')}
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Related Listings */}
