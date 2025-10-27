@@ -10,6 +10,13 @@ interface NearbyListing {
   category?: string;
   source: string;
   image_url?: string;
+  image_urls?: string[];
+  primary_image_url?: string;
+  featured_image_url?: string;
+  stored_image_path?: string | null;
+  image_downloaded_at?: string | null;
+  photo_urls?: string[];
+  photo_count?: number;
   web_url?: string;
   review_count?: number;
   location_type?: string;
@@ -17,21 +24,32 @@ interface NearbyListing {
   website?: string;
   description?: string;
   hours_of_operation?: Record<string, any>;
-  photo_count?: number;
-  ranking_in_city?: number | null;
+  rank_in_category?: string | null;
+  ranking_in_city?: string | null;
+  ranking_in_category?: number | null;
   awards?: any[];
   price_level?: number | null;
+  price_range?: string | null;
+  duration?: string | null;
+  traveler_type?: string | null;
+  best_for_type?: string | null;
+  best_for?: string[];
+  visibility_score?: number | null;
   slug: string;
   raw?: Record<string, any>;
   verified?: boolean;
+  last_verified_at?: string | null;
   updated_at: string;
   highlights?: string[];
-  amenities?: string[];
+  amenities?: any[];
   accessibility_info?: Record<string, any>;
   nearby_attractions?: string[];
-  price_range?: string | null;
+  admission_fee?: string | null;
+  review_details?: any[];
   fetch_status?: string;
   fetch_error_message?: string | null;
+  lat?: number;
+  lng?: number;
 }
 
 const PHILIPPINES_CITIES = [
