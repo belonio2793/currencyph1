@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { populateManilaListings } from '../lib/populateManillaListings'
 import { populateTripadvisorListings } from '../lib/populateTripadvisorListings'
+import { tripadvisorPhilippinesFetcher } from '../lib/tripadvisorPhilippinesFetcher'
 
 export default function AdminPopulate() {
   const [loading, setLoading] = useState(false)
