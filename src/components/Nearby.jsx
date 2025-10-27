@@ -295,12 +295,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             <button
               key={letter}
               onClick={() => {
-                setExpandedLetters(prev => ({
-                  ...prev,
-                  [letter]: !prev[letter]
-                }))
+                setExpandedLetter(expandedLetter === letter ? null : letter)
               }}
-              className="px-3 py-2 rounded-lg text-sm font-bold transition-colors bg-slate-100 text-slate-700 hover:bg-slate-200"
+              className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
+                expandedLetter === letter
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
             >
               {letter}
             </button>
