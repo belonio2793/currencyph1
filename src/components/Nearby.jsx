@@ -247,24 +247,55 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const displayListings = searchResults.length > 0 ? searchResults : listings
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10">
-      {/* Featured Listings Section */}
-      {featuredListings.length > 0 && (
-        <div className="mb-10">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-2">⭐ Featured</h2>
-          <p className="text-sm text-slate-500 mb-4">Top-rated listings from our database</p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {featuredListings.map(listing => (
-              <ListingCard
-                key={listing.tripadvisor_id}
-                listing={listing}
-                onNavigateToDetail={handleNavigateToListing}
-                hideImage={true}
-              />
-            ))}
-          </div>
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-4xl font-bold mb-2">Explore Philippines</h1>
+          <p className="text-blue-100 text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
+
+          {/* Stats */}
+          {listingStats && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                <div className="text-3xl font-bold text-white">{listingStats.total.toLocaleString()}</div>
+                <div className="text-blue-100 text-sm">Total Listings</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                <div className="text-3xl font-bold text-white">{listingStats.cities}</div>
+                <div className="text-blue-100 text-sm">Philippine Cities</div>
+              </div>
+              <div className="bg-white/10 backdrop-blur rounded-lg p-4">
+                <div className="text-3xl font-bold text-white">⭐ {listingStats.avgRating}</div>
+                <div className="text-blue-100 text-sm">Avg Rating</div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-6 py-10">
+        {/* Featured Listings Section */}
+        {featuredListings.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-2">
+              <h2 className="text-3xl font-bold text-slate-900">⭐ Featured</h2>
+              <span className="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full">Top Rated</span>
+            </div>
+            <p className="text-slate-600 mb-6">The highest-rated listings across the Philippines</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredListings.map(listing => (
+                <ListingCard
+                  key={listing.tripadvisor_id}
+                  listing={listing}
+                  onNavigateToDetail={handleNavigateToListing}
+                  hideImage={false}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
       {/* Search Section */}
       <div className="mb-8">
@@ -379,7 +410,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       {/* Listings Grid */}
       {displayListings.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {displayListings.map(listing => (
             <ListingCard
               key={listing.tripadvisor_id}
@@ -414,6 +445,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           </button>
         </div>
       )}
+      </div>
     </div>
   )
 }
