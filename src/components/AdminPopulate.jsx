@@ -279,12 +279,20 @@ export default function AdminPopulate() {
         )}
 
         {result && (
-          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded text-sm text-green-700">
-            <p className="font-semibold mb-2">✓ Success!</p>
-            {result.totalFetched !== undefined && <p>Total fetched: {result.totalFetched}</p>}
-            {result.uniqueSaved !== undefined && <p>Unique saved: {result.uniqueSaved}</p>}
-            {result.inserted !== undefined && <p>Inserted: {result.inserted}</p>}
-            <p className="mt-2">{result.message}</p>
+          <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded text-sm text-green-700">
+            <p className="font-semibold mb-3">✓ Success!</p>
+            <div className="space-y-1">
+              {result.totalFetched !== undefined && <p>📊 Total fetched: {result.totalFetched}</p>}
+              {result.uniqueSaved !== undefined && <p>📝 Unique saved: {result.uniqueSaved}</p>}
+              {result.inserted !== undefined && <p>✅ Inserted: {result.inserted}</p>}
+              {result.total !== undefined && <p>📝 Total collected: {result.total}</p>}
+              {result.successCount !== undefined && <p>✓ Cities succeeded: {result.successCount}</p>}
+              {result.errorCount !== undefined && <p>⚠️ Cities failed: {result.errorCount}</p>}
+              {result.beforeCount !== undefined && <p>📈 Before: {result.beforeCount} listings</p>}
+              {result.afterCount !== undefined && <p>📈 After: {result.afterCount} listings</p>}
+              {result.newListings !== undefined && <p className="font-semibold text-green-900">🎉 Added: {result.newListings} new listings</p>}
+            </div>
+            <p className="mt-3">{result.message}</p>
           </div>
         )}
       </div>
