@@ -574,7 +574,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, set
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
       {/* Featured Manila Attractions Section */}
-      <FeaturedListings />
+      <FeaturedListings onNavigateToListing={handleNavigateToListing} />
 
       {/* Stats Section */}
       {listingStats && (
