@@ -186,7 +186,7 @@ const POPULAR_CITIES = [
   'Port Barton (tourist)'
 ]
 
-export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
+export default function Nearby({ userId, setActiveTab, setCurrentBusinessId, setCurrentListingSlug }) {
   const [selectedCity, setSelectedCity] = useState(null)
   const [cityListings, setCityListings] = useState([])
   const [cityPage, setCityPage] = useState(1)
