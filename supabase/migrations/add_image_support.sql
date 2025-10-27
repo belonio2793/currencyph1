@@ -101,19 +101,19 @@ RETURNS TABLE (
 ) AS $$
 BEGIN
   RETURN QUERY
-  SELECT 
+  SELECT
     nl.id,
-    nl.tripadvisor_id,
-    nl.name,
-    nl.address,
-    nl.latitude,
-    nl.longitude,
-    nl.rating,
-    nl.category,
-    nl.stored_image_path,
+    nl.tripadvisor_id::TEXT,
+    nl.name::TEXT,
+    nl.address::TEXT,
+    nl.latitude::FLOAT8,
+    nl.longitude::FLOAT8,
+    nl.rating::FLOAT8,
+    nl.category::TEXT,
+    nl.stored_image_path::TEXT,
     haversine_distance(lat_input, lon_input, nl.latitude, nl.longitude)::FLOAT8
   FROM nearby_listings nl
-  WHERE nl.latitude IS NOT NULL 
+  WHERE nl.latitude IS NOT NULL
     AND nl.longitude IS NOT NULL
     AND haversine_distance(lat_input, lon_input, nl.latitude, nl.longitude) <= distance_km
   ORDER BY haversine_distance(lat_input, lon_input, nl.latitude, nl.longitude)
