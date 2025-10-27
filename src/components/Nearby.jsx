@@ -223,32 +223,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
-      {/* Stats Section */}
-      {listingStats && (
-        <div className="mb-8 grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
-            <div className="text-2xl font-bold text-blue-900">{listingStats.total}</div>
-            <div className="text-sm text-blue-700">Total Listings</div>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
-            <div className="text-2xl font-bold text-green-900">{listingStats.cities}</div>
-            <div className="text-sm text-green-700">Cities</div>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
-            <div className="text-2xl font-bold text-purple-900">{listingStats.categories}</div>
-            <div className="text-sm text-purple-700">Categories</div>
-          </div>
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-4 border border-amber-200">
-            <div className="text-2xl font-bold text-amber-900">{listingStats.avgRating}</div>
-            <div className="text-sm text-amber-700">Avg Rating</div>
-          </div>
-          <div className="bg-gradient-to-br from-pink-50 to-pink-100 rounded-lg p-4 border border-pink-200">
-            <div className="text-2xl font-bold text-pink-900">{listingStats.withRatings}</div>
-            <div className="text-sm text-pink-700">Rated</div>
-          </div>
-        </div>
-      )}
-
       {/* Search Section */}
       <div className="mb-8">
         <form onSubmit={handleSearch} className="flex gap-2 mb-6">
