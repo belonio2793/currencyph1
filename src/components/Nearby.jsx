@@ -20,6 +20,21 @@ const PHILIPPINE_CITIES = [
   'Toledo', 'Trece Martires', 'Tuguegarao', 'Urdaneta', 'Valenzuela', 'Victorias', 'Vigan', 'Virac', 'Zamboanga City'
 ]
 
+function groupCitiesByLetter(cities) {
+  const grouped = {}
+  cities.forEach(city => {
+    const letter = city.charAt(0).toUpperCase()
+    if (!grouped[letter]) {
+      grouped[letter] = []
+    }
+    grouped[letter].push(city)
+  })
+  return Object.keys(grouped).sort().reduce((acc, letter) => {
+    acc[letter] = grouped[letter]
+    return acc
+  }, {})
+}
+
 export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) {
   const [selectedCity, setSelectedCity] = useState(null)
   const [listings, setListings] = useState([])
