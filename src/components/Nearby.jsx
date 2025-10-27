@@ -230,6 +230,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                 key={listing.tripadvisor_id}
                 listing={listing}
                 onNavigateToDetail={handleNavigateToListing}
+                hideImage={true}
               />
             ))}
           </div>
