@@ -203,7 +203,7 @@ export default function Rates({ globalCurrency }) {
       }
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
-      console.error('Error loading crypto prices:', err)
+      console.debug('Crypto prices API unavailable, using default prices:', err)
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
       const defaults = {}
       Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
