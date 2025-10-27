@@ -47,6 +47,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [listingStats, setListingStats] = useState(null)
   const [isFetching, setIsFetching] = useState(false)
   const [page, setPage] = useState(1)
+  const [expandedLetters, setExpandedLetters] = useState({})
   const itemsPerPage = 12
 
   useEffect(() => {
