@@ -246,6 +246,23 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
   const displayListings = searchResults.length > 0 ? searchResults : listings
 
+  // CSS for fade-in animation
+  const style = document.createElement('style')
+  if (!document.querySelector('style[data-fadeIn]')) {
+    const styleEl = document.createElement('style')
+    styleEl.setAttribute('data-fadeIn', 'true')
+    styleEl.textContent = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out;
+      }
+    `
+    document.head.appendChild(styleEl)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Header Section */}
@@ -333,44 +350,66 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         )}
       </div>
 
-      {/* Browse by City Section */}
-      <div className="mb-8">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Browse by City</h3>
-        <button
-          onClick={() => {
-            setSelectedCity(null)
-            setPage(1)
-          }}
-          className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors mb-4 ${
-            selectedCity === null
-              ? 'bg-blue-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-          }`}
-        >
-          All Cities
-        </button>
+      {/* Browse by City Section - Enhanced Alphabet Selector */}
+      <div className="mb-12">
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold text-slate-900 mb-2">📍 Browse by City</h3>
+          <p className="text-slate-600 mb-6">Select a letter to see all cities starting with that letter</p>
 
-        <div className="flex gap-2 flex-wrap">
-          {Object.keys(citiesByLetter).map(letter => (
-            <button
-              key={letter}
-              onClick={() => {
-                setExpandedLetter(expandedLetter === letter ? null : letter)
-              }}
-              className={`px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
-                expandedLetter === letter
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              {letter}
-            </button>
-          ))}
+          {/* Prominent A-Z Alphabet Selector */}
+          <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {/* All Button */}
+              <button
+                onClick={() => {
+                  setSelectedCity(null)
+                  setExpandedLetter(null)
+                  setPage(1)
+                }}
+                className={`px-4 py-3 rounded-lg font-bold text-sm transition-all duration-200 ${
+                  expandedLetter === null && selectedCity === null
+                    ? 'bg-blue-600 text-white shadow-lg scale-105'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                All
+              </button>
+
+              {/* A-Z Letters */}
+              {Object.keys(citiesByLetter).sort().map(letter => (
+                <button
+                  key={letter}
+                  onClick={() => {
+                    setExpandedLetter(expandedLetter === letter ? null : letter)
+                    setSelectedCity(null)
+                    setPage(1)
+                  }}
+                  className={`w-10 h-10 rounded-lg font-bold text-sm transition-all duration-200 flex items-center justify-center ${
+                    expandedLetter === letter
+                      ? 'bg-blue-600 text-white shadow-lg scale-110'
+                      : 'bg-slate-100 text-slate-700 hover:bg-blue-500 hover:text-white hover:scale-105'
+                  }`}
+                  title={`Cities starting with ${letter}`}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
+        {/* City List for Selected Letter */}
         {expandedLetter && citiesByLetter[expandedLetter] && (
-          <div className="mt-4 p-4 bg-slate-50 rounded-lg">
-            <div className="flex gap-2 flex-wrap">
+          <div className="animate-fadeIn">
+            <div className="mb-4 flex items-center gap-3">
+              <h4 className="text-xl font-bold text-slate-900">
+                Cities Starting with <span className="bg-blue-600 text-white px-3 py-1 rounded-lg">{expandedLetter}</span>
+              </h4>
+              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                {citiesByLetter[expandedLetter].length} cities
+              </span>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {citiesByLetter[expandedLetter].map(city => (
                 <button
                   key={city}
@@ -378,13 +417,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                     setSelectedCity(city)
                     setPage(1)
                   }}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  className={`px-4 py-3 rounded-lg text-sm font-semibold transition-all duration-200 text-left border-2 ${
                     selectedCity === city
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                      ? 'bg-blue-600 text-white border-blue-700 shadow-lg'
+                      : 'bg-white text-slate-700 border-slate-200 hover:border-blue-400 hover:bg-blue-50'
                   }`}
                 >
-                  {city}
+                  <span className="block">{city}</span>
                 </button>
               ))}
             </div>
