@@ -538,7 +538,7 @@ async function fetchFullListingData(
       }
     };
     
-    console.log(`✓ ${listing.name} (${locations.length} photos, ${reviews.length} reviews)`);
+    console.log(`✓ ${listing.name} (${photos.length} photos, ${reviews.length} reviews)`);
     return listing;
   } catch (err) {
     console.error(`Error fetching ${locationId}:`, err instanceof Error ? err.message : String(err));
