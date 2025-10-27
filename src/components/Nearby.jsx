@@ -241,6 +241,84 @@ export default function Nearby({ userId, setActiveTab, setCurrentBusinessId }) {
     }
   }
 
+  async function loadAllCities() {
+    try {
+      const cities = await tripadvisorSync.getAllCities()
+      setAllCities(cities)
+    } catch (err) {
+      console.error('Error loading cities:', err)
+    }
+  }
+
+  async function loadAllCategories() {
+    try {
+      const categories = await tripadvisorSync.getAllCategories()
+      setAllCategories(categories)
+    } catch (err) {
+      console.error('Error loading categories:', err)
+    }
+  }
+
+  async function loadStats() {
+    try {
+      const stats = await tripadvisorSync.getListingStats()
+      setListingStats(stats)
+    } catch (err) {
+      console.error('Error loading stats:', err)
+    }
+  }
+
+  async function handleSearch(e) {
+    e.preventDefault()
+    if (!searchQuery.trim()) {
+      setSearchResults([])
+      return
+    }
+
+    setIsSearching(true)
+    try {
+      const results = await tripadvisorSync.searchListings(searchQuery)
+      setSearchResults(results)
+    } catch (err) {
+      console.error('Error searching:', err)
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  async function loadCategoryListings(category, pageNum = 1) {
+    if (!category) return
+
+    setLoading(true)
+    setError('')
+    try {
+      const perPage = 12
+      const offset = (pageNum - 1) * perPage
+      const data = await tripadvisorSync.getListingsByCategory(category, perPage, offset)
+      setCityListings(data || [])
+
+      // Load vote counts
+      const counts = {}
+      const votes = {}
+      for (const listing of (data || [])) {
+        const voteData = await nearbyUtils.getListingVoteCounts(listing.tripadvisor_id, 'nearby')
+        counts[listing.tripadvisor_id] = voteData
+
+        if (userId) {
+          const userVote = await nearbyUtils.getListingVote(listing.tripadvisor_id, 'nearby', userId)
+          votes[listing.tripadvisor_id] = userVote
+        }
+      }
+      setVoteCounts(counts)
+      setUserVotes(votes)
+    } catch (err) {
+      console.error('Failed to load category listings:', err)
+      setError('Failed to load listings')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   async function loadSavedIds() {
     try {
       const { data, error } = await supabase.from('nearby_listings').select('tripadvisor_id')
