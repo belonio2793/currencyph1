@@ -68,6 +68,12 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [categoryLoading, setCategoryLoading] = useState({ restaurants: false, attractions: false, hotels: false })
   const [categoryError, setCategoryError] = useState({ restaurants: '', attractions: '', hotels: '' })
 
+  // Letter-level categorized state when filtering by alphabet letter
+  const [letterCategoryPages, setLetterCategoryPages] = useState({ restaurants: 1, attractions: 1, hotels: 1 })
+  const [letterCategoryListings, setLetterCategoryListings] = useState({ restaurants: [], attractions: [], hotels: [] })
+  const [letterCategoryLoading, setLetterCategoryLoading] = useState({ restaurants: false, attractions: false, hotels: false })
+  const [letterCategoryError, setLetterCategoryError] = useState({ restaurants: '', attractions: '', hotels: '' })
+
   const itemsPerPage = 12
 
   useEffect(() => {
@@ -159,7 +165,9 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         setLoading(false)
         return
       } else if (expandedLetter) {
-        query = query.ilike('city', `${expandedLetter}%`)
+        // When a letter is selected, we handle via letter-categorized loaders
+        setLoading(false)
+        return
       }
 
       const from = (page - 1) * itemsPerPage
@@ -367,27 +375,95 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     window.history.pushState(null, '', `/nearby/${slug}`)
   }
 
+  // Load categorized listings for selected letter
+  async function loadCategoryListingsForLetter(letter, nextPages = letterCategoryPages) {
+    if (!letter) return
+    try {
+      setLetterCategoryLoading({ restaurants: true, attractions: true, hotels: true })
+      setLetterCategoryError({ restaurants: '', attractions: '', hotels: '' })
+
+      const fromFor = (p) => (p - 1) * itemsPerPage
+      const toFor = (p) => fromFor(p) + itemsPerPage - 1
+
+      const qRestaurants = supabase
+        .from('nearby_listings')
+        .select('*')
+        .ilike('city', `${letter}%`)
+        .ilike('category', '%restaurant%')
+        .order('rating', { ascending: false })
+        .range(fromFor(nextPages.restaurants), toFor(nextPages.restaurants))
+
+      const qHotels = supabase
+        .from('nearby_listings')
+        .select('*')
+        .ilike('city', `${letter}%`)
+        .or('category.ilike.%hotel%,category.ilike.%resort%')
+        .order('rating', { ascending: false })
+        .range(fromFor(nextPages.hotels), toFor(nextPages.hotels))
+
+      const qAttractions = supabase
+        .from('nearby_listings')
+        .select('*')
+        .ilike('city', `${letter}%`)
+        .not('category', 'ilike', '%restaurant%')
+        .not('category', 'ilike', '%hotel%')
+        .not('category', 'ilike', '%resort%')
+        .order('rating', { ascending: false })
+        .range(fromFor(nextPages.attractions), toFor(nextPages.attractions))
+
+      const [restRes, hotelRes, attrRes] = await Promise.all([
+        qRestaurants, qHotels, qAttractions
+      ])
+
+      if (restRes.error) throw restRes.error
+      if (hotelRes.error) throw hotelRes.error
+      if (attrRes.error) throw attrRes.error
+
+      setLetterCategoryListings({
+        restaurants: restRes.data || [],
+        hotels: hotelRes.data || [],
+        attractions: attrRes.data || []
+      })
+    } catch (err) {
+      console.error('Error loading letter categorized listings:', err)
+      const msg = 'Failed to load listings'
+      setLetterCategoryError({ restaurants: msg, attractions: msg, hotels: msg })
+    } finally {
+      setLetterCategoryLoading({ restaurants: false, attractions: false, hotels: false })
+    }
+  }
+
   useEffect(() => {
     if (selectedCity) {
       // Reset category pages when switching city
       setCategoryPages({ restaurants: 1, attractions: 1, hotels: 1 })
       loadCategoryListingsForCity(selectedCity, { restaurants: 1, attractions: 1, hotels: 1 })
+    } else if (expandedLetter) {
+      // Reset letter category pages on new letter
+      setLetterCategoryPages({ restaurants: 1, attractions: 1, hotels: 1 })
+      loadCategoryListingsForLetter(expandedLetter, { restaurants: 1, attractions: 1, hotels: 1 })
     } else {
       loadListings()
     }
-  }, [selectedCity])
+  }, [selectedCity, expandedLetter])
 
   useEffect(() => {
-    if (!selectedCity) {
+    if (!selectedCity && !expandedLetter) {
       loadListings()
     }
-  }, [expandedLetter, page])
+  }, [page])
 
   useEffect(() => {
     if (selectedCity) {
       loadCategoryListingsForCity(selectedCity, categoryPages)
     }
   }, [categoryPages])
+
+  useEffect(() => {
+    if (!selectedCity && expandedLetter) {
+      loadCategoryListingsForLetter(expandedLetter, letterCategoryPages)
+    }
+  }, [letterCategoryPages])
 
   const displayListings = searchResults.length > 0 ? searchResults : listings
 
@@ -450,6 +526,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                         setExpandedLetter(next)
                         setSelectedCity(null)
                         setPage(1)
+                        setLetterCategoryPages({ restaurants: 1, attractions: 1, hotels: 1 })
                       }}
                       className={`w-9 h-9 rounded-md font-bold text-sm transition-all duration-200 flex items-center justify-center ${
                         expandedLetter === letter
@@ -569,47 +646,62 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
         </div>
       )}
 
-      {/* Listings - Show search results or general grid when no city is selected */}
-      {selectedCity === null ? (
-        <>
-          {displayListings.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-              {displayListings.map(listing => (
-                <ListingCard
-                  key={listing.tripadvisor_id}
-                  listing={listing}
-                  onNavigateToDetail={handleNavigateToListing}
-                />
-              ))}
-            </div>
-          ) : loading ? (
-            <div className="text-center py-12 text-slate-500">Loading listings...</div>
-          ) : (
-            <div className="text-center py-12 text-slate-500">No listings found</div>
-          )}
+      {/* Listings - Show categorized sections for letter selection or city selection; otherwise general grid */}
+      {selectedCity === null && expandedLetter !== null ? (
+        <div className="space-y-10">
+          {['restaurants', 'attractions', 'hotels'].map((key) => {
+            const titleMap = { restaurants: 'Restaurants', attractions: 'Attractions', hotels: 'Hotels' }
+            const items = letterCategoryListings[key]
+            const isLoading = letterCategoryLoading[key]
+            const err = letterCategoryError[key]
+            const currentPage = letterCategoryPages[key]
+            return (
+              <section key={key}>
+                <div className="mb-3 flex items-center justify-between">
+                  <h3 className="text-2xl font-bold text-slate-900">{titleMap[key]}</h3>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setLetterCategoryPages(prev => ({ ...prev, [key]: Math.max(1, currentPage - 1) }))}
+                      disabled={currentPage === 1 || isLoading}
+                      className="px-3 py-1 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200 text-sm"
+                    >
+                      Previous
+                    </button>
+                    <span className="text-sm text-slate-600">Page {currentPage}</span>
+                    <button
+                      onClick={() => setLetterCategoryPages(prev => ({ ...prev, [key]: currentPage + 1 }))}
+                      disabled={isLoading || (items && items.length < itemsPerPage)}
+                      className="px-3 py-1 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200 text-sm"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
 
-          {/* Pagination for general listings */}
-          {searchResults.length === 0 && listings.length > 0 && (
-            <div className="flex gap-2 justify-center mt-8">
-              <button
-                onClick={() => setPage(Math.max(1, page - 1))}
-                disabled={page === 1}
-                className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200"
-              >
-                Previous
-              </button>
-              <span className="px-4 py-2 text-slate-700">Page {page}</span>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={displayListings.length < itemsPerPage}
-                className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200"
-              >
-                Next
-              </button>
-            </div>
-          )}
-        </>
-      ) : (
+                {err && (
+                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">{err}</div>
+                )}
+
+                {isLoading ? (
+                  <div className="text-slate-500">Loading {titleMap[key]}...</div>
+                ) : items && items.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {items.map(listing => (
+                      <ListingCard
+                        key={listing.tripadvisor_id}
+                        listing={listing}
+                        onNavigateToDetail={handleNavigateToListing}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-slate-500">No {titleMap[key].toLowerCase()} found for cities starting with {expandedLetter}</div>
+                )}
+              </section>
+            )
+          })}
+        </div>
+      ) : selectedCity !== null ? (
         // Categorized sections when a city is selected
         <div className="space-y-10">
           {['restaurants', 'attractions', 'hotels'].map((key) => {
@@ -664,6 +756,46 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             )
           })}
         </div>
+      ) : (
+        // General grid
+        <>
+          {displayListings.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+              {displayListings.map(listing => (
+                <ListingCard
+                  key={listing.tripadvisor_id}
+                  listing={listing}
+                  onNavigateToDetail={handleNavigateToListing}
+                />
+              ))}
+            </div>
+          ) : loading ? (
+            <div className="text-center py-12 text-slate-500">Loading listings...</div>
+          ) : (
+            <div className="text-center py-12 text-slate-500">No listings found</div>
+          )}
+
+          {/* Pagination for general listings */}
+          {searchResults.length === 0 && listings.length > 0 && (
+            <div className="flex gap-2 justify-center mt-8">
+              <button
+                onClick={() => setPage(Math.max(1, page - 1))}
+                disabled={page === 1}
+                className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200"
+              >
+                Previous
+              </button>
+              <span className="px-4 py-2 text-slate-700">Page {page}</span>
+              <button
+                onClick={() => setPage(page + 1)}
+                disabled={displayListings.length < itemsPerPage}
+                className="px-4 py-2 bg-slate-100 rounded disabled:opacity-50 hover:bg-slate-200"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
       )}
       </div>
     </div>
