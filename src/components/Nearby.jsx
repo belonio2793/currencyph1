@@ -308,30 +308,28 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           ))}
         </div>
 
-        {Object.entries(groupCitiesByLetter(PHILIPPINE_CITIES)).map(([letter, cities]) => (
-          expandedLetters[letter] && (
-            <div key={letter} className="mt-4 p-4 bg-slate-50 rounded-lg">
-              <div className="flex gap-2 flex-wrap">
-                {cities.map(city => (
-                  <button
-                    key={city}
-                    onClick={() => {
-                      setSelectedCity(city)
-                      setPage(1)
-                    }}
-                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      selectedCity === city
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
-                    }`}
-                  >
-                    {city}
-                  </button>
-                ))}
-              </div>
+        {expandedLetter && groupCitiesByLetter(PHILIPPINE_CITIES)[expandedLetter] && (
+          <div className="mt-4 p-4 bg-slate-50 rounded-lg">
+            <div className="flex gap-2 flex-wrap">
+              {groupCitiesByLetter(PHILIPPINE_CITIES)[expandedLetter].map(city => (
+                <button
+                  key={city}
+                  onClick={() => {
+                    setSelectedCity(city)
+                    setPage(1)
+                  }}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    selectedCity === city
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white text-slate-700 hover:bg-slate-200 border border-slate-200'
+                  }`}
+                >
+                  {city}
+                </button>
+              ))}
             </div>
-          )
-        ))}
+          </div>
+        )}
       </div>
 
       {/* Header */}
