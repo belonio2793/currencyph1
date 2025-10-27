@@ -13,7 +13,9 @@
     "import-photos": "node scripts/import-photos.js",
     "populate-all": "node scripts/populate-all-listings.js",
     "sync-tripadvisor": "node scripts/sync-tripadvisor-locally.js",
-    "scrape-tripadvisor-bee": "node scripts/scrape-tripadvisor-scrapingbee.js"
+    "scrape-tripadvisor-bee": "node scripts/scrape-tripadvisor-scrapingbee.js",
+    "fetch-all-cities": "bash scripts/fetch-all-cities.sh",
+    "fetch-all-cities-node": "node scripts/fetch-all-cities-listings.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
