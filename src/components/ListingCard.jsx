@@ -149,7 +149,7 @@ export default function ListingCard({
               <div className="absolute inset-0 bg-slate-200 animate-pulse" />
             )}
             <img
-              src={imageUrl}
+              src={(getNormalizedPhotoUrls().length > 0 ? getNormalizedPhotoUrls()[currentPhotoIndex] : imageUrl) || imageUrl}
               alt={listing.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               onError={(e) => {
@@ -162,6 +162,30 @@ export default function ListingCard({
               loading="lazy"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+
+            {/* Small thumbnail strip (shows up to 5) */}
+            {getNormalizedPhotoUrls().length > 1 && (
+              <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/60 to-transparent">
+                <div className="flex gap-1">
+                  {getNormalizedPhotoUrls().slice(0, 5).map((thumb, idx) => (
+                    <button
+                      key={`thumb-${idx}`}
+                      onClick={(e) => { e.stopPropagation(); setCurrentPhotoIndex(idx) }}
+                      className={`h-8 w-12 rounded overflow-hidden border ${idx === currentPhotoIndex ? 'border-white' : 'border-white/40'} transition-all`}
+                      title={`Photo ${idx + 1}`}
+                    >
+                      <img
+                        src={thumb}
+                        alt={`thumb-${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = 'none' }}
+                        loading="lazy"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Badge Container */}
             <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
