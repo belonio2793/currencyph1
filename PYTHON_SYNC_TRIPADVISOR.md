@@ -92,6 +92,30 @@ Abuyog, Alaminos, Alcala, Angeles, Antipolo, Aroroy, Bacolod, Bacoor, Baguio, Ba
 
 attractions, museums, parks, beaches, hotels, restaurants, churches, shopping, nightlife
 
+## Runtime Expectations
+
+With 180+ cities and 9 categories, syncing **all data** means:
+- **1,620+ API queries** (180 cities × 9 categories)
+- **~8-10 minutes** of runtime with rate limiting
+- **5,000-10,000+ listings** expected from TripAdvisor API
+
+### Recommended Approach:
+
+1. **Start small**: Test with a single city or category first
+2. **Scale up**: Sync by category across all cities
+3. **Then go full**: Run complete sync for updates
+
+```bash
+# Test with 10 items
+python scripts/sync-tripadvisor.py --city=Manila --limit=10
+
+# Then one category at a time
+python scripts/sync-tripadvisor.py --category=attractions
+
+# Finally, full sync (takes ~10 minutes)
+python scripts/sync-tripadvisor.py
+```
+
 ## Sample Workflow
 
 ```bash
