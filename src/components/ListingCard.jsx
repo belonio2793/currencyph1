@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react'
-import { imageManager } from '../lib/imageManager'
+import React from 'react'
 import StarRating from './StarRating'
 
 export default function ListingCard({
@@ -12,45 +11,7 @@ export default function ListingCard({
   isAuthenticated = false,
   voteCounts = { thumbsUp: 0, thumbsDown: 0 },
   userVote = null,
-  hideImage = false,
 }) {
-  const [imageUrl, setImageUrl] = useState(null)
-  const [imageLoading, setImageLoading] = useState(true)
-  const [imageError, setImageError] = useState(false)
-
-  useEffect(() => {
-    loadImage()
-  }, [listing?.tripadvisor_id])
-
-  async function loadImage() {
-    if (!listing) {
-      setImageLoading(false)
-      return
-    }
-
-    try {
-      setImageLoading(true)
-      const url = await imageManager.getImageUrl(listing)
-
-      if (url) {
-        setImageUrl(url)
-        setImageError(false)
-      } else {
-        setImageUrl(
-          `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80`
-        )
-        setImageError(false)
-      }
-    } catch (err) {
-      console.error('Error loading image:', err)
-      setImageUrl(
-        `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80`
-      )
-      setImageError(true)
-    } finally {
-      setImageLoading(false)
-    }
-  }
 
   const handleCardClick = () => {
     if (onNavigateToDetail && listing?.slug) {
