@@ -459,8 +459,8 @@ def main():
         print(f"[{idx + 1}/{len(listings)}] {name} ({city})...", end=" ", flush=True)
         
         try:
-            # Search TripAdvisor using Grok
-            listing_url = search_tripadvisor_with_grok(search_query)
+            # Search TripAdvisor using ScrapingBee
+            listing_url = search_tripadvisor(search_query)
             
             if not listing_url:
                 print("⚠️  Not found on TripAdvisor")
