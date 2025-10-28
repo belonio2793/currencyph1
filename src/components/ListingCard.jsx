@@ -105,9 +105,9 @@ export default function ListingCard({
         listing.avg_cost ? (
           <div className="relative w-full overflow-hidden" style={{ height: '220px' }}>
             {/* Background Image - use photo_urls carousel if available */}
-            {Array.isArray(listing.photo_urls) && listing.photo_urls.length > 0 ? (
+            {getNormalizedPhotoUrls().length > 0 ? (
               <img
-                src={listing.photo_urls[currentPhotoIndex]}
+                src={getNormalizedPhotoUrls()[currentPhotoIndex]}
                 alt={listing.name}
                 className="w-full h-full object-cover transition-opacity duration-1000"
                 onError={(e) => {
