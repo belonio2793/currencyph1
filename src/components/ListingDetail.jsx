@@ -411,7 +411,7 @@ export default function ListingDetail({ slug, onBack }) {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">Highlights</h2>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {listing.highlights.map((highlight, idx) => (
-                <li key={idx} className="flex items-start gap-2 text-slate-700">
+                <li key={`highlight-${idx}-${highlight}`} className="flex items-start gap-2 text-slate-700">
                   <span className="text-blue-600 font-bold mt-1">✓</span>
                   <span>{highlight}</span>
                 </li>
@@ -429,7 +429,7 @@ export default function ListingDetail({ slug, onBack }) {
                 const tagText = typeof tag === 'string' ? tag : (tag.category || tag.name || 'Category')
                 return (
                   <span
-                    key={idx}
+                    key={`bestfor-${idx}-${tagText}`}
                     className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium"
                   >
                     {tagText}
@@ -446,7 +446,7 @@ export default function ListingDetail({ slug, onBack }) {
             <h2 className="text-2xl font-bold text-slate-900 mb-4">🕒 Hours of Operation</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(listing.hours_of_operation).map(([day, hours], idx) => (
-                <div key={idx} className="flex justify-between text-slate-700">
+                <div key={`hours-${day}-${idx}`} className="flex justify-between text-slate-700">
                   <span className="font-medium capitalize">{day}:</span>
                   <span className="text-slate-600">
                     {typeof hours === 'object' && hours.closed
@@ -466,12 +466,15 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">🛎️ Amenities</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {listing.amenities.map((amenity, idx) => (
-                <div key={idx} className="flex items-center gap-2 text-slate-700">
+              {listing.amenities.map((amenity, idx) => {
+                const amenityText = typeof amenity === 'string' ? amenity : (amenity.name || JSON.stringify(amenity))
+                return (
+                <div key={`amenity-${idx}-${amenityText}`} className="flex items-center gap-2 text-slate-700">
                   <span className="text-green-600">✓</span>
                   <span>{typeof amenity === 'string' ? amenity : amenity.name || amenity}</span>
                 </div>
-              ))}
+              )
+              })}
             </div>
           </div>
         )}
