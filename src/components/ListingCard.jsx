@@ -25,13 +25,24 @@ export default function ListingCard({
 
   useEffect(() => {
     // Set up carousel rotation for photos
-    const hasMultiplePhotos = Array.isArray(listing?.photo_urls) && listing.photo_urls.length > 0
+    let photoArray = listing?.photo_urls
+
+    // Handle if photo_urls is a string
+    if (typeof photoArray === 'string') {
+      try {
+        photoArray = JSON.parse(photoArray)
+      } catch {
+        photoArray = photoArray.split(/[,|]/).map(url => url.trim()).filter(Boolean)
+      }
+    }
+
+    const hasMultiplePhotos = Array.isArray(photoArray) && photoArray.length > 0
 
     if (!hasMultiplePhotos) return
 
     const interval = setInterval(() => {
       setCurrentPhotoIndex((prev) => {
-        const maxIndex = Math.min(5, listing.photo_urls.length)
+        const maxIndex = Math.min(5, photoArray.length)
         return (prev + 1) % maxIndex
       })
     }, 5000)
