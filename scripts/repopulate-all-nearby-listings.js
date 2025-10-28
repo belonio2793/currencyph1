@@ -270,7 +270,7 @@ function createListing(city, category, index) {
     timezone: 'Asia/Manila',
     region_name: city,
     city_id: generateUUID(),
-    raw: JSON.stringify({ city, category })
+    raw: { city, category }
   }
 }
 
