@@ -129,7 +129,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {activeTab !== 'home' && <Navbar activeTab={activeTab} onTabChange={setActiveTab} />}
+      {activeTab !== 'home' && <Navbar activeTab={activeTab} onTabChange={setActiveTab} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} />}
 
       {/* User Status Bar - Only on non-home pages */}
       {activeTab !== 'home' && (
