@@ -122,14 +122,74 @@ def fetch_with_scrapingbee(url: str) -> Optional[str]:
         return None
 
 
-def extract_tripadvisor_listing_data(url: str, name: str = None) -> Optional[Dict]:
+def city_to_region(city: str) -> str:
+    """Map city to region name"""
+    region_map = {
+        "Abuyog": "Eastern Visayas", "Alaminos": "Calabarzon", "Alcala": "Northern Luzon",
+        "Angeles": "Central Luzon", "Antipolo": "Calabarzon", "Aroroy": "Bicol",
+        "Bacolod": "Western Visayas", "Bacoor": "Calabarzon", "Bago": "Western Visayas",
+        "Bais": "Central Visayas", "Balanga": "Central Luzon", "Baliuag": "Central Luzon",
+        "Bangued": "Cordillera", "Bansalan": "Mindanao", "Bantayan": "Central Visayas",
+        "Bataan": "Central Luzon", "Batac": "Northern Luzon", "Batangas City": "Calabarzon",
+        "Bayambang": "Northern Luzon", "Bayawan": "Negros Oriental", "Baybay": "Eastern Visayas",
+        "Bayugan": "Mindanao", "Biñan": "Calabarzon", "Bislig": "Mindanao",
+        "Bocaue": "Central Luzon", "Bogo": "Central Visayas", "Boracay": "Western Visayas",
+        "Borongan": "Eastern Visayas", "Butuan": "Caraga", "Cabadbaran": "Caraga",
+        "Cabanatuan": "Central Luzon", "Cabuyao": "Calabarzon", "Cadiz": "Western Visayas",
+        "Cagayan de Oro": "Northern Mindanao", "Calamba": "Calabarzon", "Calapan": "Mimaropa",
+        "Calbayog": "Western Visayas", "Caloocan": "Metro Manila", "Camiling": "Northern Luzon",
+        "Canlaon": "Negros Oriental", "Caoayan": "Northern Luzon", "Capiz": "Western Visayas",
+        "Caraga": "Caraga", "Carmona": "Calabarzon", "Catbalogan": "Eastern Visayas",
+        "Cauayan": "Northern Luzon", "Cavite City": "Calabarzon", "Cebu City": "Central Visayas",
+        "Cotabato City": "Soccsksargen", "Dagupan": "Northern Luzon", "Danao": "Central Visayas",
+        "Dapitan": "Northern Mindanao", "Daraga": "Bicol", "Dasmariñas": "Calabarzon",
+        "Davao City": "Davao Region", "Davao del Norte": "Davao Region", "Davao del Sur": "Davao Region",
+        "Davao Oriental": "Davao Region", "Dipolog": "Zamboanga", "Dumaguete": "Negros Oriental",
+        "General Santos": "Soccsksargen", "General Trias": "Calabarzon", "Gingoog": "Northern Mindanao",
+        "Guihulngan": "Negros Oriental", "Himamaylan": "Negros Occidental", "Ilagan": "Northern Luzon",
+        "Iligan": "Northern Mindanao", "Iloilo City": "Western Visayas", "Imus": "Calabarzon",
+        "Isabela": "Northern Luzon", "Isulan": "Soccsksargen", "Kabankalan": "Negros Occidental",
+        "Kidapawan": "Soccsksargen", "Koronadal": "Soccsksargen", "La Carlota": "Negros Occidental",
+        "Laoag": "Ilocos Region", "Lapu-Lapu": "Central Visayas", "Las Piñas": "Metro Manila",
+        "Laoang": "Bicol", "Legazpi": "Bicol", "Ligao": "Bicol", "Limay": "Central Luzon",
+        "Lucena": "Calabarzon", "Maasin": "Eastern Visayas", "Mabalacat": "Central Luzon",
+        "Malabon": "Metro Manila", "Malaybalay": "Northern Mindanao", "Malolos": "Central Luzon",
+        "Mandaluyong": "Metro Manila", "Mandaue": "Central Visayas", "Manila": "Metro Manila",
+        "Marawi": "Bangsamoro", "Marilao": "Central Luzon", "Masbate City": "Bicol",
+        "Mati": "Davao Region", "Meycauayan": "Central Luzon", "Muntinlupa": "Metro Manila",
+        "Naga (Camarines Sur)": "Bicol", "Navotas": "Metro Manila", "Olongapo": "Central Luzon",
+        "Ormoc": "Eastern Visayas", "Oroquieta": "Northern Mindanao", "Ozamiz": "Northern Mindanao",
+        "Pagadian": "Zamboanga", "Palo": "Eastern Visayas", "Parañaque": "Metro Manila",
+        "Pasay": "Metro Manila", "Pasig": "Metro Manila", "Passi": "Western Visayas",
+        "Puerto Princesa": "Mimaropa", "Quezon City": "Metro Manila", "Roxas": "Western Visayas",
+        "Sagay": "Negros Occidental", "Samal": "Davao Region", "San Carlos (Negros Occidental)": "Negros Occidental",
+        "San Carlos (Pangasinan)": "Northern Luzon", "San Fernando (La Union)": "Ilocos Region",
+        "San Fernando (Pampanga)": "Central Luzon", "San Jose (Antique)": "Western Visayas",
+        "San Jose del Monte": "Central Luzon", "San Juan": "Metro Manila", "San Pablo": "Calabarzon",
+        "San Pedro": "Calabarzon", "Santiago": "Northern Luzon", "Silay": "Negros Occidental",
+        "Sipalay": "Negros Occidental", "Sorsogon City": "Bicol", "Surigao City": "Caraga",
+        "Tabaco": "Bicol", "Tabuk": "Cordillera", "Tacurong": "Soccsksargen", "Tagaytay": "Calabarzon",
+        "Tagbilaran": "Central Visayas", "Taguig": "Metro Manila", "Tacloban": "Eastern Visayas",
+        "Talisay (Cebu)": "Central Visayas", "Talisay (Negros Occidental)": "Negros Occidental",
+        "Tanjay": "Negros Oriental", "Tarlac City": "Central Luzon", "Tayabas": "Calabarzon",
+        "Toledo": "Central Visayas", "Trece Martires": "Calabarzon", "Tuguegarao": "Cagayan Valley",
+        "Urdaneta": "Northern Luzon", "Valencia": "Negros Oriental", "Valenzuela": "Central Luzon",
+        "Victorias": "Negros Occidental", "Vigan": "Ilocos Region", "Virac": "Bicol",
+        "Zamboanga City": "Zamboanga", "Baguio": "Cordillera", "Bohol": "Central Visayas",
+        "Coron": "Mimaropa", "El Nido": "Mimaropa", "Makati": "Metro Manila",
+        "Palawan": "Mimaropa", "Siargao": "Caraga"
+    }
+    return region_map.get(city, "Philippines")
+
+
+def extract_tripadvisor_listing_data(url: str, name: str = None, city: str = None, category: str = None) -> Optional[Dict]:
     """Extract ALL real data from a TripAdvisor listing page"""
     try:
         html = fetch_with_scrapingbee(url)
-        
+
         if not html:
             return None
-        
+
         soup = BeautifulSoup(html, 'html.parser')
         html_content = html
 
@@ -173,11 +233,17 @@ def extract_tripadvisor_listing_data(url: str, name: str = None) -> Optional[Dic
 
         # Extract phone
         phone = None
-        for pattern in [r'\+63[\d\s-]+', r'tel:\s*[\d\s-]+']:
+        for pattern in [r'\+63[\d\s-]+', r'tel:\s*[\d\s-]+', r'0[\d\s-]{9,}']:
             match = re.search(pattern, html_content)
             if match:
                 phone = match.group(0).strip()
                 break
+
+        # Extract email
+        email = None
+        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', html_content)
+        if email_match:
+            email = email_match.group(0)
 
         # Extract description
         description = None
@@ -216,22 +282,37 @@ def extract_tripadvisor_listing_data(url: str, name: str = None) -> Optional[Dic
             elif 'museum' in name_lower or 'temple' in name_lower or 'church' in name_lower:
                 location_type = "Attraction"
 
+        # Determine category
+        subcategory = category or location_type
+
         return {
             "tripadvisor_id": tripadvisor_id,
             "name": name,
             "rating": rating,
             "review_count": review_count,
+            "reviews_stags": review_count,
+            "ranking_d": rating or 0,
             "address": address,
+            "phone": phone,
             "phone_number": phone,
+            "email": email,
             "description": description,
             "amenities": amenities,
             "image_url": image_url,
+            "photo_url": image_url,
             "photo_urls": photo_urls,
             "photo_count": len(photo_urls),
             "location_type": location_type,
+            "subcategory": subcategory,
             "web_url": url,
             "fetch_status": "success",
             "last_verified_at": datetime.now().isoformat(),
+            "last_sync": datetime.now().isoformat(),
+            "country": "Philippines",
+            "currency": "PHP",
+            "timezone": "Asia/Manila",
+            "region_name": city_to_region(city) if city else "Philippines",
+            "city": city,
         }
 
     except Exception as e:
@@ -465,7 +546,7 @@ def main():
             print(f"⚠️  Errors logged: {ERRORS_FILE}\n")
     
     else:
-        print(f"🔍 DRY RUN: Would insert {len(all_listings)} listings\n")
+        print(f"�� DRY RUN: Would insert {len(all_listings)} listings\n")
 
 
 if __name__ == "__main__":
