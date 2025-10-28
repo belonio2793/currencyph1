@@ -99,11 +99,6 @@ async function extractPhotoUrlsFromHTML(html) {
 async function fetchTripAdvisorPage(url) {
   try {
     console.log('    Fetching page with curl...')
-    
-    // Use curl with proper headers to fetch the page
-    const { exec } = await import('child_process')
-    const { promisify } = await import('util')
-    const execAsync = promisify(exec)
 
     try {
       const { stdout } = await execAsync(
