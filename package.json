@@ -24,7 +24,10 @@
     "test-api": "node scripts/test-tripadvisor-api.js",
     "populate-costs": "node scripts/quick-populate-costs.js",
     "populate-all-costs": "node scripts/populate-all-costs.js",
-    "populate-costs-grok": "node scripts/grok-avg-costs.js"
+    "populate-costs-grok": "node scripts/grok-avg-costs.js",
+    "fetch-photos": "node scripts/fetch-tripadvisor-photos.js",
+    "fetch-photos-batch": "node scripts/fetch-tripadvisor-photos.js --batch=10",
+    "fetch-photos-all": "node scripts/fetch-tripadvisor-photos.js --batch=100"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
