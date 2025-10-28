@@ -392,11 +392,16 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
   const loadInitialData = async () => {
     try {
       setAllCurrencies(currencyAPI.getCurrencies())
-      await Promise.all([
-        loadWallets(),
-        loadExchangeRates(),
-        loadRecentTransactions()
-      ])
+      // Load data in sequence with fallbacks instead of Promise.all to prevent cascading failures
+      await loadWallets().catch(err => {
+        console.debug('Wallet loading failed, continuing with defaults:', err)
+      })
+      await loadExchangeRates().catch(err => {
+        console.debug('Exchange rates loading failed, continuing with defaults:', err)
+      })
+      await loadRecentTransactions().catch(err => {
+        console.debug('Recent transactions loading failed, continuing with defaults:', err)
+      })
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load data')
