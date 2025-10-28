@@ -1,4 +1,5 @@
-const { createClient } = require('@supabase/supabase-js')
+import { createClient } from '@supabase/supabase-js'
+import process from 'process'
 
 const supabase = createClient(
   process.env.VITE_PROJECT_URL,
