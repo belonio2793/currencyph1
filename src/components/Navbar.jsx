@@ -12,7 +12,7 @@ export default function Navbar({ activeTab, onTabChange }) {
     { id: 'bills', label: 'Bills' },
     { id: 'transactions', label: 'History' },
     { id: 'profile', label: 'Profile' },
-    { id: 'photo-scraper', label: '🔍 Photos' }
+    { id: 'fill-photos', label: '📸 Photos' }
   ]
 
   return (
