@@ -277,7 +277,6 @@ export default function App() {
               setCurrentListingSlug(null)
               window.history.pushState(null, '', '/nearby')
             }} /> }
-            {activeTab === 'fill-photos' && <div className="max-w-7xl mx-auto px-6 py-8"><FillPhotos /></div> }
           </>
         )}
       </main>
