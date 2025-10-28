@@ -137,6 +137,80 @@ export default function ListingDetail({ slug, onBack }) {
           </div>
         </div>
 
+        {/* Photo Gallery - Underneath Cost */}
+        {listing.photo_urls && listing.photo_urls.length > 0 && (
+          <div className="mb-8 rounded-lg overflow-hidden shadow-lg bg-slate-900">
+            {/* Main Photo Display */}
+            <div className="relative w-full bg-slate-200" style={{ aspectRatio: '16/9' }}>
+              <img
+                src={listing.photo_urls[selectedPhotoIndex]}
+                alt={`${listing.name} photo ${selectedPhotoIndex + 1}`}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=800&fit=crop&auto=format&q=80'
+                }}
+              />
+
+              {/* Navigation Arrows */}
+              {listing.photo_urls.length > 1 && (
+                <>
+                  <button
+                    onClick={() => setSelectedPhotoIndex(Math.max(0, selectedPhotoIndex - 1))}
+                    disabled={selectedPhotoIndex === 0}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full w-10 h-10 flex items-center justify-center font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                    title="Previous photo"
+                  >
+                    ←
+                  </button>
+                  <button
+                    onClick={() => setSelectedPhotoIndex(Math.min(listing.photo_urls.length - 1, selectedPhotoIndex + 1))}
+                    disabled={selectedPhotoIndex === listing.photo_urls.length - 1}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-slate-900 rounded-full w-10 h-10 flex items-center justify-center font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                    title="Next photo"
+                  >
+                    →
+                  </button>
+
+                  {/* Photo Counter */}
+                  <div className="absolute top-3 right-3 bg-black/60 text-white rounded-lg px-3 py-1 text-sm font-semibold">
+                    {selectedPhotoIndex + 1} / {listing.photo_urls.length}
+                  </div>
+                </>
+              )}
+
+              {/* Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            </div>
+
+            {/* Thumbnail Strip */}
+            {listing.photo_urls.length > 1 && (
+              <div className="bg-slate-800 p-2 flex gap-1 overflow-x-auto">
+                {listing.photo_urls.map((url, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedPhotoIndex(idx)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${
+                      selectedPhotoIndex === idx
+                        ? 'border-blue-500 ring-2 ring-blue-400'
+                        : 'border-slate-600 hover:border-slate-400'
+                    }`}
+                    title={`Photo ${idx + 1}`}
+                  >
+                    <img
+                      src={url}
+                      alt={`Thumbnail ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop&auto=format&q=80'
+                      }}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Title and Badges */}
         <div className="flex items-start gap-4 mb-4">
           <div className="flex-1">
