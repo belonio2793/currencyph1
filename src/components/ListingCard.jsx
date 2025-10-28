@@ -44,18 +44,8 @@ export default function ListingCard({
 
   useEffect(() => {
     // Set up carousel rotation for photos
-    let photoArray = listing?.photo_urls
-
-    // Handle if photo_urls is a string
-    if (typeof photoArray === 'string') {
-      try {
-        photoArray = JSON.parse(photoArray)
-      } catch {
-        photoArray = photoArray.split(/[,|]/).map(url => url.trim()).filter(Boolean)
-      }
-    }
-
-    const hasMultiplePhotos = Array.isArray(photoArray) && photoArray.length > 0
+    const photoArray = getNormalizedPhotoUrls()
+    const hasMultiplePhotos = photoArray.length > 0
 
     if (!hasMultiplePhotos) return
 
