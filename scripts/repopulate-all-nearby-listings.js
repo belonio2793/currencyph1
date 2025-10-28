@@ -231,19 +231,19 @@ function createListing(city, category, index) {
     phone_number: `+63 ${Math.floor(Math.random() * 900) + 100} ${Math.floor(Math.random() * 9000) + 1000}`,
     
     // Details
-    highlights: JSON.stringify(['Highly rated', 'Verified reviews', 'Popular with families']),
-    amenities: JSON.stringify(amenities),
-    awards: JSON.stringify(Math.random() > 0.7 ? [{ name: "Travelers' Choice", year: 2024 }] : []),
-    hours_of_operation: JSON.stringify(getHours()),
-    accessibility_info: JSON.stringify({
+    highlights: ['Highly rated', 'Verified reviews', 'Popular with families'],
+    amenities: amenities,
+    awards: Math.random() > 0.7 ? [{ name: "Travelers' Choice", year: 2024 }] : [],
+    hours_of_operation: getHours(),
+    accessibility_info: {
       wheelchair_accessible: Math.random() > 0.5,
       pet_friendly: Math.random() > 0.6,
       elevator: category === 'Hotels' ? true : Math.random() > 0.6,
       accessible_parking: Math.random() > 0.4,
       accessible_restroom: Math.random() > 0.3
-    }),
-    nearby_attractions: JSON.stringify([]),
-    best_for: JSON.stringify(['Travel']),
+    },
+    nearby_attractions: [],
+    best_for: ['Travel'],
     
     // Pricing
     price_level: priceLevel,
