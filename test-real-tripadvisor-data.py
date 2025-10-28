@@ -286,7 +286,7 @@ NEXT STEPS:
 print(summary)
 
 # Save output for reference
-with open("real_tripadvisor_test_output.json", "w") as f:
+with open("real_tripadvisor_test_output.json", "w", encoding='utf-8') as f:
     json.dump({
         "source_url": "https://www.tripadvisor.com.ph/Restaurant_Review-g298573-d26455563-Reviews-Manila_Bay_Kitchen-Manila_Metro_Manila_Luzon.html",
         "raw_data": REAL_TRIPADVISOR_DATA,
