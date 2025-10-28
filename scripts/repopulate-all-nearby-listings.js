@@ -206,7 +206,7 @@ function createListing(city, category, index) {
     // Ratings
     rating: rating,
     review_count: reviewCount,
-    review_details: JSON.stringify([
+    review_details: [
       {
         author: 'Traveler',
         rating: rating,
@@ -214,7 +214,7 @@ function createListing(city, category, index) {
         date: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString(),
         verified: true
       }
-    ]),
+    ],
     
     // Images
     image_url: null,
