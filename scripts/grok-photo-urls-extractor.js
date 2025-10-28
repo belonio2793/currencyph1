@@ -55,12 +55,16 @@ let BATCH = 10
 let START = 0
 let LIMIT = 999999
 let SKIP_EXISTING = true
+let FILTER_SLUG = null
+let FILTER_ID = null
 
 for (let i = 0; i < argv.length; i++) {
   if (argv[i] === '--batch' && argv[i+1]) { BATCH = Number(argv[i+1]); i++ }
   if (argv[i] === '--start' && argv[i+1]) { START = Number(argv[i+1]); i++ }
   if (argv[i] === '--limit' && argv[i+1]) { LIMIT = Number(argv[i+1]); i++ }
   if (argv[i] === '--force') { SKIP_EXISTING = false }
+  if (argv[i] === '--slug' && argv[i+1]) { FILTER_SLUG = String(argv[i+1]); i++ }
+  if (argv[i] === '--id' && argv[i+1]) { FILTER_ID = Number(argv[i+1]); i++ }
 }
 
 function sleep(ms) { 
@@ -314,11 +318,63 @@ async function main() {
   console.log(`  Limit: ${LIMIT}`)
   console.log(`  Skip existing: ${SKIP_EXISTING}`)
   console.log(`  ScrapingBee keys available: ${SCRAPINGBEE_KEYS.length}`)
-  console.log(`  Max photos per listing: ${MAX_PHOTOS}\n`)
+  console.log(`  Max photos per listing: ${MAX_PHOTOS}`)
+  if (FILTER_SLUG) console.log(`  Filter slug: ${FILTER_SLUG}`)
+  if (FILTER_ID) console.log(`  Filter id: ${FILTER_ID}`)
+  console.log('\n')
 
   let offset = START
   let totalProcessed = 0
   let stats = { processed: 0, updated: 0, skipped: 0, failed: 0, fetchError: 0 }
+
+  // If targeting a single listing by slug or id, process it directly
+  if (FILTER_SLUG || FILTER_ID) {
+    let listing = null
+    if (FILTER_SLUG) {
+      const { data, error } = await supabase
+        .from('nearby_listings')
+        .select('id, name, city, web_url, photo_urls, photo_count, slug')
+        .eq('slug', FILTER_SLUG)
+        .single()
+      if (error) {
+        console.error('Failed to fetch listing by slug:', error.message)
+        process.exit(1)
+      }
+      listing = data
+    } else if (FILTER_ID) {
+      const { data, error } = await supabase
+        .from('nearby_listings')
+        .select('id, name, city, web_url, photo_urls, photo_count, slug')
+        .eq('id', FILTER_ID)
+        .single()
+      if (error) {
+        console.error('Failed to fetch listing by id:', error.message)
+        process.exit(1)
+      }
+      listing = data
+    }
+
+    if (!listing) {
+      console.log('No listing found for the provided filter')
+      process.exit(0)
+    }
+
+    const result = await processListing(listing)
+    stats.processed = 1
+    if (result.status === 'updated') stats.updated = 1
+    if (result.status === 'skip') stats.skipped = 1
+    if (result.status === 'fetch-error') stats.fetchError = 1
+    if (result.status === 'no-photos') stats.failed = 1
+
+    console.log(`\n\n=== FINAL RESULTS ===`)
+    console.log(`Total processed: ${stats.processed}`)
+    console.log(`Updated with photos: ${stats.updated}`)
+    console.log(`Already had photos: ${stats.skipped}`)
+    console.log(`No photos found: ${stats.failed}`)
+    console.log(`Fetch errors: ${stats.fetchError}`)
+    console.log(`Success rate: ${stats.processed > 0 ? ((stats.updated / stats.processed) * 100).toFixed(1) : 0}%`)
+    process.exit(0)
+  }
 
   while (totalProcessed < LIMIT) {
     const batchEnd = offset + BATCH
