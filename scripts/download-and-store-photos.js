@@ -17,7 +17,11 @@ import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
+import { exec } from 'child_process'
+import { promisify } from 'util'
 import { fileURLToPath } from 'url'
+
+const execAsync = promisify(exec)
 
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
