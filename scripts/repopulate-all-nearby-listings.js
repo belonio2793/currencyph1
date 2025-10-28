@@ -269,7 +269,7 @@ function createListing(city, category, index) {
     currency: 'PHP',
     timezone: 'Asia/Manila',
     region_name: city,
-    city_id: Math.abs(city.charCodeAt(0) * 1000 + city.length),
+    city_id: generateUUID(),
     raw: JSON.stringify({ city, category })
   }
 }
