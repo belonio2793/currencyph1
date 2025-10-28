@@ -415,7 +415,8 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       const data = await wisegcashAPI.getWallets(userId)
       setWallets(data)
     } catch (err) {
-      console.error('Error loading wallets:', err)
+      console.debug('Wallet data unavailable, using empty wallets:', err?.message)
+      setWallets([])
     }
   }
 
