@@ -432,18 +432,26 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         // fallback to external API
         try {
           const globalRates = await currencyAPI.getGlobalRates()
+          if (!globalRates || typeof globalRates !== 'object') {
+            console.debug('Invalid rates format, using empty rates')
+            setExchangeRates(ratesMap)
+            return
+          }
           const codes = Object.keys(globalRates)
           codes.forEach(code => {
-            const usdToCode = globalRates[code].rate || 0
-            ratesMap[`USD_${code}`] = usdToCode
+            const rateObj = globalRates[code]
+            const rate = rateObj?.rate || 0
+            if (rate > 0) {
+              ratesMap[`USD_${code}`] = rate
+            }
           })
           codes.forEach(from => {
             codes.forEach(to => {
               if (from === to) return
-              const usdToFrom = globalRates[from].rate || 0
-              const usdToTo = globalRates[to].rate || 0
-              if (usdToFrom > 0 && usdToTo > 0) {
-                ratesMap[`${from}_${to}`] = usdToTo / usdToFrom
+              const rateFrom = globalRates[from]?.rate || 0
+              const rateTo = globalRates[to]?.rate || 0
+              if (rateFrom > 0 && rateTo > 0) {
+                ratesMap[`${from}_${to}`] = rateTo / rateFrom
               }
             })
           })
