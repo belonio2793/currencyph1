@@ -345,7 +345,8 @@ async function processListing(listing) {
 
     if (error) throw error
 
-    console.log(`  ✓ Successfully stored ${uploadedUrls.length} photos`)
+    console.log(`  ✅ Success! Stored ${uploadedUrls.length} photos`)
+    console.log(`  Public URLs: ${uploadedUrls.slice(0, 2).map(u => u.substring(0, 60) + '...').join(', ')}`)
     return { id: listing.id, status: 'success', count: uploadedUrls.length }
   } catch (err) {
     console.log(`  ✗ Database error: ${err.message}`)
