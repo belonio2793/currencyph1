@@ -49,30 +49,35 @@ GROK_HEADERS = {
 }
 
 
-def search_tripadvisor(query: str) -> Optional[str]:
-    """Search TripAdvisor for a listing and return the listing URL"""
+def search_tripadvisor_with_grok(query: str) -> Optional[str]:
+    """Use Grok to search TripAdvisor and return the listing URL"""
     try:
-        search_url = f"{TRIPADVISOR_SEARCH_URL}{requests.utils.quote(query)}"
-        response = requests.get(search_url, headers=HEADERS, timeout=10)
-        
+        payload = {
+            "model": GROK_MODEL,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": f"Search TripAdvisor.com.ph for '{query}' and provide the direct URL to the listing page. Only respond with the URL, nothing else. If not found, respond with 'NOT_FOUND'."
+                }
+            ],
+            "temperature": 0.2,
+            "max_tokens": 200
+        }
+
+        response = requests.post(GROK_API_URL, headers=GROK_HEADERS, json=payload, timeout=15)
+
         if response.status_code != 200:
+            print(f"  ❌ Grok API error: {response.status_code}", file=sys.stderr)
             return None
-        
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Find first search result link
-        # TripAdvisor search results contain links to listings
-        result_link = soup.find('a', attrs={'data-test-target': 'search-result-title'})
-        
-        if result_link and result_link.get('href'):
-            listing_path = result_link['href']
-            if listing_path.startswith('http'):
-                return listing_path
-            else:
-                return f"{TRIPADVISOR_BASE}{listing_path}"
-        
+
+        data = response.json()
+        url = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+
+        if url and url != "NOT_FOUND" and url.startswith("http"):
+            return url
+
         return None
-        
+
     except Exception as e:
         print(f"  ❌ Search error: {e}", file=sys.stderr)
         return None
