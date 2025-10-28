@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
 import cheerio from 'cheerio'
+import { createClient } from '@supabase/supabase-js'
 
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
