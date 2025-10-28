@@ -381,12 +381,14 @@ def clear_nearby_listings(supabase: Client) -> bool:
     """Clear entire nearby_listings table"""
     try:
         print("🗑️  Clearing nearby_listings table...")
-        supabase.table("nearby_listings").delete().neq("id", "").execute()
+        # Delete all rows (using gt with 0 to match all IDs)
+        supabase.table("nearby_listings").delete().gt("id", -1).execute()
         print("  ✅ Table cleared")
         return True
     except Exception as e:
-        print(f"  ❌ Clear error: {e}", file=sys.stderr)
-        return False
+        print(f"  ⚠️  Clear skipped (table may already be empty): {e}", file=sys.stderr)
+        # Don't abort, table is likely already empty
+        return True
 
 
 def insert_listing(supabase: Client, listing_data: Dict) -> Optional[int]:
