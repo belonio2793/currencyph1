@@ -38,7 +38,8 @@
     "scrape-photos-bee": "node scripts/scrape-photos-rotate-bee.js",
     "fill-photos": "node scripts/fill-empty-photos.js",
     "cleanup-photos": "node scripts/cleanup-remove-unsplash.js",
-    "extract-photo-urls": "node scripts/grok-photo-urls-extractor.js"
+    "extract-photo-urls": "node scripts/grok-photo-urls-extractor.js",
+    "download-photos": "node scripts/download-and-store-photos.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
