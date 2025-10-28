@@ -278,6 +278,7 @@ export default function App() {
               setCurrentListingSlug(null)
               window.history.pushState(null, '', '/nearby')
             }} /> }
+            {activeTab === 'photo-scraper' && <div className="max-w-7xl mx-auto px-6 py-8"><PhotoScraper /></div> }
           </>
         )}
       </main>
