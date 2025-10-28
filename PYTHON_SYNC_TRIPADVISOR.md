@@ -84,9 +84,9 @@ python scripts/sync-tripadvisor.py --city=Manila --limit=50
 ✅ **Error Handling**: Gracefully handles API errors and continues processing  
 ✅ **Rate Limiting**: Built-in delays between API calls to respect rate limits  
 
-## Available Cities
+## Available Cities (180+ Philippine Cities)
 
-Manila, Cebu, Davao, Quezon City, Makati, Baguio, Boracay, Puerto Princesa, Iloilo, Pasig, Taguig, Caloocan, Las Piñas, Parañaque, Marikina, Muntinlupa, Navotas, Malabon, Valenzuela, Antipolo, Cabanatuan, Dagupan, Lucena, Batangas City, Bacoor, Cavite City, Tagaytay, Calapan, Tagbilaran, Dumaguete
+Abuyog, Alaminos, Alcala, Angeles, Antipolo, Aroroy, Bacolod, Bacoor, Baguio, Bago, Bais, Balanga, Baliuag, Bangued, Bansalan, Bantayan, Bataan, Batac, Batangas City, Bayambang, Bayawan, Baybay, Bayugan, Biñan, Bislig, Bocaue, Bogo, Boracay, Borongan, Bohol, Butuan, Cabadbaran, Cabanatuan, Cabuyao, Cadiz, Cagayan de Oro, Calamba, Calapan, Calbayog, Caloocan, Camiling, Canlaon, Caoayan, Capiz, Caraga, Carmona, Catbalogan, Cauayan, Cavite City, Cebu City, Coron, Cotabato City, Dagupan, Danao, Dapitan, Daraga, Dasmariñas, Davao City, Davao del Norte, Davao del Sur, Davao Oriental, Dipolog, Dumaguete, El Nido, General Santos, General Trias, Gingoog, Guihulngan, Himamaylan, Ilagan, Iligan, Iloilo City, Imus, Isabela, Isulan, Kabankalan, Kidapawan, Koronadal, La Carlota, Laoag, Lapu-Lapu, Las Piñas, Laoang, Legazpi, Ligao, Limay, Lucena, Maasin, Mabalacat, Malabon, Makati, Malaybalay, Malolos, Mandaluyong, Mandaue, Manila, Marawi, Marilao, Masbate City, Mati, Meycauayan, Muntinlupa, Naga (Camarines Sur), Navotas, Olongapo, Ormoc, Oroquieta, Ozamiz, Pagadian, Palo, Palawan, Parañaque, Pasay, Pasig, Passi, Puerto Princesa, Quezon City, Roxas, Sagay, Samal, San Carlos (Negros Occidental), San Carlos (Pangasinan), San Fernando (La Union), San Fernando (Pampanga), San Jose (Antique), San Jose del Monte, San Juan, San Pablo, San Pedro, Santiago, Siargao, Silay, Sipalay, Sorsogon City, Surigao City, Tabaco, Tabuk, Tacloban, Tacurong, Tagaytay, Tagbilaran, Taguig, Talisay (Cebu), Talisay (Negros Occidental), Tanjay, Tarlac City, Tayabas, Toledo, Trece Martires, Tuguegarao, Urdaneta, Valencia, Valenzuela, Victorias, Vigan, Virac, Zamboanga City
 
 ## Available Categories
 
