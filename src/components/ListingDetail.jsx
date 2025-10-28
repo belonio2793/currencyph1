@@ -83,22 +83,6 @@ export default function ListingDetail({ slug, onBack }) {
     )
   }
 
-  // Get best image from various sources
-  const getImageArray = () => {
-    if (listing.photo_urls && Array.isArray(listing.photo_urls) && listing.photo_urls.length > 0) {
-      return listing.photo_urls
-    }
-    if (listing.image_urls && Array.isArray(listing.image_urls) && listing.image_urls.length > 0) {
-      return listing.image_urls
-    }
-    if (listing.featured_image_url) return [listing.featured_image_url]
-    if (listing.primary_image_url) return [listing.primary_image_url]
-    if (listing.image_url) return [listing.image_url]
-    return []
-  }
-
-  const imageArray = getImageArray()
-  const displayImage = imageArray.length > 0 ? imageArray[selectedPhotoIndex] : null
 
   // Format hours of operation
   const formatHours = (hours) => {
