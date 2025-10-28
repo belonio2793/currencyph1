@@ -23,7 +23,6 @@ async function verifyEnrichment() {
     process.exit(1)
   }
 
-  const totalListings = allListings?.length || 0
   console.log(`📊 Total listings in database: ${totalListings}`)
 
   // Get enriched listings (have tripadvisor_id)
