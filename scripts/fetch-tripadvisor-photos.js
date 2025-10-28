@@ -207,15 +207,19 @@ async function main() {
   }
 
   console.log(`\n🎬 TripAdvisor Photo Fetcher`)
-  console.log(`━━━━━━━━━━━━━━━━━��━━━━━━━━━`)
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
   console.log(`Batch: ${batchSize}, Starting from: ${start}\n`)
 
-  // Get listings without photos
-  const { data: listings, error } = await supabase
+  // Get all listings and filter client-side for those without photos
+  const { data: allListings, error } = await supabase
     .from('nearby_listings')
-    .select('id,name,city')
-    .or('photo_urls.is.null,photo_urls.eq.{}')
+    .select('id,name,city,photo_urls')
     .range(start, start + batchSize - 1)
+
+  // Filter for listings without photos
+  const listings = (allListings || []).filter(l =>
+    !l.photo_urls || l.photo_urls.length === 0
+  ).map(l => ({ id: l.id, name: l.name, city: l.city }))
 
   if (error) {
     console.error('❌ Error fetching listings:', error)
