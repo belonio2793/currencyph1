@@ -19,7 +19,7 @@ import { createClient } from '@supabase/supabase-js'
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 const X_API_KEY = process.env.X_API_KEY || process.env.XAI_API_KEY || process.env.GROK_API_KEY
-const GROK_API_URL = process.env.GROK_API_URL || 'https://api.grok.ai/v1/search'
+const GROK_API_URL = process.env.GROK_API_URL || 'https://api.x.ai/v1/chat/completions'
 
 if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
   console.error('Missing Supabase PROJECT_URL or SERVICE_ROLE_KEY')
