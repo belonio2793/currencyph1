@@ -66,6 +66,31 @@ export default function ListingCard({
         )}
       </div>
 
+      {/* Photo Gallery Section - Underneath Cost */}
+      {listing.photo_urls && listing.photo_urls.length > 0 && (
+        <div className="w-full bg-slate-100 border-b border-slate-200 overflow-hidden">
+          <div className="relative w-full h-48 bg-slate-200 group/gallery">
+            {/* Main photo */}
+            <img
+              src={listing.photo_urls[0]}
+              alt={listing.name}
+              className="w-full h-full object-cover group-hover/gallery:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+              }}
+            />
+            {/* Photo count badge */}
+            {listing.photo_urls.length > 1 && (
+              <div className="absolute bottom-2 right-2 bg-black/70 text-white rounded-full px-3 py-1 text-xs font-semibold">
+                📸 {listing.photo_urls.length}
+              </div>
+            )}
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          </div>
+        </div>
+      )}
+
       {/* Content */}
       <div className="p-4 flex flex-col h-full">
         {/* Name */}
