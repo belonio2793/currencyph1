@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import { createClient } from '@supabase/supabase-js';
-import 'dotenv/config';
 
 const PHILIPPINES_CITIES = [
   "Manila", "Cebu", "Davao", "Quezon City", "Makati", "Baguio", "Boracay",
@@ -192,7 +191,7 @@ async function main() {
     const upsertedCount = await upsertListings(supabase, uniqueListings);
     console.log(`\n✅ Sync complete! Upserted ${upsertedCount} listings.\n`);
   } else {
-    console.log(`\n⚠️  No listings found. Check TripAdvisor API key.\n`);
+    console.log(`\n��️  No listings found. Check TripAdvisor API key.\n`);
   }
 }
 
