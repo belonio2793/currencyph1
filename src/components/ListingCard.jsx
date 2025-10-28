@@ -17,6 +17,7 @@ export default function ListingCard({
   const [imageUrl, setImageUrl] = useState(null)
   const [imageLoading, setImageLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
 
   useEffect(() => {
     loadImage()
