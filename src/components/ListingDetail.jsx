@@ -135,8 +135,16 @@ export default function ListingDetail({ slug, onBack }) {
       </button>
 
       <div className="mb-8">
-        {/* Hero Image Gallery */}
-        {displayImage && (
+        {/* Hero Image Gallery or Average Cost */}
+        {listing.avg_cost ? (
+          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-white border border-slate-200 flex items-center justify-center">
+            <div className="text-center py-16 px-6">
+              <div className="text-sm text-slate-500">Estimated cost per person</div>
+              <div className="mt-3 text-4xl font-extrabold text-slate-900">₱{Number(listing.avg_cost).toLocaleString()}</div>
+              <div className="text-sm text-slate-600 mt-2">(Approximate)</div>
+            </div>
+          </div>
+        ) : displayImage && (
           <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-slate-200">
             <img
               src={displayImage}
