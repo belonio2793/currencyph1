@@ -45,7 +45,8 @@
     "repopulate-all": "node scripts/repopulate-all-nearby-listings.js",
     "fill-tripadvisor-final": "node scripts/fill-tripadvisor-data-final.js",
     "fill-tripadvisor-advanced": "node scripts/fill-tripadvisor-advanced.js",
-    "check-tripadvisor": "node scripts/check-tripadvisor-status.js"
+    "check-tripadvisor": "node scripts/check-tripadvisor-status.js",
+    "fill-tripadvisor-local": "node scripts/fill-tripadvisor-local.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
