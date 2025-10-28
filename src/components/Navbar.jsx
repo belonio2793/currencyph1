@@ -11,8 +11,7 @@ export default function Navbar({ activeTab, onTabChange }) {
     { id: 'send', label: 'Send' },
     { id: 'bills', label: 'Bills' },
     { id: 'transactions', label: 'History' },
-    { id: 'profile', label: 'Profile' },
-    { id: 'fill-photos', label: '📸 Photos' }
+    { id: 'profile', label: 'Profile' }
   ]
 
   return (
