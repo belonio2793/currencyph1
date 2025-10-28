@@ -42,7 +42,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function fetchTripAdvisorData(query, tripKey, limit = 30) {
+async function fetchTripAdvisorData(query, tripKey, limit = 30, city = null) {
   const params = new URLSearchParams();
   params.append("query", query);
   params.append("limit", String(limit));
@@ -66,11 +66,20 @@ async function fetchTripAdvisorData(query, tripKey, limit = 30) {
     const items = (json.data || json.results || []);
 
     return items.map((item) => {
-      const address = item.address_obj
-        ? [item.address_obj.street1, item.address_obj.city, item.address_obj.country]
-            .filter(Boolean)
-            .join(", ")
-        : item.address || item.address_string || "";
+      // Extract address components
+      let address = "";
+      let apiCity = city;
+      let apiCountry = "Philippines";
+
+      if (item.address_obj) {
+        address = [item.address_obj.street1, item.address_obj.city, item.address_obj.country]
+          .filter(Boolean)
+          .join(", ");
+        if (item.address_obj.city) apiCity = item.address_obj.city;
+        if (item.address_obj.country) apiCountry = item.address_obj.country;
+      } else {
+        address = item.address || item.address_string || "";
+      }
 
       const name = item.name || item.title || "";
       const locationType = item.type || item.location_type || (item.subcategory || item.category?.name || "Attraction");
@@ -83,31 +92,145 @@ async function fetchTripAdvisorData(query, tripKey, limit = 30) {
         .replace(/-+/g, "-");
 
       const tripadvisorId = item.location_id ? String(item.location_id) : `php_${Math.random().toString(36).slice(2,10)}`;
-      // Append a small part of the tripadvisor_id to the slug for uniqueness
       const idSuffix = tripadvisorId.slice(-6).toLowerCase();
       const slug = baseSlug ? `${baseSlug}-${idSuffix}` : `listing-${idSuffix}`;
 
+      // Extract photo URLs
+      let photoUrls = [];
+      if (Array.isArray(item.photos)) {
+        photoUrls = item.photos.map(p => p.url).filter(Boolean).slice(0, 20);
+      }
+
+      // Extract amenities, awards, highlights
+      const amenities = Array.isArray(item.amenities) ? item.amenities : [];
+      const awards = Array.isArray(item.awards) ? item.awards : [];
+      const highlights = Array.isArray(item.highlights) ? item.highlights : [];
+
+      // Extract accessibility info
+      const accessibilityInfo = item.accessibility_info && typeof item.accessibility_info === 'object'
+        ? item.accessibility_info
+        : {};
+
+      // Extract hours of operation
+      const hoursOfOperation = item.hours_of_operation && typeof item.hours_of_operation === 'object'
+        ? item.hours_of_operation
+        : {};
+
+      // Extract nearby attractions
+      const nearbyAttractions = Array.isArray(item.nearby_attractions) ? item.nearby_attractions : [];
+
+      // Extract best_for
+      const bestFor = Array.isArray(item.best_for) ? item.best_for : [];
+
+      // Extract price information
+      let priceLevel = null;
+      if (item.price_level) {
+        try {
+          priceLevel = parseInt(item.price_level, 10);
+        } catch (e) {
+          priceLevel = null;
+        }
+      }
+
+      const priceRange = item.price_range || null;
+      const duration = item.duration || null;
+
+      // Extract ranking information
+      const rankingInCity = item.ranking_in_city || null;
+      let rankingInCategory = null;
+      if (item.ranking_in_category) {
+        try {
+          rankingInCategory = parseInt(item.ranking_in_category, 10);
+        } catch (e) {
+          rankingInCategory = null;
+        }
+      }
+
+      // Calculate visibility score (0-100)
+      let visibilityScore = 0;
+      if (item.rating) {
+        visibilityScore += (Number(item.rating) / 5.0) * 40;
+      }
+      if (item.review_count || item.num_reviews) {
+        const reviews = item.review_count || item.num_reviews;
+        visibilityScore += Math.min((reviews / 1000.0) * 40, 40);
+      }
+      if (item.photo?.images?.large?.url || item.image_url) {
+        visibilityScore += 10;
+      }
+      if (item.verified) {
+        visibilityScore += 10;
+      }
+
+      const now = new Date().toISOString();
+      const imageUrl = item.photo?.images?.large?.url || item.image_url || null;
+
       return {
+        // Core identification
         tripadvisor_id: tripadvisorId,
-        name: name,
-        address: address || null,
-        latitude: item.latitude || item.lat || null,
-        longitude: item.longitude || item.lon || null,
-        rating: item.rating ? Number(item.rating) : null,
-        review_count: item.review_count || item.num_reviews || null,
-        category: item.subcategory || item.category?.name || null,
-        image_url: item.photo?.images?.large?.url || item.image_url || null,
-        web_url: item.web_url || `https://www.tripadvisor.com/Attraction_Review-g298573-d${item.location_id || "0"}`,
-        location_type: locationType,
-        phone_number: item.phone || item.phone_number || null,
-        website: item.website || item.web_url || null,
-        description: item.description || item.about || null,
-        hours_of_operation: {},
-        photo_count: item.photo_count || item.num_photos || null,
         slug: slug,
         source: "tripadvisor",
+
+        // Basic information
+        name: name,
+        address: address || null,
+        city: apiCity,
+        country: apiCountry,
+        location_type: locationType,
+        category: item.subcategory || item.category?.name || null,
+        description: item.description || item.about || null,
+
+        // Geographic data
+        latitude: item.latitude || item.lat || null,
+        longitude: item.longitude || item.lon || null,
+        lat: item.latitude || item.lat || null,
+        lng: item.longitude || item.lon || null,
+
+        // Rating & review data
+        rating: item.rating ? Number(item.rating) : null,
+        review_count: item.review_count || item.num_reviews || null,
+        review_details: Array.isArray(item.review_details) ? item.review_details : [],
+
+        // Images & media
+        image_url: imageUrl,
+        featured_image_url: imageUrl,
+        primary_image_url: imageUrl,
+        photo_urls: photoUrls,
+        photo_count: item.photo_count || item.num_photos || null,
+
+        // Contact & website
+        website: item.website || item.web_url || null,
+        web_url: item.web_url || `https://www.tripadvisor.com/Attraction_Review-g298573-d${item.location_id || "0"}`,
+        phone_number: item.phone || item.phone_number || null,
+
+        // Details & features
+        highlights: highlights,
+        amenities: amenities,
+        awards: awards,
+        hours_of_operation: hoursOfOperation,
+        accessibility_info: accessibilityInfo,
+        nearby_attractions: nearbyAttractions,
+        best_for: bestFor,
+
+        // Pricing & duration
+        price_level: priceLevel,
+        price_range: priceRange,
+        duration: duration,
+
+        // Rankings & visibility
+        ranking_in_city: rankingInCity,
+        ranking_in_category: rankingInCategory,
+        visibility_score: Math.round(visibilityScore * 100) / 100,
+        verified: Boolean(item.verified),
+
+        // Data status
+        fetch_status: "success",
+        fetch_error_message: null,
+        last_verified_at: now,
+        updated_at: now,
+
+        // Raw data
         raw: item,
-        updated_at: new Date().toISOString(),
       };
     });
   } catch (err) {
