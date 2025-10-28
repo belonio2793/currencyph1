@@ -516,9 +516,9 @@ def main():
             query_count += 1
             query = f"{category} in {city} Philippines"
             print(f"[{query_count}/{total_queries}] Fetching {query}... ", end="", flush=True)
-            
+
             try:
-                listings = fetch_tripadvisor_data(query, tripadvisor_key, args.limit)
+                listings = fetch_tripadvisor_data(query, tripadvisor_key, args.limit, city)
                 
                 if listings:
                     all_listings.extend(listings)
