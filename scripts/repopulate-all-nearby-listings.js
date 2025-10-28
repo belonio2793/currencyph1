@@ -142,6 +142,14 @@ function getHours() {
   }
 }
 
+// Generate UUID v4
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
 // City coordinates
 const CITY_COORDS = {
   'Manila': { lat: 14.5995, lng: 120.9842 },
