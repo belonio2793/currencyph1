@@ -541,15 +541,13 @@ def main():
         name = listing.get("name", "Unknown")
         city = listing.get("city", "Unknown")
         address = listing.get("address", "")
-        
-        # Build search query
-        search_query = f"{name} {city} Philippines"
-        
-        print(f"[{idx + 1}/{len(listings)}] {name} ({city})...", end=" ", flush=True)
-        
+        category = listing.get("category") or listing.get("location_type") or None
+
+        print(f"[{idx + 1}/{len(listings)}] {name} ({city})")
+
         try:
-            # Search TripAdvisor using ScrapingBee
-            listing_url = search_tripadvisor(search_query)
+            # Smart search with multiple strategies
+            listing_url = search_tripadvisor(name, city, category)
             
             if not listing_url:
                 print("⚠️  Not found on TripAdvisor")
