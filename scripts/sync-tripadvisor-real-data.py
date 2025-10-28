@@ -24,29 +24,34 @@ import re
 from typing import List, Dict, Optional
 from datetime import datetime
 from pathlib import Path
+from itertools import cycle
 
 import requests
 from supabase import create_client, Client
+from bs4 import BeautifulSoup
 
 # Configuration
 BATCH_SIZE = 50
-REQUEST_DELAY = 0.5  # shorter delay with API (was 1.0 for scraping)
+REQUEST_DELAY = 0.3
 CHECKPOINT_FILE = "tripadvisor_sync_checkpoint.json"
 BACKUP_FILE = "nearby_listings_backup.json"
 ERRORS_FILE = "tripadvisor_sync_errors.json"
 
-# Grok API Configuration
-GROK_API_URL = "https://api.x.ai/v1/chat/completions"
-GROK_API_KEY = "xai-qe0lzba8kfDmccd5EBClqO7ELZXxYG3hyyetV1b5D4dISqjStXLHcFElnYfmRD3ddy0gV4sHxnR3XZT3"
-GROK_MODEL = "grok-2"
+# ScrapingBee API Configuration (rotated to avoid 1000 call limit)
+SCRAPINGBEE_KEYS = [
+    "Z3CQBBBPQIA4FQAQOHWJVO40ZKIRMM7LNUBVOQVAN2VP2PE2F1PQO9JGJZ5C9U9C9LRWK712V7P963C9",
+    "OPYAXOKXYQ0SBE7LR23GJ3NH1R4M66NUM85WJO1SCFUOFGJ11LJP6ZKD1JBVKNGMGC3E1RQXF81NT4YS",
+    "IQA11BPV1NYZEFAX4Q3SMM3DQZIBZWXY4O47IPRDBQPGAVZTQPKB4C2GAMXOEZJTEJ9TU5J2GQJJXSOP",
+    "DHOMQK5VZOIUQN9JJZHFR3WX07XFGTFFYFVCRM6AOLZFGI5S9Z60R23AQM2LUL84M2SNK4HH9NGMVDCG",
+    "8WKM4CAOLMHF8GXKHB3G1QPURA4X4LCIG9EGCXRWS7QMUJ7S7E3M6WQBYYV2FTFG5EWXR6Y4XM7TM4QX",
+    "GLSHI1K5BM0VXE2CWR26MV73KXL6SLC6K055F65913FPY8MNRJXXU9ZYN8UD5HSRISOWL0OB7RV6CNEA"
+]
+SCRAPINGBEE_URL = "https://app.scrapingbee.com/api/v1"
+SCRAPINGBEE_KEY_CYCLE = cycle(SCRAPINGBEE_KEYS)
+CURRENT_KEY = next(SCRAPINGBEE_KEY_CYCLE)
 
+TRIPADVISOR_SEARCH_URL = "https://www.tripadvisor.com.ph/Search?q="
 TRIPADVISOR_BASE = "https://www.tripadvisor.com.ph"
-
-# Headers for Grok API
-GROK_HEADERS = {
-    "Authorization": f"Bearer {GROK_API_KEY}",
-    "Content-Type": "application/json"
-}
 
 
 def search_tripadvisor_with_grok(query: str) -> Optional[str]:
