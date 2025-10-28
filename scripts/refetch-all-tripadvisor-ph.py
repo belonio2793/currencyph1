@@ -422,18 +422,19 @@ def main():
     print("REFETCH ALL TRIPADVISOR.COM.PH LISTINGS")
     print("=" * 100)
     print(f"\n📊 USING {len(SCRAPINGBEE_KEYS)} SCRAPINGBEE KEYS (8000 total calls)\n")
-    
-    # Backup before clearing
-    if not args.dry_run:
+
+    # Backup before clearing (skip if --no-backup)
+    if not args.dry_run and not args.no_backup:
         if not backup_current_listings(supabase):
             print("❌ Backup failed, aborting")
             sys.exit(1)
-    
-    # Clear table
-    if not args.dry_run:
+
+        # Clear table
         if not clear_nearby_listings(supabase):
             print("❌ Clear failed, aborting")
             sys.exit(1)
+    elif args.no_backup:
+        print("⏭️  Skipping backup/clear (using --no-backup)\n")
     else:
         print("🔍 DRY RUN - Would clear table here\n")
     
