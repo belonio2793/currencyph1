@@ -550,7 +550,7 @@ def main():
             listing_url = search_tripadvisor(name, city, category)
             
             if not listing_url:
-                print("⚠️  Not found on TripAdvisor")
+                print("  ⚠️  Not found on TripAdvisor")
                 checkpoint["not_found"] += 1
                 errors_log.append({
                     "id": listing_id,
