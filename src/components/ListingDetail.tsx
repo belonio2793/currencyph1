@@ -26,11 +26,29 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
     }
   }
 
-  const galleryImages = useMemo(() => {
+  const getImageArray = () => {
     if (!listing) return [] as string[]
-    const primary = canonicalize(listing.image)
+    // Prefer photo_urls and image_urls columns (from Supabase) when present
+    if ((listing as any).photo_urls && Array.isArray((listing as any).photo_urls) && (listing as any).photo_urls.length > 0) {
+      return (listing as any).photo_urls as string[]
+    }
+    if ((listing as any).image_urls && Array.isArray((listing as any).image_urls) && (listing as any).image_urls.length > 0) {
+      return (listing as any).image_urls as string[]
+    }
+    // Fall back to local listing.images or fields
+    if (listing.images && listing.images.length) return listing.images
+    if ((listing as any).featured_image_url) return [(listing as any).featured_image_url]
+    if ((listing as any).primary_image_url) return [(listing as any).primary_image_url]
+    if ((listing as any).image) return [(listing as any).image]
+    return []
+  }
+
+  const galleryImages = useMemo(() => {
+    const arr = getImageArray()
+    if (!arr || arr.length === 0) return [] as string[]
+    const primary = canonicalize((listing?.image as string) || arr[0])
     const seen = new Set<string>()
-    return (listing.images || []).filter((u) => {
+    return arr.filter((u) => {
       const c = canonicalize(u)
       if (c === primary || seen.has(c)) return false
       seen.add(c)
