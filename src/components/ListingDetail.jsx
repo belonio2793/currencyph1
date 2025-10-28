@@ -7,6 +7,7 @@ export default function ListingDetail({ slug, onBack }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [relatedListings, setRelatedListings] = useState([])
+  const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
 
   useEffect(() => {
     loadListing()
