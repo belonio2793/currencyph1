@@ -118,18 +118,31 @@ python scripts/sync-tripadvisor.py
 
 ## Sample Workflow
 
+**Option A: Comprehensive Sync (Recommended for full database)**
 ```bash
 # 1. Test with 10 items in Manila
 python scripts/sync-tripadvisor.py --city=Manila --limit=10
 
-# 2. If successful, sync all attractions
+# 2. If working, sync all attractions category (covers all cities)
 python scripts/sync-tripadvisor.py --category=attractions
 
-# 3. Then sync restaurants
+# 3. Repeat for other categories
+python scripts/sync-tripadvisor.py --category=hotels
 python scripts/sync-tripadvisor.py --category=restaurants
 
-# 4. Finally, sync everything (takes longer)
+# 4. Or sync everything at once (~10 minutes)
 python scripts/sync-tripadvisor.py
+```
+
+**Option B: City-by-City Sync (Better for testing)**
+```bash
+# Sync one city at a time
+python scripts/sync-tripadvisor.py --city=Manila
+python scripts/sync-tripadvisor.py --city=Cebu
+python scripts/sync-tripadvisor.py --city="Cagayan de Oro"
+
+# Or specific city + category
+python scripts/sync-tripadvisor.py --city=Manila --category=attractions
 ```
 
 ## Output
