@@ -647,7 +647,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {searchResults.map(item => (
                 <ListingCard
-                  key={item.tripadvisor_id}
+                  key={item.slug || item.tripadvisor_id || item.id || `listing-${Math.random()}`}
                   listing={item}
                   onNavigateToDetail={handleNavigateToListing}
                 />
@@ -726,7 +726,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {items.map(listing => (
                       <ListingCard
-                        key={listing.tripadvisor_id}
+                        key={listing.slug || listing.tripadvisor_id || listing.id || `listing-${Math.random()}`}
                         listing={listing}
                         onNavigateToDetail={handleNavigateToListing}
                       />
@@ -781,7 +781,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {items.map(listing => (
                       <ListingCard
-                        key={listing.tripadvisor_id}
+                        key={listing.slug || listing.tripadvisor_id || listing.id || `listing-${Math.random()}`}
                         listing={listing}
                         onNavigateToDetail={handleNavigateToListing}
                       />
@@ -801,7 +801,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
               {displayListings.map(listing => (
                 <ListingCard
-                  key={listing.tripadvisor_id}
+                  key={listing.slug || listing.tripadvisor_id || listing.id || `listing-${Math.random()}`}
                   listing={listing}
                   onNavigateToDetail={handleNavigateToListing}
                 />
