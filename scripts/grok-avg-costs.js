@@ -85,15 +85,15 @@ async function askGrok(prompt){
         'Authorization': `Bearer ${X_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'grok-beta',
+        model: 'grok-3',
         messages: [
           {
             role: 'user',
             content: prompt
           }
         ],
-        temperature: 0.7,
-        max_tokens: 100
+        temperature: 0.3,
+        max_tokens: 50
       }),
     })
     if (!res.ok) {
