@@ -176,7 +176,7 @@ export default function ListingDetail({ slug, onBack }) {
       <div className="mb-8">
         {/* Hero Image Gallery with Photo Gallery Thumbnails */}
         {displayImage ? (
-          <div className="mb-8 rounded-lg overflow-hidden bg-slate-200">
+          <div className="mb-8 rounded-lg overflow-hidden bg-slate-200" data-hero="true">
             {/* Main Image Display */}
             <div className="relative max-h-96 bg-slate-200 flex items-center justify-center">
               <img
@@ -245,7 +245,7 @@ export default function ListingDetail({ slug, onBack }) {
             )}
           </div>
         ) : listing.avg_cost ? (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-gradient-to-br from-blue-50 to-slate-50 border border-slate-200 flex items-center justify-center">
+          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-gradient-to-br from-blue-50 to-slate-50 border border-slate-200 flex items-center justify-center" data-hero="true">
             <div className="text-center py-16 px-6">
               <div className="text-sm text-slate-500">Estimated cost per person</div>
               <div className="mt-3 text-4xl font-extrabold text-slate-900">₱{Number(listing.avg_cost).toLocaleString()}</div>
@@ -253,7 +253,7 @@ export default function ListingDetail({ slug, onBack }) {
             </div>
           </div>
         ) : (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-200 flex items-center justify-center">
+          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-200 flex items-center justify-center" data-hero="true">
             <div className="text-center py-16 px-6 text-slate-500">
               <p className="text-lg">No image available</p>
             </div>
@@ -423,6 +423,38 @@ export default function ListingDetail({ slug, onBack }) {
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-3">About</h2>
             <p className="text-slate-700 leading-relaxed">{listing.description}</p>
+          </div>
+        )}
+
+        {/* Photo Gallery Grid */}
+        {imageArray.length > 0 && (
+          <div className="mb-10">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Photo Gallery</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              {imageArray.map((url, idx) => (
+                <button
+                  key={`gallery-${idx}`}
+                  onClick={() => {
+                    setSelectedPhotoIndex(idx)
+                    const hero = document.querySelector('[data-hero="true"]')
+                    if (hero && hero.scrollIntoView) hero.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }}
+                  className="relative group rounded overflow-hidden border border-slate-200 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  title={`View photo ${idx + 1}`}
+                >
+                  <img
+                    src={url}
+                    alt={`${listing.name} - Photo ${idx + 1}`}
+                    className="w-full h-32 md:h-36 lg:h-40 object-cover group-hover:scale-105 transition-transform"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop&auto=format&q=80'
+                    }}
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
