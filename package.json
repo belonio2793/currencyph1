@@ -21,7 +21,10 @@
     "fetch-comprehensive": "node scripts/fetch-all-philippines-comprehensive.js",
     "populate-direct": "node scripts/populate-philippines-direct.js",
     "populate-demo": "node scripts/populate-demo-listings.js",
-    "test-api": "node scripts/test-tripadvisor-api.js"
+    "test-api": "node scripts/test-tripadvisor-api.js",
+    "populate-costs": "node scripts/quick-populate-costs.js",
+    "populate-all-costs": "node scripts/populate-all-costs.js",
+    "populate-costs-grok": "node scripts/grok-avg-costs.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
