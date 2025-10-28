@@ -473,8 +473,13 @@ def main():
             
             try:
                 # Extract full data from listing page
-                ta_data = extract_tripadvisor_listing_data(listing['url'], listing['name'])
-                
+                ta_data = extract_tripadvisor_listing_data(
+                    listing['url'],
+                    listing['name'],
+                    listing['location'],
+                    listing['category']
+                )
+
                 if not ta_data:
                     print("❌ Failed to extract")
                     errors_log.append({
@@ -482,14 +487,18 @@ def main():
                         "error": "Failed to extract data"
                     })
                     continue
-                
-                # Prepare insert payload
+
+                # Prepare insert payload with ALL columns
                 insert_payload = {
                     "id": str(uuid.uuid4()),
                     "name": listing['name'],
                     "city": listing['location'],
                     "category": listing['category'],
                     "slug": re.sub(r'[^a-z0-9]+', '-', listing['name'].lower()).strip('-'),
+                    "created_at": datetime.now().isoformat(),
+                    "updated_at": datetime.now().isoformat(),
+                    "avg_cost": 0,  # Will be calculated based on reviews/ratings
+                    "city_id": hash(listing['location']) % 10000,  # Generate consistent city ID
                     **ta_data
                 }
                 
@@ -546,7 +555,7 @@ def main():
             print(f"⚠️  Errors logged: {ERRORS_FILE}\n")
     
     else:
-        print(f"�� DRY RUN: Would insert {len(all_listings)} listings\n")
+        print(f"🔍 DRY RUN: Would insert {len(all_listings)} listings\n")
 
 
 if __name__ == "__main__":
