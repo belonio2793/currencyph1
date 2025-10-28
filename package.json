@@ -40,7 +40,8 @@
     "cleanup-photos": "node scripts/cleanup-remove-unsplash.js",
     "extract-photo-urls": "node scripts/grok-photo-urls-extractor.js",
     "download-photos": "node scripts/download-and-store-photos.js",
-    "save-photo-urls": "node scripts/extract-and-save-photo-urls.js"
+    "save-photo-urls": "node scripts/extract-and-save-photo-urls.js",
+    "repopulate-nearby": "node scripts/repopulate-nearby-listings.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
