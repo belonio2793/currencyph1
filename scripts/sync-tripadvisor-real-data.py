@@ -568,7 +568,7 @@ def main():
             ta_data = extract_tripadvisor_listing_data(listing_url)
             
             if not ta_data:
-                print("❌ Failed to extract data")
+                print("  ❌ Failed to extract data")
                 checkpoint["errors"] += 1
                 errors_log.append({
                     "id": listing_id,
