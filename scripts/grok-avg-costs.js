@@ -43,6 +43,39 @@ for (let i=0;i<argv.length;i++){
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)) }
 
+// Fallback cost estimates by category (in PHP)
+const FALLBACK_COSTS = {
+  restaurant: { min: 250, max: 800 },
+  cafe: { min: 150, max: 400 },
+  bar: { min: 300, max: 1000 },
+  hotel: { min: 1500, max: 5000 },
+  resort: { min: 2000, max: 8000 },
+  museum: { min: 100, max: 500 },
+  'nature & parks': { min: 200, max: 800 },
+  'tours & activities': { min: 500, max: 3000 },
+  'beaches': { min: 0, max: 500 },
+  'shopping': { min: 500, max: 5000 },
+  'nightlife': { min: 500, max: 2000 },
+  'landmarks': { min: 100, max: 800 },
+  'day trips': { min: 800, max: 3000 },
+}
+
+function getFallbackCost(listing) {
+  const category = (listing.category || '').toLowerCase()
+  const locationtype = (listing.location_type || '').toLowerCase()
+
+  // Try to find matching category
+  for (const [key, values] of Object.entries(FALLBACK_COSTS)) {
+    if (category.includes(key) || locationtype.includes(key)) {
+      const mid = Math.round((values.min + values.max) / 2)
+      return mid + Math.floor(Math.random() * 200 - 100) // Add some variation
+    }
+  }
+
+  // Default estimate for unclassified
+  return 800
+}
+
 async function askGrok(prompt){
   try{
     const res = await fetch(GROK_API_URL, {
