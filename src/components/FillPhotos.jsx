@@ -124,16 +124,16 @@ export default function FillPhotos() {
           </div>
 
           {result.results && result.results.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-green-200 max-h-80 overflow-y-auto">
-              <p className="font-semibold text-sm mb-2">Updates:</p>
+            <div className="mt-4 pt-4 border-t border-green-200 max-h-96 overflow-y-auto">
+              <p className="font-semibold text-sm mb-2">Fill Photo Details:</p>
               <div className="space-y-2">
                 {result.results.map((r, idx) => (
                   <div
                     key={idx}
-                    className={`text-xs p-2 rounded ${
+                    className={`text-xs p-2 rounded border-l-4 ${
                       r.success
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
+                        ? 'bg-green-100 text-green-800 border-green-500'
+                        : 'bg-yellow-100 text-yellow-800 border-yellow-500'
                     }`}
                   >
                     <div className="font-semibold">{r.name}</div>
@@ -141,7 +141,7 @@ export default function FillPhotos() {
                     {r.success ? (
                       <div className="text-xs">✓ {r.count} photos added</div>
                     ) : (
-                      <div className="text-xs">✗ {r.error}</div>
+                      <div className="text-xs">⚠️ {r.error}</div>
                     )}
                   </div>
                 ))}
