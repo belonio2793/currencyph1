@@ -344,17 +344,17 @@ def main():
     parser.add_argument("--limit", type=int, default=0, help="Limit rows for testing")
     parser.add_argument("--resume", action="store_true", help="Resume from checkpoint")
     parser.add_argument("--force", action="store_true", help="Skip checkpoint and start fresh")
-    
+
     args = parser.parse_args()
-    
-    # Load environment
-    supabase_url = os.getenv("VITE_PROJECT_URL") or os.getenv("SUPABASE_URL")
-    supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
-    
+
+    # Supabase credentials
+    supabase_url = "https://corcofbmafdxehvlbesx.supabase.co"
+    supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvcmNvZmJtYWZkeGVodmxiZXN4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTQ0Mjk2NiwiZXhwIjoyMDc3MDE4OTY2fQ.zKQaZcsCXmVMr4uExjJzuV07H3JlEJP65f2_SKrpcb4"
+
     if not supabase_url or not supabase_key:
         print("❌ Missing Supabase credentials", file=sys.stderr)
         sys.exit(1)
-    
+
     supabase = create_client(supabase_url, supabase_key)
     
     # Load existing listings
