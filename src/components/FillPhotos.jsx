@@ -93,13 +93,31 @@ export default function FillPhotos() {
       {result && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
           <h3 className="text-green-900 font-semibold mb-3">✅ Complete!</h3>
-          <div className="space-y-2 text-sm text-green-800 mb-4">
-            <p>
-              <span className="font-semibold">Processed:</span> {result.processed} listings
-            </p>
-            <p>
-              <span className="font-semibold">Updated:</span> {result.updated} with photos
-            </p>
+          <div className="space-y-3 text-sm text-green-800 mb-4">
+            {result.steps?.cleanup && (
+              <div className="p-2 bg-white rounded border border-green-200">
+                <p className="font-semibold text-green-700">🧹 Cleanup Step</p>
+                <p>
+                  Removed mountain images from {result.steps.cleanup.cleaned} listings
+                </p>
+              </div>
+            )}
+            {result.steps?.fill && (
+              <div className="p-2 bg-white rounded border border-green-200">
+                <p className="font-semibold text-green-700">📸 Fill Photos Step</p>
+                <p>
+                  Processed: {result.steps.fill.processed} listings
+                </p>
+                <p>
+                  Updated: {result.steps.fill.updated} with photos
+                </p>
+                {result.steps.fill.failed > 0 && (
+                  <p className="text-yellow-700">
+                    Failed: {result.steps.fill.failed}
+                  </p>
+                )}
+              </div>
+            )}
             {result.message && (
               <p className="text-gray-700">{result.message}</p>
             )}
