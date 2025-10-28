@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '../lib/supabaseClient';
 
 export default function PhotoScraper() {
   const [isLoading, setIsLoading] = useState(false);
