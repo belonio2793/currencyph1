@@ -277,8 +277,6 @@ async function run(){
         html = await beeFetch(searchUrl)
         links = parseSearch(html).slice(0, perCity)
       }
-      const html = await beeFetch(searchUrl)
-      const links = parseSearch(html).slice(0, perCity)
       console.log(`  Found ${links.length} detail links`)
       const listings = []
       for (const link of links){
