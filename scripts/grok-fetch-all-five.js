@@ -1,13 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
-import cheerio from 'cheerio'
-
-const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
-const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-const X_API_KEY = process.env.X_API_KEY || process.env.XAI_API_KEY || process.env.GROK_API_KEY || process.env.X_API_KEY
-const GROK_API_URL = process.env.GROK_API_URL || 'https://api.grok.ai/v1/search'
-import { createClient } from '@supabase/supabase-js'
-import fetch from 'node-fetch'
 
 // Grok-only script: find up to 5 TripAdvisor listing gallery image URLs per listing
 // and append them to nearby_listings.photo_urls (Supabase). Uses X_API_KEY & GROK_API_URL.
@@ -47,7 +39,6 @@ async function grokFindImages(query, attempt = 1) {
         'Authorization': `Bearer ${X_API_KEY}`
       },
       body: JSON.stringify({ query: prompt }),
-      // node-fetch doesn't support timeout option in v2; implement via AbortController if needed
     })
 
     if (!res.ok) {
@@ -138,74 +129,6 @@ async function main() {
     await sleep(2000)
   }
   console.log('Grok harvest complete')
-  process.exit(0)
-}
-
-main().catch(err => { console.error('Fatal error', err); process.exit(1) })
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
-
-async function processListing(listing) {
-  const q = `${listing.name} ${listing.city || ''} TripAdvisor`.replace(/\s+/g, ' ').trim()
-  console.log(`Processing id=${listing.id} name="${listing.name}"`) 
-
-  // If already 5 or more photos, skip
-  if (Array.isArray(listing.photo_urls) && listing.photo_urls.length >= MAX_IMAGES) {
-    console.log('  already has >=5 photos, skipping')
-    return {id: listing.id, status: 'skip'}
-  }
-
-  let imgs = []
-  if (X_API_KEY) {
-    imgs = await grokFindImages(q)
-    if (imgs.length) console.log('  grok ->', imgs.length)
-  }
-  if (imgs.length === 0 && SCRAPING_BEE) {
-    imgs = await scrapingBeeFindImages(q)
-    if (imgs.length) console.log('  scrapingbee ->', imgs.length)
-  }
-  if (imgs.length === 0) {
-    imgs = await fallbackScrapeDirect(q)
-    if (imgs.length) console.log('  fallback ->', imgs.length)
-  }
-
-  if (imgs.length === 0) {
-    console.log('  no images found')
-    return {id: listing.id, status: 'none'}
-  }
-
-  imgs = imgs.slice(0, MAX_IMAGES)
-
-  const updated = await updatePhotoUrls(listing.id, imgs)
-  console.log(`  updated photo_urls (${updated.length})`)
-  return { id: listing.id, status: 'updated', count: updated.length }
-}
-
-async function main() {
-  console.log('Starting grok-fetch-all-five')
-  // Determine count
-  const { countRes, countErr } = await supabase.from('nearby_listings').select('id', { count: 'exact', head: false })
-  // We'll fetch in pages until no more
-  let start = START
-  let totalProcessed = 0
-  while (true) {
-    const batch = await fetchBatch(start, BATCH)
-    if (!batch || batch.length === 0) break
-    console.log(`Fetched batch start=${start} len=${batch.length}`)
-    for (const l of batch) {
-      try {
-        await processListing(l)
-      } catch (err) {
-        console.warn('  error processing listing:', err.message || err)
-      }
-      totalProcessed++
-      await sleep(600) // polite delay between listings
-    }
-    start += BATCH
-    // small pause between batches
-    await sleep(2000)
-  }
-  console.log('Complete. total processed:', totalProcessed)
   process.exit(0)
 }
 
