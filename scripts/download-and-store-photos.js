@@ -135,7 +135,8 @@ async function downloadImage(imageUrl, filename) {
       return null
     }
 
-    const buffer = await response.buffer()
+    const arrayBuffer = await response.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
     const filepath = path.join(TEMP_DIR, filename)
     fs.writeFileSync(filepath, buffer)
     return filepath
