@@ -37,7 +37,8 @@
     "monitor-enrich": "node scripts/monitor-enrichment-live.js",
     "scrape-photos-bee": "node scripts/scrape-photos-rotate-bee.js",
     "fill-photos": "node scripts/fill-empty-photos.js",
-    "cleanup-photos": "node scripts/cleanup-remove-unsplash.js"
+    "cleanup-photos": "node scripts/cleanup-remove-unsplash.js",
+    "extract-photo-urls": "node scripts/grok-photo-urls-extractor.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
