@@ -462,6 +462,14 @@ def main():
                 update_payload["website"] = ta_data["website"]
             if ta_data.get("image_url"):
                 update_payload["image_url"] = ta_data["image_url"]
+                update_payload["featured_image_url"] = ta_data["image_url"]
+                update_payload["primary_image_url"] = ta_data["image_url"]
+            if ta_data.get("photo_urls"):
+                update_payload["photo_urls"] = ta_data["photo_urls"]
+            if ta_data.get("photo_count"):
+                update_payload["photo_count"] = ta_data["photo_count"]
+            if ta_data.get("location_type"):
+                update_payload["location_type"] = ta_data["location_type"]
             if ta_data.get("tripadvisor_id"):
                 update_payload["tripadvisor_id"] = ta_data["tripadvisor_id"]
             
