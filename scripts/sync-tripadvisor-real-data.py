@@ -625,10 +625,12 @@ def main():
             
             # Update database
             if update_listing_in_db(supabase, listing_id, update_payload):
-                print(f"✅ Updated ({ta_data.get('rating')} rating, {ta_data.get('review_count')} reviews)")
+                rating_str = f"{ta_data.get('rating')} rating" if ta_data.get('rating') else "no rating"
+                review_str = f"{ta_data.get('review_count')} reviews" if ta_data.get('review_count') else "no reviews"
+                print(f"  ✅ Updated ({rating_str}, {review_str})")
                 checkpoint["updated"] += 1
             else:
-                print("⚠️  No data to update")
+                print("  ⚠️  No data to update")
             
             checkpoint["processed"] += 1
             checkpoint["last_listing_id"] = listing_id
