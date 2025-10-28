@@ -99,31 +99,107 @@ def fetch_with_scrapingbee(url: str) -> Optional[str]:
         return None
 
 
-def search_tripadvisor(query: str) -> Optional[str]:
-    """Search TripAdvisor for a listing and return the listing URL"""
+def extract_keywords(name: str) -> List[str]:
+    """Extract meaningful keywords from listing name"""
+    # Remove common generic words
+    stop_words = {'the', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'of', 'de', 'la', 'le', 'with'}
+    words = name.lower().split()
+    keywords = [w.strip('.,!?;:') for w in words if w.strip('.,!?;:') not in stop_words and len(w) > 2]
+    return keywords[:3]  # Top 3 keywords
+
+
+def fuzzy_match(source: str, target: str) -> float:
+    """Calculate fuzzy match ratio between two strings (0-1)"""
+    return SequenceMatcher(None, source.lower(), target.lower()).ratio()
+
+
+def extract_listing_name_from_html(html: str) -> Optional[str]:
+    """Extract listing name from search result HTML"""
     try:
-        search_url = f"{TRIPADVISOR_SEARCH_URL}{requests.utils.quote(query)}"
-        html = fetch_with_scrapingbee(search_url)
-
-        if not html:
-            return None
-
         soup = BeautifulSoup(html, 'html.parser')
+        # Try multiple selectors for the listing name
+        for selector in [
+            'a[data-test-target="search-result-title"]',
+            'a[class*="result"]',
+            'div[class*="name"] a',
+            'h2 a',
+            'a[href*="-d"]'
+        ]:
+            elem = soup.select_one(selector)
+            if elem:
+                text = elem.get_text(strip=True)
+                if text and len(text) > 2:
+                    return text
+        return None
+    except:
+        return None
 
-        # Find first search result link
-        result_link = soup.find('a', attrs={'data-test-target': 'search-result-title'})
 
-        if not result_link:
-            # Try alternative selectors
-            result_link = soup.find('a', href=re.compile(r'-d\d+-'))
+def search_tripadvisor(name: str, city: str, category: Optional[str] = None) -> Optional[str]:
+    """Smart search for exact TripAdvisor listing using multiple strategies"""
+    try:
+        # Strategy 1: Try exact name + city
+        search_queries = [
+            f"{name} {city} Philippines",
+            f"{name} {city}",
+        ]
 
-        if result_link and result_link.get('href'):
-            listing_path = result_link['href']
-            if listing_path.startswith('http'):
-                return listing_path
+        # Strategy 2: Try with keywords + city
+        keywords = extract_keywords(name)
+        if keywords:
+            search_queries.append(f"{' '.join(keywords)} {city} Philippines")
+            search_queries.append(f"{' '.join(keywords[:2])} {city}")
+
+        # Strategy 3: Try category + city if provided
+        if category:
+            search_queries.append(f"{category} {city} Philippines")
+
+        for attempt, query in enumerate(search_queries, 1):
+            print(f"  🔍 Attempt {attempt}: '{query}'...", end=" ", flush=True)
+
+            search_url = f"{TRIPADVISOR_SEARCH_URL}{requests.utils.quote(query)}"
+            html = fetch_with_scrapingbee(search_url)
+
+            if not html:
+                print("(no HTML)", end=" ")
+                continue
+
+            soup = BeautifulSoup(html, 'html.parser')
+
+            # Find all search result links
+            result_links = soup.find_all('a', href=re.compile(r'-d\d+-'))
+
+            if not result_links:
+                # Try alternative selector
+                result_links = soup.find_all('a', attrs={'data-test-target': 'search-result-title'})
+
+            if result_links:
+                # Use fuzzy matching to find best match
+                best_match = None
+                best_score = 0.3  # Minimum 30% match threshold
+
+                for link in result_links[:5]:  # Check top 5 results
+                    result_name = link.get_text(strip=True)
+                    score = fuzzy_match(name, result_name)
+
+                    if score > best_score:
+                        best_score = score
+                        best_match = link
+
+                if best_match and best_match.get('href'):
+                    listing_path = best_match['href']
+                    if listing_path.startswith('http'):
+                        print(f"✅ Found (match: {best_score:.1%})")
+                        return listing_path
+                    else:
+                        print(f"✅ Found (match: {best_score:.1%})")
+                        return f"{TRIPADVISOR_BASE}{listing_path}"
+                else:
+                    print(f"(no good match: {best_score:.1%})", end=" ")
             else:
-                return f"{TRIPADVISOR_BASE}{listing_path}"
+                print("(no results)", end=" ")
 
+        print("")
         return None
 
     except Exception as e:
