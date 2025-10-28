@@ -226,11 +226,33 @@ Total queries: 9
 - Verify your TripAdvisor API key is correct
 - Check if API quota is exceeded (TripAdvisor has rate limits)
 
+## Data Completeness
+
+The script populates **all 47 columns** in the `nearby_listings` table with data from TripAdvisor API:
+
+- **Always populated**: `tripadvisor_id`, `slug`, `name`, `city`, `country`, `source`, `fetch_status`, `updated_at`, `last_verified_at`, `verified`
+- **Usually populated**: `address`, `latitude`, `longitude`, `rating`, `review_count`, `image_url`, `category`, `phone_number`, `website`
+- **Sometimes populated** (depends on API response): `amenities`, `awards`, `hours_of_operation`, `accessibility_info`, `best_for`, `price_level`, `duration`, `ranking_in_city`
+- **Derived**: `visibility_score` (calculated from rating, review count, image availability, verification status)
+
+### Visibility Score Calculation
+
+```
+visibility_score = (rating / 5.0) × 40 + min((review_count / 1000) × 40, 40) + image_bonus(10) + verified_bonus(10)
+Range: 0.0 - 100.0
+```
+
 ## Differences from Node.js Version
 
-The Python script is functionally identical to `sync-tripadvisor-locally.js` with these minor differences:
+Both Python and Node.js versions are **functionally identical** with comprehensive column population:
 
+Python specific:
 - Uses `python-dotenv` for `.env` loading
 - Command syntax: `python scripts/sync-tripadvisor.py` instead of `npm run sync-tripadvisor`
-- Same environment variables and Supabase upsert logic
 - Native Python packages (no npm/yarn required)
+
+Both use:
+- Same environment variables and Supabase upsert logic
+- Same TripAdvisor API endpoints
+- Same deduplication and visibility scoring algorithms
+- Same 180+ Philippine cities and 9 categories
