@@ -58,14 +58,16 @@ TRIPADVISOR_BASE = "https://www.tripadvisor.com.ph"
 
 def rotate_scrapingbee_key():
     """Get next ScrapingBee key from rotation"""
-    global CURRENT_KEY
+    global CURRENT_KEY, SCRAPINGBEE_KEY_INDEX, SCRAPINGBEE_CALL_COUNT
     CURRENT_KEY = next(SCRAPINGBEE_KEY_CYCLE)
+    SCRAPINGBEE_KEY_INDEX = (SCRAPINGBEE_KEY_INDEX + 1) % len(SCRAPINGBEE_KEYS)
+    SCRAPINGBEE_CALL_COUNT = 0
     return CURRENT_KEY
 
 
 def fetch_with_scrapingbee(url: str) -> Optional[str]:
     """Fetch HTML content from URL using ScrapingBee"""
-    global CURRENT_KEY
+    global CURRENT_KEY, SCRAPINGBEE_KEY_INDEX, SCRAPINGBEE_CALL_COUNT
     try:
         params = {
             "api_key": CURRENT_KEY,
@@ -73,12 +75,14 @@ def fetch_with_scrapingbee(url: str) -> Optional[str]:
             "render_javascript": "false"
         }
 
+        SCRAPINGBEE_CALL_COUNT += 1
+
         response = requests.get(SCRAPINGBEE_URL, params=params, timeout=20)
 
         if response.status_code == 429:
             # Rate limit hit, rotate key
-            print("  🔄 Rotating ScrapingBee key...", end=" ", flush=True)
-            CURRENT_KEY = rotate_scrapingbee_key()
+            rotate_scrapingbee_key()
+            print(f"  🔄 Rotated to Key #{SCRAPINGBEE_KEY_INDEX + 1}", end=" ", flush=True)
             params["api_key"] = CURRENT_KEY
             response = requests.get(SCRAPINGBEE_URL, params=params, timeout=20)
 
