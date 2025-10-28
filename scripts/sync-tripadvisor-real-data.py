@@ -29,6 +29,7 @@ from itertools import cycle
 import requests
 from supabase import create_client, Client
 from bs4 import BeautifulSoup
+from difflib import SequenceMatcher
 
 # Configuration
 BATCH_SIZE = 50
