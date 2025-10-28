@@ -414,6 +414,10 @@ def main():
     supabase_url = "https://corcofbmafdxehvlbesx.supabase.co"
     supabase_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvcmNvZmJtYWZkeGVodmxiZXN4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTQ0Mjk2NiwiZXhwIjoyMDc3MDE4OTY2fQ.zKQaZcsCXmVMr4uExjJzuV07H3JlEJP65f2_SKrpcb4"
 
+    print("=" * 100)
+    print(f"📊 USING {len(SCRAPINGBEE_KEYS)} SCRAPINGBEE KEYS (rotating to avoid 1000-call limit)")
+    print("=" * 100)
+
     if not supabase_url or not supabase_key:
         print("❌ Missing Supabase credentials", file=sys.stderr)
         sys.exit(1)
