@@ -196,15 +196,15 @@ def create_slug(name: str, tripadvisor_id: str) -> str:
         return f"listing-{id_suffix}"
 
 
-def fetch_tripadvisor_data(query: str, api_key: str, limit: int = 30) -> List[Dict]:
-    """Fetch data from TripAdvisor API"""
+def fetch_tripadvisor_data(query: str, api_key: str, limit: int = 30, city: str = None) -> List[Dict]:
+    """Fetch data from TripAdvisor API and populate all nearby_listings columns"""
     params = {
         "query": query,
         "limit": limit
     }
-    
+
     url = "https://api.tripadvisor.com/api/partner/2.0/locations/search"
-    
+
     try:
         response = requests.get(
             url,
@@ -215,80 +215,228 @@ def fetch_tripadvisor_data(query: str, api_key: str, limit: int = 30) -> List[Di
             },
             timeout=10
         )
-        
+
         if response.status_code != 200:
             print(f"  ⚠️  API returned {response.status_code} for: {query}", file=sys.stderr)
             return []
-        
+
         data = response.json()
         items = data.get("data", data.get("results", []))
-        
+
         listings = []
         for item in items:
-            # Extract address
+            # Extract address components
             address = ""
+            api_city = city
+            api_country = "Philippines"
+
             if isinstance(item.get("address_obj"), dict):
+                addr_obj = item["address_obj"]
                 parts = [
-                    item["address_obj"].get("street1", ""),
-                    item["address_obj"].get("city", ""),
-                    item["address_obj"].get("country", "")
+                    addr_obj.get("street1", ""),
+                    addr_obj.get("city", ""),
+                    addr_obj.get("country", "")
                 ]
                 address = ", ".join(filter(None, parts))
+                if addr_obj.get("city"):
+                    api_city = addr_obj.get("city")
+                if addr_obj.get("country"):
+                    api_country = addr_obj.get("country")
             else:
                 address = item.get("address", item.get("address_string", ""))
-            
+
             # Extract basic info
             name = item.get("name", item.get("title", ""))
             location_type = item.get("type", item.get("location_type", ""))
             if not location_type:
-                category = item.get("category", {})
-                if isinstance(category, dict):
-                    location_type = category.get("name", "Attraction")
+                category_obj = item.get("category", {})
+                if isinstance(category_obj, dict):
+                    location_type = category_obj.get("name", "Attraction")
                 else:
                     location_type = item.get("subcategory", "Attraction")
-            
+
             # Generate TripAdvisor ID
             tripadvisor_id = str(item.get("location_id", f"php_{''.join(random.choices(string.ascii_lowercase + string.digits, k=8))}"))
-            
+
             # Create slug
             slug = create_slug(name, tripadvisor_id)
-            
-            # Extract photo URL
+
+            # Extract photo URLs and count
+            photo_urls = []
             image_url = None
+
             if isinstance(item.get("photo"), dict):
                 images = item["photo"].get("images", {})
                 if isinstance(images, dict):
-                    image_url = images.get("large", {}).get("url") if isinstance(images.get("large"), dict) else None
+                    large = images.get("large", {})
+                    if isinstance(large, dict):
+                        image_url = large.get("url")
+
             if not image_url:
                 image_url = item.get("image_url")
-            
-            # Build listing
+
+            # Extract all photo URLs if available
+            if isinstance(item.get("photos"), list):
+                photo_urls = [p.get("url") for p in item.get("photos", []) if isinstance(p, dict) and p.get("url")][:20]
+
+            # Extract rating and review details
+            rating = None
+            if item.get("rating"):
+                try:
+                    rating = float(item["rating"])
+                except (ValueError, TypeError):
+                    rating = None
+
+            review_count = item.get("review_count", item.get("num_reviews"))
+            if review_count is not None:
+                try:
+                    review_count = int(review_count)
+                except (ValueError, TypeError):
+                    review_count = None
+
+            # Extract amenities, highlights, awards
+            amenities = []
+            if isinstance(item.get("amenities"), list):
+                amenities = item.get("amenities", [])
+
+            awards = []
+            if isinstance(item.get("awards"), list):
+                awards = item.get("awards", [])
+
+            highlights = []
+            if isinstance(item.get("highlights"), list):
+                highlights = item.get("highlights", [])
+
+            # Extract accessibility info
+            accessibility_info = {}
+            if isinstance(item.get("accessibility_info"), dict):
+                accessibility_info = item.get("accessibility_info", {})
+
+            # Extract hours of operation
+            hours_of_operation = {}
+            if isinstance(item.get("hours_of_operation"), dict):
+                hours_of_operation = item.get("hours_of_operation", {})
+
+            # Extract nearby attractions
+            nearby_attractions = []
+            if isinstance(item.get("nearby_attractions"), list):
+                nearby_attractions = item.get("nearby_attractions", [])
+
+            # Extract best_for categories
+            best_for = []
+            if isinstance(item.get("best_for"), list):
+                best_for = item.get("best_for", [])
+
+            # Extract price information
+            price_level = None
+            price_range = None
+            if item.get("price_level"):
+                try:
+                    price_level = int(item["price_level"])
+                except (ValueError, TypeError):
+                    price_level = None
+
+            if item.get("price_range"):
+                price_range = item.get("price_range")
+
+            # Extract duration
+            duration = item.get("duration")
+
+            # Extract ranking information
+            ranking_in_city = item.get("ranking_in_city")
+            ranking_in_category = None
+            if item.get("ranking_in_category"):
+                try:
+                    ranking_in_category = int(item["ranking_in_category"])
+                except (ValueError, TypeError):
+                    ranking_in_category = None
+
+            # Calculate visibility score (0-100) based on available data
+            visibility_score = 0.0
+            if rating:
+                visibility_score += (rating / 5.0) * 40  # Rating worth 40 points
+            if review_count:
+                visibility_score += min((review_count / 1000.0) * 40, 40)  # Review count worth up to 40 points
+            if image_url:
+                visibility_score += 10  # Has image worth 10 points
+            if item.get("verified"):
+                visibility_score += 10  # Verified worth 10 points
+
+            now = datetime.now().isoformat()
+
+            # Build complete listing with all columns
             listing = {
+                # Core identification
                 "tripadvisor_id": tripadvisor_id,
-                "name": name,
-                "address": address or None,
-                "latitude": item.get("latitude", item.get("lat")),
-                "longitude": item.get("longitude", item.get("lon")),
-                "rating": float(item["rating"]) if item.get("rating") else None,
-                "review_count": item.get("review_count", item.get("num_reviews")),
-                "category": item.get("subcategory", location_type),
-                "image_url": image_url,
-                "web_url": item.get("web_url", f"https://www.tripadvisor.com/Attraction_Review-g298573-d{item.get('location_id', '0')}"),
-                "location_type": location_type,
-                "phone_number": item.get("phone", item.get("phone_number")),
-                "website": item.get("website", item.get("web_url")),
-                "description": item.get("description", item.get("about")),
-                "hours_of_operation": {},
-                "photo_count": item.get("photo_count", item.get("num_photos")),
                 "slug": slug,
                 "source": "tripadvisor",
-                "updated_at": datetime.now().isoformat()
+
+                # Basic information
+                "name": name,
+                "address": address or None,
+                "city": api_city,
+                "country": api_country,
+                "location_type": location_type,
+                "category": item.get("subcategory", location_type),
+                "description": item.get("description", item.get("about")),
+
+                # Geographic data
+                "latitude": item.get("latitude", item.get("lat")),
+                "longitude": item.get("longitude", item.get("lon")),
+                "lat": item.get("latitude", item.get("lat")),
+                "lng": item.get("longitude", item.get("lon")),
+
+                # Rating & review data
+                "rating": rating,
+                "review_count": review_count,
+                "review_details": item.get("review_details", []) if isinstance(item.get("review_details"), list) else [],
+
+                # Images & media
+                "image_url": image_url,
+                "featured_image_url": image_url,  # Use same as image_url if not provided
+                "primary_image_url": image_url,   # Use same as image_url if not provided
+                "photo_urls": photo_urls,
+                "photo_count": item.get("photo_count", item.get("num_photos")),
+
+                # Contact & website
+                "website": item.get("website", item.get("web_url")),
+                "web_url": item.get("web_url", f"https://www.tripadvisor.com/Attraction_Review-g298573-d{item.get('location_id', '0')}"),
+                "phone_number": item.get("phone", item.get("phone_number")),
+
+                # Details & features
+                "highlights": highlights,
+                "amenities": amenities,
+                "awards": awards,
+                "hours_of_operation": hours_of_operation,
+                "accessibility_info": accessibility_info,
+                "nearby_attractions": nearby_attractions,
+                "best_for": best_for,
+
+                # Pricing & duration
+                "price_level": price_level,
+                "price_range": price_range,
+                "duration": duration,
+
+                # Rankings & visibility
+                "ranking_in_city": ranking_in_city,
+                "ranking_in_category": ranking_in_category,
+                "visibility_score": round(visibility_score, 2),
+                "verified": bool(item.get("verified", True)),
+
+                # Data status
+                "fetch_status": "success",
+                "fetch_error_message": None,
+                "last_verified_at": now,
+                "updated_at": now,
+
+                # Raw data
+                "raw": item
             }
-            
+
             listings.append(listing)
-        
+
         return listings
-        
+
     except requests.RequestException as e:
         print(f"  ❌ Error fetching {query}: {e}", file=sys.stderr)
         return []
