@@ -51,8 +51,17 @@ async function askGrok(prompt){
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${X_API_KEY}`
       },
-      body: JSON.stringify({ query: prompt }),
-      // no timeout control here; caller can handle
+      body: JSON.stringify({
+        model: 'grok-beta',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.7,
+        max_tokens: 100
+      }),
     })
     if (!res.ok) {
       const txt = await res.text().catch(()=>'')
@@ -60,13 +69,13 @@ async function askGrok(prompt){
       return null
     }
     const data = await res.json()
-    // Try to extract a number in PHP
-    const jsonStr = JSON.stringify(data)
-    const m = jsonStr.match(/([0-9]{1,3}(?:,[0-9]{3})*|[0-9]+)(?:\.?[0-9]*)/) // basic number match
+    // Try to extract a number in PHP from the response
+    const responseText = data?.choices?.[0]?.message?.content || JSON.stringify(data)
+    const m = responseText.match(/([0-9]{1,3}(?:,[0-9]{3})*|[0-9]+)(?:\.?[0-9]*)/) // basic number match
     if (!m) return null
     // parse removing commas
     const num = Number(m[1].replace(/,/g,''))
-    if (!Number.isFinite(num)) return null
+    if (!Number.isFinite(num) || num < 100) return null // filter out unreasonable low values
     return Math.round(num)
   }catch(err){
     console.warn('Grok request error', err.message)
