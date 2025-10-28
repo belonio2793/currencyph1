@@ -84,12 +84,12 @@ export default function ListingCard({
       {!hideImage && (
         listing.avg_cost ? (
           <div className="relative w-full overflow-hidden" style={{ height: '220px' }}>
-            {/* Background Image - use photo_urls if available */}
+            {/* Background Image - use photo_urls carousel if available */}
             {Array.isArray(listing.photo_urls) && listing.photo_urls.length > 0 ? (
               <img
-                src={listing.photo_urls[0]}
+                src={listing.photo_urls[currentPhotoIndex]}
                 alt={listing.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-opacity duration-1000"
                 onError={(e) => {
                   e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
                 }}
@@ -99,8 +99,8 @@ export default function ListingCard({
               <div className="w-full h-full bg-gradient-to-br from-slate-200 to-slate-300" />
             )}
 
-            {/* Dark overlay for better text readability */}
-            <div className="absolute inset-0 bg-black/40" />
+            {/* Dark overlay (50% opacity) for better text readability */}
+            <div className="absolute inset-0 bg-black/50" />
 
             {/* Centered cost display */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
