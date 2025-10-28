@@ -26,58 +26,52 @@ async function verifyEnrichment() {
   console.log(`📊 Total listings in database: ${totalListings}`)
 
   // Get enriched listings (have tripadvisor_id)
-  const { data: enrichedIds } = await supabase
+  const { count: enrichedCount, error: enrichError } = await supabase
     .from('nearby_listings')
-    .select('id, tripadvisor_id')
+    .select('*', { count: 'exact', head: true })
     .not('tripadvisor_id', 'is', null)
 
-  const enrichedCount = enrichedIds?.length || 0
-  console.log(`✅ Listings with tripadvisor_id: ${enrichedCount}`)
+  console.log(`✅ Listings with tripadvisor_id: ${enrichedCount || 0}`)
 
   // Get ratings filled
-  const { data: ratedListings } = await supabase
+  const { count: ratedCount } = await supabase
     .from('nearby_listings')
-    .select('id')
+    .select('*', { count: 'exact', head: true })
     .not('rating', 'is', null)
 
-  const ratedCount = ratedListings?.length || 0
-  console.log(`⭐ Listings with ratings: ${ratedCount}`)
+  console.log(`⭐ Listings with ratings: ${ratedCount || 0}`)
 
   // Get descriptions filled
-  const { data: describedListings } = await supabase
+  const { count: describedCount } = await supabase
     .from('nearby_listings')
-    .select('id')
+    .select('*', { count: 'exact', head: true })
     .not('description', 'is', null)
 
-  const describedCount = describedListings?.length || 0
-  console.log(`📝 Listings with descriptions: ${describedCount}`)
+  console.log(`📝 Listings with descriptions: ${describedCount || 0}`)
 
   // Get phone numbers
-  const { data: phonedListings } = await supabase
+  const { count: phonedCount } = await supabase
     .from('nearby_listings')
-    .select('id')
+    .select('*', { count: 'exact', head: true })
     .not('phone_number', 'is', null)
 
-  const phonedCount = phonedListings?.length || 0
-  console.log(`📞 Listings with phone numbers: ${phonedCount}`)
+  console.log(`📞 Listings with phone numbers: ${phonedCount || 0}`)
 
   // Get websites
-  const { data: webListings } = await supabase
+  const { count: webCount } = await supabase
     .from('nearby_listings')
-    .select('id')
+    .select('*', { count: 'exact', head: true })
     .not('website', 'is', null)
 
-  const webCount = webListings?.length || 0
-  console.log(`🌐 Listings with websites: ${webCount}`)
+  console.log(`🌐 Listings with websites: ${webCount || 0}`)
 
   // Get reviews
-  const { data: reviewedListings } = await supabase
+  const { count: reviewedCount } = await supabase
     .from('nearby_listings')
-    .select('id')
+    .select('*', { count: 'exact', head: true })
     .not('review_count', 'is', null)
 
-  const reviewedCount = reviewedListings?.length || 0
-  console.log(`💬 Listings with review counts: ${reviewedCount}`)
+  console.log(`💬 Listings with review counts: ${reviewedCount || 0}`)
 
   // Sample verified listings
   console.log('\n📋 Sample enriched listings:\n')
