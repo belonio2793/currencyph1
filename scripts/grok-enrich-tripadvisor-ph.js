@@ -190,9 +190,38 @@ function mergeListing(original, enriched) {
 // Upsert to Supabase
 async function upsertToSupabase(listing) {
   try {
+    // Ensure arrays are properly formatted
+    const amenities = Array.isArray(listing.amenities) ? listing.amenities : []
+    const highlights = Array.isArray(listing.highlights) ? listing.highlights : []
+    const photoUrls = Array.isArray(listing.photo_urls) ? listing.photo_urls : []
+
+    // Ensure hours_of_operation is proper JSON
+    let hoursOp = listing.hours_of_operation
+    if (typeof hoursOp === 'string' && hoursOp !== 'Check TripAdvisor') {
+      try {
+        hoursOp = JSON.parse(hoursOp)
+      } catch (e) {
+        hoursOp = {}
+      }
+    } else if (typeof hoursOp !== 'object') {
+      hoursOp = {}
+    }
+
+    // Ensure accessibility_info is proper JSON
+    let accessInfo = listing.accessibility_info
+    if (typeof accessInfo === 'string') {
+      try {
+        accessInfo = JSON.parse(accessInfo)
+      } catch (e) {
+        accessInfo = {}
+      }
+    } else if (typeof accessInfo !== 'object') {
+      accessInfo = {}
+    }
+
     const preparedData = {
       id: listing.id ? parseInt(listing.id) : undefined,
-      name: listing.name,
+      name: listing.name || 'Unknown',
       address: listing.address,
       city: listing.city,
       country: 'Philippines',
@@ -208,7 +237,7 @@ async function upsertToSupabase(listing) {
       phone_number: listing.phone_number,
       website: listing.website,
       email: listing.email,
-      hours_of_operation: listing.hours_of_operation,
+      hours_of_operation: hoursOp,
       review_count: listing.review_count ? parseInt(listing.review_count) : null,
       web_url: listing.web_url,
       price_range: listing.price_range,
@@ -216,11 +245,11 @@ async function upsertToSupabase(listing) {
       duration: listing.duration,
       visibility_score: listing.visibility_score ? parseFloat(listing.visibility_score) : null,
       slug: listing.slug,
-      amenities: listing.amenities,
-      accessibility_info: listing.accessibility_info,
+      amenities: amenities,
+      accessibility_info: accessInfo,
       photo_count: listing.photo_count ? parseInt(listing.photo_count) : null,
-      photo_urls: listing.photo_urls || [],
-      highlights: listing.highlights,
+      photo_urls: photoUrls,
+      highlights: highlights,
       ranking_in_city: listing.ranking_in_city,
       updated_at: new Date().toISOString(),
       created_at: listing.created_at || new Date().toISOString(),
@@ -245,6 +274,7 @@ async function upsertToSupabase(listing) {
 
     if (error) {
       console.error(`❌ Supabase error for "${listing.name}":`, error.message)
+      console.error(`   Data:`, JSON.stringify(preparedData).slice(0, 300))
       return false
     }
 
@@ -252,6 +282,7 @@ async function upsertToSupabase(listing) {
     return true
   } catch (error) {
     console.error(`❌ Error upserting listing:`, error.message)
+    console.error(`   Listing:`, listing.name)
     return false
   }
 }
