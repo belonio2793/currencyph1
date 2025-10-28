@@ -60,20 +60,21 @@ async function scrapeTripAdvisorPhotos(tripadvisorId) {
 
   try {
     const tripAdvisorUrl = `https://www.tripadvisor.com/Tourism-g${tripadvisorId}-Philippines.html`
-    
+
+    // ScrapingBee uses query parameters, not JSON body
+    const params = new URLSearchParams({
+      api_key: SCRAPINGBEE_API_KEY,
+      url: tripAdvisorUrl,
+      render_javascript: 'false',
+    })
+
     const response = await fetch(
-      `https://app.scrapingbee.com/api/v1/`,
+      `https://app.scrapingbee.com/api/v1/?${params.toString()}`,
       {
-        method: 'POST',
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          api_key: SCRAPINGBEE_API_KEY,
-          url: tripAdvisorUrl,
-          render_javascript: false,
-          timeout: 15000,
-        }),
       }
     )
 
