@@ -113,8 +113,7 @@ async function scrapeDetail(url, city){
   const listing = {
     tripadvisor_id,
     name,
-    slug: (name? name.toLowerCase().replace(/[^
-\w\s-]/g,'').replace(/\s+/g,'-').slice(0,150): null),
+    slug: (name ? name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').slice(0, 150) : null),
     address,
     latitude: ld.lat || null,
     longitude: ld.lng || null,
