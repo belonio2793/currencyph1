@@ -14,7 +14,7 @@ export default function FillPhotos() {
 
     try {
       const { data, error: err } = await supabase.functions.invoke(
-        'fill-photo-urls',
+        'cleanup-and-fill-photos',
         {
           body: { limit: parseInt(limit) },
         }
