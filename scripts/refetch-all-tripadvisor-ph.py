@@ -323,40 +323,57 @@ def extract_tripadvisor_listing_data(url: str, name: str = None, city: str = Non
 def fetch_listings_by_location(location: str, category: str) -> List[Dict]:
     """Fetch listings for a specific location and category"""
     try:
-        # Build search URL
-        search_url = f"{TRIPADVISOR_BASE}/Search?q={location}%20{category}"
-        
-        print(f"  🔍 Fetching {category.lower()} in {location}...", end=" ", flush=True)
-        
-        html = fetch_with_scrapingbee(search_url)
-        if not html:
-            print("(no HTML)")
-            return []
-        
-        soup = BeautifulSoup(html, 'html.parser')
-        listings = []
-        
-        # Find all listing links
-        for link in soup.find_all('a', href=re.compile(r'-d\d+-')):
-            href = link.get('href', '')
-            if href:
-                name = link.get_text(strip=True)
-                if name:
-                    if href.startswith('http'):
-                        url = href
-                    else:
-                        url = f"{TRIPADVISOR_BASE}{href}"
-                    
-                    listings.append({
-                        "url": url,
-                        "name": name,
-                        "location": location,
-                        "category": category
-                    })
-        
-        print(f"Found {len(listings)} listings")
-        return listings
-        
+        # Try multiple URL patterns
+        search_patterns = [
+            f"{TRIPADVISOR_BASE}/Search?q={requests.utils.quote(location)}%20{requests.utils.quote(category)}",
+            f"{TRIPADVISOR_BASE}/Search?q={requests.utils.quote(f'{location} {category}')}",
+            f"{TRIPADVISOR_BASE}/Tourism-g1213895-{location.replace(' ', '_')}_Eastern_Visayas_Region_Calabarzon_Region_Ilocos_Region.html",
+        ]
+
+        category_suffix = category.lower()
+        if category_suffix == "attractions":
+            category_suffix = "Attractions"
+        elif category_suffix == "hotels":
+            category_suffix = "Hotels"
+        elif category_suffix == "restaurants":
+            category_suffix = "Restaurants"
+
+        search_patterns.append(f"{TRIPADVISOR_BASE}/Search?q={requests.utils.quote(location)}&type={category_suffix}")
+
+        print(f"  🔍 {category} in {location}...", end=" ", flush=True)
+
+        for attempt, search_url in enumerate(search_patterns, 1):
+            html = fetch_with_scrapingbee(search_url)
+
+            if html and len(html) > 500:  # Check if we got meaningful content
+                soup = BeautifulSoup(html, 'html.parser')
+                listings = []
+
+                # Find all listing links
+                for link in soup.find_all('a', href=re.compile(r'-d\d+-|/Attraction_Review')):
+                    href = link.get('href', '')
+                    if href:
+                        name = link.get_text(strip=True)
+                        if name and len(name) > 2:
+                            if href.startswith('http'):
+                                url = href
+                            else:
+                                url = f"{TRIPADVISOR_BASE}{href}"
+
+                            listings.append({
+                                "url": url,
+                                "name": name,
+                                "location": location,
+                                "category": category
+                            })
+
+                if listings:
+                    print(f"✅ {len(listings)}")
+                    return listings
+
+        print("(no results)")
+        return []
+
     except Exception as e:
         print(f"(error: {e})")
         return []
