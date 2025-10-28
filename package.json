@@ -52,7 +52,8 @@
     "fetch-real-tripadvisor": "node scripts/fetch-tripadvisor-via-scrapingbee.js",
     "fetch-scrapingbee": "node scripts/fetch-real-data-scrapingbee.js",
     "fetch-real": "node scripts/fetch-scrapingbee-correct.js",
-    "populate-nearby-real": "node scripts/populate-nearby-real-tripadvisor.js"
+    "populate-nearby-real": "node scripts/populate-nearby-real-tripadvisor.js",
+    "verify-nearby": "node scripts/verify-nearby-population.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
