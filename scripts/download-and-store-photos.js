@@ -106,46 +106,100 @@ async function extractPhotoUrlsFromHTML(html) {
   return Array.from(photoUrls).slice(0, MAX_PHOTOS)
 }
 
-function getNextScrapingBeeKey() {
-  const key = SCRAPINGBEE_KEYS[keyIndex]
-  keyIndex = (keyIndex + 1) % SCRAPINGBEE_KEYS.length
-  return key
-}
-
 async function fetchTripAdvisorPage(url) {
   try {
-    console.log('    Fetching with ScrapingBee (JavaScript rendering)...')
+    console.log('    Fetching with curl...')
 
-    const key = getNextScrapingBeeKey()
+    const { stdout, stderr } = await execAsync(
+      `curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" --connect-timeout 10 --max-time 30 "${url}" | head -c 2000000`,
+      { maxBuffer: 5 * 1024 * 1024 }
+    )
 
-    const params = new URLSearchParams({
-      api_key: key,
-      url: url,
-      render_js: 'true',
-      wait: '3000',
-      premium_proxy: 'true'
-    })
+    if (!stdout || stdout.length < 100) {
+      console.log('    Fetch returned minimal/empty response')
+      return null
+    }
 
-    const scrapingBeeUrl = `https://api.scrapingbee.com/api/v1/?${params}`
+    return stdout
+  } catch (err) {
+    console.log(`    Error: ${err.message}`)
+    return null
+  }
+}
 
-    const response = await fetch(scrapingBeeUrl, {
-      method: 'GET',
+async function grokExtractPhotoUrls(html, listingName) {
+  try {
+    console.log('    Sending to Grok for photo extraction...')
+
+    const prompt = `Extract all photo URLs from this TripAdvisor listing HTML for "${listingName}".
+
+Look for URLs that start with:
+- https://dynamic-media-cdn.tripadvisor.com/media/photo
+- https://media.tacdn.com/media/photo
+
+Return ONLY a JSON array of URLs. Example format:
+["https://dynamic-media-cdn.tripadvisor.com/media/photo-s/1a/2b/3c/photo.jpg", "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/2b/3c/photo.jpg"]
+
+Do not include any other text, just the JSON array.
+
+HTML to analyze (first 80000 characters):
+${html.substring(0, 80000)}`
+
+    const response = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${X_API_KEY}`
       },
+      body: JSON.stringify({
+        model: 'grok-2-latest',
+        messages: [
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        temperature: 0.1,
+        max_tokens: 4000
+      }),
       timeout: 30000
     })
 
     if (!response.ok) {
-      console.log(`    ScrapingBee error: ${response.status}`)
-      return null
+      const error = await response.text()
+      console.log(`    Grok API error: ${response.status}`)
+      return []
     }
 
-    const html = await response.text()
-    return html
+    const data = await response.json()
+
+    if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+      console.log('    Invalid Grok response')
+      return []
+    }
+
+    const content = data.choices[0].message.content.trim()
+
+    // Extract JSON array from response
+    const jsonMatch = content.match(/\[[\s\S]*\]/)
+    if (!jsonMatch) {
+      console.log('    No JSON array found in Grok response')
+      return []
+    }
+
+    const urls = JSON.parse(jsonMatch[0])
+
+    if (Array.isArray(urls)) {
+      return urls
+        .filter(url => typeof url === 'string' && url.startsWith('https://'))
+        .filter(url => !url.includes('placeholder') && !url.includes('logo'))
+        .slice(0, MAX_PHOTOS)
+    }
+
+    return []
   } catch (err) {
-    console.log(`    Error fetching page: ${err.message}`)
-    return null
+    console.log(`    Grok error: ${err.message}`)
+    return []
   }
 }
 
