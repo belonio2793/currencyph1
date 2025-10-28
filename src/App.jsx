@@ -17,7 +17,6 @@ import Nearby from './components/Nearby'
 import Business from './components/Business'
 import CommunityManagement from './components/CommunityManagement'
 import ListingDetail from './components/ListingDetail'
-import FillPhotos from './components/FillPhotos'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
