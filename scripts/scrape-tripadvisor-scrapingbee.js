@@ -268,7 +268,15 @@ async function run(){
   for (const city of cities){
     try{
       console.log(`\n🔎 City: ${city}`)
-      const searchUrl = `https://www.tripadvisor.com.ph/Search?q=${encodeURIComponent(city + ' Philippines')}`
+      let searchUrl = `https://www.tripadvisor.com/Search?q=${encodeURIComponent(city + ' Philippines')}`
+      // fallback to .com.ph if no results
+      let html = await beeFetch(searchUrl)
+      let links = parseSearch(html).slice(0, perCity)
+      if (!links.length) {
+        searchUrl = `https://www.tripadvisor.com.ph/Search?q=${encodeURIComponent(city + ' Philippines')}`
+        html = await beeFetch(searchUrl)
+        links = parseSearch(html).slice(0, perCity)
+      }
       const html = await beeFetch(searchUrl)
       const links = parseSearch(html).slice(0, perCity)
       console.log(`  Found ${links.length} detail links`)
