@@ -421,6 +421,23 @@ def insert_listing(supabase: Client, listing_data: Dict) -> Optional[int]:
         return None
 
 
+def test_scrapingbee():
+    """Test ScrapingBee connectivity"""
+    print("🧪 Testing ScrapingBee connectivity...\n")
+
+    test_url = "https://www.tripadvisor.com.ph/Search?q=Manila%20Hotels"
+    html = fetch_with_scrapingbee(test_url)
+
+    if html and len(html) > 500:
+        print(f"✅ ScrapingBee working! Got {len(html)} bytes")
+        print(f"   Testing URL: {test_url}\n")
+        return True
+    else:
+        print(f"❌ ScrapingBee not working - got {len(html) if html else 0} bytes")
+        print(f"   Trying different approach...\n")
+        return False
+
+
 def main():
     parser = argparse.ArgumentParser(description="Refetch all TripAdvisor.com.ph listings")
     parser.add_argument("--dry-run", action="store_true", help="Preview without inserting")
