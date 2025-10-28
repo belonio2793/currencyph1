@@ -590,6 +590,11 @@ def main():
   Not found on TripAdvisor: {checkpoint['not_found']}
   Errors: {checkpoint['errors']}
 
+🔑 API USAGE:
+  ScrapingBee calls made: {SCRAPINGBEE_CALL_COUNT}
+  Current key index: {SCRAPINGBEE_KEY_INDEX + 1}/{len(SCRAPINGBEE_KEYS)}
+  Remaining calls on current key: {1000 - (SCRAPINGBEE_CALL_COUNT % 1000)}
+
 ✅ Updated {checkpoint['updated']} listings with real TripAdvisor data
 📍 Checkpoint saved: {CHECKPOINT_FILE}
 💾 Errors logged: {ERRORS_FILE}
