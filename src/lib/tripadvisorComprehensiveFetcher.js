@@ -48,7 +48,7 @@ export const tripadvisorComprehensiveFetcher = {
     if (!rawData) return null
 
     return {
-      tripadvisor_id: String(rawData.location_id || rawData.id),
+      tripadvisor_id: rawData.location_id ? String(rawData.location_id) : `php_${Math.random().toString(36).slice(2,10)}`,
       name: rawData.name || '',
       slug: generateSlug(rawData.name || ''),
       description: rawData.description || rawData.overview || '',

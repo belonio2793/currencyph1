@@ -78,7 +78,7 @@ async function fetchTripAdvisorListings(query, limit = 20) {
     const items = data.data || []
 
     return items.map(item => ({
-      tripadvisor_id: String(item.location_id || item.id || Math.random()),
+      tripadvisor_id: item.location_id ? String(item.location_id) : `php_${Math.random().toString(36).slice(2,10)}`,
       name: item.name,
       address: item.address || '',
       latitude: item.latitude || item.address_obj?.latitude || null,

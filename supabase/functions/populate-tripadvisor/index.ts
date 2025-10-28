@@ -59,9 +59,9 @@ async function fetchPlacesFor(query: string, tripKey: string, limit = 50) {
           .filter(Boolean)
           .join(", ")
       : it.address || it.address_string || "";
-    const id = it.location_id || it.id || it.place_id;
+    const locId = it.location_id ? String(it.location_id) : null;
     return {
-      tripadvisor_id: id ? String(id) : `tmp-${Math.random().toString(36).slice(2, 10)}`,
+      tripadvisor_id: locId ?? `php_${Math.random().toString(36).slice(2, 10)}`,
       name: it.name || it.title || it.poi_name || "",
       address: addr || null,
       latitude: it.latitude || it.lat || (it.address_obj && it.address_obj.latitude) || null,

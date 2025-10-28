@@ -66,9 +66,9 @@ async function fetchPlacesForViaAPI(query, limit = 50) {
   
   return (items || []).map(it => {
     const addr = it.address_obj ? [it.address_obj.street1, it.address_obj.city, it.address_obj.country].filter(Boolean).join(', ') : (it.address || it.address_string || '')
-    const id = (it.location_id || it.id || it.place_id)
+    const id = it.location_id ? String(it.location_id) : null
     return {
-      tripadvisor_id: id ? String(id) : `tmp-${Math.random().toString(36).slice(2,10)}`,
+      tripadvisor_id: id ?? `php_${Math.random().toString(36).slice(2,10)}`,
       name: it.name || it.title || it.poi_name || '',
       address: addr || null,
       latitude: it.latitude || it.lat || (it.address_obj && it.address_obj.latitude) || null,

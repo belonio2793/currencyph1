@@ -32,7 +32,7 @@ export async function searchPlaces(query, lat = null, lng = null, limit = 20) {
     return (items || []).map(it => {
       const addr = it.address_obj ? [it.address_obj.street1, it.address_obj.city, it.address_obj.country].filter(Boolean).join(', ') : (it.address || it.address_string || '')
       return {
-        id: (it.location_id || it.id || it.place_id || it.location_id)?.toString?.() || String(Math.random()).slice(2, 12),
+        id: it.location_id ? String(it.location_id) : `php_${Math.random().toString(36).slice(2, 12)}`,
         name: it.name || it.title || it.poi_name || '',
         address: addr,
         latitude: it.latitude || it.lat || (it.address_obj && it.address_obj.latitude) || null,

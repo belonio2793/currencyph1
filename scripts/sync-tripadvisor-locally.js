@@ -60,7 +60,7 @@ async function fetchTripAdvisorData(query, tripKey, limit = 30) {
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
 
-      const tripadvisorId = String(item.location_id || item.id || Math.random());
+      const tripadvisorId = item.location_id ? String(item.location_id) : `php_${Math.random().toString(36).slice(2,10)}`;
       // Append a small part of the tripadvisor_id to the slug for uniqueness
       const idSuffix = tripadvisorId.slice(-6).toLowerCase();
       const slug = baseSlug ? `${baseSlug}-${idSuffix}` : `listing-${idSuffix}`;
