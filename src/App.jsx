@@ -161,19 +161,22 @@ export default function App() {
       <main>
         {(activeTab === 'home' || showAuth) && (
           <>
-            {/* Home Page Navbar (also shown during auth for a persistent header) */}
+            {/* Home Page Navbar - Double Row Layout */}
             <nav className="bg-white border-b border-slate-100">
-              <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center md:justify-between gap-4">
-                <div className="flex items-center gap-6 w-full md:w-auto justify-between md:justify-start">
+              <div className="max-w-7xl mx-auto px-4">
+                {/* Row 1: Logo and HeaderMap */}
+                <div className="py-4 flex items-center justify-between">
                   <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
-                  <div className="hidden md:block ml-auto">
+                  <div className="hidden md:block">
                     <HeaderMap />
                   </div>
                 </div>
-                <div className="md:hidden w-full">
+                <div className="md:hidden w-full pb-4">
                   <HeaderMap />
                 </div>
-                <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
+
+                {/* Row 2: Currency selector and Navigation */}
+                <div className="border-t border-slate-100 py-3 flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
                     <label className="text-sm font-medium text-slate-700">Display Currency:</label>
                     <select
@@ -208,13 +211,15 @@ export default function App() {
                       <option value="AED">AED - UAE Dirham</option>
                     </select>
                   </div>
+
+                  {/* Main navigation buttons */}
                   <button
                     onClick={() => {
                       setActiveTab('home')
                       setShowAuth(false)
                       window.history.replaceState(null, '', '/')
                     }}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     Home
                   </button>
@@ -224,7 +229,7 @@ export default function App() {
                       setShowAuth(false)
                       window.history.replaceState(null, '', '/nearby')
                     }}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     Nearby
                   </button>
@@ -234,24 +239,73 @@ export default function App() {
                       setShowAuth(false)
                       window.history.replaceState(null, '', '/community')
                     }}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     Community
                   </button>
+
+                  {/* Separator */}
+                  <div className="w-px h-6 bg-slate-200 mx-1"></div>
+
+                  {/* Dashboard tabs */}
+                  <button
+                    onClick={() => {
+                      setActiveTab('wallet')
+                      setShowAuth(false)
+                    }}
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Wallets
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('send')
+                      setShowAuth(false)
+                    }}
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Send
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('bills')
+                      setShowAuth(false)
+                    }}
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Bills
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('transactions')
+                      setShowAuth(false)
+                    }}
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    History
+                  </button>
+                  <button
+                    onClick={() => {
+                      setActiveTab('profile')
+                      setShowAuth(false)
+                    }}
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  >
+                    Profile
+                  </button>
+
+                  {/* Separator */}
+                  <div className="w-px h-6 bg-slate-200 mx-1"></div>
+
+                  {/* Auth button */}
                   <button
                     onClick={() => {
                       setShowAuth(true)
                       window.history.replaceState(null, '', '/login')
                     }}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                   >
                     Login
-                  </button>
-                  <button
-                    onClick={() => setActiveTab('dashboard')}
-                    className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    More Tools
                   </button>
                 </div>
               </div>
