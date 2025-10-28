@@ -53,7 +53,8 @@
     "fetch-scrapingbee": "node scripts/fetch-real-data-scrapingbee.js",
     "fetch-real": "node scripts/fetch-scrapingbee-correct.js",
     "populate-nearby-real": "node scripts/populate-nearby-real-tripadvisor.js",
-    "verify-nearby": "node scripts/verify-nearby-population.js"
+    "verify-nearby": "node scripts/verify-nearby-population.js",
+    "download-images": "node scripts/trigger-image-downloader.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
