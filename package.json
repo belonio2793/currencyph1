@@ -50,7 +50,8 @@
     "fill-tripadvisor-unique": "node scripts/fill-tripadvisor-unique.js",
     "verify-tripadvisor": "node scripts/verify-tripadvisor-data.js",
     "fetch-real-tripadvisor": "node scripts/fetch-tripadvisor-via-scrapingbee.js",
-    "fetch-scrapingbee": "node scripts/fetch-real-data-scrapingbee.js"
+    "fetch-scrapingbee": "node scripts/fetch-real-data-scrapingbee.js",
+    "fetch-real": "node scripts/fetch-scrapingbee-correct.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
