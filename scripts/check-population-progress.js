@@ -7,16 +7,19 @@ const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.e
 const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
 async function checkProgress() {
-  const { count: total } = await supabase.from('nearby_listings').select('id', { count: 'exact', head: true })
-  const { count: withCost } = await supabase.from('nearby_listings').select('id', { count: 'exact', head: true }).neq('avg_cost', null)
+  const { data: allCount } = await supabase.from('nearby_listings').select('id').limit(1)
+  const { count: total } = await supabase.from('nearby_listings').select('id', { count: 'exact', head: false })
   
-  const remaining = total - withCost
-  const percent = Math.round((withCost / total) * 100)
+  const { data: withCostData } = await supabase.from('nearby_listings').select('id').not('avg_cost', 'is', null).limit(1)
+  const { count: withCost } = await supabase.from('nearby_listings').select('id', { count: 'exact', head: false }).not('avg_cost', 'is', null)
+  
+  const remaining = total && withCost ? total - withCost : 0
+  const percent = total && withCost ? Math.round((withCost / total) * 100) : 0
   
   console.log(`\n📊 Cost Population Progress`)
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
-  console.log(`Total listings:    ${total}`)
-  console.log(`With costs:        ${withCost} ✓`)
+  console.log(`Total listings:    ${total || 0}`)
+  console.log(`With costs:        ${withCost || 0} ✓`)
   console.log(`Remaining:         ${remaining}`)
   console.log(`Progress:          ${percent}%`)
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`)
