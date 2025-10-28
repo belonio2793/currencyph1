@@ -135,47 +135,89 @@ export default function ListingDetail({ slug, onBack }) {
       </button>
 
       <div className="mb-8">
-        {/* Hero Image Gallery or Average Cost */}
-        {listing.avg_cost ? (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-white border border-slate-200 flex items-center justify-center">
+        {/* Hero Image Gallery with Photo Gallery Thumbnails */}
+        {displayImage ? (
+          <div className="mb-8 rounded-lg overflow-hidden bg-slate-200">
+            {/* Main Image Display */}
+            <div className="relative max-h-96 bg-slate-200 flex items-center justify-center">
+              <img
+                src={displayImage}
+                alt={listing.name}
+                className="w-full h-96 object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+                }}
+              />
+
+              {/* Dark overlay for better navigation visibility */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+            </div>
+
+            {/* Photo Gallery Navigation */}
+            {imageArray.length > 1 && (
+              <div className="space-y-3 p-4 bg-white border-t border-slate-200">
+                {/* Navigation Buttons and Counter */}
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={() => setSelectedPhotoIndex(Math.max(0, selectedPhotoIndex - 1))}
+                    disabled={selectedPhotoIndex === 0}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    ← Previous
+                  </button>
+                  <span className="text-slate-700 font-semibold">
+                    {selectedPhotoIndex + 1} / {imageArray.length} Photos
+                  </span>
+                  <button
+                    onClick={() => setSelectedPhotoIndex(Math.min(imageArray.length - 1, selectedPhotoIndex + 1))}
+                    disabled={selectedPhotoIndex === imageArray.length - 1}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    Next →
+                  </button>
+                </div>
+
+                {/* Thumbnail Gallery */}
+                <div className="overflow-x-auto pb-2">
+                  <div className="flex gap-2 min-w-min">
+                    {imageArray.map((url, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setSelectedPhotoIndex(idx)}
+                        className={`flex-shrink-0 h-20 w-20 rounded overflow-hidden border-2 transition-all ${
+                          idx === selectedPhotoIndex
+                            ? 'border-blue-600 ring-2 ring-blue-400'
+                            : 'border-slate-200 hover:border-slate-300 opacity-70 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={url}
+                          alt={`${listing.name} - Photo ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100&h=100&fit=crop&auto=format&q=80'
+                          }}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : listing.avg_cost ? (
+          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-gradient-to-br from-blue-50 to-slate-50 border border-slate-200 flex items-center justify-center">
             <div className="text-center py-16 px-6">
               <div className="text-sm text-slate-500">Estimated cost per person</div>
               <div className="mt-3 text-4xl font-extrabold text-slate-900">₱{Number(listing.avg_cost).toLocaleString()}</div>
               <div className="text-sm text-slate-600 mt-2">(Approximate)</div>
             </div>
           </div>
-        ) : displayImage && (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-slate-200">
-            <img
-              src={displayImage}
-              alt={listing.name}
-              className="w-full h-96 object-cover"
-              onError={(e) => {
-                e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
-              }}
-            />
-            {/* Photo Navigation */}
-            {imageArray.length > 1 && (
-              <div className="flex justify-between items-center px-4 py-3 bg-black bg-opacity-50">
-                <button
-                  onClick={() => setSelectedPhotoIndex(Math.max(0, selectedPhotoIndex - 1))}
-                  disabled={selectedPhotoIndex === 0}
-                  className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
-                >
-                  ←
-                </button>
-                <span className="text-white text-sm">
-                  {selectedPhotoIndex + 1} / {imageArray.length}
-                </span>
-                <button
-                  onClick={() => setSelectedPhotoIndex(Math.min(imageArray.length - 1, selectedPhotoIndex + 1))}
-                  disabled={selectedPhotoIndex === imageArray.length - 1}
-                  className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
-                >
-                  →
-                </button>
-              </div>
-            )}
+        ) : (
+          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-200 flex items-center justify-center">
+            <div className="text-center py-16 px-6 text-slate-500">
+              <p className="text-lg">No image available</p>
+            </div>
           </div>
         )}
 
