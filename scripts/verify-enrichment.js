@@ -13,10 +13,10 @@ const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 async function verifyEnrichment() {
   console.log('🔍 Verifying enrichment status...\n')
 
-  // Get total listings
-  const { data: allListings, error: countError } = await supabase
+  // Get total listings with proper count
+  const { count: totalListings, error: countError } = await supabase
     .from('nearby_listings')
-    .select('id', { count: 'exact' })
+    .select('*', { count: 'exact', head: true })
 
   if (countError) {
     console.error('❌ Error:', countError)
