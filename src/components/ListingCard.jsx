@@ -19,6 +19,25 @@ export default function ListingCard({
   const [imageError, setImageError] = useState(false)
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
 
+  // Helper to normalize photo_urls (handle string or array)
+  const getNormalizedPhotoUrls = () => {
+    let photos = listing?.photo_urls
+
+    if (!photos) return []
+    if (Array.isArray(photos)) return photos
+
+    // Handle if photo_urls is a string
+    if (typeof photos === 'string') {
+      try {
+        return JSON.parse(photos)
+      } catch {
+        return photos.split(/[,|]/).map(url => url.trim()).filter(Boolean)
+      }
+    }
+
+    return []
+  }
+
   useEffect(() => {
     loadImage()
   }, [listing?.tripadvisor_id])
