@@ -457,6 +457,10 @@ def main():
     print("=" * 100)
     print(f"\n📊 USING {len(SCRAPINGBEE_KEYS)} SCRAPINGBEE KEYS (8000 total calls)\n")
 
+    # Test ScrapingBee first
+    if not test_scrapingbee():
+        print("⚠️  ScrapingBee may not be working properly. Continuing anyway...\n")
+
     # Backup before clearing (skip if --no-backup)
     if not args.dry_run and not args.no_backup:
         if not backup_current_listings(supabase):
