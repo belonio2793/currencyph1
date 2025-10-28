@@ -23,6 +23,22 @@ export default function ListingCard({
     loadImage()
   }, [listing?.tripadvisor_id])
 
+  useEffect(() => {
+    // Set up carousel rotation for photos
+    const hasMultiplePhotos = Array.isArray(listing?.photo_urls) && listing.photo_urls.length > 0
+
+    if (!hasMultiplePhotos) return
+
+    const interval = setInterval(() => {
+      setCurrentPhotoIndex((prev) => {
+        const maxIndex = Math.min(5, listing.photo_urls.length)
+        return (prev + 1) % maxIndex
+      })
+    }, 5000)
+
+    return () => clearInterval(interval)
+  }, [listing?.photo_urls])
+
   async function loadImage() {
     if (!listing) {
       setImageLoading(false)
