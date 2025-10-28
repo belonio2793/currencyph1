@@ -27,21 +27,25 @@ from pathlib import Path
 
 import requests
 from supabase import create_client, Client
-from bs4 import BeautifulSoup
 
 # Configuration
 BATCH_SIZE = 50
-REQUEST_DELAY = 1.0  # seconds between requests (be respectful)
+REQUEST_DELAY = 0.5  # shorter delay with API (was 1.0 for scraping)
 CHECKPOINT_FILE = "tripadvisor_sync_checkpoint.json"
 BACKUP_FILE = "nearby_listings_backup.json"
 ERRORS_FILE = "tripadvisor_sync_errors.json"
 
-TRIPADVISOR_SEARCH_URL = "https://www.tripadvisor.com.ph/Search?q="
+# Grok API Configuration
+GROK_API_URL = "https://api.x.ai/v1/chat/completions"
+GROK_API_KEY = "xai-qe0lzba8kfDmccd5EBClqO7ELZXxYG3hyyetV1b5D4dISqjStXLHcFElnYfmRD3ddy0gV4sHxnR3XZT3"
+GROK_MODEL = "grok-2"
+
 TRIPADVISOR_BASE = "https://www.tripadvisor.com.ph"
 
-# User-Agent to avoid blocking
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+# Headers for Grok API
+GROK_HEADERS = {
+    "Authorization": f"Bearer {GROK_API_KEY}",
+    "Content-Type": "application/json"
 }
 
 
