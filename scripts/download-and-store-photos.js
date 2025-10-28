@@ -61,37 +61,46 @@ function sleep(ms) {
 async function extractPhotoUrlsFromHTML(html) {
   const photoUrls = new Set()
 
-  // Pattern 1: Dynamic media CDN
-  const dynamicPattern = /https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo[a-zA-Z0-9\-_\/]*(?:\.jpg|\.png|\.webp)?/g
-  const dynamicMatches = html.match(dynamicPattern) || []
-  dynamicMatches.forEach(url => {
-    const cleaned = url.split(/['"?]/)[0].trim()
-    if (cleaned && !cleaned.includes('placeholder') && !cleaned.includes('logo')) {
-      const baseUrl = cleaned.split('?')[0]
-      if (baseUrl) photoUrls.add(baseUrl)
-    }
-  })
+  // More aggressive pattern matching for TripAdvisor photo CDN URLs
 
-  // Pattern 2: Media tacdn
-  const mediaPattern = /https:\/\/media\.tacdn\.com\/media\/photo[a-zA-Z0-9\-_\/]*(?:\.jpg|\.png|\.webp)?/g
-  const mediaMatches = html.match(mediaPattern) || []
-  mediaMatches.forEach(url => {
-    const cleaned = url.split(/['"?]/)[0].trim()
-    if (cleaned && !cleaned.includes('placeholder') && !cleaned.includes('logo')) {
-      const baseUrl = cleaned.split('?')[0]
-      if (baseUrl) photoUrls.add(baseUrl)
-    }
-  })
+  // Pattern 1: Exact dynamic-media-cdn URLs in various contexts
+  const patterns = [
+    // Direct URLs in quotes or attributes
+    /https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo-[a-zA-Z0-9\-_/]+\.jpg/g,
+    /https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo-[a-zA-Z0-9\-_/]+\.png/g,
+    /https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo-[a-zA-Z0-9\-_/]+\.webp/g,
+    /https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo-[a-zA-Z0-9\-_/\.]+/g,
 
-  // Pattern 3: Look for srcset and data attributes
-  const srcPattern = /(https:\/\/(?:dynamic-media-cdn|media\.tacdn)\.com\/[^\s"'<>]+(?:\.jpg|\.png|\.webp))/g
-  const srcMatches = html.match(srcPattern) || []
-  srcMatches.forEach(url => {
-    const cleaned = url.split('?')[0]
-    if (cleaned && !cleaned.includes('placeholder') && !cleaned.includes('logo')) {
-      photoUrls.add(cleaned)
-    }
-  })
+    // Media tacdn alternatives
+    /https:\/\/media\.tacdn\.com\/media\/photo-[a-zA-Z0-9\-_/]+\.jpg/g,
+    /https:\/\/media\.tacdn\.com\/media\/photo-[a-zA-Z0-9\-_/]+\.png/g,
+    /https:\/\/media\.tacdn\.com\/media\/photo-[a-zA-Z0-9\-_/]+\.webp/g,
+
+    // Catch-all for any https://dynamic-media-cdn or media.tacdn URL
+    /https:\/\/(?:dynamic-media-cdn|media\.tacdn)\.com\/[^\s"'<>]+/g
+  ]
+
+  for (const pattern of patterns) {
+    const matches = html.match(pattern) || []
+    matches.forEach(url => {
+      // Clean URL - remove query params, quotes, etc
+      let cleaned = url
+        .replace(/['"]/g, '')
+        .split('?')[0]
+        .split('#')[0]
+        .trim()
+
+      // Only include valid photo URLs
+      if (cleaned &&
+          cleaned.startsWith('https://') &&
+          (cleaned.includes('dynamic-media-cdn') || cleaned.includes('tacdn')) &&
+          !cleaned.includes('placeholder') &&
+          !cleaned.includes('logo') &&
+          !cleaned.includes('avatar')) {
+        photoUrls.add(cleaned)
+      }
+    })
+  }
 
   return Array.from(photoUrls).slice(0, MAX_PHOTOS)
 }
