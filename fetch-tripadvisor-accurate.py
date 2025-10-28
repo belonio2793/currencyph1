@@ -230,17 +230,17 @@ def extract_listing_data(html: str, listing: Dict) -> Optional[Dict]:
     """Extract all data from a single listing page"""
     if not html:
         return None
-    
+
     try:
         soup = BeautifulSoup(html, 'html.parser')
         now = datetime.utcnow().isoformat()
-        
+
         # Extract tripadvisor ID from URL
         tripadvisor_id = None
         match = re.search(r'-d(\d+)', listing['url'])
         if match:
             tripadvisor_id = match.group(1)
-        
+
         # Extract rating from page
         rating = None
         for elem in soup.find_all('span'):
@@ -251,7 +251,7 @@ def extract_listing_data(html: str, listing: Dict) -> Optional[Dict]:
                     break
                 except:
                     pass
-        
+
         # Extract review count
         review_count = None
         for text in soup.stripped_strings:
@@ -259,17 +259,44 @@ def extract_listing_data(html: str, listing: Dict) -> Optional[Dict]:
             if match:
                 review_count = int(match.group(1))
                 break
-        
+
         # Extract address
         address = None
         for elem in soup.find_all(['div', 'span']):
             text = elem.get_text(strip=True)
             if 'Philippines' in text and len(text) > 10:
-                address = text[:100]
+                address = text[:150]
                 break
-        
+
+        # Extract phone number
+        phone_number = None
+        phone_patterns = [r'\+63\s?[\d\s\-]{9,}', r'0[\d\s\-]{9,}']
+        for pattern in phone_patterns:
+            match = re.search(pattern, soup.get_text())
+            if match:
+                phone_number = match.group(0).strip()
+                break
+
+        # Extract website
+        website = None
+        for link in soup.find_all('a', href=True):
+            href = link.get('href', '')
+            if 'http' in href and 'tripadvisor' not in href:
+                website = href
+                break
+
+        # Extract amenities/features
+        amenities = []
+        for text in soup.stripped_strings:
+            if any(x in text.lower() for x in ['wifi', 'parking', 'pool', 'restaurant', 'bar', 'gym', 'spa', 'shower']):
+                if len(text) < 50:
+                    amenities.append({'name': text[:40], 'available': True})
+
         # Get coordinates
         coords = CITY_COORDS.get(listing['city'], (12.8797, 121.7740))
+
+        # Get region
+        region = CITY_REGION_MAP.get(listing['city'], 'Philippines')
         
         return {
             'tripadvisor_id': tripadvisor_id or f"d{int(time.time())}",
