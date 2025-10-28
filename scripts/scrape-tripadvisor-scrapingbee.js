@@ -5,7 +5,7 @@ import cheerio from 'cheerio'
 
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY
+const SCRAPINGBEE_API_KEY = process.env.SCRAPINGBEE_API_KEY || process.env.SCRAPING_BEE
 
 if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
   console.error('❌ Missing Supabase env (PROJECT_URL, SUPABASE_SERVICE_ROLE_KEY)')
