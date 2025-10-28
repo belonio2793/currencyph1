@@ -108,6 +108,12 @@ async function processListing(listing) {
     return 'skip'
   }
 
+  // Only process listings with a numeric TripAdvisor ID
+  if (!listing.tripadvisor_id || !/^\d+$/.test(String(listing.tripadvisor_id))) {
+    console.log(`⊘ Skipping (no numeric TripAdvisor ID): ${listing.name}`)
+    return 'skip'
+  }
+
   // Try to fetch from TripAdvisor
   let imageUrl = null
   const photos = await fetchTripAdvisorPhotos(listing.tripadvisor_id)
@@ -115,14 +121,15 @@ async function processListing(listing) {
   if (photos.length > 0) {
     imageUrl = photos[0]
   } else {
-    // Use placeholder
-    imageUrl = generatePlaceholder(listing.name, listing.category)
+    // No photos found — skip (do not generate placeholders)
+    console.log(`⊘ No TripAdvisor photos for: ${listing.name} (${listing.tripadvisor_id})`)
+    return 'skip'
   }
 
   try {
     // Download and store
     let storedPath = null
-    if (!imageUrl.includes('placeholder.com')) {
+    if (imageUrl) {
       storedPath = await downloadAndStore(imageUrl, listing.tripadvisor_id)
     }
 
