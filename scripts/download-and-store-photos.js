@@ -417,11 +417,19 @@ async function main() {
     await sleep(5000)
   }
 
-  console.log(`\n\n=== RESULTS ===`)
-  console.log(`Processed: ${stats.processed}`)
-  console.log(`Success: ${stats.success}`)
-  console.log(`Failed: ${stats.failed}`)
-  console.log(`Success rate: ${stats.processed > 0 ? ((stats.success / stats.processed) * 100).toFixed(1) : 0}%`)
+  console.log(`\n\n╔════════════════════════════════════════════════════════╗`)
+  console.log(`║                    FINAL RESULTS                     ║`)
+  console.log(`╚════════════════════════════════════════════════════════╝\n`)
+  console.log(`  📊 Total processed: ${stats.processed}`)
+  console.log(`  ✅ Successful: ${stats.success}`)
+  console.log(`  ❌ Failed: ${stats.failed}`)
+  console.log(`  📈 Success rate: ${stats.processed > 0 ? ((stats.success / stats.processed) * 100).toFixed(1) : 0}%\n`)
+
+  if (stats.success > 0) {
+    console.log(`✓ Photos have been uploaded to Supabase storage!`)
+    console.log(`  Bucket: nearby_listings/photos/{listing_id}/`)
+    console.log(`  Database: photo_urls column updated\n`)
+  }
 
   process.exit(0)
 }
