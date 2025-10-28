@@ -588,18 +588,21 @@ export default function ListingDetail({ slug, onBack }) {
                 href={`/nearby/${related.slug}`}
                 className="bg-white border rounded-lg overflow-hidden hover:shadow-lg cursor-pointer transition-all block"
               >
-                {(related.photo_urls?.[0] || related.image_urls?.[0] || related.image_url) && (
-                  <div className="h-40 overflow-hidden bg-slate-200">
-                    <img
-                      src={related.photo_urls?.[0] || related.image_urls?.[0] || related.image_url}
-                      alt={related.name}
-                      className="w-full h-full object-cover hover:scale-105 transition-transform"
-                      onError={(e) => {
-                        e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
-                      }}
-                    />
-                  </div>
-                )}
+                {/* Cost Display Instead of Image */}
+                <div className="h-40 overflow-hidden bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center border-b border-slate-200">
+                  {related.avg_cost ? (
+                    <div className="text-center">
+                      <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Cost</div>
+                      <div className="text-3xl font-bold text-slate-900">₱{Number(related.avg_cost).toLocaleString()}</div>
+                      <div className="text-xs text-slate-500 mt-1">per person</div>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <div className="text-2xl text-slate-300">—</div>
+                      <div className="text-xs text-slate-400 mt-1">No estimate</div>
+                    </div>
+                  )}
+                </div>
                 <div className="p-4">
                   <h3 className="font-semibold text-slate-900 mb-2 truncate">
                     {related.name}
