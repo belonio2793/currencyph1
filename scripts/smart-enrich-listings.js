@@ -176,8 +176,38 @@ async function upsertToSupabase(listing) {
     const features = Array.isArray(listing.features) ? listing.features : []
     const tags = Array.isArray(listing.tags) ? listing.tags : []
 
+    // Build complete update object with ALL fields to preserve existing data
     const preparedData = {
       id: listing.id,
+      name: listing.name,
+      address: listing.address,
+      city: listing.city,
+      country: listing.country,
+      latitude: listing.latitude,
+      longitude: listing.longitude,
+      lat: listing.lat,
+      lng: listing.lng,
+      rating: listing.rating,
+      review_count: listing.review_count,
+      category: listing.category,
+      location_type: listing.location_type,
+      source: listing.source,
+      description: listing.description,
+      phone_number: listing.phone_number,
+      website: listing.website,
+      web_url: listing.web_url,
+      price_range: listing.price_range,
+      price_level: listing.price_level,
+      hours_of_operation: listing.hours_of_operation,
+      visibility_score: listing.visibility_score,
+      slug: listing.slug,
+      amenities: listing.amenities,
+      accessibility_info: listing.accessibility_info,
+      highlights: listing.highlights,
+      best_for: listing.best_for,
+      nearby_attractions: listing.nearby_attractions,
+      review_details: listing.review_details,
+      // New enriched fields
       tripadvisor_id: listing.tripadvisor_id,
       photo_urls: photoUrls,
       primary_image_url: listing.primary_image_url,
@@ -188,12 +218,18 @@ async function upsertToSupabase(listing) {
       admission_fee: listing.admission_fee,
       ranking_in_city: listing.ranking_in_city,
       ranking_in_category: listing.ranking_in_category,
-      updated_at: listing.updated_at,
-      last_verified_at: listing.last_verified_at
+      updated_at: new Date().toISOString(),
+      last_verified_at: new Date().toISOString(),
+      verified: listing.verified,
+      fetch_status: listing.fetch_status,
+      created_at: listing.created_at,
+      timezone: listing.timezone,
+      currency: listing.currency
     }
 
+    // Remove undefined and empty values
     Object.keys(preparedData).forEach(key => {
-      if (preparedData[key] === undefined || preparedData[key] === '') {
+      if (preparedData[key] === undefined) {
         delete preparedData[key]
       }
     })
