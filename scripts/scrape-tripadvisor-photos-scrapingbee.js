@@ -84,13 +84,14 @@ async function scrapeTripAdvisorPhotos(tripadvisorId) {
       return []
     }
 
-    const data = await response.json()
-    if (!data.body) {
-      console.warn('  ⚠️  No HTML body received from ScrapingBee')
+    // ScrapingBee returns HTML directly as text
+    const html = await response.text()
+    if (!html) {
+      console.warn('  ⚠️  No HTML received from ScrapingBee')
       return []
     }
 
-    const photos = await extractPhotoUrls(data.body)
+    const photos = await extractPhotoUrls(html)
     return photos
   } catch (err) {
     console.warn(`  ⚠️  Scrape error:`, err.message)
