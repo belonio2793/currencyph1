@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
 import { createClient } from '@supabase/supabase-js'
-import 'dotenv/config'
-
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 const TRIPADVISOR_KEY = process.env.VITE_TRIPADVISOR_API_KEY || process.env.TRIPADVISOR_API_KEY || process.env.VITE_TRIPADVISOR || process.env.TRIPADVISOR
@@ -14,8 +12,19 @@ if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
 
 const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
-const argv = require('minimist')(process.argv.slice(2))
-const BATCH = Number(argv.batch || argv.b || 200)
+// simple arg parsing: --batch=NUM or -b NUM
+const rawArgs = process.argv.slice(2)
+let BATCH = 200
+for (let i = 0; i < rawArgs.length; i++) {
+  const a = rawArgs[i]
+  if (a.startsWith('--batch=')) {
+    const v = parseInt(a.split('=')[1], 10)
+    if (!isNaN(v)) BATCH = v
+  } else if (a === '-b' && rawArgs[i+1]) {
+    const v = parseInt(rawArgs[i+1], 10)
+    if (!isNaN(v)) BATCH = v
+  }
+}
 const FETCH_FACTOR = 3 // fetch factor to oversample before filtering
 
 async function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
