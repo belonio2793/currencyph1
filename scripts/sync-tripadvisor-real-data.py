@@ -54,32 +54,66 @@ TRIPADVISOR_SEARCH_URL = "https://www.tripadvisor.com.ph/Search?q="
 TRIPADVISOR_BASE = "https://www.tripadvisor.com.ph"
 
 
-def search_tripadvisor_with_grok(query: str) -> Optional[str]:
-    """Use Grok to search TripAdvisor and return the listing URL"""
+def rotate_scrapingbee_key():
+    """Get next ScrapingBee key from rotation"""
+    global CURRENT_KEY
+    CURRENT_KEY = next(SCRAPINGBEE_KEY_CYCLE)
+    return CURRENT_KEY
+
+
+def fetch_with_scrapingbee(url: str) -> Optional[str]:
+    """Fetch HTML content from URL using ScrapingBee"""
+    global CURRENT_KEY
     try:
-        payload = {
-            "model": GROK_MODEL,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": f"Search TripAdvisor.com.ph for '{query}' and provide the direct URL to the listing page. Only respond with the URL, nothing else. If not found, respond with 'NOT_FOUND'."
-                }
-            ],
-            "temperature": 0.2,
-            "max_tokens": 200
+        params = {
+            "api_key": CURRENT_KEY,
+            "url": url,
+            "render_javascript": "false"
         }
 
-        response = requests.post(GROK_API_URL, headers=GROK_HEADERS, json=payload, timeout=15)
+        response = requests.get(SCRAPINGBEE_URL, params=params, timeout=20)
+
+        if response.status_code == 429:
+            # Rate limit hit, rotate key
+            print("  🔄 Rotating ScrapingBee key...", end=" ", flush=True)
+            CURRENT_KEY = rotate_scrapingbee_key()
+            params["api_key"] = CURRENT_KEY
+            response = requests.get(SCRAPINGBEE_URL, params=params, timeout=20)
 
         if response.status_code != 200:
-            print(f"  ❌ Grok API error: {response.status_code}", file=sys.stderr)
             return None
 
-        data = response.json()
-        url = data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+        return response.text
 
-        if url and url != "NOT_FOUND" and url.startswith("http"):
-            return url
+    except Exception as e:
+        print(f"  ❌ ScrapingBee error: {e}", file=sys.stderr)
+        return None
+
+
+def search_tripadvisor(query: str) -> Optional[str]:
+    """Search TripAdvisor for a listing and return the listing URL"""
+    try:
+        search_url = f"{TRIPADVISOR_SEARCH_URL}{requests.utils.quote(query)}"
+        html = fetch_with_scrapingbee(search_url)
+
+        if not html:
+            return None
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+        # Find first search result link
+        result_link = soup.find('a', attrs={'data-test-target': 'search-result-title'})
+
+        if not result_link:
+            # Try alternative selectors
+            result_link = soup.find('a', href=re.compile(r'-d\d+-'))
+
+        if result_link and result_link.get('href'):
+            listing_path = result_link['href']
+            if listing_path.startswith('http'):
+                return listing_path
+            else:
+                return f"{TRIPADVISOR_BASE}{listing_path}"
 
         return None
 
