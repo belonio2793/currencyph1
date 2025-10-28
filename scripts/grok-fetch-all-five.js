@@ -6,7 +6,8 @@ const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 const X_API_KEY = process.env.X_API_KEY || process.env.XAI_API_KEY || process.env.GROK_API_KEY || process.env.X_API_KEY
 const GROK_API_URL = process.env.GROK_API_URL || 'https://api.grok.ai/v1/search'
-const SCRAPING_BEE = process.env.SCRAPING_BEE || process.env.SCRAPINGBEE_API_KEY
+// Grok-only version: remove ScrapingBee and fallback, add retry/backoff
+const SCRAPING_BEE = null
 
 if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
   console.error('Missing Supabase PROJECT_URL or SERVICE_ROLE_KEY')
@@ -23,9 +24,9 @@ function cleanUrl(u) {
   try { return u.split(/[?#]/)[0] } catch { return u }
 }
 
-async function grokFindImages(query) {
+async function grokFindImages(query, attempt = 1) {
   if (!X_API_KEY) return []
-  const prompt = `Find the TripAdvisor listing page for the query: "${query}". Return a JSON or text containing up to ${MAX_IMAGES} direct high-resolution image URLs from the TripAdvisor listing gallery. Only include fully qualified https URLs ending with jpg/jpeg/png/webp.`
+  const prompt = `Find the listing for the query: "${query}" on tripadvisor.com.ph and return up to ${MAX_IMAGES} direct high-resolution image URLs from its listing gallery as full https URLs ending with jpg/jpeg/png/webp.`
   try {
     const res = await fetch(GROK_API_URL, {
       method: 'POST',
@@ -42,61 +43,12 @@ async function grokFindImages(query) {
     const m = str.match(/https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp)/gi) || []
     return [...new Set(m.map(cleanUrl))].slice(0, MAX_IMAGES)
   } catch (err) {
-    console.warn('Grok error', err.message)
-    return []
-  }
-}
-
-async function scrapingBeeFindImages(query) {
-  if (!SCRAPING_BEE) return []
-  try {
-    const searchUrl = `https://www.tripadvisor.com/Search?q=${encodeURIComponent(query)}`
-    const params = new URLSearchParams({ url: searchUrl, render_js: 'true', wait: '3000', premium_proxy: 'true' })
-    const endpoint = `https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(SCRAPING_BEE)}&${params.toString()}`
-    const res = await fetch(endpoint, { timeout: 20000 })
-    if (!res.ok) { console.warn('ScrapingBee search failed', res.status); return [] }
-    const html = await res.text()
-    const $ = cheerio.load(html)
-    let link = null
-    $('a[href*="-d"]').each((_, a) => {
-      const href = $(a).attr('href')
-      if (href && /-d\d+-/.test(href)) {
-        link = href.startsWith('http') ? href.split('?')[0] : `https://www.tripadvisor.com${href.split('?')[0]}`
-        return false
-      }
-    })
-    if (!link) return []
-    const detailParams = new URLSearchParams({ url: link, render_js: 'true', wait: '3000', premium_proxy: 'true' })
-    const detailEndpoint = `https://app.scrapingbee.com/api/v1/?api_key=${encodeURIComponent(SCRAPING_BEE)}&${detailParams.toString()}`
-    const dres = await fetch(detailEndpoint, { timeout: 20000 })
-    if (!dres.ok) { console.warn('ScrapingBee detail failed', dres.status); return [] }
-    const detailHtml = await dres.text()
-    const patterns = [
-      /https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo-[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/gi,
-      /https:\/\/media-cdn\.tripadvisor\.com\/media\/photo-[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/gi
-    ]
-    const all = []
-    for (const p of patterns) {
-      const m = detailHtml.match(p) || []
-      all.push(...m)
+    console.warn('Grok error', err.message, 'attempt', attempt)
+    if (attempt < 3) {
+      // exponential backoff
+      await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)))
+      return grokFindImages(query, attempt + 1)
     }
-    const cleaned = [...new Set(all.map(cleanUrl))].slice(0, MAX_IMAGES)
-    return cleaned
-  } catch (err) {
-    console.warn('ScrapingBee error', err.message)
-    return []
-  }
-}
-
-async function fallbackScrapeDirect(query) {
-  try {
-    const url = `https://www.tripadvisor.com/Search?q=${encodeURIComponent(query)}`
-    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 20000 })
-    if (!res.ok) return []
-    const html = await res.text()
-    const m = html.match(/https:\/\/dynamic-media-cdn\.tripadvisor\.com\/media\/photo-[^\s"'<>]+\.(?:jpg|jpeg|png|webp)/gi) || []
-    return [...new Set(m.map(cleanUrl))].slice(0, MAX_IMAGES)
-  } catch (err) {
     return []
   }
 }
