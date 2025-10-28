@@ -33,6 +33,7 @@
     "enrich-resume": "node scripts/grok-resume-enrich.js",
     "enrich-all-resume": "node scripts/grok-enrich-all-resume.js",
     "enrich-complete": "node scripts/grok-enrich-complete.js",
+    "enrich-accurate": "node scripts/enrich-accurate-tripadvisor.js",
     "monitor-enrich": "node scripts/monitor-enrichment-live.js"
   },
   "dependencies": {
