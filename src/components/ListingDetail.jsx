@@ -663,18 +663,38 @@ export default function ListingDetail({ slug, onBack }) {
                 href={`/nearby/${related.slug}`}
                 className="bg-white border rounded-lg overflow-hidden hover:shadow-lg cursor-pointer transition-all block"
               >
-                {/* Cost Display Instead of Image */}
-                <div className="h-40 overflow-hidden bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center border-b border-slate-200">
-                  {related.avg_cost ? (
-                    <div className="text-center">
-                      <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Cost</div>
-                      <div className="text-3xl font-bold text-slate-900">₱{Number(related.avg_cost).toLocaleString()}</div>
-                      <div className="text-xs text-slate-500 mt-1">per person</div>
-                    </div>
+                {/* Photo or Cost Display */}
+                <div className="h-40 overflow-hidden bg-slate-200 relative">
+                  {related.photo_urls && related.photo_urls.length > 0 ? (
+                    <>
+                      <img
+                        src={related.photo_urls[0]}
+                        alt={related.name}
+                        className="w-full h-full object-cover hover:scale-105 transition-transform"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+                        }}
+                      />
+                      {related.photo_urls.length > 1 && (
+                        <div className="absolute bottom-2 right-2 bg-black/70 text-white rounded-full px-2 py-1 text-xs font-semibold">
+                          📸 {related.photo_urls.length}
+                        </div>
+                      )}
+                    </>
                   ) : (
-                    <div className="text-center">
-                      <div className="text-2xl text-slate-300">—</div>
-                      <div className="text-xs text-slate-400 mt-1">No estimate</div>
+                    <div className="w-full h-full bg-gradient-to-br from-blue-50 to-slate-50 flex items-center justify-center border-b border-slate-200">
+                      {related.avg_cost ? (
+                        <div className="text-center">
+                          <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Cost</div>
+                          <div className="text-2xl font-bold text-slate-900">₱{Number(related.avg_cost).toLocaleString()}</div>
+                          <div className="text-xs text-slate-500 mt-1">per person</div>
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <div className="text-2xl text-slate-300">—</div>
+                          <div className="text-xs text-slate-400 mt-1">No info</div>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -682,12 +702,17 @@ export default function ListingDetail({ slug, onBack }) {
                   <h3 className="font-semibold text-slate-900 mb-2 truncate">
                     {related.name}
                   </h3>
-                  <div className="flex items-center gap-2">
-                    {related.rating && <StarRating value={related.rating} size="sm" />}
-                    {related.rating && (
-                      <span className="text-sm font-medium text-slate-700">
-                        {Number(related.rating).toFixed(1)}
-                      </span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {related.rating && <StarRating value={related.rating} size="sm" />}
+                      {related.rating && (
+                        <span className="text-sm font-medium text-slate-700">
+                          {Number(related.rating).toFixed(1)}
+                        </span>
+                      )}
+                    </div>
+                    {related.avg_cost && (
+                      <span className="text-xs font-semibold text-blue-600">₱{Number(related.avg_cost).toLocaleString()}</span>
                     )}
                   </div>
                 </div>
