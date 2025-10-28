@@ -298,7 +298,7 @@ async function main() {
         const query = `${category} in ${city} Philippines`;
         process.stdout.write(`[${queryCount}/${PHILIPPINES_CITIES.length * CATEGORIES.length}] Fetching ${query}... `);
 
-        const listings = await fetchTripAdvisorData(query, tripKey, 30);
+        const listings = await fetchTripAdvisorData(query, tripKey, 30, city);
 
         if (listings.length > 0) {
           allListings.push(...listings);
