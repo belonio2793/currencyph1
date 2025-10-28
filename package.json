@@ -29,7 +29,8 @@
     "enrich-all": "node scripts/grok-enrich-all-listings.js",
     "enrich-deep": "node scripts/grok-deep-enrich-all.js",
     "enrich-smart": "node scripts/smart-enrich-listings.js",
-    "enrich-final": "node scripts/final-enrich-complete.js"
+    "enrich-final": "node scripts/final-enrich-complete.js",
+    "enrich-resume": "node scripts/grok-resume-enrich.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
