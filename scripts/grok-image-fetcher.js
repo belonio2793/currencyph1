@@ -82,7 +82,7 @@ async function grokSearchImage(query) {
     if (data.image_url && typeof data.image_url === 'string') return data.image_url
     if (data.result && typeof data.result === 'string') {
       // maybe raw text contains a URL — extract first https://...jpg/png/webp
-      const m = data.result.match(/https?:\\/\\/[^\s\"']+\.(?:jpg|jpeg|png|webp)/i)
+      const m = data.result.match(/https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp)/i)
       if (m) return m[0]
     }
 
@@ -91,14 +91,14 @@ async function grokSearchImage(query) {
     for (const p of searchPaths) {
       if (data[p]) {
         const str = JSON.stringify(data[p])
-        const m = str.match(/https?:\\/\\/[^\s\"']+\.(?:jpg|jpeg|png|webp)/i)
+        const m = str.match(/https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp)/i)
         if (m) return m[0]
       }
     }
 
     // Last resort: scan entire JSON for URL-like strings
     const jsonStr = JSON.stringify(data)
-    const m = jsonStr.match(/https?:\\/\\/[^\s\"']+\.(?:jpg|jpeg|png|webp)/i)
+    const m = jsonStr.match(/https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp)/i)
     if (m) return m[0]
 
     return null
