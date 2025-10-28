@@ -267,7 +267,7 @@ export default function ListingDetail({ slug, onBack }) {
         )}
 
         {/* Key Info Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {listing.rating && (
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
               <div className="text-sm text-blue-700 font-medium">Rating</div>
@@ -278,12 +278,6 @@ export default function ListingDetail({ slug, onBack }) {
             <div className="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
               <div className="text-sm text-green-700 font-medium">Reviews</div>
               <div className="text-2xl font-bold text-green-900">{(listing.review_count || 0).toLocaleString()}</div>
-            </div>
-          )}
-          {listing.photo_count && (
-            <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
-              <div className="text-sm text-purple-700 font-medium">Photos</div>
-              <div className="text-2xl font-bold text-purple-900">{(listing.photo_count || 0).toLocaleString()}</div>
             </div>
           )}
           {listing.admission_fee && (
