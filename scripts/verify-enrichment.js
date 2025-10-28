@@ -97,15 +97,16 @@ async function verifyEnrichment() {
   const completionPercent = totalListings > 0 ? (((enrichedCount || 0) / totalListings) * 100).toFixed(1) : 0
   
   console.log('\n' + '='.repeat(70))
-  console.log(`📈 Enrichment Progress: ${completionPercent}% (${enrichedCount}/${totalListings})`)
+  console.log(`📈 Enrichment Progress: ${completionPercent}% (${enrichedCount || 0}/${totalListings})`)
   console.log('='.repeat(70))
 
+  const remaining = totalListings - (enrichedCount || 0)
   if (completionPercent >= 95) {
     console.log('✨ Enrichment nearly complete!')
   } else if (completionPercent >= 50) {
-    console.log(`⚠️  ${totalListings - enrichedCount} listings still need enrichment`)
+    console.log(`⚠️  ${remaining} listings still need enrichment`)
   } else {
-    console.log(`⚠️  ${totalListings - enrichedCount} listings still need enrichment`)
+    console.log(`⚠️  ${remaining} listings still need enrichment`)
   }
 
   process.exit(0)
