@@ -100,8 +100,6 @@ export default function EnrichmentMonitor() {
   }, [lastEnrichedCount, rateInfo.lastUpdate])
 
   const percent = stats.total > 0 ? ((stats.enriched / stats.total) * 100).toFixed(1) : 0
-  const filledBars = Math.round((stats.enriched / stats.total) * 30) if (stats.total > 0) else 0
-  const emptyBars = 30 - filledBars
 
   const formatTime = (seconds) => {
     const hours = Math.floor(seconds / 3600)
