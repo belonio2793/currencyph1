@@ -263,28 +263,29 @@ async function processListing(listing) {
   }
 
   console.log(`\n[ID: ${listing.id}] ${listing.name} (${listing.city})`)
+  console.log(`  URL: ${listing.web_url.substring(0, 100)}...`)
 
   // Step 1: Fetch TripAdvisor page
-  console.log('  Fetching TripAdvisor page...')
+  console.log('  Step 1: Fetching page...')
   const html = await fetchTripAdvisorPage(listing.web_url)
 
   if (!html) {
-    console.log('  ✗ Failed to fetch page')
+    console.log('  ✗ Failed to fetch')
     return { id: listing.id, status: 'fetch-error' }
   }
 
-  console.log('  ✓ Page fetched')
+  console.log(`  ✓ Fetched ${(html.length / 1024).toFixed(1)}KB`)
 
-  // Step 2: Extract photo URLs from HTML
-  console.log('  Extracting photo URLs...')
-  const photoUrls = await extractPhotoUrlsFromHTML(html)
+  // Step 2: Extract photo URLs using Grok
+  console.log('  Step 2: Extracting photo URLs with Grok...')
+  const photoUrls = await grokExtractPhotoUrls(html, listing.name)
 
   if (photoUrls.length === 0) {
-    console.log('  ✗ No photo URLs found')
+    console.log('  ✗ No photo URLs extracted')
     return { id: listing.id, status: 'no-photos' }
   }
 
-  console.log(`  ✓ Found ${photoUrls.length} photos`)
+  console.log(`  ✓ Grok found ${photoUrls.length} photos`)
 
   // Step 3: Download and upload each photo
   const uploadedUrls = []
