@@ -66,12 +66,28 @@ export default function ListingCard({
       {/* Image or Avg Cost */}
       {!hideImage && (
         listing.avg_cost ? (
-          <div className="relative w-full bg-white border-b border-slate-200 overflow-hidden flex items-center justify-center" style={{ height: '220px' }}>
-            <div className="text-center py-6 px-4">
+          <div className="relative w-full bg-white border-b border-slate-200 overflow-hidden" style={{ height: '260px' }}>
+            <div className="text-center py-4 px-4">
               <div className="text-sm text-slate-500">Estimated cost per person</div>
               <div className="mt-2 text-3xl font-extrabold text-slate-900">₱{Number(listing.avg_cost).toLocaleString()}</div>
               <div className="text-xs text-slate-400 mt-1">Approximate</div>
             </div>
+
+            {/* Show first photo under the cost when available */}
+            {Array.isArray(listing.photo_urls) && listing.photo_urls.length > 0 && (
+              <div className="w-full h-28 overflow-hidden">
+                <img
+                  src={listing.photo_urls[0]}
+                  alt={listing.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none'
+                  }}
+                  loading="lazy"
+                />
+              </div>
+            )}
+
             {/* Category & location_type badges overlay */}
             <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
               {listing.category && (
