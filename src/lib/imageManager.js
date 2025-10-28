@@ -60,7 +60,7 @@ class ImageManager {
    * Generate placeholder image URL
    */
   getPlaceholderUrl(name) {
-    return `https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop&auto=format`
+    return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23e5e7eb' width='400' height='300'/%3E%3Ctext x='50%25' y='50%25' font-size='24' fill='%239ca3af' text-anchor='middle' dominant-baseline='middle' font-family='system-ui'%3ENo image available%3C/text%3E%3C/svg%3E`
   }
 
   /**
