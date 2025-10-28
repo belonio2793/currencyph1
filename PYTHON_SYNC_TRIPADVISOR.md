@@ -78,11 +78,48 @@ python scripts/sync-tripadvisor.py --city=Manila --limit=50
 
 ## Features
 
-✅ **Deduplication**: Automatically removes duplicate listings by `tripadvisor_id`  
-✅ **Batch Upsert**: Inserts/updates listings in chunks of 50 for efficiency  
-✅ **Progress Tracking**: Shows real-time progress with counts  
-✅ **Error Handling**: Gracefully handles API errors and continues processing  
-✅ **Rate Limiting**: Built-in delays between API calls to respect rate limits  
+✅ **Complete Column Population**: Updates ALL 47 columns in nearby_listings table
+✅ **Deduplication**: Automatically removes duplicate listings by `tripadvisor_id`
+✅ **Batch Upsert**: Inserts/updates listings in chunks of 50 for efficiency
+✅ **Progress Tracking**: Shows real-time progress with counts
+✅ **Error Handling**: Gracefully handles API errors and continues processing
+✅ **Rate Limiting**: Built-in delays between API calls to respect rate limits
+✅ **Visibility Scoring**: Calculates visibility score (0-100) based on ratings, reviews, images
+
+## All Populated Columns
+
+**Core Identification:**
+- `tripadvisor_id`, `slug`, `source`
+
+**Basic Information:**
+- `name`, `address`, `city`, `country`, `location_type`, `category`, `description`
+
+**Geographic Data:**
+- `latitude`, `longitude`, `lat`, `lng`
+
+**Rating & Reviews:**
+- `rating`, `review_count`, `review_details`
+
+**Images & Media:**
+- `image_url`, `featured_image_url`, `primary_image_url`, `photo_urls`, `photo_count`
+
+**Contact & Website:**
+- `website`, `web_url`, `phone_number`
+
+**Details & Features:**
+- `highlights`, `amenities`, `awards`, `hours_of_operation`, `accessibility_info`, `nearby_attractions`, `best_for`
+
+**Pricing & Duration:**
+- `price_level`, `price_range`, `duration`
+
+**Rankings & Visibility:**
+- `ranking_in_city`, `ranking_in_category`, `visibility_score`, `verified`
+
+**Data Status:**
+- `fetch_status`, `fetch_error_message`, `last_verified_at`, `updated_at`
+
+**Raw Data:**
+- `raw` (complete TripAdvisor API response)  
 
 ## Available Cities (180+ Philippine Cities)
 
