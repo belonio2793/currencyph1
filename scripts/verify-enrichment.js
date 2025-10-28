@@ -94,7 +94,7 @@ async function verifyEnrichment() {
   }
 
   // Calculate completion percentage
-  const completionPercent = totalListings > 0 ? ((enrichedCount / totalListings) * 100).toFixed(1) : 0
+  const completionPercent = totalListings > 0 ? (((enrichedCount || 0) / totalListings) * 100).toFixed(1) : 0
   
   console.log('\n' + '='.repeat(70))
   console.log(`📈 Enrichment Progress: ${completionPercent}% (${enrichedCount}/${totalListings})`)
