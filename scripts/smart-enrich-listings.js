@@ -10,22 +10,36 @@ if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
 
 const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
-// Extract TripAdvisor ID from URL
+// Extract TripAdvisor ID from URL - more aggressive
 function extractTripAdvisorId(url) {
   if (!url) return null
-  
-  // Match patterns like d123456, Review-d123456, or /Hotels-g298573-oa0-Manila_Metro_Manila_Calabarzon_Region_Calabarzon_Luzon.html
+
+  // TripAdvisor URLs typically have IDs in these formats:
+  // d12345, Restaurant_Review-g123-d456, Hotels-g123-oa0, Attraction_Review-g298573-d1234567
   const patterns = [
-    /[/-]d(\d+)(?:[/-]|$)/,                      // d123456 pattern
-    /\/(\d+)-/,                                   // /123456- pattern
-    /[?&]d[A-Za-z]*=(\d+)/                       // query param
+    /(?:d|Review-d|_d)(\d+)(?:[/-]|$)/,          // d123456 or Review-d123456 pattern
+    /[/-]d(\d+)[/-]/,                             // /d123456- pattern
+    /[?&]d[A-Za-z]*=(\d+)/,                       // d parameter in query
+    /(?:g|Hotel|Restaurant|Attraction)(\d+)(?:[_-]|$)/, // g123456 pattern
+    /.*?(\d{4,}).*?(?:Review|Hotel|Restaurant)/, // fallback: any 4+ digit number near Review/Hotel
   ]
-  
+
   for (const pattern of patterns) {
     const match = url.match(pattern)
-    if (match) return match[1]
+    if (match) {
+      const id = match[1]
+      if (id && id.length >= 4) return id
+    }
   }
-  
+
+  // If URL contains numbers, try to extract longest sequence
+  const numbers = url.match(/\d+/g)
+  if (numbers) {
+    // Return the longest number that looks like an ID (4+ digits)
+    const longNumbers = numbers.filter(n => n.length >= 4).sort((a, b) => b.length - a.length)
+    if (longNumbers.length > 0) return longNumbers[0]
+  }
+
   return null
 }
 
