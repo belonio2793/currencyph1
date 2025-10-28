@@ -28,7 +28,8 @@
     "enrich-tripadvisor": "node scripts/grok-enrich-tripadvisor-ph.js",
     "enrich-all": "node scripts/grok-enrich-all-listings.js",
     "enrich-deep": "node scripts/grok-deep-enrich-all.js",
-    "enrich-smart": "node scripts/smart-enrich-listings.js"
+    "enrich-smart": "node scripts/smart-enrich-listings.js",
+    "enrich-final": "node scripts/final-enrich-complete.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
