@@ -353,30 +353,25 @@ def main():
     else:
         print("🔍 DRY RUN - Would clear table here\n")
     
-    # Fetch listings from all locations
+    # Fetch listings from all cities
     all_listings = []
-    total_locations = sum(len(cities) for cities in PH_REGIONS.values())
+    total_locations = len(PH_CITIES)
     location_count = 0
-    
-    print(f"🌍 Scanning {total_locations} Philippine locations...\n")
-    
-    for region, cities in PH_REGIONS.items():
-        print(f"📍 {region}:")
-        
-        for city in cities:
-            location_count += 1
-            
-            for category in CATEGORIES:
-                listings = fetch_listings_by_location(city, category)
-                all_listings.extend(listings)
-                time.sleep(0.2)
-                
-                if args.limit and len(all_listings) >= args.limit:
-                    break
-            
+
+    print(f"🌍 Scanning {total_locations} Philippine cities...\n")
+
+    for city in PH_CITIES:
+        location_count += 1
+        print(f"📍 {city}:")
+
+        for category in CATEGORIES:
+            listings = fetch_listings_by_location(city, category)
+            all_listings.extend(listings)
+            time.sleep(0.2)
+
             if args.limit and len(all_listings) >= args.limit:
                 break
-        
+
         if args.limit and len(all_listings) >= args.limit:
             break
     
