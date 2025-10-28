@@ -207,14 +207,14 @@ async function main() {
   }
 
   console.log(`\n🎬 TripAdvisor Photo Fetcher`)
-  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━`)
+  console.log(`━━━━━━━━━━━━━━━━━��━━━━━━━━━`)
   console.log(`Batch: ${batchSize}, Starting from: ${start}\n`)
 
   // Get listings without photos
   const { data: listings, error } = await supabase
     .from('nearby_listings')
     .select('id,name,city')
-    .is('photo_urls', null)
+    .or('photo_urls.is.null,photo_urls.eq.{}')
     .range(start, start + batchSize - 1)
 
   if (error) {
@@ -243,7 +243,7 @@ async function main() {
   console.log(`✅ Completed!`)
   console.log(`   Processed: ${processed}`)
   console.log(`   Successful: ${successful}`)
-  console.log(`━━━━━━━━��━━━━━━━━━━━━━━━━━━\n`)
+  console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`)
 }
 
 main().catch(err => {
