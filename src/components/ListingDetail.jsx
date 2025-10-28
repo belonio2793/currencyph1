@@ -118,49 +118,23 @@ export default function ListingDetail({ slug, onBack }) {
       </button>
 
       <div className="mb-8">
-        {/* Hero Image Gallery or Average Cost */}
-        {listing.avg_cost ? (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-white border border-slate-200 flex items-center justify-center">
-            <div className="text-center py-16 px-6">
-              <div className="text-sm text-slate-500">Estimated cost per person</div>
-              <div className="mt-3 text-4xl font-extrabold text-slate-900">₱{Number(listing.avg_cost).toLocaleString()}</div>
-              <div className="text-sm text-slate-600 mt-2">(Approximate)</div>
-            </div>
-          </div>
-        ) : displayImage && (
-          <div className="mb-8 rounded-lg overflow-hidden max-h-96 bg-slate-200">
-            <img
-              src={displayImage}
-              alt={listing.name}
-              className="w-full h-96 object-cover"
-              onError={(e) => {
-                e.currentTarget.src = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
-              }}
-            />
-            {/* Photo Navigation */}
-            {imageArray.length > 1 && (
-              <div className="flex justify-between items-center px-4 py-3 bg-black bg-opacity-50">
-                <button
-                  onClick={() => setSelectedPhotoIndex(Math.max(0, selectedPhotoIndex - 1))}
-                  disabled={selectedPhotoIndex === 0}
-                  className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
-                >
-                  ←
-                </button>
-                <span className="text-white text-sm">
-                  {selectedPhotoIndex + 1} / {imageArray.length}
-                </span>
-                <button
-                  onClick={() => setSelectedPhotoIndex(Math.min(imageArray.length - 1, selectedPhotoIndex + 1))}
-                  disabled={selectedPhotoIndex === imageArray.length - 1}
-                  className="px-3 py-1 bg-white bg-opacity-80 text-black rounded disabled:opacity-50"
-                >
-                  →
-                </button>
-              </div>
+        {/* Estimated Cost Display - Always Shown */}
+        <div className="mb-8 rounded-lg overflow-hidden bg-gradient-to-br from-blue-50 to-slate-50 border-2 border-blue-200 flex items-center justify-center shadow-lg">
+          <div className="text-center py-16 px-6 w-full">
+            <div className="text-sm font-semibold text-slate-600 uppercase tracking-wider mb-3">Estimated Cost Per Person</div>
+            {listing.avg_cost ? (
+              <>
+                <div className="text-6xl font-extrabold text-slate-900 mb-2">₱{Number(listing.avg_cost).toLocaleString()}</div>
+                <div className="text-base text-slate-600">Approximate • Includes admission, meals, and transport</div>
+              </>
+            ) : (
+              <>
+                <div className="text-5xl font-bold text-slate-300 mb-2">—</div>
+                <div className="text-base text-slate-500">Cost estimation in progress</div>
+              </>
             )}
           </div>
-        )}
+        </div>
 
         {/* Title and Badges */}
         <div className="flex items-start gap-4 mb-4">
