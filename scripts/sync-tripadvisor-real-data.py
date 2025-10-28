@@ -123,108 +123,177 @@ def search_tripadvisor(query: str) -> Optional[str]:
 
 
 def extract_tripadvisor_listing_data(url: str) -> Optional[Dict]:
-    """Use Grok to extract ALL real data from a TripAdvisor listing URL"""
+    """Extract ALL real data from a TripAdvisor listing page using ScrapingBee"""
     try:
+        # Fetch HTML content from TripAdvisor listing
+        html = fetch_with_scrapingbee(url)
+
+        if not html:
+            return None
+
+        soup = BeautifulSoup(html, 'html.parser')
+        html_content = html
+
         # Extract listing ID from URL
         tripadvisor_id = None
         match = re.search(r'-d(\d+)-', url)
         if match:
             tripadvisor_id = match.group(1)
 
-        # Use Grok to extract data from the TripAdvisor URL
-        payload = {
-            "model": GROK_MODEL,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": f"""Visit this TripAdvisor listing and extract ALL available data:
-{url}
+        # Extract name (usually in h1)
+        name = None
+        h1 = soup.find('h1')
+        if h1:
+            name = h1.get_text(strip=True)
 
-Return ONLY a JSON object (no markdown, no code blocks) with these fields:
-{{
-    "name": "listing name",
-    "rating": numeric rating or null,
-    "review_count": number of reviews or null,
-    "address": "full address",
-    "phone_number": "phone with +63 prefix if possible",
-    "description": "short description",
-    "amenities": ["amenity1", "amenity2"],
-    "hours_of_operation": {{"Monday": "9am-5pm", "Tuesday": "9am-5pm"}},
-    "price_range": "₱₱ or €€ etc",
-    "website": "external website URL if available",
-    "location_type": "Hotel/Restaurant/Attraction",
-    "photo_urls": ["photo_url1", "photo_url2"]
-}}
-
-Be accurate. Extract only what is actually visible on the page."""
-                }
-            ],
-            "temperature": 0.1,
-            "max_tokens": 2000
-        }
-
-        response = requests.post(GROK_API_URL, headers=GROK_HEADERS, json=payload, timeout=30)
-
-        if response.status_code != 200:
-            print(f"  ❌ Grok API error: {response.status_code}", file=sys.stderr)
-            return None
-
-        api_data = response.json()
-        json_str = api_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
-
-        # Parse JSON response from Grok
-        if not json_str:
-            return None
-
-        # Try to extract JSON from response (in case Grok wraps it)
-        json_match = re.search(r'\{.*\}', json_str, re.DOTALL)
-        if json_match:
-            json_str = json_match.group()
-
-        ta_data = json.loads(json_str)
-
-        # Ensure data types
-        rating = ta_data.get("rating")
-        if rating is not None:
+        # Extract rating
+        rating = None
+        rating_elem = soup.find('span', class_=re.compile('ratingFilter|Rating|rating'))
+        if rating_elem:
+            rating_text = rating_elem.get_text(strip=True)
             try:
-                rating = float(rating)
+                rating_match = re.search(r'[\d.]+', rating_text)
+                if rating_match:
+                    rating = float(rating_match.group())
             except:
-                rating = None
+                pass
 
-        review_count = ta_data.get("review_count")
-        if review_count is not None:
-            try:
-                review_count = int(review_count)
-            except:
-                review_count = None
+        # Extract review count
+        review_count = None
+        review_patterns = [
+            soup.find(text=re.compile(r'\d+\s+review')),
+            soup.find(text=re.compile(r'\d+.*review'))
+        ]
+        for review_elem in review_patterns:
+            if review_elem:
+                try:
+                    review_match = re.search(r'(\d+)', review_elem)
+                    if review_match:
+                        review_count = int(review_match.group(1))
+                        break
+                except:
+                    pass
 
-        # Clean photo URLs
-        photo_urls = ta_data.get("photo_urls", [])
-        if isinstance(photo_urls, list):
-            photo_urls = [url for url in photo_urls if isinstance(url, str) and url.startswith("http")][:50]
+        # Extract address
+        address = None
+        address_elem = soup.find('address')
+        if address_elem:
+            address = address_elem.get_text(strip=True)
         else:
-            photo_urls = []
+            # Try alternate selectors
+            for elem in soup.find_all(['span', 'div'], class_=re.compile('address|location')):
+                if elem:
+                    address = elem.get_text(strip=True)
+                    break
 
-        # Extract main photo (first valid URL)
+        # Extract phone
+        phone = None
+        phone_patterns = [
+            r'\+63\s?[\d\s-]+',
+            r'tel:\s*[\d\s-]+',
+            r'\(\d{3}\)\s*\d{3}-\d{4}'
+        ]
+        for pattern in phone_patterns:
+            phone_match = re.search(pattern, html_content)
+            if phone_match:
+                phone = phone_match.group(0).strip()
+                break
+
+        # Extract description
+        description = None
+        for selector in ['div.description', 'div.about', 'div[class*="description"]', 'p']:
+            desc_elem = soup.select_one(selector)
+            if desc_elem:
+                text = desc_elem.get_text(strip=True)
+                if len(text) > 20:
+                    description = text
+                    break
+
+        # Extract amenities list
+        amenities = []
+        for item in soup.find_all(['li', 'div'], class_=re.compile('amenity|feature|highlight')):
+            amenity_text = item.get_text(strip=True)
+            if amenity_text and 5 < len(amenity_text) < 100:
+                amenities.append(amenity_text)
+
+        # Extract hours
+        hours_of_operation = {}
+        hours_match = re.findall(r'(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[:\s]+([0-9:\s–\-ampm]+|Closed)', html_content, re.IGNORECASE)
+        for day, time in hours_match:
+            hours_of_operation[day.capitalize()] = time.strip()
+
+        # Extract price range
+        price_range = None
+        price_match = re.search(r'(₱|€|\$)\s*-?\s*(₱|€|\$)?', html_content)
+        if price_match:
+            price_range = price_match.group(0).strip()
+
+        # Extract website
+        website = None
+        for link in soup.find_all('a', href=re.compile(r'^http')):
+            href = link.get('href', '')
+            if href and 'tripadvisor' not in href.lower() and 'javascript' not in href.lower():
+                website = href
+                break
+
+        # Extract ALL photo URLs
+        photo_urls = []
+
+        # Method 1: Extract from img tags
+        for img in soup.find_all('img'):
+            src = img.get('src', '') or img.get('data-src', '')
+            if src and ('media' in src or 'photo' in src or 'image' in src or 'static' in src):
+                if src not in photo_urls and src.startswith('http'):
+                    photo_urls.append(src)
+
+        # Method 2: Extract from picture/source tags
+        for picture in soup.find_all('picture'):
+            for source in picture.find_all('source'):
+                srcset = source.get('srcset', '')
+                for url_part in srcset.split(','):
+                    url_match = re.search(r'(https?://[^\s]+)', url_part.strip())
+                    if url_match:
+                        photo_url = url_match.group(1).split()[0]
+                        if photo_url not in photo_urls and photo_url.startswith('http'):
+                            photo_urls.append(photo_url)
+
+        # Method 3: Extract from data attributes
+        for attr_val in re.findall(r'data-src="([^"]*)"', html_content):
+            if attr_val and 'media' in attr_val and attr_val not in photo_urls:
+                photo_urls.append(attr_val)
+
+        # Clean up photo URLs (limit, remove duplicates)
+        photo_urls = list(dict.fromkeys(photo_urls))[:50]
+
+        # Extract main photo
         image_url = photo_urls[0] if photo_urls else None
+
+        # Extract category/type
+        location_type = "Attraction"
+        if (name and 'restaurant' in name.lower()) or 'restaurant' in url.lower():
+            location_type = "Restaurant"
+        elif (name and 'hotel' in name.lower()) or 'hotel' in url.lower():
+            location_type = "Hotel"
+        elif 'attraction' in url.lower():
+            location_type = "Attraction"
 
         # Build result with ALL extracted data
         data = {
             "tripadvisor_id": tripadvisor_id,
-            "name": ta_data.get("name"),
+            "name": name,
             "rating": rating,
             "review_count": review_count,
-            "address": ta_data.get("address"),
-            "phone_number": ta_data.get("phone_number"),
-            "description": ta_data.get("description"),
-            "amenities": ta_data.get("amenities", []),
-            "hours_of_operation": ta_data.get("hours_of_operation", {}),
-            "price_range": ta_data.get("price_range"),
-            "website": ta_data.get("website"),
+            "address": address,
+            "phone_number": phone,
+            "description": description,
+            "amenities": amenities,
+            "hours_of_operation": hours_of_operation,
+            "price_range": price_range,
+            "website": website,
             "image_url": image_url,
             "photo_urls": photo_urls,
             "photo_count": len(photo_urls),
-            "location_type": ta_data.get("location_type", "Attraction"),
+            "location_type": location_type,
             "web_url": url,
             "fetch_status": "success",
             "fetch_error_message": None,
@@ -233,9 +302,6 @@ Be accurate. Extract only what is actually visible on the page."""
 
         return data
 
-    except json.JSONDecodeError as e:
-        print(f"  ❌ JSON parsing error: {e}", file=sys.stderr)
-        return None
     except Exception as e:
         print(f"  ❌ Extraction error: {e}", file=sys.stderr)
         return None
