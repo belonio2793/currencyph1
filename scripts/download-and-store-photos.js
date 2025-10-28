@@ -30,6 +30,15 @@ const BUCKET_NAME = 'nearby_listings'
 const MAX_PHOTOS = 15
 const TEMP_DIR = '/tmp/tripadvisor-photos'
 
+// ScrapingBee API keys (rotating)
+const SCRAPINGBEE_KEYS = [
+  'Z3CQBBBPQIA4FQAQOHWJVO40ZKIRMM7LNUBVOQVAN2VP2PE2F1PQO9JGJZ5C9U9C9LRWK712V7P963C9',
+  'OPYAXOKXYQ0SBE7LR23GJ3NH1R4M66NUM85WJO1SCFUOFGJ11LJP6ZKD1JBVKNGMGC3E1RQXF81NT4YS',
+  'IQA11BPV1NYZEFAX4Q3SMM3DQZIBZWXY4O47IPRDBQPGAVZTQPKB4C2GAMXOEZJTEJ9TU5J2GQJJXSOP',
+  'DHOMQK5VZOIUQN9JJZHFR3WX07XFGTFFYFVCRM6AOLZFGI5S9Z60R23AQM2LUL84M2SNK4HH9NGMVDCG'
+]
+let keyIndex = 0
+
 if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
   console.error('❌ Missing environment variables')
   process.exit(1)
@@ -271,7 +280,7 @@ async function processListing(listing) {
 
     if (error) throw error
 
-    console.log(`  ✓ Successfully stored ${uploadedUrls.length} photos`)
+    console.log(`  ��� Successfully stored ${uploadedUrls.length} photos`)
     return { id: listing.id, status: 'success', count: uploadedUrls.length }
   } catch (err) {
     console.log(`  ✗ Database error: ${err.message}`)
