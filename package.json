@@ -31,7 +31,8 @@
     "enrich-smart": "node scripts/smart-enrich-listings.js",
     "enrich-final": "node scripts/final-enrich-complete.js",
     "enrich-resume": "node scripts/grok-resume-enrich.js",
-    "enrich-all-resume": "node scripts/grok-enrich-all-resume.js"
+    "enrich-all-resume": "node scripts/grok-enrich-all-resume.js",
+    "monitor-enrich": "node scripts/monitor-enrichment-live.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
