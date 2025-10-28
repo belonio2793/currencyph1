@@ -110,12 +110,11 @@ async function main() {
   console.log('🔍 Mapping real TripAdvisor location IDs to listings...\n')
 
   try {
-    // Get all listings with synthetic IDs
-    console.log('📋 Fetching listings with synthetic IDs...')
-    const { data: listings, error } = await supabase
+    // Get listings and filter non-numeric tripadvisor_id (synthetic or missing)
+    console.log('📋 Fetching listings...')
+    const { data, error } = await supabase
       .from('nearby_listings')
       .select('id, tripadvisor_id, name, city')
-      .like('tripadvisor_id', 'php_%')
       .order('rating', { ascending: false, nullsLast: true })
 
     if (error) {
@@ -123,10 +122,12 @@ async function main() {
       process.exit(1)
     }
 
-    console.log(`✓ Found ${listings.length} listings with synthetic IDs\n`)
+    const listings = (data || []).filter(l => l.tripadvisor_id && !/^\d+$/.test(String(l.tripadvisor_id)))
+
+    console.log(`✓ Found ${listings.length} listings with non-numeric (synthetic) tripadvisor_id\n`)
 
     if (listings.length === 0) {
-      console.log('✓ All listings already have real IDs!')
+      console.log('✓ All listings already have real numeric TripAdvisor IDs!')
       process.exit(0)
     }
 
