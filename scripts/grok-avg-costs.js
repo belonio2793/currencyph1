@@ -135,22 +135,26 @@ async function processBatch(batchSize=BATCH, start=START){
     const q = `${l.name} ${l.city || ''}`.trim()
     const prompt = `Estimate the average cost in Philippine pesos (PHP) per person to go to "${q}". Consider a typical visit: admission or cover, one average meal, and local transport if applicable. Provide a single numeric value only (no currency symbol), rounded to the nearest peso.`
     console.log(`[${processed}] Asking Grok for: ${q}`)
-    const val = await askGrok(prompt)
+    let val = await askGrok(prompt)
+
+    // If Grok fails, use fallback estimate
     if (val === null) {
-      console.log('  Grok returned no value for', q)
-      // backoff small
-      await sleep(400)
-      continue
+      val = getFallbackCost(l)
+      console.log(`  Using fallback estimate for ${q}: ₱${val}`)
+      await sleep(200)
+    } else {
+      console.log(`  Grok estimate for ${q}: ₱${val}`)
+      await sleep(600)
     }
+
     // update DB
     const { error: up } = await supabase.from('nearby_listings').update({ avg_cost: val, updated_at: new Date().toISOString() }).eq('id', l.id)
     if (up) {
       console.error('  DB update error', up)
     } else {
-      console.log(`  Updated ${l.id} avg_cost=${val}`)
+      console.log(`  ✓ Updated ${l.id} avg_cost=₱${val}`)
       updated++
     }
-    await sleep(600)
   }
   console.log('Batch processed', processed, 'updated', updated)
 }
