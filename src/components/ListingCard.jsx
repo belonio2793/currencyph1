@@ -63,59 +63,82 @@ export default function ListingCard({
       className="bg-white border border-slate-200 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group"
       onClick={handleCardClick}
     >
-      {/* Image */}
+      {/* Image or Avg Cost */}
       {!hideImage && (
-        <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '220px' }}>
-          {imageLoading && (
-            <div className="absolute inset-0 bg-slate-200 animate-pulse" />
-          )}
-          <img
-            src={imageUrl}
-            alt={listing.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            onError={(e) => {
-              if (!imageError) {
-                e.currentTarget.src =
-                  'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
-                setImageError(true)
-              }
-            }}
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-
-          {/* Badge Container */}
-          <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
-            {/* Category Badge */}
-            {listing.category && (
-              <span className="inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-md">
-                {listing.category.charAt(0).toUpperCase() + listing.category.slice(1)}
-              </span>
+        listing.avg_cost ? (
+          <div className="relative w-full bg-white border-b border-slate-200 overflow-hidden flex items-center justify-center" style={{ height: '220px' }}>
+            <div className="text-center py-6 px-4">
+              <div className="text-sm text-slate-500">Estimated cost per person</div>
+              <div className="mt-2 text-3xl font-extrabold text-slate-900">₱{Number(listing.avg_cost).toLocaleString()}</div>
+              <div className="text-xs text-slate-400 mt-1">Approximate</div>
+            </div>
+            {/* Category & location_type badges overlay */}
+            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+              {listing.category && (
+                <span className="inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-md">
+                  {listing.category.charAt(0).toUpperCase() + listing.category.slice(1)}
+                </span>
+              )}
+              {listing.location_type && (
+                <span className="inline-block px-2 py-1 bg-blue-600/90 text-white rounded text-xs font-medium shadow-md">
+                  {listing.location_type}
+                </span>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="relative w-full bg-gradient-to-br from-slate-200 to-slate-300 overflow-hidden" style={{ height: '220px' }}>
+            {imageLoading && (
+              <div className="absolute inset-0 bg-slate-200 animate-pulse" />
             )}
-            {/* Location Type Badge */}
-            {listing.location_type && (
-              <span className="inline-block px-2 py-1 bg-blue-600/90 text-white rounded text-xs font-medium shadow-md">
-                {listing.location_type}
-              </span>
+            <img
+              src={imageUrl}
+              alt={listing.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onError={(e) => {
+                if (!imageError) {
+                  e.currentTarget.src =
+                    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop&auto=format&q=80'
+                  setImageError(true)
+                }
+              }}
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
+
+            {/* Badge Container */}
+            <div className="absolute inset-x-0 top-0 flex items-start justify-between p-3">
+              {/* Category Badge */}
+              {listing.category && (
+                <span className="inline-block px-3 py-1 bg-white/95 text-slate-900 rounded-full text-xs font-semibold shadow-md">
+                  {listing.category.charAt(0).toUpperCase() + listing.category.slice(1)}
+                </span>
+              )}
+              {/* Location Type Badge */}
+              {listing.location_type && (
+                <span className="inline-block px-2 py-1 bg-blue-600/90 text-white rounded text-xs font-medium shadow-md">
+                  {listing.location_type}
+                </span>
+              )}
+            </div>
+
+            {/* Rating Badge */}
+            {listing.rating && (
+              <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-white/95 rounded-lg px-3 py-1 shadow-md">
+                <span className="text-yellow-400">★</span>
+                <span className="font-bold text-slate-900">{Number(listing.rating).toFixed(1)}</span>
+              </div>
+            )}
+
+            {/* Photo Count */}
+            {listing.photo_count && listing.photo_count > 0 && (
+              <div className="absolute bottom-3 right-3 bg-black/60 text-white rounded px-2 py-1 text-xs font-medium flex items-center gap-1">
+                <span>📸</span>
+                <span>{listing.photo_count}</span>
+              </div>
             )}
           </div>
-
-          {/* Rating Badge */}
-          {listing.rating && (
-            <div className="absolute bottom-3 left-3 flex items-center gap-1 bg-white/95 rounded-lg px-3 py-1 shadow-md">
-              <span className="text-yellow-400">★</span>
-              <span className="font-bold text-slate-900">{Number(listing.rating).toFixed(1)}</span>
-            </div>
-          )}
-
-          {/* Photo Count */}
-          {listing.photo_count && listing.photo_count > 0 && (
-            <div className="absolute bottom-3 right-3 bg-black/60 text-white rounded px-2 py-1 text-xs font-medium flex items-center gap-1">
-              <span>📸</span>
-              <span>{listing.photo_count}</span>
-            </div>
-          )}
-        </div>
+        )
       )}
 
       {/* Content */}
