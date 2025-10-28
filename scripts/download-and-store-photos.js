@@ -114,26 +114,43 @@ async function extractPhotoUrlsFromHTML(html) {
   return Array.from(photoUrls).slice(0, MAX_PHOTOS)
 }
 
+function getNextScrapingBeeKey() {
+  const key = SCRAPINGBEE_KEYS[keyIndex]
+  keyIndex = (keyIndex + 1) % SCRAPINGBEE_KEYS.length
+  return key
+}
+
 async function fetchTripAdvisorPage(url) {
   try {
-    console.log('    Fetching page with curl...')
+    console.log('    Fetching with ScrapingBee (JavaScript rendering)...')
 
-    try {
-      const { stdout } = await execAsync(
-        `curl -s -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "${url}" | head -c 5000000`,
-        { maxBuffer: 10 * 1024 * 1024 }
-      )
-      return stdout
-    } catch (err) {
-      // Fallback to fetch API
-      const response = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        }
-      })
-      if (!response.ok) return null
-      return await response.text()
+    const key = getNextScrapingBeeKey()
+
+    const params = new URLSearchParams({
+      api_key: key,
+      url: url,
+      render_js: 'true',
+      wait: '3000',
+      premium_proxy: 'true'
+    })
+
+    const scrapingBeeUrl = `https://api.scrapingbee.com/api/v1/?${params}`
+
+    const response = await fetch(scrapingBeeUrl, {
+      method: 'GET',
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      },
+      timeout: 30000
+    })
+
+    if (!response.ok) {
+      console.log(`    ScrapingBee error: ${response.status}`)
+      return null
     }
+
+    const html = await response.text()
+    return html
   } catch (err) {
     console.log(`    Error fetching page: ${err.message}`)
     return null
@@ -280,7 +297,7 @@ async function processListing(listing) {
 
     if (error) throw error
 
-    console.log(`  ��� Successfully stored ${uploadedUrls.length} photos`)
+    console.log(`  ✓ Successfully stored ${uploadedUrls.length} photos`)
     return { id: listing.id, status: 'success', count: uploadedUrls.length }
   } catch (err) {
     console.log(`  ✗ Database error: ${err.message}`)
