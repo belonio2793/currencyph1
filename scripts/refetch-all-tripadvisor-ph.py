@@ -406,7 +406,8 @@ def insert_listing(supabase: Client, listing_data: Dict) -> Optional[int]:
 
 def main():
     parser = argparse.ArgumentParser(description="Refetch all TripAdvisor.com.ph listings")
-    parser.add_argument("--dry-run", action="store_true", help="Preview without clearing table")
+    parser.add_argument("--dry-run", action="store_true", help="Preview without inserting")
+    parser.add_argument("--no-backup", action="store_true", help="Skip backup (use if already cleared)")
     parser.add_argument("--limit", type=int, default=0, help="Limit total listings for testing")
     
     args = parser.parse_args()
