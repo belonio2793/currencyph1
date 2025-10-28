@@ -94,15 +94,46 @@ export default function ListingDetail({ slug, onBack }) {
 
   // Get best image from various sources
   const getImageArray = () => {
-    if (listing.photo_urls && Array.isArray(listing.photo_urls) && listing.photo_urls.length > 0) {
-      return listing.photo_urls
+    // Try photo_urls first (preferred source)
+    if (listing.photo_urls) {
+      let photoArray = listing.photo_urls
+
+      // Handle if photo_urls is a string (JSON or comma-separated)
+      if (typeof photoArray === 'string') {
+        try {
+          // Try parsing as JSON
+          photoArray = JSON.parse(photoArray)
+        } catch {
+          // If JSON parse fails, try treating as comma-separated or pipe-separated
+          photoArray = photoArray.split(/[,|]/).map(url => url.trim()).filter(Boolean)
+        }
+      }
+
+      // Verify it's an array with content
+      if (Array.isArray(photoArray) && photoArray.length > 0) {
+        console.log('Using photo_urls:', photoArray.length, 'images')
+        return photoArray
+      }
     }
+
     if (listing.image_urls && Array.isArray(listing.image_urls) && listing.image_urls.length > 0) {
+      console.log('Using image_urls:', listing.image_urls.length, 'images')
       return listing.image_urls
     }
-    if (listing.featured_image_url) return [listing.featured_image_url]
-    if (listing.primary_image_url) return [listing.primary_image_url]
-    if (listing.image_url) return [listing.image_url]
+    if (listing.featured_image_url) {
+      console.log('Using featured_image_url')
+      return [listing.featured_image_url]
+    }
+    if (listing.primary_image_url) {
+      console.log('Using primary_image_url')
+      return [listing.primary_image_url]
+    }
+    if (listing.image_url) {
+      console.log('Using image_url')
+      return [listing.image_url]
+    }
+
+    console.log('No images found for:', listing.name)
     return []
   }
 
