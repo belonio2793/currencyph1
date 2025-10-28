@@ -56,15 +56,25 @@ SCRAPINGBEE_KEY_INDEX = 0
 # TripAdvisor Philippines categories and regions
 TRIPADVISOR_BASE = "https://www.tripadvisor.com.ph"
 
-# Philippine regions and their URLs for browsing
-PH_REGIONS = {
-    "Luzon": ["Manila", "Quezon City", "Pasig", "Caloocan", "Las Piñas", "Makati", "Taguig", "Marikina", "Cavite", "Laguna", "Batangas", "Bulacan", "Pangasinan"],
-    "Visayas": ["Cebu", "Iloilo", "Negros Occidental", "Siquijor", "Bohol", "Aklan", "Guimaras", "Capiz"],
-    "Mindanao": ["Davao", "Cagayan de Oro", "General Santos", "Zamboanga", "Butuan", "Surigao"],
-    "Cordillera": ["Baguio", "Benguet", "Ifugao", "Kalinga"],
-    "CALABARZON": ["Tagaytay", "Antipolo", "Naic", "Kawit"],
-    "MIMAROPA": ["Puerto Princesa", "Palawan", "Mindoro", "Romblon"],
-}
+# Philippine cities - comprehensive list (180+ cities)
+PH_CITIES = [
+    "Abuyog", "Alaminos", "Alcala", "Angeles", "Antipolo", "Aroroy", "Bacolod", "Bacoor", "Bago", "Bais",
+    "Balanga", "Baliuag", "Bangued", "Bansalan", "Bantayan", "Bataan", "Batac", "Batangas City", "Bayambang", "Bayawan",
+    "Baybay", "Bayugan", "Biñan", "Bislig", "Bocaue", "Bogo", "Boracay", "Borongan", "Butuan", "Cabadbaran",
+    "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calamba", "Calapan", "Calbayog", "Caloocan", "Camiling", "Canlaon",
+    "Caoayan", "Capiz", "Caraga", "Carmona", "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City", "Dagupan",
+    "Danao", "Dapitan", "Daraga", "Dasmariñas", "Davao City", "Davao del Norte", "Davao del Sur", "Davao Oriental", "Dipolog", "Dumaguete",
+    "General Santos", "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan", "Iloilo City", "Imus", "Isabela",
+    "Isulan", "Kabankalan", "Kidapawan", "Koronadal", "La Carlota", "Laoag", "Lapu-Lapu", "Las Piñas", "Laoang", "Legazpi",
+    "Ligao", "Limay", "Lucena", "Maasin", "Mabalacat", "Malabon", "Malaybalay", "Malolos", "Mandaluyong", "Mandaue",
+    "Manila", "Marawi", "Marilao", "Masbate City", "Mati", "Meycauayan", "Muntinlupa", "Naga (Camarines Sur)", "Navotas", "Olongapo",
+    "Ormoc", "Oroquieta", "Ozamiz", "Pagadian", "Palo", "Parañaque", "Pasay", "Pasig", "Passi", "Puerto Princesa",
+    "Quezon City", "Roxas", "Sagay", "Samal", "San Carlos (Negros Occidental)", "San Carlos (Pangasinan)", "San Fernando (La Union)", "San Fernando (Pampanga)",
+    "San Jose (Antique)", "San Jose del Monte", "San Juan", "San Pablo", "San Pedro", "Santiago", "Silay", "Sipalay",
+    "Sorsogon City", "Surigao City", "Tabaco", "Tabuk", "Tacurong", "Tagaytay", "Tagbilaran", "Taguig", "Tacloban", "Talisay (Cebu)",
+    "Talisay (Negros Occidental)", "Tanjay", "Tarlac City", "Tayabas", "Toledo", "Trece Martires", "Tuguegarao", "Urdaneta", "Valencia", "Valenzuela",
+    "Victorias", "Vigan", "Virac", "Zamboanga City", "Baguio", "Bohol", "Coron", "El Nido", "Makati", "Palawan", "Siargao"
+]
 
 CATEGORIES = [
     "Attractions",
