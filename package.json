@@ -24,7 +24,8 @@
     "test-api": "node scripts/test-tripadvisor-api.js",
     "fetch-photos-batch": "node scripts/import-photos.js",
     "fetch-photos-grok": "bash scripts/run-full-image-pipeline.sh --no-edge",
-    "grok-enrich-csv": "node scripts/grok-enrich-csv-listings.js"
+    "grok-enrich-csv": "node scripts/grok-enrich-csv-listings.js",
+    "enrich-tripadvisor": "node scripts/grok-enrich-tripadvisor-ph.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
