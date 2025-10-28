@@ -355,8 +355,15 @@ async function processListing(listing) {
 }
 
 async function main() {
-  console.log('\n=== Download & Store TripAdvisor Photos ===\n')
-  console.log(`Config: batch=${BATCH}, limit=${LIMIT}, start=${START}\n`)
+  console.log('\n╔════════════════════════════════════════════════════════╗')
+  console.log('║   Download & Store TripAdvisor Photos (Grok-Powered)  ║')
+  console.log('╚════════════════════════════════════════════════════════╝\n')
+  console.log(`Config:`)
+  console.log(`  Batch size: ${BATCH}`)
+  console.log(`  Limit: ${LIMIT}`)
+  console.log(`  Start offset: ${START}`)
+  console.log(`  X API: ${X_API_KEY ? '✓ Configured' : '✗ Missing'}`)
+  console.log(`  Supabase: ${PROJECT_URL ? '✓ Configured' : '✗ Missing'}\n`)
 
   let offset = START
   let totalProcessed = 0
