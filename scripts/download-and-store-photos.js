@@ -288,17 +288,18 @@ async function processListing(listing) {
   console.log(`  ✓ Grok found ${photoUrls.length} photos`)
 
   // Step 3: Download and upload each photo
+  console.log('  Step 3: Downloading and uploading photos...')
   const uploadedUrls = []
-  
+
   for (let i = 0; i < photoUrls.length; i++) {
     const photoUrl = photoUrls[i]
-    const ext = photoUrl.includes('.png') ? 'png' : 
+    const ext = photoUrl.includes('.png') ? 'png' :
                 photoUrl.includes('.webp') ? 'webp' : 'jpg'
     const filename = `listing-${listing.id}-photo-${i + 1}.${ext}`
     const storagePath = `photos/${listing.id}/${filename}`
 
     console.log(`    [${i + 1}/${photoUrls.length}] Downloading...`)
-    
+
     const filepath = await downloadImage(photoUrl, filename)
     if (!filepath) {
       console.log(`      ✗ Download failed`)
@@ -306,11 +307,11 @@ async function processListing(listing) {
     }
 
     console.log(`      ✓ Downloaded, uploading...`)
-    
+
     const publicUrl = await uploadToSupabase(filepath, storagePath)
     if (!publicUrl) {
       console.log(`      ✗ Upload failed`)
-      fs.unlinkSync(filepath)
+      try { fs.unlinkSync(filepath) } catch (e) {}
       continue
     }
 
@@ -318,19 +319,19 @@ async function processListing(listing) {
     console.log(`      ✓ Uploaded`)
 
     // Clean up temp file
-    fs.unlinkSync(filepath)
+    try { fs.unlinkSync(filepath) } catch (e) {}
 
     // Rate limit
     await sleep(500)
   }
 
   if (uploadedUrls.length === 0) {
-    console.log('  ✗ No photos could be uploaded')
+    console.log('  ✗ No photos uploaded')
     return { id: listing.id, status: 'no-uploads' }
   }
 
   // Step 4: Update database
-  console.log(`  Updating database with ${uploadedUrls.length} URLs...`)
+  console.log(`  Step 4: Updating database with ${uploadedUrls.length} URLs...`)
 
   try {
     const { error } = await supabase
