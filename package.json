@@ -35,7 +35,8 @@
     "enrich-complete": "node scripts/grok-enrich-complete.js",
     "enrich-accurate": "node scripts/enrich-accurate-tripadvisor.js",
     "monitor-enrich": "node scripts/monitor-enrichment-live.js",
-    "scrape-photos-bee": "node scripts/scrape-photos-rotate-bee.js"
+    "scrape-photos-bee": "node scripts/scrape-photos-rotate-bee.js",
+    "fill-photos": "node scripts/fill-empty-photos.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
