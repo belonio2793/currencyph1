@@ -6,16 +6,28 @@ const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
 const X_API_KEY = process.env.X_API_KEY || process.env.XAI_API_KEY || process.env.GROK_API_KEY || process.env.X_API_KEY
 const GROK_API_URL = process.env.GROK_API_URL || 'https://api.grok.ai/v1/search'
-// Grok-only version: remove ScrapingBee and fallback, add retry/backoff
-const SCRAPING_BEE = null
+import { createClient } from '@supabase/supabase-js'
+import fetch from 'node-fetch'
+
+// Grok-only script: find up to 5 TripAdvisor listing gallery image URLs per listing
+// and append them to nearby_listings.photo_urls (Supabase). Uses X_API_KEY & GROK_API_URL.
+
+const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
+const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+const X_API_KEY = process.env.X_API_KEY || process.env.XAI_API_KEY || process.env.GROK_API_KEY
+const GROK_API_URL = process.env.GROK_API_URL || 'https://api.grok.ai/v1/search'
 
 if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
   console.error('Missing Supabase PROJECT_URL or SERVICE_ROLE_KEY')
   process.exit(1)
 }
 
-const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
+if (!X_API_KEY) {
+  console.error('Missing X_API_KEY (Grok) - set X_API_KEY or GROK_API_KEY in environment')
+  process.exit(1)
+}
 
+const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 const BATCH = Number(process.env.BATCH_SIZE || 100)
 const START = Number(process.env.START_INDEX || 0)
 const MAX_IMAGES = 5
@@ -25,27 +37,35 @@ function cleanUrl(u) {
 }
 
 async function grokFindImages(query, attempt = 1) {
-  if (!X_API_KEY) return []
-  const prompt = `Find the listing for the query: "${query}" on tripadvisor.com.ph and return up to ${MAX_IMAGES} direct high-resolution image URLs from its listing gallery as full https URLs ending with jpg/jpeg/png/webp.`
+  const prompt = `Find the listing for the query: "${query}" on tripadvisor.com.ph and return up to ${MAX_IMAGES} direct high-resolution image URLs (full https URLs, typically on dynamic-media-cdn.tripadvisor.com) from the listing's photo gallery. Respond with any text or JSON that includes the direct image links.`
+
   try {
     const res = await fetch(GROK_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${X_API_KEY}` },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${X_API_KEY}`
+      },
       body: JSON.stringify({ query: prompt }),
-      timeout: 20000
+      // node-fetch doesn't support timeout option in v2; implement via AbortController if needed
     })
+
     if (!res.ok) {
-      console.warn('Grok failed', res.status)
+      const text = await res.text().catch(() => '')
+      console.warn('Grok API returned status', res.status, text.slice(0, 200))
       return []
     }
-    const data = await res.json()
-    const str = JSON.stringify(data)
-    const m = str.match(/https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp)/gi) || []
-    return [...new Set(m.map(cleanUrl))].slice(0, MAX_IMAGES)
+
+    const data = await res.json().catch(() => null)
+    const str = JSON.stringify(data || '')
+    const matches = str.match(/https?:\/\/[^\s"']+\.(?:jpg|jpeg|png|webp)/gi) || []
+    // Prefer TripAdvisor CDN images
+    const tripadvisorImgs = matches.filter(u => /dynamic-media-cdn\.tripadvisor\.com|media-cdn\.tripadvisor\.com/.test(u))
+    const chosen = (tripadvisorImgs.length ? tripadvisorImgs : matches).map(cleanUrl)
+    return [...new Set(chosen)].slice(0, MAX_IMAGES)
   } catch (err) {
-    console.warn('Grok error', err.message, 'attempt', attempt)
+    console.warn('Grok request error:', err && err.message ? err.message : err)
     if (attempt < 3) {
-      // exponential backoff
       await new Promise(r => setTimeout(r, 1000 * Math.pow(2, attempt)))
       return grokFindImages(query, attempt + 1)
     }
@@ -54,7 +74,12 @@ async function grokFindImages(query, attempt = 1) {
 }
 
 async function fetchBatch(start, batchSize) {
-  const { data, error } = await supabase.from('nearby_listings').select('id,tripadvisor_id,name,city,photo_urls').order('id', { ascending: true }).range(start, start + batchSize - 1)
+  const { data, error } = await supabase
+    .from('nearby_listings')
+    .select('id,tripadvisor_id,name,city,photo_urls')
+    .order('id', { ascending: true })
+    .range(start, start + batchSize - 1)
+
   if (error) throw error
   return data || []
 }
@@ -68,6 +93,55 @@ async function updatePhotoUrls(listingId, newUrls) {
   if (error) throw error
   return combined
 }
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
+
+async function processListing(listing) {
+  try {
+    // Skip if already has 5 images
+    if (Array.isArray(listing.photo_urls) && listing.photo_urls.length >= MAX_IMAGES) {
+      console.log(`id=${listing.id} already has ${listing.photo_urls.length} photos, skipping`)
+      return { id: listing.id, status: 'skip' }
+    }
+
+    const q = `${listing.name} ${listing.city || ''} TripAdvisor`.replace(/\s+/g, ' ').trim()
+    console.log(`Processing id=${listing.id} name="${listing.name}"`)
+    const imgs = await grokFindImages(q)
+    if (!imgs || imgs.length === 0) {
+      console.log('  grok found no images')
+      return { id: listing.id, status: 'none' }
+    }
+
+    const updated = await updatePhotoUrls(listing.id, imgs)
+    console.log(`  updated id=${listing.id} photo_urls=${updated.length}`)
+    return { id: listing.id, status: 'updated', count: updated.length }
+  } catch (err) {
+    console.warn('  error processing listing', err && err.message ? err.message : err)
+    return { id: listing.id, status: 'error' }
+  }
+}
+
+async function main() {
+  console.log('Starting Grok-only image harvest: will add up to', MAX_IMAGES, 'images per listing')
+  let start = START
+  while (true) {
+    const batch = await fetchBatch(start, BATCH)
+    if (!batch || batch.length === 0) break
+    console.log(`Fetched batch start=${start} len=${batch.length}`)
+    for (const l of batch) {
+      await processListing(l)
+      // polite delay between calls to Grok
+      await sleep(600)
+    }
+    start += BATCH
+    // pause between batches
+    await sleep(2000)
+  }
+  console.log('Grok harvest complete')
+  process.exit(0)
+}
+
+main().catch(err => { console.error('Fatal error', err); process.exit(1) })
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)) }
 
