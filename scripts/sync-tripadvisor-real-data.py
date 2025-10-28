@@ -75,111 +75,146 @@ def search_tripadvisor(query: str) -> Optional[str]:
 
 
 def extract_tripadvisor_listing_data(url: str) -> Optional[Dict]:
-    """Extract real data from a TripAdvisor listing page"""
+    """Extract ALL real data from a TripAdvisor listing page including all photos"""
     try:
         response = requests.get(url, headers=HEADERS, timeout=15)
-        
+
         if response.status_code != 200:
             return None
-        
+
         soup = BeautifulSoup(response.content, 'html.parser')
-        
+        html_content = response.text
+
         # Extract listing ID from URL
         tripadvisor_id = None
         match = re.search(r'-d(\d+)-', url)
         if match:
             tripadvisor_id = match.group(1)
-        
+
         # Extract name (usually in h1)
         name = None
         h1 = soup.find('h1')
         if h1:
             name = h1.get_text(strip=True)
-        
+
         # Extract rating
         rating = None
-        rating_elem = soup.find('span', class_=re.compile('Rating'))
+        rating_elem = soup.find('span', class_=re.compile('ratingFilter|Rating'))
         if rating_elem:
             rating_text = rating_elem.get_text(strip=True)
             try:
                 rating = float(re.search(r'[\d.]+', rating_text).group())
             except:
                 pass
-        
+
         # Extract review count
         review_count = None
-        review_elem = soup.find('span', class_=re.compile('reviewCount'))
+        review_elem = soup.find(text=re.compile(r'\d+\s+review'))
         if review_elem:
-            review_text = review_elem.get_text(strip=True)
             try:
-                review_count = int(re.search(r'\d+', review_text).group())
+                review_count = int(re.search(r'\d+', review_elem).group())
             except:
                 pass
-        
+
         # Extract address
         address = None
         address_elem = soup.find('address')
         if address_elem:
             address = address_elem.get_text(strip=True)
-        else:
-            # Alternative: look for address in data attributes or text
-            address_span = soup.find('span', class_=re.compile('address'))
-            if address_span:
-                address = address_span.get_text(strip=True)
-        
+
         # Extract phone
         phone = None
-        for elem in soup.find_all('span', class_=re.compile('phone')):
-            phone_text = elem.get_text(strip=True)
-            if phone_text and '+' in phone_text or 'ext' not in phone_text.lower():
-                phone = phone_text
-                break
-        
+        phone_match = re.search(r'(?:\+63|tel:)[\s\d-]+', html_content)
+        if phone_match:
+            phone = phone_match.group(0).strip()
+
         # Extract description
         description = None
-        desc_elem = soup.find('div', class_=re.compile('description'))
+        desc_elem = soup.find('div', class_=re.compile('description|about'))
         if desc_elem:
             description = desc_elem.get_text(strip=True)
-        
+
         # Extract amenities list
         amenities = []
-        amenities_section = soup.find('div', class_=re.compile('amenities'))
-        if amenities_section:
-            for item in amenities_section.find_all('span', class_=re.compile('amenity')):
-                amenities.append(item.get_text(strip=True))
-        
+        for item in soup.find_all(re.compile('li|div'), class_=re.compile('amenity')):
+            amenity_text = item.get_text(strip=True)
+            if amenity_text and len(amenity_text) < 100:
+                amenities.append(amenity_text)
+
         # Extract hours
         hours_of_operation = {}
-        hours_elem = soup.find('div', class_=re.compile('hours'))
-        if hours_elem:
-            for day_elem in hours_elem.find_all('tr'):
-                cells = day_elem.find_all('td')
-                if len(cells) >= 2:
-                    day = cells[0].get_text(strip=True)
-                    time_str = cells[1].get_text(strip=True)
-                    hours_of_operation[day] = time_str
-        
+        hours_match = re.findall(r'(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)[:\s]+([0-9:\s–\-]+|Closed)', html_content)
+        for day, time in hours_match:
+            hours_of_operation[day] = time.strip()
+
         # Extract price range
         price_range = None
-        price_elem = soup.find('span', class_=re.compile('priceRange'))
-        if price_elem:
-            price_range = price_elem.get_text(strip=True)
-        
+        price_match = re.search(r'(₱|€|\$)+\s*–?\s*(₱|€|\$)*', html_content)
+        if price_match:
+            price_range = price_match.group(0).strip()
+
         # Extract website
         website = None
-        for link in soup.find_all('a', class_=re.compile('website')):
+        for link in soup.find_all('a', href=re.compile(r'^http')):
             href = link.get('href', '')
-            if href and not 'tripadvisor' in href:
+            if href and 'tripadvisor' not in href and 'javascript' not in href:
                 website = href
                 break
-        
-        # Extract main photo URL
-        image_url = None
-        photo_elem = soup.find('img', class_=re.compile('photo'))
-        if photo_elem and photo_elem.get('src'):
-            image_url = photo_elem['src']
-        
-        # Build result
+
+        # Extract ALL photo URLs (comprehensive extraction)
+        photo_urls = []
+
+        # Method 1: Extract from img tags
+        for img in soup.find_all('img'):
+            src = img.get('src', '') or img.get('data-src', '')
+            if src and ('media' in src or 'photo' in src or 'image' in src):
+                if src not in photo_urls and src.startswith('http'):
+                    photo_urls.append(src)
+
+        # Method 2: Extract from picture/source tags
+        for picture in soup.find_all('picture'):
+            for source in picture.find_all('source'):
+                srcset = source.get('srcset', '')
+                for url_part in srcset.split(','):
+                    url_match = re.search(r'(https?://[^\s]+)', url_part.strip())
+                    if url_match:
+                        photo_url = url_match.group(1).split()[0]
+                        if photo_url not in photo_urls:
+                            photo_urls.append(photo_url)
+
+        # Method 3: Extract from data attributes and JSON
+        for attr_val in re.findall(r'data-src="([^"]*)"', html_content):
+            if attr_val and 'media' in attr_val and attr_val not in photo_urls:
+                photo_urls.append(attr_val)
+
+        # Method 4: Extract from JSON in script tags
+        for script in soup.find_all('script', type='application/json'):
+            try:
+                data = json.loads(script.string)
+                if isinstance(data, dict):
+                    for value in data.values():
+                        if isinstance(value, str) and value.startswith('http') and 'photo' in value:
+                            if value not in photo_urls:
+                                photo_urls.append(value)
+            except:
+                pass
+
+        # Clean up photo URLs (limit to reasonable size, remove duplicates)
+        photo_urls = list(dict.fromkeys(photo_urls))[:50]  # Keep unique, limit to 50
+
+        # Extract main photo (first valid URL)
+        image_url = photo_urls[0] if photo_urls else None
+
+        # Extract category/type
+        location_type = "Attraction"
+        if 'restaurant' in url.lower() or 'restaurant' in name.lower():
+            location_type = "Restaurant"
+        elif 'hotel' in url.lower() or 'hotel' in name.lower():
+            location_type = "Hotel"
+        elif 'attraction' in url.lower():
+            location_type = "Attraction"
+
+        # Build result with ALL extracted data
         data = {
             "tripadvisor_id": tripadvisor_id,
             "name": name,
@@ -193,14 +228,17 @@ def extract_tripadvisor_listing_data(url: str) -> Optional[Dict]:
             "price_range": price_range,
             "website": website,
             "image_url": image_url,
+            "photo_urls": photo_urls,
+            "photo_count": len(photo_urls),
+            "location_type": location_type,
             "web_url": url,
             "fetch_status": "success",
             "fetch_error_message": None,
             "last_verified_at": datetime.now().isoformat(),
         }
-        
+
         return data
-        
+
     except Exception as e:
         print(f"  ❌ Extraction error: {e}", file=sys.stderr)
         return None
