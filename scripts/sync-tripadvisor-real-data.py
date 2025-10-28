@@ -49,6 +49,8 @@ SCRAPINGBEE_KEYS = [
 SCRAPINGBEE_URL = "https://app.scrapingbee.com/api/v1"
 SCRAPINGBEE_KEY_CYCLE = cycle(SCRAPINGBEE_KEYS)
 CURRENT_KEY = next(SCRAPINGBEE_KEY_CYCLE)
+SCRAPINGBEE_CALL_COUNT = 0
+SCRAPINGBEE_KEY_INDEX = 0
 
 TRIPADVISOR_SEARCH_URL = "https://www.tripadvisor.com.ph/Search?q="
 TRIPADVISOR_BASE = "https://www.tripadvisor.com.ph"
