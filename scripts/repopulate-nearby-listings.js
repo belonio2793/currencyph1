@@ -1,27 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * Repopulate Nearby Listings with Real TripAdvisor Data via Grok API
+ * Repopulate Nearby Listings from CSV Data
  * 
  * This script:
- * 1. Connects to Supabase using service role key
- * 2. Uses Grok API to search and fetch real TripAdvisor listings
- * 3. Extracts comprehensive data for all 47 columns
- * 4. Populates nearby_listings table with accurate, verified data
+ * 1. Reads from nearby-listings.csv (existing data)
+ * 2. Connects to Supabase using service role key
+ * 3. Backs up existing data
+ * 4. Clears the table (optional)
+ * 5. Repopulates with accurate listings from CSV
  * 
  * Usage:
  *   node scripts/repopulate-nearby-listings.js [options]
  * 
  * Options:
- *   --limit N          Fetch max N listings per city/category (default: 10)
- *   --cities LIST      Comma-separated cities (default: major cities)
- *   --clear            Clear table before populating (backs up first)
+ *   --clear            Clear table before populating
  *   --dry-run          Preview without inserting
- *   --resume           Resume from checkpoint
+ *   --limit N          Import max N listings (default: all)
  */
 
 import { createClient } from '@supabase/supabase-js'
-import fetch from 'node-fetch'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -32,98 +30,191 @@ const __dirname = path.dirname(__filename)
 // Environment variables
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
-const X_API_KEY = process.env.X_API_KEY
 
 // Validate credentials
 if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
   console.error('❌ Missing Supabase credentials')
+  console.error('   VITE_PROJECT_URL:', PROJECT_URL ? '✓' : '✗')
+  console.error('   VITE_SUPABASE_SERVICE_ROLE_KEY:', SERVICE_ROLE_KEY ? '✓' : '✗')
   process.exit(1)
-}
-
-if (!X_API_KEY) {
-  console.error('⚠️  Warning: X_API_KEY not set - will use fallback data')
 }
 
 const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
 // Configuration
-const CHECKPOINT_FILE = path.join(__dirname, '..', '.populate-checkpoint.json')
+const CSV_FILE = path.join(__dirname, '..', 'nearby-listings.csv')
 const BACKUP_FILE = path.join(__dirname, '..', 'nearby_listings_backup.json')
-const BATCH_SIZE = 50
+const BATCH_SIZE = 100
 
-// Philippine cities
-const CITIES = [
-  { name: 'Manila', lat: 14.5995, lng: 120.9842 },
-  { name: 'Cebu', lat: 10.3157, lng: 123.8854 },
-  { name: 'Davao', lat: 7.0731, lng: 125.6121 },
-  { name: 'Quezon City', lat: 14.6349, lng: 121.0388 },
-  { name: 'Makati', lat: 14.5547, lng: 121.0244 },
-  { name: 'Boracay', lat: 11.9674, lng: 121.9248 },
-  { name: 'Palawan', lat: 9.7484, lng: 118.7381 },
-  { name: 'Baguio', lat: 16.4023, lng: 120.5960 },
-  { name: 'Iloilo', lat: 10.6917, lng: 122.5597 },
-  { name: 'Bacolod', lat: 10.3910, lng: 123.0262 },
-  { name: 'Dumaguete', lat: 9.3031, lng: 123.3091 },
-  { name: 'Vigan', lat: 16.4197, lng: 120.8854 },
-  { name: 'Tagaytay', lat: 14.1268, lng: 121.1995 },
-  { name: 'Taguig', lat: 14.5726, lng: 121.0437 },
-  { name: 'Antipolo', lat: 14.5814, lng: 121.1784 },
-  { name: 'Cavite', lat: 14.3242, lng: 120.9272 },
-  { name: 'Laguna', lat: 14.3667, lng: 121.2333 },
-  { name: 'Pampanga', lat: 15.0833, lng: 121.0833 },
-  { name: 'Subic Bay', lat: 14.8244, lng: 120.2318 },
-  { name: 'El Nido', lat: 10.5898, lng: 119.3933 },
-]
-
-const CATEGORIES = ['Attractions', 'Hotels', 'Restaurants']
-
-// Parse arguments
+// Parse command line arguments
 function parseArgs() {
   const args = process.argv.slice(2)
   const options = {
-    limit: 10,
-    cities: [],
     clear: false,
     dryRun: false,
-    resume: false,
+    limit: Infinity,
   }
 
   for (let i = 0; i < args.length; i++) {
-    if (args[i] === '--limit' && args[i + 1]) {
-      options.limit = parseInt(args[i + 1])
-      i++
-    } else if (args[i] === '--cities' && args[i + 1]) {
-      options.cities = args[i + 1].split(',').map(c => c.trim())
-      i++
-    } else if (args[i] === '--clear') {
+    if (args[i] === '--clear') {
       options.clear = true
     } else if (args[i] === '--dry-run') {
       options.dryRun = true
-    } else if (args[i] === '--resume') {
-      options.resume = true
+    } else if (args[i] === '--limit' && args[i + 1]) {
+      options.limit = parseInt(args[i + 1])
+      i++
     }
   }
 
   return options
 }
 
-// Checkpoint functions
-function loadCheckpoint() {
-  try {
-    if (fs.existsSync(CHECKPOINT_FILE)) {
-      return JSON.parse(fs.readFileSync(CHECKPOINT_FILE, 'utf-8'))
-    }
-  } catch (e) {}
-  return {
-    startTime: Date.now(),
-    processedCities: [],
-    stats: { success: 0, failed: 0, total: 0 },
-    errors: []
+// Parse CSV file
+function parseCSV(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8')
+  const lines = content.split('\n')
+  
+  if (lines.length < 2) {
+    throw new Error('CSV file is empty')
   }
+
+  const headers = lines[0].split(',').map(h => h.trim())
+  const headerMap = {}
+  headers.forEach((h, i) => {
+    headerMap[h] = i
+  })
+
+  const rows = []
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim()
+    if (!line) continue
+
+    const values = []
+    let current = ''
+    let inQuotes = false
+
+    for (let j = 0; j < line.length; j++) {
+      const char = line[j]
+      const nextChar = line[j + 1]
+
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          current += '"'
+          j++
+        } else {
+          inQuotes = !inQuotes
+        }
+      } else if (char === ',' && !inQuotes) {
+        values.push(current)
+        current = ''
+      } else {
+        current += char
+      }
+    }
+    values.push(current)
+
+    const row = {}
+    headers.forEach((header, idx) => {
+      let value = values[idx] || ''
+      if (value.startsWith('"') && value.endsWith('"')) {
+        value = value.slice(1, -1)
+      }
+      row[header] = value || null
+    })
+
+    rows.push(row)
+  }
+
+  return rows
 }
 
-function saveCheckpoint(checkpoint) {
-  fs.writeFileSync(CHECKPOINT_FILE, JSON.stringify(checkpoint, null, 2))
+// Convert CSV row to database object
+function csvRowToListing(row) {
+  const now = new Date().toISOString()
+
+  const parseJSON = (str) => {
+    if (!str || str === '' || str === '{}' || str === '[]') return null
+    try {
+      return JSON.parse(str)
+    } catch (e) {
+      return null
+    }
+  }
+
+  const parseNumber = (str) => {
+    if (!str || str === '') return null
+    const num = parseFloat(str)
+    return isNaN(num) ? null : num
+  }
+
+  const parseBoolean = (str) => {
+    if (!str) return null
+    return str.toLowerCase() === 'true'
+  }
+
+  const parseArray = (str) => {
+    if (!str || str === '' || str === '[]') return null
+    try {
+      const arr = JSON.parse(str)
+      return Array.isArray(arr) ? arr : null
+    } catch (e) {
+      return null
+    }
+  }
+
+  return {
+    tripadvisor_id: row.tripadvisor_id || null,
+    slug: row.slug || '',
+    name: row.name || 'Unknown',
+    address: row.address || null,
+    city: row.city || null,
+    country: row.country || 'Philippines',
+    location_type: row.location_type || null,
+    category: row.category || null,
+    description: row.description || null,
+    latitude: parseNumber(row.latitude),
+    longitude: parseNumber(row.longitude),
+    lat: parseNumber(row.lat),
+    lng: parseNumber(row.lng),
+    rating: parseNumber(row.rating),
+    review_count: parseNumber(row.review_count) || parseNumber(row.num_reviews),
+    review_details: parseJSON(row.review_details),
+    image_url: row.image_url || row.primary_image_url || null,
+    featured_image_url: row.featured_image_url || null,
+    primary_image_url: row.primary_image_url || null,
+    photo_urls: parseArray(row.photo_urls),
+    photo_count: parseNumber(row.photo_count),
+    stored_image_path: row.stored_image_path || null,
+    image_downloaded_at: row.image_downloaded_at || null,
+    website: row.website || null,
+    web_url: row.web_url || null,
+    phone_number: row.phone_number || row.phone || null,
+    highlights: parseArray(row.highlights),
+    amenities: parseArray(row.amenities),
+    awards: parseArray(row.awards),
+    hours_of_operation: parseJSON(row.hours_of_operation),
+    accessibility_info: parseJSON(row.accessibility_info),
+    nearby_attractions: parseArray(row.nearby_attractions),
+    best_for: parseArray(row.best_for),
+    price_level: parseNumber(row.price_level),
+    price_range: row.price_range || null,
+    duration: row.duration || null,
+    ranking_in_city: row.ranking_in_city || null,
+    ranking_in_category: parseNumber(row.ranking_in_category),
+    visibility_score: parseNumber(row.visibility_score),
+    verified: parseBoolean(row.verified),
+    fetch_status: row.fetch_status || 'success',
+    fetch_error_message: row.fetch_error_message || null,
+    last_verified_at: row.last_verified_at || null,
+    source: row.source || 'tripadvisor_direct',
+    created_at: row.created_at || now,
+    updated_at: row.updated_at || now,
+    raw: parseJSON(row.raw),
+    currency: row.currency || 'PHP',
+    timezone: row.timezone || 'Asia/Manila',
+    region_name: row.region_name || null,
+    city_id: row.city_id || null,
+  }
 }
 
 // Backup existing data
@@ -132,141 +223,33 @@ async function backupExistingData() {
     console.log('📥 Backing up existing data...')
     const { data, error } = await supabase
       .from('nearby_listings')
-      .select('id')
-      .limit(1)
+      .select('*')
+      .limit(10000)
 
-    if (!error) {
-      const { data: allData } = await supabase
-        .from('nearby_listings')
-        .select('*')
-        .limit(10000)
-
-      if (allData && allData.length > 0) {
-        fs.writeFileSync(BACKUP_FILE, JSON.stringify(allData, null, 2))
-        console.log(`  ✅ Backed up ${allData.length} listings to ${BACKUP_FILE}`)
-      }
+    if (error && !error.message.includes('no rows')) throw error
+    
+    if (data && data.length > 0) {
+      fs.writeFileSync(BACKUP_FILE, JSON.stringify(data, null, 2))
+      console.log(`  ✅ Backed up ${data.length} listings`)
+    } else {
+      console.log(`  ℹ️  No existing data to backup`)
     }
   } catch (e) {
-    console.error(`  ⚠️  Backup skipped: ${e.message}`)
+    console.error(`  ⚠️  Backup warning: ${e.message}`)
   }
 }
 
 // Clear table
 async function clearTable() {
   try {
-    console.log('🗑️  Clearing table...')
+    console.log('🗑️  Clearing nearby_listings table...')
     await supabase
       .from('nearby_listings')
       .delete()
       .gte('id', 0)
     console.log('  ✅ Table cleared')
   } catch (e) {
-    console.error(`  ❌ Error: ${e.message}`)
-    throw e
-  }
-}
-
-// Generate slug
-function generateSlug(name) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .substring(0, 100)
-}
-
-// Fetch from Grok API
-async function fetchFromGrok(prompt) {
-  if (!X_API_KEY) return null
-
-  try {
-    const response = await fetch('https://api.x.ai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${X_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'grok-2',
-        messages: [{ role: 'user', content: prompt }],
-        temperature: 0.7,
-        max_tokens: 2000
-      })
-    })
-
-    if (!response.ok) {
-      console.error(`Grok API error: ${response.status}`)
-      return null
-    }
-
-    const data = await response.json()
-    return data.choices?.[0]?.message?.content || null
-  } catch (e) {
-    console.error(`Grok fetch error: ${e.message}`)
-    return null
-  }
-}
-
-// Create listing object with all required fields
-function createListingObject(name, city, category, index) {
-  const now = new Date().toISOString()
-  const cityData = CITIES.find(c => c.name === city) || { lat: 14.5995, lng: 120.9842 }
-  
-  const locationTypeMap = {
-    'Attractions': 'Attraction',
-    'Hotels': 'Hotel',
-    'Restaurants': 'Restaurant',
-  }
-
-  return {
-    tripadvisor_id: `d${Math.random().toString().slice(2, 10)}`,
-    slug: generateSlug(`${name}-${index}`),
-    name: name,
-    address: null,
-    city: city,
-    country: 'Philippines',
-    location_type: locationTypeMap[category] || 'Attraction',
-    category: category,
-    description: null,
-    latitude: cityData.lat,
-    longitude: cityData.lng,
-    lat: cityData.lat,
-    lng: cityData.lng,
-    rating: null,
-    review_count: null,
-    review_details: null,
-    image_url: null,
-    featured_image_url: null,
-    primary_image_url: null,
-    photo_urls: null,
-    photo_count: 0,
-    stored_image_path: null,
-    image_downloaded_at: null,
-    website: null,
-    web_url: `https://www.tripadvisor.com.ph/Search?q=${encodeURIComponent(name)}`,
-    phone_number: null,
-    highlights: null,
-    amenities: null,
-    awards: null,
-    hours_of_operation: null,
-    accessibility_info: null,
-    nearby_attractions: null,
-    best_for: null,
-    price_level: null,
-    price_range: null,
-    duration: null,
-    ranking_in_city: null,
-    ranking_in_category: null,
-    visibility_score: Math.round(Math.random() * 100),
-    verified: false,
-    fetch_status: 'pending',
-    fetch_error_message: null,
-    last_verified_at: null,
-    source: 'tripadvisor_api',
-    created_at: now,
-    updated_at: now,
-    raw: null
+    console.error(`  ⚠️  Clear skipped: ${e.message}`)
   }
 }
 
@@ -279,99 +262,142 @@ async function insertBatch(listings) {
       .from('nearby_listings')
       .insert(listings, { returning: 'minimal' })
 
-    if (error) throw error
+    if (error) {
+      console.error(`  ❌ Insert error: ${error.message}`)
+      return { success: 0, failed: listings.length }
+    }
+
     return { success: listings.length, failed: 0 }
   } catch (e) {
-    console.error(`    ❌ Insert error: ${e.message}`)
+    console.error(`  ❌ Insert error: ${e.message}`)
     return { success: 0, failed: listings.length }
   }
 }
 
-// Main
+// Main execution
 async function main() {
   const options = parseArgs()
-  const checkpoint = options.resume ? loadCheckpoint() : { startTime: Date.now(), processedCities: [], stats: { success: 0, failed: 0, total: 0 }, errors: [] }
-  const citiesToProcess = options.cities.length > 0
-    ? CITIES.filter(c => options.cities.includes(c.name))
-    : CITIES
 
   console.log('\n' + '='.repeat(100))
-  console.log('REPOPULATE NEARBY_LISTINGS TABLE WITH ACCURATE DATA')
+  console.log('REPOPULATE NEARBY_LISTINGS FROM CSV')
   console.log('='.repeat(100))
-  console.log(`\n⚙️  Options:`)
-  console.log(`  Cities: ${citiesToProcess.length}`)
-  console.log(`  Listings per city/category: ${options.limit}`)
+
+  // Check CSV file
+  if (!fs.existsSync(CSV_FILE)) {
+    console.error(`\n❌ CSV file not found: ${CSV_FILE}`)
+    process.exit(1)
+  }
+
+  console.log(`\n⚙️  Configuration:`)
+  console.log(`  CSV file: ${CSV_FILE}`)
   console.log(`  Dry run: ${options.dryRun}`)
   console.log(`  Clear table: ${options.clear}`)
-  console.log(`  Resume: ${options.resume}\n`)
+  console.log(`  Limit: ${options.limit === Infinity ? 'none' : options.limit}`)
+  console.log(`  Batch size: ${BATCH_SIZE}\n`)
 
+  // Parse CSV
+  console.log('📖 Reading CSV file...')
+  let rows
+  try {
+    rows = parseCSV(CSV_FILE)
+    console.log(`  ✅ Parsed ${rows.length} rows from CSV\n`)
+  } catch (e) {
+    console.error(`  ❌ Error parsing CSV: ${e.message}`)
+    process.exit(1)
+  }
+
+  if (rows.length === 0) {
+    console.error('  ❌ No data in CSV file')
+    process.exit(1)
+  }
+
+  // Apply limit
+  if (options.limit < Infinity) {
+    rows = rows.slice(0, options.limit)
+  }
+
+  // Backup and clear
   if (!options.dryRun) {
     await backupExistingData()
+
     if (options.clear) {
       await clearTable()
     }
   }
 
+  // Convert and insert
+  console.log(`📤 Processing ${rows.length} listings...\n`)
+
   let totalInserted = 0
   let totalFailed = 0
   const batch = []
 
-  console.log(`📍 Fetching listings from ${citiesToProcess.length} Philippine cities\n`)
+  for (let i = 0; i < rows.length; i++) {
+    const row = rows[i]
 
-  for (const city of citiesToProcess) {
-    if (checkpoint.processedCities.includes(city.name)) {
-      console.log(`⏭️  ${city.name} (already processed)`)
+    // Skip if missing required fields
+    if (!row.name || !row.name.trim()) {
+      console.warn(`  ⚠️  Skipping row ${i + 2}: missing name`)
       continue
     }
 
-    console.log(`🔍 ${city.name}:`)
-    let cityCount = 0
+    try {
+      const listing = csvRowToListing(row)
+      batch.push(listing)
 
-    for (const category of CATEGORIES) {
-      for (let i = 1; i <= options.limit; i++) {
-        const name = `${category.slice(0, -1)} ${i}`
-        const listing = createListingObject(name, city.name, category, i)
-
-        batch.push(listing)
-        cityCount++
-
-        if (batch.length >= BATCH_SIZE) {
-          if (!options.dryRun) {
-            const result = await insertBatch(batch)
-            totalInserted += result.success
-            totalFailed += result.failed
-          }
-          batch.length = 0
+      if (batch.length >= BATCH_SIZE) {
+        if (!options.dryRun) {
+          const result = await insertBatch(batch)
+          totalInserted += result.success
+          totalFailed += result.failed
+          console.log(`  ✅ Inserted batch of ${result.success} listings`)
+        } else {
+          console.log(`  [DRY RUN] Would insert batch of ${batch.length} listings`)
         }
-
-        await new Promise(resolve => setTimeout(resolve, 10))
+        batch.length = 0
       }
+    } catch (e) {
+      console.error(`  ❌ Error processing row ${i + 2}: ${e.message}`)
+      totalFailed++
     }
 
-    console.log(`  ✅ ${cityCount} listings`)
-    checkpoint.processedCities.push(city.name)
-    saveCheckpoint(checkpoint)
+    // Progress indicator
+    if ((i + 1) % 500 === 0) {
+      console.log(`  Processing... ${i + 1}/${rows.length}`)
+    }
   }
 
-  // Insert remaining
-  if (batch.length > 0 && !options.dryRun) {
-    const result = await insertBatch(batch)
-    totalInserted += result.success
-    totalFailed += result.failed
+  // Insert remaining batch
+  if (batch.length > 0) {
+    if (!options.dryRun) {
+      const result = await insertBatch(batch)
+      totalInserted += result.success
+      totalFailed += result.failed
+      console.log(`  ✅ Inserted final batch of ${result.success} listings`)
+    } else {
+      console.log(`  [DRY RUN] Would insert final batch of ${batch.length} listings`)
+    }
   }
 
+  // Summary
   console.log('\n' + '='.repeat(100))
-  console.log('COMPLETE')
+  console.log('POPULATION COMPLETE')
   console.log('='.repeat(100))
   console.log(`\n📊 Results:`)
+  console.log(`  Total processed: ${rows.length}`)
   console.log(`  Successfully inserted: ${totalInserted}`)
   console.log(`  Failed: ${totalFailed}`)
-  if (options.dryRun) console.log(`  (Dry run - no data inserted)`)
-  console.log(`\n✅ To enrich with real TripAdvisor data, run:`)
-  console.log(`   npm run enrich-accurate\n`)
+  if (options.dryRun) {
+    console.log(`  📝 Dry run - no data was actually inserted`)
+  }
+  console.log(`\n📁 Files:`)
+  if (fs.existsSync(BACKUP_FILE)) {
+    console.log(`  Backup: ${BACKUP_FILE}`)
+  }
+  console.log(`\n✅ Done!\n`)
 }
 
 main().catch(e => {
-  console.error('❌ Error:', e.message)
+  console.error('\n❌ Fatal error:', e.message)
   process.exit(1)
 })
