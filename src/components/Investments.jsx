@@ -1,6 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getCurrencySymbol, formatCurrency } from '../lib/currency'
+import { createPortal } from 'react-dom'
+
+function Modal({ children, onClose, className = '' }) {
+  if (typeof document === 'undefined') return null
+  return createPortal(
+    <div className={`fixed inset-0 flex items-center justify-center z-[9999] ${className} w-full h-full min-h-screen`} onClick={onClose}>
+      <div className="absolute inset-0 bg-black/50" />
+      <div onClick={(e) => e.stopPropagation()} className="relative w-full flex items-center justify-center">
+        {children}
+      </div>
+    </div>,
+    document.body
+  )
+}
 
 export default function Investments({ userId }) {
   const [projects, setProjects] = useState([])
@@ -223,9 +237,8 @@ export default function Investments({ userId }) {
         })}
       </div>
 
-      {/* Project Detail Modal */}
       {showDetail && selectedProject && (
-        <div className="fixed inset-0 bg-black/40 flex items-start md:items-center justify-center z-70 p-6 overflow-auto w-full h-full min-h-screen">
+        <Modal onClose={() => setShowDetail(false)} className="">
           <div className="w-full max-w-4xl bg-white rounded-xl p-6 shadow-lg">
             <div className="flex items-start justify-between">
               <div>
@@ -307,12 +320,11 @@ export default function Investments({ userId }) {
             </div>
 
           </div>
-        </div>
+        </Modal>
       )}
 
-      {/* Invest Modal - simple inline panel */}
       {showInvestModal && selectedProject && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-70 w-full h-full min-h-screen">
+        <Modal onClose={() => setShowInvestModal(false)}>
           <div className="w-full max-w-lg bg-white rounded-xl p-6">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Invest in {selectedProject.name}</h3>
             <p className="text-sm text-slate-600 mb-4">Minimum: {getCurrencySymbol(selectedProject.currency_code || 'PHP')}{selectedProject.min_investment || 0}</p>
@@ -339,7 +351,7 @@ export default function Investments({ userId }) {
               </div>
             </form>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   )
