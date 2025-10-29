@@ -97,8 +97,8 @@ const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
 // Parse args
 const argv = process.argv.slice(2)
-let LIMIT = 10
-let BATCH = 10
+let LIMIT = Number.MAX_SAFE_INTEGER
+let BATCH = 50
 for (let i = 0; i < argv.length; i++) {
   if (argv[i] === '--limit' && argv[i+1]) { LIMIT = Number(argv[i+1]); i++ }
   if (argv[i] === '--batch' && argv[i+1]) { BATCH = Number(argv[i+1]); i++ }
