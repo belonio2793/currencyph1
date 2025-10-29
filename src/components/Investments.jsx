@@ -294,7 +294,7 @@ export default function Investments({ userId }) {
       )}
 
       {/* Invest Modal - simple inline panel */}
-      {selectedProject && (
+      {showInvestModal && selectedProject && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="w-full max-w-lg bg-white rounded-xl p-6">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Invest in {selectedProject.name}</h3>
