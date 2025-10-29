@@ -235,7 +235,7 @@ function extractRatingAndReviews(html) {
 
 function extractPriceLevel(html) {
   if (!html) return null;
-  
+
   const patterns = [
     /(\${1,4})/,
     /price['":\s]+['"]*(\${1,4})/i,
@@ -253,6 +253,27 @@ function extractPriceLevel(html) {
   }
 
   return null;
+}
+
+function extractTripadvisorIdFromUrl(url) {
+  if (!url) return null;
+  const patterns = [/-d(\d+)-/, /location\/(\d+)/, /-d(\d+)(?:[\-_]|$)/];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m && m[1]) return m[1];
+  }
+  return null;
+}
+
+function generateSlug(name, id) {
+  const base = String(name || '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .substring(0, 100);
+  return id ? `${base}-${id}` : base;
 }
 
 async function fetchViaScrapingBee(url) {
