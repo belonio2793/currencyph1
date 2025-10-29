@@ -312,7 +312,7 @@ export default function Investments({ userId }) {
 
       {/* Invest Modal - simple inline panel */}
       {showInvestModal && selectedProject && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-60">
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-60 w-full h-full min-h-screen">
           <div className="w-full max-w-lg bg-white rounded-xl p-6">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Invest in {selectedProject.name}</h3>
             <p className="text-sm text-slate-600 mb-4">Minimum: {getCurrencySymbol(selectedProject.currency_code || 'PHP')}{selectedProject.min_investment || 0}</p>
