@@ -26,7 +26,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 │  - rating, review_count (from snippet)                │
 │  - category, location_type                            │
 │                                                         │
-└──────────────────┬───────────────────────��──────────────┘
+└──────────────────┬──────────────────────────────────────┘
                    │ 
                    ↓
 ┌─────────────────────────────────────────────────────────┐
@@ -43,7 +43,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 │  - Address & complete details                          │
 │  - Price level                                         │
 │                                                         │
-└──────────────────┬─────────────────────���────────────────┘
+└──────────────────┬──────────────────────────────────────┘
                    │ (Update all fields)
                    ↓
 ┌─────────────────────────────────────────────────────────┐
@@ -86,11 +86,11 @@ npm run populate-nearby-batch
 ```
 
 This runs both steps automatically:
-1. Google Custom Search population (~40 min)
-2. TripAdvisor enrichment (~50 min)
+1. Google Custom Search population (~60-90 min)
+2. TripAdvisor enrichment (~90-150 min)
 3. Shows detailed progress and statistics
 
-**Duration**: ~90 minutes total
+**Duration**: ~2.5-4 hours total
 
 ### Option 2: Individual Steps
 
