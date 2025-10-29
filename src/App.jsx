@@ -141,9 +141,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50">
       <HeaderMap />
-      {activeTab !== 'home' && <Navbar activeTab={activeTab} onTabChange={setActiveTab} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} />}
+      <Navbar activeTab={activeTab} onTabChange={setActiveTab} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} />
 
-      {/* User Status Bar - Only on non-home pages */}
+      {/* User Status Bar */}
       {activeTab !== 'home' && (
         <div className="bg-white border-b border-slate-100">
           <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
@@ -173,138 +173,6 @@ export default function App() {
       <main>
         {(activeTab === 'home' || showAuth) && (
           <>
-            {/* Home Page Navbar - Double Row Layout */}
-            <nav className="bg-white border-b border-slate-100">
-              <div className="max-w-7xl mx-auto px-4">
-                {/* Row 1: Logo and HeaderMap */}
-                <div className="py-4 flex items-center justify-between">
-                  <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
-                </div>
-                {/* Row 2: Currency selector and Navigation */}
-                <div className="border-t border-slate-100 py-3 flex flex-wrap items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <label className="text-sm font-medium text-slate-700">Display Currency:</label>
-                    <select
-                      value={globalCurrency}
-                      onChange={(e) => setGlobalCurrency(e.target.value)}
-                      className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white"
-                    >
-                      <option value="PHP">PHP - Philippine Peso</option>
-                      <option value="USD">USD - US Dollar</option>
-                      <option value="CAD">CAD - Canadian Dollar</option>
-                      <option value="EUR">EUR - Euro</option>
-                      <option value="GBP">GBP - British Pound</option>
-                      <option value="JPY">JPY - Japanese Yen</option>
-                      <option value="CNY">CNY - Chinese Yuan</option>
-                      <option value="INR">INR - Indian Rupee</option>
-                      <option value="AUD">AUD - Australian Dollar</option>
-                      <option value="CHF">CHF - Swiss Franc</option>
-                      <option value="SEK">SEK - Swedish Krona</option>
-                      <option value="NZD">NZD - New Zealand Dollar</option>
-                      <option value="SGD">SGD - Singapore Dollar</option>
-                      <option value="HKD">HKD - Hong Kong Dollar</option>
-                      <option value="IDR">IDR - Indonesian Rupiah</option>
-                      <option value="MYR">MYR - Malaysian Ringgit</option>
-                      <option value="THB">THB - Thai Baht</option>
-                      <option value="VND">VND - Vietnamese Dong</option>
-                      <option value="KRW">KRW - South Korean Won</option>
-                      <option value="ZAR">ZAR - South African Rand</option>
-                      <option value="BRL">BRL - Brazilian Real</option>
-                      <option value="MXN">MXN - Mexican Peso</option>
-                      <option value="NOK">NOK - Norwegian Krone</option>
-                      <option value="DKK">DKK - Danish Krone</option>
-                      <option value="AED">AED - UAE Dirham</option>
-                    </select>
-                  </div>
-
-                  {/* Main navigation buttons */}
-                  <button
-                    onClick={() => {
-                      setActiveTab('home')
-                      setShowAuth(false)
-                      window.history.replaceState(null, '', '/')
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Home
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('nearby')
-                      setShowAuth(false)
-                      window.history.replaceState(null, '', '/nearby')
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Nearby
-                  </button>
-
-                  {/* Separator */}
-                  <div className="w-px h-6 bg-slate-200 mx-1"></div>
-
-                  {/* Dashboard tabs */}
-                  <button
-                    onClick={() => {
-                      setActiveTab('wallet')
-                      setShowAuth(false)
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Wallets
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('send')
-                      setShowAuth(false)
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Send
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('bills')
-                      setShowAuth(false)
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Bills
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('transactions')
-                      setShowAuth(false)
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    History
-                  </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('profile')
-                      setShowAuth(false)
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Profile
-                  </button>
-
-                  {/* Separator */}
-                  <div className="w-px h-6 bg-slate-200 mx-1"></div>
-
-                  {/* Auth button */}
-                  <button
-                    onClick={() => {
-                      setShowAuth(true)
-                      window.history.replaceState(null, '', '/login')
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Login
-                  </button>
-                </div>
-              </div>
-            </nav>
             {!showAuth && <LandingPage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />}
           </>
         )}
@@ -330,51 +198,49 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer - Only on non-home pages */}
-      {activeTab !== 'home' && (
-        <footer className="bg-white border-t border-slate-100 mt-20">
-          <div className="max-w-7xl mx-auto px-6 py-16">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-              <div>
-                <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
-                <p className="text-sm text-slate-500 leading-relaxed">Your modern platform for global financial management.</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
-                <ul className="space-y-3 text-sm">
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Multi-Currency</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Company</h4>
-                <ul className="space-y-3 text-sm">
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">About</a></li>
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Blog</a></li>
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Careers</a></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Legal</h4>
-                <ul className="space-y-3 text-sm">
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Privacy</a></li>
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Terms</a></li>
-                  <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Security</a></li>
-                </ul>
-              </div>
+      {/* Footer - On all pages */}
+      <footer className="bg-white border-t border-slate-100 mt-20">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+            <div>
+              <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
+              <p className="text-sm text-slate-500 leading-relaxed">Your modern platform for global financial management.</p>
             </div>
-            <div className="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 tracking-wide">
-              <p>&copy; {new Date().getFullYear()} currency.ph. All rights reserved.</p>
-              <p className="mt-3">
-                <button onClick={() => setActiveTab('network')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
-                  Network Balances
-                </button>
-              </p>
+            <div>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Multi-Currency</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Company</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">About</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Blog</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Careers</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Legal</h4>
+              <ul className="space-y-3 text-sm">
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Privacy</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Terms</a></li>
+                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Security</a></li>
+              </ul>
             </div>
           </div>
-        </footer>
-      )}
+          <div className="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 tracking-wide">
+            <p>&copy; {new Date().getFullYear()} currency.ph. All rights reserved.</p>
+            <p className="mt-3">
+              <button onClick={() => setActiveTab('network')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                Network Balances
+              </button>
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
