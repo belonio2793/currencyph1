@@ -83,6 +83,14 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [letterCategoryLoading, setLetterCategoryLoading] = useState({ restaurants: false, attractions: false, hotels: false })
   const [letterCategoryError, setLetterCategoryError] = useState({ restaurants: '', attractions: '', hotels: '' })
 
+  // Community management section
+  const [viewMode, setViewMode] = useState('listings') // 'listings' or 'community'
+  const [pendingListings, setPendingListings] = useState([])
+  const [communityLoading, setCommunityLoading] = useState(false)
+  const [communityError, setCommunityError] = useState('')
+  const [voteCounts, setVoteCounts] = useState({})
+  const [userVotes, setUserVotes] = useState({})
+
   const itemsPerPage = 12
 
   useEffect(() => {
