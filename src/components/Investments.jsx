@@ -94,6 +94,8 @@ export default function Investments({ userId }) {
   }
 
   function openProjectDetail(project) {
+    // Close invest modal first to keep modals exclusive
+    setShowInvestModal(false)
     setSelectedProject(project)
     setShowDetail(true)
     setError('')
