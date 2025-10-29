@@ -202,21 +202,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
     }
   }, [])
 
-  // small component to render geo marker
-  function GeoMarker() {
-    if (!geo || (!geo.country && !geo.lat && !geo.ip)) return null
-    return (
-      <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-slate-100 rounded-lg p-3 text-xs w-44 shadow-sm">
-        <div className="flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 2v2m0 16v2m8-10h2M2 12H4m15.5 6.5l1.5 1.5M4.5 4.5L6 6m12.02 0L18 6M6 18l1.5 1.5"/></svg>
-          <div>
-            <div className="font-medium text-slate-900">{geo.city ? `${geo.city}, ${geo.region || ''}` : geo.country || 'Unknown'}</div>
-            <div className="text-slate-500">{geo.ip ? geo.ip : `${geo.lat ? geo.lat.toFixed(2) : '—'}, ${geo.lon ? geo.lon.toFixed(2) : '—'}`}</div>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   const handleUseIP = async () => {
     try {
