@@ -204,7 +204,7 @@ export default function App() {
       {/* Footer - On all pages */}
       <footer className="bg-white border-t border-slate-100 mt-20">
         <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
             <div>
               <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
               <p className="text-sm text-slate-500 leading-relaxed">Your modern platform for global financial management.</p>
@@ -215,22 +215,6 @@ export default function App() {
                 <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
                 <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
                 <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Multi-Currency</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Company</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">About</a></li>
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Blog</a></li>
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Careers</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Legal</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Privacy</a></li>
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Terms</a></li>
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Security</a></li>
               </ul>
             </div>
           </div>
