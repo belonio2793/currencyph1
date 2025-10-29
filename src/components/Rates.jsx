@@ -176,31 +176,14 @@ export default function Rates({ globalCurrency }) {
 
   const loadCryptoPrices = async () => {
     try {
-      // Use edge function to proxy API calls (avoids CORS issues)
-      const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNvcmNvZmJtYWZkeGVodmxiZXN4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0NDI5NjYsImV4cCI6MjA3NzAxODk2Nn0.F0CvLIJjN-eifHDrQGGNIj2R3az1j6MyuyOKRJwehKU'
-
-      const data = await fetchWithRetries(
-        `${supabaseUrl}/functions/v1/fetch-rates`,
-        {
-          headers: {
-            'Authorization': `Bearer ${anonKey}`,
-            'Content-Type': 'application/json'
-          }
-        },
-        1,
-        1000
-      )
-
-      if (!data || !data.cryptoPrices) {
-        console.debug('Fetch rates endpoint unavailable, attempting CoinGecko fallback')
-        // Try direct CoinGecko public API as a fallback
-        try {
-          const ids = [
-            'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
-          ].join(',')
-          const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, { }, 2, 500)
-          const cryptoData = cg || {}
+      // Try CoinGecko first (public, CORS-friendly). If that fails, fall back to supabase edge function.
+      try {
+        const ids = [
+          'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
+        ].join(',')
+        const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 500, 8000)
+        const cryptoData = cg || null
+        if (cryptoData) {
           const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
 
           const cryptoPricesInGlobalCurrency = {
@@ -222,16 +205,37 @@ export default function Rates({ globalCurrency }) {
           }
           setCryptoRates(cryptoPricesInGlobalCurrency)
           return
-        } catch (cgErr) {
-          console.debug('CoinGecko fallback failed, using defaults:', cgErr)
-          const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
-          const defaults = {}
-          Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
-            defaults[key] = Math.round(value * globalExchangeRate * 100) / 100
-          })
-          setCryptoRates(defaults)
-          return
         }
+      } catch (cgErr) {
+        console.debug('CoinGecko direct attempt failed, will try edge function:', cgErr)
+      }
+
+      // Use edge function to proxy API calls (avoids other issues)
+      const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+
+      const data = await fetchWithRetries(
+        `${supabaseUrl}/functions/v1/fetch-rates`,
+        {
+          headers: {
+            'Authorization': `Bearer ${anonKey}`,
+            'Content-Type': 'application/json'
+          }
+        },
+        1,
+        1000,
+        10000
+      )
+
+      if (!data || !data.cryptoPrices) {
+        console.debug('Fetch rates endpoint unavailable, using defaults')
+        const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+        const defaults = {}
+        Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
+          defaults[key] = Math.round(value * globalExchangeRate * 100) / 100
+        })
+        setCryptoRates(defaults)
+        return
       }
 
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
