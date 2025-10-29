@@ -185,16 +185,26 @@ export default function SendMoney({ userId }) {
             <form onSubmit={handleSendMoney} className="space-y-8">
               {/* Step Indicator */}
               <div className="flex items-center space-x-4">
-                {[1, 2, 3].map((s) => (
-                  <div key={s} className="flex items-center flex-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
-                      s <= step ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
-                    }`}>
-                      {s}
-                    </div>
-                    {s < 3 && <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-blue-600' : 'bg-slate-200'}`}></div>}
-                  </div>
-                ))}
+                { /* labels for steps */ }
+                {(() => {
+                  const stepLabels = ['Sender Account', 'Recipient', 'Amount']
+                  return stepLabels.map((label, idx) => {
+                    const s = idx + 1
+                    return (
+                      <div key={s} className="flex-1">
+                        <div className="flex items-center">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${
+                            s <= step ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-600'
+                          }`}>
+                            {s}
+                          </div>
+                          {s < stepLabels.length && <div className={`flex-1 h-1 mx-2 ${s < step ? 'bg-blue-600' : 'bg-slate-200'}`}></div>}
+                        </div>
+                        <div className="mt-2 text-xs text-center text-slate-600">{label}</div>
+                      </div>
+                    )
+                  })
+                })()}
               </div>
 
               {step === 1 && (
