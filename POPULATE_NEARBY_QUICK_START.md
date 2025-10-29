@@ -7,14 +7,14 @@ npm run populate-nearby-batch
 ```
 
 That's it! This single command:
-1. ✅ Searches TripAdvisor via Google Custom Search (40 min)
-2. ✅ Fetches TripAdvisor pages for details (50 min)
+1. ✅ Searches TripAdvisor via Google Custom Search (60-90 min)
+2. ✅ Fetches TripAdvisor pages for details (90-150 min)
 3. ✅ Populates all columns in nearby_listings
 4. ✅ Shows progress and statistics
 
-**Total time**: ~90 minutes
+**Total time**: ~2.5-4 hours
 
-**Result**: 7,000+ complete listings on /nearby page
+**Result**: 30,000+ complete listings on /nearby page
 
 ## Individual Steps
 
