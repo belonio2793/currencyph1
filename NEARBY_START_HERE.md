@@ -229,11 +229,11 @@ Edit scripts to customize searches, cities, or data extraction.
    npm run populate-nearby-batch
    ```
 
-2. **Wait** for completion (~90 minutes)
+2. **Wait** for completion (~2.5-4 hours)
 
 3. **Visit** http://localhost:5173/nearby
 
-4. **See** 7,000+ listings with photos, ratings, hours, amenities, etc.!
+4. **See** 30,000+ listings with photos, ratings, hours, amenities, etc.!
 
 ---
 
