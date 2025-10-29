@@ -163,6 +163,7 @@ export default function Investments({ userId }) {
       // refresh data
       await loadProjects()
       await loadWallets()
+      setShowInvestModal(false)
       setSelectedProject(null)
     } catch (err) {
       console.error('Investment failed', err)
