@@ -307,9 +307,39 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       )
 
       if (!data || !data.cryptoPrices) {
-        console.debug('Fetch rates endpoint unavailable in LandingPage, using defaults')
-        setCryptoRates(defaultCryptoPrices)
-        return
+        console.debug('Fetch rates endpoint unavailable in LandingPage, attempting CoinGecko fallback')
+        try {
+          const ids = [
+            'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
+          ].join(',')
+          const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 500)
+          const cryptoData = cg || {}
+          const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+
+          const cryptoPricesInGlobalCurrency = {
+            BTC: Math.round(((cryptoData.bitcoin?.usd) || defaultCryptoPrices.BTC) * globalExchangeRate * 100) / 100,
+            ETH: Math.round(((cryptoData.ethereum?.usd) || defaultCryptoPrices.ETH) * globalExchangeRate * 100) / 100,
+            LTC: Math.round(((cryptoData.litecoin?.usd) || defaultCryptoPrices.LTC) * globalExchangeRate * 100) / 100,
+            DOGE: Math.round(((cryptoData.dogecoin?.usd) || defaultCryptoPrices.DOGE) * globalExchangeRate * 100) / 100,
+            XRP: Math.round(((cryptoData.ripple?.usd) || defaultCryptoPrices.XRP) * globalExchangeRate * 100) / 100,
+            ADA: Math.round(((cryptoData.cardano?.usd) || defaultCryptoPrices.ADA) * globalExchangeRate * 100) / 100,
+            SOL: Math.round(((cryptoData.solana?.usd) || defaultCryptoPrices.SOL) * globalExchangeRate * 100) / 100,
+            AVAX: Math.round(((cryptoData['avalanche-2']?.usd) || defaultCryptoPrices.AVAX) * globalExchangeRate * 100) / 100,
+            MATIC: Math.round(((cryptoData['matic-network']?.usd) || defaultCryptoPrices.MATIC) * globalExchangeRate * 100) / 100,
+            DOT: Math.round(((cryptoData.polkadot?.usd) || defaultCryptoPrices.DOT) * globalExchangeRate * 100) / 100,
+            LINK: Math.round(((cryptoData.chainlink?.usd) || defaultCryptoPrices.LINK) * globalExchangeRate * 100) / 100,
+            UNI: Math.round(((cryptoData.uniswap?.usd) || defaultCryptoPrices.UNI) * globalExchangeRate * 100) / 100,
+            AAVE: Math.round(((cryptoData.aave?.usd) || defaultCryptoPrices.AAVE) * globalExchangeRate * 100) / 100,
+            USDC: Math.round(((cryptoData['usd-coin']?.usd) || defaultCryptoPrices.USDC) * globalExchangeRate * 100) / 100,
+            USDT: Math.round(((cryptoData.tether?.usd) || defaultCryptoPrices.USDT) * globalExchangeRate * 100) / 100
+          }
+          setCryptoRates(cryptoPricesInGlobalCurrency)
+          return
+        } catch (cgErr) {
+          console.debug('CoinGecko fallback failed, using defaults in LandingPage:', cgErr)
+          setCryptoRates(defaultCryptoPrices)
+          return
+        }
       }
 
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
