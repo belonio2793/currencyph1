@@ -43,14 +43,6 @@ let stats = {
   totalPhotos: 0
 };
 
-let beeKeyIndex = 0;
-let requestCount = 0;
-
-function getNextBeeKey() {
-  const key = SCRAPINGBEE_KEYS[beeKeyIndex % SCRAPINGBEE_KEYS.length];
-  beeKeyIndex++;
-  return key;
-}
 
 function extractTripadvisorIdFromUrl(url) {
   if (!url) return null;
