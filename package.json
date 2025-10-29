@@ -58,7 +58,8 @@
     "download-photos": "node scripts/complete-photo-download.js",
     "populate-google-search": "node scripts/populate-via-google-custom-search.js",
     "enrich-tripadvisor-pages": "node scripts/enrich-listings-from-tripadvisor-pages.js",
-    "populate-full": "node scripts/populate-via-google-custom-search.js && node scripts/enrich-listings-from-tripadvisor-pages.js"
+    "enrich-comprehensive": "node scripts/enrich-listings-comprehensive.js",
+    "populate-full": "node scripts/populate-via-google-custom-search.js && node scripts/enrich-listings-comprehensive.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
