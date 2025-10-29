@@ -42,9 +42,20 @@ for (let i = 0; i < argv.length; i++) {
   if (argv[i] === '--batch' && argv[i+1]) { BATCH = Number(argv[i+1]); i++ }
 }
 
+// Support rotating API keys provided as a comma-separated env var GOOGLE_API_KEYS
+const KEY_LIST = (process.env.GOOGLE_API_KEYS || process.env.GOOGLE_CUSTOM_SEARCH_API || process.env.GOOGLE_API_KEY || '').split(',').map(s => s.trim()).filter(Boolean)
+let keyIndex = 0
+function getNextKey() {
+  if (!KEY_LIST || KEY_LIST.length === 0) return GOOGLE_API_KEY
+  const key = KEY_LIST[keyIndex % KEY_LIST.length]
+  keyIndex += 1
+  return key
+}
+
 async function googleImageSearch(query, num=8) {
+  const keyToUse = getNextKey()
   const params = new URLSearchParams({
-    key: GOOGLE_API_KEY,
+    key: keyToUse,
     cx: CSE_CX,
     searchType: 'image',
     q: query,
