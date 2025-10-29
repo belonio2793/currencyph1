@@ -53,10 +53,13 @@ export default function Investments({ userId }) {
   }
 
   function openInvestModal(project) {
+    // Close detail first, then open invest modal to avoid both showing
+    setShowDetail(false)
     setSelectedProject(project)
     setInvestAmount('')
     setError('')
     setSuccess('')
+    setTimeout(() => setShowInvestModal(true), 50)
   }
 
   async function loadProjectContributions(projectId) {
