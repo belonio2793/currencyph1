@@ -10,12 +10,23 @@ The population process works in two stages:
 - Use Google Custom Search API to find TripAdvisor listings for restaurants, hotels, and attractions
 - Search across 50+ Philippine cities
 - Extract basic information (name, URL, snippet, category)
+- Automatically **skip existing listings** to avoid duplicates
 - Create initial database records with pending status
 
-### Stage 2: Enrichment (Page Scraping)
+### Stage 2: Enrichment (Page Scraping - Comprehensive)
 - Fetch detailed data from each TripAdvisor page
-- Extract comprehensive information (ratings, reviews, address, phone, hours, amenities, photos)
-- Update database records with complete data
+- Extract all comprehensive information using multiple methods:
+  - **JSON-LD structured data** for most reliable extraction
+  - **HTML attributes** and element selectors for fallback data
+  - Multiple selectors to maximize data capture
+- Fill every database column:
+  - Ratings, reviews, address, phone, website
+  - Operating hours (all 7 days), description, price level
+  - Highlights, amenities, up to 25 photos
+  - Geographic coordinates (latitude/longitude)
+  - Rankings, slug generation
+- Automatically **skip already-enriched listings** to save API calls
+- Update database records with complete, verified data
 
 ## Prerequisites
 
