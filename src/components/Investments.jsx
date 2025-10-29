@@ -157,7 +157,6 @@ export default function Investments({ userId }) {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => openInvestModal(p)} className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm">Invest</button>
-                <button onClick={() => { window.alert(JSON.stringify(p, null, 2)) }} className="px-3 py-2 border rounded-lg text-sm">Schema</button>
               </div>
             </div>
           )
