@@ -20,6 +20,17 @@ export default function Investments({ userId }) {
     loadWallets()
   }, [])
 
+  // Prevent background scrolling when modals are open
+  useEffect(() => {
+    const locked = showDetail || showInvestModal
+    if (typeof document !== 'undefined') {
+      document.body.style.overflow = locked ? 'hidden' : ''
+    }
+    return () => {
+      if (typeof document !== 'undefined') document.body.style.overflow = ''
+    }
+  }, [showDetail, showInvestModal])
+
   async function loadWallets() {
     try {
       const { data } = await supabase.from('wallets').select('*').eq('user_id', userId)
