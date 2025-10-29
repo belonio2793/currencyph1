@@ -175,11 +175,12 @@ async function processListing(listing) {
 
   // Save to database
   try {
+    const uniqueClean = Array.from(new Set(photoUrls.map(u => u.split('?')[0].split('#')[0]))).slice(0, MAX_PHOTOS)
     const { error } = await supabase
       .from('nearby_listings')
       .update({
-        photo_urls: photoUrls,
-        photo_count: photoUrls.length,
+        photo_urls: uniqueClean,
+        photo_count: uniqueClean.length,
         updated_at: new Date().toISOString()
       })
       .eq('id', listing.id)
