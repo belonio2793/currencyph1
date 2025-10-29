@@ -211,6 +211,7 @@ async function main() {
       .from('nearby_listings')
       .select('id, name, city, web_url')
       .not('web_url', 'is', null)
+      .neq('web_url', 'https://www.tripadvisor.com/')
       .order('id', { ascending: true })
       .range(offset, offset + BATCH - 1)
 
