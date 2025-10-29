@@ -7,19 +7,19 @@ npm run populate-nearby-batch
 ```
 
 That's all you need! This command:
-1. ✅ Searches TripAdvisor Philippines via Google (40 min)
-2. ✅ Fetches complete listing data (50 min)
-3. ✅ Populates 7,000+ listings with all data
+1. ✅ Searches TripAdvisor Philippines via Google (60-90 min)
+2. ✅ Fetches complete listing data (90-150 min)
+3. ✅ Populates 30,000+ listings with all data
 4. ✅ Shows you progress in real-time
 
-**Total time**: ~90 minutes
+**Total time**: ~2.5-4 hours
 
 ---
 
 ## What Happens
 
 ### Step 1: Google Search
-- Searches 50+ Philippine cities
+- Searches 150+ Philippine cities (complete nationwide coverage)
 - 3 categories: restaurants, hotels, attractions
 - Finds real TripAdvisor.com.ph listings
 - Extracts names, URLs, ratings
@@ -34,7 +34,7 @@ That's all you need! This command:
 - Extracts **price levels**
 
 ### Result
-Visit http://localhost:5173/nearby to see all 7,000+ listings!
+Visit http://localhost:5173/nearby to see all 30,000+ listings!
 
 ---
 
