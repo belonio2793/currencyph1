@@ -188,6 +188,31 @@ async function main() {
   }
 
   console.log('='.repeat(80));
+  console.log('STEP 1.6: ENRICH VIA REAL TRIPADVISOR PAGES');
+  console.log('='.repeat(80));
+  console.log('\nRunning real TripAdvisor populator (Grok + ScrapingBee) to fetch accurate URLs, IDs and photos...');
+
+  // This will try to find exact TripAdvisor pages and populate tripadvisor_id, web_url, photo_urls
+  const realPopOk = await runCommand('npm', ['run', 'populate-nearby-real']);
+  if (!realPopOk) {
+    console.log('  ⚠️  Real TripAdvisor population encountered issues; continuing.');
+  } else {
+    console.log('  ✅ Real TripAdvisor population completed');
+  }
+
+  console.log('='.repeat(80));
+  console.log('STEP 1.7: FILL ANY REMAINING MISSING IDS (GENERATE UNIQUE)');
+  console.log('='.repeat(80));
+  console.log('\nRunning filler to generate unique tripadvisor IDs for any remaining entries (fallback)');
+
+  const fillUniqueOk = await runCommand('npm', ['run', 'fill-tripadvisor-unique']);
+  if (!fillUniqueOk) {
+    console.log('  ⚠️  ID filler encountered issues; continuing.');
+  } else {
+    console.log('  ✅ ID filler completed');
+  }
+
+  console.log('='.repeat(80));
   console.log('STEP 2: DATA ENRICHMENT FROM TRIPADVISOR PAGES');
   console.log('='.repeat(80));
   console.log('\nStarting TripAdvisor data enrichment...');
