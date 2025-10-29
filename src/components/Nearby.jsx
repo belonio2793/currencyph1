@@ -94,6 +94,15 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const itemsPerPage = 12
 
   useEffect(() => {
+    // Check if view parameter is in URL
+    const params = new URLSearchParams(window.location.search)
+    const viewParam = params.get('view')
+    if (viewParam === 'community') {
+      setViewMode('community')
+    }
+  }, [])
+
+  useEffect(() => {
     loadCities()
     loadStats()
     loadFeaturedListings()
