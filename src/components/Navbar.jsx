@@ -113,18 +113,20 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
           </div>
 
           {/* Secondary row for Manage Investments (desktop) */}
-          <div className="hidden md:flex w-full mt-2">
-            {secondaryNav.map(btn => (
-              <button
-                key={btn.id}
-                onClick={() => onTabChange(btn.id)}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                  activeTab === btn.id ? 'text-blue-600 bg-blue-50' : 'text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
+          <div className="hidden md:flex w-full mt-4 pt-3 border-t border-slate-100">
+            <div className="w-full px-4 flex">
+              {secondaryNav.map(btn => (
+                <button
+                  key={btn.id}
+                  onClick={() => onTabChange(btn.id)}
+                  className={`px-4 py-2 text-sm font-semibold transition-colors rounded-md ${
+                    activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Mobile menu button */}
