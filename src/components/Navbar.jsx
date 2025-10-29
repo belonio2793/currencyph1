@@ -146,7 +146,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 border-t border-slate-100">
             <div className="space-y-2">
-              {navButtons.map(btn => (
+              {mainNav.concat(rightNav).map(btn => (
                 <button
                   key={btn.id}
                   onClick={() => {
@@ -157,6 +157,24 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                     activeTab === btn.id
                       ? 'text-blue-600 bg-blue-50'
                       : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+
+              {/* include secondary nav in mobile list */}
+              {secondaryNav.map(btn => (
+                <button
+                  key={btn.id}
+                  onClick={() => {
+                    onTabChange(btn.id)
+                    setMobileMenuOpen(false)
+                  }}
+                  className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === btn.id
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
                   {btn.label}
