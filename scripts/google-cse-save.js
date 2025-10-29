@@ -179,7 +179,7 @@ async function processBatch(offset, limit) {
 
   const results = []
   for (const listing of listings) {
-    console.log(`\n[ID ${listing.id}] ${listing.name}`)
+    log(`\n[ID ${listing.id}] ${listing.name}`)
 
     // perform same query order, prefer TripAdvisor Philippines domain
     const queries = [listing.web_url, `${listing.name} site:tripadvisor.com.ph`, `${listing.name} site:tripadvisor.com`, listing.name]
@@ -187,7 +187,7 @@ async function processBatch(offset, limit) {
     for (const q of queries) {
       const res = await googleImageSearch(q, 8)
       if (res.error) {
-        console.log(`  Google error: ${res.error}`)
+        log(`  Google error: ${res.error}`)
         continue
       }
       const urls = (res.items || []).map(it => it.link).filter(Boolean)
@@ -198,29 +198,29 @@ async function processBatch(offset, limit) {
     }
 
     if (found.length === 0) {
-      console.log('  ✗ No images from CSE — trying Grok fallback')
+      log('  ✗ No images from CSE — trying Grok fallback')
       // Grok fallback: fetch page HTML via curl and ask Grok to extract tripadvisor CDN URLs
       try {
         const grokUrls = await grokExtractFromPage(listing.web_url, listing.name)
         if (grokUrls && grokUrls.length > 0) {
           found = grokUrls
-          console.log(`  ✓ Grok found ${found.length} images`)
+          log(`  ✓ Grok found ${found.length} images`)
         } else {
-          console.log('  ✗ Grok found no images')
+          log('  ✗ Grok found no images')
         }
       } catch (err) {
-        console.log('  ✗ Grok error:', String(err).substring(0,200))
+        log('  ✗ Grok error: ' + String(err).substring(0,200))
       }
     }
 
     if (found.length === 0) {
-      console.log('  ✗ No images found')
+      log('  ✗ No images found')
       results.push({ id: listing.id, status: 'no-images' })
       continue
     }
 
     const cleaned = cleanUrls(found)
-    console.log(`  ✓ Found ${cleaned.length} images. Saving...`)
+    log(`  ✓ Found ${cleaned.length} images. Saving...`)
 
     // update DB
     try {
@@ -230,14 +230,14 @@ async function processBatch(offset, limit) {
         .eq('id', listing.id)
 
       if (upErr) {
-        console.log(`  ✗ DB error: ${upErr.message}`)
+        log(`  ✗ DB error: ${upErr.message}`)
         results.push({ id: listing.id, status: 'db-error', error: upErr.message })
       } else {
-        console.log('  ✓ Saved')
+        log('  ✓ Saved')
         results.push({ id: listing.id, status: 'saved', count: cleaned.length })
       }
     } catch (err) {
-      console.log(`  ✗ Exception: ${err.message}`)
+      log(`  ✗ Exception: ${err.message}`)
       results.push({ id: listing.id, status: 'error', error: String(err) })
     }
 
@@ -248,7 +248,7 @@ async function processBatch(offset, limit) {
 }
 
 async function main() {
-  console.log('\n=== Google CSE Save: updating photo_urls ===\n')
+  log('\n=== Google CSE Save: updating photo_urls ===\n')
   let offset = 0
   let total = 0
   while (total < LIMIT) {
@@ -260,7 +260,7 @@ async function main() {
     // small pause between batches
     await new Promise(r => setTimeout(r, 1000))
   }
-  console.log('\n=== Done ===\n')
+  log('\n=== Done ===\n')
   process.exit(0)
 }
 
