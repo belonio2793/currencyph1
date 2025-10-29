@@ -181,8 +181,8 @@ async function processBatch(offset, limit) {
   for (const listing of listings) {
     console.log(`\n[ID ${listing.id}] ${listing.name}`)
 
-    // perform same query order
-    const queries = [listing.web_url, `${listing.name} site:tripadvisor.com`, listing.name]
+    // perform same query order, prefer TripAdvisor Philippines domain
+    const queries = [listing.web_url, `${listing.name} site:tripadvisor.com.ph`, `${listing.name} site:tripadvisor.com`, listing.name]
     let found = []
     for (const q of queries) {
       const res = await googleImageSearch(q, 8)
