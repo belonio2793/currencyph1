@@ -29,21 +29,6 @@ export default function App() {
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
 
-  // Content locker: when enabled (VITE_CONTENT_LOCKER=true) block access to the production host "currency.ph"
-  const enableContentLocker = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTENT_LOCKER === 'true') || false
-  const currentHost = typeof window !== 'undefined' ? window.location.host : ''
-  const isProductionHost = currentHost && (currentHost === 'currency.ph' || currentHost.endsWith('.currency.ph'))
-
-  if (enableContentLocker && isProductionHost) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="max-w-xl w-full bg-white border border-slate-200 rounded-xl p-8 text-center">
-          <h2 className="text-2xl font-semibold text-slate-900 mb-3">This site is under construction</h2>
-          <p className="text-sm text-slate-600 mb-6">Access to currency.ph is temporarily disabled while we build features. Please use your development server or enable access by setting VITE_CONTENT_LOCKER=false in your deployment environment.</p>
-        </div>
-      </div>
-    )
-  }
 
   useEffect(() => {
     initializeUser()
