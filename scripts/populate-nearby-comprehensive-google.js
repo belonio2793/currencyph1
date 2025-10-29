@@ -278,11 +278,14 @@ async function upsertListing(listing) {
 
     const { error } = await supabase
       .from('nearby_listings')
-      .insert({
-        ...listing,
-        rating: listing.rating ? Math.min(5, Math.max(0, listing.rating)) : null,
-        review_count: listing.review_count ? Math.max(0, listing.review_count) : null
-      });
+      .upsert(
+        [{
+          ...listing,
+          rating: listing.rating ? Math.min(5, Math.max(0, listing.rating)) : null,
+          review_count: listing.review_count ? Math.max(0, listing.review_count) : null
+        }],
+        { onConflict: 'tripadvisor_id' }
+      );
 
     if (error) {
       console.warn(`    ❌ Insert failed: ${error.message?.substring(0, 60)}`);
