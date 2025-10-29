@@ -15,7 +15,6 @@ import Profile from './components/Profile'
 import Auth from './components/Auth'
 import Nearby from './components/Nearby'
 import Business from './components/Business'
-import CommunityManagement from './components/CommunityManagement'
 import ListingDetail from './components/ListingDetail'
 
 export default function App() {
