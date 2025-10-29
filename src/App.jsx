@@ -207,7 +207,7 @@ export default function App() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-12">
             <div>
               <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">Your modern platform for global financial management.</p>
+              <p className="text-sm text-slate-500 leading-relaxed">An open-source application that displays all transactions publicly.</p>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
