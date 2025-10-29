@@ -225,6 +225,7 @@ Deno.serve(async (req) => {
       .select('id, name, city, web_url, photo_urls')
       .or('photo_urls.is.null,photo_urls.eq.{}')
       .not('web_url', 'is', null)
+      .neq('web_url', 'https://www.tripadvisor.com/')
       .order('id', { ascending: true })
       .range(offset, offset + limit - 1)
 
