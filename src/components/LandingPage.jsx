@@ -919,8 +919,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           </div>
         )}
 
-        {/* Balances Section */}
-        <BalancesSection userId={userId} />
 
       </div>
 
