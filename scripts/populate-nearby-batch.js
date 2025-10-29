@@ -117,12 +117,12 @@ async function main() {
   console.log('  6️⃣  Fill all available data columns');
 
   console.log('\n⏱️  Estimated Duration:');
-  console.log('  • Step 1 (Google Search): 30-40 minutes');
-  console.log('  • Step 2 (TripAdvisor Enrichment): 40-60 minutes');
-  console.log('  • Total: 70-100 minutes (~1.5 hours)');
+  console.log('  • Step 1 (Google Search): 60-90 minutes (150+ cities)');;
+  console.log('  • Step 2 (TripAdvisor Enrichment): 90-150 minutes');
+  console.log('  • Total: 150-240 minutes (~2.5-4 hours)');;
 
   console.log('\n🎯 Target Results:');
-  console.log('  • ~7,500+ total listings across 50 Philippine cities');
+  console.log('  • ~30,000+ total listings across 150+ Philippine cities');
   console.log('  • 3 categories: restaurants, hotels, attractions');
   console.log('  • Full data including photos, ratings, hours, amenities');
 
@@ -150,7 +150,7 @@ async function main() {
   console.log('STEP 1: POPULATION VIA GOOGLE CUSTOM SEARCH');
   console.log('='.repeat(80));
   console.log('\nStarting Google Custom Search population...');
-  console.log('(Searching 50 cities × 3 categories = 150 searches)\n');
+  console.log('(Searching 150+ cities × 3 categories = 450+ searches)\n');
 
   const populateSuccess = await runCommand('npm', ['run', 'populate-nearby-google']);
 
