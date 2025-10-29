@@ -48,8 +48,8 @@ const PREMIUM_ATTRACTIONS = {
  */
 async function fetchTripAdvisorListings(query, limit = 20) {
   try {
-    const apiKey = import.meta.env.VITE_TRIPADVISOR || process.env.VITE_TRIPADVISOR
-    
+    const apiKey = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_TRIPADVISOR) || (typeof process !== 'undefined' && process.env && process.env.VITE_TRIPADVISOR)
+
     if (!apiKey) {
       console.warn('TripAdvisor API key not available, using enhanced mock data')
       return []
