@@ -14,18 +14,21 @@ export default function BalancesSection({ userId }) {
     fetchMostRecent()
     fetchLargest()
 
-    // Real-time subscription: update lists on insert/update
-    const subs = supabase
-      .channel('public:balances')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'balances' }, payload => {
-        // Refresh small subset on changes
+    // Real-time subscription: update lists on insert/update (compatible with existing project usage)
+    const subscription = supabase
+      .from('balances')
+      .on('INSERT', payload => {
+        if (tab === 'most_recent') fetchMostRecent()
+        if (tab === 'largest_balances') fetchLargest()
+      })
+      .on('UPDATE', payload => {
         if (tab === 'most_recent') fetchMostRecent()
         if (tab === 'largest_balances') fetchLargest()
       })
       .subscribe()
 
     return () => {
-      try { subs.unsubscribe() } catch (e) { /* ignore */ }
+      try { subscription.unsubscribe() } catch (e) { /* ignore */ }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab])
