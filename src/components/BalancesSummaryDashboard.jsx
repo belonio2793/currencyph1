@@ -16,14 +16,17 @@ export default function BalancesSummaryDashboard({ userId }) {
   useEffect(() => {
     fetchBalancesData()
 
-    const subscription = supabase
-      .from('balances')
-      .on('INSERT', () => fetchBalancesData())
-      .on('UPDATE', () => fetchBalancesData())
+    const channel = supabase
+      .channel('public:balances')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'balances' },
+        () => fetchBalancesData()
+      )
       .subscribe()
 
     return () => {
-      try { subscription.unsubscribe() } catch (e) { }
+      channel.unsubscribe()
     }
   }, [])
 
