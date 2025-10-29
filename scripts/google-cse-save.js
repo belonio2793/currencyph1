@@ -169,7 +169,6 @@ async function processBatch(offset, limit) {
     .from('nearby_listings')
     .select('id, name, city, web_url, photo_urls, photo_count')
     .not('web_url', 'is', null)
-    .neq('web_url', 'https://www.tripadvisor.com/')
     .or('photo_count.is.null,photo_count.lt.5')
     .order('id', { ascending: true })
     .range(offset, offset + limit - 1)
