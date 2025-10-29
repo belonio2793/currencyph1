@@ -1,7 +1,7 @@
 import { supabase } from './supabaseClient'
 import { generateSlug } from './slugUtils'
 
-const TRIPADVISOR_KEY = import.meta.env.VITE_TRIPADVISOR || process.env.VITE_TRIPADVISOR
+const TRIPADVISOR_KEY = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_TRIPADVISOR) || (typeof process !== 'undefined' && process.env && process.env.VITE_TRIPADVISOR)
 
 /**
  * TripAdvisor Philippines Fetcher
