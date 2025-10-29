@@ -54,9 +54,9 @@ npm run populate-nearby-full
 
 ## Coverage
 
-- **50+ Philippine cities** (Manila, Cebu, Davao, Boracay, etc.)
+- **150+ Philippine cities** (Complete nationwide coverage)
 - **3 categories** (Restaurants, Hotels, Attractions)
-- **7,000+ total listings**
+- **30,000+ total listings**
 
 ## Troubleshooting
 
