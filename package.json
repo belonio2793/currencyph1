@@ -25,7 +25,7 @@
     "fetch-photos-batch": "node scripts/import-photos.js",
     "fetch-photos-grok": "bash scripts/run-full-image-pipeline.sh --no-edge",
     "grok-enrich-csv": "node scripts/grok-enrich-csv-listings.js",
-    "enrich-tripadvisor": "node scripts/grok-enrich-tripadvisor-ph.js",
+    "enrich-grok-tripadvisor": "node scripts/grok-enrich-tripadvisor-ph.js",
     "enrich-all": "node scripts/grok-enrich-all-listings.js",
     "enrich-deep": "node scripts/grok-deep-enrich-all.js",
     "enrich-smart": "node scripts/smart-enrich-listings.js",
