@@ -171,7 +171,7 @@ A: No. It checks for existing listings and skips them (by tripadvisor_id).
 A: Yes! It will add new listings and skip existing ones.
 
 **Q: How long does it really take?**
-A: ~90 minutes total (40 min search + 50 min enrichment).
+A: ~2.5-4 hours total (60-90 min search + 90-150 min enrichment).
 
 **Q: What if it crashes halfway?**
 A: Data already inserted stays. Just run again to continue.
