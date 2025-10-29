@@ -9,6 +9,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'nearby', label: 'Nearby' },
     { id: 'wallet', label: 'Wallets' },
     { id: 'send', label: 'Send' },
+    { id: 'investments', label: 'Investment Opportunities' },
     { id: 'bills', label: 'Bills' },
     { id: 'transactions', label: 'History' },
     { id: 'profile', label: 'Profile' }
