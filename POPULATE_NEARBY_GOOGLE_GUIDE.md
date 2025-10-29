@@ -46,7 +46,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 └──────────────────┬──────────────────────────────────────┘
                    │ (Update all fields)
                    ↓
-┌───────────────────────────���─────────────────────────────┐
+┌─────────────────────────────────────────────────────────┐
 │    COMPLETE nearby_listings (All columns filled)       │
 │                                                         │
 │  ✅ 7,500+ listings                                    │
@@ -62,7 +62,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 ┌─────────────────────────────────────────────────────────┐
 │         Frontend Application                           │
 │  /nearby page displays all populated listings          │
-└───────────────────────────────────────────��─────────────┘
+└─────────────────────────────────────────────────────────┘
 ```
 
 ## Prerequisites
@@ -341,8 +341,8 @@ After running the full batch:
 
 | Metric | Expected |
 |--------|----------|
-| Total listings | 7,000-8,000 |
-| Cities covered | 50+ |
+| Total listings | 30,000-35,000 |
+| Cities covered | 150+ |
 | Categories | 3 |
 | With photos | 70-80% |
 | With ratings | 90%+ |
