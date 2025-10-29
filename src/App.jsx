@@ -325,6 +325,7 @@ export default function App() {
               setCurrentListingSlug(null)
               window.history.pushState(null, '', '/nearby')
             }} /> }
+            {activeTab === 'network' && <Network userId={userId} />}
           </>
         )}
       </main>
