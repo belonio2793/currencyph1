@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { currencySymbols, formatCurrency, getCurrencySymbol } from '../lib/currency'
 
 export default function SendMoney({ userId }) {
   const [wallets, setWallets] = useState([])
@@ -65,24 +66,31 @@ export default function SendMoney({ userId }) {
     }
   }
 
-  const handleSearchUsers = async (query) => {
-    setSearchQuery(query)
-    if (query.trim().length < 2) {
+  useEffect(() => {
+    if (!showSearchDropdown) return
+    const q = searchQuery.trim()
+    if (q.length < 2) {
       setSearchResults([])
       return
     }
-
+    let cancelled = false
     setSearching(true)
-    try {
-      const results = await wisegcashAPI.searchUsers(query)
-      setSearchResults(results)
-    } catch (err) {
-      console.error('Error searching users:', err)
-      setError('Failed to search users')
-    } finally {
-      setSearching(false)
+    const t = setTimeout(async () => {
+      try {
+        const results = await wisegcashAPI.searchUsers(q)
+        if (!cancelled) setSearchResults(results)
+      } catch (err) {
+        console.error('Error searching users:', err)
+        if (!cancelled) setError('Failed to search users')
+      } finally {
+        if (!cancelled) setSearching(false)
+      }
+    }, 300)
+    return () => {
+      cancelled = true
+      clearTimeout(t)
     }
-  }
+  }, [searchQuery, showSearchDropdown])
 
   const handleSelectRecipient = (user) => {
     setSelectedRecipient(user)
@@ -201,7 +209,7 @@ export default function SendMoney({ userId }) {
                     >
                       {wallets.map(wallet => (
                         <option key={wallet.id} value={wallet.currency_code}>
-                          {wallet.currency_code} - Balance: {wallet.balance.toFixed(2)}
+                          {getCurrencySymbol(wallet.currency_code)}{wallet.balance.toFixed(2)} ({wallet.currency_code})
                         </option>
                       ))}
                     </select>
@@ -227,7 +235,7 @@ export default function SendMoney({ userId }) {
                       type="text"
                       value={searchQuery}
                       onChange={e => {
-                        handleSearchUsers(e.target.value)
+                        setSearchQuery(e.target.value)
                         setShowSearchDropdown(true)
                       }}
                       onFocus={() => setShowSearchDropdown(true)}
@@ -268,27 +276,46 @@ export default function SendMoney({ userId }) {
                   {/* Selected Recipient Display */}
                   {selectedRecipient && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <p className="text-sm font-medium text-slate-700 mb-3">Selected Recipient</p>
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-600">Name:</span>
-                          <span className="text-sm font-medium text-slate-900">{selectedRecipient.full_name || 'N/A'}</span>
+                      <p className="text-sm font-medium text-slate-700 mb-3">Recipient Profile (Verification)</p>
+                      <div className="flex items-start gap-3">
+                        <div className="shrink-0 w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold overflow-hidden">
+                          {selectedRecipient.profile_picture_url ? (
+                            <img src={selectedRecipient.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
+                          ) : (
+                            <span>{(selectedRecipient.full_name || selectedRecipient.email)?.charAt(0).toUpperCase()}</span>
+                          )}
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-600">Email:</span>
-                          <span className="text-sm font-medium text-slate-900">{selectedRecipient.email}</span>
-                        </div>
-                        {selectedRecipient.phone_number && (
+                        <div className="flex-1 space-y-1 text-sm">
                           <div className="flex justify-between items-center">
-                            <span className="text-sm text-slate-600">Phone:</span>
-                            <span className="text-sm font-medium text-slate-900">{selectedRecipient.phone_number}</span>
+                            <span className="text-slate-600">Name</span>
+                            <span className="font-medium text-slate-900">{selectedRecipient.full_name || 'N/A'}</span>
                           </div>
-                        )}
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-slate-600">Status:</span>
-                          <span className={`text-xs font-medium px-2 py-1 rounded ${selectedRecipient.status === 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700'}`}>
-                            {selectedRecipient.status || 'Active'}
-                          </span>
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-600">Email</span>
+                            <span className="font-medium text-slate-900">{selectedRecipient.email}</span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-600">Phone</span>
+                            <span className="font-medium text-slate-900">{selectedRecipient.phone_number || '—'}</span>
+                          </div>
+                          {selectedRecipient.country_code && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600">Country</span>
+                              <span className="font-medium text-slate-900">{selectedRecipient.country_code}</span>
+                            </div>
+                          )}
+                          {selectedRecipient.created_at && (
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600">Member Since</span>
+                              <span className="font-medium text-slate-900">{new Date(selectedRecipient.created_at).toLocaleDateString()}</span>
+                            </div>
+                          )}
+                          <div className="flex justify-between items-center">
+                            <span className="text-slate-600">Verification</span>
+                            <span className={`text-xs font-medium px-2 py-1 rounded ${selectedRecipient.phone_number ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                              {selectedRecipient.phone_number ? 'Verified (Phone on file)' : 'Unverified'}
+                            </span>
+                          </div>
                         </div>
                       </div>
                       <button
@@ -315,7 +342,7 @@ export default function SendMoney({ userId }) {
                     >
                       {currencies.map(curr => (
                         <option key={curr} value={curr}>
-                          {curr}
+                          {getCurrencySymbol(curr)} {curr}
                         </option>
                       ))}
                     </select>
@@ -347,7 +374,7 @@ export default function SendMoney({ userId }) {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Amount ({selectedSender})
+                      Amount ({getCurrencySymbol(selectedSender)} {selectedSender})
                     </label>
                     <input
                       type="number"
@@ -362,10 +389,10 @@ export default function SendMoney({ userId }) {
                   <div className="bg-slate-50 p-4 rounded-lg">
                     <p className="text-xs text-slate-600 font-medium uppercase tracking-wider mb-1">Recipient Receives</p>
                     <p className="text-3xl font-light text-slate-900">
-                      {receiverAmount} {recipientCurrency}
+                      {formatCurrency(receiverAmount, recipientCurrency)}
                     </p>
                     <p className="text-xs text-slate-500 mt-2">
-                      Rate: 1 {selectedSender} = {exchangeRate.toFixed(4)} {recipientCurrency}
+                      Rate: {getCurrencySymbol(selectedSender)}1 = {getCurrencySymbol(recipientCurrency)}{exchangeRate.toFixed(4)} ({selectedSender}→{recipientCurrency})
                     </p>
                   </div>
 
