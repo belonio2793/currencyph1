@@ -67,6 +67,13 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Redirect /community to /nearby
+    if (path === '/community') {
+      window.history.replaceState(null, '', '/nearby?view=community')
+      setActiveTab('nearby')
+      setShowAuth(false)
+    }
+
     // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
