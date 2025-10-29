@@ -64,8 +64,9 @@ export const wisegcashAPI = {
     const searchTerm = query.toLowerCase().trim()
     const { data, error } = await supabase
       .from('users')
-      .select('id, email, full_name, phone_number, profile_picture_url, status, created_at')
-      .or(`email.ilike.%${searchTerm}%,full_name.ilike.%${searchTerm}%`)
+      .select('id, email, full_name, phone_number, profile_picture_url, status, created_at, country_code')
+      .or(`email.ilike.%${searchTerm}%,full_name.ilike.%${searchTerm}%,phone_number.ilike.%${searchTerm}%`)
+      .order('created_at', { ascending: false })
       .limit(10)
 
     if (error) throw error
