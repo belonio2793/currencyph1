@@ -227,10 +227,13 @@ Return only the JSON array of photo URLs, no other text.`
     try {
       const urls = JSON.parse(jsonMatch[0])
       if (Array.isArray(urls)) {
-        return urls
+        const cleaned = urls
           .filter(url => typeof url === 'string' && url.startsWith('https://'))
+          .map(u => u.split('?')[0].split('#')[0])
+          .filter(url => url.includes('dynamic-media-cdn.tripadvisor.com') || url.includes('media.tacdn.com'))
           .filter(url => !url.includes('placeholder') && !url.includes('logo'))
-          .slice(0, MAX_PHOTOS)
+        // Deduplicate and cap
+        return Array.from(new Set(cleaned)).slice(0, MAX_PHOTOS)
       }
     } catch (parseErr) {
       console.log(`    JSON parse error: ${parseErr.message}`)
