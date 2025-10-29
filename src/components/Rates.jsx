@@ -142,24 +142,29 @@ export default function Rates({ globalCurrency }) {
   }
 
   // Helper: fetch with retries and proper error handling
-  const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
+  const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500, timeoutMs = 8000) => {
     let lastErr
     for (let i = 0; i <= retries; i++) {
       try {
         const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
 
         try {
           const resp = await fetch(url, { ...options, signal: controller.signal })
           clearTimeout(timeoutId)
 
           if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-          return await resp.json()
+          const contentType = resp.headers.get('content-type') || ''
+          if (contentType.includes('application/json')) {
+            return await resp.json()
+          }
+          return await resp.text()
         } finally {
           clearTimeout(timeoutId)
         }
       } catch (err) {
         lastErr = err
+        console.debug(`fetchWithRetries attempt ${i + 1} failed for ${url}:`, err?.message || err)
         if (i < retries) {
           await new Promise(r => setTimeout(r, backoff * (i + 1)))
         }
