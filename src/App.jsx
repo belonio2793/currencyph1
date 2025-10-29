@@ -38,8 +38,9 @@ export default function App() {
     })
 
     // Start background sync for TripAdvisor listings only when explicitly enabled
-    // Set ENABLE_BACKGROUND_SYNC=true in env to enable (disabled by default during local dev)
-    if (process.env.ENABLE_BACKGROUND_SYNC === 'true') {
+    // Set ENABLE_BACKGROUND_SYNC (Vite: VITE_ENABLE_BACKGROUND_SYNC=true) to enable background sync
+    const enableBackgroundSync = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ENABLE_BACKGROUND_SYNC === 'true') || (typeof process !== 'undefined' && process.env && process.env.ENABLE_BACKGROUND_SYNC === 'true')
+    if (enableBackgroundSync) {
       backgroundSync.start(24) // Sync every 24 hours
     }
 
