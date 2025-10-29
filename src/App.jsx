@@ -174,9 +174,6 @@ export default function App() {
                 {/* Row 1: Logo and HeaderMap */}
                 <div className="py-4 flex items-center justify-between">
                   <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
-                  <div className="hidden md:block">
-                    <HeaderMap />
-                  </div>
                 </div>
                 <div className="md:hidden w-full pb-4">
                   <HeaderMap />
