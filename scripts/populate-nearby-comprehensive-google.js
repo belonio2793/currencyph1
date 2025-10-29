@@ -344,6 +344,18 @@ async function processCity(city, category) {
   return added;
 }
 
+async function cityHasListings(city) {
+  try {
+    const { count } = await supabase
+      .from('nearby_listings')
+      .select('id', { count: 'exact', head: true })
+      .eq('city', city);
+    return (count || 0) > 0;
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
   console.log('\n' + '='.repeat(80));
   console.log('🚀 COMPREHENSIVE POPULATE NEARBY_LISTINGS VIA GOOGLE CUSTOM SEARCH');
