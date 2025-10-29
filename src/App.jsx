@@ -175,10 +175,6 @@ export default function App() {
                 <div className="py-4 flex items-center justify-between">
                   <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
                 </div>
-                <div className="md:hidden w-full pb-4">
-                  <HeaderMap />
-                </div>
-
                 {/* Row 2: Currency selector and Navigation */}
                 <div className="border-t border-slate-100 py-3 flex flex-wrap items-center gap-3">
                   <div className="flex items-center gap-2">
