@@ -707,9 +707,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           </div>
         )}
 
-        {/* Balance Summary Dashboard - First Section */}
-        <BalancesSummaryDashboard userId={userId} />
-
         {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
           {/* Total Balance */}
