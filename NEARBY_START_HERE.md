@@ -245,7 +245,7 @@ After running, you should see:
 - ✅ Listings show photos
 - ✅ Listings show ratings & reviews
 - ✅ Listings show hours & amenities
-- ✅ Database has 7,000+ records
+- ✅ Database has 30,000+ records
 
 ---
 
