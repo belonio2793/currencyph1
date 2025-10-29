@@ -7,7 +7,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   const navButtons = [
     { id: 'home', label: 'Home' },
     { id: 'nearby', label: 'Nearby' },
-    { id: 'community', label: 'Community' },
     { id: 'wallet', label: 'Wallets' },
     { id: 'send', label: 'Send' },
     { id: 'bills', label: 'Bills' },
