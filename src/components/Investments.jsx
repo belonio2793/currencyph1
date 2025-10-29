@@ -194,7 +194,7 @@ export default function Investments({ userId }) {
           const funded = fundedMap[p.id] || 0
           const pct = p.total_cost > 0 ? ((funded / Number(p.total_cost)) * 100).toFixed(2) : '0.00'
           return (
-            <div key={p.id} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-shadow">
+            <div key={p.id} onClick={() => openProjectDetail(p)} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <h3 className="text-lg font-medium text-slate-900 mb-2">{p.name}</h3>
               <p className="text-sm text-slate-600 mb-3">{p.description}</p>
               <div className="text-sm text-slate-700 space-y-1 mb-4">
