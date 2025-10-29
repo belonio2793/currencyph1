@@ -204,6 +204,93 @@ export default function Investments({ userId }) {
         })}
       </div>
 
+      {/* Project Detail Modal */}
+      {showDetail && selectedProject && (
+        <div className="fixed inset-0 bg-black/40 flex items-start md:items-center justify-center z-50 p-6 overflow-auto">
+          <div className="w-full max-w-4xl bg-white rounded-xl p-6 shadow-lg">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-2xl font-semibold text-slate-900">{selectedProject.name}</h3>
+                <p className="text-sm text-slate-600 mt-1">{selectedProject.description}</p>
+              </div>
+              <div>
+                <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">Close</button>
+              </div>
+            </div>
+
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="md:col-span-2">
+                <div className="bg-slate-50 p-4 rounded-lg">
+                  <div className="flex justify-between mb-2">
+                    <div className="text-sm text-slate-600">Total Cost</div>
+                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(selectedProject.total_cost || 0).toLocaleString()}</div>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <div className="text-sm text-slate-600">Funded</div>
+                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(fundedMap[selectedProject.id] || 0).toLocaleString()}</div>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <div className="text-sm text-slate-600">Remaining</div>
+                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0)).toLocaleString()}</div>
+                  </div>
+
+                  <div className="mt-4">
+                    <div className="text-xs uppercase text-slate-500 mb-2">Funding Progress</div>
+                    <div className="w-full bg-slate-200 rounded-full h-3">
+                      <div className="bg-emerald-600 h-3 rounded-full" style={{ width: `${selectedProject.total_cost > 0 ? ((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost) * 100) : 0}%` }} />
+                    </div>
+                    <div className="text-xs text-slate-600 mt-2">{selectedProject.total_cost > 0 ? (((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost)) * 100).toFixed(2) : '0.00'}%</div>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-sm font-medium text-slate-900 mb-2">Contribution Distribution</h4>
+                    {projectContributions.length === 0 ? (
+                      <p className="text-sm text-slate-500">No contributions yet</p>
+                    ) : (
+                      <div className="space-y-2 text-sm">
+                        {projectContributions.map(c => {
+                          const pct = (c.total / (fundedMap[selectedProject.id] || 1)) * 100
+                          return (
+                            <div key={c.user_id} className="flex justify-between items-center">
+                              <div>
+                                <div className="font-medium">{c.full_name}</div>
+                                <div className="text-xs text-slate-500">{c.email}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(c.total).toLocaleString()}</div>
+                                <div className="text-xs text-slate-500">{pct.toFixed(2)}%</div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="bg-white border border-slate-100 rounded-lg p-4">
+                  <div className="mb-4">
+                    <div className="text-sm text-slate-600">Status</div>
+                    <div className="font-medium">{selectedProject.status || 'funding'}</div>
+                  </div>
+                  <div className="mb-4">
+                    <div className="text-sm text-slate-600">Min Investment</div>
+                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{selectedProject.min_investment || 0}</div>
+                  </div>
+
+                  <div>
+                    <button onClick={(e) => { e.stopPropagation(); openInvestModal(selectedProject) }} className="w-full bg-blue-600 text-white py-2 rounded-lg">Invest in this project</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* Invest Modal - simple inline panel */}
       {selectedProject && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
