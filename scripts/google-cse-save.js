@@ -136,6 +136,22 @@ async function processBatch(offset, limit) {
     }
 
     if (found.length === 0) {
+      console.log('  ✗ No images from CSE — trying Grok fallback')
+      // Grok fallback: fetch page HTML via curl and ask Grok to extract tripadvisor CDN URLs
+      try {
+        const grokUrls = await grokExtractFromPage(listing.web_url, listing.name)
+        if (grokUrls && grokUrls.length > 0) {
+          found = grokUrls
+          console.log(`  ✓ Grok found ${found.length} images`)
+        } else {
+          console.log('  ✗ Grok found no images')
+        }
+      } catch (err) {
+        console.log('  ✗ Grok error:', String(err).substring(0,200))
+      }
+    }
+
+    if (found.length === 0) {
       console.log('  ✗ No images found')
       results.push({ id: listing.id, status: 'no-images' })
       continue
