@@ -58,6 +58,20 @@ export const wisegcashAPI = {
     return data
   },
 
+  async searchUsers(query) {
+    if (!query || query.trim().length < 2) return []
+
+    const searchTerm = query.toLowerCase().trim()
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, email, full_name, phone_number, profile_picture_url, status, created_at')
+      .or(`email.ilike.%${searchTerm}%,full_name.ilike.%${searchTerm}%`)
+      .limit(10)
+
+    if (error) throw error
+    return data || []
+  },
+
   // ============ Wallet Management ============
   async createWallet(userId, currencyCode) {
     const { data, error } = await supabase
