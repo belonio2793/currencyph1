@@ -745,8 +745,8 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
             <p className="text-blue-100 mb-4">Select a letter to see all cities starting with that letter</p>
 
             {/* Prominent A-Z Alphabet Selector */}
-            <div className="bg-transparent rounded-xl p-2 max-w-4xl mx-auto">
-              <div className="flex flex-wrap gap-2 justify-center">
+            <div className="bg-transparent rounded-xl p-2 w-full">
+              <div className="flex flex-nowrap gap-1 justify-center overflow-x-auto">
                 {/* All Button */}
                 <button
                   onClick={() => {
