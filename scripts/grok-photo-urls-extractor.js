@@ -249,7 +249,7 @@ Return only the JSON array of photo URLs, no other text.`
 
 // Process a single listing
 async function processListing(listing) {
-  if (!listing.web_url) {
+  if (!listing.web_url || listing.web_url === 'https://www.tripadvisor.com/') {
     return { id: listing.id, status: 'no-url' }
   }
 
