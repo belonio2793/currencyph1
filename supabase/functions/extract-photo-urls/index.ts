@@ -143,10 +143,13 @@ Return only the JSON array of photo URLs, no other text.`
 
     const urls = JSON.parse(jsonMatch[0]) as string[]
     return Array.isArray(urls)
-      ? urls
-          .filter(url => typeof url === 'string' && url.startsWith('https://'))
-          .filter(url => !url.includes('placeholder') && !url.includes('logo'))
-          .slice(0, MAX_PHOTOS)
+      ? Array.from(new Set(
+          urls
+            .filter(url => typeof url === 'string' && url.startsWith('https://'))
+            .map(u => u.split('?')[0].split('#')[0])
+            .filter(url => url.includes('dynamic-media-cdn.tripadvisor.com') || url.includes('media.tacdn.com'))
+            .filter(url => !url.includes('placeholder') && !url.includes('logo'))
+        )).slice(0, MAX_PHOTOS)
       : []
   } catch (error) {
     console.error('Grok error:', error)
