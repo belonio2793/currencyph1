@@ -18,7 +18,15 @@ import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
 import { exec } from 'child_process'
 import { promisify } from 'util'
+import fs from 'fs'
 const execAsync = promisify(exec)
+const LOG_PATH = 'scripts/logs/google-cse-save.log'
+
+function log(msg) {
+  const line = `[${(new Date()).toISOString()}] ${msg}\n`
+  try { fs.appendFileSync(LOG_PATH, line) } catch(e) { /* ignore */ }
+  console.log(msg)
+}
 
 const GROK_KEY = process.env.X_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY
 if (!GROK_KEY) {
