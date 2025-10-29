@@ -4,12 +4,18 @@ import HeaderMap from './HeaderMap'
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  const navButtons = [
+  const mainNav = [
     { id: 'home', label: 'Home' },
     { id: 'nearby', label: 'Nearby' },
     { id: 'wallet', label: 'Wallets' },
-    { id: 'send', label: 'Send' },
-    { id: 'investments', label: 'Investment Opportunities' },
+    { id: 'send', label: 'Send' }
+  ]
+
+  const secondaryNav = [
+    { id: 'investments', label: 'Manage Investments' }
+  ]
+
+  const rightNav = [
     { id: 'bills', label: 'Bills' },
     { id: 'transactions', label: 'History' },
     { id: 'profile', label: 'Profile' }
