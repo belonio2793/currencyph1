@@ -326,6 +326,19 @@ async function enrichListing(listing) {
     updated_at: new Date().toISOString()
   };
 
+  if (!listing.tripadvisor_id && listing.web_url) {
+    const tid = extractTripadvisorIdFromUrl(listing.web_url);
+    if (tid) {
+      updateData.tripadvisor_id = String(tid);
+    }
+  }
+
+  if ((!listing.slug || listing.slug.length === 0) && listing.name) {
+    const basisId = updateData.tripadvisor_id || listing.tripadvisor_id || '';
+    const slug = generateSlug(listing.name, basisId);
+    if (slug) updateData.slug = slug;
+  }
+
   const photoUrls = extractPhotoUrls(html);
   if (photoUrls.length > 0) {
     updateData.photo_urls = photoUrls;
