@@ -430,8 +430,9 @@ async function enrichListing(listing) {
 async function fetchListingsToEnrich(limit = 50) {
   const { data, error } = await supabase
     .from('nearby_listings')
-    .select('id, name, city, web_url, rating, review_count, photo_urls, amenities')
-    .eq('source', 'google_custom_search')
+    .select('id, name, city, web_url, rating, review_count, photo_urls, amenities, tripadvisor_id, slug, address, website')
+    .not('web_url', 'is', null)
+    .or('photo_urls.is.null,rating.is.null,review_count.is.null,address.is.null,website.is.null,tripadvisor_id.is.null,slug.is.null')
     .order('created_at', { ascending: false })
     .limit(limit);
 
