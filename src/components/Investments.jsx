@@ -319,7 +319,7 @@ export default function Investments({ userId }) {
 
               <div className="flex gap-3">
                 <button type="submit" className="flex-1 bg-emerald-600 text-white py-2 rounded-lg">Confirm Invest</button>
-                <button type="button" onClick={() => setSelectedProject(null)} className="px-4 py-2 border rounded-lg">Cancel</button>
+                <button type="button" onClick={() => setShowInvestModal(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
               </div>
             </form>
           </div>
