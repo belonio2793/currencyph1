@@ -4,6 +4,7 @@ import { currencyAPI } from '../lib/currencyAPI'
 import { supabase } from '../lib/supabaseClient'
 import Rates from './Rates'
 import BalancesSection from './BalancesSection'
+import BalancesSummaryDashboard from './BalancesSummaryDashboard'
 
 // Searchable Select Component
 function SearchableSelect({ value, onChange, options, placeholder, label }) {
