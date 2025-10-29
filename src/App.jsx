@@ -239,16 +239,6 @@ export default function App() {
                   >
                     Nearby
                   </button>
-                  <button
-                    onClick={() => {
-                      setActiveTab('nearby')
-                      setShowAuth(false)
-                      window.history.replaceState(null, '', '/nearby?view=community')
-                    }}
-                    className="px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  >
-                    Community
-                  </button>
 
                   {/* Separator */}
                   <div className="w-px h-6 bg-slate-200 mx-1"></div>
