@@ -685,15 +685,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       {/* Main Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
-        {/* Welcome Message */}
-        <div className="mb-12 text-center">
-          <h1 className="text-5xl font-light text-slate-900 mb-3 tracking-tight">
-            Welcome to currency.ph
-          </h1>
-          <p className="text-slate-600 text-lg">
-            Add funds with real-time currency conversion
-          </p>
-        </div>
 
         {/* Error & Success Messages */}
         {error && (
