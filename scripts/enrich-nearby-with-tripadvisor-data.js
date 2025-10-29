@@ -264,10 +264,8 @@ function generateSlug(name, id) {
 
 async function fetchViaScrapingBee(url) {
   try {
-    const beeKey = getNextBeeKey();
-    const beeUrl = `https://app.scrapingbee.com/api/v1/?api_key=${beeKey}&url=${encodeURIComponent(url)}&render_javascript=false&premium_proxy=true`;
-
-    const response = await fetch(beeUrl, {
+    // Direct fetch of TripAdvisor page (no ScrapingBee).
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -276,7 +274,7 @@ async function fetchViaScrapingBee(url) {
     });
 
     if (!response.ok) {
-      console.log(`    ⚠️  ScrapingBee ${response.status}`);
+      console.log(`    ⚠️  Fetch ${response.status}`);
       return null;
     }
 
