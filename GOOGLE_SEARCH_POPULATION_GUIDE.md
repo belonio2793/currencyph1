@@ -129,12 +129,18 @@ Configuration:
 - Check that TripAdvisor.com.ph domain is included in your Custom Search configuration
 - Verify search terms by testing in browser manually
 
-## Stage 2: Run Enrichment Script
+## Stage 2: Run Comprehensive Enrichment Script
 
 ### Command
 
 ```bash
-node scripts/enrich-listings-from-tripadvisor-pages.js
+npm run enrich-comprehensive
+```
+
+Or directly:
+
+```bash
+node scripts/enrich-listings-comprehensive.js
 ```
 
 ### What It Does
