@@ -70,6 +70,9 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [expandedLetter, setExpandedLetter] = useState(null)
   const [cities, setCities] = useState([])
   const [citiesByLetter, setCitiesByLetter] = useState({})
+  const [autocompleteSuggestions, setAutocompleteSuggestions] = useState([])
+  const [showAutocomplete, setShowAutocomplete] = useState(false)
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1)
 
   // Per-category pagination and data for selected city
   const [categoryPages, setCategoryPages] = useState({ restaurants: 1, attractions: 1, hotels: 1 })
