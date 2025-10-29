@@ -746,7 +746,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
             {/* Prominent A-Z Alphabet Selector */}
             <div className="bg-transparent rounded-xl p-2 w-full">
-              <div className="flex flex-nowrap gap-1 justify-center overflow-x-auto">
+              <div className="flex flex-nowrap gap-0 justify-between overflow-x-auto">
                 {/* All Button */}
                 <button
                   onClick={() => {
@@ -754,7 +754,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                     setExpandedLetter(null)
                     setPage(1)
                   }}
-                  className={`px-2 py-1 rounded-md font-bold text-xs transition-all duration-200 whitespace-nowrap ${
+                  className={`flex-1 py-2 rounded-md font-bold text-sm transition-all duration-200 whitespace-nowrap ${
                     expandedLetter === null && selectedCity === null
                       ? 'bg-white/20 text-white shadow-lg'
                       : 'bg-white/5 text-white hover:bg-white/10'
@@ -776,10 +776,10 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                         setPage(1)
                         setLetterCategoryPages({ restaurants: 1, attractions: 1, hotels: 1 })
                       }}
-                      className={`w-7 h-7 rounded-md font-bold text-xs transition-all duration-200 flex items-center justify-center ${
+                      className={`flex-1 py-2 rounded-md font-bold text-base transition-all duration-200 flex items-center justify-center ${
                         expandedLetter === letter
-                          ? 'bg-white/25 text-white shadow-lg scale-110'
-                          : 'bg-white/5 text-white hover:bg-white/10 hover:scale-105'
+                          ? 'bg-white/25 text-white shadow-lg'
+                          : 'bg-white/5 text-white hover:bg-white/10'
                       } ${!hasCities ? 'opacity-60' : ''}`}
                       title={`Cities starting with ${letter}`}
                     >
