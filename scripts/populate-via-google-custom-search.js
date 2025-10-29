@@ -183,33 +183,45 @@ async function googleCustomSearch(query) {
   }
 }
 
+async function checkIfListingExists(tripadvisor_id) {
+  try {
+    const { data } = await supabase
+      .from('nearby_listings')
+      .select('id, tripadvisor_id')
+      .eq('tripadvisor_id', tripadvisor_id)
+      .single();
+
+    return data !== null;
+  } catch (error) {
+    return false;
+  }
+}
+
 async function upsertListing(listing) {
   try {
+    // Check if already exists
+    const exists = await checkIfListingExists(listing.tripadvisor_id);
+    if (exists) {
+      stats.skipped++;
+      return false;
+    }
+
     const { data, error } = await supabase
       .from('nearby_listings')
-      .upsert(
-        {
-          ...listing,
-          updated_at: new Date().toISOString()
-        },
-        { onConflict: 'tripadvisor_id' }
-      )
+      .insert({
+        ...listing,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
       .select();
 
     if (error) {
-      console.warn(`    ✗ Upsert failed: ${error.message}`);
+      console.warn(`    ✗ Insert failed: ${error.message}`);
       stats.failed++;
       return false;
     }
 
-    if (data && data.length > 0) {
-      const isNew = data[0].created_at === data[0].updated_at;
-      if (isNew) {
-        stats.created++;
-      } else {
-        stats.updated++;
-      }
-    }
+    stats.created++;
     return true;
   } catch (error) {
     console.warn(`    ✗ Error: ${error.message}`);
