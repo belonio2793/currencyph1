@@ -3,15 +3,14 @@ import { supabase } from '../lib/supabaseClient'
 
 export default function BalancesSummaryDashboard({ userId }) {
   const [recentBalances, setRecentBalances] = useState([])
+  const [allBalances, setAllBalances] = useState([])
   const [stats, setStats] = useState({
     totalTransactions: 0,
-    largestBalance: 0,
-    averageAmount: 0,
-    currencyBreakdown: {}
+    largestBalance: 0
   })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [filter, setFilter] = useState('all')
+  const [activeTab, setActiveTab] = useState('transactions')
 
   useEffect(() => {
     fetchBalancesData()
@@ -36,7 +35,7 @@ export default function BalancesSummaryDashboard({ userId }) {
     try {
       const { data, error: fetchError } = await supabase
         .from('balances')
-        .select('id, user_id, transaction_type, amount, currency, new_balance, created_at, description, visibility')
+        .select('id, user_id, transaction_type, amount, currency, new_balance, created_at, description')
         .order('created_at', { ascending: false })
         .limit(100)
 
@@ -44,27 +43,29 @@ export default function BalancesSummaryDashboard({ userId }) {
 
       setRecentBalances(data || [])
 
+      // Get unique balances sorted by new_balance descending
+      const balanceMap = new Map()
+      ;(data || []).forEach(b => {
+        const key = `${b.user_id}-${b.currency}`
+        const existing = balanceMap.get(key)
+        if (!existing || parseFloat(b.new_balance) > parseFloat(existing.new_balance)) {
+          balanceMap.set(key, b)
+        }
+      })
+      
+      const sorted = Array.from(balanceMap.values())
+        .sort((a, b) => parseFloat(b.new_balance || 0) - parseFloat(a.new_balance || 0))
+      
+      setAllBalances(sorted)
+
       // Calculate stats
       if (data && data.length > 0) {
         const totalTxns = data.length
         const largest = Math.max(...data.map(b => parseFloat(b.new_balance || 0)))
-        const avgAmount = (data.reduce((sum, b) => sum + parseFloat(b.amount || 0), 0) / totalTxns).toFixed(2)
-        
-        // Group by currency
-        const currencyMap = {}
-        data.forEach(b => {
-          if (!currencyMap[b.currency]) {
-            currencyMap[b.currency] = { count: 0, total: 0 }
-          }
-          currencyMap[b.currency].count++
-          currencyMap[b.currency].total += parseFloat(b.amount || 0)
-        })
 
         setStats({
           totalTransactions: totalTxns,
-          largestBalance: largest,
-          averageAmount: avgAmount,
-          currencyBreakdown: currencyMap
+          largestBalance: largest
         })
       }
     } catch (err) {
@@ -80,34 +81,10 @@ export default function BalancesSummaryDashboard({ userId }) {
     return 'text-emerald-600'
   }
 
-  const getTransactionIcon = (type) => {
-    if (type && type.includes('sent')) return '↗'
-    if (type === 'bill_payment') return '✕'
-    return '↙'
-  }
-
-  const getFilteredTransactions = () => {
-    if (filter === 'all') return recentBalances.slice(0, 6)
-    if (filter === 'incoming') return recentBalances.filter(b => !b.transaction_type?.includes('sent') && b.transaction_type !== 'bill_payment').slice(0, 6)
-    if (filter === 'outgoing') return recentBalances.filter(b => b.transaction_type?.includes('sent') || b.transaction_type === 'bill_payment').slice(0, 6)
-    return recentBalances.slice(0, 6)
-  }
-
   const formatDate = (dateStr) => {
     try {
       const date = new Date(dateStr)
-      const now = new Date()
-      const diffMs = now - date
-      const diffMins = Math.floor(diffMs / 60000)
-      const diffHours = Math.floor(diffMs / 3600000)
-      const diffDays = Math.floor(diffMs / 86400000)
-
-      if (diffMins < 1) return 'Just now'
-      if (diffMins < 60) return `${diffMins}m ago`
-      if (diffHours < 24) return `${diffHours}h ago`
-      if (diffDays < 7) return `${diffDays}d ago`
-      
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
     } catch (e) {
       return dateStr
     }
@@ -115,172 +92,128 @@ export default function BalancesSummaryDashboard({ userId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200 mb-8 animate-pulse">
-        <div className="h-8 bg-slate-200 rounded w-1/4 mb-6"></div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          {[1, 2, 3, 4].map(i => (
-            <div key={i} className="h-24 bg-slate-100 rounded-lg"></div>
-          ))}
-        </div>
-        <div className="space-y-3">
-          {[1, 2, 3].map(i => (
-            <div key={i} className="h-16 bg-slate-100 rounded-lg"></div>
-          ))}
-        </div>
+      <div className="bg-white rounded-lg border border-slate-200 mb-8 p-6 animate-pulse">
+        <div className="h-6 bg-slate-200 rounded w-1/4 mb-6"></div>
+        <div className="h-40 bg-slate-100 rounded"></div>
       </div>
     )
   }
 
-  const filteredTransactions = getFilteredTransactions()
-
   return (
-    <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
+    <div className="bg-white rounded-lg border border-slate-200 mb-8 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 to-slate-700 px-8 py-8 text-white">
-        <h2 className="text-3xl font-light tracking-tight mb-2">Balance Overview</h2>
-        <p className="text-slate-300 text-sm">Real-time transaction summary and activity</p>
+      <div className="border-b border-slate-200 px-6 py-4">
+        <h2 className="text-lg font-semibold text-slate-900">Balance Data</h2>
       </div>
 
-      <div className="p-8">
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
-            {error}
-          </div>
-        )}
+      {error && (
+        <div className="px-6 py-4 bg-red-50 border-b border-red-200 text-red-700 text-sm">
+          {error}
+        </div>
+      )}
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-          {/* Total Transactions */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-blue-700 text-sm font-medium uppercase tracking-wider">Total Transactions</p>
-              <span className="text-2xl">📊</span>
-            </div>
-            <p className="text-3xl font-light text-blue-900">{stats.totalTransactions}</p>
-            <p className="text-xs text-blue-600 mt-2">All-time records</p>
-          </div>
+      {/* Tabs */}
+      <div className="border-b border-slate-200 px-6 flex gap-6">
+        <button
+          onClick={() => setActiveTab('transactions')}
+          className={`py-3 px-1 font-medium text-sm border-b-2 transition-colors ${
+            activeTab === 'transactions'
+              ? 'text-slate-900 border-slate-900'
+              : 'text-slate-600 border-transparent hover:text-slate-900'
+          }`}
+        >
+          Recent Transactions
+        </button>
+        <button
+          onClick={() => setActiveTab('balances')}
+          className={`py-3 px-1 font-medium text-sm border-b-2 transition-colors ${
+            activeTab === 'balances'
+              ? 'text-slate-900 border-slate-900'
+              : 'text-slate-600 border-transparent hover:text-slate-900'
+          }`}
+        >
+          Balances
+        </button>
+      </div>
 
-          {/* Largest Balance */}
-          <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-xl p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-emerald-700 text-sm font-medium uppercase tracking-wider">Largest Balance</p>
-              <span className="text-2xl">💰</span>
-            </div>
-            <p className="text-3xl font-light text-emerald-900">{stats.largestBalance.toFixed(2)}</p>
-            <p className="text-xs text-emerald-600 mt-2">Peak balance</p>
+      <div className="p-6">
+        {/* Stats Summary */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <div className="border border-slate-200 rounded p-4">
+            <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Total Transactions</p>
+            <p className="text-2xl font-semibold text-slate-900">{stats.totalTransactions}</p>
           </div>
-
-          {/* Average Amount */}
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-xl p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-orange-700 text-sm font-medium uppercase tracking-wider">Avg Transaction</p>
-              <span className="text-2xl">📈</span>
-            </div>
-            <p className="text-3xl font-light text-orange-900">{stats.averageAmount}</p>
-            <p className="text-xs text-orange-600 mt-2">Per transaction</p>
-          </div>
-
-          {/* Active Currencies */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-purple-700 text-sm font-medium uppercase tracking-wider">Currencies</p>
-              <span className="text-2xl">🌍</span>
-            </div>
-            <p className="text-3xl font-light text-purple-900">{Object.keys(stats.currencyBreakdown).length}</p>
-            <p className="text-xs text-purple-600 mt-2">In use</p>
+          <div className="border border-slate-200 rounded p-4">
+            <p className="text-xs text-slate-600 uppercase tracking-wide mb-1">Largest Balance</p>
+            <p className="text-2xl font-semibold text-slate-900">{stats.largestBalance.toFixed(2)}</p>
           </div>
         </div>
 
-        {/* Currency Breakdown */}
-        {Object.keys(stats.currencyBreakdown).length > 0 && (
-          <div className="bg-slate-50 rounded-xl p-6 mb-8 border border-slate-200">
-            <h3 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Currency Breakdown</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-              {Object.entries(stats.currencyBreakdown).map(([currency, data]) => (
-                <div key={currency} className="bg-white rounded-lg p-4 border border-slate-100 hover:border-slate-300 transition-colors">
-                  <p className="text-slate-600 text-xs font-medium mb-1">{currency}</p>
-                  <p className="text-lg font-light text-slate-900">{data.count}</p>
-                  <p className="text-xs text-slate-500 mt-1">Total: {data.total.toFixed(2)}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Recent Activity Section */}
-        <div>
-          <div className="mb-6">
-            <h3 className="text-lg font-light text-slate-900 mb-4 tracking-tight">Recent Activity</h3>
-            
-            {/* Filter Tabs */}
-            <div className="flex gap-2 mb-6">
-              {['all', 'incoming', 'outgoing'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setFilter(tab)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    filter === tab
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                  }`}
-                >
-                  {tab === 'all' && 'All'}
-                  {tab === 'incoming' && '↙ Incoming'}
-                  {tab === 'outgoing' && '↗ Outgoing'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Transaction Cards */}
-          <div className="space-y-3">
-            {filteredTransactions.length > 0 ? (
-              filteredTransactions.map((txn) => (
-                <div
-                  key={txn.id}
-                  className="bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl p-4 transition-colors"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className={`text-2xl ${getTransactionColor(txn.transaction_type)} mt-1`}>
-                        {getTransactionIcon(txn.transaction_type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-slate-900 text-sm">{txn.description || txn.transaction_type || 'Transaction'}</p>
-                        <p className="text-xs text-slate-500 mt-1">{formatDate(txn.created_at)}</p>
-                      </div>
-                    </div>
-                    <div className="text-right ml-4">
-                      <p className={`font-light text-sm ${getTransactionColor(txn.transaction_type)}`}>
-                        {(txn.transaction_type?.includes('sent') || txn.transaction_type === 'bill_payment') ? '-' : '+'}
-                        {parseFloat(txn.amount).toFixed(2)}
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">{txn.currency}</p>
-                    </div>
-                  </div>
-                  {txn.new_balance !== null && (
-                    <div className="mt-3 pt-3 border-t border-slate-200">
-                      <p className="text-xs text-slate-600">Balance after: <span className="font-medium text-slate-900">{parseFloat(txn.new_balance).toFixed(2)} {txn.currency}</span></p>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-12 text-slate-500">
-                <p className="text-sm">No transactions found</p>
+        {/* Content */}
+        {activeTab === 'transactions' && (
+          <div>
+            {recentBalances.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-2 font-semibold text-slate-900">Date</th>
+                      <th className="text-left py-3 px-2 font-semibold text-slate-900">Type</th>
+                      <th className="text-left py-3 px-2 font-semibold text-slate-900">Description</th>
+                      <th className="text-right py-3 px-2 font-semibold text-slate-900">Amount</th>
+                      <th className="text-right py-3 px-2 font-semibold text-slate-900">Currency</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentBalances.slice(0, 20).map((txn, idx) => (
+                      <tr key={txn.id} className={idx % 2 === 0 ? 'bg-slate-50' : ''}>
+                        <td className="py-3 px-2 text-slate-700">{formatDate(txn.created_at)}</td>
+                        <td className="py-3 px-2 text-slate-700">{txn.transaction_type || '-'}</td>
+                        <td className="py-3 px-2 text-slate-700">{txn.description || '-'}</td>
+                        <td className={`py-3 px-2 text-right font-medium ${getTransactionColor(txn.transaction_type)}`}>
+                          {(txn.transaction_type?.includes('sent') || txn.transaction_type === 'bill_payment') ? '-' : '+'}
+                          {parseFloat(txn.amount).toFixed(2)}
+                        </td>
+                        <td className="py-3 px-2 text-right text-slate-700">{txn.currency}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
+            ) : (
+              <p className="text-center py-8 text-slate-500">No transactions found</p>
             )}
           </div>
+        )}
 
-          {/* View More Link */}
-          {recentBalances.length > 6 && (
-            <div className="mt-6 text-center">
-              <p className="text-sm text-slate-600">
-                Showing 6 of {recentBalances.length} transactions
-              </p>
-            </div>
-          )}
-        </div>
+        {activeTab === 'balances' && (
+          <div>
+            {allBalances.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="text-left py-3 px-2 font-semibold text-slate-900">User ID</th>
+                      <th className="text-right py-3 px-2 font-semibold text-slate-900">Balance</th>
+                      <th className="text-right py-3 px-2 font-semibold text-slate-900">Currency</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allBalances.map((balance, idx) => (
+                      <tr key={`${balance.user_id}-${balance.currency}-${idx}`} className={idx % 2 === 0 ? 'bg-slate-50' : ''}>
+                        <td className="py-3 px-2 text-slate-700 font-mono text-xs">{balance.user_id.slice(0, 12)}</td>
+                        <td className="py-3 px-2 text-right font-semibold text-slate-900">{parseFloat(balance.new_balance).toFixed(2)}</td>
+                        <td className="py-3 px-2 text-right text-slate-700">{balance.currency}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <p className="text-center py-8 text-slate-500">No balances found</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
