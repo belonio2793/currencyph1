@@ -175,6 +175,18 @@ async function main() {
     console.log(`  ✅ Ready to enrich ${googleListings} new listings with data\n`);
   }
 
+  console.log('\n' + '='.repeat(80));
+  console.log('STEP 1.5: FILL MISSING TRIPADVISOR IDS');
+  console.log('='.repeat(80));
+  console.log('\nFilling missing tripadvisor_id using web_url/raw/Grok...');
+
+  const idFillOk = await runCommand('node', ['scripts/map-tripadvisor-ids-grok.js']);
+  if (!idFillOk) {
+    console.log('  ⚠️  ID mapping step encountered issues; continuing.');
+  } else {
+    console.log('  ✅ ID mapping step completed');
+  }
+
   console.log('='.repeat(80));
   console.log('STEP 2: DATA ENRICHMENT FROM TRIPADVISOR PAGES');
   console.log('='.repeat(80));
