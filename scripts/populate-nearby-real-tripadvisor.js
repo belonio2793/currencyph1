@@ -134,11 +134,8 @@ async function grokFindUrl(name, city, category) {
 
 async function fetchViaScrapingBee(url) {
   try {
-    const beeKey = getNextBeeKey();
-    const beeUrl = `https://app.scrapingbee.com/api/v1/?api_key=${beeKey}&url=${encodeURIComponent(url)}&render_javascript=true&wait_for=.attractions-review-list-parts-ReviewCount&premium_proxy=true`;
-
-    requestCount++;
-    const response = await fetch(beeUrl, {
+    // Direct fetch without ScrapingBee; relies on the TripAdvisor page HTML returned by a standard GET
+    const response = await fetch(url, {
       method: 'GET',
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
@@ -147,13 +144,13 @@ async function fetchViaScrapingBee(url) {
     });
 
     if (!response.ok) {
-      console.log(`  ⚠️  ScrapingBee ${response.status}`);
+      console.log(`  ⚠️  Fetch ${response.status}`);
       return null;
     }
 
     return await response.text();
   } catch (error) {
-    console.log(`  ⚠️  ScrapingBee error: ${error.message?.substring(0, 60)}`);
+    console.log(`  ⚠️  Fetch error: ${error.message?.substring(0, 60)}`);
     return null;
   }
 }
