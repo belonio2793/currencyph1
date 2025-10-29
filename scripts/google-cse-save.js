@@ -52,28 +52,44 @@ function getNextKey() {
   return key
 }
 
-async function googleImageSearch(query, num=8) {
-  const keyToUse = getNextKey()
-  const params = new URLSearchParams({
-    key: keyToUse,
-    cx: CSE_CX,
-    searchType: 'image',
-    q: query,
-    num: String(num)
-  })
-  const url = `https://www.googleapis.com/customsearch/v1?${params}`
-  try {
-    const res = await fetch(url, { timeout: 20000 })
-    if (!res.ok) {
-      const txt = await res.text()
-      return { error: `HTTP ${res.status} ${txt.substring(0,200)}` }
+async function googleImageSearch(query, num=8, maxRetries=3) {
+  let attempt = 0
+  let lastErr = null
+  while (attempt < maxRetries) {
+    const keyToUse = getNextKey()
+    const params = new URLSearchParams({
+      key: keyToUse,
+      cx: CSE_CX,
+      searchType: 'image',
+      q: query,
+      num: String(num)
+    })
+    const url = `https://www.googleapis.com/customsearch/v1?${params}`
+    try {
+      const res = await fetch(url, { timeout: 20000 })
+      if (!res.ok) {
+        const txt = await res.text()
+        // If quota exceeded or rate limited, try next key after delay
+        if (res.status === 429) {
+          lastErr = `HTTP 429 ${txt.substring(0,200)}`
+          // small backoff
+          await new Promise(r => setTimeout(r, 1000 * (attempt + 1)))
+          attempt++
+          continue
+        }
+        return { error: `HTTP ${res.status} ${txt.substring(0,200)}` }
+      }
+      const json = await res.json()
+      const items = json.items || []
+      return { items }
+    } catch (err) {
+      lastErr = err.message
+      await new Promise(r => setTimeout(r, 500 * (attempt + 1)))
+      attempt++
+      continue
     }
-    const json = await res.json()
-    const items = json.items || []
-    return { items }
-  } catch (err) {
-    return { error: err.message }
   }
+  return { error: lastErr || 'Unknown error' }
 }
 
 function preferTripadvisorUrls(urls) {
