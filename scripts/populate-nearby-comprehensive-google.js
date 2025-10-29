@@ -21,16 +21,33 @@ if (!GOOGLE_CUSTOM_SEARCH_API || !CX) {
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const PHIL_CITIES = [
-  'Manila', 'Cebu City', 'Davao City', 'Quezon City', 'Makati',
-  'Caloocan', 'Las Piñas', 'Parañaque', 'Pasig', 'Taguig',
-  'Valenzuela', 'Malabon', 'Navotas', 'Muntinlupa', 'Pasay',
-  'Bacolod', 'Iloilo City', 'Cagayan de Oro', 'Zamboanga City', 'General Santos',
-  'Butuan', 'Dumaguete', 'Tacloban', 'Cabanatuan', 'Dagupan',
-  'Baguio', 'Boracay', 'Palawan', 'Siargao', 'El Nido',
-  'Coron', 'Calapan', 'Puerto Princesa', 'Lucena', 'Tagaytay',
-  'Antipolo', 'Cavite City', 'Imus', 'Kawit', 'Batangas City',
-  'Laoag', 'Vigan', 'Urdaneta', 'Pangasinan', 'Cabadbaran',
-  'Iligan', 'Marawi', 'Cotabato City', 'Kidapawan', 'Zamboanga'
+  'Abuyog', 'Alaminos', 'Alcala', 'Angeles', 'Antipolo', 'Aroroy', 'Bacolod',
+  'Bacoor', 'Bago', 'Bais', 'Balanga', 'Baliuag', 'Bangued', 'Bansalan',
+  'Bantayan', 'Bataan', 'Batac', 'Batangas City', 'Bayambang', 'Bayawan',
+  'Baybay', 'Bayugan', 'Biñan', 'Bislig', 'Bocaue', 'Bogo', 'Boracay',
+  'Borongan', 'Butuan', 'Cabadbaran', 'Cabanatuan', 'Cabuyao', 'Cadiz',
+  'Cagayan de Oro', 'Calamba', 'Calapan', 'Calbayog', 'Caloocan', 'Camiling',
+  'Canlaon', 'Caoayan', 'Capiz', 'Caraga', 'Carmona', 'Catbalogan', 'Cauayan',
+  'Cavite City', 'Cebu City', 'Cotabato City', 'Dagupan', 'Danao', 'Dapitan',
+  'Daraga', 'Dasmariñas', 'Davao City', 'Davao del Norte', 'Davao del Sur',
+  'Davao Oriental', 'Dipolog', 'Dumaguete', 'General Santos', 'General Trias',
+  'Gingoog', 'Guihulngan', 'Himamaylan', 'Ilagan', 'Iligan', 'Iloilo City',
+  'Imus', 'Isabela', 'Isulan', 'Kabankalan', 'Kidapawan', 'Koronadal',
+  'La Carlota', 'Laoag', 'Lapu-Lapu', 'Las Piñas', 'Laoang', 'Legazpi',
+  'Ligao', 'Limay', 'Lucena', 'Maasin', 'Mabalacat', 'Malabon', 'Malaybalay',
+  'Malolos', 'Mandaluyong', 'Mandaue', 'Manila', 'Marawi', 'Marilao',
+  'Masbate City', 'Mati', 'Meycauayan', 'Muntinlupa', 'Naga (Camarines Sur)',
+  'Navotas', 'Olongapo', 'Ormoc', 'Oroquieta', 'Ozamiz', 'Pagadian', 'Palo',
+  'Parañaque', 'Pasay', 'Pasig', 'Passi', 'Puerto Princesa', 'Quezon City',
+  'Roxas', 'Sagay', 'Samal', 'San Carlos (Negros Occidental)',
+  'San Carlos (Pangasinan)', 'San Fernando (La Union)', 'San Fernando (Pampanga)',
+  'San Jose (Antique)', 'San Jose del Monte', 'San Juan', 'San Pablo', 'San Pedro',
+  'Santiago', 'Silay', 'Sipalay', 'Sorsogon City', 'Surigao City', 'Tabaco',
+  'Tabuk', 'Tacurong', 'Tagaytay', 'Tagbilaran', 'Taguig', 'Tacloban',
+  'Talisay (Cebu)', 'Talisay (Negros Occidental)', 'Tanjay', 'Tarlac City',
+  'Tayabas', 'Toledo', 'Trece Martires', 'Tuguegarao', 'Urdaneta', 'Valencia',
+  'Valenzuela', 'Victorias', 'Vigan', 'Virac', 'Zamboanga City', 'Baguio',
+  'Bohol', 'Coron', 'El Nido', 'Makati', 'Palawan', 'Siargao'
 ];
 
 const CATEGORIES = ['restaurants', 'hotels', 'attractions'];
