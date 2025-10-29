@@ -833,14 +833,68 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
       {/* Search Section */}
       <div className="mb-8">
-        <form onSubmit={handleSearch} className="flex gap-2 mb-6">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search listings by name, address, or category..."
-            className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+        <form onSubmit={handleSearch} className="flex gap-2 mb-6 relative">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value)
+                handleAutocompleteFetch(e.target.value)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault()
+                  setSelectedSuggestionIndex(prev =>
+                    prev < autocompleteSuggestions.length - 1 ? prev + 1 : prev
+                  )
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault()
+                  setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1)
+                } else if (e.key === 'Enter') {
+                  if (selectedSuggestionIndex >= 0) {
+                    e.preventDefault()
+                    handleAutocompleteSelect(autocompleteSuggestions[selectedSuggestionIndex])
+                  }
+                } else if (e.key === 'Escape') {
+                  setShowAutocomplete(false)
+                }
+              }}
+              placeholder="Search listings by name, address, or category..."
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            {/* Autocomplete Dropdown */}
+            {showAutocomplete && autocompleteSuggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
+                {autocompleteSuggestions.map((suggestion, index) => (
+                  <div
+                    key={`${suggestion.id}-${index}`}
+                    onClick={() => handleAutocompleteSelect(suggestion)}
+                    className={`px-4 py-3 cursor-pointer transition-colors border-b border-slate-100 last:border-b-0 ${
+                      index === selectedSuggestionIndex
+                        ? 'bg-blue-50 border-l-4 border-l-blue-600'
+                        : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="font-semibold text-slate-900">{suggestion.name}</div>
+                    <div className="flex items-center gap-2 mt-1">
+                      {suggestion.city && (
+                        <span className="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
+                          📍 {suggestion.city}
+                        </span>
+                      )}
+                      {suggestion.category && (
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded">
+                          {suggestion.category}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
           <button
             type="submit"
             disabled={isSearching}
