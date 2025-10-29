@@ -184,6 +184,7 @@ export default function App() {
             {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
             {activeTab === 'wallet' && <Wallet userId={userId} />}
             {activeTab === 'send' && <SendMoney userId={userId} />}
+            {activeTab === 'investments' && <Investments userId={userId} />}
             {activeTab === 'bills' && <BillPayments userId={userId} />}
             {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
             {activeTab === 'profile' && <Profile userId={userId} />}
