@@ -670,36 +670,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       <GeoMarker />
       {/* Main Hero Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Map (uses geolocation when available) */}
-        <div className="mb-6">
-          {geo && (geo.lat || geo.lon) ? (
-            (() => {
-              const lat = geo.lat || 0
-              const lon = geo.lon || 0
-              const delta = 0.05
-              const bbox = `${(lon - delta).toFixed(6)},${(lat - delta).toFixed(6)},${(lon + delta).toFixed(6)},${(lat + delta).toFixed(6)}`
-              const src = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat.toFixed(6)}%2C${lon.toFixed(6)}`
-              return (
-                <div className="w-full mb-6 rounded-lg overflow-hidden border border-slate-200 shadow-sm">
-                  <iframe
-                    title="User location map"
-                    src={src}
-                    className="w-full h-64 sm:h-80 md:h-96"
-                    style={{ border: 0 }}
-                    loading="lazy"
-                  />
-                  <div className="p-3 bg-white text-xs text-slate-600 flex items-center justify-between">
-                    <div>
-                      <strong>{geo.city ? `${geo.city}${geo.region ? ', ' + geo.region : ''}` : geo.country || 'Unknown location'}</strong>
-                      <div className="text-xs text-slate-500">{geo.ip ? `IP: ${geo.ip}` : `${geo.lat ? geo.lat.toFixed(4) : '—'}, ${geo.lon ? geo.lon.toFixed(4) : '—'}`}</div>
-                    </div>
-                    <a href={`https://www.openstreetmap.org/?mlat=${geo.lat || 0}&mlon=${geo.lon || 0}#map=12/${geo.lat || 0}/${geo.lon || 0}`} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">Open in OSM</a>
-                  </div>
-                </div>
-              )
-            })()
-          ) : null}
-        </div>
 
         {/* Welcome Message */}
         <div className="mb-12 text-center">
