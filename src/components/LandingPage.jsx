@@ -914,6 +914,10 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
             </div>
           </div>
         )}
+
+        {/* Balances Section */}
+        <BalancesSection userId={userId} />
+
       </div>
 
       {/* Footer */}
