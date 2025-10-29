@@ -3,6 +3,7 @@ import { wisegcashAPI } from '../lib/wisegcashAPI'
 import { currencyAPI } from '../lib/currencyAPI'
 import { supabase } from '../lib/supabaseClient'
 import Rates from './Rates'
+import BalancesSection from './BalancesSection'
 
 // Searchable Select Component
 function SearchableSelect({ value, onChange, options, placeholder, label }) {
