@@ -58,6 +58,45 @@ export default function Investments({ userId }) {
     setSuccess('')
   }
 
+  async function loadProjectContributions(projectId) {
+    try {
+      const { data: invs, error } = await supabase
+        .from('investments')
+        .select('id, user_id, amount, status, investment_date, users(id, email, full_name)')
+        .eq('project_id', projectId)
+        .eq('status', 'confirmed')
+
+      if (error) throw error
+      const contributions = (invs || []).map(i => ({
+        id: i.id,
+        user_id: i.user_id,
+        amount: Number(i.amount || 0),
+        email: i.users?.email || null,
+        full_name: i.users?.full_name || null,
+        date: i.investment_date
+      }))
+
+      const byUser = {}
+      contributions.forEach(c => {
+        if (!byUser[c.user_id]) byUser[c.user_id] = { user_id: c.user_id, full_name: c.full_name || c.email || 'Anonymous', email: c.email, total: 0 }
+        byUser[c.user_id].total += c.amount
+      })
+      const arr = Object.values(byUser).sort((a, b) => b.total - a.total)
+      setProjectContributions(arr)
+    } catch (err) {
+      console.error('Failed loading contributions', err)
+      setProjectContributions([])
+    }
+  }
+
+  function openProjectDetail(project) {
+    setSelectedProject(project)
+    setShowDetail(true)
+    setError('')
+    setSuccess('')
+    loadProjectContributions(project.id)
+  }
+
   async function handleInvest(e) {
     e.preventDefault()
     setError('')
