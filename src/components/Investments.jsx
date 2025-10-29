@@ -214,7 +214,7 @@ export default function Investments({ userId }) {
 
       {/* Project Detail Modal */}
       {showDetail && selectedProject && (
-        <div className="fixed inset-0 bg-black/40 flex items-start md:items-center justify-center z-50 p-6 overflow-auto">
+        <div className="fixed inset-0 bg-black/40 flex items-start md:items-center justify-center z-40 p-6 overflow-auto">
           <div className="w-full max-w-4xl bg-white rounded-xl p-6 shadow-lg">
             <div className="flex items-start justify-between">
               <div>
