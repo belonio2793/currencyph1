@@ -279,6 +279,63 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
+  async function handleAutocompleteFetch(query) {
+    if (!query.trim()) {
+      setAutocompleteSuggestions([])
+      setShowAutocomplete(false)
+      return
+    }
+
+    try {
+      const { data, error: searchError } = await supabase
+        .from('nearby_listings')
+        .select('id, name, city, address, category')
+        .or(
+          `name.ilike.%${query}%,address.ilike.%${query}%,category.ilike.%${query}%,description.ilike.%${query}%,city.ilike.%${query}%,country.ilike.%${query}%`
+        )
+        .limit(100)
+
+      if (searchError) throw searchError
+
+      const suggestions = (data || []).map(item => ({
+        ...item,
+        priority: calculateSuggestionPriority(item, query)
+      }))
+
+      suggestions.sort((a, b) => {
+        if (a.priority !== b.priority) {
+          return a.priority - b.priority
+        }
+        return a.name.localeCompare(b.name)
+      })
+
+      setAutocompleteSuggestions(suggestions.slice(0, 10))
+      setShowAutocomplete(true)
+      setSelectedSuggestionIndex(-1)
+    } catch (err) {
+      console.error('Error fetching autocomplete:', err)
+    }
+  }
+
+  function calculateSuggestionPriority(item, query) {
+    const lowerQuery = query.toLowerCase()
+
+    if (item.city && item.city.toLowerCase().startsWith(lowerQuery)) return 1
+    if (item.city && item.city.toLowerCase().includes(lowerQuery)) return 2
+    if (item.name && item.name.toLowerCase().startsWith(lowerQuery)) return 3
+    if (item.name && item.name.toLowerCase().includes(lowerQuery)) return 4
+    if (item.address && item.address.toLowerCase().includes(lowerQuery)) return 5
+    if (item.category && item.category.toLowerCase().includes(lowerQuery)) return 6
+
+    return 7
+  }
+
+  function handleAutocompleteSelect(suggestion) {
+    setSearchQuery(`${suggestion.name}${suggestion.city ? ` - ${suggestion.city}` : ''}`)
+    setShowAutocomplete(false)
+    setAutocompleteSuggestions([])
+  }
+
   async function handleSearch(e) {
     e.preventDefault()
     if (!searchQuery.trim()) {
@@ -286,6 +343,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       return
     }
 
+    setShowAutocomplete(false)
     setIsSearching(true)
     try {
       const { data, error: searchError } = await supabase
