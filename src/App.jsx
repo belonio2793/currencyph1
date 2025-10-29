@@ -29,6 +29,28 @@ export default function App() {
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
 
+  // Content locker: restrict access to allowed hosts while building
+  const enableContentLocker = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTENT_LOCKER === 'true') || false
+  const allowedHostsEnv = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_ALLOWED_HOSTS) || ''
+  const allowedHosts = allowedHostsEnv ? allowedHostsEnv.split(',').map(h => h.trim()).filter(Boolean) : ['localhost', '127.0.0.1']
+  const devHost = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_DEV_HOST) || allowedHosts[0]
+  const currentHost = typeof window !== 'undefined' ? window.location.host : ''
+
+  if (enableContentLocker && currentHost && !allowedHosts.includes(currentHost)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="max-w-xl w-full bg-white border border-slate-200 rounded-xl p-8 text-center">
+          <h2 className="text-2xl font-semibold text-slate-900 mb-3">This site is under construction</h2>
+          <p className="text-sm text-slate-600 mb-6">Access is restricted while we build features. If you need access, view the dev server instead.</p>
+          <div className="space-y-2">
+            <a href={`https://${devHost}`} className="inline-block w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors">Open Dev Server</a>
+            <p className="text-xs text-slate-500 mt-2">Allowed hosts: {allowedHosts.join(', ')}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   useEffect(() => {
     initializeUser()
     handleRouting()
