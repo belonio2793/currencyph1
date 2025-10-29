@@ -490,6 +490,97 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
+  async function loadPendingListings() {
+    try {
+      setCommunityLoading(true)
+      setCommunityError('')
+      const listings = await nearbyUtils.getPendingListings('pending', 100)
+      setPendingListings(listings)
+
+      const counts = {}
+      const votes = {}
+      for (const listing of listings) {
+        const voteData = await nearbyUtils.getApprovalVotes(listing.id)
+        counts[listing.id] = voteData
+
+        if (userId) {
+          const userVote = await nearbyUtils.getUserApprovalVote(listing.id, userId)
+          votes[listing.id] = userVote
+        }
+      }
+      setVoteCounts(counts)
+      setUserVotes(votes)
+    } catch (err) {
+      console.error('Error loading pending listings:', err)
+      setCommunityError('Failed to load pending listings')
+    } finally {
+      setCommunityLoading(false)
+    }
+  }
+
+  async function handleApprovalVote(listingId, voteType) {
+    if (!userId) {
+      setCommunityError('Please log in to vote')
+      return
+    }
+
+    try {
+      await nearbyUtils.submitApprovalVote(listingId, userId, voteType)
+
+      setUserVotes(prev => ({
+        ...prev,
+        [listingId]: userVotes[listingId] === voteType ? null : voteType
+      }))
+
+      const voteData = await nearbyUtils.getApprovalVotes(listingId)
+      setVoteCounts(prev => ({
+        ...prev,
+        [listingId]: voteData
+      }))
+    } catch (err) {
+      console.error('Error submitting vote:', err)
+      setCommunityError('Failed to submit vote')
+    }
+  }
+
+  async function handleApprove(listingId) {
+    if (!userId) {
+      setCommunityError('Please log in to approve listings')
+      return
+    }
+
+    try {
+      await nearbyUtils.approvePendingListing(listingId)
+      setPendingListings(prev => prev.filter(l => l.id !== listingId))
+    } catch (err) {
+      console.error('Error approving listing:', err)
+      setCommunityError('Failed to approve listing')
+    }
+  }
+
+  async function handleReject(listingId) {
+    if (!userId) {
+      setCommunityError('Please log in to reject listings')
+      return
+    }
+
+    if (!confirm('Reject this listing? This cannot be undone.')) return
+
+    try {
+      await nearbyUtils.rejectPendingListing(listingId)
+      setPendingListings(prev => prev.filter(l => l.id !== listingId))
+    } catch (err) {
+      console.error('Error rejecting listing:', err)
+      setCommunityError('Failed to reject listing')
+    }
+  }
+
+  useEffect(() => {
+    if (viewMode === 'community') {
+      loadPendingListings()
+    }
+  }, [viewMode])
+
   useEffect(() => {
     if (selectedCity) {
       // Reset category pages when switching city
