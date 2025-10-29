@@ -76,7 +76,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
           {/* Desktop navigation */}
           <div className="hidden md:flex flex-wrap items-center gap-1">
-            {navButtons.map(btn => (
+            {mainNav.map(btn => (
               <button
                 key={btn.id}
                 onClick={() => {
@@ -87,6 +87,39 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   activeTab === btn.id
                     ? 'text-blue-600 bg-blue-50'
                     : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                {btn.label}
+              </button>
+            ))}
+
+            {/* Right-side nav items */}
+            {rightNav.map(btn => (
+              <button
+                key={btn.id}
+                onClick={() => {
+                  onTabChange(btn.id)
+                  setMobileMenuOpen(false)
+                }}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                  activeTab === btn.id
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                {btn.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Secondary row for Manage Investments (desktop) */}
+          <div className="hidden md:flex w-full mt-2">
+            {secondaryNav.map(btn => (
+              <button
+                key={btn.id}
+                onClick={() => onTabChange(btn.id)}
+                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                  activeTab === btn.id ? 'text-blue-600 bg-blue-50' : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
                 {btn.label}
