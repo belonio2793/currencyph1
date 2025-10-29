@@ -55,7 +55,6 @@
     "populate-nearby-real": "node scripts/populate-nearby-real-tripadvisor.js",
     "verify-nearby": "node scripts/verify-nearby-population.js",
     "download-images": "node scripts/trigger-image-downloader.js",
-    "download-photos": "node scripts/complete-photo-download.js",
     "populate-google-search": "node scripts/populate-via-google-custom-search.js",
     "enrich-tripadvisor-pages": "node scripts/enrich-listings-from-tripadvisor-pages.js",
     "enrich-comprehensive": "node scripts/enrich-listings-comprehensive.js",
