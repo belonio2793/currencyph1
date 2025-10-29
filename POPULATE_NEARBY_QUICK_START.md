@@ -21,10 +21,10 @@ That's it! This single command:
 If you want to run steps separately:
 
 ```bash
-# Step 1: Search & create base listings (40 min)
+# Step 1: Search & create base listings (60-90 min)
 npm run populate-nearby-google
 
-# Step 2: Enrich with TripAdvisor data (50 min)
+# Step 2: Enrich with TripAdvisor data (90-150 min)
 npm run enrich-nearby-data
 
 # Or run both with one command
