@@ -37,8 +37,11 @@ export default function App() {
       console.warn('Could not populate slugs:', err)
     })
 
-    // Start background sync for TripAdvisor listings
-    backgroundSync.start(24) // Sync every 24 hours
+    // Start background sync for TripAdvisor listings only when explicitly enabled
+    // Set ENABLE_BACKGROUND_SYNC=true in env to enable (disabled by default during local dev)
+    if (process.env.ENABLE_BACKGROUND_SYNC === 'true') {
+      backgroundSync.start(24) // Sync every 24 hours
+    }
 
     window.addEventListener('popstate', handleRouting)
     window.addEventListener('hashchange', handleRouting)
