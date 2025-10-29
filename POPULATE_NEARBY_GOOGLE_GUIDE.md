@@ -18,7 +18,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 └──────────────────┬──────────────────────────────────────┘
                    │ (Insert base listings)
                    ↓
-┌────────────────────────���────────────────────────────────┐
+┌─────────────────────────────────────────────────────────┐
 │     nearby_listings table (PostgreSQL/Supabase)        │
 │                                                         │
 │  Basic fields populated:                               │
@@ -46,7 +46,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 └──────────────────┬──────────────────────────────────────┘
                    │ (Update all fields)
                    ↓
-┌─────────────────────────────────────────────────────────┐
+┌───────────────────────────���─────────────────────────────┐
 │    COMPLETE nearby_listings (All columns filled)       │
 │                                                         │
 │  ✅ 7,500+ listings                                    │
@@ -62,7 +62,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 ┌─────────────────────────────────────────────────────────┐
 │         Frontend Application                           │
 │  /nearby page displays all populated listings          │
-└─────────────────────────────────────────────────────────┘
+└───────────────────────────────────────────��─────────────┘
 ```
 
 ## Prerequisites
@@ -163,16 +163,10 @@ npm run enrich-nearby-data
 
 ## Coverage
 
-### Cities Covered (50+)
-**Metro Manila Area**: Manila, Quezon City, Makati, Taguig, Pasig, Las Piñas, Parañaque, Caloocan, Antipolo, Cavite City, Imus, Bacoor, Dasmariñas, Kawit, Batangas City
+### Cities Covered (150+)
+**Complete Philippines Coverage**:
 
-**Northern Luzon**: Baguio, Vigan, Dagupan, Urdaneta, Laoag, Pangasinan, Lucena, Tagaytay
-
-**Visayas**: Cebu City, Boracay, Iloilo City, Bacolod, Dumaguete, Kalibo, Caticlan, Roxas, Calapan, Romblon
-
-**Mindanao**: Davao City, Cagayan de Oro, Butuan, Surigao City, General Santos, Zamboanga City, Marawi, Cotabato City
-
-**Island/Beach Areas**: Palawan, El Nido, Coron, Puerto Princesa, Siargao, Boracay
+Abuyog, Alaminos, Alcala, Angeles, Antipolo, Aroroy, Bacolod, Bacoor, Bago, Bais, Balanga, Baliuag, Bangued, Bansalan, Bantayan, Bataan, Batac, Batangas City, Bayambang, Bayawan, Baybay, Bayugan, Biñan, Bislig, Bocaue, Bogo, Boracay, Borongan, Butuan, Cabadbaran, Cabanatuan, Cabuyao, Cadiz, Cagayan de Oro, Calamba, Calapan, Calbayog, Caloocan, Camiling, Canlaon, Caoayan, Capiz, Caraga, Carmona, Catbalogan, Cauayan, Cavite City, Cebu City, Cotabato City, Dagupan, Danao, Dapitan, Daraga, Dasmariñas, Davao City, Davao del Norte, Davao del Sur, Davao Oriental, Dipolog, Dumaguete, General Santos, General Trias, Gingoog, Guihulngan, Himamaylan, Ilagan, Iligan, Iloilo City, Imus, Isabela, Isulan, Kabankalan, Kidapawan, Koronadal, La Carlota, Laoag, Lapu-Lapu, Las Piñas, Laoang, Legazpi, Ligao, Limay, Lucena, Maasin, Mabalacat, Malabon, Malaybalay, Malolos, Mandaluyong, Mandaue, Manila, Marawi, Marilao, Masbate City, Mati, Meycauayan, Muntinlupa, Naga (Camarines Sur), Navotas, Olongapo, Ormoc, Oroquieta, Ozamiz, Pagadian, Palo, Parañaque, Pasay, Pasig, Passi, Puerto Princesa, Quezon City, Roxas, Sagay, Samal, San Carlos (Negros Occidental), San Carlos (Pangasinan), San Fernando (La Union), San Fernando (Pampanga), San Jose (Antique), San Jose del Monte, San Juan, San Pablo, San Pedro, Santiago, Silay, Sipalay, Sorsogon City, Surigao City, Tabaco, Tabuk, Tacurong, Tagaytay, Tagbilaran, Taguig, Tacloban, Talisay (Cebu), Talisay (Negros Occidental), Tanjay, Tarlac City, Tayabas, Toledo, Trece Martires, Tuguegarao, Urdaneta, Valencia, Valenzuela, Victorias, Vigan, Virac, Zamboanga City, Baguio, Bohol, Coron, El Nido, Makati, Palawan, Siargao
 
 ### Categories Covered
 1. **Restaurants** - Cafes, bars, fast food, desserts, etc.
