@@ -16,6 +16,60 @@ Environment:
 
 import { createClient } from '@supabase/supabase-js'
 import fetch from 'node-fetch'
+import { exec } from 'child_process'
+import { promisify } from 'util'
+const execAsync = promisify(exec)
+
+const GROK_KEY = process.env.X_API_KEY || process.env.GROK_API_KEY || process.env.XAI_API_KEY
+if (!GROK_KEY) {
+  console.warn('Warning: GROK API key not set (X_API_KEY) — Grok fallback will fail')
+}
+
+async function fetchPageWithCurl(url) {
+  try {
+    const safeUrl = url.replace(/"/g, '\\"')
+    const cmd = `curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" --max-time 30 "${safeUrl}" | head -c 3000000`
+    const { stdout } = await execAsync(cmd, { maxBuffer: 5 * 1024 * 1024 })
+    return stdout
+  } catch (err) {
+    return null
+  }
+}
+
+async function grokExtractFromPage(url, listingName) {
+  try {
+    const html = await fetchPageWithCurl(url)
+    if (!html || html.length < 200) return []
+
+    const prompt = `Extract ALL photo URLs from this TripAdvisor listing HTML.\n\nLook for URLs that contain:\n- dynamic-media-cdn.tripadvisor.com/media/photo\n- media.tacdn.com/media/photo\n\nReturn ONLY a JSON array of complete HTTPS URLs. Exclude placeholders and logo images. HTML:\n${html.substring(0,100000)}`
+
+    const res = await fetch('https://api.x.ai/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${GROK_KEY}` },
+      body: JSON.stringify({ model: 'grok-2-latest', messages: [{ role: 'user', content: prompt }], temperature: 0.1, max_tokens: 4096 }),
+      timeout: 30000
+    })
+
+    if (!res.ok) return []
+    const json = await res.json()
+    const content = json.choices?.[0]?.message?.content || ''
+    const match = content.match(/\[[\s\S]*\]/)
+    if (!match) return []
+    const urls = JSON.parse(match[0])
+    if (!Array.isArray(urls)) return []
+    // filter/clean
+    const cleaned = urls
+      .filter(u => typeof u === 'string' && u.startsWith('https://'))
+      .map(u => u.split('?')[0].split('#')[0])
+      .filter(u => u.includes('dynamic-media-cdn.tripadvisor.com') || u.includes('media.tacdn.com'))
+      .filter(u => !u.includes('placeholder') && !u.includes('logo'))
+    return Array.from(new Set(cleaned)).slice(0,20)
+  } catch (err) {
+    return []
+  }
+}
+
+
 
 const PROJECT_URL = process.env.VITE_PROJECT_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
