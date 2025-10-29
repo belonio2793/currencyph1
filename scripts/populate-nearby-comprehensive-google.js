@@ -374,7 +374,15 @@ async function main() {
   for (const city of PHIL_CITIES) {
     cityCount++;
     console.log(`\n[${cityCount}/${PHIL_CITIES.length}] Processing ${city}...`);
-    
+
+    if ((process.env.SKIP_EXISTING_CITIES || 'true') !== 'false') {
+      const exists = await cityHasListings(city);
+      if (exists) {
+        console.log(`  ⏭️  Skipping ${city} (already has listings)`);
+        continue;
+      }
+    }
+
     for (const category of CATEGORIES) {
       await processCity(city, category);
       await sleep(500);
