@@ -141,14 +141,23 @@ export default function Rates({ globalCurrency }) {
     }
   }
 
-  // Helper: fetch with retries
+  // Helper: fetch with retries and proper error handling
   const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
     let lastErr
     for (let i = 0; i <= retries; i++) {
       try {
-        const resp = await fetch(url, options)
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-        return await resp.json()
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
+        try {
+          const resp = await fetch(url, { ...options, signal: controller.signal })
+          clearTimeout(timeoutId)
+
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+          return await resp.json()
+        } finally {
+          clearTimeout(timeoutId)
+        }
       } catch (err) {
         lastErr = err
         if (i < retries) {
@@ -156,7 +165,7 @@ export default function Rates({ globalCurrency }) {
         }
       }
     }
-    // All retries failed — return null and let caller handle fallback (avoids unhandled exceptions)
+    console.debug(`Fetch failed after ${retries + 1} attempts for ${url}:`, lastErr?.message || lastErr)
     return null
   }
 
@@ -174,12 +183,12 @@ export default function Rates({ globalCurrency }) {
             'Content-Type': 'application/json'
           }
         },
-        2,
-        500
+        1,
+        1000
       )
 
       if (!data || !data.cryptoPrices) {
-        console.warn('Fetch rates endpoint failed, using defaults scaled by global rate')
+        console.debug('Fetch rates endpoint unavailable, using defaults scaled by global rate')
         const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
         const defaults = {}
         Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
@@ -211,7 +220,7 @@ export default function Rates({ globalCurrency }) {
       }
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
-      console.debug('Crypto prices API unavailable, using default prices:', err)
+      console.debug('Crypto prices API error, using default prices:', err?.message || err)
       const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
       const defaults = {}
       Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
