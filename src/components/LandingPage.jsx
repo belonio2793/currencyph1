@@ -275,14 +275,23 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
     USDT: 56
   }
 
-  // Helper: fetch with retries
+  // Helper: fetch with retries and proper error handling
   const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
     let lastErr
     for (let i = 0; i <= retries; i++) {
       try {
-        const resp = await fetch(url, options)
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-        return await resp.json()
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
+        try {
+          const resp = await fetch(url, { ...options, signal: controller.signal })
+          clearTimeout(timeoutId)
+
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
+          return await resp.json()
+        } finally {
+          clearTimeout(timeoutId)
+        }
       } catch (err) {
         lastErr = err
         if (i < retries) {
@@ -290,6 +299,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       }
     }
+    console.debug(`Fetch failed after ${retries + 1} attempts for ${url}:`, lastErr?.message || lastErr)
     return null
   }
 
@@ -307,12 +317,12 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
             'Content-Type': 'application/json'
           }
         },
-        2,
-        500
+        1,
+        1000
       )
 
       if (!data || !data.cryptoPrices) {
-        console.warn('Fetch rates endpoint failed in LandingPage, using defaults')
+        console.debug('Fetch rates endpoint unavailable in LandingPage, using defaults')
         setCryptoRates(defaultCryptoPrices)
         return
       }
@@ -339,7 +349,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       }
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
-      console.debug('Crypto prices API unavailable in LandingPage, using default prices:', err)
+      console.debug('Crypto prices API error in LandingPage, using default prices:', err?.message || err)
       setCryptoRates(defaultCryptoPrices)
     }
   }
