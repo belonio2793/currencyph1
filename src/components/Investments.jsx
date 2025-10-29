@@ -7,6 +7,8 @@ export default function Investments({ userId }) {
   const [fundedMap, setFundedMap] = useState({})
   const [loading, setLoading] = useState(false)
   const [selectedProject, setSelectedProject] = useState(null)
+  const [showDetail, setShowDetail] = useState(false)
+  const [projectContributions, setProjectContributions] = useState([])
   const [investAmount, setInvestAmount] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
