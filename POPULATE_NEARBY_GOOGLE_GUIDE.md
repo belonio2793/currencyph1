@@ -18,7 +18,7 @@ This guide explains how to populate the `nearby_listings` table with real, accur
 └──────────────────┬──────────────────────────────────────┘
                    │ (Insert base listings)
                    ↓
-┌─────────────────────────────────────────────────────────┐
+┌────────────────────────���────────────────────────────────┐
 │     nearby_listings table (PostgreSQL/Supabase)        │
 │                                                         │
 │  Basic fields populated:                               │
@@ -99,11 +99,11 @@ This runs both steps automatically:
 npm run populate-nearby-google
 ```
 
-- Searches 50 cities × 3 categories
+- Searches 150+ Philippine cities × 3 categories
 - Creates base listings with TripAdvisor IDs
 - Extracts basic info from search results
-- **Duration**: 30-40 minutes
-- **Output**: ~7,500 listings
+- **Duration**: 60-90 minutes
+- **Output**: ~30,000+ listings
 
 #### Step 2 Only - Data Enrichment
 ```bash
