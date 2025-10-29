@@ -350,7 +350,7 @@ async function main() {
   console.log('='.repeat(80));
 
   console.log(`\n📊 Configuration:`);
-  console.log(`  Cities to search: ${PHIL_CITIES.length}`);
+  console.log(`  Cities to search: ${PHIL_CITIES.length} (comprehensive Philippines coverage)`);
   console.log(`  Categories: ${CATEGORIES.join(', ')}`);
   console.log(`  Expected searches: ${PHIL_CITIES.length * CATEGORIES.length}`);
   console.log(`  Target per city/category: 5 listings`);
