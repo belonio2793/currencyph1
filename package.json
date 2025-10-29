@@ -62,7 +62,8 @@
     "populate-full": "node scripts/populate-via-google-custom-search.js && node scripts/enrich-listings-comprehensive.js",
     "populate-nearby-google": "node scripts/populate-nearby-comprehensive-google.js",
     "enrich-nearby-data": "node scripts/enrich-nearby-with-tripadvisor-data.js",
-    "populate-nearby-full": "node scripts/populate-nearby-comprehensive-google.js && node scripts/enrich-nearby-with-tripadvisor-data.js"
+    "populate-nearby-full": "node scripts/populate-nearby-comprehensive-google.js && node scripts/enrich-nearby-with-tripadvisor-data.js",
+    "populate-nearby-batch": "node scripts/populate-nearby-batch.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
