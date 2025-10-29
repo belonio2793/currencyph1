@@ -92,6 +92,7 @@ async function processBatch(offset, limit) {
     .select('id, name, city, web_url, photo_urls')
     .not('web_url', 'is', null)
     .neq('web_url', 'https://www.tripadvisor.com/')
+    .or('photo_urls.is.null,photo_urls.eq.{}')
     .order('id', { ascending: true })
     .range(offset, offset + limit - 1)
 
