@@ -917,14 +917,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-slate-100 mt-16">
-        <div className="max-w-7xl mx-auto px-6 py-8 text-center">
-          <p className="text-slate-500 text-sm">
-            &copy; 2024 currency.ph • Secure • Real-time Rates • Global Payments
-          </p>
-        </div>
-      </footer>
     </div>
   )
 }
