@@ -18,6 +18,7 @@ import Nearby from './components/Nearby'
 import Business from './components/Business'
 import ListingDetail from './components/ListingDetail'
 import Network from './components/Network'
+import About from './components/About'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
