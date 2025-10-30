@@ -107,23 +107,36 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleLeaveTable(tableId) {
     if (!userId) return
     try {
-      // Find and delete the user's seat
-      const { error: deleteError } = await supabase.from('poker_seats').delete().eq('table_id', tableId).eq('user_id', userId)
-      if (deleteError) throw deleteError
-
-      // Check if table is now empty
-      const { data: remainingSeats } = await supabase.from('poker_seats').select('*').eq('table_id', tableId)
-      if (!remainingSeats || remainingSeats.length === 0) {
-        // Delete empty table and all related records
-        await supabase.from('poker_tables').delete().eq('id', tableId)
+      // Get seat info with starting balance
+      const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).eq('user_id', userId).single()
+      if (!seatData) {
+        alert('Seat not found')
+        return
       }
 
-      // Reset selection and reload
-      setSelectedTable(null)
-      await loadTables()
+      // Get current wallet balance
+      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
+      const endingBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
+      const currencyCode = wallets && wallets.length > 0 ? wallets[0].currency_code : 'PHP'
+      const startingBalance = Number(seatData.starting_balance) || 0
+
+      // Show rake modal
+      setRakeModal({
+        open: true,
+        startingBalance,
+        endingBalance,
+        tableId,
+        currencyCode
+      })
     } catch (e) {
       alert('Could not leave table: ' + (e.message || e))
     }
+  }
+
+  async function handleRakeProcessed(data) {
+    // Reload tables after rake is processed
+    setSelectedTable(null)
+    await loadTables()
   }
 
   const getTableStatusColor = (table) => {
