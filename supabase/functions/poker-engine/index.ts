@@ -29,8 +29,8 @@ function shuffle(deck: string[], seedBytes?: Uint8Array) {
   return deck
 }
 
-async function createTable(name: string, stakeMin: number, stakeMax: number, currency = 'PHP') {
-  const { data, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: currency }]).select().single()
+async function createTable(name: string, stakeMin: number, stakeMax: number, currency = 'PHP', userId?: string) {
+  const { data, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: currency, created_by: userId || null, is_default: false }]).select().single()
   if (error) throw error
   return data
 }
@@ -224,8 +224,12 @@ async function processRake(userId: string, tableId: string, startingBalance: num
   // Check if table is now empty
   const { data: remainingSeats } = await supabase.from('poker_seats').select('*').eq('table_id', tableId)
   if (!remainingSeats || remainingSeats.length === 0) {
-    // Delete empty table and all related records
-    await supabase.from('poker_tables').delete().eq('id', tableId)
+    // Only delete user-created tables (not default tables)
+    const { data: tableData } = await supabase.from('poker_tables').select('is_default').eq('id', tableId).single()
+    if (tableData && !tableData.is_default) {
+      // Delete empty user-created table and all related records
+      await supabase.from('poker_tables').delete().eq('id', tableId)
+    }
   }
 
   return { success: true, rakeAmount, tipAmount: tipPercent > 0 ? Math.round(rakeAmount * (tipPercent / 100)) : 0, finalBalance: endingBalance - rakeAmount - (tipPercent > 0 ? Math.round(rakeAmount * (tipPercent / 100)) : 0) }
@@ -249,7 +253,7 @@ Deno.serve(async (req) => {
     const path = url.pathname
     if (path.endsWith('/create_table') && req.method === 'POST') {
       const body = await req.json()
-      const t = await createTable(body.name, Number(body.stakeMin), Number(body.stakeMax), body.currency)
+      const t = await createTable(body.name, Number(body.stakeMin), Number(body.stakeMax), body.currency, body.userId)
       return new Response(JSON.stringify(t), { headers: corsHeaders })
     }
 
