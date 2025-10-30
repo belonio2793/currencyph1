@@ -525,7 +525,10 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       const data = await wisegcashAPI.getTransactions(userId, 5)
       setRecentTransactions(data)
     } catch (err) {
+      // Normalize error message for UI and logs
+      const msg = err && (err.message || (typeof err === 'string' ? err : JSON.stringify(err))) || 'Failed to load transactions'
       console.error('Error loading transactions:', err)
+      setError(`Error loading transactions: ${msg}`)
     }
   }
 
