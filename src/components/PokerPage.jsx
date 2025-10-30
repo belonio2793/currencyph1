@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import RakeModal from './RakeModal'
 import HouseBalanceTab from './HouseBalanceTab'
 import PokerGameModal from './PokerGameModal'
 
 export default function PokerPage({ userId, userEmail, onShowAuth }) {
+  const pageRef = useRef(null)
   const [tables, setTables] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedTable, setSelectedTable] = useState(null)
