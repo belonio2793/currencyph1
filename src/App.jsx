@@ -104,6 +104,11 @@ export default function App() {
     }
   }, [])
 
+  // Scroll to top when activeTab (page) changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [activeTab])
+
   const handleRouting = () => {
     const path = window.location.pathname
     const hash = window.location.hash
