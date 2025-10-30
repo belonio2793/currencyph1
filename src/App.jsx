@@ -105,10 +105,13 @@ export default function App() {
     }
   }, [])
 
-  // Scroll to top when activeTab (page) changes
+  // Scroll to top when activeTab (page) changes (if preference is enabled)
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [activeTab])
+    const autoScroll = preferencesManager.getAutoScrollToTop(userId)
+    if (autoScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [activeTab, userId])
 
   const handleRouting = () => {
     const path = window.location.pathname
