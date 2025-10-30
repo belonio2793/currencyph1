@@ -206,7 +206,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           </div>
         )}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-4xl font-light text-white">Poker Room</h2>
+          <h2 className="text-4xl font-light text-white">Poker</h2>
           {activeTab === 'tables' && (
             <div className="flex items-center gap-2">
               <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>
@@ -221,13 +221,13 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
             onClick={() => setActiveTab('tables')}
             className={`px-6 py-3 font-semibold transition ${activeTab === 'tables' ? 'border-b-2 border-blue-500 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
-            🎰 Tables
+            Tables
           </button>
           <button
             onClick={() => setActiveTab('network-balances')}
             className={`px-6 py-3 font-semibold transition ${activeTab === 'network-balances' ? 'border-b-2 border-amber-500 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
-            📊 Network Balances
+            Network Balances
           </button>
         </div>
 
@@ -311,7 +311,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                       onClick={() => openGameModal(selectedTable)}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition"
                     >
-                      🎮 Play
+                      Open Table
                     </button>
                     {userId && seats.some(s => s.user_id === userId) && (
                       <button
@@ -377,7 +377,6 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                 <div className="text-center">
                                   {seat ? (
                                     <>
-                                      <div className="text-xs">💰</div>
                                       <div className="text-xs font-bold">{seat.user_id === userId ? 'You' : 'Player'}</div>
                                     </>
                                   ) : (
@@ -417,7 +416,6 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
             ) : (
               <div className="flex items-center justify-center h-96">
                 <div className="text-center">
-                  <div className="text-6xl mb-4">🃏</div>
                   <div className="text-slate-400 text-lg">Select a table to view details</div>
                 </div>
               </div>
