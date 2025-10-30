@@ -82,8 +82,9 @@ export default function PlayerSeats({ seats, table, userId, gameState, currentPl
                     <div className="text-xs text-amber-100">Seat {seat.seat_number}</div>
                   </div>
                 ) : (
-                  <div
-                    className="w-16 h-20 rounded-lg border-2 border-dashed border-slate-500 flex flex-col items-center justify-center text-xs text-slate-400 hover:border-slate-400 transition hover:bg-slate-800/30"
+                  <button
+                    onClick={() => onSitClick?.(i + 1)}
+                    className="w-16 h-20 rounded-lg border-2 border-dashed border-slate-500 flex flex-col items-center justify-center text-xs text-slate-400 hover:border-emerald-400 hover:text-emerald-300 transition hover:bg-emerald-500/10 cursor-pointer"
                     style={{
                       transform: `rotate(${-rotateDeg}deg)`,
                     }}
@@ -91,7 +92,7 @@ export default function PlayerSeats({ seats, table, userId, gameState, currentPl
                     <div className="text-lg">○</div>
                     <div>Seat</div>
                     <div className="font-mono">{i + 1}</div>
-                  </div>
+                  </button>
                 )}
               </div>
             )
