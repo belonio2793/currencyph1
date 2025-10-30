@@ -144,8 +144,7 @@ export default function CurrencyRates() {
       {/* Info Footer */}
       <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
         <p>
-          <strong>Rate Calculation:</strong> DOG Token price is calculated as: Total Market Value of Deposits ÷ Total DOG in Circulation.
-          All fiat rates are relative to USD. Data is refreshed every 30 seconds from global financial networks.
+          <strong>Rate Calculation:</strong> All fiat rates are relative to USD. Data is refreshed every 30 seconds from global financial networks.
         </p>
       </div>
     </div>
