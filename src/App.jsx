@@ -30,9 +30,9 @@ export default function App() {
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
 
-  // Content locker: enable by setting VITE_CONTENT_LOCKER=true (client) or CONTENT_LOCKER=true (server)
-  const contentLocked = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_CONTENT_LOCKER === 'TRUE' || import.meta.env.VITE_CONTENT_LOCKER === 'true')) ||
-    (typeof process !== 'undefined' && process.env && (process.env.CONTENT_LOCKER === 'TRUE' || process.env.CONTENT_LOCKER === 'true'))
+  // Content locker: enable by setting VITE_CONTENT_LOCKER=TRUE (client) or CONTENT_LOCKER=TRUE (server)
+  const contentLocked = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTENT_LOCKER === 'TRUE') ||
+    (typeof process !== 'undefined' && process.env && process.env.CONTENT_LOCKER === 'TRUE')
 
   useEffect(() => {
     initializeUser()
@@ -142,15 +142,17 @@ export default function App() {
     )
   }
 
-  // If content locker is enabled, show a lock screen and prevent access to the app
+  // If content locker is enabled, show a full black 'UNDER DEVELOPMENT' splash
   if (contentLocked) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="max-w-xl w-full bg-white border border-slate-200 rounded-2xl p-8 text-center shadow">
-          <h1 className="text-2xl font-semibold text-slate-900 mb-4">Site Access Restricted</h1>
-          <p className="text-slate-600 mb-6">This site is currently locked by the site operator and is not publicly accessible.</p>
-          <div className="text-sm text-slate-500">
-            If you are the site owner and need to unlock it, set CONTENT_LOCKER to false in the environment variables and redeploy.
+      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
+        <div className="w-full max-w-3xl text-center">
+          <div className="text-6xl font-bold tracking-wide mb-6">UNDER DEVELOPMENT</div>
+          <p className="text-lg text-slate-300 mb-8">This site is currently under development and not publicly accessible.</p>
+          <div className="flex items-center justify-center space-x-3">
+            <span className="w-4 h-4 bg-white rounded-full animate-pulse" />
+            <span className="w-4 h-4 bg-white rounded-full animate-pulse delay-200" />
+            <span className="w-4 h-4 bg-white rounded-full animate-pulse delay-400" />
           </div>
         </div>
       </div>
