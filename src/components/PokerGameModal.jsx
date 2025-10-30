@@ -34,8 +34,16 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   const handsUnsubscribeRef = useRef(null)
   const seatsUnsubscribeRef = useRef(null)
   const betsUnsubscribeRef = useRef(null)
+  const contentScrollRef = useRef(null)
 
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
+
+  // Scroll to top when modal opens
+  useEffect(() => {
+    if (open && contentScrollRef.current) {
+      contentScrollRef.current.scrollTop = 0
+    }
+  }, [open])
 
   // Load initial data
   useEffect(() => {
