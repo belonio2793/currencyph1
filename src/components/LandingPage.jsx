@@ -262,6 +262,17 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
   // Helper: fetch with retries and proper error handling
   const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
+    if (!url) return null
+    try {
+      // validate URL - if invalid, bail out early
+      // allow relative URLs by catching TypeError
+      new URL(url)
+    } catch (e) {
+      // invalid URL (maybe relative). If it's clearly invalid, don't attempt fetch
+      // but still try once if it's a relative URL (starts with /)
+      if (typeof url !== 'string' || !url.startsWith('/')) return null
+    }
+
     let lastErr = null
     for (let i = 0; i <= retries; i++) {
       try {
@@ -275,7 +286,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           if (!resp.ok) {
             // attempt to read body for debugging
             let bodyText = null
-            try { bodyText = await resp.text() } catch (e) {}
+            try { bodyText = await resp.text() } catch (e) { bodyText = null }
             throw new Error(`HTTP ${resp.status}${bodyText ? ` - ${bodyText}` : ''}`)
           }
 
@@ -290,11 +301,14 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       } catch (err) {
         lastErr = err
+        // If it's a network error, wait and retry; otherwise break
         if (i < retries) {
           await new Promise(r => setTimeout(r, backoff * (i + 1)))
         }
       }
     }
+    // final log for debugging but don't throw
+    console.debug('fetchWithRetries final error for', url, lastErr?.message || String(lastErr))
     return null
   }
 
