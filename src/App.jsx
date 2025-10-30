@@ -179,9 +179,12 @@ export default function App() {
         setGlobalCurrency={setGlobalCurrency}
         userEmail={userEmail}
         onShowAuth={(tab) => {
+          setAuthInitialTab(tab || 'login')
           setShowAuth(true)
           if (tab === 'register') window.history.replaceState(null, '', '/register')
           else window.history.replaceState(null, '', '/login')
+          // scroll to top so auth card is visible
+          setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
         }}
         onSignOut={async () => {
           try {
