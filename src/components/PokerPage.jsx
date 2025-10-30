@@ -261,14 +261,26 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Tables Lobby */}
           <div className="lg:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-6">
-            <h3 className="text-xl font-semibold text-white mb-4">Lobby</h3>
+            <h3 className="text-xl font-semibold text-white mb-4">{activeTab === 'my-tables' ? 'My Tables' : 'Available Tables'}</h3>
             {loading ? (
               <div className="text-slate-400 text-center py-8">Loading tables...</div>
-            ) : tables.length === 0 ? (
-              <div className="text-slate-400 text-center py-8">No tables available</div>
+            ) : filteredTables.length === 0 ? (
+              activeTab === 'my-tables' ? (
+                <div className="text-center py-16 flex flex-col items-center justify-center">
+                  <div className="text-slate-400 mb-3 text-sm font-medium">You have no created tables</div>
+                  <button
+                    onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }}
+                    className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm font-semibold"
+                  >
+                    Create a Table
+                  </button>
+                </div>
+              ) : (
+                <div className="text-slate-400 text-center py-8">No other tables available</div>
+              )
             ) : (
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {tables.map(t => {
+                {filteredTables.map(t => {
                   const tableSeats = seats.filter(s => s.table_id === t.id)
                   const openSeats = t.max_seats - tableSeats.length
                   const isSelected = selectedTable?.id === t.id
