@@ -261,7 +261,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
   }
 
   // Helper: fetch with retries and proper error handling
-  const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
+  const fetchWithRetries = async (url, options = {}, retries = 1, backoff = 500) => {
     if (!url) return null
     try {
       // validate URL - if invalid, bail out early
@@ -301,14 +301,13 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       } catch (err) {
         lastErr = err
-        // If it's a network error, wait and retry; otherwise break
+        // If it's a network error and we have retries left, wait and retry
         if (i < retries) {
           await new Promise(r => setTimeout(r, backoff * (i + 1)))
         }
       }
     }
-    // final log for debugging but don't throw
-    console.debug('fetchWithRetries final error for', url, lastErr?.message || String(lastErr))
+    // Return null on failure - caller should use defaults
     return null
   }
 
