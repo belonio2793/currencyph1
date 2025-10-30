@@ -197,7 +197,10 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   }
 
   async function startHand() {
-    if (!userId) return onShowAuth?.('register')
+    if (!userId) {
+      setAuthModalOpen(true)
+      return
+    }
     if (seats.length < 2) {
       setWaitingForPlayers(true)
       return
