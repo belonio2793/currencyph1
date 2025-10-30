@@ -102,31 +102,35 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
           {/* Secondary row for Manage Investments (desktop) */}
           <div className="hidden md:flex w-full mt-4 pt-3 border-t border-slate-100">
-            <div className="w-full px-4 flex items-center gap-3">
-              {secondaryNav.map(btn => (
-                <button
-                  key={btn.id}
-                  onClick={() => onTabChange(btn.id)}
-                  className={`px-4 py-2 text-sm font-semibold transition-colors rounded-md ${
-                    activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'
-                  }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-
-              {/* Buttons moved into the Manage Investments row */}
-              <div className="ml-4 flex items-center gap-2">
-                {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
-                  <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm rounded-md ${activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
+            <div className="w-full px-4 flex items-center">
+              <div className="flex items-center gap-3">
+                {secondaryNav.map(btn => (
+                  <button
+                    key={btn.id}
+                    onClick={() => onTabChange(btn.id)}
+                    className={`px-4 py-2 text-sm font-semibold transition-colors rounded-md ${
+                      activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'
+                    }`}
+                  >
                     {btn.label}
                   </button>
                 ))}
 
-                {/* Auth controls */}
+                {/* Buttons moved into the Manage Investments row */}
+                <div className="ml-4 flex items-center gap-2">
+                  {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
+                    <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm rounded-md ${activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
+                      {btn.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right-aligned auth controls */}
+              <div className="ml-auto flex items-center gap-3">
                 {userEmail ? (
                   <>
-                    <span className="text-sm text-slate-600">{userEmail}</span>
+                    <span className="text-sm font-medium text-blue-600 truncate max-w-[200px]">{userEmail}</span>
                     <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Sign out</button>
                   </>
                 ) : (
