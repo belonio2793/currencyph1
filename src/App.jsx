@@ -206,7 +206,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <HeaderMap />
+      <HeaderMap userId={userId} />
       <Navbar
         activeTab={activeTab}
         onTabChange={setActiveTab}
