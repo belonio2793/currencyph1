@@ -19,10 +19,16 @@ export default function ChatBar({ userId, userEmail }) {
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(false)
   const [unreadCounts, setUnreadCounts] = useState({})
-  const [onlineUsers, setOnlineUsers] = useState(new Set())
+  const [onlineUsers, setOnlineUsers] = useState({})
+  const [recordingVoice, setRecordingVoice] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const [presenceUnsubscribe, setPresenceUnsubscribe] = useState(null)
   const messageListRef = useRef(null)
   const subRef = useRef(null)
   const typingTimeoutRef = useRef(null)
+  const mediaInputRef = useRef(null)
+  const mediaRecorderRef = useRef(null)
+  const audioChunksRef = useRef([])
 
   // Load friends on mount
   useEffect(() => {
