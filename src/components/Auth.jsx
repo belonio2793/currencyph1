@@ -119,8 +119,8 @@ export default function Auth({ onAuthSuccess }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-start justify-center py-2 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md mt-2 mb-2">
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl font-light text-slate-900 tracking-tight mb-2">
