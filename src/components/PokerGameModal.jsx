@@ -128,26 +128,37 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
         .eq('table_id', table.id)
         .order('created_at', { ascending: false })
         .limit(1)
-      
+
       if (handsErr) throw handsErr
-      
+
       if (handsData && handsData[0]) {
         setHand(handsData[0])
         setGameState(handsData[0].round_state)
-        
+        setDealerSeat(handsData[0].dealer_seat)
+
         // Load cards if dealt
         const { data: holeCards } = await supabase
           .from('poker_hole_cards')
           .select('*')
           .eq('hand_id', handsData[0].id)
-        
+
         // Load community cards
         if (handsData[0].community_cards) {
           setCommunityCards(handsData[0].community_cards)
         }
+
+        // Determine who should act next (simplified - in real poker this is more complex)
+        if (['preflop', 'flop', 'turn', 'river'].includes(handsData[0].round_state)) {
+          const actedPlayers = betHistory.map(b => b.user_id)
+          const needsToAct = seatsData?.find(s => !actedPlayers.includes(s.user_id))
+          if (needsToAct) {
+            setCurrentPlayerSeat(needsToAct.seat_number)
+          }
+        }
       } else {
         setGameState('waiting')
         setWaitingForPlayers(seatsData && seatsData.length < 2)
+        setDealerSeat(null)
       }
       
       // Load bets and calculate pot
