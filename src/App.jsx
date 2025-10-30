@@ -195,6 +195,13 @@ export default function App() {
       setTotalBalancePHP(0)
       return
     }
+
+    // For guest-local accounts, skip balance loading
+    if (uid.includes('guest-local')) {
+      setTotalBalancePHP(0)
+      return
+    }
+
     try {
       const wallets = await wisegcashAPI.getWallets(uid)
       const promises = (wallets || []).map(async (w) => {
