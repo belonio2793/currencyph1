@@ -320,7 +320,6 @@ export default function Profile({ userId }) {
       <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">Profile</h2>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
-      {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
       {isGuestAccount && !isValidUUID(userId) && (
         <div className="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-sm">
           You are logged in as a guest. Create an account to save profile changes and access more features.
