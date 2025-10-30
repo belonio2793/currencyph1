@@ -226,6 +226,7 @@ export default function App() {
               window.history.pushState(null, '', '/nearby')
             }} /> }
             {activeTab === 'network' && <Network userId={userId} />}
+            {activeTab === 'about' && <About />}
           </>
         )}
       </main>
