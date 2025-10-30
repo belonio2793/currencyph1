@@ -123,6 +123,10 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     // No rake for losers or breakeven players - just remove seat
     await supabase.from('poker_seats').delete().eq('table_id', tableId).eq('user_id', userId)
   } else {
+    // Get seat ID first
+    const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
+    if (!seat) throw new Error('Seat not found')
+
     // Deduct rake from wallet
     const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', userId).single()
     if (!wallet) throw new Error('Wallet not found')
@@ -133,20 +137,11 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     const newBalance = currentBalance - rakeAmount
     await supabase.from('wallets').update({ balance: newBalance, updated_at: new Date() }).eq('user_id', userId)
 
-    // Record the seat with ending balance and rake deducted
-    await supabase.from('poker_seats').update({
-      ending_balance: endingBalance,
-      rake_deducted: rakeAmount,
-      session_ended_at: new Date()
-    }).eq('table_id', tableId).eq('user_id', userId)
-
     // Create session record for analytics
-    const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
-
     await supabase.from('poker_sessions').insert([{
       table_id: tableId,
       user_id: userId,
-      seat_id: seat?.id,
+      seat_id: seat.id,
       starting_balance: startingBalance,
       ending_balance: endingBalance,
       net_profit: netProfit,
