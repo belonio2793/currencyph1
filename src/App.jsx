@@ -158,7 +158,7 @@ export default function App() {
         setUserId(user.id)
         setUserEmail(user.email)
         (wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')).catch(() => {})
-        initializePresence(user.id).catch(() => {})
+        try { initializePresence(user.id) } catch(e) {}
         // If user is authenticated, don't forcibly change the current route — let handleRouting manage it
         setShowAuth(false)
       } else {
