@@ -429,6 +429,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                   gameState={gameState}
                   currentPlayerSeat={currentPlayerSeat}
                   dealerSeat={dealerSeat}
+                  onSitClick={sitAtTable}
                 />
               </div>
               
