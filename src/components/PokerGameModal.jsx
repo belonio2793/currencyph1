@@ -37,12 +37,21 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
-  // Scroll to top when modal opens
+  // Scroll to top when modal opens (if preference is enabled)
   useEffect(() => {
     if (open && contentScrollRef.current) {
-      contentScrollRef.current.scrollTop = 0
+      const autoScroll = preferencesManager.getAutoScrollToTop(userId)
+      if (autoScroll) {
+        contentScrollRef.current.scrollTop = 0
+        // Double-call to ensure it scrolls
+        setTimeout(() => {
+          if (contentScrollRef.current) {
+            contentScrollRef.current.scrollTop = 0
+          }
+        }, 0)
+      }
     }
-  }, [open])
+  }, [open, userId])
 
   // Load initial data
   useEffect(() => {
