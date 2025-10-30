@@ -224,6 +224,7 @@ export default function App() {
         }}
         onSignOut={async () => {
           try {
+            stopPresence()
             await supabase.auth.signOut()
           } catch (e) {
             console.warn('Sign out error', e)
