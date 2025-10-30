@@ -572,8 +572,19 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               </div>
               
               {/* Game Chat */}
-              <div className="bg-slate-900 border-2 border-slate-700 rounded-lg p-4">
-                <GameChat tableId={table.id} userId={userId} />
+              <div className="bg-slate-900 border-2 border-slate-700 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => setChatCollapsed(!chatCollapsed)}
+                  className="w-full px-4 py-3 flex items-center justify-between bg-slate-800 hover:bg-slate-700 transition border-b border-slate-700"
+                >
+                  <span className="text-sm font-semibold text-slate-300">Table Chat</span>
+                  <span className="text-xs text-slate-400">{chatCollapsed ? '▶' : '▼'}</span>
+                </button>
+                {!chatCollapsed && (
+                  <div className="p-4">
+                    <GameChat tableId={table.id} userId={userId} />
+                  </div>
+                )}
               </div>
               
               {/* Error Display */}
