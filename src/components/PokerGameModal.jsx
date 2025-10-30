@@ -325,7 +325,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   async function sitAtTable() {
     if (!userId || !userEmail) {
-      setAuthModalOpen(true)
+      onShowAuth?.('register')
       return
     }
 
