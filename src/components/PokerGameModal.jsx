@@ -33,17 +33,43 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   const handsUnsubscribeRef = useRef(null)
   const seatsUnsubscribeRef = useRef(null)
   const betsUnsubscribeRef = useRef(null)
-  
+
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
   if (!open || !table) return null
+
+  // Determine if it's current player's turn
+  useEffect(() => {
+    if (!hand || !myPosition || !userId) {
+      setActionRequired(false)
+      return
+    }
+
+    // Check if hand is in active state
+    const isHandActive = ['preflop', 'flop', 'turn', 'river'].includes(hand.round_state)
+
+    if (!isHandActive) {
+      setActionRequired(false)
+      return
+    }
+
+    // Determine if current player has already acted in this round
+    const hasActedThisRound = betHistory.some(bet =>
+      bet.user_id === userId &&
+      bet.round_state === hand.round_state
+    )
+
+    // Simple logic: if hand is active and we haven't acted this round, it's potentially our turn
+    // In a real implementation, you'd track the actual turn order from the hand state
+    setActionRequired(!hasActedThisRound && isHandActive)
+  }, [hand?.round_state, hand?.id, myPosition, userId, betHistory])
 
   // Load initial data
   useEffect(() => {
     if (!table) return
     loadGameData()
     subscribeToRealtime()
-    
+
     return () => {
       unsubscribeFromRealtime()
     }
