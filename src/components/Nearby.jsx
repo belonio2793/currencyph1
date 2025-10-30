@@ -110,8 +110,12 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     loadCities()
     loadStats()
     loadFeaturedListings()
-    loadListings()
+    // initial listings load is handled below and will re-run when userLocation/page/filters change
   }, [])
+
+  useEffect(() => {
+    loadListings()
+  }, [userLocation, page, selectedCity, expandedLetter])
 
   async function loadStats() {
     try {
