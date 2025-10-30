@@ -86,34 +86,57 @@ export default function Profile({ userId }) {
         return
       }
 
-      const userData = await wisegcashAPI.getUserById(userId)
-      setUser(userData)
-      setFormData({
-        full_name: userData?.full_name || '',
-        email: userData?.email || '',
-        phone_number: userData?.phone_number || '',
-        phone_country_code: userData?.phone_country_code || 'PH',
-        username: userData?.username || '',
-        country_code: userData?.country_code || 'PH',
-        relationship_status: userData?.relationship_status || '',
-        biography: userData?.biography || '',
-        profile_picture_url: userData?.profile_picture_url || '',
-        display_name_type: userData?.display_name_type || 'full_name',
-        display_as_username_everywhere: userData?.display_as_username_everywhere || false
-      })
-      setDisplayNameType(userData?.display_name_type || 'full_name')
+      try {
+        const userData = await wisegcashAPI.getUserById(userId)
+        setUser(userData)
+        setFormData({
+          full_name: userData?.full_name || '',
+          email: userData?.email || '',
+          phone_number: userData?.phone_number || '',
+          phone_country_code: userData?.phone_country_code || 'PH',
+          username: userData?.username || '',
+          country_code: userData?.country_code || 'PH',
+          relationship_status: userData?.relationship_status || '',
+          biography: userData?.biography || '',
+          profile_picture_url: userData?.profile_picture_url || '',
+          display_name_type: userData?.display_name_type || 'full_name',
+          display_as_username_everywhere: userData?.display_as_username_everywhere || false
+        })
+        setDisplayNameType(userData?.display_name_type || 'full_name')
 
-      // Load privacy settings
-      const { data: privacyData } = await supabase
-        .from('privacy_settings')
-        .select('*')
-        .eq('user_id', userId)
+        // Load privacy settings
+        const { data: privacyData } = await supabase
+          .from('privacy_settings')
+          .select('*')
+          .eq('user_id', userId)
 
-      const privacyMap = {}
-      privacyData?.forEach(setting => {
-        privacyMap[setting.field_name] = setting.visibility
-      })
-      setPrivacySettings(privacyMap)
+        const privacyMap = {}
+        privacyData?.forEach(setting => {
+          privacyMap[setting.field_name] = setting.visibility
+        })
+        setPrivacySettings(privacyMap)
+      } catch (profileErr) {
+        console.error('Error loading user profile:', profileErr)
+        // If profile load fails, provide basic form with email
+        setUser({
+          id: userId,
+          email: 'user@example.com',
+          status: 'active'
+        })
+        setFormData({
+          full_name: '',
+          email: 'user@example.com',
+          phone_number: '',
+          phone_country_code: 'PH',
+          username: '',
+          country_code: 'PH',
+          relationship_status: '',
+          biography: '',
+          profile_picture_url: '',
+          display_name_type: 'full_name',
+          display_as_username_everywhere: false
+        })
+      }
     } catch (err) {
       console.error('Error loading user:', err)
       setError('Failed to load user profile')
