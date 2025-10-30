@@ -119,6 +119,42 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     loadListings()
   }, [userLocation, page, selectedCity, expandedLetter])
 
+  // Real-time search: as user types, run the search (debounced)
+  useEffect(() => {
+    const q = (searchQuery || '').trim()
+    const handle = setTimeout(async () => {
+      if (!q) {
+        setSearchResults([])
+        setShowAutocomplete(false)
+        return
+      }
+
+      setShowAutocomplete(false)
+      setIsSearching(true)
+      try {
+        const { data, error: searchError } = await supabase
+          .from('nearby_listings')
+          .select('*')
+          .or(
+            `name.ilike.%${q}%,address.ilike.%${q}%,category.ilike.%${q}%,description.ilike.%${q}%,city.ilike.%${q}%,country.ilike.%${q}%`
+          )
+          .order('photo_count', { ascending: false, nullsLast: true })
+          .order('rating', { ascending: false })
+          .limit(50)
+
+        if (searchError) throw searchError
+        setSearchResults(data || [])
+      } catch (err) {
+        console.error('Error searching (realtime):', err)
+        setError('Search failed')
+      } finally {
+        setIsSearching(false)
+      }
+    }, 300) // 300ms debounce
+
+    return () => clearTimeout(handle)
+  }, [searchQuery])
+
   async function loadStats() {
     try {
       const { data: countData } = await supabase
