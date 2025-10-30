@@ -45,3 +45,184 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
 }
 
 export { supabase }
+
+// Generic Token API utilities (replacing deprecated dog token API)
+export const tokenAPI = {
+  // Get current user balance
+  async getUserBalance(userId) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('balance')
+      .eq('id', userId)
+      .single()
+    if (error) throw error
+    return data?.balance || 0
+  },
+
+  // Get or create user
+  async getOrCreateUser(email, walletAddress = null) {
+    const { data, error } = await supabase
+      .from('users')
+      .upsert([
+        {
+          email,
+          wallet_address: walletAddress,
+          region_code: 'PH'
+        }
+      ])
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  // Add deposit
+  async addDeposit(userId, amount, depositType = 'manual') {
+    // First update user balance
+    const currentBalance = await this.getUserBalance(userId)
+    const newBalance = currentBalance + amount
+
+    const { data: updatedUser, error: updateError } = await supabase
+      .from('users')
+      .update({ balance: newBalance, updated_at: new Date() })
+      .eq('id', userId)
+      .select()
+      .single()
+
+    if (updateError) throw updateError
+
+    // Then record deposit in ledger
+    const { data: deposit, error: depositError } = await supabase
+      .from('deposits')
+      .insert([
+        {
+          user_id: userId,
+          amount,
+          deposit_type: depositType,
+          status: 'completed'
+        }
+      ])
+      .select()
+      .single()
+
+    if (depositError) throw depositError
+
+    return { user: updatedUser, deposit }
+  },
+
+  // Get deposit history
+  async getDepositHistory(userId) {
+    const { data, error } = await supabase
+      .from('deposits')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+    if (error) throw error
+    return data
+  },
+
+  // Request withdrawal
+  async requestWithdrawal(userId, amount) {
+    const { data, error } = await supabase
+      .from('withdrawal_requests')
+      .insert([
+        {
+          user_id: userId,
+          amount,
+          status: 'pending'
+        }
+      ])
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  // Subscribe to balance updates
+  subscribeToBalance(userId, callback) {
+    return supabase
+      .from(`users:id=eq.${userId}`)
+      .on('UPDATE', payload => {
+        callback(payload.new.balance)
+      })
+      .subscribe()
+  },
+
+  // Get token stats
+  async getTokenStats() {
+    const { data, error } = await supabase
+      .from('token_stats')
+      .select('*')
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  // Calculate token price: total_deposits / total_supply
+  async calculateTokenPrice() {
+    try {
+      // Get total value of all deposits
+      const { data: deposits, error: depositError } = await supabase
+        .from('deposits')
+        .select('amount')
+
+      if (depositError) {
+        console.error('Error fetching deposits:', {
+          message: depositError.message,
+          code: depositError.code,
+          status: depositError.status,
+          details: depositError.details
+        })
+        throw depositError
+      }
+
+      const totalDeposits = (deposits || []).reduce((sum, d) => sum + (d.amount || 0), 0)
+
+      // Get total in circulation (sum of all user balances)
+      const { data: users, error: userError } = await supabase
+        .from('users')
+        .select('balance')
+
+      if (userError) {
+        console.error('Error fetching users:', {
+          message: userError.message,
+          code: userError.code,
+          status: userError.status,
+          details: userError.details
+        })
+        throw userError
+      }
+
+      const totalSupply = (users || []).reduce((sum, u) => sum + (u.balance || 0), 0)
+
+      // Avoid division by zero
+      if (totalSupply === 0 || totalDeposits === 0) {
+        return {
+          price: 0,
+          totalDeposits: 0,
+          totalSupply: 0,
+          marketCap: 0
+        }
+      }
+
+      const price = totalDeposits / totalSupply
+
+      return {
+        price: parseFloat(price.toFixed(4)),
+        totalDeposits: parseFloat(totalDeposits.toFixed(2)),
+        totalSupply: parseFloat(totalSupply.toFixed(2)),
+        marketCap: parseFloat((price * totalSupply).toFixed(2))
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : JSON.stringify(err)
+      console.error('Error calculating token price:', errorMessage)
+      console.warn('Using fallback values: price=0. This usually means Supabase tables are not set up yet.')
+      return {
+        price: 0,
+        totalDeposits: 0,
+        totalSupply: 0,
+        marketCap: 0
+      }
+    }
+  }
+}
