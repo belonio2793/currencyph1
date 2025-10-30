@@ -284,6 +284,12 @@ export default function App() {
           } catch (e) {
             console.warn('Sign out error', e)
           }
+          // Clear guest session from localStorage
+          try {
+            localStorage.removeItem('currency_ph_guest_session')
+          } catch (e) {
+            console.warn('Could not clear guest session', e)
+          }
           setUserId(null)
           setUserEmail(null)
           // Don't force the auth overlay — keep the current route visible (e.g., /nearby)
