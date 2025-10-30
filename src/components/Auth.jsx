@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-export default function Auth({ onAuthSuccess }) {
-  const [activeTab, setActiveTab] = useState('login')
+export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
+  const [activeTab, setActiveTab] = useState(initialTab)
+
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab)
+  }, [initialTab])
   const [identifier, setIdentifier] = useState('') // email or phone or 'guest'
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
