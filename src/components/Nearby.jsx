@@ -191,7 +191,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     }
   }
 
-  const { location: userLocation } = useGeolocation()
 
   async function loadListings() {
     setLoading(true)
