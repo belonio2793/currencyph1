@@ -198,7 +198,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const getFilteredTables = () => {
     if (activeTab === 'my-tables') {
       return tables.filter(t => t.created_by === userId)
-    } else if (activeTab === 'other-tables') {
+    } else if (activeTab === 'lobby') {
       return tables.filter(t => t.created_by !== userId || !t.created_by)
     }
     return tables
