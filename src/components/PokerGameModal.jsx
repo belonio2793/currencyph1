@@ -587,7 +587,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               </div>
               
               {/* Game Chat */}
-              <GameChat tableId={table.id} userId={userId} />
+              <div className="bg-slate-900 border-2 border-slate-700 rounded-lg p-4">
+                <GameChat tableId={table.id} userId={userId} />
+              </div>
               
               {/* Error Display */}
               {error && (
