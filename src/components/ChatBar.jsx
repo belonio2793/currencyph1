@@ -278,6 +278,137 @@ export default function ChatBar({ userId, userEmail }) {
     }
   }
 
+  const handleMediaUpload = async (file) => {
+    if (!file || !selectedConversation?.id || !userId) return
+
+    setUploading(true)
+    try {
+      // First, create a message without media
+      const convId = selectedConversation.id
+      const keyB64 = localStorage.getItem(`conv_key_${convId}`)
+      let key
+
+      if (keyB64) {
+        key = await importKeyFromBase64(keyB64)
+      } else {
+        key = await generateSymmetricKey()
+        const newKeyB64 = await exportKeyToBase64(key)
+        localStorage.setItem(`conv_key_${convId}`, newKeyB64)
+      }
+
+      const { ciphertext, iv } = await encryptString(key, `[File: ${file.name}]`)
+
+      const { data: messageData, error: msgError } = await supabase
+        .from('messages')
+        .insert([{
+          sender_id: userId,
+          conversation_id: convId,
+          ciphertext,
+          iv,
+          metadata: { type: 'media', filename: file.name, mime_type: file.type }
+        }])
+        .select()
+
+      if (msgError) throw msgError
+
+      // Upload the file to storage
+      const messageId = messageData[0].id
+      await uploadMediaToChat(messageId, file)
+
+      // Add message to list
+      setMessages(prev => [...prev, {
+        ...messageData[0],
+        plain: `[File: ${file.name}]`,
+        decrypted: true
+      }])
+      setMessageText('')
+    } catch (err) {
+      console.warn('Media upload error:', err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const startVoiceRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const mediaRecorder = new MediaRecorder(stream)
+      mediaRecorderRef.current = mediaRecorder
+      audioChunksRef.current = []
+
+      mediaRecorder.ondataavailable = (event) => {
+        audioChunksRef.current.push(event.data)
+      }
+
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
+        const duration = Math.round(audioChunksRef.current.length / 50)
+        await handleVoiceMessageUpload(audioBlob, duration)
+        stream.getTracks().forEach(track => track.stop())
+      }
+
+      mediaRecorder.start()
+      setRecordingVoice(true)
+    } catch (err) {
+      console.warn('Voice recording error:', err)
+    }
+  }
+
+  const stopVoiceRecording = () => {
+    if (mediaRecorderRef.current) {
+      mediaRecorderRef.current.stop()
+      setRecordingVoice(false)
+    }
+  }
+
+  const handleVoiceMessageUpload = async (audioBlob, duration) => {
+    if (!selectedConversation?.id || !userId) return
+
+    setUploading(true)
+    try {
+      const convId = selectedConversation.id
+      const keyB64 = localStorage.getItem(`conv_key_${convId}`)
+      let key
+
+      if (keyB64) {
+        key = await importKeyFromBase64(keyB64)
+      } else {
+        key = await generateSymmetricKey()
+        const newKeyB64 = await exportKeyToBase64(key)
+        localStorage.setItem(`conv_key_${convId}`, newKeyB64)
+      }
+
+      const { ciphertext, iv } = await encryptString(key, '[Voice Message]')
+
+      const { data: messageData, error: msgError } = await supabase
+        .from('messages')
+        .insert([{
+          sender_id: userId,
+          conversation_id: convId,
+          ciphertext,
+          iv,
+          metadata: { type: 'voice_message', duration }
+        }])
+        .select()
+
+      if (msgError) throw msgError
+
+      const messageId = messageData[0].id
+      const voiceFile = new File([audioBlob], `voice_${Date.now()}.webm`, { type: 'audio/webm' })
+      await uploadVoiceMessage(messageId, audioBlob, duration)
+
+      setMessages(prev => [...prev, {
+        ...messageData[0],
+        plain: '[Voice Message]',
+        decrypted: true
+      }])
+    } catch (err) {
+      console.warn('Voice message upload error:', err)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="fixed bottom-0 right-0 z-50 flex flex-col">
       {/* Minimized Button */}
