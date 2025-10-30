@@ -229,6 +229,7 @@ export default function Auth({ onAuthSuccess }) {
                     Sign up
                   </button>
                 </p>
+                <p className="text-center text-xs text-slate-400 mt-2">Guest login available: use identifier "guest" and password "guest"</p>
               </form>
             )}
 
