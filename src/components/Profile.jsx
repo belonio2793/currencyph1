@@ -190,6 +190,24 @@ export default function Profile({ userId }) {
     return COUNTRIES.find(c => c.code === formData.country_code)
   }
 
+  const getSelectedPhoneCountry = () => {
+    return COUNTRIES.find(c => c.code === formData.phone_country_code)
+  }
+
+  const getDisplayNamePreview = () => {
+    const type = formData.display_name_type
+    if (type === 'username') return `@${formData.username}`
+    if (type === 'first_name') {
+      const names = (formData.full_name || '').split(' ')
+      return names[0] || 'User'
+    }
+    if (type === 'last_name') {
+      const names = (formData.full_name || '').split(' ')
+      return names.length > 1 ? names[names.length - 1] : 'User'
+    }
+    return formData.full_name || 'User'
+  }
+
   const filteredCountries = COUNTRIES.filter(c =>
     c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
     c.code.toLowerCase().includes(countrySearch.toLowerCase())
