@@ -142,6 +142,21 @@ export default function App() {
     )
   }
 
+  // If content locker is enabled, show a lock screen and prevent access to the app
+  if (contentLocked) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+        <div className="max-w-xl w-full bg-white border border-slate-200 rounded-2xl p-8 text-center shadow">
+          <h1 className="text-2xl font-semibold text-slate-900 mb-4">Site Access Restricted</h1>
+          <p className="text-slate-600 mb-6">This site is currently locked by the site operator and is not publicly accessible.</p>
+          <div className="text-sm text-slate-500">
+            If you are the site owner and need to unlock it, set CONTENT_LOCKER to false in the environment variables and redeploy.
+          </div>
+        </div>
+      </div>
+    )
+  }
+
 
   return (
     <div className="min-h-screen bg-slate-50">
