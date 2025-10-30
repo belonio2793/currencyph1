@@ -225,33 +225,36 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                       <circle cx="200" cy="160" r="20" fill="none" stroke="#4b5563" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
                     </svg>
 
-                    {/* Seats arranged in circle */}
+                    {/* Seats arranged around table edges */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="relative w-80 h-64">
+                      <div className="relative" style={{ width: '420px', height: '340px' }}>
                         {Array.from({ length: selectedTable.max_seats }).map((_, i) => {
                           const angle = (i / selectedTable.max_seats) * Math.PI * 2 - Math.PI / 2
-                          const radius = selectedTable.max_seats <= 6 ? 95 : 85
-                          const x = Math.cos(angle) * radius
-                          const y = Math.sin(angle) * radius
+                          const radiusX = 200
+                          const radiusY = 150
+                          const x = Math.cos(angle) * radiusX
+                          const y = Math.sin(angle) * radiusY
+                          const rotateDeg = (angle * 180 / Math.PI) + 90
 
                           const seat = seats.find(s => s.seat_number === i + 1)
 
                           return (
                             <div
                               key={i}
-                              className="absolute w-16 h-20 flex flex-col items-center justify-center"
+                              className="absolute flex flex-col items-center justify-start"
                               style={{
-                                transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
+                                transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotateDeg}deg)`,
                                 left: '50%',
                                 top: '50%',
                               }}
                             >
                               <div
-                                className={`w-14 h-16 rounded-lg border-2 flex flex-col items-center justify-center text-xs font-semibold transition ${
+                                className={`w-16 h-20 rounded-lg border-2 flex flex-col items-center justify-center text-xs font-semibold transition ${
                                   seat
                                     ? 'bg-amber-600 border-amber-500 text-white shadow-lg'
                                     : 'bg-slate-600 border-slate-500 text-slate-300 hover:bg-slate-500'
                                 }`}
+                                style={{ transform: `rotate(${-rotateDeg}deg)` }}
                               >
                                 <div className="text-center">
                                   {seat ? (
