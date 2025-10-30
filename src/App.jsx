@@ -170,7 +170,28 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50">
       <HeaderMap />
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} />
+      <Navbar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        globalCurrency={globalCurrency}
+        setGlobalCurrency={setGlobalCurrency}
+        userEmail={userEmail}
+        onShowAuth={(tab) => {
+          setShowAuth(true)
+          if (tab === 'register') window.history.replaceState(null, '', '/register')
+          else window.history.replaceState(null, '', '/login')
+        }}
+        onSignOut={async () => {
+          try {
+            await supabase.auth.signOut()
+          } catch (e) {
+            console.warn('Sign out error', e)
+          }
+          setUserId(null)
+          setUserEmail(null)
+          setShowAuth(true)
+        }}
+      />
 
       {/* User Status Bar */}
       {activeTab !== 'home' && (
