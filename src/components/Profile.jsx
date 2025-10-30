@@ -43,7 +43,10 @@ export default function Profile({ userId }) {
   const [usernameAvailable, setUsernameAvailable] = useState(null)
   const [countrySearch, setCountrySearch] = useState('')
   const [showCountryDropdown, setShowCountryDropdown] = useState(false)
+  const [phoneCountrySearch, setPhoneCountrySearch] = useState('')
+  const [showPhoneCountryDropdown, setShowPhoneCountryDropdown] = useState(false)
   const [openPrivacyDropdown, setOpenPrivacyDropdown] = useState(null)
+  const [displayNameType, setDisplayNameType] = useState('full_name')
 
   useEffect(() => {
     loadUser()
