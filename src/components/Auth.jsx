@@ -323,10 +323,6 @@ export default function Auth({ onAuthSuccess }) {
           </div>
         </div>
 
-        {/* Footer */}
-        <p className="text-center text-sm text-slate-500 mt-8">
-          &copy; 2024 currency.ph. All rights reserved.
-        </p>
       </div>
     </div>
   )
