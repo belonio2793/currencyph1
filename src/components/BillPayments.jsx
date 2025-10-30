@@ -38,6 +38,13 @@ export default function BillPayments({ userId }) {
 
   const loadData = async () => {
     try {
+      // Skip for guest-local or invalid user IDs
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        setBills([])
+        setWallets([])
+        setLoading(false)
+        return
+      }
       const [billsData, walletsData] = await Promise.all([
         wisegcashAPI.getBills(userId),
         wisegcashAPI.getWallets(userId)
@@ -48,8 +55,9 @@ export default function BillPayments({ userId }) {
         setSelectedCurrency(walletsData[0].currency_code)
       }
     } catch (err) {
-      console.error('Error loading data:', err)
       setError('Failed to load bills')
+      setBills([])
+      setWallets([])
     } finally {
       setLoading(false)
     }
