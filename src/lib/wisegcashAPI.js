@@ -92,6 +92,9 @@ export const wisegcashAPI = {
   },
 
   async getWallets(userId) {
+    // Guard against invalid userId values like the string "null" which can break Postgres UUID comparisons
+    if (!userId || userId === 'null' || userId === 'undefined') return []
+
     const { data, error } = await supabase
       .from('wallets')
       .select('*')
@@ -386,6 +389,9 @@ export const wisegcashAPI = {
   },
 
   async getTransactions(userId, limit = 20) {
+    // Protect against bad input where userId might be the literal string "null" from client state
+    if (!userId || userId === 'null' || userId === 'undefined') return []
+
     const { data, error } = await supabase
       .from('transactions')
       .select('*')
