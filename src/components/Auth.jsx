@@ -14,7 +14,7 @@ export default function Auth({ onAuthSuccess }) {
   const normalizeIdentifier = (id) => {
     const v = (id || '').trim()
     if (!v) return ''
-    if (v === 'guest') return 'guest@currency.local'
+    if (v === 'guest') return 'guest@currency.ph'
     if (v.includes('@')) return v
     // treat as phone or username
     return `${v}@currency.local`
