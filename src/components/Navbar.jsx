@@ -113,6 +113,36 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 {btn.label}
               </button>
             ))}
+
+            {/* Auth controls */}
+            <div className="ml-4 flex items-center gap-2">
+              {userEmail ? (
+                <>
+                  <span className="text-sm text-slate-600">{userEmail}</span>
+                  <button
+                    onClick={() => onSignOut && onSignOut()}
+                    className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50"
+                  >
+                    Sign out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => onShowAuth && onShowAuth('login')}
+                    className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => onShowAuth && onShowAuth('register')}
+                    className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  >
+                    Register
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
           {/* Secondary row for Manage Investments (desktop) */}
