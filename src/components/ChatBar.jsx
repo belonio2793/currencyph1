@@ -5,7 +5,7 @@ import { getFriendsList, sendFriendRequest, removeFriend, isFriend, getPendingFr
 import { getOrCreateDirectConversation } from '../lib/conversations'
 import { uploadMediaToChat, uploadVoiceMessage } from '../lib/chatMedia'
 import { subscribeToMultiplePresence, getMultipleUsersPresence } from '../lib/presence'
-import useGeolocation from '../lib/useGeolocation'
+import { useGeolocation } from '../lib/useGeolocation'
 
 export default function ChatBar({ userId, userEmail }) {
   const [minimized, setMinimized] = useState(true)
