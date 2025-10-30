@@ -70,20 +70,28 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
             const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || process.env.PROJECT_URL
             try {
               if (PROJECT_URL) {
-                const fnRes = await fetch(`${PROJECT_URL}/functions/v1/create-guest`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ email, password: effectivePassword, full_name: 'Guest' })
-                })
-                if (!fnRes.ok) {
-                  const txt = await fnRes.text().catch(()=>'')
-                  console.warn('create-guest function failed', fnRes.status, txt)
-                  throw new Error('create-guest failed')
+                const controller = new AbortController()
+                const timeout = setTimeout(() => controller.abort(), 5000)
+                try {
+                  const fnRes = await fetch(`${PROJECT_URL}/functions/v1/create-guest`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password: effectivePassword, full_name: 'Guest' }),
+                    signal: controller.signal
+                  })
+                  clearTimeout(timeout)
+                  if (!fnRes.ok) {
+                    const txt = await fnRes.text().catch(()=>'')
+                    console.warn('create-guest function failed', fnRes.status, txt)
+                    throw new Error('create-guest failed')
+                  }
+                  // After creation, sign in
+                  const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+                  if (retry.error) throw retry.error
+                  data = retry.data
+                } finally {
+                  clearTimeout(timeout)
                 }
-                // After creation, sign in
-                const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-                if (retry.error) throw retry.error
-                data = retry.data
               } else {
                 throw new Error('Project URL not configured')
               }
@@ -92,23 +100,31 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
               // fallback to admin direct (if service role key is present on client)
               const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
               if (ADMIN_KEY && PROJECT_URL) {
-                const res = await fetch(`${PROJECT_URL}/auth/v1/admin/users`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    apikey: ADMIN_KEY,
-                    Authorization: `Bearer ${ADMIN_KEY}`,
-                  },
-                  body: JSON.stringify({ email, password: effectivePassword, email_confirm: true, user_metadata: { full_name: 'Guest' } }),
-                })
-                if (res.ok) {
-                  const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-                  if (retry.error) throw retry.error
-                  data = retry.data
-                } else {
-                  const txt = await res.text().catch(()=>'')
-                  console.warn('Admin create user failed', res.status, txt)
-                  throw new Error('Admin create user failed')
+                const controller = new AbortController()
+                const timeout = setTimeout(() => controller.abort(), 5000)
+                try {
+                  const res = await fetch(`${PROJECT_URL}/auth/v1/admin/users`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                      apikey: ADMIN_KEY,
+                      Authorization: `Bearer ${ADMIN_KEY}`,
+                    },
+                    body: JSON.stringify({ email, password: effectivePassword, email_confirm: true, user_metadata: { full_name: 'Guest' } }),
+                    signal: controller.signal
+                  })
+                  clearTimeout(timeout)
+                  if (res.ok) {
+                    const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+                    if (retry.error) throw retry.error
+                    data = retry.data
+                  } else {
+                    const txt = await res.text().catch(()=>'')
+                    console.warn('Admin create user failed', res.status, txt)
+                    throw new Error('Admin create user failed')
+                  }
+                } finally {
+                  clearTimeout(timeout)
                 }
               } else {
                 throw err
