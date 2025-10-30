@@ -121,9 +121,12 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
       }
 
       const json = await res.json()
-      await openTable(tables.find(t => t.id === tableId))
+      const table = tables.find(t => t.id === tableId)
+      if (table) {
+        await openTable(table)
+      }
     } catch (e) {
-      alert('Could not join table: ' + (e.message || e))
+      setError(`Could not join table: ${e.message || e}`)
     }
   }
 
