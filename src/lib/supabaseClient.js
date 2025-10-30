@@ -33,7 +33,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
       signUp: missingError('auth.signUp'),
       getUser: async () => ({ data: { user: null }, error: null })
     },
-    channel: () => ({ subscribe: missingError('channel().subscribe') }),
+    channel: (name) => ({
+      // allow .on(...).subscribe() chaining
+      on: () => ({ subscribe: missingError('channel().on().subscribe') }),
+      // allow subscribe() directly
+      subscribe: missingError('channel().subscribe')
+    }),
+    removeChannel: (c) => { /* noop when supabase not configured */ },
     rpc: missingError('rpc')
   }
 }
