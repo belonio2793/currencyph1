@@ -5,7 +5,6 @@ import BettingControls from './BettingControls'
 import PlayerSeats from './PlayerSeats'
 import PotDisplay from './PotDisplay'
 import GameChat from './GameChat'
-import PokerAuthModal from './PokerAuthModal'
 
 export default function PokerGameModal({ open, onClose, table, userId, userEmail, onShowAuth, onLeaveTable }) {
   // Game state
