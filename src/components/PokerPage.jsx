@@ -59,6 +59,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   function openGameModal(table) {
     setGameModalTable(table)
     setGameModalOpen(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   function closeGameModal() {
