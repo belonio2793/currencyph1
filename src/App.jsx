@@ -246,6 +246,7 @@ export default function App() {
             }} /> }
             {activeTab === 'network' && <Network userId={userId} />}
             {activeTab === 'about' && <About />}
+            {activeTab === 'inbox' && <Inbox userId={userId} />}
           </>
         )}
       </main>
