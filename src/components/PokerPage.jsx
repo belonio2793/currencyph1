@@ -443,6 +443,16 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         currencyCode={rakeModal.currencyCode}
         onRakeProcessed={handleRakeProcessed}
       />
+
+      <PokerGameModal
+        open={gameModalOpen}
+        onClose={closeGameModal}
+        table={gameModalTable}
+        userId={userId}
+        userEmail={userEmail}
+        onShowAuth={onShowAuth}
+        onLeaveTable={handleLeaveTable}
+      />
     </div>
   )
 }
