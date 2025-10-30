@@ -33,8 +33,8 @@ export default function SendLocationModal({ open, onClose, location, city, sende
   }
 
   return (
-    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-lg shadow max-w-lg w-full">
+    <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
+      <div className="bg-white rounded-lg shadow max-w-lg w-full" onClick={e => e.stopPropagation()}>
         <div className="p-4 border-b flex items-center justify-between">
           <h3 className="text-lg font-semibold">Send Location</h3>
           <button onClick={onClose} className="text-slate-600">Close</button>
