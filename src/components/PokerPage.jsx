@@ -81,13 +81,28 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
       const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
 
       // Join table with starting balance
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
       const res = await fetch(FUNCTIONS_BASE + '/join_table', {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
         body: JSON.stringify({ tableId, userId, seatNumber, startingBalance: currentBalance })
       })
+
+      if (!res.ok) {
+        let errorMsg = 'Failed to sit'
+        try {
+          const json = await res.json()
+          errorMsg = json.error || errorMsg
+        } catch (e) {
+          // Could not parse JSON error response
+        }
+        throw new Error(errorMsg)
+      }
+
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Failed to sit')
       await openTable(tables.find(t => t.id === tableId))
     } catch (e) {
       alert('Could not join table: ' + (e.message || e))
@@ -96,9 +111,28 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
 
   async function handleStartHand(tableId) {
     try {
-      const res = await fetch(FUNCTIONS_BASE + '/start_hand', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tableId }) })
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+      const res = await fetch(FUNCTIONS_BASE + '/start_hand', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({ tableId })
+      })
+
+      if (!res.ok) {
+        let errorMsg = 'Failed to start hand'
+        try {
+          const json = await res.json()
+          errorMsg = json.error || errorMsg
+        } catch (e) {
+          // Could not parse JSON error response
+        }
+        throw new Error(errorMsg)
+      }
+
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error || 'Failed to start hand')
       alert('Hand started')
       await openTable(tables.find(t => t.id === tableId))
     } catch (e) {
