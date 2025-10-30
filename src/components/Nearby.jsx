@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import ListingCard from './ListingCard'
 import { imageManager } from '../lib/imageManager'
 import { nearbyUtils } from '../lib/nearbyUtils'
+import { useGeolocation } from '../lib/useGeolocation'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
