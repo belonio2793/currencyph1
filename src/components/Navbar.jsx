@@ -6,10 +6,10 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const mainNav = [
-    { id: 'home', label: 'Home' },
-    { id: 'nearby', label: 'Nearby' },
-    { id: 'wallet', label: 'Wallets' },
-    { id: 'send', label: 'Send' }
+    { id: 'home', label: 'Home', public: true },
+    { id: 'nearby', label: 'Nearby', auth: true },
+    { id: 'wallet', label: 'Wallets', auth: true },
+    { id: 'send', label: 'Send', auth: true }
   ]
 
   const secondaryNav = [
