@@ -250,7 +250,10 @@ export default function App() {
           </div>
           <div className="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 tracking-wide">
             <p>&copy; {new Date().getFullYear()} currency.ph. All rights reserved.</p>
-            <p className="mt-3">
+            <p className="mt-3 space-x-4">
+              <button onClick={() => setActiveTab('about')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                About
+              </button>
               <button onClick={() => setActiveTab('network')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                 Network Balances
               </button>
