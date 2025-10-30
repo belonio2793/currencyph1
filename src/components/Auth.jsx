@@ -146,7 +146,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
         })
         clearTimeout(timeout)
         if (!res.ok) {
-          const txt = await res.text().catch(()=>'')
+          const txt = await (res.text().catch(()=>''))
           // surface 401 with helpful message
           if (res.status === 401) throw new Error(txt || 'Unauthorized to call resend-confirmation function')
           throw new Error(txt || `Server error ${res.status}`)
@@ -270,7 +270,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
                     if (retry.error) throw retry.error
                     data = retry.data
                   } else {
-                    const txt = await res.text().catch(()=>'')
+                    const txt = await (res.text().catch(()=>''))
                     console.warn('Admin create user failed', res.status, txt)
                     throw new Error('Admin create user failed')
                   }
