@@ -227,7 +227,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         )}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-4xl font-light text-white">Poker</h2>
-          {(activeTab === 'my-tables' || activeTab === 'other-tables') && (
+          {(activeTab === 'my-tables' || activeTab === 'lobby') && (
             <div className="flex items-center gap-2">
               <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>
               <button onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Create Table</button>
