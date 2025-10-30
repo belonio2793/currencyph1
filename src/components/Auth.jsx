@@ -381,7 +381,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••��•"
+                    placeholder="••••••••"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
