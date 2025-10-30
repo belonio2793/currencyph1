@@ -168,9 +168,41 @@ export default function HeaderMap() {
                 Real-time tracking enabled. Updates automatically as you move.
               </div>
             </div>
+            <div className="p-4 border-t border-slate-200 flex items-center justify-between">
+              <div className="text-xs text-slate-600">Share your location with a user</div>
+              <div>
+                <SendLocationButton location={displayLocation} city={city} />
+              </div>
+            </div>
           </div>
         </div>
       )}
     </div>
+  )
+}
+
+
+function SendLocationButton({ location, city }) {
+  const [open, setOpen] = useState(false)
+  const [userId, setUserId] = useState(null)
+
+  useEffect(() => {
+    // attempt to get logged in supabase user id via client
+    const fetchUser = async () => {
+      try {
+        const { data: { user } } = await import('../lib/supabaseClient').then(m => m.supabase.auth.getUser())
+        if (user) setUserId(user.id)
+      } catch (e) {
+        // ignore
+      }
+    }
+    fetchUser()
+  }, [])
+
+  return (
+    <>
+      <button onClick={() => setOpen(true)} className="px-3 py-2 bg-white border rounded text-sm">Send Location</button>
+      {open && <SendLocationModal open={open} onClose={() => setOpen(false)} location={location} city={city} senderId={userId} />}
+    </>
   )
 }
