@@ -33,11 +33,17 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   }
 
   async function handleCreate(name, stakeMin, stakeMax) {
+    if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
     try {
-      const { data, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax }]).select().single()
+      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax }]).select().single()
       if (error) throw error
+
+      // Auto-sit creator at seat 1
+      const { error: seatError } = await supabase.from('poker_seats').insert([{ table_id: table.id, user_id: userId, seat_number: 1 }])
+      if (seatError) console.warn('Could not auto-sit creator:', seatError)
+
       await loadTables()
-      setSelectedTable(data)
+      setSelectedTable(table)
     } catch (e) {
       alert('Create table failed: ' + (e.message || e))
     }
