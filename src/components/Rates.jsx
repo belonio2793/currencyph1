@@ -164,13 +164,11 @@ export default function Rates({ globalCurrency }) {
         }
       } catch (err) {
         lastErr = err
-        console.debug(`fetchWithRetries attempt ${i + 1} failed for ${url}:`, err?.message || err)
         if (i < retries) {
           await new Promise(r => setTimeout(r, backoff * (i + 1)))
         }
       }
     }
-    console.debug(`Fetch failed after ${retries + 1} attempts for ${url}:`, lastErr?.message || lastErr)
     return null
   }
 
