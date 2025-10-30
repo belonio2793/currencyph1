@@ -184,7 +184,7 @@ serve(async (req) => {
 
     if (path.endsWith('/join_table') && req.method === 'POST') {
       const body = await req.json()
-      const r = await joinTable(body.tableId, body.userId, Number(body.seatNumber))
+      const r = await joinTable(body.tableId, body.userId, Number(body.seatNumber), Number(body.startingBalance) || 0)
       return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
     }
 
