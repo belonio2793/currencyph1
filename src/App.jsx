@@ -49,8 +49,37 @@ export default function App() {
         metaDesc.setAttribute('content', 'Currency - Philippines: open-source multi-currency dashboard and network balances.')
       }
     }
+
+    // Initialize current user from Supabase and routing
     initializeUser()
     handleRouting()
+
+    // Subscribe to Supabase auth state changes so session is kept in sync across tabs
+    let authSubscription = null
+    try {
+      const { data } = supabase.auth.onAuthStateChange((event, session) => {
+        try {
+          if (session && session.user) {
+            setUserId(session.user.id)
+            setUserEmail(session.user.email)
+            // ensure presence and balance are initialized for new session
+            initializePresence(session.user.id).catch(() => {})
+            loadTotalBalance(session.user.id).catch(() => {})
+            setShowAuth(false)
+          } else {
+            // no active session
+            setUserId(null)
+            setUserEmail(null)
+            // don't force the auth UI here; keep current route visible
+          }
+        } catch (e) {
+          console.warn('Auth state handler error', e)
+        }
+      })
+      authSubscription = data?.subscription || data
+    } catch (e) {
+      console.warn('Could not subscribe to auth state changes', e)
+    }
 
     // Populate slugs for listings if needed (one-time operation)
     populateSlugsForListings(supabase).catch((err) => {
@@ -70,6 +99,7 @@ export default function App() {
       window.removeEventListener('popstate', handleRouting)
       window.removeEventListener('hashchange', handleRouting)
       backgroundSync.stop()
+      try { if (authSubscription && typeof authSubscription.unsubscribe === 'function') authSubscription.unsubscribe() } catch (e) { /* ignore */ }
     }
   }, [])
 
