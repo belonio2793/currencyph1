@@ -14,17 +14,18 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   const [seats, setSeats] = useState([])
   const [communityCards, setCommunityCards] = useState([])
   const [pot, setPot] = useState(0)
-  const [currentPlayer, setCurrentPlayer] = useState(null)
+  const [currentPlayerSeat, setCurrentPlayerSeat] = useState(null)
   const [actionRequired, setActionRequired] = useState(false)
   const [playerBalance, setPlayerBalance] = useState(0)
   const [waitingForPlayers, setWaitingForPlayers] = useState(false)
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
-  
+
   // Player action state
   const [selectedBet, setSelectedBet] = useState(0)
   const [betHistory, setBetHistory] = useState([])
   const [myPosition, setMyPosition] = useState(null)
+  const [dealerSeat, setDealerSeat] = useState(null)
 
   // Auth modal
   const [authModalOpen, setAuthModalOpen] = useState(false)
