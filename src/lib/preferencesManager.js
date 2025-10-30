@@ -3,7 +3,8 @@ export const preferencesManager = {
     try {
       const key = userId ? `preferences_${userId}_autoScroll` : 'preferences_guest_autoScroll'
       const stored = localStorage.getItem(key)
-      return stored !== null ? stored === 'true' : true
+      const result = stored !== null ? stored === 'true' : true
+      return result
     } catch (e) {
       console.warn('Failed to read preference:', e)
       return true
