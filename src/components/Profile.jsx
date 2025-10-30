@@ -183,24 +183,26 @@ export default function Profile({ userId }) {
 
       await wisegcashAPI.updateUserProfile(userId, updateData)
 
-      // Save privacy settings
-      for (const [field, visibility] of Object.entries(privacySettings)) {
-        const { data: existing } = await supabase
-          .from('privacy_settings')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('field_name', field)
-          .single()
+      // Save privacy settings (skip for guest accounts)
+      if (isValidUUID(userId)) {
+        for (const [field, visibility] of Object.entries(privacySettings)) {
+          const { data: existing } = await supabase
+            .from('privacy_settings')
+            .select('id')
+            .eq('user_id', userId)
+            .eq('field_name', field)
+            .single()
 
-        if (existing) {
-          await supabase
-            .from('privacy_settings')
-            .update({ visibility })
-            .eq('id', existing.id)
-        } else {
-          await supabase
-            .from('privacy_settings')
-            .insert([{ user_id: userId, field_name: field, visibility }])
+          if (existing) {
+            await supabase
+              .from('privacy_settings')
+              .update({ visibility })
+              .eq('id', existing.id)
+          } else {
+            await supabase
+              .from('privacy_settings')
+              .insert([{ user_id: userId, field_name: field, visibility }])
+          }
         }
       }
 
