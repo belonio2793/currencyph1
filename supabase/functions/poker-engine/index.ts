@@ -232,7 +232,31 @@ Deno.serve(async (req) => {
 
     if (path.endsWith('/post_bet') && req.method === 'POST') {
       const body = await req.json()
-      const r = await postBet(body.handId, body.userId, Number(body.amount))
+      const r = await postBet(body.handId, body.userId, Number(body.amount), body.action || 'bet')
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/fold') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await postBet(body.handId, body.userId, 0, 'fold')
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/check') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await postBet(body.handId, body.userId, 0, 'check')
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/call') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await postBet(body.handId, body.userId, Number(body.amount) || 0, 'call')
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/raise') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await postBet(body.handId, body.userId, Number(body.amount), 'raise')
       return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
