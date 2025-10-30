@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import RakeModal from './RakeModal'
 import HouseBalanceTab from './HouseBalanceTab'
 import PokerGameModal from './PokerGameModal'
+import { preferencesManager } from '../lib/preferencesManager'
 
 export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const pageRef = useRef(null)
