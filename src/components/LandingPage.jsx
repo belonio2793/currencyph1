@@ -522,13 +522,17 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
   const loadRecentTransactions = async () => {
     try {
+      // Skip for guest-local or invalid user IDs
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        setRecentTransactions([])
+        return
+      }
       const data = await wisegcashAPI.getTransactions(userId, 5)
       setRecentTransactions(data)
     } catch (err) {
-      // Normalize error message for UI and logs
-      const msg = err && (err.message || (typeof err === 'string' ? err : JSON.stringify(err))) || 'Failed to load transactions'
-      console.error('Error loading transactions:', err)
-      setError(`Error loading transactions: ${msg}`)
+      // Silently fail for transaction loading - it's not critical
+      console.debug('Could not load recent transactions:', err?.message || err)
+      setRecentTransactions([])
     }
   }
 
