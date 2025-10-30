@@ -238,16 +238,16 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         {/* Tab Navigation */}
         <div className="mb-8 flex items-center gap-2 border-b border-slate-700">
           <button
+            onClick={() => setActiveTab('lobby')}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'lobby' ? 'border-b-2 border-purple-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+          >
+            Lobby
+          </button>
+          <button
             onClick={() => setActiveTab('my-tables')}
             className={`px-6 py-3 font-semibold transition ${activeTab === 'my-tables' ? 'border-b-2 border-blue-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
             My Tables
-          </button>
-          <button
-            onClick={() => setActiveTab('other-tables')}
-            className={`px-6 py-3 font-semibold transition ${activeTab === 'other-tables' ? 'border-b-2 border-purple-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
-          >
-            Other Tables
           </button>
           <button
             onClick={() => setActiveTab('network-balances')}
