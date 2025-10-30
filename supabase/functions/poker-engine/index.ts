@@ -55,8 +55,27 @@ async function startHand(tableId: string) {
   const { data: seats } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).order('seat_number')
   if (!seats || seats.length < 2) throw new Error('Need at least 2 players')
 
+  // Determine dealer position (rotate for next hand)
+  const { data: lastHand } = await supabase
+    .from('poker_hands')
+    .select('dealer_seat')
+    .eq('table_id', tableId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+
+  const currentDealerSeat = lastHand && lastHand[0]?.dealer_seat ? lastHand[0].dealer_seat : 0
+  const nextDealerSeat = (currentDealerSeat % seats.length) + 1
+
   // create hand
-  const { data: hand } = await supabase.from('poker_hands').insert([{ table_id: tableId, round_state: 'preflop' }]).select().single()
+  const { data: hand } = await supabase
+    .from('poker_hands')
+    .insert([{
+      table_id: tableId,
+      round_state: 'preflop',
+      dealer_seat: nextDealerSeat
+    }])
+    .select()
+    .single()
   if (!hand) throw new Error('Could not create hand')
 
   // build and shuffle deck
@@ -73,10 +92,26 @@ async function startHand(tableId: string) {
   const { error: holeErr } = await supabase.from('poker_hole_cards').insert(holeInserts)
   if (holeErr) throw holeErr
 
-  // store remaining deck in audit for deterministic replay (not stored literally, store a hash or encrypted blob in production)
-  await supabase.from('poker_audit').insert([{ hand_id: hand.id, table_id: tableId, event: 'deck_shuffled', payload: { deck_remaining: deck.slice(deckIndex) } }])
+  // store remaining deck in audit for deterministic replay
+  await supabase.from('poker_audit').insert([{
+    hand_id: hand.id,
+    table_id: tableId,
+    event: 'hand_started',
+    payload: {
+      dealer_seat: nextDealerSeat,
+      num_players: seats.length,
+      deck_remaining: deck.slice(deckIndex)
+    }
+  }])
 
-  return { handId: hand.id, dealt: holeInserts.map(h => ({ user_id: h.user_id, seat_number: h.seat_number })) }
+  return {
+    handId: hand.id,
+    dealerSeat: nextDealerSeat,
+    smallBlindSeat: nextDealerSeat === seats.length ? 1 : nextDealerSeat + 1,
+    bigBlindSeat: nextDealerSeat === seats.length - 1 ? 1 : (nextDealerSeat === seats.length ? 2 : nextDealerSeat + 2),
+    actionOnSeat: nextDealerSeat === seats.length - 1 ? 1 : (nextDealerSeat === seats.length ? 2 : nextDealerSeat + 2),
+    dealt: holeInserts.map(h => ({ user_id: h.user_id, seat_number: h.seat_number }))
+  }
 }
 
 async function postBet(handId: string, userId: string, amount: number, action: string = 'bet') {
