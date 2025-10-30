@@ -20,6 +20,7 @@ import ListingDetail from './components/ListingDetail'
 import Network from './components/Network'
 import About from './components/About'
 import Inbox from './components/Inbox'
+import ChatBar from './components/ChatBar'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
