@@ -51,13 +51,18 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     }
     // Scroll to top if preference is enabled, otherwise scroll to table view
     const autoScroll = preferencesManager.getAutoScrollToTop(userId)
-    setTimeout(() => {
-      if (autoScroll) {
+    if (autoScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      setTimeout(() => {
         window.scrollTo({ top: 0, behavior: 'smooth' })
-      } else if (tableViewRef.current) {
-        tableViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    }, 100)
+      }, 50)
+    } else {
+      setTimeout(() => {
+        if (tableViewRef.current) {
+          tableViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    }
   }
 
   function openGameModal(table) {
