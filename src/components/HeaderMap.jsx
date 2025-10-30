@@ -38,6 +38,36 @@ function MapUpdater({ location }) {
   return null
 }
 
+function CenterButton({ location, fallback }) {
+  const map = useMap()
+
+  const handleCenter = () => {
+    const loc = location || fallback
+    if (!loc) return
+    try {
+      map.setView([loc.latitude, loc.longitude], 13)
+      setTimeout(() => { try { map.invalidateSize() } catch (e) {} }, 50)
+    } catch (e) {
+      console.debug('CenterButton failed to set view', e)
+    }
+  }
+
+  return (
+    <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000 }}>
+      <button
+        onClick={handleCenter}
+        title="Center map to your location"
+        className="bg-white p-2 rounded shadow hover:bg-slate-50 border border-slate-200"
+      >
+        <svg className="w-5 h-5 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l2 2" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
 export default function HeaderMap({ userId: headerUserId }) {
   const { location, error, loading, city } = useGeolocation()
   const [isExpanded, setIsExpanded] = useState(false)
@@ -131,6 +161,9 @@ export default function HeaderMap({ userId: headerUserId }) {
                     </Popup>
                   </Marker>
                 )}
+
+                {/* Center button control - uses map instance via useMap */}
+                <CenterButton location={location} fallback={displayLocation} />
 
                 <MapUpdater location={location} />
               </MapContainer>
