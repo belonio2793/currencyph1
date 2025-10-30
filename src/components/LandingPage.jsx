@@ -320,35 +320,24 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
       // Only attempt edge function if we have proper environment variables
       if (supabaseUrl && anonKey) {
-        try {
-          data = await fetchWithRetries(
-            `${supabaseUrl}/functions/v1/fetch-rates`,
-            {
-              headers: {
-                'Authorization': `Bearer ${anonKey}`,
-                'Content-Type': 'application/json'
-              }
-            },
-            1,
-            1000
-          )
-        } catch (err) {
-          console.debug('Edge function fetch failed, falling back to public APIs:', err?.message || err)
-        }
-      } else {
-        console.debug('Supabase environment variables not configured, skipping edge function')
+        data = await fetchWithRetries(
+          `${supabaseUrl}/functions/v1/fetch-rates`,
+          {
+            headers: {
+              'Authorization': `Bearer ${anonKey}`,
+              'Content-Type': 'application/json'
+            }
+          },
+          1,
+          1000
+        )
       }
 
       if (!data || !data.cryptoPrices) {
         const ids = [
           'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
         ].join(',')
-        let cg = null
-        try {
-          cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 500)
-        } catch (cgErr) {
-          console.debug('CoinGecko fetch failed:', cgErr?.message || cgErr)
-        }
+        const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 1, 500)
 
         const cryptoData = cg || {}
         const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
@@ -396,7 +385,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       }
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
-      console.debug('Crypto prices API error in LandingPage, using default prices:', err?.message || String(err))
+      // Silently fall back to defaults on any error
       setCryptoRates(defaultCryptoPrices)
     }
   }
