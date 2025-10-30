@@ -12,9 +12,6 @@
   Usage: node scripts/cleanup_nearby.js
 */
 
-import dotenv from 'dotenv'
-dotenv.config()
-
 import { createClient } from '@supabase/supabase-js'
 
 const SUPABASE_URL = process.env.VITE_PROJECT_URL || process.env.SUPABASE_URL || process.env.SUPABASE_PROJECT_URL
