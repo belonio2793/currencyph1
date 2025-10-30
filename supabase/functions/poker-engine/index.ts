@@ -127,14 +127,20 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
     if (!seat) throw new Error('Seat not found')
 
-    // Deduct rake from player wallet
+    // Calculate tip
+    const tipAmount = Math.round(rakeAmount * (tipPercent / 100))
+
+    // Total deduction: rake + tip
+    const totalDeduction = rakeAmount + tipAmount
+
+    // Deduct rake and tip from player wallet
     const { data: playerWallet } = await supabase.from('wallets').select('*').eq('user_id', userId).eq('currency_code', currencyCode).single()
     if (!playerWallet) throw new Error('Player wallet not found')
 
     const playerCurrentBalance = Number(playerWallet.balance)
-    if (playerCurrentBalance < rakeAmount) throw new Error('Insufficient balance for rake')
+    if (playerCurrentBalance < totalDeduction) throw new Error('Insufficient balance for rake and tip')
 
-    const playerNewBalance = playerCurrentBalance - rakeAmount
+    const playerNewBalance = playerCurrentBalance - totalDeduction
     await supabase.from('wallets').update({ balance: playerNewBalance, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', currencyCode)
 
     // Get House wallet and update it
@@ -142,15 +148,15 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     if (!houseWallet) throw new Error('House wallet not found')
 
     const houseCurrentBalance = Number(houseWallet.balance)
-    const houseNewBalance = houseCurrentBalance + rakeAmount
+    const houseNewBalance = houseCurrentBalance + totalDeduction
     await supabase.from('wallets').update({ balance: houseNewBalance, updated_at: new Date() }).eq('user_id', HOUSE_ID).eq('currency_code', currencyCode)
 
-    // Record rake transaction
+    // Record rake transaction (rake only, or total? Assuming total as amount)
     await supabase.from('rake_transactions').insert([{
       house_id: HOUSE_ID,
       user_id: userId,
       table_id: tableId,
-      amount: rakeAmount,
+      amount: totalDeduction,
       tip_percent: tipPercent,
       currency_code: currencyCode,
       balance_after: houseNewBalance
@@ -167,7 +173,7 @@ async function processRake(userId: string, tableId: string, startingBalance: num
       rake_percent: 10,
       rake_amount: rakeAmount,
       tip_percent: tipPercent,
-      tip_amount: rakeAmount,
+      tip_amount: tipAmount,
       currency_code: currencyCode,
       left_at: new Date()
     }])
@@ -183,7 +189,7 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     await supabase.from('poker_tables').delete().eq('id', tableId)
   }
 
-  return { success: true, rakeAmount, finalBalance: endingBalance - rakeAmount }
+  return { success: true, rakeAmount, tipAmount: tipPercent > 0 ? Math.round(rakeAmount * (tipPercent / 100)) : 0, finalBalance: endingBalance - rakeAmount - (tipPercent > 0 ? Math.round(rakeAmount * (tipPercent / 100)) : 0) }
 }
 
 const corsHeaders = {
