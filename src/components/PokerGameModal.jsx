@@ -285,17 +285,17 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   async function submitAction(action, amount = 0) {
     if (!userId || !hand) return
-    
+
     try {
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-      
+
       let endpoint = '/post_bet'
       if (action === 'fold') {
         endpoint = '/fold'
       } else if (action === 'check') {
         endpoint = '/check'
       }
-      
+
       const res = await fetch(FUNCTIONS_BASE + endpoint, {
         method: 'POST',
         headers: {
@@ -308,18 +308,90 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
           amount: action === 'fold' || action === 'check' ? 0 : amount
         })
       })
-      
+
       if (!res.ok) {
         const json = await res.json()
         throw new Error(json.error || 'Action failed')
       }
-      
+
       setActionRequired(false)
       setSelectedBet(0)
       await loadGameData()
     } catch (err) {
       setError(err.message)
       console.error('Error submitting action:', err)
+    }
+  }
+
+  async function sitAtTable() {
+    if (!userId || !userEmail) {
+      setAuthModalOpen(true)
+      return
+    }
+
+    setLoading(true)
+    try {
+      const seatNumber = seats.length + 1
+
+      // Get current wallet balance
+      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
+      const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
+
+      // Join table with starting balance
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+      const res = await fetch(FUNCTIONS_BASE + '/join_table', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({ tableId: table.id, userId, seatNumber, startingBalance: currentBalance })
+      })
+
+      if (!res.ok) {
+        let errorMsg = 'Failed to sit'
+        try {
+          const json = await res.json()
+          errorMsg = json.error || errorMsg
+        } catch (e) {}
+        throw new Error(errorMsg)
+      }
+
+      await loadGameData()
+      setError(null)
+    } catch (err) {
+      setError(err.message || 'Could not join table')
+      console.error('Error sitting at table:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function leaveSeat() {
+    if (!userId) return
+    try {
+      // Get seat info with starting balance
+      const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', table.id).eq('user_id', userId).single()
+      if (!seatData) {
+        setError('Seat not found')
+        return
+      }
+
+      // Get current wallet balance
+      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
+      const endingBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
+      const currencyCode = wallets && wallets.length > 0 ? wallets[0].currency_code : 'PHP'
+      const startingBalance = Number(seatData.starting_balance) || 0
+
+      // Delete the seat directly (simplified - in production might want rake processing)
+      const { error: deleteErr } = await supabase.from('poker_seats').delete().eq('id', seatData.id)
+      if (deleteErr) throw deleteErr
+
+      await loadGameData()
+      setError(null)
+    } catch (err) {
+      setError(err.message || 'Could not leave table')
+      console.error('Error leaving seat:', err)
     }
   }
 
