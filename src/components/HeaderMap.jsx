@@ -18,9 +18,21 @@ function MapUpdater({ location }) {
   const map = useMap()
 
   useEffect(() => {
+    // When a new location arrives, move the map
     if (location) {
-      map.setView([location.latitude, location.longitude], 13)
+      try {
+        map.setView([location.latitude, location.longitude], 13)
+      } catch (e) {
+        console.debug('Map setView failed:', e)
+      }
     }
+
+    // Sometimes Leaflet needs invalidateSize when container becomes visible
+    const tid = setTimeout(() => {
+      try { map.invalidateSize() } catch (e) { /* ignore */ }
+    }, 100)
+
+    return () => clearTimeout(tid)
   }, [location, map])
 
   return null
