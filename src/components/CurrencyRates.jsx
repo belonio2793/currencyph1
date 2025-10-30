@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/currencyAPI'
+import { tokenAPI } from '../lib/supabaseClient'
 
 export default function CurrencyRates() {
   const [rates, setRates] = useState({})
   const [cryptoPrices, setCryptoPrices] = useState(null)
+  const [tokenPrice, setTokenPrice] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [lastUpdate, setLastUpdate] = useState(null)
@@ -14,12 +16,16 @@ export default function CurrencyRates() {
         setLoading(true)
         setError(null)
 
-        // Fetch all rates in parallel
+        // Fetch all rates in parallel, with fallback for token price
         const fiatRates = await currencyAPI.getGlobalRates()
         const cryptos = await currencyAPI.getCryptoPrices()
 
+        // Token price calculation has fallback built-in, won't throw
+        const token = await tokenAPI.calculateTokenPrice()
+
         setRates(fiatRates)
         setCryptoPrices(cryptos)
+        setTokenPrice(token)
         setLastUpdate(new Date())
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err)
