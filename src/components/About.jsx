@@ -3,7 +3,6 @@ export default function About() {
     <div className="min-h-screen bg-slate-50 py-12">
       <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow border border-slate-200">
         <h1 className="text-3xl font-bold text-slate-900 mb-4">About currency.ph</h1>
-        <p className="mb-4 text-slate-700">Play The Number One Game Of The Philippines</p>
 
         <p className="mb-4 text-slate-700">
           currency.ph uses real-world currency values and instruments but is essentially a digital ecosystem. There are no refunds, and withdrawals are disabled — the application is a realistic virtual experience with real life implications, measurable analytics and statistics. There are leaderboards, transparent account balances, recorded transactions and total transparency controls for sharing, creating a more fun and open environment across participants and players.
