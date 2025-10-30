@@ -151,14 +151,25 @@ export default function App() {
 
   const initializeUser = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      // supabase.auth.getUser() may return different shapes; handle defensively
+      const res = await supabase.auth.getUser().catch(err => { throw err })
+      let user = null
+      if (res && res.data && res.data.user) user = res.data.user
+      else if (res && res.user) user = res.user
+      else user = null
+
       const path = typeof window !== 'undefined' ? window.location.pathname : '/'
 
       if (user) {
         setUserId(user.id)
         setUserEmail(user.email)
-        (wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')).catch(() => {})
-        try { initializePresence(user.id) } catch(e) {}
+        try {
+          await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+        } catch (e) {
+          console.warn('wisegcash getOrCreateUser failed', e)
+        }
+        try { initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
+        try { await loadTotalBalance(user.id) } catch (e) { console.warn('loadTotalBalance failed', e) }
         // If user is authenticated, don't forcibly change the current route — let handleRouting manage it
         setShowAuth(false)
       } else {
@@ -183,7 +194,7 @@ export default function App() {
       }
     } catch (err) {
       console.error('Error initializing user:', err)
-      setError('Failed to initialize application')
+      setError('Failed to initialize application: ' + (err && err.message ? err.message : String(err)))
     } finally {
       setLoading(false)
     }
