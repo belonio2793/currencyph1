@@ -1,13 +1,48 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
+
+const COUNTRIES = [
+  { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
+  { code: 'US', name: 'United States', flag: '🇺🇸' },
+  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+  { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
+  { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+  { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+  { code: 'FR', name: 'France', flag: '🇫🇷' },
+  { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+  { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+  { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+  { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
+  { code: 'CN', name: 'China', flag: '🇨🇳' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+  { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+  { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+  { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
+  { code: 'TW', name: 'Taiwan', flag: '🇹🇼' }
+]
+
+const RELATIONSHIP_STATUS = ['Single', 'In a relationship', 'Engaged', 'Married', 'It\'s complicated', 'Prefer not to say']
 
 export default function Profile({ userId }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
   const [formData, setFormData] = useState({})
+  const [privacySettings, setPrivacySettings] = useState({})
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [usernameAvailable, setUsernameAvailable] = useState(null)
+  const [countrySearch, setCountrySearch] = useState('')
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false)
 
   useEffect(() => {
     loadUser()
@@ -17,7 +52,28 @@ export default function Profile({ userId }) {
     try {
       const userData = await wisegcashAPI.getUserById(userId)
       setUser(userData)
-      setFormData(userData)
+      setFormData({
+        full_name: userData?.full_name || '',
+        email: userData?.email || '',
+        phone_number: userData?.phone_number || '',
+        username: userData?.username || '',
+        country_code: userData?.country_code || 'PH',
+        relationship_status: userData?.relationship_status || '',
+        biography: userData?.biography || '',
+        profile_picture_url: userData?.profile_picture_url || ''
+      })
+
+      // Load privacy settings
+      const { data: privacyData } = await supabase
+        .from('privacy_settings')
+        .select('*')
+        .eq('user_id', userId)
+
+      const privacyMap = {}
+      privacyData?.forEach(setting => {
+        privacyMap[setting.field_name] = setting.visibility
+      })
+      setPrivacySettings(privacyMap)
     } catch (err) {
       console.error('Error loading user:', err)
       setError('Failed to load user profile')
@@ -26,16 +82,73 @@ export default function Profile({ userId }) {
     }
   }
 
+  const checkUsernameAvailability = async (username) => {
+    if (!username || username.length < 3) {
+      setUsernameAvailable(null)
+      return
+    }
+
+    try {
+      const { data } = await supabase
+        .from('users')
+        .select('id')
+        .eq('username', username)
+        .single()
+
+      setUsernameAvailable(!data)
+    } catch (err) {
+      setUsernameAvailable(true)
+    }
+  }
+
+  const handleUsernameChange = (value) => {
+    setFormData({ ...formData, username: value })
+    checkUsernameAvailability(value)
+  }
+
   const handleSaveProfile = async (e) => {
     e.preventDefault()
     setError('')
 
+    if (formData.username && !usernameAvailable) {
+      setError('Username is not available')
+      return
+    }
+
     try {
-      await wisegcashAPI.updateUserProfile(userId, {
+      const updateData = {
         full_name: formData.full_name,
         phone_number: formData.phone_number,
-        country_code: formData.country_code
-      })
+        country_code: formData.country_code,
+        username: formData.username || null,
+        relationship_status: formData.relationship_status || null,
+        biography: formData.biography || null,
+        profile_picture_url: formData.profile_picture_url || null
+      }
+
+      await wisegcashAPI.updateUserProfile(userId, updateData)
+
+      // Save privacy settings
+      for (const [field, visibility] of Object.entries(privacySettings)) {
+        const { data: existing } = await supabase
+          .from('privacy_settings')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('field_name', field)
+          .single()
+
+        if (existing) {
+          await supabase
+            .from('privacy_settings')
+            .update({ visibility })
+            .eq('id', existing.id)
+        } else {
+          await supabase
+            .from('privacy_settings')
+            .insert([{ user_id: userId, field_name: field, visibility }])
+        }
+      }
+
       setSuccess('Profile updated successfully!')
       loadUser()
       setEditing(false)
@@ -44,6 +157,33 @@ export default function Profile({ userId }) {
       setError(err.message || 'Failed to update profile')
     }
   }
+
+  const togglePrivacy = (field) => {
+    const current = privacySettings[field] || 'everyone'
+    const next = current === 'everyone' ? 'friends_only' : current === 'friends_only' ? 'only_me' : 'everyone'
+    setPrivacySettings({ ...privacySettings, [field]: next })
+  }
+
+  const toggleAllPrivacy = (visibility) => {
+    const fields = ['full_name', 'phone_number', 'country_code', 'relationship_status', 'biography']
+    const newSettings = {}
+    fields.forEach(f => newSettings[f] = visibility)
+    setPrivacySettings(newSettings)
+  }
+
+  const getPrivacyLabel = (visibility) => {
+    const labels = { everyone: '👥 Everyone', friends_only: '👫 Friends', only_me: '🔒 Only Me' }
+    return labels[visibility] || 'Everyone'
+  }
+
+  const getSelectedCountry = () => {
+    return COUNTRIES.find(c => c.code === formData.country_code)
+  }
+
+  const filteredCountries = COUNTRIES.filter(c =>
+    c.name.toLowerCase().includes(countrySearch.toLowerCase()) ||
+    c.code.toLowerCase().includes(countrySearch.toLowerCase())
+  )
 
   if (loading) {
     return (
@@ -64,11 +204,21 @@ export default function Profile({ userId }) {
         {/* Profile Card */}
         <div className="bg-white border border-slate-200 rounded-xl p-8">
           <div className="text-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl mx-auto mb-4 font-light">
-              {user?.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'}
+            <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-4xl mx-auto mb-4 font-light overflow-hidden">
+              {formData.profile_picture_url ? (
+                <img src={formData.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                formData.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'
+              )}
             </div>
-            <h3 className="text-2xl font-light text-slate-900">{user?.full_name || 'User'}</h3>
+            <h3 className="text-2xl font-light text-slate-900">{formData.full_name || 'User'}</h3>
+            {formData.username && (
+              <p className="text-slate-500 text-sm mt-1">@{formData.username}</p>
+            )}
             <p className="text-slate-500 text-sm mt-1">{user?.email}</p>
+            {getSelectedCountry() && (
+              <p className="text-xl mt-3">{getSelectedCountry().flag}</p>
+            )}
           </div>
 
           <div className="border-t border-slate-100 pt-6 space-y-4">
@@ -77,10 +227,12 @@ export default function Profile({ userId }) {
               <p className="text-sm text-slate-900 capitalize">{user?.status}</p>
             </div>
 
-            <div>
-              <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Country</p>
-              <p className="text-sm text-slate-900">{user?.country_code}</p>
-            </div>
+            {formData.relationship_status && (
+              <div>
+                <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Relationship</p>
+                <p className="text-sm text-slate-900">{formData.relationship_status}</p>
+              </div>
+            )}
 
             <div>
               <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Member Since</p>
@@ -118,6 +270,7 @@ export default function Profile({ userId }) {
 
             {editing ? (
               <form onSubmit={handleSaveProfile} className="space-y-6">
+                {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
                   <input
@@ -128,6 +281,27 @@ export default function Profile({ userId }) {
                   />
                 </div>
 
+                {/* Username */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Username (for Poker & Leaderboards)</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={formData.username || ''}
+                      onChange={e => handleUsernameChange(e.target.value)}
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      placeholder="choose_your_username"
+                    />
+                    {formData.username && (
+                      <span className={`text-sm font-medium ${usernameAvailable ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {usernameAvailable ? '✓ Available' : '✗ Taken'}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">3-20 characters, letters and numbers only</p>
+                </div>
+
+                {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                   <input
@@ -138,6 +312,7 @@ export default function Profile({ userId }) {
                   />
                 </div>
 
+                {/* Phone Number */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
                   <input
@@ -149,16 +324,79 @@ export default function Profile({ userId }) {
                   />
                 </div>
 
+                {/* Country with Search and Flag */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Country Code</label>
-                  <input
-                    type="text"
-                    value={formData.country_code || ''}
-                    onChange={e => setFormData({...formData, country_code: e.target.value.toUpperCase()})}
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Country</label>
+                  <div className="relative">
+                    <button
+                      type="button"
+                      onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
+                    >
+                      <span>
+                        {getSelectedCountry() && `${getSelectedCountry().flag} ${getSelectedCountry().name}`}
+                        {!getSelectedCountry() && 'Select Country'}
+                      </span>
+                      <span>▼</span>
+                    </button>
+
+                    {showCountryDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                        <input
+                          type="text"
+                          placeholder="Search country..."
+                          value={countrySearch}
+                          onChange={e => setCountrySearch(e.target.value)}
+                          className="w-full px-4 py-2 border-b border-slate-200 focus:outline-none text-sm"
+                        />
+                        {filteredCountries.map(country => (
+                          <button
+                            key={country.code}
+                            type="button"
+                            onClick={() => {
+                              setFormData({...formData, country_code: country.code})
+                              setShowCountryDropdown(false)
+                              setCountrySearch('')
+                            }}
+                            className="w-full text-left px-4 py-2 hover:bg-slate-100 text-sm flex items-center gap-2"
+                          >
+                            <span>{country.flag}</span>
+                            <span>{country.name}</span>
+                            <span className="text-slate-500 text-xs ml-auto">{country.code}</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Relationship Status */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Relationship Status</label>
+                  <select
+                    value={formData.relationship_status || ''}
+                    onChange={e => setFormData({...formData, relationship_status: e.target.value})}
                     className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    placeholder="PH"
-                    maxLength="5"
+                  >
+                    <option value="">Not specified</option>
+                    {RELATIONSHIP_STATUS.map(status => (
+                      <option key={status} value={status}>{status}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Biography */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Biography</label>
+                  <textarea
+                    value={formData.biography || ''}
+                    onChange={e => setFormData({...formData, biography: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    placeholder="Tell us about yourself..."
+                    rows="4"
+                    maxLength={500}
                   />
+                  <p className="text-xs text-slate-500 mt-1">{(formData.biography || '').length}/500</p>
                 </div>
 
                 <button
@@ -175,6 +413,13 @@ export default function Profile({ userId }) {
                   <p className="text-lg text-slate-900">{formData.full_name || '-'}</p>
                 </div>
 
+                {formData.username && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Username</p>
+                    <p className="text-lg text-slate-900">@{formData.username}</p>
+                  </div>
+                )}
+
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Email</p>
                   <p className="text-lg text-slate-900">{user?.email}</p>
@@ -186,12 +431,69 @@ export default function Profile({ userId }) {
                 </div>
 
                 <div>
-                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Country Code</p>
-                  <p className="text-lg text-slate-900">{formData.country_code}</p>
+                  <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Country</p>
+                  <p className="text-lg text-slate-900">
+                    {getSelectedCountry() && `${getSelectedCountry().flag} ${getSelectedCountry().name}`}
+                  </p>
                 </div>
+
+                {formData.relationship_status && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Relationship Status</p>
+                    <p className="text-lg text-slate-900">{formData.relationship_status}</p>
+                  </div>
+                )}
+
+                {formData.biography && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Biography</p>
+                    <p className="text-lg text-slate-900">{formData.biography}</p>
+                  </div>
+                )}
               </div>
             )}
           </div>
+
+          {/* Privacy Settings */}
+          {editing && (
+            <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-medium text-slate-900">Privacy Controls</h3>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => toggleAllPrivacy('everyone')}
+                    className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-700"
+                  >
+                    Show All
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => toggleAllPrivacy('only_me')}
+                    className="text-xs px-2 py-1 bg-slate-100 hover:bg-slate-200 rounded text-slate-700"
+                  >
+                    Hide All
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {['full_name', 'phone_number', 'country_code', 'relationship_status', 'biography'].map(field => (
+                  <div key={field} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                    <span className="text-sm font-medium text-slate-900 capitalize">{field.replace(/_/g, ' ')}</span>
+                    <button
+                      type="button"
+                      onClick={() => togglePrivacy(field)}
+                      className="text-sm px-3 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 text-slate-700"
+                    >
+                      {getPrivacyLabel(privacySettings[field] || 'everyone')}
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-slate-500 mt-4">👥 Everyone: Visible to all users | 👫 Friends: Only friends can see | 🔒 Only Me: Private</p>
+            </div>
+          )}
 
           {/* Security Section */}
           <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
