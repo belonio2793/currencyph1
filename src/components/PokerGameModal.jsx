@@ -321,7 +321,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     }
   }
 
-  async function sitAtTable() {
+  async function sitAtTable(seatNumber) {
     if (!userId || !userEmail) {
       onShowAuth?.('register')
       return
@@ -329,7 +329,8 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
     setLoading(true)
     try {
-      const seatNumber = seats.length + 1
+      // Use provided seat number or calculate next available
+      const targetSeat = seatNumber || (seats.length + 1)
 
       // Get current wallet balance
       const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
