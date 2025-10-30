@@ -33,6 +33,7 @@ export default function App() {
   const [authInitialTab, setAuthInitialTab] = useState('login')
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
+  const [totalBalancePHP, setTotalBalancePHP] = useState(0)
 
   // Content locker: enable by setting VITE_CONTENT_LOCKER=TRUE (client) or CONTENT_LOCKER=TRUE (server)
   const contentLocked = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTENT_LOCKER === 'TRUE') ||
