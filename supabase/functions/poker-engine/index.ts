@@ -95,7 +95,7 @@ async function postBet(handId: string, userId: string, amount: number) {
 
   // Deduct balance
   const newBal = Number(wallet.balance) - amount
-  const { error: updErr } = await supabase.from('wallets').update({ balance: newBal, updated_at: new Date() }).eq('user_id', userId)
+  const { error: updErr } = await supabase.from('wallets').update({ balance: newBal, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', wallet.currency_code)
   if (updErr) throw updErr
 
   // Insert escrow
