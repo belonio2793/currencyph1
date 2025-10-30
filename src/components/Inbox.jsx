@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { fetchRecentMessagesForUser, deleteMessage } from '../lib/messages'
 
 export default function Inbox({ userId }) {
