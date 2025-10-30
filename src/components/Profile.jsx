@@ -59,6 +59,7 @@ export default function Profile({ userId }) {
 
   useEffect(() => {
     loadUser()
+    setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
   }, [userId])
 
   const loadUser = async () => {
