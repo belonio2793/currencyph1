@@ -94,6 +94,20 @@ export default function ChatBar({ userId, userEmail }) {
       setLoading(true)
       const friendsList = await getFriendsList(userId)
       setFriends(friendsList)
+
+      // Load presence for all friends
+      if (friendsList.length > 0) {
+        const friendIds = friendsList.map(f => f.id)
+        const presenceMap = await getMultipleUsersPresence(friendIds)
+        setOnlineUsers(presenceMap)
+
+        // Subscribe to presence updates
+        if (presenceUnsubscribe) presenceUnsubscribe()
+        const unsubscribe = await subscribeToMultiplePresence(friendIds, (userId, status) => {
+          setOnlineUsers(prev => ({ ...prev, [userId]: status }))
+        })
+        setPresenceUnsubscribe(() => unsubscribe)
+      }
     } catch (err) {
       console.warn('Load friends error:', err)
     } finally {
