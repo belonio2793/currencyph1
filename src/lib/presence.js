@@ -1,0 +1,178 @@
+import { supabase } from './supabaseClient'
+
+const PRESENCE_UPDATE_INTERVAL = 30000 // 30 seconds
+const OFFLINE_TIMEOUT = 120000 // 2 minutes
+
+let presenceIntervalId = null
+let currentUserId = null
+
+export function initializePresence(userId) {
+  currentUserId = userId
+  if (!userId) return
+
+  updatePresence('online')
+
+  presenceIntervalId = setInterval(() => {
+    updatePresence('online')
+  }, PRESENCE_UPDATE_INTERVAL)
+
+  window.addEventListener('beforeunload', () => {
+    updatePresence('offline')
+    clearInterval(presenceIntervalId)
+  })
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      updatePresence('away')
+    } else {
+      updatePresence('online')
+    }
+  })
+}
+
+export function stopPresence() {
+  if (presenceIntervalId) {
+    clearInterval(presenceIntervalId)
+  }
+  if (currentUserId) {
+    updatePresence('offline')
+  }
+}
+
+async function updatePresence(status) {
+  if (!currentUserId) return
+
+  try {
+    const { data, error } = await supabase
+      .from('user_presence')
+      .upsert([{
+        user_id: currentUserId,
+        status,
+        updated_at: new Date().toISOString()
+      }])
+
+    if (error) console.warn('Presence update error:', error)
+  } catch (err) {
+    console.warn('Presence update failed:', err)
+  }
+}
+
+export async function getUserPresence(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('user_presence')
+      .select('status, last_seen')
+      .eq('user_id', userId)
+      .single()
+
+    if (error && error.code !== 'PGRST116') throw error
+
+    if (!data) return 'offline'
+
+    const lastSeen = new Date(data.last_seen).getTime()
+    const now = Date.now()
+
+    if (data.status === 'offline' || (now - lastSeen) > OFFLINE_TIMEOUT) {
+      return 'offline'
+    }
+
+    return data.status || 'offline'
+  } catch (err) {
+    console.warn('Get presence error:', err)
+    return 'offline'
+  }
+}
+
+export async function subscribeToUserPresence(userId, callback) {
+  const channel = supabase
+    .channel(`user_presence:${userId}`)
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'user_presence',
+      filter: `user_id=eq.${userId}`
+    }, (payload) => {
+      callback(payload.new.status)
+    })
+    .subscribe()
+
+  return () => supabase.removeChannel(channel)
+}
+
+export async function subscribeToMultiplePresence(userIds, callback) {
+  const channels = userIds.map(userId =>
+    supabase
+      .channel(`presence:${userId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'user_presence',
+        filter: `user_id=eq.${userId}`
+      }, (payload) => {
+        callback(userId, payload.new.status)
+      })
+      .subscribe()
+  )
+
+  return () => {
+    channels.forEach(channel => supabase.removeChannel(channel))
+  }
+}
+
+export async function getMultipleUsersPresence(userIds) {
+  try {
+    const { data, error } = await supabase
+      .from('user_presence')
+      .select('user_id, status')
+      .in('user_id', userIds)
+
+    if (error) throw error
+
+    const presenceMap = {}
+    userIds.forEach(id => {
+      const user = (data || []).find(u => u.user_id === id)
+      presenceMap[id] = user?.status || 'offline'
+    })
+
+    return presenceMap
+  } catch (err) {
+    console.warn('Get multiple presence error:', err)
+    return userIds.reduce((acc, id) => ({ ...acc, [id]: 'offline' }), {})
+  }
+}
+
+export async function markMessagesAsRead(messageIds, readerId) {
+  if (!messageIds.length) return
+
+  try {
+    const records = messageIds.map(msgId => ({
+      message_id: msgId,
+      reader_id: readerId
+    }))
+
+    const { error } = await supabase
+      .from('message_read_receipts')
+      .upsert(records)
+
+    if (error) console.warn('Mark read error:', error)
+  } catch (err) {
+    console.warn('Mark as read failed:', err)
+  }
+}
+
+export async function getUnreadMessageCount(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('messages')
+      .select('id')
+      .eq('recipient_id', userId)
+      .is('deleted_at', null)
+      .not('message_read_receipts.reader_id', 'is', userId)
+
+    if (error && error.code !== 'PGRST116') throw error
+    return data?.length || 0
+  } catch (err) {
+    console.warn('Get unread count error:', err)
+    return 0
+  }
+}
