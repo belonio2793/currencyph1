@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function PlayerSeats({ seats, table, userId, gameState, currentPlayerSeat, dealerSeat }) {
+export default function PlayerSeats({ seats, table, userId, gameState, currentPlayerSeat, dealerSeat, onSitClick }) {
   const getPlayerName = (seat) => {
     if (seat.user_id === userId) return 'You'
     return `Player ${seat.seat_number}`
