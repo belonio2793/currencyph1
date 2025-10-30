@@ -419,7 +419,7 @@ export default function Profile({ userId }) {
                 <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                   <div>
                     <p className="text-sm font-medium text-slate-900">Hide my profile from the All users list</p>
-                    <p className="text-xs text-slate-500">When enabled, your account will not appear in the Messages -> All tab for other users.</p>
+                    <p className="text-xs text-slate-500">When enabled, your account will not appear in the Messages {'>'} All tab for other users.</p>
                   </div>
                   <div>
                     <input type="checkbox" checked={isAccountPrivate()} onChange={(e) => setPrivacy('listed_in_all', e.target.checked ? 'only_me' : 'everyone')} className="w-4 h-4" />
