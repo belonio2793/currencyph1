@@ -26,9 +26,6 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   const [myPosition, setMyPosition] = useState(null)
   const [dealerSeat, setDealerSeat] = useState(null)
 
-  // Auth modal
-  const [authModalOpen, setAuthModalOpen] = useState(false)
-
   // Real-time sync
   const handsUnsubscribeRef = useRef(null)
   const seatsUnsubscribeRef = useRef(null)
