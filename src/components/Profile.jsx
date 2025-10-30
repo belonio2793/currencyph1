@@ -127,11 +127,14 @@ export default function Profile({ userId }) {
       const updateData = {
         full_name: formData.full_name,
         phone_number: formData.phone_number,
+        phone_country_code: formData.phone_country_code,
         country_code: formData.country_code,
         username: formData.username || null,
         relationship_status: formData.relationship_status || null,
         biography: formData.biography || null,
-        profile_picture_url: formData.profile_picture_url || null
+        profile_picture_url: formData.profile_picture_url || null,
+        display_name_type: formData.display_name_type,
+        display_as_username_everywhere: formData.display_as_username_everywhere
       }
 
       await wisegcashAPI.updateUserProfile(userId, updateData)
