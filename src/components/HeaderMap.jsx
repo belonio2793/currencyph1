@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { useGeolocation } from '../lib/useGeolocation'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import SendLocationModal from './SendLocationModal'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
