@@ -132,9 +132,18 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
             }
           } catch (err) {
             console.warn('Guest backend create failed', err)
-            // Final fallback: create local guest session (non-authenticated)
-            const localUser = { id: 'guest-local', email: 'guest', user_metadata: {} }
-            setSuccess('Guest session created locally')
+            // Final fallback: create local guest session with persistence
+            const localUser = { id: 'guest-local-' + Date.now(), email: 'guest@currency.ph', user_metadata: { full_name: 'Guest' } }
+            // Persist to localStorage so session survives refresh
+            try {
+              localStorage.setItem('currency_ph_guest_session', JSON.stringify({
+                user: localUser,
+                timestamp: Date.now()
+              }))
+            } catch (e) {
+              console.warn('Could not persist guest session to localStorage', e)
+            }
+            setSuccess('Guest session created (offline mode)')
             setTimeout(() => onAuthSuccess(localUser), 500)
             return
           }
