@@ -89,8 +89,10 @@ export default function HouseBalanceTab() {
 
       if (txError) throw txError
       setRakeTransactions(txs || [])
+      setError(null)
     } catch (err) {
       console.error('Error loading rake transactions:', err)
+      setRakeTransactions([])
       setError('Failed to load transactions')
     }
   }
