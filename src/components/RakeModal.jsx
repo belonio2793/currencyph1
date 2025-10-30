@@ -30,10 +30,14 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
 
     try {
       const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/, '') + '/functions/v1/poker-engine'
-      
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+
       const response = await fetch(`${FUNCTIONS_BASE}/process_rake`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
         body: JSON.stringify({
           userId,
           tableId,
@@ -45,11 +49,18 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
         })
       })
 
-      const data = await response.json()
-
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to process rake')
+        let errorMsg = 'Failed to process rake'
+        try {
+          const data = await response.json()
+          errorMsg = data.error || errorMsg
+        } catch (e) {
+          // Could not parse JSON error response
+        }
+        throw new Error(errorMsg)
       }
+
+      const data = await response.json()
 
       // Call success callback
       if (onRakeProcessed) {
