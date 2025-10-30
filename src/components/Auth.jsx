@@ -39,12 +39,25 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
       // Map guest/guest -> backend safe password to bypass Supabase min-length checks
       const effectivePassword = (identifier === 'guest' && password === 'guest') ? 'guest123' : password
 
-      // Try signing in
+      // Try signing in with timeout
       let signInResult
       try {
-        signInResult = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10 second timeout
+
+        try {
+          signInResult = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+        } finally {
+          clearTimeout(timeoutId)
+        }
       } catch (err) {
-        signInResult = { error: err }
+        if (err.name === 'AbortError') {
+          signInResult = { error: new Error('Login request timed out. Check your internet connection.') }
+        } else if (err?.message?.includes('Failed to fetch')) {
+          signInResult = { error: new Error('Cannot connect to authentication service. Check your internet connection or try again later.') }
+        } else {
+          signInResult = { error: err }
+        }
       }
 
       let data = signInResult.data
@@ -352,7 +365,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder="••••••��•"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
