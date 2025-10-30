@@ -97,6 +97,12 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Direct /nearby route should activate nearby tab
+    if (path === '/nearby') {
+      setActiveTab('nearby')
+      setShowAuth(false)
+    }
+
     // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
