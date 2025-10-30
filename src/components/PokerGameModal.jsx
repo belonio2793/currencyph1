@@ -365,21 +365,17 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   async function leaveSeat() {
     if (!userId) return
+    setLoading(true)
     try {
-      // Get seat info with starting balance
+      // Get seat info
       const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', table.id).eq('user_id', userId).single()
       if (!seatData) {
         setError('Seat not found')
+        setLoading(false)
         return
       }
 
-      // Get current wallet balance
-      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
-      const endingBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
-      const currencyCode = wallets && wallets.length > 0 ? wallets[0].currency_code : 'PHP'
-      const startingBalance = Number(seatData.starting_balance) || 0
-
-      // Delete the seat directly (simplified - in production might want rake processing)
+      // Delete the seat
       const { error: deleteErr } = await supabase.from('poker_seats').delete().eq('id', seatData.id)
       if (deleteErr) throw deleteErr
 
@@ -388,6 +384,8 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     } catch (err) {
       setError(err.message || 'Could not leave table')
       console.error('Error leaving seat:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
