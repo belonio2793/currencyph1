@@ -43,6 +43,7 @@ export default function Profile({ userId }) {
   const [usernameAvailable, setUsernameAvailable] = useState(null)
   const [countrySearch, setCountrySearch] = useState('')
   const [showCountryDropdown, setShowCountryDropdown] = useState(false)
+  const [openPrivacyDropdown, setOpenPrivacyDropdown] = useState(null)
 
   useEffect(() => {
     loadUser()
@@ -158,10 +159,9 @@ export default function Profile({ userId }) {
     }
   }
 
-  const togglePrivacy = (field) => {
-    const current = privacySettings[field] || 'everyone'
-    const next = current === 'everyone' ? 'friends_only' : current === 'friends_only' ? 'only_me' : 'everyone'
-    setPrivacySettings({ ...privacySettings, [field]: next })
+  const setPrivacy = (field, visibility) => {
+    setPrivacySettings({ ...privacySettings, [field]: visibility })
+    setOpenPrivacyDropdown(null)
   }
 
   const toggleAllPrivacy = (visibility) => {
@@ -481,17 +481,34 @@ export default function Profile({ userId }) {
                 {['full_name', 'phone_number', 'country_code', 'relationship_status', 'biography'].map(field => (
                   <div key={field} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                     <span className="text-sm font-medium text-slate-900 capitalize">{field.replace(/_/g, ' ')}</span>
-                    <button
-                      type="button"
-                      onClick={() => togglePrivacy(field)}
-                      className="text-sm px-3 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 text-slate-700"
-                    >
-                      {getPrivacyLabel(privacySettings[field] || 'everyone')}
-                    </button>
+                    <div className="relative">
+                      <button
+                        type="button"
+                        onClick={() => setOpenPrivacyDropdown(openPrivacyDropdown === field ? null : field)}
+                        className="text-sm px-3 py-1 bg-white border border-slate-300 rounded hover:bg-slate-50 text-slate-700 flex items-center gap-1"
+                      >
+                        {getPrivacyLabel(privacySettings[field] || 'everyone')}
+                        <span>▼</span>
+                      </button>
+
+                      {openPrivacyDropdown === field && (
+                        <div className="absolute right-0 top-full mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-20 min-w-max">
+                          {['everyone', 'friends_only', 'only_me'].map(visibility => (
+                            <button
+                              key={visibility}
+                              type="button"
+                              onClick={() => setPrivacy(field, visibility)}
+                              className="block w-full text-left px-4 py-2 hover:bg-slate-50 text-sm"
+                            >
+                              {getPrivacyLabel(visibility)}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
-              <p className="text-xs text-slate-500 mt-4">👥 Everyone: Visible to all users | 👫 Friends: Only friends can see | 🔒 Only Me: Private</p>
             </div>
           )}
 
