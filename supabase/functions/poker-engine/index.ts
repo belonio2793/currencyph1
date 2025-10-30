@@ -113,6 +113,65 @@ async function postBet(handId: string, userId: string, amount: number) {
   return { success: true, remaining: newBal }
 }
 
+async function processRake(userId: string, tableId: string, startingBalance: number, endingBalance: number, rakeAmount: number, tipPercent: number, currencyCode: string) {
+  if (!userId || !tableId) throw new Error('Invalid parameters')
+
+  const netProfit = endingBalance - startingBalance
+  const isWinner = netProfit > 0
+
+  if (!isWinner || rakeAmount === 0) {
+    // No rake for losers or breakeven players - just remove seat
+    await supabase.from('poker_seats').delete().eq('table_id', tableId).eq('user_id', userId)
+  } else {
+    // Deduct rake from wallet
+    const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', userId).single()
+    if (!wallet) throw new Error('Wallet not found')
+
+    const currentBalance = Number(wallet.balance)
+    if (currentBalance < rakeAmount) throw new Error('Insufficient balance for rake')
+
+    const newBalance = currentBalance - rakeAmount
+    await supabase.from('wallets').update({ balance: newBalance, updated_at: new Date() }).eq('user_id', userId)
+
+    // Record the seat with ending balance and rake deducted
+    await supabase.from('poker_seats').update({
+      ending_balance: endingBalance,
+      rake_deducted: rakeAmount,
+      session_ended_at: new Date()
+    }).eq('table_id', tableId).eq('user_id', userId)
+
+    // Create session record for analytics
+    const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
+
+    await supabase.from('poker_sessions').insert([{
+      table_id: tableId,
+      user_id: userId,
+      seat_id: seat?.id,
+      starting_balance: startingBalance,
+      ending_balance: endingBalance,
+      net_profit: netProfit,
+      rake_percent: 10,
+      rake_amount: rakeAmount,
+      tip_percent: tipPercent,
+      tip_amount: rakeAmount,
+      currency_code: currencyCode,
+      left_at: new Date()
+    }])
+
+    // Remove seat
+    await supabase.from('poker_seats').delete().eq('table_id', tableId).eq('user_id', userId)
+  }
+
+  // Check if table is now empty
+  const { data: remainingSeats } = await supabase.from('poker_seats').select('*').eq('table_id', tableId)
+  if (!remainingSeats || remainingSeats.length === 0) {
+    // Delete empty table and all related records
+    await supabase.from('poker_tables').delete().eq('id', tableId)
+  }
+
+  return { success: true, rakeAmount, finalBalance: endingBalance - rakeAmount }
+}
+
 serve(async (req) => {
   try {
     const url = new URL(req.url)
