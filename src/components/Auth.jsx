@@ -135,7 +135,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
         const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
         const headers = { 'Content-Type': 'application/json' }
         if (ANON_KEY) {
-          headers.apikey = ANON_KEY
+          // Send only Authorization header to avoid triggering preflight for custom 'apikey' header
           headers.Authorization = `Bearer ${ANON_KEY}`
         }
         const res = await fetch(`${PROJECT_URL}/functions/v1/resend-confirmation`, {
