@@ -207,7 +207,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         )}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-4xl font-light text-white">Poker</h2>
-          {activeTab === 'tables' && (
+          {(activeTab === 'my-tables' || activeTab === 'other-tables') && (
             <div className="flex items-center gap-2">
               <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>
               <button onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Create Table</button>
@@ -218,10 +218,16 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         {/* Tab Navigation */}
         <div className="mb-8 flex items-center gap-2 border-b border-slate-700">
           <button
-            onClick={() => setActiveTab('tables')}
-            className={`px-6 py-3 font-semibold transition ${activeTab === 'tables' ? 'border-b-2 border-blue-500 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+            onClick={() => setActiveTab('my-tables')}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'my-tables' ? 'border-b-2 border-blue-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
-            Tables
+            My Tables
+          </button>
+          <button
+            onClick={() => setActiveTab('other-tables')}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'other-tables' ? 'border-b-2 border-purple-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+          >
+            Other Tables
           </button>
           <button
             onClick={() => setActiveTab('network-balances')}
@@ -231,7 +237,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           </button>
         </div>
 
-        {activeTab === 'tables' && (
+        {(activeTab === 'my-tables' || activeTab === 'other-tables') && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Tables Lobby */}
           <div className="lg:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-6">
