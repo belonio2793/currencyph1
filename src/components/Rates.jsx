@@ -207,7 +207,7 @@ export default function Rates({ globalCurrency }) {
           return
         }
       } catch (cgErr) {
-        console.debug('CoinGecko direct attempt failed, will try edge function:', cgErr)
+        // Silently fail and try next method
       }
 
       // Use edge function to proxy API calls (avoids other issues)
@@ -228,7 +228,6 @@ export default function Rates({ globalCurrency }) {
       )
 
       if (!data || !data.cryptoPrices) {
-        console.debug('Fetch rates endpoint unavailable, using defaults')
         const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
         const defaults = {}
         Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
