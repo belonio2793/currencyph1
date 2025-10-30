@@ -289,6 +289,9 @@ export default function App() {
         )}
       </main>
 
+      {/* Chat Bar */}
+      {userId && <ChatBar userId={userId} userEmail={userEmail} />}
+
       {/* Footer - On all pages */}
       <footer className="bg-white border-t border-slate-100 mt-20">
         <div className="max-w-7xl mx-auto px-6 py-16">
