@@ -1,10 +1,44 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Initialize Supabase client
-const SUPABASE_URL = import.meta.env.VITE_PROJECT_URL || ''
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+// Helper to read env both in browser (import.meta.env) and Node (process.env)
+const getEnv = (name) => {
+  try {
+    // import.meta is available in Vite/browser builds
+    if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[name]) return import.meta.env[name]
+  } catch (e) {
+    // ignore
+  }
+  try {
+    if (typeof process !== 'undefined' && process.env && process.env[name]) return process.env[name]
+  } catch (e) {
+    // ignore
+  }
+  return undefined
+}
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
+const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || ''
+
+let supabase
+
+if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+} else {
+  console.warn('Supabase not fully configured. SUPABASE_URL or SUPABASE_ANON_KEY is missing. Some features will be disabled.')
+  const missingError = (method) => () => { throw new Error(`Supabase not configured. Called ${method} but SUPABASE_URL or SUPABASE_ANON_KEY is missing.`) }
+  supabase = {
+    from: () => ({ select: missingError('from().select'), insert: missingError('from().insert'), update: missingError('from().update'), upsert: missingError('from().upsert'), eq: missingError('from().eq'), order: missingError('from().order') }),
+    auth: {
+      signInWithPassword: missingError('auth.signInWithPassword'),
+      signUp: missingError('auth.signUp'),
+      getUser: async () => ({ data: { user: null }, error: null })
+    },
+    channel: () => ({ subscribe: missingError('channel().subscribe') }),
+    rpc: missingError('rpc')
+  }
+}
+
+export { supabase }
 
 // DOG Token API utilities
 export const dogTokenAPI = {
