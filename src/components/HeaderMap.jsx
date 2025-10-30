@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { useGeolocation } from '../lib/useGeolocation'
+import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import SendLocationModal from './SendLocationModal'
