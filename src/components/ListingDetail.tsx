@@ -70,7 +70,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
       setRelatedListings(getRelatedListings(slug, 3))
 
       // Set page title and meta tags for SEO
-      document.title = `${listingData.name} - Manila Tourism Guide | Currency.ph`
+      document.title = `${listingData.name} - Currency - Philippines`
 
       // Update meta description
       const metaDescription = document.querySelector('meta[name="description"]')
