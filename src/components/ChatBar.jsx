@@ -491,12 +491,13 @@ export default function ChatBar({ userId, userEmail }) {
                   {/* Chat Header */}
                   <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
                     <div className="flex items-center gap-2">
+                      <div className={`w-3 h-3 rounded-full ${onlineUsers[selectedConversation.user?.id] === 'online' ? 'bg-green-500' : 'bg-slate-300'}`} />
                       <div>
                         <div className="font-medium text-sm">
                           {selectedConversation.user?.full_name || selectedConversation.user?.email}
                         </div>
                         <div className="text-xs text-slate-500">
-                          {onlineUsers.has(selectedConversation.user?.id) ? 'Active now' : 'Offline'}
+                          {onlineUsers[selectedConversation.user?.id] === 'online' ? 'Active now' : onlineUsers[selectedConversation.user?.id] === 'away' ? 'Away' : 'Offline'}
                         </div>
                       </div>
                     </div>
