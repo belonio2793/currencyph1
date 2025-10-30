@@ -187,43 +187,55 @@ async function processRake(userId: string, tableId: string, startingBalance: num
   return { success: true, rakeAmount, finalBalance: endingBalance - rakeAmount }
 }
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  'Content-Type': 'application/json'
+}
+
 serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   try {
     const url = new URL(req.url)
     const path = url.pathname
     if (path.endsWith('/create_table') && req.method === 'POST') {
       const body = await req.json()
       const t = await createTable(body.name, Number(body.stakeMin), Number(body.stakeMax), body.currency)
-      return new Response(JSON.stringify(t), { headers: { 'content-type': 'application/json' } })
+      return new Response(JSON.stringify(t), { headers: corsHeaders })
     }
 
     if (path.endsWith('/join_table') && req.method === 'POST') {
       const body = await req.json()
       const r = await joinTable(body.tableId, body.userId, Number(body.seatNumber), Number(body.startingBalance) || 0)
-      return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
     if (path.endsWith('/start_hand') && req.method === 'POST') {
       const body = await req.json()
       const r = await startHand(body.tableId)
-      return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
     if (path.endsWith('/post_bet') && req.method === 'POST') {
       const body = await req.json()
       const r = await postBet(body.handId, body.userId, Number(body.amount))
-      return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
     if (path.endsWith('/process_rake') && req.method === 'POST') {
       const body = await req.json()
       const r = await processRake(body.userId, body.tableId, Number(body.startingBalance), Number(body.endingBalance), Number(body.rakeAmount), Number(body.tipPercent), body.currencyCode)
-      return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
-    return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { 'content-type': 'application/json' } })
+    return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: corsHeaders })
   } catch (err) {
     console.error('poker-engine error', err)
-    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: { 'content-type': 'application/json' } })
+    return new Response(JSON.stringify({ error: String(err) }), { status: 500, headers: corsHeaders })
   }
 })
