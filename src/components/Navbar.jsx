@@ -91,7 +91,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               <button
                 key={btn.id}
                 onClick={() => {
-                  if (btn.id === 'poker') { setPokerOpen(true); setMobileMenuOpen(false); return }
                   onTabChange(btn.id)
                   setMobileMenuOpen(false)
                 }}
@@ -174,7 +173,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 <button
                   key={btn.id}
                   onClick={() => {
-                    if (btn.id === 'poker') { setPokerOpen(true); setMobileMenuOpen(false); return }
                     onTabChange(btn.id)
                     setMobileMenuOpen(false)
                   }}
