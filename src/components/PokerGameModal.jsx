@@ -37,8 +37,6 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
-  if (!open || !table) return null
-
   // Load initial data
   useEffect(() => {
     if (!table) return
