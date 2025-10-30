@@ -320,8 +320,11 @@ export default function App() {
           setShowAuth(true)
           if (tab === 'register') window.history.replaceState(null, '', '/register')
           else window.history.replaceState(null, '', '/login')
-          // scroll to top so auth card is visible
-          setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
+          // scroll to top so auth card is visible (if preference is enabled)
+          const autoScroll = preferencesManager.getAutoScrollToTop(userId)
+          if (autoScroll) {
+            setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
+          }
         }}
         onSignOut={async () => {
           try {
