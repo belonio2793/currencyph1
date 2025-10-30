@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import React from 'react'
+import React, { useState } from 'react'
 import HeaderMap from './HeaderMap'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, onShowAuth, onSignOut }) {
