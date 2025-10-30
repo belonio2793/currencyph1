@@ -80,11 +80,9 @@ export default function GameChat({ tableId, userId }) {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="text-sm font-semibold text-slate-300 mb-3">Table Chat</div>
-      
+    <div className="flex flex-col h-full gap-3">
       {/* Messages */}
-      <div className="flex-1 space-y-2 overflow-y-auto mb-3 max-h-48">
+      <div className="flex-1 space-y-2 overflow-y-auto min-h-0">
         {messages.length === 0 ? (
           <div className="text-xs text-slate-500 italic text-center py-4">No messages yet</div>
         ) : (
@@ -99,10 +97,10 @@ export default function GameChat({ tableId, userId }) {
         )}
         <div ref={messagesEndRef} />
       </div>
-      
+
       {/* Input */}
       {userId && (
-        <form onSubmit={sendMessage} className="flex gap-2">
+        <form onSubmit={sendMessage} className="flex gap-2 flex-shrink-0">
           <input
             type="text"
             value={newMessage}
@@ -115,7 +113,7 @@ export default function GameChat({ tableId, userId }) {
           <button
             type="submit"
             disabled={loading || !newMessage.trim()}
-            className="px-2 py-1 bg-slate-600 hover:bg-slate-500 disabled:bg-slate-700 disabled:opacity-50 text-white text-xs font-semibold rounded transition"
+            className="px-3 py-1 bg-slate-600 hover:bg-slate-500 disabled:bg-slate-700 disabled:opacity-50 text-white text-xs font-semibold rounded transition whitespace-nowrap"
           >
             Send
           </button>
