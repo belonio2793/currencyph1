@@ -418,28 +418,33 @@ export default function Profile({ userId }) {
                       />
                       <span className="text-sm text-slate-700">Username</span>
                     </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="display_name_type"
-                        value="first_name"
-                        checked={formData.display_name_type === 'first_name'}
-                        onChange={e => setFormData({...formData, display_name_type: 'first_name'})}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm text-slate-700">First Name</span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="display_name_type"
-                        value="last_name"
-                        checked={formData.display_name_type === 'last_name'}
-                        onChange={e => setFormData({...formData, display_name_type: 'last_name'})}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm text-slate-700">Last Name</span>
-                    </label>
+
+                    <div className="flex items-center gap-6">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="display_name_type"
+                          value="first_name"
+                          checked={formData.display_name_type === 'first_name'}
+                          onChange={e => setFormData({...formData, display_name_type: 'first_name'})}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-sm text-slate-700">First Name</span>
+                      </label>
+
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="display_name_type"
+                          value="last_name"
+                          checked={formData.display_name_type === 'last_name'}
+                          onChange={e => setFormData({...formData, display_name_type: 'last_name'})}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-sm text-slate-700">Last Name</span>
+                      </label>
+                    </div>
+
                     <label className="flex items-center gap-3 cursor-pointer">
                       <input
                         type="radio"
