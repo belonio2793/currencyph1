@@ -94,17 +94,19 @@ export default function HeaderMap({ userId: headerUserId }) {
               </button>
             </div>
 
-            <div className="h-96 bg-slate-100">
-              {!loading && !error && location ? (
-                <MapContainer
-                  center={[location.latitude, location.longitude]}
-                  zoom={13}
-                  style={{ height: '100%', width: '100%' }}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; OpenStreetMap contributors'
-                  />
+            <div className="h-96 bg-slate-100 relative">
+              <MapContainer
+                center={[displayLocation.latitude, displayLocation.longitude]}
+                zoom={13}
+                style={{ height: '100%', width: '100%' }}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; OpenStreetMap contributors'
+                />
+
+                {/* Show marker only if we have a live location */}
+                {location && (
                   <Marker position={[location.latitude, location.longitude]}>
                     <Popup>
                       <div className="text-sm">
@@ -116,10 +118,14 @@ export default function HeaderMap({ userId: headerUserId }) {
                       </div>
                     </Popup>
                   </Marker>
-                  <MapUpdater location={location} />
-                </MapContainer>
-              ) : (
-                <div className="h-full flex items-center justify-center flex-col gap-2">
+                )}
+
+                <MapUpdater location={location} />
+              </MapContainer>
+
+              {/* Overlay messages for loading / error */}
+              {(loading || error) && (
+                <div className="absolute inset-0 flex items-center justify-center flex-col gap-2 bg-white/60">
                   {loading && (
                     <>
                       <div className="animate-spin">
