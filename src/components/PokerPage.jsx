@@ -195,6 +195,26 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     return 'bg-green-50'
   }
 
+  const getFilteredTables = () => {
+    if (activeTab === 'my-tables') {
+      return tables.filter(t => t.created_by === userId)
+    } else if (activeTab === 'other-tables') {
+      return tables.filter(t => t.created_by !== userId || !t.created_by)
+    }
+    return tables
+  }
+
+  const getFeltColor = () => {
+    if (activeTab === 'my-tables') {
+      return 'from-blue-800 to-blue-900'
+    } else if (activeTab === 'other-tables') {
+      return 'from-purple-800 to-purple-900'
+    }
+    return 'from-slate-700 to-slate-800'
+  }
+
+  const filteredTables = getFilteredTables()
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <div className="max-w-7xl mx-auto px-6 py-12">
