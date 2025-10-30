@@ -213,6 +213,7 @@ export default function App() {
         globalCurrency={globalCurrency}
         setGlobalCurrency={setGlobalCurrency}
         userEmail={userEmail}
+        userId={userId}
         totalBalancePHP={totalBalancePHP}
         onShowAuth={(tab) => {
           setAuthInitialTab(tab || 'login')
