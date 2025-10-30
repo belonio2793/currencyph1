@@ -542,10 +542,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                       </div>
                       <button
                         onClick={leaveSeat}
-                        disabled={loading}
-                        className="w-full mt-2 px-3 py-2 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 text-white text-sm font-semibold rounded-lg transition"
+                        className="w-full mt-2 px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition"
                       >
-                        {loading ? 'Leaving...' : 'Leave Seat'}
+                        Leave Seat
                       </button>
                     </div>
                   )}
