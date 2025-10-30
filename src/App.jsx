@@ -30,6 +30,9 @@ export default function App() {
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
 
+  // Content locker: enable by setting VITE_CONTENT_LOCKER=true (client) or CONTENT_LOCKER=true (server)
+  const contentLocked = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_CONTENT_LOCKER === 'TRUE' || import.meta.env.VITE_CONTENT_LOCKER === 'true')) ||
+    (typeof process !== 'undefined' && process.env && (process.env.CONTENT_LOCKER === 'TRUE' || process.env.CONTENT_LOCKER === 'true'))
 
   useEffect(() => {
     initializeUser()
