@@ -116,6 +116,7 @@ async function postBet(handId: string, userId: string, amount: number) {
 async function processRake(userId: string, tableId: string, startingBalance: number, endingBalance: number, rakeAmount: number, tipPercent: number, currencyCode: string) {
   if (!userId || !tableId) throw new Error('Invalid parameters')
 
+  const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
   const netProfit = endingBalance - startingBalance
   const isWinner = netProfit > 0
 
@@ -127,15 +128,34 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
     if (!seat) throw new Error('Seat not found')
 
-    // Deduct rake from wallet
-    const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', userId).single()
-    if (!wallet) throw new Error('Wallet not found')
+    // Deduct rake from player wallet
+    const { data: playerWallet } = await supabase.from('wallets').select('*').eq('user_id', userId).eq('currency_code', currencyCode).single()
+    if (!playerWallet) throw new Error('Player wallet not found')
 
-    const currentBalance = Number(wallet.balance)
-    if (currentBalance < rakeAmount) throw new Error('Insufficient balance for rake')
+    const playerCurrentBalance = Number(playerWallet.balance)
+    if (playerCurrentBalance < rakeAmount) throw new Error('Insufficient balance for rake')
 
-    const newBalance = currentBalance - rakeAmount
-    await supabase.from('wallets').update({ balance: newBalance, updated_at: new Date() }).eq('user_id', userId)
+    const playerNewBalance = playerCurrentBalance - rakeAmount
+    await supabase.from('wallets').update({ balance: playerNewBalance, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', currencyCode)
+
+    // Get House wallet and update it
+    const { data: houseWallet } = await supabase.from('wallets').select('*').eq('user_id', HOUSE_ID).eq('currency_code', currencyCode).single()
+    if (!houseWallet) throw new Error('House wallet not found')
+
+    const houseCurrentBalance = Number(houseWallet.balance)
+    const houseNewBalance = houseCurrentBalance + rakeAmount
+    await supabase.from('wallets').update({ balance: houseNewBalance, updated_at: new Date() }).eq('user_id', HOUSE_ID).eq('currency_code', currencyCode)
+
+    // Record rake transaction
+    await supabase.from('rake_transactions').insert([{
+      house_id: HOUSE_ID,
+      user_id: userId,
+      table_id: tableId,
+      amount: rakeAmount,
+      tip_percent: tipPercent,
+      currency_code: currencyCode,
+      balance_after: houseNewBalance
+    }])
 
     // Create session record for analytics
     await supabase.from('poker_sessions').insert([{
