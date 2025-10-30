@@ -79,15 +79,19 @@ async function startHand(tableId: string) {
   return { handId: hand.id, dealt: holeInserts.map(h => ({ user_id: h.user_id, seat_number: h.seat_number })) }
 }
 
-async function postBet(handId: string, userId: string, amount: number) {
+async function postBet(handId: string, userId: string, amount: number, action: string = 'bet') {
+  if (action === 'fold' || action === 'check') {
+    // No amount for fold/check
+    const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount: 0, action }])
+    if (betErr) throw betErr
+
+    await supabase.from('poker_audit').insert([{ hand_id: handId, event: action, payload: { userId } }])
+    return { success: true, action }
+  }
+
   if (amount <= 0) throw new Error('Invalid bet amount')
 
-  // Begin atomic operation: deduct from wallets and record escrow and bet
-  const client = supabase
-  const rpc = await client.rpc.bind(client)
-
-  // Use a transaction via the REST client pattern: perform concurrency-safe updates with checks
-  // 1. Read wallet
+  // For bet/raise/call: deduct from wallets and record escrow and bet
   const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId).limit(1)
   const wallet = (wallets && wallets[0])
   if (!wallet) throw new Error('Wallet not found')
@@ -103,13 +107,13 @@ async function postBet(handId: string, userId: string, amount: number) {
   if (escErr) throw escErr
 
   // Insert bet record
-  const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount, action: 'bet' }])
+  const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount, action }])
   if (betErr) throw betErr
 
   // Audit
-  await supabase.from('poker_audit').insert([{ hand_id: handId, event: 'bet_posted', payload: { userId, amount } }])
+  await supabase.from('poker_audit').insert([{ hand_id: handId, event: action, payload: { userId, amount } }])
 
-  return { success: true, remaining: newBal }
+  return { success: true, remaining: newBal, action }
 }
 
 async function processRake(userId: string, tableId: string, startingBalance: number, endingBalance: number, rakeAmount: number, tipPercent: number, currencyCode: string) {
