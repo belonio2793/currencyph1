@@ -232,7 +232,7 @@ export default function App() {
           </>
         )}
         {showAuth ? (
-          <Auth onAuthSuccess={handleAuthSuccess} />
+          <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
         ) : (
           <>
             {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
