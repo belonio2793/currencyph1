@@ -98,7 +98,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             ))}
 
             {/* Right-side nav items */}
-            {rightNav.map(btn => (
+            {rightNav.filter(btn => (!btn.auth) || userEmail).map(btn => (
               <button
                 key={btn.id}
                 onClick={() => {
