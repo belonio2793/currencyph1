@@ -352,11 +352,13 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               
               {/* Poker Table Visualization */}
               <div className="bg-slate-800 rounded-xl border border-slate-700 p-8">
-                <PlayerSeats 
+                <PlayerSeats
                   seats={seats}
                   table={table}
                   userId={userId}
                   gameState={gameState}
+                  currentPlayerSeat={currentPlayerSeat}
+                  dealerSeat={dealerSeat}
                 />
               </div>
               
