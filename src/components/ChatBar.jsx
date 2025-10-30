@@ -2,8 +2,8 @@ import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { generateSymmetricKey, exportKeyToBase64, importKeyFromBase64, encryptString, decryptString } from '../lib/crypto'
 import { getFriendsList, sendFriendRequest, removeFriend, isFriend, getPendingFriendRequests, getSentFriendRequests, acceptFriendRequest, rejectFriendRequest, blockUser, unblockUser, getBlockedUsers } from '../lib/friends'
-import { getOrCreateDirectConversation, sendConversationMessage, deleteConversationMessage } from '../lib/conversations'
-import { uploadMediaToChat, getMessageMedia, getMediaDownloadUrl, deleteMessageMedia, uploadVoiceMessage } from '../lib/chatMedia'
+import { getOrCreateDirectConversation } from '../lib/conversations'
+import { uploadMediaToChat, uploadVoiceMessage } from '../lib/chatMedia'
 import { subscribeToMultiplePresence, getMultipleUsersPresence } from '../lib/presence'
 import useGeolocation from '../lib/useGeolocation'
 
@@ -30,6 +30,7 @@ export default function ChatBar({ userId, userEmail }) {
   const mediaInputRef = useRef(null)
   const mediaRecorderRef = useRef(null)
   const audioChunksRef = useRef([])
+  const privacySubRef = useRef(null)
 
   const [allUsers, setAllUsers] = useState([])
   const [allLoading, setAllLoading] = useState(false)
@@ -37,6 +38,7 @@ export default function ChatBar({ userId, userEmail }) {
   const [pendingRequests, setPendingRequests] = useState([])
   const [sentRequests, setSentRequests] = useState([])
   const [blockedUsers, setBlockedUsers] = useState([])
+  const [userStatus, setUserStatus] = useState('online')
 
   const { location: userLocation } = useGeolocation()
 
@@ -54,7 +56,7 @@ export default function ChatBar({ userId, userEmail }) {
   useEffect(() => {
     const timeout = setTimeout(() => {
       if (searchQuery.length >= 2) {
-        searchUsers(searchQuery)
+        dbSearchUsers(searchQuery)
       } else {
         setSearchResults([])
       }
@@ -76,6 +78,32 @@ export default function ChatBar({ userId, userEmail }) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight
     }
   }, [messages])
+
+  useEffect(() => {
+    if (!userId) return
+    loadUserStatus()
+
+    // Subscribe to privacy_settings changes for this user so status updates reflect immediately
+    try {
+      const channel = supabase
+        .channel(`privacy:${userId}`)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'privacy_settings', filter: `user_id=eq.${userId}` }, (payload) => {
+          const row = payload.new
+          if (row.field_name === 'presence_status') {
+            setUserStatus(row.visibility)
+          }
+        })
+        .subscribe()
+
+      privacySubRef.current = channel
+    } catch (e) {
+      // ignore
+    }
+
+    return () => {
+      try { if (privacySubRef.current) supabase.removeChannel(privacySubRef.current) } catch (e) {}
+    }
+  }, [userId])
 
   const dbSearchUsers = async (query) => {
     if (!query || query.length < 2) {
@@ -491,7 +519,6 @@ export default function ChatBar({ userId, userEmail }) {
 
       enriched.sort((a, b) => sortAscending ? (a.distance_km || Infinity) - (b.distance_km || Infinity) : (b.distance_km || Infinity) - (a.distance_km || Infinity))
 
-      // Mark pending/sent requests
       const sent = await getSentFriendRequests(userId)
       const sentMap = {}
       (sent || []).forEach(s => { if (s.receiver_id) sentMap[s.receiver_id] = s.status })
@@ -513,6 +540,70 @@ export default function ChatBar({ userId, userEmail }) {
 
   const toggleSortOrder = () => setSortAscending(prev => !prev)
 
+  const loadUserStatus = async () => {
+    if (!userId) return
+    try {
+      const { data } = await supabase
+        .from('privacy_settings')
+        .select('visibility')
+        .eq('user_id', userId)
+        .eq('field_name', 'presence_status')
+        .limit(1)
+
+      const vis = Array.isArray(data) && data.length > 0 ? data[0].visibility : 'online'
+      setUserStatus(vis)
+    } catch (e) {
+      setUserStatus('online')
+    }
+  }
+
+  const updateUserStatus = async (status) => {
+    if (!userId) return
+    setUserStatus(status)
+
+    try {
+      const { data: existingArr } = await supabase
+        .from('privacy_settings')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('field_name', 'presence_status')
+        .limit(1)
+
+      const existing = Array.isArray(existingArr) && existingArr.length > 0 ? existingArr[0] : null
+
+      if (existing) {
+        await supabase.from('privacy_settings').update({ visibility: status }).eq('id', existing.id)
+      } else {
+        await supabase.from('privacy_settings').insert([{ user_id: userId, field_name: 'presence_status', visibility: status }])
+      }
+
+      // If user chose to Hide, also set listed_in_all to only_me; if switching away from hide, restore to everyone
+      const { data: listedArr } = await supabase
+        .from('privacy_settings')
+        .select('id, visibility')
+        .eq('user_id', userId)
+        .eq('field_name', 'listed_in_all')
+        .limit(1)
+
+      const listedExisting = Array.isArray(listedArr) && listedArr.length > 0 ? listedArr[0] : null
+
+      if (status === 'hide') {
+        if (listedExisting) {
+          if (listedExisting.visibility !== 'only_me') await supabase.from('privacy_settings').update({ visibility: 'only_me' }).eq('id', listedExisting.id)
+        } else {
+          await supabase.from('privacy_settings').insert([{ user_id: userId, field_name: 'listed_in_all', visibility: 'only_me' }])
+        }
+      } else {
+        // if previously private because of hide, set to everyone when leaving hide
+        if (listedExisting && listedExisting.visibility === 'only_me') {
+          await supabase.from('privacy_settings').update({ visibility: 'everyone' }).eq('id', listedExisting.id)
+        }
+      }
+    } catch (e) {
+      console.warn('Failed updating presence status:', e)
+    }
+  }
+
   return (
     <div className="fixed bottom-0 right-0 z-50 flex flex-col">
       {minimized && (
@@ -528,13 +619,27 @@ export default function ChatBar({ userId, userEmail }) {
       {!minimized && (
         <div className="bg-white rounded-t-lg shadow-2xl border border-slate-200 w-96 h-screen md:h-[600px] flex flex-col">
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
-            <h2 className="font-bold text-lg">Messages</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="font-bold text-lg">Messages</h2>
+              <div className="flex items-center gap-2">
+                <span className={`w-2.5 h-2.5 rounded-full ${userStatus === 'online' ? 'bg-green-400' : userStatus === 'busy' ? 'bg-red-400' : userStatus === 'away' ? 'bg-yellow-400' : 'bg-slate-400'}`} />
+                <select value={userStatus} onChange={(e) => updateUserStatus(e.target.value)} className="text-sm bg-blue-700/40 text-white px-2 py-1 rounded">
+                  <option value="online">Online</option>
+                  <option value="busy">Busy</option>
+                  <option value="away">Away</option>
+                  <option value="invisible">Invisible (Offline)</option>
+                  <option value="hide">Hide (no search)</option>
+                </select>
+              </div>
+            </div>
             <div className="flex items-center gap-2">
               <button onClick={() => setMinimized(true)} className="hover:bg-blue-800 p-1 rounded-lg transition-colors">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
               </button>
             </div>
           </div>
+
+          {/* rest of UI unchanged, reuse previous rendering logic */}
 
           <div className="flex border-b border-slate-200">
             <button onClick={() => setActiveTab('chats')} className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'chats' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-slate-600 hover:text-slate-900'}`}>Chats</button>
@@ -558,9 +663,7 @@ export default function ChatBar({ userId, userEmail }) {
                         <div className="text-xs text-slate-500">{onlineUsers[selectedConversation.user?.id] === 'online' ? 'Active now' : onlineUsers[selectedConversation.user?.id] === 'away' ? 'Away' : 'Offline'}</div>
                       </div>
                     </div>
-                    <button onClick={() => { setSelectedConversation(null); setMessages([]) }} className="text-slate-600 hover:text-slate-900">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-                    </button>
+                    <button onClick={() => { setSelectedConversation(null); setMessages([]) }} className="text-slate-600 hover:text-slate-900">Close</button>
                   </div>
 
                   <div ref={messageListRef} className="flex-1 overflow-y-auto p-3 space-y-3 bg-white">
@@ -582,8 +685,8 @@ export default function ChatBar({ userId, userEmail }) {
                     <div className="flex gap-2">
                       <input type="text" placeholder="Write a message..." value={messageText} onChange={(e) => setMessageText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
                       <input ref={mediaInputRef} type="file" onChange={(e) => e.target.files?.[0] && handleMediaUpload(e.target.files[0])} className="hidden" />
-                      <button onClick={() => mediaInputRef.current?.click()} disabled={uploading} title="Upload file" className="text-slate-600 hover:text-blue-600 disabled:opacity-50 transition-colors">...</button>
-                      <button onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording} disabled={uploading} title={recordingVoice ? 'Stop recording' : 'Record voice message'} className={`text-slate-600 disabled:opacity-50 transition-colors ${recordingVoice ? 'text-red-500 animate-pulse' : 'hover:text-blue-600'}`}>...</button>
+                      <button onClick={() => mediaInputRef.current?.click()} disabled={uploading} title="Upload file" className="text-slate-600 hover:text-blue-600 disabled:opacity-50 transition-colors">Upload</button>
+                      <button onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording} disabled={uploading} title={recordingVoice ? 'Stop recording' : 'Record voice message'} className={`text-slate-600 disabled:opacity-50 transition-colors ${recordingVoice ? 'text-red-500 animate-pulse' : 'hover:text-blue-600'}`}>Record</button>
                       <button onClick={sendMessage} disabled={sending || !messageText.trim()} className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">Send</button>
                     </div>
                   </div>
