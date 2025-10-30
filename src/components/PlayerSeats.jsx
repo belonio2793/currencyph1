@@ -1,12 +1,15 @@
 import React from 'react'
 
-export default function PlayerSeats({ seats, table, userId, gameState }) {
+export default function PlayerSeats({ seats, table, userId, gameState, currentPlayerSeat, dealerSeat }) {
   const getPlayerName = (seat) => {
     if (seat.user_id === userId) return 'You'
     return `Player ${seat.seat_number}`
   }
 
   const getSeatStatus = (seat) => {
+    if (currentPlayerSeat === seat.seat_number) {
+      return 'action'
+    }
     if (gameState === 'preflop' || gameState === 'flop' || gameState === 'turn' || gameState === 'river') {
       return 'active'
     }
