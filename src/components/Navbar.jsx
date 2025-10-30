@@ -29,8 +29,14 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
       <div className="max-w-7xl mx-auto px-4">
         {/* Row 1: Logo and HeaderMap */}
         <div className="py-4 flex items-center justify-between">
-          <div>
+          <div className="flex items-center">
             <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
+            {userEmail && (
+              <div className="ml-4 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex items-center">
+                <span className="text-slate-400 mr-2 text-xs">Total</span>
+                <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
+              </div>
+            )}
           </div>
           <div className="hidden md:block">
             <HeaderMap />
