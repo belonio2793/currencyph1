@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import React from 'react'
 import HeaderMap from './HeaderMap'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, onShowAuth, onSignOut }) {
@@ -18,7 +19,8 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   const rightNav = [
     { id: 'bills', label: 'Bills' },
     { id: 'transactions', label: 'History' },
-    { id: 'profile', label: 'Profile' }
+    { id: 'profile', label: 'Profile' },
+    { id: 'inbox', label: 'Inbox' }
   ]
 
   return (
