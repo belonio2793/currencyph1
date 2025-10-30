@@ -3,7 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import { generateSymmetricKey, exportKeyToBase64, importKeyFromBase64, encryptString, decryptString } from '../lib/crypto'
 import { getFriendsList, sendFriendRequest, removeFriend, isFriend } from '../lib/friends'
 import { getOrCreateDirectConversation, sendConversationMessage, deleteConversationMessage } from '../lib/conversations'
-import { uploadMediaToChat, getMessageMedia, getMediaDownloadUrl, deleteMessageMedia } from '../lib/chatMedia'
+import { uploadMediaToChat, getMessageMedia, getMediaDownloadUrl, deleteMessageMedia, uploadVoiceMessage } from '../lib/chatMedia'
+import { subscribeToMultiplePresence, getMultipleUsersPresence } from '../lib/presence'
 
 export default function ChatBar({ userId, userEmail }) {
   const [minimized, setMinimized] = useState(true)
