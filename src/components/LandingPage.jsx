@@ -455,10 +455,14 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
   const loadWallets = async () => {
     try {
+      // Skip for guest-local or invalid user IDs
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        setWallets([])
+        return
+      }
       const data = await wisegcashAPI.getWallets(userId)
       setWallets(data)
     } catch (err) {
-      console.debug('Wallet data unavailable, using empty wallets:', err?.message)
       setWallets([])
     }
   }
