@@ -210,12 +210,14 @@ export default function Profile({ userId }) {
       // Save privacy settings (skip for guest accounts)
       if (isValidUUID(userId)) {
         for (const [field, visibility] of Object.entries(privacySettings)) {
-          const { data: existing } = await supabase
+          const { data: existingArr } = await supabase
             .from('privacy_settings')
             .select('id')
             .eq('user_id', userId)
             .eq('field_name', field)
-            .maybeSingle()
+            .limit(1)
+
+          const existing = Array.isArray(existingArr) && existingArr.length > 0 ? existingArr[0] : null
 
           if (existing) {
             await supabase
