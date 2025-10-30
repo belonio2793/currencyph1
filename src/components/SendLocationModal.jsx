@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import React, { useState, useEffect } from 'react'
 import { searchUsers, sendLocationMessage } from '../lib/messages'
 
 export default function SendLocationModal({ open, onClose, location, city, senderId }) {
