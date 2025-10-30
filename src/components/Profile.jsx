@@ -239,10 +239,7 @@ export default function Profile({ userId }) {
                 formData.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'
               )}
             </div>
-            <h3 className="text-2xl font-light text-slate-900">{formData.full_name || 'User'}</h3>
-            {formData.username && (
-              <p className="text-slate-500 text-sm mt-1">@{formData.username}</p>
-            )}
+            <h3 className="text-2xl font-light text-slate-900">{getDisplayNamePreview()}</h3>
             <p className="text-slate-500 text-sm mt-1">{user?.email}</p>
             {getSelectedCountry() && (
               <p className="text-xl mt-3">{getSelectedCountry().flag}</p>
