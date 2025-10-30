@@ -9,14 +9,18 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const PROJECT_URL = Deno.env.get('SUPABASE_URL') || Deno.env.get('VITE_PROJECT_URL')
-    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || Deno.env.get('VITE_SUPABASE_SERVICE_ROLE_KEY')
-    if (!PROJECT_URL || !SERVICE_ROLE_KEY) return new Response('Missing Supabase env', { status: 500 })
+    const PROJECT_URL = Deno.env.get('SUPABASE_URL')
+    const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-    const supabaseAdmin = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
+    if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
+      console.error('Missing env vars - SUPABASE_URL:', !!PROJECT_URL, 'SERVICE_ROLE_KEY:', !!SERVICE_ROLE_KEY)
+      return new Response(JSON.stringify({ error: 'Missing Supabase configuration' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    }
 
     const body = await req.json().catch(() => null)
-    if (!body || !body.email || !body.password) return new Response('Missing email or password', { status: 400 })
+    if (!body || !body.email || !body.password) {
+      return new Response(JSON.stringify({ error: 'Missing email or password' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    }
 
     const email = body.email
     const password = body.password
@@ -31,10 +35,7 @@ Deno.serve(async (req) => {
       },
     })
 
-    if (!listRes.ok) {
-      // proceed to create
-      console.warn('Could not query admin users list, response', listRes.status)
-    } else {
+    if (listRes.ok) {
       const listJson = await listRes.json().catch(() => null)
       if (Array.isArray(listJson) && listJson.length > 0) {
         const existing = listJson[0]
@@ -45,13 +46,17 @@ Deno.serve(async (req) => {
           headers: { 'Content-Type': 'application/json', apikey: SERVICE_ROLE_KEY, Authorization: `Bearer ${SERVICE_ROLE_KEY}` },
           body: JSON.stringify({ password, email_confirm: true, user_metadata: { full_name } })
         })
-        if (!patchRes.ok) {
-          console.warn('Failed to update user', patchRes.status)
-        } else {
+        if (patchRes.ok) {
           const patched = await patchRes.json().catch(() => null)
           return new Response(JSON.stringify({ ok: true, user: patched }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+        } else {
+          const errText = await patchRes.text().catch(() => '')
+          console.error('Failed to update user:', patchRes.status, errText)
         }
       }
+    } else {
+      const errText = await listRes.text().catch(() => '')
+      console.error('Failed to query users:', listRes.status, errText)
     }
 
     // Create new user
@@ -63,14 +68,14 @@ Deno.serve(async (req) => {
 
     if (!createRes.ok) {
       const txt = await createRes.text().catch(()=>'')
-      console.warn('Admin create user failed', createRes.status, txt)
-      return new Response('Admin create user failed', { status: 500 })
+      console.error('Admin create user failed:', createRes.status, txt)
+      return new Response(JSON.stringify({ error: `Failed to create user: ${createRes.status}` }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     }
 
     const created = await createRes.json().catch(() => null)
     return new Response(JSON.stringify({ ok: true, user: created }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   } catch (err) {
-    console.error('create-guest error', err)
-    return new Response('Internal error', { status: 500 })
+    console.error('create-guest error:', err)
+    return new Response(JSON.stringify({ error: 'Internal error' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
   }
 })
