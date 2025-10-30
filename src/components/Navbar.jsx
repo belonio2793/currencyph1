@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import HeaderMap from './HeaderMap'
 
-export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, totalBalancePHP, onShowAuth, onSignOut }) {
+export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, userId, totalBalancePHP, onShowAuth, onSignOut }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const mainNav = [
@@ -38,7 +38,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             )}
           </div>
           <div className="hidden md:block">
-            <HeaderMap />
+            <HeaderMap userId={userId} />
           </div>
         </div>
         <div className="md:hidden w-full pb-4">
