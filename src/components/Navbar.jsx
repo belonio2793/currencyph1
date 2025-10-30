@@ -6,6 +6,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
   const mainNav = [
     { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
     { id: 'nearby', label: 'Nearby' },
     { id: 'wallet', label: 'Wallets' },
     { id: 'send', label: 'Send' }
