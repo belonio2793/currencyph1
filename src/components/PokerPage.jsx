@@ -308,10 +308,10 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => handleStartHand(selectedTable.id)}
+                      onClick={() => openGameModal(selectedTable)}
                       className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition"
                     >
-                      Start Hand
+                      🎮 Play
                     </button>
                     {userId && seats.some(s => s.user_id === userId) && (
                       <button
