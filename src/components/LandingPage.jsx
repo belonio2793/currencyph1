@@ -355,7 +355,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           setCryptoRates(cryptoPricesInGlobalCurrency)
           return
         } catch (cgErr) {
-          console.debug('CoinGecko fallback failed, using defaults in LandingPage:', cgErr)
           setCryptoRates(defaultCryptoPrices)
           return
         }
