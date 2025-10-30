@@ -326,7 +326,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
             1000
           )
         } catch (err) {
-          console.debug('Edge function fetch failed, trying CoinGecko:', err?.message)
+          // Silently fail and try next method
         }
       } else {
         console.debug('Supabase environment variables not configured, skipping edge function')
