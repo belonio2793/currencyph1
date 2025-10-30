@@ -443,19 +443,19 @@ export default function Profile({ userId }) {
                         />
                         <span className="text-sm text-slate-700">Last Name</span>
                       </label>
-                    </div>
 
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="display_name_type"
-                        value="full_name"
-                        checked={formData.display_name_type === 'full_name'}
-                        onChange={e => setFormData({...formData, display_name_type: 'full_name'})}
-                        className="w-4 h-4"
-                      />
-                      <span className="text-sm text-slate-700">Full Name</span>
-                    </label>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="radio"
+                          name="display_name_type"
+                          value="full_name"
+                          checked={formData.display_name_type === 'full_name'}
+                          onChange={e => setFormData({...formData, display_name_type: 'full_name'})}
+                          className="w-4 h-4"
+                        />
+                        <span className="text-sm text-slate-700">Full Name</span>
+                      </label>
+                    </div>
                   </div>
                   <div className="mt-3 pt-3 border-t border-blue-200">
                     <p className="text-xs text-slate-600">Preview: <span className="font-semibold text-slate-900">{getDisplayNamePreview()}</span></p>
