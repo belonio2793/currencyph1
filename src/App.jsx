@@ -35,6 +35,14 @@ export default function App() {
     (typeof process !== 'undefined' && process.env && process.env.CONTENT_LOCKER === 'TRUE')
 
   useEffect(() => {
+    // Ensure default page title/meta is set
+    if (typeof document !== 'undefined') {
+      document.title = 'Currency - Philippines'
+      const metaDesc = document.querySelector('meta[name="description"]')
+      if (metaDesc) {
+        metaDesc.setAttribute('content', 'Currency - Philippines: open-source multi-currency dashboard and network balances.')
+      }
+    }
     initializeUser()
     handleRouting()
 
