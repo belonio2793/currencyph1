@@ -13,11 +13,19 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
 
   async function loadTables() {
     setLoading(true)
+    setError(null)
     try {
-      const { data } = await supabase.from('poker_tables').select('*').order('created_at', { ascending: false })
-      setTables(data || [])
+      const { data, error: err } = await supabase.from('poker_tables').select('*').order('created_at', { ascending: false })
+      if (err) {
+        console.error('Load tables error:', err)
+        setError(`Failed to load tables: ${err.message}`)
+        setTables([])
+      } else {
+        setTables(data || [])
+      }
     } catch (e) {
-      console.warn('Could not load tables', e)
+      console.error('Could not load tables', e)
+      setError(`Error: ${e.message}`)
       setTables([])
     } finally { setLoading(false) }
   }
