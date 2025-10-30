@@ -61,7 +61,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleCreate(name, stakeMin, stakeMax) {
     if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
     try {
-      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: 'PHP' }]).select().single()
+      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: 'PHP', created_by: userId, is_default: false }]).select().single()
       if (error) {
         console.error('Create table error:', error)
         throw new Error(error.message)
