@@ -472,7 +472,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           </div>
 
           {/* Table Visualization */}
-          <div className="lg:col-span-2 bg-slate-800 rounded-xl border border-slate-700 p-8">
+          <div ref={tableViewRef} className="lg:col-span-2 bg-slate-800 rounded-xl border border-slate-700 p-8">
             <h3 className="text-xl font-semibold text-white mb-6">Table View</h3>
             {selectedTable ? (
               <div className="space-y-6">
