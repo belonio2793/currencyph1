@@ -424,7 +424,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
         </div>
 
         {/* Content */}
-        <div className="overflow-y-auto h-[calc(90vh-100px)]">
+        <div ref={contentScrollRef} className="overflow-y-auto h-[calc(90vh-100px)]">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 p-6">
             
             {/* Main Game Area */}
