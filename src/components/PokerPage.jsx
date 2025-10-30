@@ -207,7 +207,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const getFeltColor = () => {
     if (activeTab === 'my-tables') {
       return 'from-blue-800 to-blue-900'
-    } else if (activeTab === 'other-tables') {
+    } else if (activeTab === 'lobby') {
       return 'from-purple-800 to-purple-900'
     }
     return 'from-slate-700 to-slate-800'
