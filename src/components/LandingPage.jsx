@@ -262,7 +262,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
   // Helper: fetch with retries and proper error handling
   const fetchWithRetries = async (url, options = {}, retries = 2, backoff = 500) => {
-    let lastErr
+    let lastErr = null
     for (let i = 0; i <= retries; i++) {
       try {
         const controller = new AbortController()
@@ -272,8 +272,19 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           const resp = await fetch(url, { ...options, signal: controller.signal })
           clearTimeout(timeoutId)
 
-          if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
-          return await resp.json()
+          if (!resp.ok) {
+            // attempt to read body for debugging
+            let bodyText = null
+            try { bodyText = await resp.text() } catch (e) {}
+            throw new Error(`HTTP ${resp.status}${bodyText ? ` - ${bodyText}` : ''}`)
+          }
+
+          const text = await resp.text()
+          try {
+            return text ? JSON.parse(text) : null
+          } catch (parseErr) {
+            return text
+          }
         } finally {
           clearTimeout(timeoutId)
         }
@@ -284,7 +295,12 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       }
     }
-    console.debug(`Fetch failed after ${retries + 1} attempts for ${url}:`, lastErr?.message || lastErr)
+    try {
+      const msg = lastErr ? (lastErr.message || String(lastErr)) : 'Unknown error'
+      console.debug(`Fetch failed after ${retries + 1} attempts for ${url}: ${msg}`)
+    } catch (e) {
+      // ignore logging errors
+    }
     return null
   }
 
