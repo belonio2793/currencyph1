@@ -650,6 +650,9 @@ export default function Profile({ userId }) {
                 >
                   Save Changes
                 </button>
+                {success && (
+                  <div className="mt-3 text-sm text-emerald-700" role="status" aria-live="polite">{success}</div>
+                )}
               </form>
             ) : (
               <div className="space-y-6">
