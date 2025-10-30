@@ -17,10 +17,10 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   ]
 
   const rightNav = [
-    { id: 'bills', label: 'Bills' },
-    { id: 'transactions', label: 'History' },
-    { id: 'profile', label: 'Profile' },
-    { id: 'inbox', label: 'Inbox' }
+    { id: 'bills', label: 'Bills', auth: true },
+    { id: 'transactions', label: 'History', auth: true },
+    { id: 'profile', label: 'Profile', auth: true },
+    { id: 'inbox', label: 'Inbox', auth: true }
   ]
 
   return (
