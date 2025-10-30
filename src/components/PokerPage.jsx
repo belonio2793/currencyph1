@@ -47,6 +47,10 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
       console.warn('Could not load seats', e)
       setSeats([])
     }
+    // Scroll to top when table is opened
+    if (pageRef.current) {
+      pageRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   function openGameModal(table) {
