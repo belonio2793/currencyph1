@@ -120,6 +120,7 @@ export default function App() {
         setUserId(user.id)
         setUserEmail(user.email)
         await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+        initializePresence(user.id)
         setShowAuth(false)
         window.history.replaceState(null, '', '/')
       } else {
