@@ -478,10 +478,24 @@ export default function Profile({ userId }) {
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                   <input
                     type="email"
-                    value={user?.email || ''}
-                    disabled
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-500 cursor-not-allowed"
+                    value={formData.email || ''}
+                    onChange={e => setFormData({...formData, email: e.target.value})}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
                   />
+                  <p className="text-xs text-slate-500 mt-1">Changing your email will also attempt to update your authentication email (may require confirmation).</p>
+                </div>
+
+                {/* Realtime autosave toggle */}
+                <div className="mt-3">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.realtime_save || false}
+                      onChange={e => setFormData({...formData, realtime_save: e.target.checked})}
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm text-slate-700">Save changes in real time</span>
+                  </label>
                 </div>
 
                 {/* Phone Number with Country Code */}
