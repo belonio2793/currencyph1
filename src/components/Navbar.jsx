@@ -80,7 +80,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
           {/* Desktop navigation */}
           <div className="hidden md:flex flex-wrap items-center gap-1">
-            {mainNav.map(btn => (
+            {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail)).map(btn => (
               <button
                 key={btn.id}
                 onClick={() => {
