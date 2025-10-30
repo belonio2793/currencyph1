@@ -200,6 +200,12 @@ serve(async (req) => {
       return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
     }
 
+    if (path.endsWith('/process_rake') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await processRake(body.userId, body.tableId, Number(body.startingBalance), Number(body.endingBalance), Number(body.rakeAmount), Number(body.tipPercent), body.currencyCode)
+      return new Response(JSON.stringify(r), { headers: { 'content-type': 'application/json' } })
+    }
+
     return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: { 'content-type': 'application/json' } })
   } catch (err) {
     console.error('poker-engine error', err)
