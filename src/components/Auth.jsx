@@ -35,19 +35,40 @@ export default function Auth({ onAuthSuccess }) {
       // Map guest/guest -> backend safe password to bypass Supabase min-length checks
       const effectivePassword = (identifier === 'guest' && password === 'guest') ? 'guest123' : password
 
-      let { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password: effectivePassword
-      })
+      // Try signing in
+      let signInResult
+      try {
+        signInResult = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+      } catch (err) {
+        signInResult = { error: err }
+      }
+
+      let data = signInResult.data
+      let signInError = signInResult.error
 
       if (signInError) {
-        // If guest and no account exists, create it then sign in
         if (identifier === 'guest') {
-          const { error: su } = await supabase.auth.signUp({ email, password: effectivePassword })
-          if (su) throw su
-          const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-          if (retry.error) throw retry.error
-          data = retry.data
+          // Try to create a user record in users table (may fail due to RLS); if that fails, fallback to local guest session
+          try {
+            const { data: up, error: upErr } = await supabase.from('users').upsert({ email }).select().single()
+            if (upErr) {
+              throw upErr
+            }
+            // Attempt to sign up in auth
+            const { error: su } = await supabase.auth.signUp({ email, password: effectivePassword })
+            if (su) {
+              throw su
+            }
+            const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+            if (retry.error) throw retry.error
+            data = retry.data
+          } catch (err) {
+            // Final fallback: create local guest session (non-authenticated)
+            const localUser = { id: 'guest-local', email: 'guest', user_metadata: {} }
+            setSuccess('Guest session created locally')
+            setTimeout(() => onAuthSuccess(localUser), 500)
+            return
+          }
         } else {
           throw signInError
         }
