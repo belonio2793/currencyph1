@@ -74,6 +74,28 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  async function handleLeaveTable(tableId) {
+    if (!userId) return
+    try {
+      // Find and delete the user's seat
+      const { error: deleteError } = await supabase.from('poker_seats').delete().eq('table_id', tableId).eq('user_id', userId)
+      if (deleteError) throw deleteError
+
+      // Check if table is now empty
+      const { data: remainingSeats } = await supabase.from('poker_seats').select('*').eq('table_id', tableId)
+      if (!remainingSeats || remainingSeats.length === 0) {
+        // Delete empty table and all related records
+        await supabase.from('poker_tables').delete().eq('id', tableId)
+      }
+
+      // Reset selection and reload
+      setSelectedTable(null)
+      await loadTables()
+    } catch (e) {
+      alert('Could not leave table: ' + (e.message || e))
+    }
+  }
+
   const getTableStatusColor = (table) => {
     const openSeats = table.max_seats - seats.filter(s => s.table_id === table.id).length
     if (openSeats === 0) return 'bg-red-50'
