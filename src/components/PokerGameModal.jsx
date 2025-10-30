@@ -344,7 +344,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
           'content-type': 'application/json',
           'Authorization': `Bearer ${anonKey}`
         },
-        body: JSON.stringify({ tableId: table.id, userId, seatNumber, startingBalance: currentBalance })
+        body: JSON.stringify({ tableId: table.id, userId, seatNumber: targetSeat, startingBalance: currentBalance })
       })
 
       if (!res.ok) {
