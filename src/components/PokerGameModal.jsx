@@ -53,7 +53,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   // Refresh player balance
   useEffect(() => {
     if (!userId) return
-    
+
     const refreshBalance = async () => {
       try {
         const { data: wallets } = await supabase
@@ -61,7 +61,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
           .select('balance')
           .eq('user_id', userId)
           .limit(1)
-        
+
         if (wallets && wallets[0]) {
           setPlayerBalance(Number(wallets[0].balance))
         }
@@ -69,11 +69,36 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
         console.error('Error loading balance:', err)
       }
     }
-    
+
     refreshBalance()
     const interval = setInterval(refreshBalance, 2000)
     return () => clearInterval(interval)
   }, [userId])
+
+  // Determine if it's current player's turn
+  useEffect(() => {
+    if (!hand || !myPosition || !userId || !currentPlayerSeat) {
+      setActionRequired(false)
+      return
+    }
+
+    // Check if hand is in active state
+    const isHandActive = ['preflop', 'flop', 'turn', 'river'].includes(hand.round_state)
+
+    if (!isHandActive) {
+      setActionRequired(false)
+      return
+    }
+
+    // Check if it's our turn
+    const isOurTurn = myPosition === currentPlayerSeat
+
+    // Check if we've already acted
+    const lastAction = betHistory.find(b => b.user_id === userId && b.round_state === hand.round_state)
+
+    // Action required if it's our turn and we haven't acted yet
+    setActionRequired(isOurTurn && !lastAction)
+  }, [hand?.round_state, hand?.id, myPosition, userId, currentPlayerSeat, betHistory])
 
   async function loadGameData() {
     setLoading(true)
