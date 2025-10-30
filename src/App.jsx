@@ -220,8 +220,27 @@ export default function App() {
   const handleAuthSuccess = async (user) => {
     setUserId(user.id)
     setUserEmail(user.email)
-    await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
-    initializePresence(user.id)
+
+    // For guest-local users (not real Supabase auth), don't try database operations
+    if (!user.id.includes('guest-local')) {
+      try {
+        await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+        initializePresence(user.id)
+      } catch (err) {
+        console.warn('Could not initialize user profile:', err)
+      }
+    } else {
+      // For guest-local accounts, persist to localStorage
+      try {
+        localStorage.setItem('currency_ph_guest_session', JSON.stringify({
+          user,
+          timestamp: Date.now()
+        }))
+      } catch (e) {
+        console.warn('Could not persist guest session', e)
+      }
+    }
+
     setShowAuth(false)
     window.history.replaceState(null, '', '/')
     setActiveTab('home')
