@@ -511,14 +511,13 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                   ) : !isSeated ? (
                     <div className="space-y-3">
                       <p className="text-slate-300">Join the table to play</p>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => window.location.href = '/poker'}
-                          className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition"
-                        >
-                          Go to Lobby
-                        </button>
-                      </div>
+                      <button
+                        onClick={sitAtTable}
+                        disabled={loading}
+                        className="w-full px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-900 disabled:opacity-50 text-white font-semibold rounded-lg transition"
+                      >
+                        {loading ? 'Taking Seat...' : 'Take a Seat'}
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -526,7 +525,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                       <button
                         onClick={startHand}
                         disabled={loading || waitingForPlayers}
-                        className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-900 disabled:opacity-50 text-white font-semibold rounded-lg transition"
+                        className="w-full px-6 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-900 disabled:opacity-50 text-white font-semibold rounded-lg transition"
                       >
                         {waitingForPlayers ? `Waiting for players (${seats.length}/2)...` : loading ? 'Starting...' : 'Start Hand'}
                       </button>
