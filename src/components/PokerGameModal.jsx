@@ -362,30 +362,14 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     }
   }
 
-  async function leaveSeat() {
-    if (!userId) return
-    setLoading(true)
-    try {
-      // Get seat info
-      const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', table.id).eq('user_id', userId).single()
-      if (!seatData) {
-        setError('Seat not found')
-        setLoading(false)
-        return
-      }
-
-      // Delete the seat
-      const { error: deleteErr } = await supabase.from('poker_seats').delete().eq('id', seatData.id)
-      if (deleteErr) throw deleteErr
-
-      await loadGameData()
-      setError(null)
-    } catch (err) {
-      setError(err.message || 'Could not leave table')
-      console.error('Error leaving seat:', err)
-    } finally {
-      setLoading(false)
-    }
+  function leaveSeat() {
+    if (!userId || !table) return
+    // Use the parent callback which handles rake and proper cleanup
+    onLeaveTable?.(table.id)
+    // Close modal after a short delay to allow cleanup
+    setTimeout(() => {
+      onClose?.()
+    }, 500)
   }
 
   const isSigned = !!userId && !!userEmail
