@@ -182,7 +182,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {mobileMenuOpen && (
           <div className="md:hidden pb-4 border-t border-slate-100">
             <div className="space-y-2">
-              {mainNav.concat(rightNav).map(btn => (
+              {mainNav.concat(rightNav).filter(btn => (btn.public || !btn.auth) || userEmail).map(btn => (
                 <button
                   key={btn.id}
                   onClick={() => {
