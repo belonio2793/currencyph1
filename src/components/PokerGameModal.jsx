@@ -409,12 +409,21 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               <span className="ml-4 text-emerald-400">{tableStatusText}</span>
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-slate-400 hover:text-white transition p-2 hover:bg-slate-700 rounded-lg"
-          >
-            ✕
-          </button>
+          <div className="flex items-center gap-8">
+            <div className="text-right">
+              <div className="text-xs text-slate-400 mb-1">Current Pot</div>
+              <div className="text-2xl font-bold text-amber-400">
+                {pot.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </div>
+              <div className="text-xs text-slate-400">{table.currency_code}</div>
+            </div>
+            <button
+              onClick={onClose}
+              className="text-slate-400 hover:text-white transition p-2 hover:bg-slate-700 rounded-lg"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         {/* Content */}
