@@ -128,6 +128,12 @@ export default function Profile({ userId }) {
       return
     }
 
+    // Skip availability check for guest accounts
+    if (isGuestAccount && !isValidUUID(userId)) {
+      setUsernameAvailable(true)
+      return
+    }
+
     try {
       const { data } = await supabase
         .from('users')
