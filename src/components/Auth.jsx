@@ -32,18 +32,20 @@ export default function Auth({ onAuthSuccess }) {
       }
 
       const email = normalizeIdentifier(identifier)
+      // Map guest/guest -> backend safe password to bypass Supabase min-length checks
+      const effectivePassword = (identifier === 'guest' && password === 'guest') ? 'guest123' : password
 
       let { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password: effectivePassword
       })
 
       if (signInError) {
         // If guest and no account exists, create it then sign in
         if (identifier === 'guest') {
-          const { error: su } = await supabase.auth.signUp({ email, password })
+          const { error: su } = await supabase.auth.signUp({ email, password: effectivePassword })
           if (su) throw su
-          const retry = await supabase.auth.signInWithPassword({ email, password })
+          const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
           if (retry.error) throw retry.error
           data = retry.data
         } else {
