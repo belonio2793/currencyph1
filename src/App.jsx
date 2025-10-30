@@ -29,6 +29,7 @@ export default function App() {
   const [error, setError] = useState('')
   const [globalCurrency, setGlobalCurrency] = useState('PHP')
   const [showAuth, setShowAuth] = useState(false)
+  const [authInitialTab, setAuthInitialTab] = useState('login')
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
 
