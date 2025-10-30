@@ -176,6 +176,27 @@ export default function Profile({ userId }) {
               .insert([{ user_id: userId, field_name: field, visibility }])
           }
         }
+
+        // If user set their account to private in listed_in_all, also mark presence as 'hide'
+        try {
+          if (privacySettings['listed_in_all'] === 'only_me') {
+            const { data: presArr } = await supabase
+              .from('privacy_settings')
+              .select('id')
+              .eq('user_id', userId)
+              .eq('field_name', 'presence_status')
+              .limit(1)
+
+            const existingPres = Array.isArray(presArr) && presArr.length > 0 ? presArr[0] : null
+            if (existingPres) {
+              await supabase.from('privacy_settings').update({ visibility: 'hide' }).eq('id', existingPres.id)
+            } else {
+              await supabase.from('privacy_settings').insert([{ user_id: userId, field_name: 'presence_status', visibility: 'hide' }])
+            }
+          }
+        } catch (e) {
+          console.debug('Failed to sync presence status with privacy:', e)
+        }
       }
 
       if (!silent) {
