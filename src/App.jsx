@@ -64,7 +64,7 @@ export default function App() {
             setUserId(session.user.id)
             setUserEmail(session.user.email)
             // ensure presence and balance are initialized for new session
-            initializePresence(session.user.id).catch(() => {})
+            try { initializePresence(session.user.id) } catch(e) {}
             loadTotalBalance(session.user.id).catch(() => {})
             setShowAuth(false)
           } else {
