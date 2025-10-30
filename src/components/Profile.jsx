@@ -60,12 +60,16 @@ export default function Profile({ userId }) {
         full_name: userData?.full_name || '',
         email: userData?.email || '',
         phone_number: userData?.phone_number || '',
+        phone_country_code: userData?.phone_country_code || 'PH',
         username: userData?.username || '',
         country_code: userData?.country_code || 'PH',
         relationship_status: userData?.relationship_status || '',
         biography: userData?.biography || '',
-        profile_picture_url: userData?.profile_picture_url || ''
+        profile_picture_url: userData?.profile_picture_url || '',
+        display_name_type: userData?.display_name_type || 'full_name',
+        display_as_username_everywhere: userData?.display_as_username_everywhere || false
       })
+      setDisplayNameType(userData?.display_name_type || 'full_name')
 
       // Load privacy settings
       const { data: privacyData } = await supabase
