@@ -162,7 +162,7 @@ export default function Profile({ userId }) {
         .from('users')
         .select('id')
         .eq('username', username)
-        .single()
+        .maybeSingle()
 
       setUsernameAvailable(!data)
     } catch (err) {
