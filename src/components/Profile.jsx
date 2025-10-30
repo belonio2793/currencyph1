@@ -539,15 +539,22 @@ export default function Profile({ userId }) {
               </form>
             ) : (
               <div className="space-y-6">
+                {formData.username && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Username</p>
+                    <p className="text-lg text-slate-900">@{formData.username}</p>
+                  </div>
+                )}
+
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Full Name</p>
                   <p className="text-lg text-slate-900">{formData.full_name || '-'}</p>
                 </div>
 
-                {formData.username && (
+                {formData.display_name_type && (
                   <div>
-                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Username</p>
-                    <p className="text-lg text-slate-900">@{formData.username}</p>
+                    <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Display As</p>
+                    <p className="text-lg text-slate-900 capitalize">{formData.display_name_type.replace(/_/g, ' ')}</p>
                   </div>
                 )}
 
@@ -558,7 +565,9 @@ export default function Profile({ userId }) {
 
                 <div>
                   <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Phone Number</p>
-                  <p className="text-lg text-slate-900">{formData.phone_number || '-'}</p>
+                  <p className="text-lg text-slate-900">
+                    {formData.phone_number ? `${getSelectedPhoneCountry()?.flag || ''} ${formData.phone_number}` : '-'}
+                  </p>
                 </div>
 
                 <div>
