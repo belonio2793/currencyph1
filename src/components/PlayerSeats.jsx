@@ -78,7 +78,6 @@ export default function PlayerSeats({ seats, table, userId, gameState, currentPl
                         : '0 0 10px rgba(217, 119, 6, 0.3)'
                     }}
                   >
-                    <div className="text-xl">{dealerSeat === seat.seat_number ? '♠️' : '💰'}</div>
                     <div className="font-bold text-white">{getPlayerName(seat)}</div>
                     <div className="text-xs text-amber-100">Seat {seat.seat_number}</div>
                   </div>
