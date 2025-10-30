@@ -1,107 +1,172 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { generateSymmetricKey, exportKeyToBase64, importKeyFromBase64, encryptString, decryptString } from '../lib/crypto'
+import { getFriendsList, sendFriendRequest, removeFriend, isFriend } from '../lib/friends'
+import { getOrCreateDirectConversation, sendConversationMessage, deleteConversationMessage } from '../lib/conversations'
+import { uploadMediaToChat, getMessageMedia, getMediaDownloadUrl, deleteMessageMedia } from '../lib/chatMedia'
 
 export default function ChatBar({ userId, userEmail }) {
-  const [open, setOpen] = useState(false)
-  const [search, setSearch] = useState('')
-  const [results, setResults] = useState([])
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [minimized, setMinimized] = useState(true)
+  const [activeTab, setActiveTab] = useState('chats')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [searchResults, setSearchResults] = useState([])
+  const [friends, setFriends] = useState([])
+  const [searching, setSearching] = useState(false)
+  const [selectedConversation, setSelectedConversation] = useState(null)
   const [messages, setMessages] = useState([])
-  const [text, setText] = useState('')
+  const [messageText, setMessageText] = useState('')
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [unreadCounts, setUnreadCounts] = useState({})
+  const [onlineUsers, setOnlineUsers] = useState(new Set())
+  const messageListRef = useRef(null)
   const subRef = useRef(null)
+  const typingTimeoutRef = useRef(null)
 
+  // Load friends on mount
   useEffect(() => {
+    if (!userId || activeTab !== 'friends') return
+    loadFriends()
+  }, [userId, activeTab])
+
+  // Search users with debounce
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (searchQuery.length >= 2) {
+        searchUsers(searchQuery)
+      } else {
+        setSearchResults([])
+      }
+    }, 300)
+    return () => clearTimeout(timeout)
+  }, [searchQuery])
+
+  // Load messages when conversation changes
+  useEffect(() => {
+    if (!selectedConversation) return
+    loadMessages()
+    subscribeToMessages()
     return () => {
       if (subRef.current) supabase.removeSubscription(subRef.current)
     }
-  }, [])
+  }, [selectedConversation])
 
-  const toggleOpen = () => setOpen(!open)
-
-  // Basic user search
-  const searchUsers = async (q) => {
-    if (!q || q.length < 2) {
-      setResults([])
-      return
-    }
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, email, full_name, phone')
-      .or(`full_name.ilike.%${q}%,email.ilike.%${q}%,phone.ilike.%${q}%`)
-      .limit(20)
-
-    setLoading(false)
-    if (error) {
-      console.warn('User search error', error)
-      setResults([])
-      return
-    }
-    // Filter out self
-    setResults((data || []).filter(u => u.id !== userId))
-  }
-
+  // Auto-scroll to bottom on new messages
   useEffect(() => {
-    const t = setTimeout(() => {
-      if (search.length >= 2) searchUsers(search)
-      else setResults([])
-    }, 300)
-    return () => clearTimeout(t)
-  }, [search])
-
-  // Conversation key management (client-only for MVP): store per pair
-  const convKeyId = (a, b) => [a, b].sort().join('_')
-
-  async function ensureConversationKey(a, b) {
-    const keyName = `conv_key_${convKeyId(a, b)}`
-    let keyB64 = localStorage.getItem(keyName)
-    if (keyB64) {
-      return importKeyFromBase64(keyB64)
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight
     }
-    const key = await generateSymmetricKey()
-    keyB64 = await exportKeyToBase64(key)
-    localStorage.setItem(keyName, keyB64)
-    return key
+  }, [messages])
+
+  const searchUsers = async (query) => {
+    if (!query || query.length < 2) {
+      setSearchResults([])
+      return
+    }
+    setSearching(true)
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, email, full_name, phone')
+        .or(`full_name.ilike.%${query}%,email.ilike.%${query}%,phone.ilike.%${query}%`)
+        .neq('id', userId)
+        .limit(20)
+
+      if (!error && data) {
+        setSearchResults(data)
+      }
+    } catch (err) {
+      console.warn('Search error:', err)
+    } finally {
+      setSearching(false)
+    }
   }
 
-  async function loadMessagesWith(user) {
-    setSelectedUser(user)
-    setMessages([])
-    // unsubscribe previous
-    if (subRef.current) supabase.removeSubscription(subRef.current)
-
-    // load recent messages between the two users
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .or(`and(sender_id.eq.${userId},recipient_id.eq.${user.id}),and(sender_id.eq.${user.id},recipient_id.eq.${userId})`)
-      .order('created_at', { ascending: true })
-      .limit(200)
-
-    if (error) {
-      console.warn('Could not load messages', error)
-    } else {
-      const key = await ensureConversationKey(userId, user.id)
-      const decrypted = await Promise.all((data || []).map(async m => {
-        const plain = await decryptString(key, m.ciphertext, m.iv)
-        return { ...m, plain }
-      }))
-      setMessages(decrypted)
+  const loadFriends = async () => {
+    try {
+      setLoading(true)
+      const friendsList = await getFriendsList(userId)
+      setFriends(friendsList)
+    } catch (err) {
+      console.warn('Load friends error:', err)
+    } finally {
+      setLoading(false)
     }
+  }
 
-    // subscribe to new messages
+  const startChat = async (otherUser) => {
+    try {
+      const convId = await getOrCreateDirectConversation(userId, otherUser.id)
+      setSelectedConversation({ id: convId, user: otherUser })
+      setSearchQuery('')
+      setSearchResults([])
+    } catch (err) {
+      console.warn('Start chat error:', err)
+    }
+  }
+
+  const loadMessages = async () => {
+    if (!selectedConversation?.id) return
+    try {
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('messages')
+        .select('*, users:sender_id(id, full_name, email)')
+        .eq('conversation_id', selectedConversation.id)
+        .order('created_at', { ascending: true })
+        .limit(200)
+
+      if (!error && data) {
+        const decrypted = await Promise.all(
+          data.map(async (msg) => {
+            if (msg.ciphertext && msg.iv) {
+              try {
+                const keyB64 = localStorage.getItem(`conv_key_${selectedConversation.id}`)
+                if (keyB64) {
+                  const key = await importKeyFromBase64(keyB64)
+                  const plain = await decryptString(key, msg.ciphertext, msg.iv)
+                  return { ...msg, plain, decrypted: true }
+                }
+              } catch (e) {
+                console.warn('Decrypt error:', e)
+              }
+            }
+            return { ...msg, plain: msg.plain || '[Encrypted]', decrypted: false }
+          })
+        )
+        setMessages(decrypted)
+      }
+    } catch (err) {
+      console.warn('Load messages error:', err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const subscribeToMessages = () => {
+    if (!selectedConversation?.id) return
+
     const channel = supabase
-      .channel('public:messages')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, async payload => {
-        const m = payload.new
-        // if relevant to this conversation
-        if ((m.sender_id === user.id && m.recipient_id === userId) || (m.sender_id === userId && m.recipient_id === user.id)) {
-          const key = await ensureConversationKey(userId, user.id)
-          const plain = await decryptString(key, m.ciphertext, m.iv)
-          setMessages(prev => [...prev, { ...m, plain }])
+      .channel(`conv:${selectedConversation.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${selectedConversation.id}`
+      }, async (payload) => {
+        const msg = payload.new
+        if (msg.ciphertext && msg.iv) {
+          try {
+            const keyB64 = localStorage.getItem(`conv_key_${selectedConversation.id}`)
+            if (keyB64) {
+              const key = await importKeyFromBase64(keyB64)
+              const plain = await decryptString(key, msg.ciphertext, msg.iv)
+              setMessages(prev => [...prev, { ...msg, plain, decrypted: true }])
+            }
+          } catch (e) {
+            console.warn('Decrypt error:', e)
+            setMessages(prev => [...prev, { ...msg, plain: '[Encrypted]', decrypted: false }])
+          }
         }
       })
       .subscribe()
@@ -110,112 +175,321 @@ export default function ChatBar({ userId, userEmail }) {
   }
 
   const sendMessage = async () => {
-    if (!selectedUser || !text.trim()) return
+    if (!messageText.trim() || !selectedConversation?.id || !userId) return
+
     setSending(true)
     try {
-      const key = await ensureConversationKey(userId, selectedUser.id)
-      const { ciphertext, iv } = await encryptString(key, text.trim())
+      const convId = selectedConversation.id
+      const keyB64 = localStorage.getItem(`conv_key_${convId}`)
+      let key
+
+      if (keyB64) {
+        key = await importKeyFromBase64(keyB64)
+      } else {
+        key = await generateSymmetricKey()
+        const newKeyB64 = await exportKeyToBase64(key)
+        localStorage.setItem(`conv_key_${convId}`, newKeyB64)
+      }
+
+      const { ciphertext, iv } = await encryptString(key, messageText.trim())
+
       const { data, error } = await supabase
         .from('messages')
-        .insert([
-          {
-            sender_id: userId,
-            recipient_id: selectedUser.id,
-            ciphertext,
-            iv,
-            metadata: { via: 'chatbar' }
-          }
-        ])
-      if (error) throw error
-      setText('')
+        .insert([{
+          sender_id: userId,
+          conversation_id: convId,
+          ciphertext,
+          iv,
+          metadata: { type: 'text', via: 'chatbar' }
+        }])
+        .select()
+
+      if (!error) {
+        setMessageText('')
+        if (data?.[0]) {
+          const msg = data[0]
+          setMessages(prev => [...prev, { ...msg, plain: messageText.trim(), decrypted: true }])
+        }
+      }
     } catch (err) {
-      console.error('Send failed', err)
+      console.warn('Send message error:', err)
     } finally {
       setSending(false)
     }
   }
 
-  const deleteMessage = async (messageId) => {
+  const handleDeleteMessage = async (messageId, senderId) => {
+    if (senderId !== userId) return
+
     try {
       const { error } = await supabase
         .from('messages')
-        .update({ deleted_at: new Date() })
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', messageId)
-      if (error) throw error
-      setMessages(prev => prev.map(m => m.id === messageId ? { ...m, deleted_at: new Date() } : m))
+
+      if (!error) {
+        setMessages(prev =>
+          prev.map(m => (m.id === messageId ? { ...m, deleted_at: new Date().toISOString() } : m))
+        )
+      }
     } catch (err) {
-      console.warn('Delete failed', err)
+      console.warn('Delete message error:', err)
+    }
+  }
+
+  const handleAddFriend = async (user) => {
+    try {
+      await sendFriendRequest(userId, user.id)
+      setSearchResults(prev =>
+        prev.map(u => (u.id === user.id ? { ...u, friendRequested: true } : u))
+      )
+    } catch (err) {
+      console.warn('Friend request error:', err)
+    }
+  }
+
+  const handleRemoveFriend = async (friendId) => {
+    try {
+      await removeFriend(userId, friendId)
+      setFriends(prev => prev.filter(f => f.id !== friendId))
+    } catch (err) {
+      console.warn('Remove friend error:', err)
     }
   }
 
   return (
-    <div>
-      {/* Collapsed button */}
-      <div className="fixed bottom-4 right-4 z-50">
-        <button onClick={toggleOpen} className="bg-blue-600 text-white rounded-full p-3 shadow-lg">{open ? '✕' : 'Chat'}</button>
-      </div>
+    <div className="fixed bottom-0 right-0 z-50 flex flex-col">
+      {/* Minimized Button */}
+      {minimized && (
+        <button
+          onClick={() => setMinimized(false)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-t-lg shadow-lg flex items-center gap-2 border-t border-l border-r border-blue-700"
+        >
+          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5z" />
+          </svg>
+          <span className="font-medium text-sm">Messages</span>
+          {Object.values(unreadCounts).reduce((a, b) => a + b, 0) > 0 && (
+            <span className="bg-red-500 text-white text-xs rounded-full px-2 py-1 ml-2">
+              {Object.values(unreadCounts).reduce((a, b) => a + b, 0)}
+            </span>
+          )}
+        </button>
+      )}
 
-      {/* Expanded panel */}
-      {open && (
-        <div className="fixed bottom-4 right-4 z-50 w-full max-w-3xl md:max-w-4xl bg-white border border-slate-200 rounded-xl shadow-lg p-4 flex">
-          {/* Left: search & users */}
-          <div className="w-1/3 border-r pr-4">
-            <div className="mb-2">
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search users (name, email, phone)" className="w-full px-3 py-2 border rounded" />
-            </div>
-            <div className="h-96 overflow-y-auto">
-              {loading && <div className="text-sm text-slate-500">Searching...</div>}
-              {results.map(u => (
-                <div key={u.id} className="p-2 cursor-pointer hover:bg-slate-50 rounded flex items-center justify-between" onClick={() => loadMessagesWith(u)}>
-                  <div>
-                    <div className="font-medium">{u.full_name || u.email}</div>
-                    <div className="text-xs text-slate-500">{u.email} {u.phone ? `• ${u.phone}` : ''}</div>
-                  </div>
-                </div>
-              ))}
+      {/* Expanded Panel */}
+      {!minimized && (
+        <div className="bg-white rounded-t-lg shadow-2xl border border-slate-200 w-96 h-screen md:h-[600px] flex flex-col">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
+            <h2 className="font-bold text-lg">Messages</h2>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setMinimized(true)}
+                className="hover:bg-blue-800 p-1 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
             </div>
           </div>
 
-          {/* Right: messages */}
-          <div className="w-2/3 pl-4 flex flex-col">
-            <div className="mb-2">
-              {selectedUser ? (
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-medium">{selectedUser.full_name || selectedUser.email}</div>
-                    <div className="text-xs text-slate-500">Chat</div>
+          {/* Tabs */}
+          <div className="flex border-b border-slate-200">
+            <button
+              onClick={() => setActiveTab('chats')}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'chats'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Chats
+            </button>
+            <button
+              onClick={() => setActiveTab('friends')}
+              className={`flex-1 py-2 text-sm font-medium transition-colors ${
+                activeTab === 'friends'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Friends
+            </button>
+          </div>
+
+          {/* Search Bar */}
+          <div className="p-3 border-b border-slate-200">
+            <input
+              type="text"
+              placeholder={activeTab === 'chats' ? 'Search conversations...' : 'Search users...'}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          {/* Content Area */}
+          <div className="flex-1 overflow-hidden flex flex-col">
+            {activeTab === 'chats' ? (
+              selectedConversation ? (
+                // Chat View
+                <div className="flex flex-col h-full">
+                  {/* Chat Header */}
+                  <div className="p-3 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+                    <div className="flex items-center gap-2">
+                      <div>
+                        <div className="font-medium text-sm">
+                          {selectedConversation.user?.full_name || selectedConversation.user?.email}
+                        </div>
+                        <div className="text-xs text-slate-500">
+                          {onlineUsers.has(selectedConversation.user?.id) ? 'Active now' : 'Offline'}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setSelectedConversation(null)
+                        setMessages([])
+                      }}
+                      className="text-slate-600 hover:text-slate-900"
+                    >
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
-                  <div>
-                    {/* Friend action placeholder */}
-                    <button className="px-3 py-1 text-sm bg-slate-100 rounded">Add Friend</button>
+
+                  {/* Messages */}
+                  <div
+                    ref={messageListRef}
+                    className="flex-1 overflow-y-auto p-3 space-y-3 bg-white"
+                  >
+                    {messages.length === 0 && (
+                      <div className="text-center text-sm text-slate-500 mt-4">
+                        No messages yet. Start the conversation!
+                      </div>
+                    )}
+                    {messages.map((msg) => (
+                      <div
+                        key={msg.id}
+                        className={`flex ${msg.sender_id === userId ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className="max-w-xs">
+                          <div
+                            className={`px-3 py-2 rounded-lg text-sm ${
+                              msg.sender_id === userId
+                                ? 'bg-blue-600 text-white rounded-br-none'
+                                : 'bg-slate-200 text-slate-900 rounded-bl-none'
+                            } break-words`}
+                          >
+                            {msg.deleted_at ? (
+                              <em className="text-xs opacity-75">Message deleted</em>
+                            ) : (
+                              msg.plain || '[Unable to decrypt]'
+                            )}
+                          </div>
+                          <div className="flex items-center justify-between mt-1 px-1 text-xs text-slate-500">
+                            <span>{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                            {msg.sender_id === userId && !msg.deleted_at && (
+                              <button
+                                onClick={() => handleDeleteMessage(msg.id, msg.sender_id)}
+                                className="text-red-500 hover:text-red-700 ml-2"
+                              >
+                                Delete
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Input */}
+                  <div className="p-3 border-t border-slate-200 bg-slate-50">
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Write a message..."
+                        value={messageText}
+                        onChange={(e) => setMessageText(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
+                        className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
+                      />
+                      <button
+                        onClick={sendMessage}
+                        disabled={sending || !messageText.trim()}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        Send
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
-                <div className="text-slate-500">Select a user to start</div>
-              )}
-            </div>
-
-            <div className="flex-1 overflow-y-auto h-96 border rounded p-3 mb-3 bg-slate-50">
-              {messages.length === 0 && <div className="text-sm text-slate-500">No messages</div>}
-              {messages.map(m => (
-                <div key={m.id} className={`mb-2 ${m.sender_id === userId ? 'text-right' : 'text-left'}`}>
-                  <div className={`inline-block p-2 rounded ${m.sender_id === userId ? 'bg-blue-600 text-white' : 'bg-white text-slate-900'}`}>
-                    {m.deleted_at ? <em className="text-xs text-slate-400">message deleted</em> : (m.plain || <em className="text-xs text-slate-400">Encrypted</em>)}
-                  </div>
-                  <div className="text-xs text-slate-400 mt-1">
-                    {new Date(m.created_at).toLocaleString()}
-                    {m.sender_id === userId && !m.deleted_at && (
-                      <button onClick={() => deleteMessage(m.id)} className="ml-2 text-red-500">Delete</button>
-                    )}
-                  </div>
+                // Chats List
+                <div className="overflow-y-auto flex-1">
+                  {searchResults.length > 0 ? (
+                    <div className="p-2">
+                      <div className="text-xs font-semibold text-slate-600 px-2 py-1 mb-2">
+                        Start a conversation
+                      </div>
+                      {searchResults.map((user) => (
+                        <button
+                          key={user.id}
+                          onClick={() => startChat(user)}
+                          className="w-full text-left p-2 hover:bg-slate-100 rounded-lg transition-colors text-sm"
+                        >
+                          <div className="font-medium">{user.full_name || user.email}</div>
+                          <div className="text-xs text-slate-500">{user.email}</div>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center text-sm text-slate-500 mt-4">
+                      Search for users to start chatting
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <input value={text} onChange={e => setText(e.target.value)} placeholder="Write a message" className="flex-1 px-3 py-2 border rounded" />
-              <button onClick={sendMessage} disabled={sending || !selectedUser} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">Send</button>
-            </div>
+              )
+            ) : (
+              // Friends Tab
+              <div className="overflow-y-auto flex-1">
+                {loading ? (
+                  <div className="text-center text-sm text-slate-500 mt-4">Loading friends...</div>
+                ) : friends.length > 0 ? (
+                  <div className="p-2">
+                    {friends.map((friend) => (
+                      <button
+                        key={friend.id}
+                        onClick={() => startChat(friend)}
+                        className="w-full text-left p-2 hover:bg-slate-100 rounded-lg transition-colors mb-1 flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-medium text-sm">{friend.full_name || friend.email}</div>
+                          <div className="text-xs text-slate-500">{friend.email}</div>
+                        </div>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRemoveFriend(friend.id)
+                          }}
+                          className="text-slate-400 hover:text-red-500 text-xs"
+                        >
+                          ✕
+                        </button>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center text-sm text-slate-500 mt-4">
+                    <p>No friends yet</p>
+                    <p className="text-xs mt-1">Add friends from the search tab</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}
