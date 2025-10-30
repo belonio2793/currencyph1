@@ -327,7 +327,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       }
 
       if (!data || !data.cryptoPrices) {
-        console.debug('Attempting CoinGecko fallback for crypto prices')
         try {
           const ids = [
             'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
