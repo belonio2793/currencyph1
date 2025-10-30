@@ -10,7 +10,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const [selectedTable, setSelectedTable] = useState(null)
   const [seats, setSeats] = useState([])
   const [error, setError] = useState(null)
-  const [activeTab, setActiveTab] = useState('tables')
+  const [activeTab, setActiveTab] = useState('my-tables')
   const [rakeModal, setRakeModal] = useState({ open: false, startingBalance: 0, endingBalance: 0, tableId: null, currencyCode: 'PHP' })
   const [gameModalOpen, setGameModalOpen] = useState(false)
   const [gameModalTable, setGameModalTable] = useState(null)
