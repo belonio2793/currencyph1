@@ -103,12 +103,12 @@ export default function PlayerSeats({ seats, table, userId, gameState, currentPl
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-2">
             <div className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg">
               <div className="text-xs font-semibold text-slate-300">
-                {gameState === 'preflop' && '🎴 Pre-Flop'}
-                {gameState === 'flop' && '📊 Flop (3 cards)'}
-                {gameState === 'turn' && '🎲 Turn (4 cards)'}
-                {gameState === 'river' && '🌊 River (5 cards)'}
-                {gameState === 'showdown' && '🏆 Showdown'}
-                {gameState === 'finished' && '✓ Hand Complete'}
+                {gameState === 'preflop' && 'Pre-Flop'}
+                {gameState === 'flop' && 'Flop (3 cards)'}
+                {gameState === 'turn' && 'Turn (4 cards)'}
+                {gameState === 'river' && 'River (5 cards)'}
+                {gameState === 'showdown' && 'Showdown'}
+                {gameState === 'finished' && 'Hand Complete'}
               </div>
             </div>
           </div>
