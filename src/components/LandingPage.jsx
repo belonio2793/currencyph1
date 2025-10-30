@@ -460,6 +460,9 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       await loadRecentTransactions().catch(err => {
         console.debug('Recent transactions loading failed, continuing with defaults:', err)
       })
+      await loadCryptoPrices().catch(err => {
+        console.debug('Crypto prices loading failed, continuing with defaults:', err)
+      })
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load data')
