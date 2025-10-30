@@ -450,6 +450,29 @@ export default function Profile({ userId }) {
           )}
 
           <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
+            <h3 className="text-lg font-medium text-slate-900 mb-4">Preferences</h3>
+
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-slate-900 text-sm">Auto-scroll to top</p>
+                  <p className="text-xs text-slate-500 mt-1">Automatically scroll to the top when changing pages, tabs, or opening modals</p>
+                </div>
+                <button
+                  onClick={() => {
+                    const newValue = !autoScrollToTop
+                    setAutoScrollToTop(newValue)
+                    preferencesManager.setAutoScrollToTop(userId, newValue)
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${autoScrollToTop ? 'bg-emerald-600' : 'bg-slate-300'}`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${autoScrollToTop ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
             <h3 className="text-lg font-medium text-slate-900 mb-4">Security</h3>
 
             <div className="space-y-3">
