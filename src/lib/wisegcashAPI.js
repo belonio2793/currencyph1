@@ -47,12 +47,13 @@ export const wisegcashAPI = {
   },
 
   async updateUserProfile(userId, updates) {
+    // Use maybeSingle() to avoid error if multiple rows are returned due to data inconsistency
     const { data, error } = await supabase
       .from('users')
       .update({ ...updates, updated_at: new Date() })
       .eq('id', userId)
       .select()
-      .single()
+      .maybeSingle()
 
     if (error) throw error
     return data
