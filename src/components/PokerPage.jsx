@@ -230,7 +230,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div ref={pageRef} className="max-w-7xl mx-auto px-6 py-12">
         {error && (
           <div className="mb-6 p-4 bg-red-900 border border-red-700 rounded-lg text-red-100">
             <div className="font-semibold">Error:</div>
