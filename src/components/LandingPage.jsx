@@ -515,7 +515,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
       }
       setTimeout(() => loadCryptoPrices(), 100)
     } catch (err) {
-      console.debug('Error loading exchange rates, continuing with fallback:', err)
+      console.debug('Error loading exchange rates, continuing with fallback:', err?.message || String(err))
       setExchangeRates({})
     }
   }
