@@ -60,7 +60,10 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   function openGameModal(table) {
     setGameModalTable(table)
     setGameModalOpen(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    const autoScroll = preferencesManager.getAutoScrollToTop(userId)
+    if (autoScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   function closeGameModal() {
