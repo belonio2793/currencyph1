@@ -22,6 +22,7 @@ import Network from './components/Network'
 import About from './components/About'
 import Inbox from './components/Inbox'
 import ChatBar from './components/ChatBar'
+import PokerPage from './components/PokerPage'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
