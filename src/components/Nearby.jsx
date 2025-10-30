@@ -57,6 +57,7 @@ function unionCities(fetched, predefined) {
 }
 
 export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) {
+  const { location: userLocation } = useGeolocation()
   const [selectedCity, setSelectedCity] = useState(null)
   const [listings, setListings] = useState([])
   const [featuredListings, setFeaturedListings] = useState([])
@@ -97,7 +98,6 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
   const itemsPerPage = 12
 
-  const { location: userLocation } = useGeolocation()
 
   useEffect(() => {
     // Check if view parameter is in URL
