@@ -176,18 +176,14 @@ export default function Profile({ userId }) {
     checkUsernameAvailability(value)
   }
 
-  const handleSaveProfile = async (e) => {
-    e.preventDefault()
-    setError('')
-
-    // Guest accounts cannot save profile changes
+  const saveProfileToServer = async (silent = false) => {
     if (isGuestAccount && !isValidUUID(userId)) {
-      setError('Guest accounts cannot modify profile settings. Please create an account to save your changes.')
+      if (!silent) setError('Guest accounts cannot modify profile settings. Please create an account to save your changes.')
       return
     }
 
     if (formData.username && !usernameAvailable) {
-      setError('Username is not available')
+      if (!silent) setError('Username is not available')
       return
     }
 
@@ -202,10 +198,27 @@ export default function Profile({ userId }) {
         biography: formData.biography || null,
         profile_picture_url: formData.profile_picture_url || null,
         display_name_type: formData.display_name_type,
-        display_as_username_everywhere: formData.display_as_username_everywhere
+        display_as_username_everywhere: formData.display_as_username_everywhere,
+        email: formData.email || null
       }
 
       await wisegcashAPI.updateUserProfile(userId, updateData)
+
+      // Attempt to update auth email if different and user is authenticated
+      try {
+        const currentUserRes = await supabase.auth.getUser()
+        const authEmail = currentUserRes?.data?.user?.email || currentUserRes?.user?.email
+        if (formData.email && authEmail && formData.email !== authEmail) {
+          // updateUser returns { data, error }
+          try {
+            await supabase.auth.updateUser({ email: formData.email })
+          } catch (e) {
+            console.debug('Could not update auth email:', e?.message || e)
+          }
+        }
+      } catch (e) {
+        console.debug('Auth email check/update failed:', e?.message || e)
+      }
 
       // Save privacy settings (skip for guest accounts)
       if (isValidUUID(userId)) {
@@ -232,14 +245,32 @@ export default function Profile({ userId }) {
         }
       }
 
-      setSuccess('Profile updated successfully!')
-      loadUser()
-      setEditing(false)
-      setTimeout(() => setSuccess(''), 2000)
+      if (!silent) {
+        setSuccess('Profile updated successfully!')
+        setEditing(false)
+        setTimeout(() => setSuccess(''), 2000)
+      }
     } catch (err) {
-      setError(err.message || 'Failed to update profile')
+      if (!silent) setError(err.message || 'Failed to update profile')
     }
   }
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault()
+    setError('')
+    await saveProfileToServer()
+  }
+
+  // Autosave effect when realtime_save is enabled
+  useEffect(() => {
+    let timer
+    if (formData.realtime_save) {
+      timer = setTimeout(() => {
+        saveProfileToServer(true)
+      }, 1000)
+    }
+    return () => clearTimeout(timer)
+  }, [formData, privacySettings])
 
   const setPrivacy = (field, visibility) => {
     setPrivacySettings({ ...privacySettings, [field]: visibility })
