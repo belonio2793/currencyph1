@@ -39,31 +39,6 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   if (!open || !table) return null
 
-  // Determine if it's current player's turn
-  useEffect(() => {
-    if (!hand || !myPosition || !userId || !currentPlayerSeat) {
-      setActionRequired(false)
-      return
-    }
-
-    // Check if hand is in active state
-    const isHandActive = ['preflop', 'flop', 'turn', 'river'].includes(hand.round_state)
-
-    if (!isHandActive) {
-      setActionRequired(false)
-      return
-    }
-
-    // Check if it's our turn
-    const isOurTurn = myPosition === currentPlayerSeat
-
-    // Check if we've already acted
-    const lastAction = betHistory.find(b => b.user_id === userId && b.round_state === hand.round_state)
-
-    // Action required if it's our turn and we haven't acted yet
-    setActionRequired(isOurTurn && !lastAction)
-  }, [hand?.round_state, hand?.id, myPosition, userId, currentPlayerSeat, betHistory])
-
   // Load initial data
   useEffect(() => {
     if (!table) return
