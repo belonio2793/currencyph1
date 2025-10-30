@@ -26,7 +26,7 @@ function MapUpdater({ location }) {
   return null
 }
 
-export default function HeaderMap() {
+export default function HeaderMap({ userId: headerUserId }) {
   const { location, error, loading, city } = useGeolocation()
   const [isExpanded, setIsExpanded] = useState(false)
 
@@ -173,7 +173,7 @@ export default function HeaderMap() {
             <div className="p-4 border-t border-slate-200 flex items-center justify-between">
               <div className="text-xs text-slate-600">Share your location with a user</div>
               <div>
-                <SendLocationButton location={displayLocation} city={city} />
+                <SendLocationButton location={displayLocation} city={city} userId={headerUserId} />
               </div>
             </div>
           </div>
@@ -184,12 +184,13 @@ export default function HeaderMap() {
 }
 
 
-function SendLocationButton({ location, city }) {
+function SendLocationButton({ location, city, userId: userIdProp }) {
   const [open, setOpen] = useState(false)
-  const [userId, setUserId] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [userId, setUserId] = useState(userIdProp || null)
+  const [loading, setLoading] = useState(!userIdProp)
 
   useEffect(() => {
+    if (userIdProp) return
     const fetchUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
@@ -201,7 +202,7 @@ function SendLocationButton({ location, city }) {
       }
     }
     fetchUser()
-  }, [])
+  }, [userIdProp])
 
   return (
     <>
