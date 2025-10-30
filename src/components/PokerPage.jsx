@@ -269,72 +269,194 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Tables Lobby */}
           <div className="lg:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-6">
-            <h3 className="text-xl font-semibold text-white mb-4">{activeTab === 'my-tables' ? 'My Tables' : 'Available Tables'}</h3>
-            {loading ? (
-              <div className="text-slate-400 text-center py-8">Loading tables...</div>
-            ) : filteredTables.length === 0 ? (
-              activeTab === 'my-tables' ? (
-                <div className="text-center py-16 flex flex-col items-center justify-center">
-                  <div className="text-slate-400 mb-3 text-sm font-medium">You have no created tables</div>
-                  <button
-                    onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }}
-                    className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm font-semibold"
-                  >
-                    Create a Table
-                  </button>
-                </div>
-              ) : (
-                <div className="text-slate-400 text-center py-8">No other tables available</div>
-              )
-            ) : (
-              <div className="space-y-2 max-h-96 overflow-y-auto">
-                {filteredTables.map(t => {
-                  const tableSeats = seats.filter(s => s.table_id === t.id)
-                  const openSeats = t.max_seats - tableSeats.length
-                  const isSelected = selectedTable?.id === t.id
-
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => openTable(t)}
-                      className={`p-4 rounded-lg cursor-pointer transition border ${
-                        isSelected
-                          ? 'bg-blue-600 border-blue-500 shadow-lg'
-                          : 'bg-slate-700 border-slate-600 hover:bg-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
-                          <div className={`text-xs mt-1 ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                            {t.stake_min}/{t.stake_max} {t.currency_code}
-                          </div>
-                          <div className={`text-xs mt-1 font-medium ${
-                            openSeats === 0 ? 'text-red-300' :
-                            openSeats <= 2 ? 'text-yellow-300' :
-                            'text-green-300'
-                          }`}>
-                            {openSeats}/{t.max_seats} seats open
-                          </div>
+            {activeTab === 'my-tables' ? (
+              <>
+                {loading ? (
+                  <div className="text-slate-400 text-center py-8">Loading tables...</div>
+                ) : (
+                  <>
+                    {/* My Tables Section */}
+                    <div className="mb-6">
+                      <h3 className="text-xl font-semibold text-white mb-4">My Tables</h3>
+                      {getMyCreatedTables().length === 0 ? (
+                        <div className="text-center py-16 flex flex-col items-center justify-center">
+                          <div className="text-slate-400 mb-3 text-sm font-medium">You have no created tables</div>
+                          <button
+                            onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }}
+                            className="mt-4 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition text-sm font-semibold"
+                          >
+                            Create a Table
+                          </button>
                         </div>
-                      </div>
+                      ) : (
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {getMyCreatedTables().map(t => {
+                            const tableSeats = seats.filter(s => s.table_id === t.id)
+                            const openSeats = t.max_seats - tableSeats.length
+                            const isSelected = selectedTable?.id === t.id
 
-                      {isSelected && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleSit(t.id)
-                          }}
-                          className="w-full mt-3 px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
-                        >
-                          <span className="relative z-10">Take a Seat</span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
-                        </button>
+                            return (
+                              <div
+                                key={t.id}
+                                onClick={() => openTable(t)}
+                                className={`p-4 rounded-lg cursor-pointer transition border ${
+                                  isSelected
+                                    ? 'bg-blue-600 border-blue-500 shadow-lg'
+                                    : 'bg-slate-700 border-slate-600 hover:bg-slate-600'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
+                                    <div className={`text-xs mt-1 ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
+                                      {t.stake_min}/{t.stake_max} {t.currency_code}
+                                    </div>
+                                    <div className={`text-xs mt-1 font-medium ${
+                                      openSeats === 0 ? 'text-red-300' :
+                                      openSeats <= 2 ? 'text-yellow-300' :
+                                      'text-green-300'
+                                    }`}>
+                                      {openSeats}/{t.max_seats} seats open
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {isSelected && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleSit(t.id)
+                                    }}
+                                    className="w-full mt-3 px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
+                                  >
+                                    <span className="relative z-10">Take a Seat</span>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
+                                  </button>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
                       )}
                     </div>
-                  )
-                })}
-              </div>
+
+                    {/* Player Tables Section */}
+                    <div>
+                      <h3 className="text-xl font-semibold text-white mb-4">Player Tables</h3>
+                      {getPlayerTables().length === 0 ? (
+                        <div className="text-slate-400 text-center py-8">No player tables available</div>
+                      ) : (
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {getPlayerTables().map(t => {
+                            const tableSeats = seats.filter(s => s.table_id === t.id)
+                            const openSeats = t.max_seats - tableSeats.length
+                            const isSelected = selectedTable?.id === t.id
+
+                            return (
+                              <div
+                                key={t.id}
+                                onClick={() => openTable(t)}
+                                className={`p-4 rounded-lg cursor-pointer transition border ${
+                                  isSelected
+                                    ? 'bg-blue-600 border-blue-500 shadow-lg'
+                                    : 'bg-slate-700 border-slate-600 hover:bg-slate-600'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between">
+                                  <div className="flex-1">
+                                    <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
+                                    <div className={`text-xs mt-1 ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
+                                      {t.stake_min}/{t.stake_max} {t.currency_code}
+                                    </div>
+                                    <div className={`text-xs mt-1 font-medium ${
+                                      openSeats === 0 ? 'text-red-300' :
+                                      openSeats <= 2 ? 'text-yellow-300' :
+                                      'text-green-300'
+                                    }`}>
+                                      {openSeats}/{t.max_seats} seats open
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {isSelected && (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation()
+                                      handleSit(t.id)
+                                    }}
+                                    className="w-full mt-3 px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
+                                  >
+                                    <span className="relative z-10">Take a Seat</span>
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
+                                  </button>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-semibold text-white mb-4">Available Tables</h3>
+                {loading ? (
+                  <div className="text-slate-400 text-center py-8">Loading tables...</div>
+                ) : filteredTables.length === 0 ? (
+                  <div className="text-slate-400 text-center py-8">No default tables available</div>
+                ) : (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {filteredTables.map(t => {
+                      const tableSeats = seats.filter(s => s.table_id === t.id)
+                      const openSeats = t.max_seats - tableSeats.length
+                      const isSelected = selectedTable?.id === t.id
+
+                      return (
+                        <div
+                          key={t.id}
+                          onClick={() => openTable(t)}
+                          className={`p-4 rounded-lg cursor-pointer transition border ${
+                            isSelected
+                              ? 'bg-purple-600 border-purple-500 shadow-lg'
+                              : 'bg-slate-700 border-slate-600 hover:bg-slate-600'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
+                              <div className={`text-xs mt-1 ${isSelected ? 'text-purple-100' : 'text-slate-400'}`}>
+                                {t.stake_min}/{t.stake_max} {t.currency_code}
+                              </div>
+                              <div className={`text-xs mt-1 font-medium ${
+                                openSeats === 0 ? 'text-red-300' :
+                                openSeats <= 2 ? 'text-yellow-300' :
+                                'text-green-300'
+                              }`}>
+                                {openSeats}/{t.max_seats} seats open
+                              </div>
+                            </div>
+                          </div>
+
+                          {isSelected && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleSit(t.id)
+                              }}
+                              className="w-full mt-3 px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
+                            >
+                              <span className="relative z-10">Take a Seat</span>
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
+                            </button>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
