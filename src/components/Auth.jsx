@@ -15,13 +15,148 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
+  const [resendLoading, setResendLoading] = useState(false)
+  const [resendError, setResendError] = useState('')
+  const [resendSuccess, setResendSuccess] = useState('')
+  const [resendAvailableIn, setResendAvailableIn] = useState(0)
+
+  useEffect(() => {
+    let timer
+    if (resendAvailableIn > 0) {
+      timer = setInterval(() => {
+        setResendAvailableIn((p) => {
+          if (p <= 1) {
+            clearInterval(timer)
+            return 0
+          }
+          return p - 1
+        })
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [resendAvailableIn])
+
   const normalizeIdentifier = (id) => {
     const v = (id || '').trim()
     if (!v) return ''
     if (v === 'guest') return 'guest@currency.ph'
     if (v.includes('@')) return v
-    // treat as phone or username
+
+    // Treat as phone number: strip non-digits/plus
+    const raw = v.replace(/[^+\d]/g, '')
+    let phone = raw
+    // If starts with +, assume full international provided
+    if (phone.startsWith('+')) {
+      // remove plus for email local part
+      phone = phone.replace(/^\+/, '')
+      return `${phone}@phone.currency.ph`
+    }
+
+    // If starts with 0 and 11 digits (e.g. 09171234567) -> convert to country code 63 (Philippines)
+    if (/^0\d{10}$/.test(phone)) {
+      const converted = '63' + phone.substring(1)
+      return `${converted}@phone.currency.ph`
+    }
+
+    // If 10 digits starting with 9 (e.g. 9171234567) -> assume Philippines, add 63
+    if (/^9\d{9}$/.test(phone)) {
+      const converted = '63' + phone
+      return `${converted}@phone.currency.ph`
+    }
+
+    // Fallback: treat as local username
     return `${v}@currency.local`
+  }
+
+  const startResendCooldown = (email) => {
+    try {
+      const key = `resend_confirmation_${email}`
+      const now = Date.now()
+      localStorage.setItem(key, String(now))
+      setResendAvailableIn(60)
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  const canResendNow = (email) => {
+    try {
+      const key = `resend_confirmation_${email}`
+      const ts = Number(localStorage.getItem(key) || '0')
+      if (!ts) return true
+      const elapsed = (Date.now() - ts) / 1000
+      return elapsed >= 60
+    } catch (e) {
+      return true
+    }
+  }
+
+  const getResendRemaining = (email) => {
+    try {
+      const key = `resend_confirmation_${email}`
+      const ts = Number(localStorage.getItem(key) || '0')
+      if (!ts) return 0
+      const elapsed = (Date.now() - ts) / 1000
+      return Math.max(0, Math.ceil(60 - elapsed))
+    } catch (e) {
+      return 0
+    }
+  }
+
+  useEffect(() => {
+    if (!identifier) return
+    const email = normalizeIdentifier(identifier)
+    const remaining = getResendRemaining(email)
+    setResendAvailableIn(remaining)
+  }, [identifier])
+
+  const sendConfirmationEmail = async (emailRaw) => {
+    setResendError('')
+    setResendSuccess('')
+    const email = String(emailRaw || '').trim()
+    if (!email) {
+      setResendError('No email to send confirmation to')
+      return
+    }
+    if (!canResendNow(email)) {
+      const rem = getResendRemaining(email)
+      setResendError(`Please wait ${rem}s before resending`) 
+      setResendAvailableIn(rem)
+      return
+    }
+
+    setResendLoading(true)
+    try {
+      const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || process.env.PROJECT_URL
+      if (!PROJECT_URL) throw new Error('Project URL not configured')
+      const controller = new AbortController()
+      const timeout = setTimeout(() => controller.abort(), 10000)
+      try {
+        const res = await fetch(`${PROJECT_URL}/functions/v1/resend-confirmation`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+          signal: controller.signal,
+        })
+        clearTimeout(timeout)
+        if (!res.ok) {
+          const txt = await res.text().catch(()=>'')
+          throw new Error(txt || `Server error ${res.status}`)
+        }
+        startResendCooldown(email)
+        setResendSuccess('Confirmation email sent')
+      } finally {
+        clearTimeout(timeout)
+      }
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        setResendError('Request timed out')
+      } else {
+        setResendError(err.message || 'Failed to send confirmation')
+      }
+    } finally {
+      setResendLoading(false)
+    }
   }
 
   const handleLogin = async (e) => {
@@ -64,6 +199,14 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
       let signInError = signInResult.error
 
       if (signInError) {
+        // If the error indicates email not confirmed, keep error but allow resend
+        const msg = String(signInError.message || '')
+        if (/confirm/i.test(msg)) {
+          setError(msg)
+          // do not throw; allow user to resend confirmation
+          return
+        }
+
         if (identifier === 'guest') {
           try {
             // Try to create the guest user via serverless Edge Function (preferred)
@@ -217,6 +360,14 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
     }
   }
 
+  // Determine if the last shown error suggests unconfirmed email
+  const isUnconfirmedError = (msg) => {
+    if (!msg) return false
+    return /confirm/i.test(msg)
+  }
+
+  const placeholderText = 'email address or phone number'
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-start justify-center py-2 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md mt-2 mb-2">
@@ -270,6 +421,19 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
                 {error}
+                {isUnconfirmedError(error) && (
+                  <div className="mt-3">
+                    <button
+                      disabled={resendLoading || resendAvailableIn > 0}
+                      onClick={() => sendConfirmationEmail(normalizeIdentifier(identifier))}
+                      className="px-3 py-2 bg-yellow-500 text-white rounded-md text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {resendLoading ? 'Sending...' : (resendAvailableIn > 0 ? `Resend available in ${resendAvailableIn}s` : 'Resend confirmation email')}
+                    </button>
+                    {resendError && <div className="mt-2 text-xs text-red-600">{resendError}</div>}
+                    {resendSuccess && <div className="mt-2 text-xs text-emerald-700">{resendSuccess}</div>}
+                  </div>
+                )}
               </div>
             )}
 
@@ -291,7 +455,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="you@example.com or 09171234567"
+                    placeholder={placeholderText}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
@@ -362,7 +526,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
                     type="text"
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
-                    placeholder="you@example.com or 09171234567"
+                    placeholder={placeholderText}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
