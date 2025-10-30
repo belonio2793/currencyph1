@@ -9,6 +9,13 @@ export default function Inbox({ userId }) {
 
   useEffect(() => {
     if (!userId) return setLoading(false)
+    // If userId is not a UUID, skip server fetch (guest-local or similar)
+    const isUuid = typeof userId === 'string' && /^[0-9a-fA-F-]{36}$/.test(userId)
+    if (!isUuid) {
+      setLoading(false)
+      setMessages([])
+      return
+    }
     let mounted = true
     fetchRecentMessagesForUser(userId).then(items => {
       if (!mounted) return
