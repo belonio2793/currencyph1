@@ -646,9 +646,14 @@ export default function ChatBar({ userId, userEmail }) {
                         onClick={() => startChat(friend)}
                         className="w-full text-left p-2 hover:bg-slate-100 rounded-lg transition-colors mb-1 flex items-center justify-between"
                       >
-                        <div>
-                          <div className="font-medium text-sm">{friend.full_name || friend.email}</div>
-                          <div className="text-xs text-slate-500">{friend.email}</div>
+                        <div className="flex items-center gap-2 flex-1">
+                          <div className={`w-2.5 h-2.5 rounded-full ${onlineUsers[friend.id] === 'online' ? 'bg-green-500' : 'bg-slate-300'}`} />
+                          <div>
+                            <div className="font-medium text-sm">{friend.full_name || friend.email}</div>
+                            <div className="text-xs text-slate-500">
+                              {onlineUsers[friend.id] === 'online' ? 'online' : onlineUsers[friend.id] === 'away' ? 'away' : 'offline'}
+                            </div>
+                          </div>
                         </div>
                         <button
                           onClick={(e) => {
