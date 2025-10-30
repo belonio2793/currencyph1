@@ -356,6 +356,25 @@ export default function ListingDetail({ slug, onBack }) {
                 📌 {(listing.latitude || listing.lat).toFixed(4)}, {(listing.longitude || listing.lng).toFixed(4)}
               </p>
             )}
+
+            {/* Map for listing coordinates */}
+            {(listing.latitude || listing.lat) && (listing.longitude || listing.lng) && (
+              <div className="mt-4 rounded overflow-hidden border border-slate-200">
+                <div style={{ height: 300 }}>
+                  <MapContainer center={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+                    <Marker position={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]}>
+                      <Popup>
+                        <div className="text-sm">
+                          <div className="font-semibold">{listing.name}</div>
+                          <div className="text-xs text-slate-600 mt-1">{listing.address}</div>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  </MapContainer>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
