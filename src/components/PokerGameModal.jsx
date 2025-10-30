@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabaseClient'
 import ActionTimer from './ActionTimer'
 import BettingControls from './BettingControls'
 import PlayerSeats from './PlayerSeats'
-import PotDisplay from './PotDisplay'
 import GameChat from './GameChat'
 
 export default function PokerGameModal({ open, onClose, table, userId, userEmail, onShowAuth, onLeaveTable }) {
