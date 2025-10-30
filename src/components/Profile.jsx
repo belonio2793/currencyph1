@@ -150,6 +150,12 @@ export default function Profile({ userId }) {
     e.preventDefault()
     setError('')
 
+    // Guest accounts cannot save profile changes
+    if (isGuestAccount && !isValidUUID(userId)) {
+      setError('Guest accounts cannot modify profile settings. Please create an account to save your changes.')
+      return
+    }
+
     if (formData.username && !usernameAvailable) {
       setError('Username is not available')
       return
