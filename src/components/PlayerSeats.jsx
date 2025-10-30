@@ -60,20 +60,25 @@ export default function PlayerSeats({ seats, table, userId, gameState, currentPl
                 {seat ? (
                   <div
                     className={`w-20 h-24 rounded-xl border-3 flex flex-col items-center justify-center gap-1 text-center text-xs font-semibold transition transform ${
-                      getSeatStatus(seat) === 'active'
+                      getSeatStatus(seat) === 'action'
+                        ? 'bg-red-500 border-red-400 shadow-2xl scale-125 animate-pulse'
+                        : getSeatStatus(seat) === 'active'
                         ? 'bg-amber-600 border-amber-500 shadow-xl scale-110'
                         : 'bg-amber-700 border-amber-600 shadow-lg scale-100'
                     }`}
                     style={{
                       transform: `rotate(${-rotateDeg}deg) ${
+                        getSeatStatus(seat) === 'action' ? 'scale(1.25)' :
                         getSeatStatus(seat) === 'active' ? 'scale(1.1)' : 'scale(1)'
                       }`,
-                      boxShadow: getSeatStatus(seat) === 'active' 
-                        ? '0 0 20px rgba(217, 119, 6, 0.6)' 
+                      boxShadow: getSeatStatus(seat) === 'action'
+                        ? '0 0 30px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.6)'
+                        : getSeatStatus(seat) === 'active'
+                        ? '0 0 20px rgba(217, 119, 6, 0.6)'
                         : '0 0 10px rgba(217, 119, 6, 0.3)'
                     }}
                   >
-                    <div className="text-xl">💰</div>
+                    <div className="text-xl">{dealerSeat === seat.seat_number ? '♠️' : '💰'}</div>
                     <div className="font-bold text-white">{getPlayerName(seat)}</div>
                     <div className="text-xs text-amber-100">Seat {seat.seat_number}</div>
                   </div>
