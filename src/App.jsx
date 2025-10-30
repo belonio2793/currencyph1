@@ -240,7 +240,8 @@ export default function App() {
           }
           setUserId(null)
           setUserEmail(null)
-          setShowAuth(true)
+          // Don't force the auth overlay — keep the current route visible (e.g., /nearby)
+          setShowAuth(false)
         }}
       />
 
