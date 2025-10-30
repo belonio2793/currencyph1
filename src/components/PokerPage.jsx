@@ -49,9 +49,12 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
       console.warn('Could not load seats', e)
       setSeats([])
     }
-    // Scroll to table view when table is opened
+    // Scroll to top if preference is enabled, otherwise scroll to table view
+    const autoScroll = preferencesManager.getAutoScrollToTop(userId)
     setTimeout(() => {
-      if (tableViewRef.current) {
+      if (autoScroll) {
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      } else if (tableViewRef.current) {
         tableViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
       }
     }, 100)
