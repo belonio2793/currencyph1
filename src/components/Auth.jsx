@@ -87,10 +87,11 @@ export default function Auth({ onAuthSuccess }) {
       }
 
       const email = normalizeIdentifier(identifier)
+      const effectivePassword = (identifier === 'guest' && password === 'guest') ? 'guest123' : password
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
-        password,
+        password: effectivePassword,
         options: {
           data: {
             full_name: fullName
