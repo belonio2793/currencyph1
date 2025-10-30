@@ -374,7 +374,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                               <stop offset="0%" style={{ stopColor: '#1e40af', stopOpacity: 1 }} />
                               <stop offset="100%" style={{ stopColor: '#0f172a', stopOpacity: 1 }} />
                             </>
-                          ) : activeTab === 'other-tables' ? (
+                          ) : activeTab === 'lobby' ? (
                             <>
                               <stop offset="0%" style={{ stopColor: '#5b21b6', stopOpacity: 1 }} />
                               <stop offset="100%" style={{ stopColor: '#2e1065', stopOpacity: 1 }} />
