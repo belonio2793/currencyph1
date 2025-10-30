@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { preferencesManager } from '../lib/preferencesManager'
 import ActionTimer from './ActionTimer'
 import BettingControls from './BettingControls'
 import PlayerSeats from './PlayerSeats'
