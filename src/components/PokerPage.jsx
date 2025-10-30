@@ -12,6 +12,8 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('tables')
   const [rakeModal, setRakeModal] = useState({ open: false, startingBalance: 0, endingBalance: 0, tableId: null, currencyCode: 'PHP' })
+  const [gameModalOpen, setGameModalOpen] = useState(false)
+  const [gameModalTable, setGameModalTable] = useState(null)
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
   useEffect(() => { loadTables() }, [])
