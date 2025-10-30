@@ -295,12 +295,6 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         }
       }
     }
-    try {
-      const msg = lastErr ? (lastErr.message || String(lastErr)) : 'Unknown error'
-      console.debug(`Fetch failed after ${retries + 1} attempts for ${url}: ${msg}`)
-    } catch (e) {
-      // ignore logging errors
-    }
     return null
   }
 
