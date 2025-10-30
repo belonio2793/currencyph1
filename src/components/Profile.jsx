@@ -496,21 +496,22 @@ export default function Profile({ userId }) {
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="email"
-                      value={formData.email || ''}
-                      onChange={e => setFormData({...formData, email: e.target.value})}
-                      disabled={!emailEditable}
-                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${emailEditable ? 'focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900' : 'bg-slate-50 text-slate-500 cursor-not-allowed border-slate-300'}`}
-                    />
+                  <div className="flex items-center justify-between">
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
                     {!emailEditable ? (
-                      <button type="button" className="px-3 py-2 bg-yellow-400 text-white rounded-md text-sm" onClick={() => setEmailEditable(true)}>Update email</button>
+                      <button type="button" onClick={() => setEmailEditable(true)} className="text-sm text-blue-600 hover:underline">Update email</button>
                     ) : (
-                      <button type="button" className="px-3 py-2 bg-slate-100 text-slate-700 rounded-md text-sm" onClick={() => { setFormData({...formData, email: user?.email || ''}); setEmailEditable(false) }}>Cancel</button>
+                      <button type="button" onClick={() => { setFormData({...formData, email: user?.email || ''}); setEmailEditable(false) }} className="text-sm text-slate-600 hover:underline">Cancel</button>
                     )}
                   </div>
+
+                  <input
+                    type="email"
+                    value={formData.email || ''}
+                    onChange={e => setFormData({...formData, email: e.target.value})}
+                    disabled={!emailEditable}
+                    className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${emailEditable ? 'focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900' : 'bg-slate-50 text-slate-500 cursor-not-allowed border-slate-300'}`}
+                  />
                   <p className="text-xs text-slate-500 mt-1">Changing your email will also attempt to update your authentication email (may require confirmation).</p>
                 </div>
 
