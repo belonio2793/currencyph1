@@ -214,7 +214,7 @@ export default function Profile({ userId }) {
             .select('id')
             .eq('user_id', userId)
             .eq('field_name', field)
-            .single()
+            .maybeSingle()
 
           if (existing) {
             await supabase
