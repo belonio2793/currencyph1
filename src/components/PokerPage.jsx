@@ -160,12 +160,31 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         )}
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-4xl font-light text-white">Poker Room</h2>
-          <div className="flex items-center gap-2">
-            <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>
-            <button onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Create Table</button>
-          </div>
+          {activeTab === 'tables' && (
+            <div className="flex items-center gap-2">
+              <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>
+              <button onClick={() => { const name = prompt('Table name') || 'Table'; const min = Number(prompt('Stake min') || 1); const max = Number(prompt('Stake max') || 2); handleCreate(name, min, max) }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition">Create Table</button>
+            </div>
+          )}
         </div>
 
+        {/* Tab Navigation */}
+        <div className="mb-8 flex items-center gap-2 border-b border-slate-700">
+          <button
+            onClick={() => setActiveTab('tables')}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'tables' ? 'border-b-2 border-blue-500 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+          >
+            🎰 Tables
+          </button>
+          <button
+            onClick={() => setActiveTab('network-balances')}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'network-balances' ? 'border-b-2 border-amber-500 text-white' : 'text-slate-400 hover:text-slate-300'}`}
+          >
+            📊 Network Balances
+          </button>
+        </div>
+
+        {activeTab === 'tables' && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Tables Lobby */}
           <div className="lg:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-6">
@@ -358,6 +377,13 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
             )}
           </div>
         </div>
+        )}
+
+        {activeTab === 'network-balances' && (
+        <div className="bg-slate-800 rounded-xl border border-slate-700 p-8">
+          <HouseBalanceTab />
+        </div>
+        )}
       </div>
 
       <RakeModal
