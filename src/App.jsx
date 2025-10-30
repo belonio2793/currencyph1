@@ -133,6 +133,34 @@ export default function App() {
     }
   }
 
+  // Load aggregated total balance converted to PHP
+  const loadTotalBalance = async (uid) => {
+    if (!uid) {
+      setTotalBalancePHP(0)
+      return
+    }
+    try {
+      const wallets = await wisegcashAPI.getWallets(uid)
+      const promises = (wallets || []).map(async (w) => {
+        const bal = Number(w.balance || 0)
+        if (!w.currency_code || w.currency_code === 'PHP') return bal
+        const rate = await wisegcashAPI.getExchangeRate(w.currency_code, 'PHP')
+        return rate ? bal * Number(rate) : 0
+      })
+      const values = await Promise.all(promises)
+      const total = values.reduce((s, v) => s + v, 0)
+      setTotalBalancePHP(total)
+    } catch (err) {
+      console.warn('Could not load wallets for total balance:', err?.message)
+      setTotalBalancePHP(0)
+    }
+  }
+
+  useEffect(() => {
+    if (userId) loadTotalBalance(userId)
+    else setTotalBalancePHP(0)
+  }, [userId])
+
   const handleAuthSuccess = async (user) => {
     setUserId(user.id)
     setUserEmail(user.email)
@@ -140,6 +168,8 @@ export default function App() {
     setShowAuth(false)
     window.history.replaceState(null, '', '/')
     setActiveTab('home')
+    // load balance for new user session
+    loadTotalBalance(user.id)
   }
 
   if (loading) {
