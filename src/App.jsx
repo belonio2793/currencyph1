@@ -157,12 +157,27 @@ export default function App() {
       if (user) {
         setUserId(user.id)
         setUserEmail(user.email)
-        await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
-        initializePresence(user.id)
+        await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User').catch(() => {})
+        initializePresence(user.id).catch(() => {})
         // If user is authenticated, don't forcibly change the current route — let handleRouting manage it
         setShowAuth(false)
       } else {
-        // No active session: only show auth UI when user explicitly navigated to login/register
+        // Check if there's a persisted guest session
+        const guestSession = typeof window !== 'undefined' ? localStorage.getItem('currency_ph_guest_session') : null
+        if (guestSession) {
+          try {
+            const parsed = JSON.parse(guestSession)
+            if (parsed.user && parsed.user.id) {
+              setUserId(parsed.user.id)
+              setUserEmail(parsed.user.email)
+              setShowAuth(false)
+            }
+          } catch (e) {
+            console.warn('Could not restore guest session', e)
+          }
+        }
+
+        // Only show auth UI when user explicitly navigated to login/register
         if (path === '/login' || path === '/register') setShowAuth(true)
         else setShowAuth(false)
       }
