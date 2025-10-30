@@ -72,8 +72,18 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleSit(tableId) {
     if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
     const seatNumber = (seats.length || 0) + 1
+
     try {
-      const res = await fetch(FUNCTIONS_BASE + '/join_table', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ tableId, userId, seatNumber }) })
+      // Get current wallet balance
+      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
+      const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
+
+      // Join table with starting balance
+      const res = await fetch(FUNCTIONS_BASE + '/join_table', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ tableId, userId, seatNumber, startingBalance: currentBalance })
+      })
       const json = await res.json()
       if (!res.ok) throw new Error(json.error || 'Failed to sit')
       await openTable(tables.find(t => t.id === tableId))
