@@ -36,12 +36,17 @@ async function createTable(name: string, stakeMin: number, stakeMax: number, cur
   return data
 }
 
-async function joinTable(tableId: string, userId: string, seatNumber: number) {
+async function joinTable(tableId: string, userId: string, seatNumber: number, startingBalance: number = 0) {
   // ensure seat available
   const { data: existing } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).eq('seat_number', seatNumber).limit(1)
   if (existing && existing.length > 0) throw new Error('Seat already taken')
 
-  const { data, error } = await supabase.from('poker_seats').insert([{ table_id: tableId, user_id: userId, seat_number: seatNumber }]).select().single()
+  const { data, error } = await supabase.from('poker_seats').insert([{
+    table_id: tableId,
+    user_id: userId,
+    seat_number: seatNumber,
+    starting_balance: startingBalance
+  }]).select().single()
   if (error) throw error
   return data
 }
