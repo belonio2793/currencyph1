@@ -47,6 +47,7 @@ export default function Profile({ userId }) {
   const [showPhoneCountryDropdown, setShowPhoneCountryDropdown] = useState(false)
   const [openPrivacyDropdown, setOpenPrivacyDropdown] = useState(null)
   const [displayNameType, setDisplayNameType] = useState('full_name')
+  const [emailEditable, setEmailEditable] = useState(false)
 
   // Check if userId is a valid UUID
   const isValidUUID = (id) => {
@@ -261,16 +262,6 @@ export default function Profile({ userId }) {
     await saveProfileToServer()
   }
 
-  // Autosave effect when realtime_save is enabled
-  useEffect(() => {
-    let timer
-    if (formData.realtime_save) {
-      timer = setTimeout(() => {
-        saveProfileToServer(true)
-      }, 1000)
-    }
-    return () => clearTimeout(timer)
-  }, [formData, privacySettings])
 
   const setPrivacy = (field, visibility) => {
     setPrivacySettings({ ...privacySettings, [field]: visibility })
@@ -507,27 +498,24 @@ export default function Profile({ userId }) {
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    value={formData.email || ''}
-                    onChange={e => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                  />
+                  <div className="flex items-center gap-3">
+                    <input
+                      type="email"
+                      value={formData.email || ''}
+                      onChange={e => setFormData({...formData, email: e.target.value})}
+                      disabled={!emailEditable}
+                      className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${emailEditable ? 'focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900' : 'bg-slate-50 text-slate-500 cursor-not-allowed border-slate-300'}`}
+                    />
+                    {!emailEditable ? (
+                      <button type="button" className="px-3 py-2 bg-yellow-400 text-white rounded-md text-sm" onClick={() => setEmailEditable(true)}>Update email</button>
+                    ) : (
+                      <button type="button" className="px-3 py-2 bg-slate-100 text-slate-700 rounded-md text-sm" onClick={() => { setFormData({...formData, email: user?.email || ''}); setEmailEditable(false) }}>Cancel</button>
+                    )}
+                  </div>
                   <p className="text-xs text-slate-500 mt-1">Changing your email will also attempt to update your authentication email (may require confirmation).</p>
                 </div>
 
-                {/* Realtime autosave toggle */}
-                <div className="mt-3">
-                  <label className="flex items-center gap-3 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.realtime_save || false}
-                      onChange={e => setFormData({...formData, realtime_save: e.target.checked})}
-                      className="w-4 h-4"
-                    />
-                    <span className="text-sm text-slate-700">Save changes in real time</span>
-                  </label>
-                </div>
+                {/* Email controls: Update button unlocks email field */}
 
                 {/* Phone Number with Country Code */}
                 <div>
