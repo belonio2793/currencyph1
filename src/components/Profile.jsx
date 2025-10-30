@@ -298,6 +298,26 @@ export default function Profile({ userId }) {
 
             {editing ? (
               <form onSubmit={handleSaveProfile} className="space-y-6">
+                {/* Username */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Username</label>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={formData.username || ''}
+                      onChange={e => handleUsernameChange(e.target.value)}
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      placeholder="Enter a display name here"
+                    />
+                    {formData.username && (
+                      <span className={`text-sm font-medium ${usernameAvailable ? 'text-emerald-600' : 'text-red-600'}`}>
+                        {usernameAvailable ? '✓ Available' : '✗ Taken'}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">3-20 characters, letters and numbers only</p>
+                </div>
+
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Full Name</label>
@@ -309,25 +329,70 @@ export default function Profile({ userId }) {
                   />
                 </div>
 
-                {/* Username */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Username (for Poker & Leaderboards)</label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={formData.username || ''}
-                      onChange={e => handleUsernameChange(e.target.value)}
-                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                      placeholder="choose_your_username"
-                    />
-                    {formData.username && (
-                      <span className={`text-sm font-medium ${usernameAvailable ? 'text-emerald-600' : 'text-red-600'}`}>
-                        {usernameAvailable ? '✓ Available' : '✗ Taken'}
-                      </span>
-                    )}
+                {/* Display Name Selection */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <label className="block text-sm font-medium text-slate-900 mb-3">How should your name appear?</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="display_name_type"
+                        value="username"
+                        checked={formData.display_name_type === 'username'}
+                        onChange={e => setFormData({...formData, display_name_type: 'username'})}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-slate-700">Username</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="display_name_type"
+                        value="first_name"
+                        checked={formData.display_name_type === 'first_name'}
+                        onChange={e => setFormData({...formData, display_name_type: 'first_name'})}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-slate-700">First Name</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="display_name_type"
+                        value="last_name"
+                        checked={formData.display_name_type === 'last_name'}
+                        onChange={e => setFormData({...formData, display_name_type: 'last_name'})}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-slate-700">Last Name</span>
+                    </label>
+                    <label className="flex items-center gap-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="display_name_type"
+                        value="full_name"
+                        checked={formData.display_name_type === 'full_name'}
+                        onChange={e => setFormData({...formData, display_name_type: 'full_name'})}
+                        className="w-4 h-4"
+                      />
+                      <span className="text-sm text-slate-700">Full Name</span>
+                    </label>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">3-20 characters, letters and numbers only</p>
+                  <div className="mt-3 pt-3 border-t border-blue-200">
+                    <p className="text-xs text-slate-600">Preview: <span className="font-semibold text-slate-900">{getDisplayNamePreview()}</span></p>
+                  </div>
                 </div>
+
+                {/* Display as Username Everywhere */}
+                <label className="flex items-center gap-3 cursor-pointer p-3 bg-slate-50 rounded-lg hover:bg-slate-100">
+                  <input
+                    type="checkbox"
+                    checked={formData.display_as_username_everywhere || false}
+                    onChange={e => setFormData({...formData, display_as_username_everywhere: e.target.checked})}
+                    className="w-4 h-4"
+                  />
+                  <span className="text-sm font-medium text-slate-700">Display as username everywhere</span>
+                </label>
 
                 {/* Email */}
                 <div>
@@ -340,16 +405,57 @@ export default function Profile({ userId }) {
                   />
                 </div>
 
-                {/* Phone Number */}
+                {/* Phone Number with Country Code */}
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                  <input
-                    type="tel"
-                    value={formData.phone_number || ''}
-                    onChange={e => setFormData({...formData, phone_number: e.target.value})}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    placeholder="+63..."
-                  />
+                  <div className="flex gap-2">
+                    <div className="w-20 relative">
+                      <button
+                        type="button"
+                        onClick={() => setShowPhoneCountryDropdown(!showPhoneCountryDropdown)}
+                        className="w-full px-2 py-2 border border-slate-300 rounded-lg text-left text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
+                      >
+                        {getSelectedPhoneCountry()?.flag || '🌍'}
+                      </button>
+
+                      {showPhoneCountryDropdown && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+                          <input
+                            type="text"
+                            placeholder="Search..."
+                            value={phoneCountrySearch}
+                            onChange={e => setPhoneCountrySearch(e.target.value)}
+                            className="w-full px-2 py-1 border-b border-slate-200 focus:outline-none text-xs"
+                          />
+                          {COUNTRIES.filter(c =>
+                            c.name.toLowerCase().includes(phoneCountrySearch.toLowerCase()) ||
+                            c.code.toLowerCase().includes(phoneCountrySearch.toLowerCase())
+                          ).map(country => (
+                            <button
+                              key={country.code}
+                              type="button"
+                              onClick={() => {
+                                setFormData({...formData, phone_country_code: country.code})
+                                setShowPhoneCountryDropdown(false)
+                                setPhoneCountrySearch('')
+                              }}
+                              className="w-full text-left px-2 py-1 hover:bg-slate-100 text-xs flex items-center gap-1"
+                            >
+                              <span>{country.flag}</span>
+                              <span className="text-slate-600">{country.code}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <input
+                      type="tel"
+                      value={formData.phone_number || ''}
+                      onChange={e => setFormData({...formData, phone_number: e.target.value})}
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      placeholder="9123456789"
+                    />
+                  </div>
                 </div>
 
                 {/* Country with Search and Flag */}
