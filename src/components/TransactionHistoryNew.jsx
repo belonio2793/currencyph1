@@ -13,10 +13,17 @@ export default function TransactionHistory({ userId }) {
 
   const loadTransactions = async () => {
     try {
+      // Skip for guest-local or invalid user IDs
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        setTransactions([])
+        setLoading(false)
+        return
+      }
       const data = await wisegcashAPI.getTransactions(userId, 100)
       setTransactions(data)
     } catch (err) {
-      console.error('Error loading transactions:', err)
+      // Silently fail - transactions are optional
+      setTransactions([])
     } finally {
       setLoading(false)
     }
