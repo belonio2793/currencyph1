@@ -48,21 +48,34 @@ export default function Auth({ onAuthSuccess }) {
 
       if (signInError) {
         if (identifier === 'guest') {
-          // Try to create a user record in users table (may fail due to RLS); if that fails, fallback to local guest session
           try {
-            const { data: up, error: upErr } = await supabase.from('users').upsert({ email }).select().single()
-            if (upErr) {
-              throw upErr
+            // Try to create the user via Supabase Admin API using service role key
+            const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+            const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || process.env.PROJECT_URL
+            if (ADMIN_KEY && PROJECT_URL) {
+              const res = await fetch(`${PROJECT_URL}/auth/v1/admin/users`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  apikey: ADMIN_KEY,
+                  Authorization: `Bearer ${ADMIN_KEY}`,
+                },
+                body: JSON.stringify({ email, password: effectivePassword, email_confirm: true, user_metadata: { full_name: 'Guest' } }),
+              })
+              if (!res.ok) {
+                const txt = await res.text().catch(()=>'')
+                console.warn('Admin create user failed', res.status, txt)
+                throw new Error('Admin create user failed')
+              }
+              // After creation, try signing in again
+              const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+              if (retry.error) throw retry.error
+              data = retry.data
+            } else {
+              throw new Error('Admin key not available')
             }
-            // Attempt to sign up in auth
-            const { error: su } = await supabase.auth.signUp({ email, password: effectivePassword })
-            if (su) {
-              throw su
-            }
-            const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-            if (retry.error) throw retry.error
-            data = retry.data
           } catch (err) {
+            console.warn('Guest backend create failed', err)
             // Final fallback: create local guest session (non-authenticated)
             const localUser = { id: 'guest-local', email: 'guest', user_metadata: {} }
             setSuccess('Guest session created locally')
