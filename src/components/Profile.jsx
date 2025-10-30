@@ -162,9 +162,10 @@ export default function Profile({ userId }) {
         .from('users')
         .select('id')
         .eq('username', username)
-        .maybeSingle()
+        .limit(1)
 
-      setUsernameAvailable(!data)
+      // data is an array; available if no matching rows
+      setUsernameAvailable(!(Array.isArray(data) && data.length > 0))
     } catch (err) {
       setUsernameAvailable(true)
     }
