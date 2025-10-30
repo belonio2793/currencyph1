@@ -180,13 +180,13 @@ export default function Auth({ onAuthSuccess }) {
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address
+                    Email or Phone
                   </label>
                   <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    type="text"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="you@example.com or 09171234567"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
@@ -251,13 +251,13 @@ export default function Auth({ onAuthSuccess }) {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address
+                    Email or Phone
                   </label>
                   <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@example.com"
+                    type="text"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    placeholder="you@example.com or 09171234567"
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
