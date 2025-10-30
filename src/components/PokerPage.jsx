@@ -369,8 +369,22 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 400 320" preserveAspectRatio="xMidYMid meet">
                       <defs>
                         <linearGradient id="tableGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                          <stop offset="0%" style={{ stopColor: '#1e3a1f', stopOpacity: 1 }} />
-                          <stop offset="100%" style={{ stopColor: '#0f2310', stopOpacity: 1 }} />
+                          {activeTab === 'my-tables' ? (
+                            <>
+                              <stop offset="0%" style={{ stopColor: '#1e40af', stopOpacity: 1 }} />
+                              <stop offset="100%" style={{ stopColor: '#0f172a', stopOpacity: 1 }} />
+                            </>
+                          ) : activeTab === 'other-tables' ? (
+                            <>
+                              <stop offset="0%" style={{ stopColor: '#5b21b6', stopOpacity: 1 }} />
+                              <stop offset="100%" style={{ stopColor: '#2e1065', stopOpacity: 1 }} />
+                            </>
+                          ) : (
+                            <>
+                              <stop offset="0%" style={{ stopColor: '#1e3a1f', stopOpacity: 1 }} />
+                              <stop offset="100%" style={{ stopColor: '#0f2310', stopOpacity: 1 }} />
+                            </>
+                          )}
                         </linearGradient>
                       </defs>
                       {/* Outer rim */}
