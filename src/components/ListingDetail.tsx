@@ -84,7 +84,7 @@ export default function ListingDetail({ slug, onBack }: ListingDetailProps) {
       // Add open graph tags for social sharing
       const metaOG = document.querySelector('meta[property="og:title"]') || document.createElement('meta')
       metaOG.setAttribute('property', 'og:title')
-      metaOG.setAttribute('content', `${listingData.name} - Manila Tourism Guide`)
+      metaOG.setAttribute('content', `${listingData.name} - Currency - Philippines`)
       if (!document.querySelector('meta[property="og:title"]')) {
         document.head.appendChild(metaOG)
       }
