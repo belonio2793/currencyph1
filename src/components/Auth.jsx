@@ -3,13 +3,22 @@ import { supabase } from '../lib/supabaseClient'
 
 export default function Auth({ onAuthSuccess }) {
   const [activeTab, setActiveTab] = useState('login')
-  const [email, setEmail] = useState('')
+  const [identifier, setIdentifier] = useState('') // email or phone or 'guest'
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  const normalizeIdentifier = (id) => {
+    const v = (id || '').trim()
+    if (!v) return ''
+    if (v === 'guest') return 'guest@currency.local'
+    if (v.includes('@')) return v
+    // treat as phone or username
+    return `${v}@currency.local`
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -18,17 +27,28 @@ export default function Auth({ onAuthSuccess }) {
     setLoading(true)
 
     try {
-      if (!email || !password) {
+      if (!identifier || !password) {
         throw new Error('Please fill in all fields')
       }
 
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const email = normalizeIdentifier(identifier)
+
+      let { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password
       })
 
       if (signInError) {
-        throw signInError
+        // If guest and no account exists, create it then sign in
+        if (identifier === 'guest') {
+          const { error: su } = await supabase.auth.signUp({ email, password })
+          if (su) throw su
+          const retry = await supabase.auth.signInWithPassword({ email, password })
+          if (retry.error) throw retry.error
+          data = retry.data
+        } else {
+          throw signInError
+        }
       }
 
       setSuccess('Login successful! Redirecting...')
@@ -49,7 +69,7 @@ export default function Auth({ onAuthSuccess }) {
     setLoading(true)
 
     try {
-      if (!email || !password || !confirmPassword || !fullName) {
+      if (!identifier || !password || !confirmPassword || !fullName) {
         throw new Error('Please fill in all fields')
       }
 
@@ -60,6 +80,8 @@ export default function Auth({ onAuthSuccess }) {
       if (password.length < 6) {
         throw new Error('Password must be at least 6 characters')
       }
+
+      const email = normalizeIdentifier(identifier)
 
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -76,7 +98,7 @@ export default function Auth({ onAuthSuccess }) {
       }
 
       setSuccess('Registration successful! Please check your email to confirm your account.')
-      setEmail('')
+      setIdentifier('')
       setPassword('')
       setConfirmPassword('')
       setFullName('')
