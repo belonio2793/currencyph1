@@ -215,6 +215,22 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   {btn.label}
                 </button>
               ))}
+
+              {/* Mobile auth buttons */}
+              <div className="pt-3 border-t border-slate-100 space-y-2">
+                {userEmail ? (
+                  <>
+                    <div className="px-3 text-sm text-slate-600">{userEmail}</div>
+                    <button onClick={() => onSignOut && onSignOut()} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200">Sign out</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => { onShowAuth && onShowAuth('login'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200">Login</button>
+                    <button onClick={() => { onShowAuth && onShowAuth('register'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">Register</button>
+                    <button onClick={() => { onShowAuth && onShowAuth('login'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-slate-50">Guest: guest/guest</button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         )}
