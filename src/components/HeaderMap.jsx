@@ -187,15 +187,17 @@ export default function HeaderMap() {
 function SendLocationButton({ location, city }) {
   const [open, setOpen] = useState(false)
   const [userId, setUserId] = useState(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // attempt to get logged in supabase user id via client
     const fetchUser = async () => {
       try {
-        const { data: { user } } = await import('../lib/supabaseClient').then(m => m.supabase.auth.getUser())
+        const { data: { user } } = await supabase.auth.getUser()
         if (user) setUserId(user.id)
       } catch (e) {
-        // ignore
+        console.warn('Failed to fetch user ID:', e)
+      } finally {
+        setLoading(false)
       }
     }
     fetchUser()
@@ -203,8 +205,14 @@ function SendLocationButton({ location, city }) {
 
   return (
     <>
-      <button onClick={() => setOpen(true)} className="px-3 py-2 bg-white border rounded text-sm">Send Location</button>
-      {open && <SendLocationModal open={open} onClose={() => setOpen(false)} location={location} city={city} senderId={userId} />}
+      <button
+        onClick={() => setOpen(true)}
+        disabled={loading || !userId}
+        className="px-3 py-2 bg-white border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {loading ? 'Loading...' : !userId ? 'Login to share' : 'Send Location'}
+      </button>
+      {open && userId && <SendLocationModal open={open} onClose={() => setOpen(false)} location={location} city={city} senderId={userId} />}
     </>
   )
 }
