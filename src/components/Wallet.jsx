@@ -18,11 +18,19 @@ export default function Wallet({ userId }) {
 
   const loadWallets = async () => {
     try {
+      // Skip for guest-local or invalid user IDs
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        setWallets([
+          { user_id: userId, currency_code: 'PHP', balance: 0 },
+          { user_id: userId, currency_code: 'USD', balance: 0 }
+        ])
+        setLoading(false)
+        return
+      }
       const data = await wisegcashAPI.getWallets(userId)
       setWallets(data || [])
       setError('')
     } catch (err) {
-      console.debug('Wallet loading failed:', err?.message)
       // Fallback: initialize default wallets
       setWallets([
         { user_id: userId, currency_code: 'PHP', balance: 0 },
