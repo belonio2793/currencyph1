@@ -6,6 +6,7 @@ import PokerGameModal from './PokerGameModal'
 
 export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const pageRef = useRef(null)
+  const tableViewRef = useRef(null)
   const [tables, setTables] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedTable, setSelectedTable] = useState(null)
