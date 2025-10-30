@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import HeaderMap from './HeaderMap'
 
-export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency }) {
+export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, onShowAuth, onSignOut }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const mainNav = [
