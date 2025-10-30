@@ -118,10 +118,8 @@ export default function App() {
         setShowAuth(false)
         window.history.replaceState(null, '', '/')
       } else {
-        const testEmail = `test-${Math.random().toString(36).substring(7)}@currency.local`
-        const testUser = await wisegcashAPI.getOrCreateUser(testEmail, 'Test User')
-        setUserId(testUser.id)
-        setUserEmail(testEmail)
+        // No active session: show auth UI (no auto-test-user creation)
+        setShowAuth(true)
       }
     } catch (err) {
       console.error('Error initializing user:', err)
