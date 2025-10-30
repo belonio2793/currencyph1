@@ -48,6 +48,16 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  function openGameModal(table) {
+    setGameModalTable(table)
+    setGameModalOpen(true)
+  }
+
+  function closeGameModal() {
+    setGameModalOpen(false)
+    setTimeout(() => setGameModalTable(null), 300)
+  }
+
   async function handleCreate(name, stakeMin, stakeMax) {
     if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
     try {
