@@ -44,16 +44,25 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleCreate(name, stakeMin, stakeMax) {
     if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
     try {
-      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax }]).select().single()
-      if (error) throw error
+      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: 'PHP' }]).select().single()
+      if (error) {
+        console.error('Create table error:', error)
+        throw new Error(error.message)
+      }
 
       // Auto-sit creator at seat 1
       const { error: seatError } = await supabase.from('poker_seats').insert([{ table_id: table.id, user_id: userId, seat_number: 1 }])
-      if (seatError) console.warn('Could not auto-sit creator:', seatError)
+      if (seatError) {
+        console.warn('Could not auto-sit creator:', seatError)
+        setError(`Table created but could not auto-seat: ${seatError.message}`)
+      }
 
+      setError(null)
       await loadTables()
       setSelectedTable(table)
     } catch (e) {
+      console.error('Create table error:', e)
+      setError(`Create table failed: ${e.message}`)
       alert('Create table failed: ' + (e.message || e))
     }
   }
