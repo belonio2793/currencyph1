@@ -184,13 +184,26 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                   <div>
                     <div className="text-lg font-semibold text-white">{selectedTable.name}</div>
                     <div className="text-sm text-slate-300 mt-1">Stakes: {selectedTable.stake_min}/{selectedTable.stake_max} {selectedTable.currency_code}</div>
+                    {userId && seats.some(s => s.user_id === userId) && (
+                      <div className="text-xs text-emerald-400 mt-1 font-semibold">✓ You are seated at this table</div>
+                    )}
                   </div>
-                  <button
-                    onClick={() => handleStartHand(selectedTable.id)}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition"
-                  >
-                    Start Hand
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleStartHand(selectedTable.id)}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition"
+                    >
+                      Start Hand
+                    </button>
+                    {userId && seats.some(s => s.user_id === userId) && (
+                      <button
+                        onClick={() => handleLeaveTable(selectedTable.id)}
+                        className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                      >
+                        Leave Table
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Poker Table */}
