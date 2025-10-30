@@ -49,30 +49,53 @@ export default function Auth({ onAuthSuccess }) {
       if (signInError) {
         if (identifier === 'guest') {
           try {
-            // Try to create the user via Supabase Admin API using service role key
-            const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+            // Try to create the guest user via serverless Edge Function (preferred)
             const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || process.env.PROJECT_URL
-            if (ADMIN_KEY && PROJECT_URL) {
-              const res = await fetch(`${PROJECT_URL}/auth/v1/admin/users`, {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  apikey: ADMIN_KEY,
-                  Authorization: `Bearer ${ADMIN_KEY}`,
-                },
-                body: JSON.stringify({ email, password: effectivePassword, email_confirm: true, user_metadata: { full_name: 'Guest' } }),
-              })
-              if (!res.ok) {
-                const txt = await res.text().catch(()=>'')
-                console.warn('Admin create user failed', res.status, txt)
-                throw new Error('Admin create user failed')
+            try {
+              if (PROJECT_URL) {
+                const fnRes = await fetch(`${PROJECT_URL}/functions/v1/create-guest`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ email, password: effectivePassword, full_name: 'Guest' })
+                })
+                if (!fnRes.ok) {
+                  const txt = await fnRes.text().catch(()=>'')
+                  console.warn('create-guest function failed', fnRes.status, txt)
+                  throw new Error('create-guest failed')
+                }
+                // After creation, sign in
+                const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+                if (retry.error) throw retry.error
+                data = retry.data
+              } else {
+                throw new Error('Project URL not configured')
               }
-              // After creation, try signing in again
-              const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
-              if (retry.error) throw retry.error
-              data = retry.data
-            } else {
-              throw new Error('Admin key not available')
+            } catch (err) {
+              console.warn('create-guest function error', err)
+              // fallback to admin direct (if service role key is present on client)
+              const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+              if (ADMIN_KEY && PROJECT_URL) {
+                const res = await fetch(`${PROJECT_URL}/auth/v1/admin/users`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    apikey: ADMIN_KEY,
+                    Authorization: `Bearer ${ADMIN_KEY}`,
+                  },
+                  body: JSON.stringify({ email, password: effectivePassword, email_confirm: true, user_metadata: { full_name: 'Guest' } }),
+                })
+                if (res.ok) {
+                  const retry = await supabase.auth.signInWithPassword({ email, password: effectivePassword })
+                  if (retry.error) throw retry.error
+                  data = retry.data
+                } else {
+                  const txt = await res.text().catch(()=>'')
+                  console.warn('Admin create user failed', res.status, txt)
+                  throw new Error('Admin create user failed')
+                }
+              } else {
+                throw err
+              }
             }
           } catch (err) {
             console.warn('Guest backend create failed', err)
