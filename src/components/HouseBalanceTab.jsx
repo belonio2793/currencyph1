@@ -164,7 +164,7 @@ export default function HouseBalanceTab() {
         {rakeTransactions.length === 0 ? (
           <div className="p-8 text-center text-slate-500">
             <div className="text-4xl mb-2">📊</div>
-            <p>No rake transactions yet</p>
+            <p>No results to display</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
