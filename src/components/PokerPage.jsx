@@ -357,6 +357,17 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           </div>
         </div>
       </div>
+
+      <RakeModal
+        open={rakeModal.open}
+        onClose={() => setRakeModal({ ...rakeModal, open: false })}
+        startingBalance={rakeModal.startingBalance}
+        endingBalance={rakeModal.endingBalance}
+        userId={userId}
+        tableId={rakeModal.tableId}
+        currencyCode={rakeModal.currencyCode}
+        onRakeProcessed={handleRakeProcessed}
+      />
     </div>
   )
 }
