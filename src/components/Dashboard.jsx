@@ -12,13 +12,23 @@ export default function Dashboard({ userId, onNavigate }) {
 
   const loadWallets = async () => {
     try {
+      // Skip for guest-local or invalid user IDs
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        const defaultWallets = [
+          { user_id: userId, currency_code: 'PHP', balance: 0 },
+          { user_id: userId, currency_code: 'USD', balance: 0 }
+        ]
+        setWallets(defaultWallets)
+        setTotalBalance(0)
+        setLoading(false)
+        return
+      }
       const data = await wisegcashAPI.getWallets(userId)
       const walletData = data || []
       setWallets(walletData)
       const total = walletData.reduce((sum, w) => sum + (w.balance || 0), 0)
       setTotalBalance(total)
     } catch (err) {
-      console.debug('Wallet data unavailable, using defaults:', err?.message)
       // Fallback: use default wallets with zero balance
       const defaultWallets = [
         { user_id: userId, currency_code: 'PHP', balance: 0 },
