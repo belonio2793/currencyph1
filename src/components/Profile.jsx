@@ -48,12 +48,44 @@ export default function Profile({ userId }) {
   const [openPrivacyDropdown, setOpenPrivacyDropdown] = useState(null)
   const [displayNameType, setDisplayNameType] = useState('full_name')
 
+  // Check if userId is a valid UUID
+  const isValidUUID = (id) => {
+    return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+  }
+
+  const isGuestAccount = userId && userId.includes('guest')
+
   useEffect(() => {
     loadUser()
   }, [userId])
 
   const loadUser = async () => {
     try {
+      // Skip database load for guest-local accounts
+      if (!isValidUUID(userId)) {
+        setUser({
+          id: userId,
+          email: 'guest@currency.ph',
+          full_name: 'Guest',
+          status: 'active'
+        })
+        setFormData({
+          full_name: 'Guest',
+          email: 'guest@currency.ph',
+          phone_number: '',
+          phone_country_code: 'PH',
+          username: 'guest',
+          country_code: 'PH',
+          relationship_status: '',
+          biography: '',
+          profile_picture_url: '',
+          display_name_type: 'full_name',
+          display_as_username_everywhere: false
+        })
+        setLoading(false)
+        return
+      }
+
       const userData = await wisegcashAPI.getUserById(userId)
       setUser(userData)
       setFormData({
