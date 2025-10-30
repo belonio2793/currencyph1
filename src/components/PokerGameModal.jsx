@@ -319,6 +319,8 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   const isSeated = seats.some(s => s.user_id === userId)
   const tableStatusText = waitingForPlayers ? `Waiting for ${2 - seats.length} more player(s)...` : gameState || 'Initializing'
 
+  if (!open || !table) return null
+
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden border border-slate-700 shadow-2xl">
