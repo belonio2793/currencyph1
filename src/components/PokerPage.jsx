@@ -197,11 +197,19 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
 
   const getFilteredTables = () => {
     if (activeTab === 'my-tables') {
-      return tables.filter(t => t.created_by === userId)
+      return tables.filter(t => !t.is_default)
     } else if (activeTab === 'lobby') {
-      return tables.filter(t => t.created_by !== userId || !t.created_by)
+      return tables.filter(t => t.is_default === true)
     }
     return tables
+  }
+
+  const getMyCreatedTables = () => {
+    return tables.filter(t => t.created_by === userId && !t.is_default)
+  }
+
+  const getPlayerTables = () => {
+    return tables.filter(t => t.created_by !== userId && !t.is_default)
   }
 
   const getFeltColor = () => {
