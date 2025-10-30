@@ -73,27 +73,41 @@ export default function HouseBalanceTab() {
     try {
       const { data: txs, error: txError } = await supabase
         .from('rake_transactions')
-        .select(`
-          id,
-          user_id,
-          amount,
-          tip_percent,
-          currency_code,
-          balance_after,
-          created_at,
-          users!rake_transactions_user_id_fkey(email)
-        `)
+        .select('id, user_id, amount, tip_percent, currency_code, balance_after, created_at')
         .eq('currency_code', currencyFilter)
         .order('created_at', { ascending: false })
         .limit(100)
 
       if (txError) throw txError
-      setRakeTransactions(txs || [])
+
+      // Load user emails separately
+      if (txs && txs.length > 0) {
+        const userIds = [...new Set(txs.map(tx => tx.user_id))]
+        const { data: users } = await supabase
+          .from('users')
+          .select('id, email')
+          .in('id', userIds)
+
+        const userMap = {}
+        if (users) {
+          users.forEach(u => {
+            userMap[u.id] = u.email
+          })
+        }
+
+        const enrichedTxs = txs.map(tx => ({
+          ...tx,
+          users: { email: userMap[tx.user_id] || tx.user_id }
+        }))
+        setRakeTransactions(enrichedTxs)
+      } else {
+        setRakeTransactions([])
+      }
       setError(null)
     } catch (err) {
       console.error('Error loading rake transactions:', err)
       setRakeTransactions([])
-      setError('Failed to load transactions')
+      setError(null)
     }
   }
 
