@@ -98,58 +98,12 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               </button>
             ))}
 
-            {/* Right-side nav items */}
-            {rightNav.filter(btn => (!btn.auth) || userEmail).map(btn => (
-              <button
-                key={btn.id}
-                onClick={() => {
-                  onTabChange(btn.id)
-                  setMobileMenuOpen(false)
-                }}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                  activeTab === btn.id
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
-
-            {/* Auth controls */}
-            <div className="ml-4 flex items-center gap-2">
-              {userEmail ? (
-                <>
-                  <span className="text-sm text-slate-600">{userEmail}</span>
-                  <button
-                    onClick={() => onSignOut && onSignOut()}
-                    className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50"
-                  >
-                    Sign out
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    onClick={() => onShowAuth && onShowAuth('login')}
-                    className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => onShowAuth && onShowAuth('register')}
-                    className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  >
-                    Register
-                  </button>
-                </>
-              )}
-            </div>
+            {/* Auth controls will be rendered in the investments row */}
           </div>
 
           {/* Secondary row for Manage Investments (desktop) */}
           <div className="hidden md:flex w-full mt-4 pt-3 border-t border-slate-100">
-            <div className="w-full px-4 flex">
+            <div className="w-full px-4 flex items-center gap-3">
               {secondaryNav.map(btn => (
                 <button
                   key={btn.id}
@@ -161,6 +115,28 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   {btn.label}
                 </button>
               ))}
+
+              {/* Buttons moved into the Manage Investments row */}
+              <div className="ml-4 flex items-center gap-2">
+                {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
+                  <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm rounded-md ${activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
+                    {btn.label}
+                  </button>
+                ))}
+
+                {/* Auth controls */}
+                {userEmail ? (
+                  <>
+                    <span className="text-sm text-slate-600">{userEmail}</span>
+                    <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Sign out</button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Login</button>
+                    <button onClick={() => onShowAuth && onShowAuth('register')} className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Register</button>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
