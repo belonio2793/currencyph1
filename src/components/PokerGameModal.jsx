@@ -445,11 +445,8 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                 />
               </div>
               
-              {/* Community Cards & Pot */}
+              {/* Community Cards */}
               <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 space-y-4">
-                <PotDisplay pot={pot} />
-                
-                {/* Community Cards */}
                 <div className="flex justify-center gap-2">
                   <div className="text-slate-400 text-sm font-semibold mr-4">Community:</div>
                   <div className="flex gap-2">
