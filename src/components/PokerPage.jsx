@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import RakeModal from './RakeModal'
 import HouseBalanceTab from './HouseBalanceTab'
+import PokerGameModal from './PokerGameModal'
 
 export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const [tables, setTables] = useState([])
