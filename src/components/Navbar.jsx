@@ -7,16 +7,17 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
-    { id: 'nearby', label: 'Nearby', public: true },
-    { id: 'wallet', label: 'Wallets', auth: true },
-    { id: 'send', label: 'Send', auth: true }
+    { id: 'nearby', label: 'Nearby', public: true }
   ]
 
   const secondaryNav = [
     { id: 'investments', label: 'Manage Investments' }
   ]
 
-  const rightNav = [
+  // Buttons that should appear under the Manage Investments row
+  const investmentsRowButtons = [
+    { id: 'wallet', label: 'Wallets', auth: true },
+    { id: 'send', label: 'Send', auth: true },
     { id: 'bills', label: 'Bills', auth: true },
     { id: 'transactions', label: 'History', auth: true },
     { id: 'profile', label: 'Profile', auth: true },
