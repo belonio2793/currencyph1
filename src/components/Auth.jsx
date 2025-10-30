@@ -77,7 +77,10 @@ export default function Auth({ onAuthSuccess }) {
         throw new Error('Passwords do not match')
       }
 
-      if (password.length < 6) {
+      // Allow a guest account with short password 'guest'
+      const normalizedEmailForCheck = normalizeIdentifier(identifier)
+      const isGuestIdentifier = (identifier === 'guest' || normalizedEmailForCheck === 'guest@currency.local')
+      if (password.length < 6 && !isGuestIdentifier) {
         throw new Error('Password must be at least 6 characters')
       }
 
