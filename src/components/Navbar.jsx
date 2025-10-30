@@ -27,7 +27,10 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
       <div className="max-w-7xl mx-auto px-4">
         {/* Row 1: Logo and HeaderMap */}
         <div className="py-4 flex items-center justify-between">
-          <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
+          <div>
+            <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
+            <div className="text-xs text-slate-500">Play The Number One Game Of The Philippines</div>
+          </div>
           <div className="hidden md:block">
             <HeaderMap />
           </div>
