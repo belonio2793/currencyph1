@@ -115,17 +115,19 @@ export default function App() {
   const initializeUser = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser()
+      const path = typeof window !== 'undefined' ? window.location.pathname : '/'
 
       if (user) {
         setUserId(user.id)
         setUserEmail(user.email)
         await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
         initializePresence(user.id)
+        // If user is authenticated, don't forcibly change the current route — let handleRouting manage it
         setShowAuth(false)
-        window.history.replaceState(null, '', '/')
       } else {
-        // No active session: show auth UI (no auto-test-user creation)
-        setShowAuth(true)
+        // No active session: only show auth UI when user explicitly navigated to login/register
+        if (path === '/login' || path === '/register') setShowAuth(true)
+        else setShowAuth(false)
       }
     } catch (err) {
       console.error('Error initializing user:', err)
