@@ -6,6 +6,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const [loading, setLoading] = useState(false)
   const [selectedTable, setSelectedTable] = useState(null)
   const [seats, setSeats] = useState([])
+  const [error, setError] = useState(null)
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
   useEffect(() => { loadTables() }, [])
