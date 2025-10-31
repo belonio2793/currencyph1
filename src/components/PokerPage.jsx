@@ -219,7 +219,18 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   }
 
   async function handleRakeProcessed(data) {
-    // Reload tables after rake is processed
+    try {
+      const tableId = rakeModal.tableId
+      if (tableId) {
+        const { data: remaining } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).limit(1)
+        const { data: tbl } = await supabase.from('poker_tables').select('id,is_default').eq('id', tableId).single()
+        if ((remaining || []).length === 0 && tbl && tbl.is_default === false) {
+          await supabase.from('poker_tables').delete().eq('id', tableId)
+        }
+      }
+    } catch (e) {
+      console.warn('Auto-delete table check failed:', e)
+    }
     setSelectedTable(null)
     await loadTables()
   }
