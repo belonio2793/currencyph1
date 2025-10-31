@@ -146,7 +146,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   return (
     <div className="space-y-6">
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm">
           {error}
         </div>
       )}
@@ -154,20 +154,20 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chessboard */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+          <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
             {/* Black Player Info */}
-            <div className="mb-6 pb-4 border-b border-slate-200 flex justify-between items-center">
+            <div className="mb-6 pb-4 border-b border-slate-700/50 flex justify-between items-center">
               <div>
-                <p className="text-slate-900 font-semibold">{currentGame.black_player_email || 'Waiting for opponent...'}</p>
-                <p className="text-xs text-slate-600 mt-1">Black</p>
+                <p className="text-white font-semibold">{currentGame.black_player_email || 'Waiting for opponent...'}</p>
+                <p className="text-xs text-slate-300 mt-1">Black</p>
               </div>
-              <div className={`text-2xl font-mono font-bold ${blackTime !== null && blackTime < 60 ? 'text-red-600' : 'text-slate-900'}`}>
+              <div className={`text-2xl font-mono font-bold ${blackTime !== null && blackTime < 60 ? 'text-red-400' : 'text-white'}`}>
                 {formatTime(blackTime)}
               </div>
             </div>
 
             {/* Board */}
-            <div className="bg-slate-300 p-2 rounded-lg mb-6 aspect-square max-w-md mx-auto">
+            <div className="bg-slate-900/40 p-1 rounded-lg border border-slate-700/50 mb-6 aspect-square max-w-md mx-auto">
               <div className="grid grid-cols-8 gap-0 h-full">
                 {board.map((piece, index) => {
                   const row = Math.floor(index / 8)
@@ -183,15 +183,22 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                       key={square}
                       onClick={() => handleSquareClick(square)}
                       className={`
-                        flex items-center justify-center text-3xl font-bold transition-all
-                        ${isLight ? 'bg-amber-100' : 'bg-amber-700'}
+                        flex items-center justify-center p-0 leading-none transition-all
+                        ${isLight ? 'bg-emerald-700' : 'bg-emerald-900'}
                         ${isSelected ? 'ring-4 ring-blue-500' : ''}
                         ${isHighlighted ? 'ring-inset ring-4 ring-green-500' : ''}
-                        ${isLastMove ? (isLight ? 'bg-yellow-300' : 'bg-yellow-600') : ''}
+                        ${isLastMove ? (isLight ? 'bg-yellow-600' : 'bg-yellow-800') : ''}
                         hover:opacity-90 cursor-pointer
                       `}
                     >
-                      {piece && PIECE_SYMBOLS[piece]}
+                      {piece && (
+                        <span
+                          className={`${piece === piece.toUpperCase() ? 'text-slate-100' : 'text-slate-900'} text-5xl md:text-6xl`}
+                          style={{ WebkitTextStroke: piece === piece.toUpperCase() ? '2px #0f172a' : '1.5px #e2e8f0', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.6))' }}
+                        >
+                          {PIECE_SYMBOLS[piece]}
+                        </span>
+                      )}
                     </button>
                   )
                 })}
@@ -199,20 +206,20 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             </div>
 
             {/* White Player Info */}
-            <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
+            <div className="pt-4 border-t border-slate-700/50 flex justify-between items-center">
               <div>
-                <p className="text-slate-900 font-semibold">{currentGame.white_player_email}</p>
-                <p className="text-xs text-slate-600 mt-1">White</p>
+                <p className="text-white font-semibold">{currentGame.white_player_email}</p>
+                <p className="text-xs text-slate-300 mt-1">White</p>
               </div>
-              <div className={`text-2xl font-mono font-bold ${whiteTime !== null && whiteTime < 60 ? 'text-red-600' : 'text-slate-900'}`}>
+              <div className={`text-2xl font-mono font-bold ${whiteTime !== null && whiteTime < 60 ? 'text-red-400' : 'text-white'}`}>
                 {formatTime(whiteTime)}
               </div>
             </div>
 
             {/* Game Status */}
             {gameStatus !== 'in_progress' && (
-              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
-                <p className="text-blue-900 font-semibold">
+              <div className="mt-6 p-4 bg-blue-900/30 border border-blue-700/50 rounded-lg text-center">
+                <p className="text-blue-200 font-semibold">
                   {gameStatus === 'white_checkmate' && 'White is checkmated - Black wins!'}
                   {gameStatus === 'black_checkmate' && 'Black is checkmated - White wins!'}
                   {gameStatus === 'stalemate' && 'Game is a draw - Stalemate'}
@@ -225,12 +232,12 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
         </div>
 
         {/* Move History & Info */}
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 h-fit">
-          <h3 className="text-lg font-bold text-slate-900 mb-4">Game Info</h3>
+        <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6 h-fit">
+          <h3 className="text-lg font-bold text-white mb-4">Game Info</h3>
           
-          <div className="mb-6 pb-4 border-b border-slate-200">
-            <p className="text-sm text-slate-600 font-medium">Time Control</p>
-            <p className="text-slate-900 font-semibold mt-1">{timeControlDisplay[currentGame.time_control]}</p>
+          <div className="mb-6 pb-4 border-b border-slate-700/50">
+            <p className="text-sm text-slate-300 font-medium">Time Control</p>
+            <p className="text-white font-semibold mt-1">{timeControlDisplay[currentGame.time_control]}</p>
           </div>
 
           <div className="mb-6">
@@ -243,8 +250,8 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                       key={idx}
                       className={`p-2 rounded text-sm font-mono text-center ${
                         idx % 2 === 0
-                          ? 'bg-slate-100 text-slate-900'
-                          : 'bg-slate-50 text-slate-700'
+                          ? 'bg-white/10 text-white'
+                          : 'bg-white/5 text-slate-300'
                       }`}
                     >
                       {Math.floor(idx / 2) + 1}. {move.from}{move.to}
@@ -252,14 +259,14 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-slate-500 text-sm">No moves yet</p>
+                <p className="text-slate-300 text-sm">No moves yet</p>
               )}
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-medium transition-colors border border-slate-300"
+            className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors border border-white/20"
           >
             Back to Lobby
           </button>
