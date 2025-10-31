@@ -43,7 +43,7 @@ export default function Dashboard({ userId, onNavigate }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="text-center text-slate-500">Loading...</div>
       </div>
     )
@@ -57,10 +57,10 @@ export default function Dashboard({ userId, onNavigate }) {
   ]
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="max-w-7xl mx-auto px-6 py-6">
       {/* Total Balance Card */}
-      <div className="mb-12">
-        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-8 text-white shadow-lg">
+      <div className="mb-6">
+        <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl p-6 text-white shadow-lg">
           <p className="text-slate-300 text-sm font-light tracking-wide mb-3">Total Balance</p>
           <h2 className="text-5xl font-light mb-2">${totalBalance.toFixed(2)}</h2>
           <p className="text-slate-400 text-sm">Across all currencies</p>
@@ -68,7 +68,7 @@ export default function Dashboard({ userId, onNavigate }) {
       </div>
 
       {/* Quick Actions */}
-      <div className="mb-12">
+      <div className="mb-6">
         <h3 className="text-lg font-light text-slate-900 mb-6 tracking-wide">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {actions.map(action => {
