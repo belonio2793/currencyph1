@@ -786,6 +786,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
             <h3 className="text-2xl font-light text-slate-900 mb-6">{cryptoAction === 'receive' ? 'Receive' : 'Send'} ({selectedCryptoWallet.currency_code})</h3>
+
+            {selectedCryptoWallet.provider === 'thirdweb' && selectedCryptoWallet.address && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-6">
+                <p className="text-xs text-emerald-700"><strong>Connected Wallet:</strong> {formatWalletAddress(selectedCryptoWallet.address)}</p>
+              </div>
+            )}
+
             <form onSubmit={handleCryptoSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
@@ -798,6 +805,20 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
                 />
               </div>
+
+              {cryptoAction === 'send' && selectedCryptoWallet.provider === 'thirdweb' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">Recipient Address</label>
+                  <input
+                    type="text"
+                    value={selectedCryptoWallet.recipientAddress || ''}
+                    onChange={e => selectedCryptoWallet.recipientAddress = e.target.value}
+                    placeholder="0x..."
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-sm font-mono"
+                  />
+                </div>
+              )}
+
               <div className="flex items-center gap-3">
                 <label className="text-sm text-slate-600">Action</label>
                 <select value={cryptoAction} onChange={e => setCryptoAction(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg text-sm">
