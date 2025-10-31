@@ -42,15 +42,10 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [success, setSuccess] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [enabledCurrencies, setEnabledCurrencies] = useState([])
-  const [activeTab, setActiveTab] = useState('mywallets')
-  const [houseBalances, setHouseBalances] = useState([])
-  const [houseTransactions, setHouseTransactions] = useState([])
 
   useEffect(() => {
     loadWallets()
     loadPreferences()
-    // also refresh house/network data
-    loadHouseData()
   }, [userId])
 
   const loadPreferences = () => {
@@ -132,52 +127,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         savePreferences(['PHP', 'USD'])
       }
 
-      // Fetch house balances and recent house-related transactions
-      try {
-        const { data: hb } = await supabase.from('wallets_house').select('*')
-        setHouseBalances(hb || [])
-      } catch (e) {
-        console.warn('Failed to load wallets_house:', e)
-      }
-
-      try {
-        const { data: txs } = await supabase.from('wallet_transactions')
-          .select('*')
-          .in('type', ['rake','deposit','transfer_in'])
-          .order('created_at', { ascending: false })
-          .limit(50)
-        setHouseTransactions(txs || [])
-      } catch (e) {
-        console.warn('Failed to load house transactions:', e)
-      }
     } catch (err) {
       console.error('Error loading wallets:', err)
       setWallets([])
       setError('')
     } finally {
       setLoading(false)
-    }
-  }
-
-  const loadHouseData = async () => {
-    try {
-      const { data: hb, error: hbErr } = await supabase.from('wallets_house').select('*')
-      if (hbErr) throw hbErr
-      setHouseBalances(hb || [])
-    } catch (e) {
-      console.warn('Failed to load wallets_house:', e)
-    }
-
-    try {
-      const { data: txs, error: txErr } = await supabase.from('wallet_transactions')
-        .select('*')
-        .in('type', ['rake','deposit','transfer_in'])
-        .order('created_at', { ascending: false })
-        .limit(50)
-      if (txErr) throw txErr
-      setHouseTransactions(txs || [])
-    } catch (e) {
-      console.warn('Failed to load house transactions:', e)
     }
   }
 
@@ -270,27 +225,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           <p className="text-xs text-slate-500 mt-1">Total value (PHP): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Tabs */}
-          <div className="bg-slate-50 rounded-full p-1 flex items-center text-sm">
-            <button
-              onClick={() => setActiveTab('mywallets')}
-              className={`px-3 py-1 rounded-full ${activeTab === 'mywallets' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
-              My Wallets
-            </button>
-            <button
-              onClick={() => setActiveTab('network')}
-              className={`px-3 py-1 rounded-full ${activeTab === 'network' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
-              Network Balances
-            </button>
-          </div>
-
-          {/* Small house summary */}
-          <div className="text-right">
-            <div className="text-xs text-slate-500">House Balances</div>
-            <div className="text-sm font-mono">{houseBalances.length > 0 ? houseBalances.map(h => `${h.currency}: ${Number(h.balance||0).toFixed(2)}`).join(' • ') : 'No house data'}</div>
-          </div>
-
+        <div>
           <button
             onClick={() => setShowPreferences(true)}
             className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
@@ -384,64 +319,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      )}
-      {activeTab === 'network' && (
-        <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-medium">Network / House Balances</h3>
-            <div className="flex gap-2">
-              <button onClick={() => loadWallets()} className="px-3 py-1 bg-slate-100 text-slate-700 rounded">Refresh</button>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            {houseBalances.length === 0 ? (
-              <p className="text-sm text-slate-500">No house balances available.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {houseBalances.map(h => (
-                  <div key={h.id} className="p-4 bg-slate-50 rounded">
-                    <div className="text-xs text-slate-500">{h.wallet_type.toUpperCase()} • {h.network || h.currency}</div>
-                    <div className="text-xl font-mono">{h.currency} {Number(h.balance || 0).toFixed(2)}</div>
-                    {h.metadata && <div className="text-xs text-slate-400 truncate mt-1">{JSON.stringify(h.metadata).slice(0,80)}</div>}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium mb-2">Recent House Transactions</h4>
-            {houseTransactions.length === 0 ? (
-              <p className="text-sm text-slate-500">No recent transactions.</p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-left text-slate-500">
-                      <th className="pr-4">Time</th>
-                      <th className="pr-4">Type</th>
-                      <th className="pr-4">Amount</th>
-                      <th className="pr-4">Currency</th>
-                      <th className="pr-4">Desc</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {houseTransactions.map(t => (
-                      <tr key={t.id} className="border-t">
-                        <td className="py-2">{new Date(t.created_at).toLocaleString()}</td>
-                        <td className="py-2">{t.type}</td>
-                        <td className="py-2 font-mono">{Number(t.amount || 0).toFixed(2)}</td>
-                        <td className="py-2">{t.currency_code}</td>
-                        <td className="py-2 truncate">{t.description || ''}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
           </div>
         </div>
       )}
