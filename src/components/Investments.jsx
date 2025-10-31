@@ -202,8 +202,8 @@ export default function Investments({ userId }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-light text-slate-900">Investment Opportunities</h2>
         <div>
           <p className="text-sm text-slate-500">Manage and invest in listed projects.</p>
