@@ -16,7 +16,9 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { secp256k1 } from '@noble/secp256k1';
-import { sha256, ripemd160, keccak_256 } from '@noble/hashes/sha3';
+import { sha256 } from '@noble/hashes/sha256';
+import { ripemd160 } from '@noble/hashes/ripemd160';
+import { keccak_256 } from '@noble/hashes/sha3';
 import { ed25519 } from '@noble/ed25519';
 import bs58 from 'bs58';
 
