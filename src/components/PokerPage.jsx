@@ -548,7 +548,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                         onClick={() => handleLeaveTable(selectedTable.id)}
                         className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
                       >
-                        Leave Table
+                        Leave Seat
                       </button>
                     )}
                   </div>
