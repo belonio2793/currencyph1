@@ -110,6 +110,12 @@ export default function Wallet({ userId }) {
 
   const handleCreateWallet = async (currency) => {
     try {
+      // Validate user before attempting wallet creation
+      if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
+        setError('Please sign in to create wallets')
+        return
+      }
+
       await wisegcashAPI.createWallet(userId, currency)
       loadWallets()
       setSuccess(`${currency} wallet created`)
