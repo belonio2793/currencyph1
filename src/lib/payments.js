@@ -1,6 +1,4 @@
 import { supabase } from './supabaseClient'
-
-import { supabase } from './supabaseClient'
 import { currencyAPI } from './currencyAPI'
 
 // Helper: generate numeric account number of given length
