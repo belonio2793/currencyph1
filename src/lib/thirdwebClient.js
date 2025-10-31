@@ -245,20 +245,7 @@ export async function sendCryptoTransaction(userId, toAddress, value, chainId, s
   }
 }
 
-// Lazy load Thirdweb SDK if needed for advanced features
-export async function loadThirdwebSDK() {
-  if (window.__thirdwebSDKLoaded) {
-    return window.__thirdwebSDK
-  }
-
-  try {
-    const { createThirdwebClient } = await import('thirdweb')
-    const sdk = createThirdwebClient({ clientId: CLIENT_ID })
-    window.__thirdwebSDK = sdk
-    window.__thirdwebSDKLoaded = true
-    return sdk
-  } catch (error) {
-    console.warn('Failed to load Thirdweb SDK:', error)
-    return null
-  }
+// Check if wallet provider is available
+export function isWalletAvailable() {
+  return hasWeb3Provider()
 }
