@@ -788,8 +788,19 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                     try {
                       setBatchCreating(true)
                       setBatchResult(null)
-                      const { data, error } = await supabase.functions.invoke('create-wallet-batch', { body: { create_house: true } })
-                      if (error) throw error
+                      const url = `${import.meta.env.VITE_PROJECT_URL.replace(/\/+$/,'')}/functions/v1/create-wallet-batch`
+                      const res = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+                        },
+                        body: JSON.stringify({ create_house: true })
+                      })
+                      const data = await res.json().catch(() => null)
+                      if (!res.ok) {
+                        throw new Error(data?.error?.message || data?.message || `HTTP ${res.status}`)
+                      }
                       setBatchResult(data)
                       await loadNetworkWallets()
                     } catch (e) {
