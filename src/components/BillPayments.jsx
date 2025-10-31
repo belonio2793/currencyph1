@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { wisegcashAPI } from '../lib/payments'
 
 export default function BillPayments({ userId }) {
   const [bills, setBills] = useState([])

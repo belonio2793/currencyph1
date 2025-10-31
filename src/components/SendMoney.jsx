@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { wisegcashAPI } from '../lib/payments'
 import { currencySymbols, formatCurrency, getCurrencySymbol } from '../lib/currency'
 
 export default function SendMoney({ userId }) {

@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { wisegcashAPI } from './wisegcashAPI'
+import { wisegcashAPI } from './payments'
 
 // Sign mapping for transaction types: negative for outflows, positive for inflows
 const isDebitType = (type) => {

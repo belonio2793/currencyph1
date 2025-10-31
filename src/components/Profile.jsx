@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 
 const COUNTRIES = [
