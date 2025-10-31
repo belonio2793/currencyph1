@@ -1,5 +1,40 @@
 import { supabase } from './supabaseClient'
 
+// Helper: generate numeric account number of given length
+const generateAccountNumber = (length = 12) => {
+  const digits = '0123456789'
+  let s = ''
+  for (let i = 0; i < length; i++) s += digits[Math.floor(Math.random() * digits.length)]
+  return s
+}
+
+// Helper: generate a unique account number by checking the wallets table
+const generateUniqueAccountNumber = async (length = 12, attempts = 10) => {
+  for (let i = 0; i < attempts; i++) {
+    const candidate = generateAccountNumber(length)
+    try {
+      const { data, error } = await supabase
+        .from('wallets')
+        .select('id')
+        .eq('account_number', candidate)
+        .limit(1)
+
+      if (error) {
+        // If the query fails for some reason, log and retry
+        console.warn('Account number uniqueness check failed, retrying', error)
+        continue
+      }
+
+      if (!data || data.length === 0) return candidate
+      // otherwise collision, try again
+    } catch (err) {
+      console.warn('Error checking account number uniqueness', err)
+      continue
+    }
+  }
+  throw new Error('Could not generate unique account number after multiple attempts')
+}
+
 export const wisegcashAPI = {
   // ============ User Management ============
   async getOrCreateUser(email, fullName = 'User') {
@@ -134,12 +169,8 @@ export const wisegcashAPI = {
         .eq('id', userId)
         .maybeSingle()
 
-      // If user doesn't exist and there's no error, that's fine - they just don't have a record yet
-      // The foreign key constraint might still fail later, but let's try
       if (userCheckError && userCheckError.code !== 'PGRST116') {
-        // PGRST116 = "no rows returned" which is expected sometimes
         console.warn('Warning checking user existence:', userCheckError)
-        // Don't fail completely, just warn and continue
       }
     } catch (err) {
       console.warn('Could not verify user, but will attempt wallet creation anyway:', err)
@@ -157,6 +188,9 @@ export const wisegcashAPI = {
       return existing
     }
 
+    // Generate a unique account number for the wallet
+    const accountNumber = await generateUniqueAccountNumber(12, 12)
+
     // Create new wallet
     const { data, error } = await supabase
       .from('wallets')
@@ -167,7 +201,8 @@ export const wisegcashAPI = {
           balance: 0,
           total_deposited: 0,
           total_withdrawn: 0,
-          is_active: true
+          is_active: true,
+          account_number: accountNumber
         }
       ])
       .select()
@@ -408,263 +443,42 @@ export const wisegcashAPI = {
     return data
   },
 
-  async getBeneficiaries(userId) {
+  // ============ Account number utilities ============
+  async assignAccountNumberToWallet(walletId, length = 12) {
+    if (!walletId) throw new Error('walletId is required')
+    const accountNumber = await generateUniqueAccountNumber(length, 12)
     const { data, error } = await supabase
-      .from('beneficiaries')
-      .select('*')
-      .eq('user_id', userId)
-      .order('is_favorite', { ascending: false })
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return data || []
-  },
-
-  async updateBeneficiary(beneficiaryId, updates) {
-    const { data, error } = await supabase
-      .from('beneficiaries')
-      .update(updates)
-      .eq('id', beneficiaryId)
+      .from('wallets')
+      .update({ account_number: accountNumber })
+      .eq('id', walletId)
       .select()
-      .single()
-
-    if (error) throw error
-    return data
-  },
-
-  async deleteBeneficiary(beneficiaryId) {
-    const { error } = await supabase
-      .from('beneficiaries')
-      .delete()
-      .eq('id', beneficiaryId)
-
-    if (error) throw error
-    return true
-  },
-
-  // ============ Bills ============
-  async createBill(userId, billData) {
-    const { data, error } = await supabase
-      .from('bills')
-      .insert([
-        {
-          user_id: userId,
-          ...billData,
-          reference_number: `BILL-${Date.now()}`
-        }
-      ])
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
-  },
-
-  async getBills(userId) {
-    const { data, error } = await supabase
-      .from('bills')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return data || []
-  },
-
-  async payBill(billId, userId, amount, currencyCode = 'PHP') {
-    const wallet = await this.getWallet(userId, currencyCode)
-    if (!wallet || wallet.balance < amount) {
-      throw new Error('Insufficient balance')
-    }
-
-    const txnId = `PAY-${Date.now()}`
-
-    try {
-      await supabase.rpc('record_wallet_transaction', {
-        p_user_id: userId,
-        p_wallet_id: wallet.id,
-        p_transaction_type: 'purchase',
-        p_amount: amount,
-        p_currency_code: currencyCode,
-        p_description: `Bill payment`,
-        p_reference_id: txnId
-      })
-
-      const { data: payment, error } = await supabase
-        .from('bill_payments')
-        .insert([
-          {
-            bill_id: billId,
-            user_id: userId,
-            amount,
-            currency_code: currencyCode,
-            transaction_id: txnId,
-            status: 'completed'
-          }
-        ])
-        .select()
-        .single()
-
-      if (error) throw error
-
-      await supabase
-        .from('bills')
-        .update({ status: 'paid', updated_at: new Date() })
-        .eq('id', billId)
-
-      return payment
-    } catch (err) {
-      console.error('Pay bill error:', err)
-      throw err
-    }
-  },
-
-  async getBillPayments(userId) {
-    const { data, error } = await supabase
-      .from('bill_payments')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-
-    if (error) throw error
-    return data || []
-  },
-
-  // ============ Wallet Transactions (NEW) ============
-  async getWalletTransactions(userId, limit = 50) {
-    if (!userId || userId === 'null' || userId === 'undefined') return []
-
-    const { data, error } = await supabase
-      .from('wallet_transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
-    return data || []
-  },
-
-  async getWalletTransactionsByType(userId, type, limit = 50) {
-    if (!userId || userId === 'null' || userId === 'undefined') return []
-
-    const { data, error } = await supabase
-      .from('wallet_transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('type', type)
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
-    return data || []
-  },
-
-  async getWalletTransactionsByCurrency(userId, currencyCode, limit = 50) {
-    if (!userId || userId === 'null' || userId === 'undefined') return []
-
-    const { data, error } = await supabase
-      .from('wallet_transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('currency_code', currencyCode)
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
-    return data || []
-  },
-
-  // ============ Legacy Transactions (for compatibility) ============
-  async createTransaction(userId, transactionType, amount, currencyCode, description, referenceNumber = null) {
-    const { data, error } = await supabase
-      .from('transactions')
-      .insert([
-        {
-          user_id: userId,
-          transaction_type: transactionType,
-          amount,
-          currency_code: currencyCode,
-          description,
-          reference_number: referenceNumber || `TXN-${Date.now()}`,
-          status: 'completed'
-        }
-      ])
-      .select()
-      .single()
-
-    if (error) throw error
-    return data
-  },
-
-  async getTransactions(userId, limit = 20) {
-    if (!userId || userId === 'null' || userId === 'undefined') return []
-
-    const { data, error } = await supabase
-      .from('transactions')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(limit)
-
-    if (error) throw error
-    return data || []
-  },
-
-  // ============ Currencies (NEW) ============
-  async getCurrencies(activeOnly = true) {
-    let query = supabase.from('currencies').select('*')
-    
-    if (activeOnly) {
-      query = query.eq('active', true)
-    }
-
-    const { data, error } = await query.order('is_default', { ascending: false }).order('code')
-
-    if (error) throw error
-    return data || []
-  },
-
-  async getCurrencyByCode(code) {
-    const { data, error } = await supabase
-      .from('currencies')
-      .select('*')
-      .eq('code', code)
-      .single()
-
-    if (error && error.code === 'PGRST116') return null
-    if (error) throw error
-    return data
-  },
-
-  // ============ Exchange Rates ============
-  async getExchangeRate(fromCurrency, toCurrency) {
-    if (fromCurrency === toCurrency) return 1
-
-    const { data, error } = await supabase
-      .from('currency_rates')
-      .select('rate')
-      .eq('from_currency', fromCurrency)
-      .eq('to_currency', toCurrency)
       .single()
 
     if (error) {
-      console.warn(`Exchange rate not found for ${fromCurrency} to ${toCurrency}`)
-      return null
+      console.error('Failed assigning account number to wallet', { walletId, error })
+      throw error
     }
-    if (error) throw error
-    return data?.rate || null
+    return data
   },
 
-  async getExchangeRates(currencies = []) {
-    if (!currencies.length) return []
-
-    const { data, error } = await supabase
-      .from('currency_rates')
-      .select('*')
-      .in('from_currency', currencies)
-
-    if (error) throw error
-    return data || []
+  // Ensure all wallets for a user have account numbers. Returns the up-to-date wallets array.
+  async ensureWalletsHaveAccountNumbers(userId) {
+    if (!userId) return []
+    const wallets = await this.getWallets(userId)
+    const updated = []
+    for (const w of wallets) {
+      if (!w.account_number) {
+        try {
+          const newW = await this.assignAccountNumberToWallet(w.id)
+          updated.push(newW)
+        } catch (err) {
+          console.warn('Could not assign account number to wallet', w.id, err)
+          updated.push(w)
+        }
+      } else {
+        updated.push(w)
+      }
+    }
+    return updated
   }
 }
