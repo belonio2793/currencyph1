@@ -185,24 +185,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 </button>
               ))}
 
-              {/* include secondary nav in mobile list */}
-              {secondaryNav.map(btn => (
-                <button
-                  key={btn.id}
-                  onClick={() => {
-                    onTabChange(btn.id)
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === btn.id
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-slate-700 hover:bg-slate-50'
-                  }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-
               {/* Mobile auth buttons */}
               <div className="pt-2 border-t border-slate-100 space-y-1">
                 {userEmail ? (
