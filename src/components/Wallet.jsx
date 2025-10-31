@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
+import { formatNumber } from '../lib/currency'
 
 const FIAT_CURRENCIES = [
   'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD',
@@ -27,7 +28,7 @@ const CURRENCY_SYMBOLS = {
   'AVAX': 'AVAX', 'DOT': 'DOT'
 }
 
-export default function Wallet({ userId }) {
+export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [wallets, setWallets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
@@ -180,7 +181,10 @@ export default function Wallet({ userId }) {
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-3xl font-light text-slate-900 tracking-tight">My Wallets</h2>
+        <div>
+          <h2 className="text-3xl font-light text-slate-900 tracking-tight">My Wallets</h2>
+          <p className="text-xs text-slate-500 mt-1">Total value (PHP): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
+        </div>
         <button
           onClick={() => setShowPreferences(true)}
           className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
