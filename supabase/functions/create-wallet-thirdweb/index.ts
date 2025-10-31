@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
     // Require ThirdWeb to return a valid address — fail otherwise
     if (!address) {
       console.error('ThirdWeb did not return an address for chain:', chainConfig.name, 'response:', thirdwebResp)
-      return new Response(JSON.stringify({ error: `ThirdWeb wallet creation failed for chain ${chainConfig.name}`, details: thirdwebResp }), { status: 502, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+      return new Response(JSON.stringify({ error: `ThirdWeb wallet creation failed for chain ${chainConfig.name}`, details: thirdwebResp }), { status: 502, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
     }
 
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
