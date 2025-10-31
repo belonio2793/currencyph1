@@ -2,13 +2,13 @@
 // POST /functions/v1/create-wallet-pairs
 // Body: { user_id, chain_id, create_house?: boolean }
 
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-import * as secp from 'https://cdn.jsdelivr.net/npm/@noble/secp256k1@1.9.0/+esm'
-import { sha256 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.0/sha256/+esm'
-import { ripemd160 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.0/ripemd160/+esm'
-import { keccak_256 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.2/sha3/+esm'
-import * as ed25519 from 'https://cdn.jsdelivr.net/npm/@noble/ed25519@1.7.3/+esm'
-import base58 from 'https://cdn.jsdelivr.net/npm/bs58@4.0.1/+esm'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4'
+import * as secp from 'https://esm.sh/@noble/secp256k1@2.0.0'
+import { sha256 } from 'https://esm.sh/@noble/hashes@1.3.2/sha256'
+import { ripemd160 } from 'https://esm.sh/@noble/hashes@1.3.2/ripemd160'
+import { keccak_256 } from 'https://esm.sh/@noble/hashes@1.3.2/sha3'
+import * as ed25519 from 'https://esm.sh/@noble/ed25519@2.0.0'
+import base58 from 'https://esm.sh/bs58@5.0.0'
 
 const CHAIN_CONFIGS = {
   0: { name: 'bitcoin', chainId: 0, symbol: 'BTC' },
@@ -37,15 +37,15 @@ const CHAIN_CONFIGS = {
   245022926: { name: 'solana', chainId: 245022926, symbol: 'SOL' }
 }
 
-const toHex = (b) => Array.from(b).map(x => x.toString(16).padStart(2, '0')).join('')
-const toBase64 = (buf) => {
+const toHex = (b: Uint8Array) => Array.from(b).map(x => x.toString(16).padStart(2, '0')).join('')
+const toBase64 = (buf: ArrayBuffer | Uint8Array) => {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf)
   let binary = ''
   for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i])
   return btoa(binary)
 }
 
-async function aesGcmEncryptString(plaintext, keyString) {
+async function aesGcmEncryptString(plaintext: string, keyString: string) {
   const enc = new TextEncoder()
   const keyMaterial = await crypto.subtle.digest('SHA-256', enc.encode(keyString))
   const cryptoKey = await crypto.subtle.importKey('raw', keyMaterial, 'AES-GCM', false, ['encrypt', 'decrypt'])
@@ -55,31 +55,40 @@ async function aesGcmEncryptString(plaintext, keyString) {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type, Authorization' } })
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization'
   }
+
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 
   try {
     const PROJECT_URL = Deno.env.get('SUPABASE_URL')
     const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    if (!PROJECT_URL || !SERVICE_ROLE_KEY) return new Response(JSON.stringify({ error: 'Missing configuration' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    if (!PROJECT_URL || !SERVICE_ROLE_KEY)
+      return new Response(JSON.stringify({ error: 'Missing configuration' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     const body = await req.json().catch(() => null)
-    if (!body || (!body.user_id && !body.create_house) || typeof body.chain_id === 'undefined') return new Response(JSON.stringify({ error: 'Missing user_id or chain_id' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    if (!body || (!body.user_id && !body.create_house) || typeof body.chain_id === 'undefined')
+      return new Response(JSON.stringify({ error: 'Missing user_id or chain_id' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
     const user_id = body.create_house ? HOUSE_ID : body.user_id
     const chain_id = Number(body.chain_id)
     const createHouse = !!body.create_house
 
-    let chainConfig = CHAIN_CONFIGS[chain_id] || { name: `chain-${chain_id}`, chainId: chain_id, symbol: 'UNKNOWN' }
+    const chainConfig = CHAIN_CONFIGS[chain_id] || { name: `chain-${chain_id}`, chainId: chain_id, symbol: 'UNKNOWN' }
 
     let address = ''
-    let public_key = null
-    let encrypted_private_key = null
+    let public_key = ''
+    let encrypted_private_key: any = null
 
     if (chainConfig.name === 'bitcoin') {
       const priv = secp.utils.randomPrivateKey()
@@ -89,7 +98,7 @@ Deno.serve(async (req) => {
       const payload = new Uint8Array(1 + pubHash.length)
       payload[0] = 0x00
       payload.set(pubHash, 1)
-      const checksum = sha256(sha256(payload)).slice(0,4)
+      const checksum = sha256(sha256(payload)).slice(0, 4)
       const addrBytes = new Uint8Array(payload.length + 4)
       addrBytes.set(payload, 0)
       addrBytes.set(checksum, payload.length)
@@ -116,23 +125,28 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
-    const metadata = { chainName: chainConfig.name, chainSymbol: chainConfig.symbol, generated_at: new Date().toISOString(), public_key, address }
+    const metadata: any = { chainName: chainConfig.name, chainSymbol: chainConfig.symbol, generated_at: new Date().toISOString(), public_key, address }
     if (encrypted_private_key) metadata.encrypted_private_key = encrypted_private_key
 
-    const { data: upserted, error: upsertErr } = await supabase.from('wallets_crypto').upsert([
-      {
-        user_id,
-        chain: (chainConfig.name || '').toUpperCase(),
-        chain_id,
-        address,
-        provider: createHouse ? 'house' : 'manual',
-        balance: 0,
-        metadata,
-        updated_at: new Date().toISOString()
-      }
-    ], { onConflict: 'user_id,chain,address' }).select().single()
+    const { data: upserted, error: upsertErr } = await supabase
+      .from('wallets_crypto')
+      .upsert([
+        {
+          user_id,
+          chain: (chainConfig.name || '').toUpperCase(),
+          chain_id,
+          address,
+          provider: createHouse ? 'house' : 'manual',
+          balance: 0,
+          metadata,
+          updated_at: new Date().toISOString()
+        }
+      ], { onConflict: 'user_id,chain,address' })
+      .select()
+      .single()
 
-    if (upsertErr) return new Response(JSON.stringify({ error: upsertErr.message }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    if (upsertErr)
+      return new Response(JSON.stringify({ error: upsertErr.message }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     let houseRow = null
     if (createHouse) {
@@ -148,10 +162,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ ok: true, wallet: { id: upserted.id, address: upserted.address, chain_id: upserted.chain_id, chain: upserted.chain, provider: upserted.provider || (createHouse ? 'house' : 'manual'), chainName: chainConfig.name, chainSymbol: chainConfig.symbol }, house: houseRow }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
-
+    return new Response(JSON.stringify({ ok: true, wallet: { id: upserted.id, address: upserted.address, chain_id: upserted.chain_id, chain: upserted.chain, provider: upserted.provider || (createHouse ? 'house' : 'manual'), chainName: chainConfig.name, chainSymbol: chainConfig.symbol }, house: houseRow }), { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   } catch (err) {
     console.error('create-wallet-pairs error', err)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
   }
 })
