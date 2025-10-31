@@ -204,10 +204,9 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                           <div
                             key={index}
                             className={`
-                              aspect-square flex items-center justify-center p-0 leading-none
-                              ${isLight ? 'bg-emerald-700' : 'bg-emerald-900'}
-                              transition-all
+                              aspect-square flex items-center justify-center p-0 leading-none transition-all
                             `}
+                            style={{ backgroundColor: isLight ? '#F1F2D1' : '#6B8F4E' }}
                           >
                             {piece && (
                               <span
