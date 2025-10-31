@@ -242,8 +242,30 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (userId) loadTotalBalance(userId)
-    else setTotalBalancePHP(0)
+    if (userId) {
+      loadTotalBalance(userId)
+    } else {
+      setTotalBalancePHP(0)
+    }
+
+    let channel = null
+    if (userId && !userId.includes('guest-local')) {
+      try {
+        channel = supabase
+          .channel('public:wallets')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets', filter: `user_id=eq.${userId}` }, () => {
+            // Recalculate total whenever wallets change for this user
+            loadTotalBalance(userId).catch(() => {})
+          })
+          .subscribe()
+      } catch (e) {
+        console.warn('Wallets realtime subscription failed', e)
+      }
+    }
+
+    return () => {
+      try { if (channel && typeof channel.unsubscribe === 'function') channel.unsubscribe() } catch (e) { /* ignore */ }
+    }
   }, [userId])
 
   const handleAuthSuccess = async (user) => {
