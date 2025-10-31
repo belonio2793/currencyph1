@@ -1,7 +1,7 @@
 export default function About() {
   return (
-    <div className="min-h-screen bg-slate-50 py-12">
-      <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow border border-slate-200">
+    <div className="min-h-screen bg-slate-50 py-6">
+      <div className="max-w-5xl mx-auto bg-white p-6 rounded-2xl shadow border border-slate-200">
         <h1 className="text-3xl font-bold text-slate-900 mb-4">About currency.ph</h1>
 
         <p className="mb-4 text-slate-700">
