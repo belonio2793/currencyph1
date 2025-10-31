@@ -111,8 +111,6 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
 
           if (updateError) throw updateError
 
-          if (updateError) throw updateError
-
           setLastMove(move)
           setSelectedSquare(null)
           setError(null)
