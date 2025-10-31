@@ -1,5 +1,8 @@
 import { supabase } from './supabaseClient'
 
+import { supabase } from './supabaseClient'
+import { currencyAPI } from './currencyAPI'
+
 // Helper: generate numeric account number of given length
 const generateAccountNumber = (length = 12) => {
   const digits = '0123456789'
@@ -441,6 +444,70 @@ export const wisegcashAPI = {
 
     if (error) throw error
     return data
+  },
+
+  // ============ Exchange rate helpers ============
+  async getExchangeRate(from, to) {
+    if (!from || !to) return null
+    if (from === to) return 1
+
+    try {
+      // Try DB first (currency_rates table)
+      const { data, error } = await supabase
+        .from('currency_rates')
+        .select('rate')
+        .eq('from_currency', from)
+        .eq('to_currency', to)
+        .maybeSingle()
+
+      if (!error && data && typeof data.rate !== 'undefined') {
+        return Number(data.rate)
+      }
+    } catch (e) {
+      // ignore and fallback
+    }
+
+    try {
+      const conv = await currencyAPI.convert(1, from, to)
+      if (conv && conv.rate) return Number(conv.rate)
+    } catch (e) {
+      console.warn('Failed to compute exchange rate via currencyAPI', e)
+    }
+
+    return null
+  },
+
+  async getAllExchangeRates() {
+    try {
+      const { data, error } = await supabase
+        .from('currency_rates')
+        .select('from_currency,to_currency,rate')
+
+      if (!error && data) return data
+    } catch (e) {
+      console.warn('Failed to fetch currency_rates from DB', e)
+    }
+
+    // Fallback: build from currencyAPI global rates
+    try {
+      const globalRates = await currencyAPI.getGlobalRates()
+      const arr = []
+      const codes = Object.keys(globalRates || {})
+      codes.forEach(from => {
+        codes.forEach(to => {
+          if (from === to) return
+          const rateFrom = globalRates[from]?.rate || 0
+          const rateTo = globalRates[to]?.rate || 0
+          if (rateFrom > 0 && rateTo > 0) {
+            arr.push({ from_currency: from, to_currency: to, rate: rateTo / rateFrom })
+          }
+        })
+      })
+      return arr
+    } catch (e) {
+      console.warn('Fallback building exchange rates failed', e)
+      return []
+    }
   },
 
   // ============ Account number utilities ============
