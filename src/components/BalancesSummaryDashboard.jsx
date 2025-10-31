@@ -17,17 +17,54 @@ export default function BalancesSummaryDashboard({ userId }) {
   useEffect(() => {
     fetchBalancesData()
 
-    const channel = supabase
-      .channel('public:wallet_transactions')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'wallet_transactions' },
-        () => fetchBalancesData()
-      )
-      .subscribe()
+    const channels = []
+
+    try {
+      const chTx = supabase
+        .channel('public:wallet_transactions')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallet_transactions' }, () => fetchBalancesData())
+        .subscribe()
+      channels.push(chTx)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallet_transactions realtime:', e)
+    }
+
+    try {
+      const chW = supabase
+        .channel('public:wallets')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets' }, () => fetchBalancesData())
+        .subscribe()
+      channels.push(chW)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets realtime:', e)
+    }
+
+    try {
+      const chF = supabase
+        .channel('public:wallets_fiat')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_fiat' }, () => fetchBalancesData())
+        .subscribe()
+      channels.push(chF)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets_fiat realtime:', e)
+    }
+
+    try {
+      const chC = supabase
+        .channel('public:wallets_crypto')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_crypto' }, () => fetchBalancesData())
+        .subscribe()
+      channels.push(chC)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets_crypto realtime:', e)
+    }
 
     return () => {
-      channel.unsubscribe()
+      try {
+        channels.forEach(c => c && c.unsubscribe && c.unsubscribe())
+      } catch (e) {
+        // ignore
+      }
     }
   }, [])
 
