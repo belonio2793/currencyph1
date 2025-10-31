@@ -5,10 +5,17 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
+// Crypto utilities for Bitcoin key generation and encoding
+import * as secp from 'https://cdn.jsdelivr.net/npm/@noble/secp256k1/+esm'
+import { sha256 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes/sha256/+esm'
+import { ripemd160 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes/ripemd160/+esm'
+import base58 from 'https://cdn.jsdelivr.net/npm/bs58/+esm'
+
 // Chain configurations with Thirdweb RPC endpoints (expanded)
 // This list contains many commonly supported chains by Thirdweb. If a chain_id is not present
 // we will fall back to a generic entry so the edge function remains flexible.
 const CHAIN_CONFIGS = {
+  0: { name: 'bitcoin', chainId: 0, symbol: 'BTC' },
   1: { name: 'ethereum', chainId: 1, symbol: 'ETH' },
   10: { name: 'optimism', chainId: 10, symbol: 'OP' },
   56: { name: 'bsc', chainId: 56, symbol: 'BNB' },
