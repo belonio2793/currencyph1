@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import ChessEngine from '../lib/chessEngine'
+import { getBestMove, difficultyLabel } from '../lib/chessAI'
 
 const PIECE_SYMBOLS = {
   'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔',
