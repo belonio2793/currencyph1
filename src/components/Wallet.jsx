@@ -2,18 +2,29 @@ import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
 import { preferencesManager } from '../lib/preferencesManager'
 
-const ALL_CURRENCIES = [
-  'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD', 
-  'CAD', 'CHF', 'SEK', 'NZD', 'SGD', 'HKD', 'IDR', 'MYR', 
+const FIAT_CURRENCIES = [
+  'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD',
+  'CAD', 'CHF', 'SEK', 'NZD', 'SGD', 'HKD', 'IDR', 'MYR',
   'THB', 'VND', 'KRW', 'ZAR', 'BRL', 'MXN', 'NOK', 'DKK', 'AED'
 ]
+
+const CRYPTO_CURRENCIES = [
+  'BTC', 'ETH', 'XRP', 'ADA', 'SOL', 'DOGE', 'MATIC', 'LINK',
+  'LTC', 'BCH', 'USDT', 'USDC', 'BUSD', 'SHIB', 'AVAX', 'DOT'
+]
+
+const ALL_CURRENCIES = [...FIAT_CURRENCIES, ...CRYPTO_CURRENCIES]
 
 const CURRENCY_SYMBOLS = {
   'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
   'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
   'MYR': 'RM', 'THB': '฿', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
-  'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ'
+  'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ',
+  'BTC': '₿', 'ETH': 'Ξ', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
+  'DOGE': 'Ð', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'Ł', 'BCH': 'BCH',
+  'USDT': 'USDT', 'USDC': 'USDC', 'BUSD': 'BUSD', 'SHIB': 'SHIB',
+  'AVAX': 'AVAX', 'DOT': 'DOT'
 }
 
 export default function Wallet({ userId }) {
