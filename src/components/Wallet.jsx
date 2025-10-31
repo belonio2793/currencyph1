@@ -114,7 +114,9 @@ export default function Wallet({ userId }) {
       loadWallets()
       setSuccess(`${currency} wallet created`)
     } catch (err) {
-      setError(`Failed to create ${currency} wallet`)
+      console.error(`Wallet creation error for ${currency}:`, err)
+      const errorMsg = err?.message || String(err) || 'Unknown error'
+      setError(`Failed to create ${currency} wallet: ${errorMsg}`)
     }
   }
 
