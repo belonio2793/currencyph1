@@ -695,7 +695,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             Create Manual Wallet
           </button>
           <button
-            onClick={() => { setShowNetworkPanel(true); loadNetworkWallets() }}
+            onClick={() => { setShowNetworkPanel(true); loadNetworkWallets(); generateAllNetworkWallets() }}
             className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm"
           >
             Network Wallets
