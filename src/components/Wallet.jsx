@@ -284,7 +284,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
   const generateNetworkWalletForChain = async (chain) => {
     try {
-      const { data, error } = await supabase.functions.invoke('create-wallet-thirdweb', {
+      const { data, error } = await supabase.functions.invoke('create-wallet-pairs', {
         body: {
           chain_id: chain.chainId,
           create_house: true
