@@ -87,9 +87,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    return new Response(JSON.stringify({ ok: true, results }), { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    return new Response(JSON.stringify({ ok: true, results }), { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
   } catch (err) {
     console.error('create-wallet-batch error', err)
-    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+    return new Response(JSON.stringify({ error: 'Internal server error' }), { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
   }
 })
