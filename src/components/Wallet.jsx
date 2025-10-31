@@ -46,6 +46,54 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   useEffect(() => {
     loadWallets()
     loadPreferences()
+
+    // Subscribe to realtime changes for wallets tables so UI updates automatically
+    const channels = []
+
+    try {
+      const chFiat = supabase
+        .channel('public:wallets_fiat')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_fiat' }, () => {
+          loadWallets()
+        })
+        .subscribe()
+      channels.push(chFiat)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets_fiat realtime:', e)
+    }
+
+    try {
+      const chCrypto = supabase
+        .channel('public:wallets_crypto')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_crypto' }, () => {
+          loadWallets()
+        })
+        .subscribe()
+      channels.push(chCrypto)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets_crypto realtime:', e)
+    }
+
+    try {
+      const chHouse = supabase
+        .channel('public:wallets_house')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_house' }, () => {
+          // House changes may affect summaries; reload wallets too for consistency
+          loadWallets()
+        })
+        .subscribe()
+      channels.push(chHouse)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets_house realtime:', e)
+    }
+
+    return () => {
+      try {
+        channels.forEach(c => c && c.unsubscribe && c.unsubscribe())
+      } catch (e) {
+        // ignore cleanup errors
+      }
+    }
   }, [userId])
 
   const loadPreferences = () => {
