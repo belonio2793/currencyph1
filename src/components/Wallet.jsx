@@ -771,6 +771,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                   {nw?.metadata?.public_key && (
                     <div className="mt-1 text-xs text-slate-500 break-all">Public Key: {nw.metadata.public_key}</div>
                   )}
+                  <div className="mt-2 text-xs text-slate-400">Wallet ID: <span className="font-mono">{nw.id}</span></div>
+                  {nw.updated_at && <div className="text-xs text-slate-400">Updated: {new Date(nw.updated_at).toLocaleString()}</div> }
                 </div>
               )) : (
                 <div className="p-4 text-sm text-slate-500">No network wallets found. Click "Generate All" to create house wallets for all supported chains.</div>
