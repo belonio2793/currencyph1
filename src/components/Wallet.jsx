@@ -616,25 +616,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 Connect Web3 Wallet
               </button>
               <button
-                onClick={async () => {
-                  try {
-                    setError('')
-                    setSuccess('')
-                    // create a default crypto wallet (BTC)
-                    await supabase.from('wallets_crypto').insert([{
-                      user_id: userId,
-                      chain: 'BTC',
-                      balance: 0,
-                      address: null,
-                      provider: 'manual'
-                    }])
-                    setSuccess('Crypto wallet created')
-                    await loadWallets()
-                  } catch (e) {
-                    console.error('Failed to create crypto wallet', e)
-                    setError('Failed to create crypto wallet')
-                  }
-                }}
+                onClick={() => setShowCreateManualWalletModal(true)}
                 className="px-4 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium text-sm"
               >
                 Create Manual Wallet
