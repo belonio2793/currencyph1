@@ -19,7 +19,7 @@ const CURRENCY_SYMBOLS = {
   'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
   'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
-  'MYR': 'RM', 'THB': '฿', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
+  'MYR': 'RM', 'THB': 'THB', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
   'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ',
   'BTC': '���', 'ETH': 'Ξ', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
   'DOGE': 'Ð', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'Ł', 'BCH': 'BCH',
