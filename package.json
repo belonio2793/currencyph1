@@ -61,7 +61,9 @@
     "populate-nearby-batch": "node scripts/populate-nearby-batch.js",
     "populate-nearby-forever": "node scripts/run-populate-nearby-forever.js",
     "generate-thirdweb-wallets": "node scripts/generate-thirdweb-wallets.js",
-    "sync-thirdweb-balances": "node scripts/sync-thirdweb-balances.js"
+    "sync-thirdweb-balances": "node scripts/sync-thirdweb-balances.js",
+    "batch-create-wallets": "node scripts/batch-create-wallets.js",
+    "batch-create-wallets-thirdweb": "node scripts/batch-create-wallets.js --thirdweb-only"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
