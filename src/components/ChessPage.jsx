@@ -206,11 +206,14 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                             className={`
                               aspect-square flex items-center justify-center p-0 leading-none transition-all
                             `}
-                            style={{ backgroundColor: isLight ? '#F1F2D1' : '#6B8F4E' }}
+                            style={{ backgroundColor: isLight ? '#EEEED2' : '#769656' }}
                           >
                             {piece && (
                               <span
-                                className={`${piece === piece.toUpperCase() ? 'text-slate-100' : 'text-slate-900'} text-5xl md:text-6xl`}
+                                className={`${piece === piece.toUpperCase() ? 'text-white' : 'text-gray-900'} text-6xl md:text-7xl`}
+                                style={{ textShadow: piece === piece.toUpperCase()
+                                  ? '0 0 1px #000, 0 0 2px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
+                                  : '0 0 1px #fff, 0 0 2px #fff, 1px 1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff, -1px -1px 0 #fff' }}
                               >
                                 {PIECE_SYMBOLS[piece]}
                               </span>
