@@ -199,8 +199,12 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
 
       onClose && onClose()
     } catch (e) {
-      setError(`Could not leave seat: ${e.message}`)
-      setTimeout(() => setError(null), 3000)
+      const msg = String(e?.message || e)
+      const hint = msg.includes('row-level security')
+        ? 'Your project\'s RLS prevents removing yourself from the row. We can update the policy or add a secure edge function to handle this.'
+        : ''
+      setError(`Could not leave seat: ${msg}${hint ? ` — ${hint}` : ''}`)
+      setTimeout(() => setError(null), 5000)
     }
   }
 
@@ -228,7 +232,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             </div>
 
             {/* Board */}
-            <div className="bg-slate-900/40 p-1 rounded-lg border border-slate-700/50 mb-6 aspect-square max-w-md mx-auto">
+            <div className="bg-slate-900/40 p-1 rounded-lg border border-slate-700/50 mb-6 aspect-square w-full mx-auto" style={{ maxWidth: 'min(92vw, 80vh)' }}>
               <div className="grid grid-cols-8 gap-0 h-full">
                 {board.map((piece, index) => {
                   const row = Math.floor(index / 8)
@@ -244,7 +248,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                       key={square}
                       onClick={() => handleSquareClick(square)}
                       className={`
-                        aspect-square flex items-center justify-center p-0 leading-none transition-all
+                        aspect-square flex items-center justify-center p-0 leading-none transition-all overflow-visible
                         ${isSelected ? 'ring-4 ring-blue-500' : ''}
                         ${isHighlighted ? 'ring-inset ring-4 ring-green-500' : ''}
                         hover:opacity-90 cursor-pointer
