@@ -342,6 +342,65 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           </div>
         </div>
       )}
+      {activeTab === 'network' && (
+        <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-medium">Network / House Balances</h3>
+            <div className="flex gap-2">
+              <button onClick={() => loadWallets()} className="px-3 py-1 bg-slate-100 text-slate-700 rounded">Refresh</button>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            {houseBalances.length === 0 ? (
+              <p className="text-sm text-slate-500">No house balances available.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {houseBalances.map(h => (
+                  <div key={h.id} className="p-4 bg-slate-50 rounded">
+                    <div className="text-xs text-slate-500">{h.wallet_type.toUpperCase()} • {h.network || h.currency}</div>
+                    <div className="text-xl font-mono">{h.currency} {Number(h.balance || 0).toFixed(2)}</div>
+                    {h.metadata && <div className="text-xs text-slate-400 truncate mt-1">{JSON.stringify(h.metadata).slice(0,80)}</div>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium mb-2">Recent House Transactions</h4>
+            {houseTransactions.length === 0 ? (
+              <p className="text-sm text-slate-500">No recent transactions.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="text-left text-slate-500">
+                      <th className="pr-4">Time</th>
+                      <th className="pr-4">Type</th>
+                      <th className="pr-4">Amount</th>
+                      <th className="pr-4">Currency</th>
+                      <th className="pr-4">Desc</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {houseTransactions.map(t => (
+                      <tr key={t.id} className="border-t">
+                        <td className="py-2">{new Date(t.created_at).toLocaleString()}</td>
+                        <td className="py-2">{t.type}</td>
+                        <td className="py-2 font-mono">{Number(t.amount || 0).toFixed(2)}</td>
+                        <td className="py-2">{t.currency_code}</td>
+                        <td className="py-2 truncate">{t.description || ''}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {showPreferences && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
