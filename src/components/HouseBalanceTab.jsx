@@ -7,6 +7,7 @@ export default function HouseBalanceTab() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currencyFilter, setCurrencyFilter] = useState('PHP')
+  const [houseCryptoAddress, setHouseCryptoAddress] = useState(null)
 
   const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
 
