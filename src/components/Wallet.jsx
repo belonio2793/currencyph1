@@ -269,12 +269,35 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           <h2 className="text-3xl font-light text-slate-900 tracking-tight">My Wallets</h2>
           <p className="text-xs text-slate-500 mt-1">Total value (PHP): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
         </div>
-        <button
-          onClick={() => setShowPreferences(true)}
-          className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
-        >
-          ⚙️ Customize
-        </button>
+
+        <div className="flex items-center gap-4">
+          {/* Tabs */}
+          <div className="bg-slate-50 rounded-full p-1 flex items-center text-sm">
+            <button
+              onClick={() => setActiveTab('mywallets')}
+              className={`px-3 py-1 rounded-full ${activeTab === 'mywallets' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
+              My Wallets
+            </button>
+            <button
+              onClick={() => setActiveTab('network')}
+              className={`px-3 py-1 rounded-full ${activeTab === 'network' ? 'bg-white shadow-sm text-slate-900' : 'text-slate-600'}`}>
+              Network Balances
+            </button>
+          </div>
+
+          {/* Small house summary */}
+          <div className="text-right">
+            <div className="text-xs text-slate-500">House Balances</div>
+            <div className="text-sm font-mono">{houseBalances.length > 0 ? houseBalances.map(h => `${h.currency}: ${Number(h.balance||0).toFixed(2)}`).join(' • ') : 'No house data'}</div>
+          </div>
+
+          <button
+            onClick={() => setShowPreferences(true)}
+            className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
+          >
+            ⚙️ Customize
+          </button>
+        </div>
       </div>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
