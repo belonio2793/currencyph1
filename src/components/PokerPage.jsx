@@ -51,10 +51,12 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     setSelectedTable(table)
     try {
       const { data } = await supabase.from('poker_seats').select('*').eq('table_id', table.id).order('seat_number')
-      setSeats(data || [])
+      setSeats(prev => {
+        const without = (prev || []).filter(s => s.table_id !== table.id)
+        return [...without, ...(data || [])]
+      })
     } catch (e) {
       console.warn('Could not load seats', e)
-      setSeats([])
     }
     // Scroll to top if preference is enabled, otherwise scroll to table view
     const autoScroll = preferencesManager.getAutoScrollToTop(userId)
