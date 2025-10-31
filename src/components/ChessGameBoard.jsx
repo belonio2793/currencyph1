@@ -27,9 +27,10 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   }
 
   const engine = new ChessEngine(currentGame.fen)
-  const isWhitePlayer = currentGame.white_player_id === userId
-  const isBlackPlayer = currentGame.black_player_id === userId
-  const isMyTurn = (engine.isWhiteTurn() && isWhitePlayer) || (!engine.isWhiteTurn() && isBlackPlayer)
+  const isVsComputer = currentGame?.mode === 'computer' || !currentGame?.id
+  const isWhitePlayer = isVsComputer ? true : currentGame.white_player_id === userId
+  const isBlackPlayer = isVsComputer ? false : currentGame.black_player_id === userId
+  const isMyTurn = isVsComputer ? engine.isWhiteTurn() : ((engine.isWhiteTurn() && isWhitePlayer) || (!engine.isWhiteTurn() && isBlackPlayer))
 
   useEffect(() => {
     const moves = engine.getLegalMoves()
@@ -44,6 +45,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   }, [currentGame.fen])
 
   useEffect(() => {
+    if (!currentGame.id) return
     subscriptionRef.current = supabase
       .channel(`chess_game_${currentGame.id}`)
       .on(
@@ -68,6 +70,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   }, [currentGame.id])
 
   useEffect(() => {
+    if (isVsComputer) return
     if (!currentGame.time_control || currentGame.time_control === 'unlimited') return
 
     const bothPlayersSeated = Boolean(currentGame.white_player_id && currentGame.black_player_id)
@@ -109,18 +112,33 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
 
           const isFirstMove = (currentGame.moves || []).length === 0
 
-          const { error: updateError } = await supabase
-            .from('chess_games')
-            .update({
-              fen: newFen,
-              moves: updatedMoves,
-              last_move_by: userId,
-              last_move_at: new Date().toISOString(),
-              started_at: isFirstMove ? new Date().toISOString() : undefined
-            })
-            .eq('id', currentGame.id)
-
-          if (updateError) throw updateError
+          if (!isVsComputer) {
+            const { error: updateError } = await supabase
+              .from('chess_games')
+              .update({
+                fen: newFen,
+                moves: updatedMoves,
+                last_move_by: userId,
+                last_move_at: new Date().toISOString(),
+                started_at: isFirstMove ? new Date().toISOString() : undefined
+              })
+              .eq('id', currentGame.id)
+            if (updateError) throw updateError
+            setCurrentGame(prev => ({ ...prev, fen: newFen, moves: updatedMoves }))
+          } else {
+            setCurrentGame(prev => ({ ...prev, fen: newFen, moves: updatedMoves }))
+            setTimeout(() => {
+              const aiMove = getBestMove(newFen, currentGame.difficulty || 'medium')
+              if (!aiMove) return
+              const aiEngine = new ChessEngine(newFen)
+              aiEngine.makeMove(aiMove)
+              const aiFen = aiEngine.getFen()
+              const aiMoves = [...updatedMoves, { ...aiMove, by: 'computer', timestamp: new Date().toISOString() }]
+              setCurrentGame(prev => ({ ...prev, fen: aiFen, moves: aiMoves }))
+              setLastMove(aiMove)
+              setGameStatus(aiEngine.getGameStatus())
+            }, 200)
+          }
 
           setLastMove(move)
           setSelectedSquare(null)
@@ -224,7 +242,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             {/* Black Player Info */}
             <div className="mb-6 pb-4 border-b border-slate-700/50 flex justify-between items-center">
               <div>
-                <p className="text-white font-semibold">{currentGame.black_player_email || 'Waiting for opponent...'}</p>
+                <p className="text-white font-semibold">{currentGame.black_player_email || (isVsComputer ? `Computer (${difficultyLabel(currentGame.difficulty || 'medium')})` : 'Waiting for opponent...')}</p>
                 <p className="text-xs text-slate-300 mt-1">Black</p>
               </div>
               <div className={`text-2xl font-mono font-bold ${blackTime !== null && blackTime < 60 ? 'text-red-400' : 'text-white'}`}>
@@ -342,7 +360,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
           </div>
 
           <div className="flex flex-col gap-3">
-            {(isWhitePlayer || isBlackPlayer) && (
+            {currentGame.id && (isWhitePlayer || isBlackPlayer) && (
               <button
                 onClick={handleLeaveSeat}
                 className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors border border-red-700/50"
