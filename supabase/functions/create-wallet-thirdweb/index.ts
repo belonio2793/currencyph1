@@ -100,9 +100,64 @@ Deno.serve(async (req) => {
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 
-    // For Solana use a non-EVM format (simplified); treat everything else as EVM-compatible by default
+    // For Bitcoin, generate real keypair and address (P2PKH mainnet) and encrypt private key
     let address = ''
-    if (chainConfig.name === 'solana') {
+    let encryptedKey = null
+
+    if (chainConfig.name === 'bitcoin') {
+      // Generate 32-byte private key
+      const privBytes = secp.utils.randomPrivateKey()
+      // Get compressed public key (33 bytes)
+      const pubKey = secp.getPublicKey(privBytes, true)
+
+      // Compute pubKeyHash = RIPEMD160(SHA256(pubKey))
+      const sha = sha256(pubKey)
+      const pubKeyHash = ripemd160(sha)
+
+      // Build P2PKH payload: 0x00 + pubKeyHash
+      const payload = new Uint8Array(1 + pubKeyHash.length)
+      payload[0] = 0x00
+      payload.set(pubKeyHash, 1)
+
+      // Checksum = first 4 bytes of double SHA256
+      const checksumFull = sha256(sha256(payload))
+      const checksum = checksumFull.slice(0, 4)
+
+      // Address bytes = payload + checksum
+      const addressBytes = new Uint8Array(payload.length + 4)
+      addressBytes.set(payload, 0)
+      addressBytes.set(checksum, payload.length)
+
+      address = base58.encode(addressBytes)
+
+      // Encrypt private key hex using AES-GCM with BTC_ENCRYPTION_KEY
+      const BTC_KEY = Deno.env.get('BTC_ENCRYPTION_KEY')
+      if (!BTC_KEY) {
+        console.error('Missing BTC_ENCRYPTION_KEY env var')
+        return new Response(JSON.stringify({ error: 'Server not configured for BTC key storage' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+      }
+
+      const encoder = new TextEncoder()
+      const privHex = Array.from(privBytes).map(b => b.toString(16).padStart(2, '0')).join('')
+      // Derive 32-byte AES key from BTC_KEY via SHA-256
+      const keyMaterial = await crypto.subtle.digest('SHA-256', encoder.encode(BTC_KEY))
+      const cryptoKey = await crypto.subtle.importKey('raw', keyMaterial, 'AES-GCM', false, ['encrypt', 'decrypt'])
+      const iv = crypto.getRandomValues(new Uint8Array(12))
+      const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, cryptoKey, encoder.encode(privHex))
+      // Convert ciphertext and iv to base64
+      const toBase64 = (buf) => {
+        const bytes = new Uint8Array(buf)
+        let binary = ''
+        for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i])
+        return btoa(binary)
+      }
+      encryptedKey = {
+        cipher: toBase64(cipherBuf),
+        iv: toBase64(iv),
+        method: 'AES-GCM',
+        created_at: new Date().toISOString()
+      }
+    } else if (chainConfig.name === 'solana') {
       // Solana: use base58-like substring (placeholder)
       address = hashHex.substring(0, 44)
     } else {
@@ -113,6 +168,13 @@ Deno.serve(async (req) => {
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
     // Upsert into wallets_crypto to avoid duplicates on retries
+    const metadataObj = {
+      chainName: chainConfig.name,
+      chainSymbol: chainConfig.symbol,
+      generated_at: new Date().toISOString()
+    }
+    if (encryptedKey) metadataObj.encrypted_private_key = encryptedKey
+
     const { data: upserted, error: upsertError } = await supabase
       .from('wallets_crypto')
       .upsert([
@@ -121,13 +183,9 @@ Deno.serve(async (req) => {
           chain: chainConfig.name.toUpperCase(),
           chain_id: chain_id,
           address: address,
-          provider: 'manual',
+          provider: chainConfig.name === 'bitcoin' ? 'house' : 'manual',
           balance: 0,
-          metadata: {
-            chainName: chainConfig.name,
-            chainSymbol: chainConfig.symbol,
-            generated_at: new Date().toISOString()
-          },
+          metadata: metadataObj,
           updated_at: new Date().toISOString()
         }
       ], { onConflict: 'user_id,chain,address' })
