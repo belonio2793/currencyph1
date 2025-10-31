@@ -114,8 +114,19 @@ export const wisegcashAPI = {
       .single()
 
     if (error) {
-      console.error('Wallet creation error:', { code: error.code, message: error.message, details: error.details, userId, currencyCode })
-      throw error
+      const errorInfo = {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        status: error.status,
+        statusText: error.statusText,
+        userId,
+        currencyCode,
+        fullError: JSON.stringify(error)
+      }
+      console.error('Wallet creation failed:', errorInfo)
+      throw new Error(`Wallet creation failed: ${error.message || error.code || 'Unknown error'}`)
     }
     return data
   },
