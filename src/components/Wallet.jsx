@@ -53,6 +53,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [favoriteCrypto, setFavoriteCrypto] = useState([])
+  const [filterMode, setFilterMode] = useState('all') // all | favorites | owned
 
   // Fiat modal state
   const [showFiatModal, setShowFiatModal] = useState(false)
@@ -151,10 +153,14 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     if (prefs.walletCurrencies_fiat) setEnabledFiat(prefs.walletCurrencies_fiat)
     if (prefs.walletCurrencies_crypto) setEnabledCrypto(prefs.walletCurrencies_crypto)
 
+    // Favorites for crypto
+    if (prefs.walletFavorites_crypto) setFavoriteCrypto(prefs.walletFavorites_crypto)
+
     // Defaults when not set
     if (!prefs.walletCurrencies) setEnabledInternal(['PHP', 'USD'])
     if (!prefs.walletCurrencies_fiat) setEnabledFiat(['PHP', 'USD'])
     if (!prefs.walletCurrencies_crypto) setEnabledCrypto(['BTC', 'ETH'])
+    if (!prefs.walletFavorites_crypto) setFavoriteCrypto([])
   }
 
   const savePreferences = (type, currencies) => {
@@ -172,6 +178,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       preferencesManager.setPreferences(userId, prefs)
       setEnabledCrypto(currencies)
     }
+  }
+
+  const saveFavoriteCrypto = (favorites) => {
+    const prefs = preferencesManager.getAllPreferences(userId)
+    prefs.walletFavorites_crypto = favorites
+    preferencesManager.setPreferences(userId, prefs)
+    setFavoriteCrypto(favorites)
   }
 
   const loadWallets = async () => {
@@ -621,7 +634,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           </div>
         </div>
 
-        <div className="mb-4 flex gap-3">
+        <div className="mb-4 flex flex-wrap gap-3 items-center">
           <button
             onClick={() => setShowThirdwebModal(true)}
             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
@@ -634,56 +647,93 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           >
             Create Manual Wallet
           </button>
+
+          <div className="ml-auto flex items-center gap-2">
+            <select value={filterMode} onChange={(e) => setFilterMode(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
+              <option value="all">All</option>
+              <option value="favorites">Favorites</option>
+              <option value="owned">Owned</option>
+            </select>
+          </div>
         </div>
 
-        {/* List of supported chains with search/filter */}
-        <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.values(SUPPORTED_CHAINS)
-              .sort((a, b) => a.name.localeCompare(b.name))
-              .filter(chain => {
-                if (!searchQuery) return true
-                const q = searchQuery.toLowerCase()
-                return chain.name.toLowerCase().includes(q) || (chain.symbol || '').toLowerCase().includes(q) || String(chain.chainId).includes(q)
-              })
-              .map(chain => {
-                const existing = cryptoWallets.find(w => Number(w.chain_id) === Number(chain.chainId) || (w.chain && w.chain.toLowerCase() === chain.name.toLowerCase()))
+        {/* Favorites row */}
+        {favoriteCrypto && favoriteCrypto.length > 0 && (
+          <div className="mb-4">
+            <h4 className="text-sm font-medium text-slate-700 mb-2">Favorites</h4>
+            <div className="flex flex-wrap gap-2">
+              {favoriteCrypto.map(fav => {
+                const chain = Object.values(SUPPORTED_CHAINS).find(c => c.chainId === Number(fav) || c.name.toLowerCase() === String(fav).toLowerCase())
+                if (!chain) return null
+                const existing = cryptoWallets.find(w => Number(w.chain_id) === Number(chain.chainId))
                 return (
-                  <div key={chain.chainId} className="bg-white border border-slate-200 rounded-lg p-4 flex flex-col justify-between">
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p className="text-sm font-semibold text-slate-700">{chain.name}</p>
-                          <p className="text-xs text-slate-500">{chain.symbol} • Chain ID: {chain.chainId}</p>
-                        </div>
-                        <div className="text-2xl font-mono text-slate-900">{chain.symbol}</div>
-                      </div>
-
-                      {existing ? (
-                        <div className="mt-2">
-                          <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-                          <p className="text-xl font-light text-slate-900 mb-2">{Number(existing.balance || 0).toFixed(6)}</p>
-                          {existing.address && <p className="text-xs text-slate-500 mb-2 truncate">Addr: {existing.address}</p>}
-                        </div>
-                      ) : (
-                        <p className="text-sm text-slate-500 mt-2">No wallet created for this chain</p>
-                      )}
-                    </div>
-
-                    <div className="mt-3 flex gap-2">
-                      {existing ? (
-                        <>
-                          <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setShowCryptoModal(true) }} className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">Send</button>
-                          <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setShowCryptoModal(true) }} className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">Receive</button>
-                        </>
-                      ) : (
-                        <button onClick={() => { setSelectedManualChainId(chain.chainId); setShowCreateManualWalletModal(true) }} className="w-full bg-emerald-600 text-white py-2 rounded-lg hover:bg-emerald-700 transition-colors text-sm">Create Wallet</button>
-                      )}
-                    </div>
+                  <div key={chain.chainId} className="px-3 py-2 bg-white/80 border border-slate-200 rounded-lg text-sm flex items-center gap-3">
+                    <div className="font-semibold">{chain.symbol}</div>
+                    <div className="text-xs text-slate-500">{chain.name}</div>
+                    {existing && <div className="text-xs text-slate-400 ml-2">• {Number(existing.balance || 0).toFixed(6)}</div>}
                   </div>
                 )
               })}
+            </div>
           </div>
+        )}
+
+        {/* List of supported chains with search/filter in vertical list style */}
+        <div className="bg-white/80 border border-slate-200 rounded-lg">
+          {Object.values(SUPPORTED_CHAINS)
+            .sort((a,b) => a.name.localeCompare(b.name))
+            .filter(chain => {
+              const q = (searchQuery || '').toLowerCase()
+              if (q) {
+                if (!(chain.name.toLowerCase().includes(q) || (chain.symbol || '').toLowerCase().includes(q) || String(chain.chainId).includes(q))) return false
+              }
+              if (filterMode === 'favorites') {
+                return favoriteCrypto.includes(String(chain.chainId)) || favoriteCrypto.map(String).includes(chain.name.toLowerCase())
+              }
+              if (filterMode === 'owned') {
+                return cryptoWallets.some(w => Number(w.chain_id) === Number(chain.chainId) || (w.chain && w.chain.toLowerCase() === chain.name.toLowerCase()))
+              }
+              return true
+            })
+            .map((chain, idx) => {
+              const existing = cryptoWallets.find(w => Number(w.chain_id) === Number(chain.chainId) || (w.chain && w.chain.toLowerCase() === chain.name.toLowerCase()))
+              const isFav = favoriteCrypto.includes(String(chain.chainId)) || favoriteCrypto.map(String).includes(chain.name.toLowerCase())
+              return (
+                <div key={chain.chainId} className={`flex items-center justify-between p-4 ${idx < Object.values(SUPPORTED_CHAINS).length-1 ? 'border-b border-slate-200' : ''}`}>
+                  <div className="flex items-center gap-4">
+                    <button onClick={() => {
+                      const idStr = String(chain.chainId)
+                      if (favoriteCrypto.includes(idStr) || favoriteCrypto.map(String).includes(chain.name.toLowerCase())) {
+                        const newFav = favoriteCrypto.filter(f => String(f) !== idStr && String(f).toLowerCase() !== chain.name.toLowerCase())
+                        saveFavoriteCrypto(newFav)
+                      } else {
+                        const newFav = [ ...favoriteCrypto, idStr ]
+                        saveFavoriteCrypto(newFav)
+                      }
+                    }} className={`p-2 rounded ${isFav ? 'bg-amber-400 text-white' : 'bg-slate-100 text-slate-600'} transition-colors`}>
+                      {isFav ? '★' : '☆'}
+                    </button>
+
+                    <div>
+                      <div className="text-sm font-semibold text-slate-700">{chain.name}</div>
+                      <div className="text-xs text-slate-500">{chain.symbol} • Chain ID: {chain.chainId}</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    {existing ? (
+                      <>
+                        <div className="text-sm text-slate-700 font-mono mr-4">{Number(existing.balance || 0).toFixed(6)}</div>
+                        <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Send</button>
+                        <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm">Receive</button>
+                      </>
+                    ) : (
+                      <button onClick={() => { setSelectedManualChainId(chain.chainId); setShowCreateManualWalletModal(true) }} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm">Create Wallet</button>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
         </div>
       </div>
 
