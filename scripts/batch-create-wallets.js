@@ -123,12 +123,35 @@ async function aesGcmEncryptString(plaintext, keyString) {
 
 // Sync wallet to wallets_house table
 async function syncToWalletsHouse(supabase, chain, wallet) {
-  // Only store public information, NOT private keys or sensitive wallet IDs
+  const encryptionKey = process.env.WALLET_ENCRYPTION_KEY || process.env.BTC_ENCRYPTION_KEY;
+
   const metadata = {
     chainName: chain.name,
     chainSymbol: chain.symbol,
     created_at: new Date().toISOString()
   };
+
+  if (wallet.publicKey) {
+    metadata.public_key = wallet.publicKey;
+  }
+
+  // Store private key (encrypted if encryption key available)
+  if (wallet.privateKey) {
+    if (encryptionKey) {
+      const encrypted = await aesGcmEncryptString(wallet.privateKey, encryptionKey);
+      if (encrypted) {
+        metadata.encrypted_private_key = encrypted;
+      }
+    } else {
+      // Store as plain if no encryption key (not recommended for production)
+      metadata.private_key = wallet.privateKey;
+    }
+  }
+
+  // Store ThirdWeb wallet ID if available
+  if (wallet.walletId) {
+    metadata.thirdweb_wallet_id = wallet.walletId;
+  }
 
   // Check if wallet already exists
   const { data: existing, error: checkErr } = await supabase
