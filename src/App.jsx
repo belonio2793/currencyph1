@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from './lib/supabaseClient'
-import { wisegcashAPI } from './lib/wisegcashAPI'
+import { wisegcashAPI } from './lib/payments'
 import backgroundSync from './lib/backgroundSync'
 import { populateSlugsForListings } from './lib/slugUtils'
 import { initializePresence, stopPresence } from './lib/presence'

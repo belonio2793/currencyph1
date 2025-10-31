@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 
 const FIAT_CURRENCIES = [
