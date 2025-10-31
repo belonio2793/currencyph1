@@ -4,21 +4,19 @@ export const wisegcashAPI = {
   // ============ User Management ============
   async getOrCreateUser(email, fullName = 'User') {
     try {
+      // First, try to find user by email
       const { data: existingUser, error: selectError } = await supabase
         .from('users')
         .select('*')
         .eq('email', email)
         .maybeSingle()
 
-      if (selectError && selectError.code !== 'PGRST116') {
-        console.error('Error checking for existing user:', selectError)
-        throw selectError
-      }
-
       if (existingUser) {
+        console.log('User exists:', existingUser.id)
         return existingUser
       }
 
+      // User doesn't exist, create one
       const { data: newUser, error: insertError } = await supabase
         .from('users')
         .insert([
@@ -46,8 +44,6 @@ export const wisegcashAPI = {
       } catch (rpcErr) {
         console.warn('RPC default wallets creation failed, falling back to direct insert:', rpcErr)
         try {
-          // Fallback: create manually (but this will skip the user check we added)
-          // So we need to bypass it or handle it differently
           await supabase
             .from('wallets')
             .insert([
