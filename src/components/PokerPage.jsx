@@ -25,18 +25,25 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: err } = await supabase.from('poker_tables').select('*').order('created_at', { ascending: false })
-      if (err) {
-        console.error('Load tables error:', err)
-        setError(`Failed to load tables: ${err.message}`)
-        setTables([])
-      } else {
-        setTables(data || [])
+      const [{ data: tableData, error: err1 }, { data: seatData, error: err2 }] = await Promise.all([
+        supabase.from('poker_tables').select('*').order('created_at', { ascending: false }),
+        supabase.from('poker_seats').select('*')
+      ])
+      if (err1) {
+        console.error('Load tables error:', err1)
+        throw err1
       }
+      if (err2) {
+        console.error('Load seats error:', err2)
+        throw err2
+      }
+      setTables(tableData || [])
+      setSeats(seatData || [])
     } catch (e) {
       console.error('Could not load tables', e)
       setError(`Error: ${e.message}`)
       setTables([])
+      setSeats([])
     } finally { setLoading(false) }
   }
 
