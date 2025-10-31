@@ -443,18 +443,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           <p className="text-xs text-slate-500 mt-1">Total value (PHP): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
         </div>
 
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowThirdwebModal(true)}
-            className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
-          >
-            🔗 Connect Wallet
-          </button>
+        <div>
           <button
             onClick={() => setShowPreferencesInternal(true)}
             className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
           >
-            ⚙️ Customize
+            Customize
           </button>
         </div>
       </div>
@@ -569,32 +563,40 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         </div>
 
         {cryptoWallets.filter(w => enabledCrypto.includes(w.currency_code)).length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
-            <p className="text-slate-500 mb-4">No crypto wallets created yet</p>
-            <button
-              onClick={async () => {
-                try {
-                  setError('')
-                  setSuccess('')
-                  // create a default crypto wallet (BTC)
-                  await supabase.from('wallets_crypto').insert([{
-                    user_id: userId,
-                    chain: 'BTC',
-                    balance: 0,
-                    address: null,
-                    provider: 'manual'
-                  }])
-                  setSuccess('Crypto wallet created')
-                  await loadWallets()
-                } catch (e) {
-                  console.error('Failed to create crypto wallet', e)
-                  setError('Failed to create crypto wallet')
-                }
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-            >
-              Create Crypto Wallet
-            </button>
+          <div className="bg-white border border-slate-200 rounded-xl p-6">
+            <p className="text-slate-500 mb-4 text-center">No crypto wallets created yet</p>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => setShowThirdwebModal(true)}
+                className="px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
+              >
+                Connect Web3 Wallet
+              </button>
+              <button
+                onClick={async () => {
+                  try {
+                    setError('')
+                    setSuccess('')
+                    // create a default crypto wallet (BTC)
+                    await supabase.from('wallets_crypto').insert([{
+                      user_id: userId,
+                      chain: 'BTC',
+                      balance: 0,
+                      address: null,
+                      provider: 'manual'
+                    }])
+                    setSuccess('Crypto wallet created')
+                    await loadWallets()
+                  } catch (e) {
+                    console.error('Failed to create crypto wallet', e)
+                    setError('Failed to create crypto wallet')
+                  }
+                }}
+                className="px-4 py-3 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium text-sm"
+              >
+                Create Manual Wallet
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
