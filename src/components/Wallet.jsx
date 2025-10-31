@@ -85,7 +85,9 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [showNetworkPanel, setShowNetworkPanel] = useState(false)
   const [networkWallets, setNetworkWallets] = useState([])
   const [generatingNetwork, setGeneratingNetwork] = useState(false)
-  const [networkProgress, setNetworkProgress] = useState({ done: 0, total: 0 })
+  // transaction UI state
+  const [networkTxOpen, setNetworkTxOpen] = useState({})
+  const [networkTxs, setNetworkTxs] = useState({})
 
   useEffect(() => {
     loadWallets()
