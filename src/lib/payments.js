@@ -3,42 +3,82 @@ import { supabase } from './supabaseClient'
 export const wisegcashAPI = {
   // ============ User Management ============
   async getOrCreateUser(email, fullName = 'User') {
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single()
-
-    if (existingUser) {
-      return existingUser
-    }
-
-    const { data: newUser, error } = await supabase
-      .from('users')
-      .insert([
-        {
-          email,
-          full_name: fullName,
-          country_code: 'PH',
-          status: 'active'
-        }
-      ])
-      .select()
-      .single()
-
-    if (error) throw error
-
-    // Create default wallets for new user (PHP + USD) using the function
     try {
-      await supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
-    } catch (rpcErr) {
-      console.warn('RPC default wallets creation failed, falling back to direct insert:', rpcErr)
-      // Fallback: create manually
-      await this.createWallet(newUser.id, 'PHP')
-      await this.createWallet(newUser.id, 'USD')
-    }
+      const { data: existingUser, error: selectError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle()
 
-    return newUser
+      if (selectError && selectError.code !== 'PGRST116') {
+        console.error('Error checking for existing user:', selectError)
+        throw selectError
+      }
+
+      if (existingUser) {
+        return existingUser
+      }
+
+      const { data: newUser, error: insertError } = await supabase
+        .from('users')
+        .insert([
+          {
+            email,
+            full_name: fullName,
+            country_code: 'PH',
+            status: 'active'
+          }
+        ])
+        .select()
+        .single()
+
+      if (insertError) {
+        console.error('Error creating user:', insertError)
+        throw insertError
+      }
+
+      console.log('User created successfully:', newUser.id)
+
+      // Create default wallets for new user (PHP + USD) using the function
+      try {
+        await supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
+        console.log('Default wallets created via RPC for user:', newUser.id)
+      } catch (rpcErr) {
+        console.warn('RPC default wallets creation failed, falling back to direct insert:', rpcErr)
+        try {
+          // Fallback: create manually (but this will skip the user check we added)
+          // So we need to bypass it or handle it differently
+          await supabase
+            .from('wallets')
+            .insert([
+              {
+                user_id: newUser.id,
+                currency_code: 'PHP',
+                balance: 0,
+                total_deposited: 0,
+                total_withdrawn: 0,
+                is_active: true
+              },
+              {
+                user_id: newUser.id,
+                currency_code: 'USD',
+                balance: 0,
+                total_deposited: 0,
+                total_withdrawn: 0,
+                is_active: true
+              }
+            ])
+          console.log('Default wallets created manually for user:', newUser.id)
+        } catch (fallbackErr) {
+          console.error('Failed to create default wallets even with fallback:', fallbackErr)
+        }
+      }
+
+      return newUser
+    } catch (err) {
+      console.error('getOrCreateUser error:', err)
+      throw err
+    }
   },
 
   async getUserById(userId) {
