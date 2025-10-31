@@ -81,6 +81,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [selectedManualChainId, setSelectedManualChainId] = useState(null)
   const [creatingManualWallet, setCreatingManualWallet] = useState(false)
 
+  // Network wallets (house) UI state
+  const [showNetworkPanel, setShowNetworkPanel] = useState(false)
+  const [networkWallets, setNetworkWallets] = useState([])
+  const [generatingNetwork, setGeneratingNetwork] = useState(false)
+  const [networkProgress, setNetworkProgress] = useState({ done: 0, total: 0 })
+
   useEffect(() => {
     loadWallets()
     loadPreferences()
