@@ -152,7 +152,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
       try {
         const { data: cData } = await supabase.from('wallets_crypto').select('*').eq('user_id', userId)
-        const cryptoMapped = (cData || []).map(r => ({
+        cryptoMapped = (cData || []).map(r => ({
           id: r.id,
           currency_code: r.chain || r.currency || 'CRYPTO',
           balance: Number(r.balance || 0),
