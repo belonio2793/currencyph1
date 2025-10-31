@@ -738,6 +738,42 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           </div>
         )}
 
+        {/* Network Wallets Panel */}
+        {showNetworkPanel && (
+          <div className="mb-4 p-4 bg-white/90 border border-slate-200 rounded-lg">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="text-lg font-semibold text-slate-800">Network Wallets</h4>
+                <p className="text-xs text-slate-500">House/network wallets generated for each supported chain. Public addresses and balances are shown below.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={() => { loadNetworkWallets() }} className="px-3 py-2 bg-slate-100 rounded">Refresh</button>
+                <button onClick={generateAllNetworkWallets} disabled={generatingNetwork} className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">
+                  {generatingNetwork ? `Generating (${networkProgress.done}/${networkProgress.total})` : 'Generate All'}
+                </button>
+                <button onClick={() => setShowNetworkPanel(false)} className="px-3 py-2 bg-white border rounded">Close</button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {networkWallets && networkWallets.length > 0 ? networkWallets.map((nw) => (
+                <div key={nw.id || nw.network} className="p-3 bg-white border border-slate-100 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-semibold text-slate-700">{nw.network || nw.currency}</div>
+                      <div className="text-xs text-slate-500">{nw.currency}</div>
+                    </div>
+                    <div className="text-sm font-mono text-slate-600">{Number(nw.balance || 0).toFixed(6)}</div>
+                  </div>
+                  <div className="mt-2 text-xs text-slate-500 break-all">Address: {nw.metadata?.address || nw.address || '—'}</div>
+                </div>
+              )) : (
+                <div className="p-4 text-sm text-slate-500">No network wallets found. Click "Generate All" to create house wallets for all supported chains.</div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* List of supported chains with search/filter in vertical list style */}
         <div className="bg-white/80 border border-slate-200 rounded-lg">
           {Object.values(SUPPORTED_CHAINS)
