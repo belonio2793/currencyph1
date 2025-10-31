@@ -126,44 +126,23 @@ export const wisegcashAPI = {
       throw new Error('Guest accounts cannot create wallets. Please sign up to create wallets.')
     }
 
-    // Try to verify user exists, but handle the case where they don't have a record yet
-    const { data: userExists, error: userCheckError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('id', userId)
-      .maybeSingle()
+    // Try to verify user exists, handle gracefully if not found
+    try {
+      const { data: userExists, error: userCheckError } = await supabase
+        .from('users')
+        .select('id')
+        .eq('id', userId)
+        .maybeSingle()
 
-    // If user doesn't exist, create them first
-    if (!userExists && !userCheckError) {
-      console.log('User record not found, creating user:', userId)
-      try {
-        const { data: newUser, error: createError } = await supabase
-          .from('users')
-          .insert([
-            {
-              id: userId,
-              email: 'user@currency.ph',
-              country_code: 'PH',
-              status: 'active'
-            }
-          ])
-          .select()
-          .single()
-
-        if (createError) {
-          console.error('Failed to create user record:', createError)
-          throw new Error('Failed to create user account. Please try again.')
-        }
-      } catch (err) {
-        console.error('Error creating user for wallet:', err)
-        throw err
+      // If user doesn't exist and there's no error, that's fine - they just don't have a record yet
+      // The foreign key constraint might still fail later, but let's try
+      if (userCheckError && userCheckError.code !== 'PGRST116') {
+        // PGRST116 = "no rows returned" which is expected sometimes
+        console.warn('Warning checking user existence:', userCheckError)
+        // Don't fail completely, just warn and continue
       }
-    }
-
-    if (userCheckError && userCheckError.code !== 'PGRST116') {
-      // PGRST116 = "no rows returned" which is fine
-      console.error('Error checking user existence:', userCheckError)
-      throw new Error('Unable to verify user account. Please try signing out and logging back in.')
+    } catch (err) {
+      console.warn('Could not verify user, but will attempt wallet creation anyway:', err)
     }
 
     // Check if wallet already exists
