@@ -133,9 +133,11 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       setInternalWallets(internal)
 
       // Fetch additional fiat and crypto wallets from Supabase (new tables)
+      let fiatMapped = []
+      let cryptoMapped = []
       try {
         const { data: fData } = await supabase.from('wallets_fiat').select('*').eq('user_id', userId)
-        const fiatMapped = (fData || []).map(r => ({
+        fiatMapped = (fData || []).map(r => ({
           id: r.id,
           currency_code: r.currency,
           balance: Number(r.balance || 0),
