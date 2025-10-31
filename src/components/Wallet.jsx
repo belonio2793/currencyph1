@@ -5,6 +5,27 @@ import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
 import { connectWallet, getWalletInfo, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress, sendCryptoTransaction } from '../lib/thirdwebClient'
 
+// Explorer helper (re-used in UI)
+function getExplorerUrl(networkOrCurrency, address) {
+  if (!address) return '#'
+  const k = (networkOrCurrency || '').toLowerCase()
+  const explorers = {
+    bitcoin: (a) => `https://blockchair.com/bitcoin/address/${a}`,
+    ethereum: (a) => `https://etherscan.io/address/${a}`,
+    polygon: (a) => `https://polygonscan.com/address/${a}`,
+    arbitrum: (a) => `https://arbiscan.io/address/${a}`,
+    optimism: (a) => `https://optimistic.etherscan.io/address/${a}`,
+    base: (a) => `https://base.blockexplorer.com/address/${a}`,
+    avalanche: (a) => `https://snowtrace.io/address/${a}`,
+    fantom: (a) => `https://ftmscan.com/address/${a}`,
+    celo: (a) => `https://explorer.celo.org/address/${a}`,
+    solana: (a) => `https://solscan.io/account/${a}`
+  }
+  const fn = explorers[k]
+  if (fn) return fn(address)
+  return `https://etherscan.io/address/${address}`
+}
+
 const FIAT_CURRENCIES = [
   'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD',
   'CAD', 'CHF', 'SEK', 'NZD', 'SGD', 'HKD', 'IDR', 'MYR',
