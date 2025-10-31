@@ -31,7 +31,8 @@ export const SUPPORTED_CHAINS = {
   metis: { chainId: 1088, name: 'Metis', symbol: 'METIS', rpcUrl: 'https://metis.rpc.thirdweb.com' },
   okc: { chainId: 66, name: 'OKC', symbol: 'OKT', rpcUrl: 'https://okc.rpc.thirdweb.com' },
   aurora: { chainId: 1313161554, name: 'Aurora', symbol: 'AURORA', rpcUrl: 'https://aurora.rpc.thirdweb.com' },
-  solana: { chainId: 245022926, name: 'Solana', symbol: 'SOL', rpcUrl: 'https://solana.rpc.thirdweb.com' }
+  solana: { chainId: 245022926, name: 'Solana', symbol: 'SOL', rpcUrl: 'https://solana.rpc.thirdweb.com' },
+  bitcoin: { chainId: 0, name: 'Bitcoin', symbol: 'BTC', rpcUrl: null }
 }
 
 export const CHAIN_IDS = Object.values(SUPPORTED_CHAINS).reduce((acc, chain) => {
