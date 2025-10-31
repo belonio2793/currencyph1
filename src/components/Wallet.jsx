@@ -622,12 +622,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             <h3 className="text-xl font-light">Crypto Wallets</h3>
             <p className="text-xs text-slate-500 mt-1">Manage your on-chain wallets. Connect a Web3 wallet or create a manual wallet for any supported chain.</p>
           </div>
-          <div className="flex items-center gap-3">
-            <div>
-              <h3 className="text-xl font-light">Crypto Wallets</h3>
-              <p className="text-xs text-slate-500 mt-1">Manage your on-chain wallets. Connect a Web3 wallet or create a manual wallet for any supported chain.</p>
-            </div>
-          </div>
         </div>
 
         <div className="mb-4 flex flex-wrap gap-3 items-center">
