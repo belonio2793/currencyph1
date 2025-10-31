@@ -110,6 +110,9 @@ export default function Wallet({ userId }) {
 
   const handleCreateWallet = async (currency) => {
     try {
+      setError('')
+      setSuccess('')
+
       // Validate user before attempting wallet creation
       if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
         setError('Please sign in to create wallets')
@@ -117,12 +120,24 @@ export default function Wallet({ userId }) {
       }
 
       await wisegcashAPI.createWallet(userId, currency)
-      loadWallets()
+
+      // Wait for wallets to load before showing success
+      await loadWallets()
+
+      // Close the modal to show updated wallet list
+      setShowPreferences(false)
+
       setSuccess(`${currency} wallet created`)
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       console.error(`Wallet creation error for ${currency}:`, err)
       const errorMsg = err?.message || String(err) || 'Unknown error'
       setError(`Failed to create ${currency} wallet: ${errorMsg}`)
+
+      // Clear error after 5 seconds
+      setTimeout(() => setError(''), 5000)
     }
   }
 
