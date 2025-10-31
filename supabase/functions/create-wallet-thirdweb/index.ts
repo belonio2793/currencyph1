@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => null)
     if (!body || (!body.user_id && !body.create_house) || !body.chain_id) {
-      return new Response(JSON.stringify({ error: 'Missing user_id or chain_id' }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+      return new Response(JSON.stringify({ error: 'Missing user_id or chain_id' }), { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
     }
 
     const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
