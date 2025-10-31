@@ -399,7 +399,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         .from('wallets_crypto')
         .upsert([{
           user_id: userId,
-          chain: selectedChainId.toString(),
+          chain: (CHAIN_IDS[selectedChainId]?.name || connectedWallet.chainName || '').toUpperCase(),
           chain_id: selectedChainId,
           address: connectedWallet.address,
           provider: 'thirdweb',
