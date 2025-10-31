@@ -173,13 +173,13 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" ref={pageRef}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900" ref={pageRef}>
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <h1 className="text-5xl font-bold text-slate-900 mb-2">Play Chess</h1>
-        <p className="text-lg text-slate-600 mb-12">Challenge players and improve your skills</p>
+        <h1 className="text-5xl font-bold text-white mb-2">Play Chess</h1>
+        <p className="text-lg text-slate-300 mb-12">Challenge players and improve your skills</p>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          <div className="mb-6 p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm">
             {error}
           </div>
         )}
@@ -190,11 +190,11 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Chess Board Left (col-span 2) */}
               <div className="lg:col-span-2 space-y-6">
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  <h2 className="text-xl font-bold text-slate-900 mb-6">Game Board</h2>
+                <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
+                  <h2 className="text-xl font-bold text-white mb-6">Game Board</h2>
                   {/* Display Chess Board */}
                   <div className="mx-auto max-w-lg">
-                    <div className="aspect-square grid grid-cols-8 gap-0 border-2 border-slate-400">
+                    <div className="aspect-square grid grid-cols-8 gap-0 border-2 border-slate-700/50 rounded-lg overflow-hidden">
                       {board.map((piece, index) => {
                         const row = Math.floor(index / 8)
                         const col = index % 8
@@ -204,12 +204,19 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                           <div
                             key={index}
                             className={`
-                              aspect-square flex items-center justify-center text-3xl font-bold
-                              ${isLight ? 'bg-blue-50' : 'bg-slate-700'}
+                              aspect-square flex items-center justify-center p-0 leading-none
+                              ${isLight ? 'bg-emerald-700' : 'bg-emerald-900'}
                               transition-all
                             `}
                           >
-                            {piece && PIECE_SYMBOLS[piece]}
+                            {piece && (
+                              <span
+                                className={`${piece === piece.toUpperCase() ? 'text-slate-100' : 'text-slate-900'} text-5xl md:text-6xl`}
+                                style={{ WebkitTextStroke: piece === piece.toUpperCase() ? '2px #0f172a' : '1.5px #e2e8f0', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.6))' }}
+                              >
+                                {PIECE_SYMBOLS[piece]}
+                              </span>
+                            )}
                           </div>
                         )
                       })}
@@ -218,23 +225,20 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                 </div>
 
                 {/* Player Stats Below Board */}
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-6">Record</h3>
+                <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-bold text-white mb-6">Record</h3>
                   <div className="grid grid-cols-3 gap-6">
                     <div>
-                      <p className="text-sm text-slate-600 font-medium">Record</p>
-                      <p className="text-2xl font-bold text-slate-900 mt-2">
-                        {gameStats.wins}W - {gameStats.losses}L
-                      </p>
-                      <p className="text-xs text-slate-500 mt-1">{gameStats.draws} draws</p>
+                      <p className="text-sm text-slate-300 font-medium">Wins</p>
+                      <p className="text-2xl font-bold text-green-400 mt-2">{gameStats.wins}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-600 font-medium">Wins</p>
-                      <p className="text-2xl font-bold text-green-600 mt-2">{gameStats.wins}</p>
+                      <p className="text-sm text-slate-300 font-medium">Losses</p>
+                      <p className="text-2xl font-bold text-red-400 mt-2">{gameStats.losses}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-slate-600 font-medium">Losses</p>
-                      <p className="text-2xl font-bold text-red-600 mt-2">{gameStats.losses}</p>
+                      <p className="text-sm text-slate-300 font-medium">Draws</p>
+                      <p className="text-2xl font-bold text-slate-200 mt-2">{gameStats.draws}</p>
                     </div>
                   </div>
                 </div>
@@ -243,8 +247,8 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
               {/* Sidebar Right */}
               <div className="space-y-6">
                 {/* Create Game Section */}
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Create Game</h3>
+                <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Create Game</h3>
                   <div className="space-y-3">
                     {['blitz', 'rapid', 'classical', 'unlimited'].map(tc => (
                       <button
@@ -259,9 +263,9 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                 </div>
 
                 {/* Available Games */}
-                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-4">Available Games</h3>
-                  <p className="text-sm text-slate-600 mb-4">
+                <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Available Games</h3>
+                  <p className="text-sm text-slate-300 mb-4">
                     {games.length} game{games.length !== 1 ? 's' : ''} waiting
                   </p>
 
@@ -274,10 +278,10 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                       {games.slice(0, 5).map(game => (
                         <div
                           key={game.id}
-                          className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                          className="p-3 border border-slate-700/50 rounded-lg hover:bg-white/10 transition-colors"
                         >
-                          <p className="text-sm font-semibold text-slate-900 truncate">{game.white_player_email}</p>
-                          <p className="text-xs text-slate-600 mb-2">
+                          <p className="text-sm font-semibold text-white truncate">{game.white_player_email}</p>
+                          <p className="text-xs text-slate-300 mb-2">
                             {timeControlLabels[game.time_control]}
                           </p>
                           <button
@@ -310,29 +314,29 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
 
         {/* Join Game Modal */}
         {joinModalGame && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-8">
-              <h3 className="text-2xl font-bold text-slate-900 mb-4">Join Game</h3>
+          <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-900/70 backdrop-blur-md rounded-lg shadow-lg max-w-sm w-full p-8 border border-slate-700/50">
+              <h3 className="text-2xl font-bold text-white mb-4">Join Game</h3>
               
               <div className="space-y-4 mb-6">
                 <div>
-                  <p className="text-sm text-slate-600 font-medium mb-1">Opponent</p>
-                  <p className="text-lg font-semibold text-slate-900">{joinModalGame.white_player_email}</p>
+                  <p className="text-sm text-slate-300 font-medium mb-1">Opponent</p>
+                  <p className="text-lg font-semibold text-white">{joinModalGame.white_player_email}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600 font-medium mb-1">Time Control</p>
-                  <p className="text-lg font-semibold text-slate-900">{timeControlLabels[joinModalGame.time_control]}</p>
+                  <p className="text-sm text-slate-300 font-medium mb-1">Time Control</p>
+                  <p className="text-lg font-semibold text-white">{timeControlLabels[joinModalGame.time_control]}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-slate-600 font-medium mb-1">Color</p>
-                  <p className="text-lg font-semibold text-slate-900">Black</p>
+                  <p className="text-sm text-slate-300 font-medium mb-1">Color</p>
+                  <p className="text-lg font-semibold text-white">Black</p>
                 </div>
               </div>
 
               <div className="space-y-3 flex gap-3">
                 <button
                   onClick={() => setJoinModalGame(null)}
-                  className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-colors"
+                  className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-semibold transition-colors border border-white/20"
                 >
                   Cancel
                 </button>
