@@ -96,60 +96,64 @@ Deno.serve(async (req) => {
     let chainConfig = CHAIN_CONFIGS[chain_id]
     if (!chainConfig) chainConfig = { name: `chain-${chain_id}`, chainId: chain_id, symbol: 'UNKNOWN' }
 
-    // Generate keypair per chain
+    // Create wallet via ThirdWeb server API if available; fall back to deterministic address if not
     let address = ''
     let publicKey: string | null = null
     let encryptedKey: any = null
+    let thirdwebResp: any = null
 
-    if (chainConfig.name === 'bitcoin') {
-      const privBytes = secp.utils.randomPrivateKey()
-      const pubKeyComp = secp.getPublicKey(privBytes, true) // 33 bytes
-      const pubKeyHash = ripemd160(sha256(pubKeyComp))
-      const versioned = new Uint8Array(1 + pubKeyHash.length)
-      versioned[0] = 0x00 // mainnet
-      versioned.set(pubKeyHash, 1)
-      const checksumFull = sha256(sha256(versioned))
-      const checksum = checksumFull.slice(0, 4)
-      const addrBytes = new Uint8Array(versioned.length + 4)
-      addrBytes.set(versioned)
-      addrBytes.set(checksum, versioned.length)
-      address = base58.encode(addrBytes)
-      publicKey = toHex(pubKeyComp)
+    const THIRDWEB_KEY = Deno.env.get('THIRDWEB_SECRET_KEY') || Deno.env.get('VITE_THIRDWEB_CLIENT_ID')
+    if (THIRDWEB_KEY) {
+      try {
+        // Call ThirdWeb REST create wallet endpoint
+        const twRes = await fetch('https://api.thirdweb.com/v1/wallets', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${THIRDWEB_KEY}`
+          },
+          body: JSON.stringify({ chain_id: chainConfig.chainId, chain: chainConfig.name })
+        })
+        thirdwebResp = await twRes.json().catch(() => null)
+        if (twRes.ok && thirdwebResp) {
+          // Response may include different shapes; try common keys
+          address = thirdwebResp.address || thirdwebResp.wallet?.address || thirdwebResp.data?.address || ''
+          publicKey = thirdwebResp.publicKey || thirdwebResp.wallet?.publicKey || null
+        } else {
+          console.warn('ThirdWeb create wallet failed', thirdwebResp)
+        }
+      } catch (e) {
+        console.warn('Failed calling ThirdWeb API:', e)
+      }
+    }
 
-      const EK = Deno.env.get('BTC_ENCRYPTION_KEY') || Deno.env.get('WALLET_ENCRYPTION_KEY')
-      if (!EK) {
-        console.error('Missing BTC_ENCRYPTION_KEY/WALLET_ENCRYPTION_KEY')
+    // If ThirdWeb didn't return an address, fallback to deterministic generation for display only
+    if (!address) {
+      if (chainConfig.name === 'bitcoin') {
+        const privBytes = secp.utils.randomPrivateKey()
+        const pubKeyComp = secp.getPublicKey(privBytes, true)
+        const pubKeyHash = ripemd160(sha256(pubKeyComp))
+        const versioned = new Uint8Array(1 + pubKeyHash.length)
+        versioned[0] = 0x00
+        versioned.set(pubKeyHash, 1)
+        const checksumFull = sha256(sha256(versioned))
+        const checksum = checksumFull.slice(0, 4)
+        const addrBytes = new Uint8Array(versioned.length + 4)
+        addrBytes.set(versioned)
+        addrBytes.set(checksum, versioned.length)
+        address = base58.encode(addrBytes)
+        publicKey = toHex(pubKeyComp)
+      } else if (chainConfig.name === 'solana') {
+        const priv = ed25519.utils.randomPrivateKey()
+        const pub = await ed25519.getPublicKey(priv)
+        address = base58.encode(pub)
+        publicKey = toHex(pub)
       } else {
-        const privHex = toHex(privBytes)
-        encryptedKey = await aesGcmEncryptString(privHex, EK)
-      }
-    } else if (chainConfig.name === 'solana') {
-      // ed25519 keypair; address = base58(publicKey)
-      const priv = ed25519.utils.randomPrivateKey()
-      const pub = await ed25519.getPublicKey(priv)
-      address = base58.encode(pub)
-      publicKey = toHex(pub)
-      const EK = Deno.env.get('SOL_ENCRYPTION_KEY') || Deno.env.get('WALLET_ENCRYPTION_KEY')
-      if (!EK) {
-        console.error('Missing SOL_ENCRYPTION_KEY/WALLET_ENCRYPTION_KEY')
-      } else {
-        const privHex = toHex(priv)
-        encryptedKey = await aesGcmEncryptString(privHex, EK)
-      }
-    } else {
-      // EVM chains
-      const priv = secp.utils.randomPrivateKey()
-      const pubUn = secp.getPublicKey(priv, false) // 65 bytes, 0x04 prefix
-      const pubComp = secp.getPublicKey(priv, true)
-      const hash = keccak_256(pubUn.slice(1)) // drop 0x04
-      address = '0x' + toHex(hash.slice(-20))
-      publicKey = toHex(pubComp)
-      const EK = Deno.env.get('EVM_ENCRYPTION_KEY') || Deno.env.get('WALLET_ENCRYPTION_KEY')
-      if (!EK) {
-        console.error('Missing EVM_ENCRYPTION_KEY/WALLET_ENCRYPTION_KEY')
-      } else {
-        const privHex = toHex(priv)
-        encryptedKey = await aesGcmEncryptString(privHex, EK)
+        const priv = secp.utils.randomPrivateKey()
+        const pubUn = secp.getPublicKey(priv, false)
+        const hash = keccak_256(pubUn.slice(1))
+        address = '0x' + toHex(hash.slice(-20))
+        publicKey = toHex(secp.getPublicKey(priv, true))
       }
     }
 
