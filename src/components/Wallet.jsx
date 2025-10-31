@@ -448,7 +448,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             onClick={() => setShowThirdwebModal(true)}
             className="px-4 py-2 text-sm bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
           >
-            ��� Connect Wallet
+            🔗 Connect Wallet
           </button>
           <button
             onClick={() => setShowPreferencesInternal(true)}
@@ -627,6 +627,85 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         )}
       </div>
 
+
+      {/* Thirdweb Connect Wallet Modal */}
+      {showThirdwebModal && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-light text-slate-900">Connect Wallet</h3>
+              <button onClick={() => setShowThirdwebModal(false)} className="text-slate-500 hover:text-slate-700">✕</button>
+            </div>
+
+            {!connectedWallet ? (
+              <div className="space-y-4">
+                <p className="text-sm text-slate-600 mb-4">Connect your Web3 wallet to manage crypto assets on-chain</p>
+                <button
+                  onClick={handleConnectWallet}
+                  disabled={thirdwebConnecting}
+                  className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {thirdwebConnecting ? 'Connecting...' : 'Connect Wallet'}
+                </button>
+                <p className="text-xs text-slate-500 text-center">Supported: MetaMask, WalletConnect, Rainbow, Coinbase Wallet</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+                  <p className="text-xs text-slate-500 uppercase font-semibold">Connected Address</p>
+                  <p className="font-mono text-sm text-slate-900">{formatWalletAddress(connectedWallet.address)}</p>
+                  <p className="text-xs text-slate-600">Full: {connectedWallet.address}</p>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-slate-700">Select Chain</label>
+                  <select
+                    value={selectedChainId || ''}
+                    onChange={(e) => setSelectedChainId(parseInt(e.target.value))}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  >
+                    <option value="">Select a chain...</option>
+                    {Object.values(SUPPORTED_CHAINS).map((chain) => (
+                      <option key={chain.chainId} value={chain.chainId}>
+                        {chain.name} (ID: {chain.chainId})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-xs text-blue-700">
+                    <strong>Current Chain:</strong> {connectedWallet.chainName}
+                  </p>
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={disconnectWallet}
+                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
+                  >
+                    Disconnect
+                  </button>
+                  <button
+                    onClick={handleSaveConnectedWallet}
+                    disabled={thirdwebConnecting || !selectedChainId}
+                    className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {thirdwebConnecting ? 'Saving...' : 'Save Wallet'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <button
+              onClick={() => setShowThirdwebModal(false)}
+              className="w-full mt-4 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-sm font-medium"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Add Funds Modal */}
       {showAddFunds && (
