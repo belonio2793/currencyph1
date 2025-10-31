@@ -16,10 +16,12 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
   const [games, setGames] = useState([])
   const [loading, setLoading] = useState(false)
   const [selectedGame, setSelectedGame] = useState(null)
+  const [joinModalGame, setJoinModalGame] = useState(null)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('lobby')
   const [gameStats, setGameStats] = useState({ wins: 0, losses: 0, draws: 0 })
   const [board, setBoard] = useState(fenToBoard(STARTING_BOARD))
+  const [joiningGame, setJoiningGame] = useState(false)
 
   function fenToBoard(fen) {
     const boardArray = Array(64).fill(null)
@@ -127,14 +129,11 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
     }
   }
 
-  async function handleJoinGame(game) {
+  async function handleJoinGame() {
+    if (!joinModalGame) return
     if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
-    if (game.white_player_id === userId) {
-      setSelectedGame(game)
-      setActiveTab('board')
-      return
-    }
 
+    setJoiningGame(true)
     try {
       const { error } = await supabase
         .from('chess_games')
@@ -144,16 +143,19 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
           status: 'in_progress',
           started_at: new Date().toISOString()
         })
-        .eq('id', game.id)
+        .eq('id', joinModalGame.id)
 
       if (error) throw new Error(error.message)
 
-      const updatedGame = { ...game, black_player_id: userId, black_player_email: userEmail, status: 'in_progress' }
+      const updatedGame = { ...joinModalGame, black_player_id: userId, black_player_email: userEmail, status: 'in_progress' }
       setSelectedGame(updatedGame)
+      setJoinModalGame(null)
       setActiveTab('board')
       loadGames()
     } catch (e) {
       setError(`Failed to join game: ${e.message}`)
+    } finally {
+      setJoiningGame(false)
     }
   }
 
@@ -184,39 +186,14 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
 
         {activeTab === 'lobby' && (
           <div className="space-y-8">
-            {/* Player Stats */}
-            {userId && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                  <p className="text-sm font-medium text-slate-600 mb-2">Record</p>
-                  <p className="text-3xl font-bold text-slate-900">
-                    {gameStats.wins}W - {gameStats.losses}L
-                  </p>
-                  <p className="text-xs text-slate-500 mt-2">{gameStats.draws} draws</p>
-                </div>
-                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                  <p className="text-sm font-medium text-slate-600 mb-2">Wins</p>
-                  <p className="text-3xl font-bold text-green-600">{gameStats.wins}</p>
-                </div>
-                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                  <p className="text-sm font-medium text-slate-600 mb-2">Losses</p>
-                  <p className="text-3xl font-bold text-red-600">{gameStats.losses}</p>
-                </div>
-                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
-                  <p className="text-sm font-medium text-slate-600 mb-2">Draws</p>
-                  <p className="text-3xl font-bold text-slate-600">{gameStats.draws}</p>
-                </div>
-              </div>
-            )}
-
             {/* Main Layout: Board Left, Sidebar Right */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Chess Board Left (col-span 2) */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 space-y-6">
                 <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                   <h2 className="text-xl font-bold text-slate-900 mb-6">Game Board</h2>
                   {/* Display Chess Board */}
-                  <div className="bg-slate-300 p-2 rounded-lg aspect-square max-w-lg mx-auto">
+                  <div className="bg-gradient-to-br from-slate-400 to-slate-300 p-3 rounded-lg aspect-square max-w-lg mx-auto">
                     <div className="grid grid-cols-8 gap-0 h-full">
                       {board.map((piece, index) => {
                         const row = Math.floor(index / 8)
@@ -227,8 +204,9 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                           <div
                             key={index}
                             className={`
-                              flex items-center justify-center text-3xl font-bold
-                              ${isLight ? 'bg-amber-100' : 'bg-amber-700'}
+                              flex items-center justify-center text-4xl font-bold
+                              ${isLight ? 'bg-blue-50' : 'bg-slate-700'}
+                              transition-all
                             `}
                           >
                             {piece && PIECE_SYMBOLS[piece]}
@@ -238,19 +216,41 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                     </div>
                   </div>
                 </div>
+
+                {/* Player Stats Below Board */}
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                  <h3 className="text-lg font-bold text-slate-900 mb-6">Record</h3>
+                  <div className="grid grid-cols-3 gap-6">
+                    <div>
+                      <p className="text-sm text-slate-600 font-medium">Record</p>
+                      <p className="text-2xl font-bold text-slate-900 mt-2">
+                        {gameStats.wins}W - {gameStats.losses}L
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">{gameStats.draws} draws</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 font-medium">Wins</p>
+                      <p className="text-2xl font-bold text-green-600 mt-2">{gameStats.wins}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 font-medium">Losses</p>
+                      <p className="text-2xl font-bold text-red-600 mt-2">{gameStats.losses}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Sidebar Right */}
               <div className="space-y-6">
                 {/* Create Game Section */}
                 <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">Create Game</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Create Game</h3>
                   <div className="space-y-3">
                     {['blitz', 'rapid', 'classical', 'unlimited'].map(tc => (
                       <button
                         key={tc}
                         onClick={() => handleCreateGame(tc)}
-                        className="w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-all duration-200 border border-slate-300 hover:border-slate-400"
+                        className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-all duration-200"
                       >
                         {timeControlLabels[tc]}
                       </button>
@@ -260,7 +260,7 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
 
                 {/* Available Games */}
                 <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">Available Games</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-4">Available Games</h3>
                   <p className="text-sm text-slate-600 mb-4">
                     {games.length} game{games.length !== 1 ? 's' : ''} waiting
                   </p>
@@ -281,8 +281,8 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                             {timeControlLabels[game.time_control]}
                           </p>
                           <button
-                            onClick={() => handleJoinGame(game)}
-                            className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded font-semibold transition-colors"
+                            onClick={() => setJoinModalGame(game)}
+                            className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-semibold transition-colors"
                           >
                             Join
                           </button>
@@ -305,6 +305,46 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
               ← Back to Lobby
             </button>
             <ChessGameBoard game={selectedGame} userId={userId} userEmail={userEmail} onClose={closeGame} />
+          </div>
+        )}
+
+        {/* Join Game Modal */}
+        {joinModalGame && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-8">
+              <h3 className="text-2xl font-bold text-slate-900 mb-4">Join Game</h3>
+              
+              <div className="space-y-4 mb-6">
+                <div>
+                  <p className="text-sm text-slate-600 font-medium mb-1">Opponent</p>
+                  <p className="text-lg font-semibold text-slate-900">{joinModalGame.white_player_email}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600 font-medium mb-1">Time Control</p>
+                  <p className="text-lg font-semibold text-slate-900">{timeControlLabels[joinModalGame.time_control]}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-slate-600 font-medium mb-1">Color</p>
+                  <p className="text-lg font-semibold text-slate-900">Black</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 flex gap-3">
+                <button
+                  onClick={() => setJoinModalGame(null)}
+                  className="flex-1 px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleJoinGame}
+                  disabled={joiningGame}
+                  className="flex-1 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50"
+                >
+                  {joiningGame ? 'Joining...' : 'Join Game'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
