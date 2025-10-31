@@ -28,9 +28,15 @@ export const wisegcashAPI = {
 
     if (error) throw error
 
-    // Create default wallets for new user (PHP and USD)
-    await this.createWallet(newUser.id, 'PHP')
-    await this.createWallet(newUser.id, 'USD')
+    // Create default wallets for new user (PHP + USD) using the function
+    try {
+      await supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
+    } catch (rpcErr) {
+      console.warn('RPC default wallets creation failed, falling back to direct insert:', rpcErr)
+      // Fallback: create manually
+      await this.createWallet(newUser.id, 'PHP')
+      await this.createWallet(newUser.id, 'USD')
+    }
 
     return newUser
   },
@@ -47,7 +53,6 @@ export const wisegcashAPI = {
   },
 
   async updateUserProfile(userId, updates) {
-    // Use maybeSingle() to avoid error if multiple rows are returned due to data inconsistency
     const { data, error } = await supabase
       .from('users')
       .update({ ...updates, updated_at: new Date() })
@@ -80,7 +85,7 @@ export const wisegcashAPI = {
       throw new Error('Invalid userId: ' + userId)
     }
 
-    // First check if wallet already exists for this user and currency
+    // Check if wallet already exists
     const { data: existing } = await supabase
       .from('wallets')
       .select('*')
@@ -89,17 +94,20 @@ export const wisegcashAPI = {
       .single()
 
     if (existing) {
-      return existing // Wallet already exists, return it
+      return existing
     }
 
-    // Create new wallet if it doesn't exist
+    // Create new wallet
     const { data, error } = await supabase
       .from('wallets')
       .insert([
         {
           user_id: userId,
           currency_code: currencyCode,
-          balance: 0
+          balance: 0,
+          total_deposited: 0,
+          total_withdrawn: 0,
+          is_active: true
         }
       ])
       .select()
@@ -113,13 +121,13 @@ export const wisegcashAPI = {
   },
 
   async getWallets(userId) {
-    // Guard against invalid userId values like the string "null" which can break Postgres UUID comparisons
     if (!userId || userId === 'null' || userId === 'undefined') return []
 
     const { data, error } = await supabase
-      .from('wallets')
+      .from('user_wallets_summary')
       .select('*')
       .eq('user_id', userId)
+      .eq('is_active', true)
       .order('currency_code')
 
     if (error) throw error
@@ -135,37 +143,73 @@ export const wisegcashAPI = {
       .single()
 
     if (error && error.code === 'PGRST116') {
-      return null // Wallet doesn't exist
+      return null
     }
     if (error) throw error
     return data
   },
 
   async addFunds(userId, currencyCode, amount) {
+    if (!userId || !currencyCode || !amount || amount <= 0) {
+      throw new Error('Invalid parameters for addFunds')
+    }
+
+    let wallet = await this.getWallet(userId, currencyCode)
+    if (!wallet) {
+      wallet = await this.createWallet(userId, currencyCode)
+    }
+
+    try {
+      const { data, error } = await supabase.rpc('record_wallet_transaction', {
+        p_user_id: userId,
+        p_wallet_id: wallet.id,
+        p_transaction_type: 'deposit',
+        p_amount: amount,
+        p_currency_code: currencyCode,
+        p_description: `Deposit of ${amount} ${currencyCode}`
+      })
+
+      if (error) throw error
+      return data
+    } catch (err) {
+      console.error('Add funds error:', err)
+      throw err
+    }
+  },
+
+  async withdrawFunds(userId, currencyCode, amount) {
+    if (!userId || !currencyCode || !amount || amount <= 0) {
+      throw new Error('Invalid parameters for withdrawFunds')
+    }
+
     const wallet = await this.getWallet(userId, currencyCode)
-    if (!wallet) await this.createWallet(userId, currencyCode)
+    if (!wallet) throw new Error('Wallet not found')
+    if (wallet.balance < amount) throw new Error('Insufficient balance')
 
-    const newBalance = (wallet?.balance || 0) + amount
+    try {
+      const { data, error } = await supabase.rpc('record_wallet_transaction', {
+        p_user_id: userId,
+        p_wallet_id: wallet.id,
+        p_transaction_type: 'withdrawal',
+        p_amount: amount,
+        p_currency_code: currencyCode,
+        p_description: `Withdrawal of ${amount} ${currencyCode}`
+      })
 
-    const { data, error } = await supabase
-      .from('wallets')
-      .update({ balance: newBalance, updated_at: new Date() })
-      .eq('user_id', userId)
-      .eq('currency_code', currencyCode)
-      .select()
-      .single()
-
-    if (error) throw error
-
-    // Record transaction
-    await this.createTransaction(userId, 'add_funds', amount, currencyCode, `Added ${amount} ${currencyCode}`)
-
-    return data
+      if (error) throw error
+      return data
+    } catch (err) {
+      console.error('Withdraw funds error:', err)
+      throw err
+    }
   },
 
   // ============ Transfers ============
   async sendMoney(senderId, recipientEmail, senderCurrency, recipientCurrency, senderAmount, exchangeRate) {
-    // Get recipient user
+    if (!senderId || !recipientEmail || !senderAmount || !exchangeRate) {
+      throw new Error('Invalid parameters for sendMoney')
+    }
+
     const { data: recipientUser, error: recipientError } = await supabase
       .from('users')
       .select('*')
@@ -175,69 +219,80 @@ export const wisegcashAPI = {
     if (recipientError) throw new Error('Recipient not found')
 
     const recipientAmount = senderAmount * exchangeRate
-    const fee = senderAmount * 0.01 // 1% fee
+    const fee = senderAmount * 0.01
     const totalDebit = senderAmount + fee
 
-    // Check sender balance
     const senderWallet = await this.getWallet(senderId, senderCurrency)
     if (!senderWallet || senderWallet.balance < totalDebit) {
       throw new Error('Insufficient balance')
     }
 
-    // Debit sender
-    await supabase
-      .from('wallets')
-      .update({ balance: senderWallet.balance - totalDebit, updated_at: new Date() })
-      .eq('user_id', senderId)
-      .eq('currency_code', senderCurrency)
-
-    // Credit recipient
-    const recipientWallet = await this.getWallet(recipientUser.id, recipientCurrency)
-    const newRecipientBalance = (recipientWallet?.balance || 0) + recipientAmount
-
-    if (recipientWallet) {
-      await supabase
-        .from('wallets')
-        .update({ balance: newRecipientBalance, updated_at: new Date() })
-        .eq('user_id', recipientUser.id)
-        .eq('currency_code', recipientCurrency)
-    } else {
-      await this.createWallet(recipientUser.id, recipientCurrency)
-      await supabase
-        .from('wallets')
-        .update({ balance: recipientAmount, updated_at: new Date() })
-        .eq('user_id', recipientUser.id)
-        .eq('currency_code', recipientCurrency)
+    let recipientWallet = await this.getWallet(recipientUser.id, recipientCurrency)
+    if (!recipientWallet) {
+      recipientWallet = await this.createWallet(recipientUser.id, recipientCurrency)
     }
 
-    // Record transfer
     const refNumber = `TRN-${Date.now()}`
-    const { data: transfer, error } = await supabase
-      .from('transfers')
-      .insert([
-        {
-          sender_id: senderId,
-          recipient_id: recipientUser.id,
-          sender_currency: senderCurrency,
-          recipient_currency: recipientCurrency,
-          sender_amount: senderAmount,
-          recipient_amount: recipientAmount,
-          exchange_rate: exchangeRate,
-          fee,
-          status: 'completed',
-          reference_number: refNumber
-        }
-      ])
-      .select()
-      .single()
 
-    if (error) throw error
+    try {
+      // Debit sender with fee
+      await supabase.rpc('record_wallet_transaction', {
+        p_user_id: senderId,
+        p_wallet_id: senderWallet.id,
+        p_transaction_type: 'transfer_out',
+        p_amount: senderAmount,
+        p_currency_code: senderCurrency,
+        p_description: `Transfer to ${recipientEmail} (${recipientCurrency})`,
+        p_reference_id: refNumber
+      })
 
-    // Record transactions
-    await this.createTransaction(senderId, 'transfer_sent', senderAmount, senderCurrency, `Sent to ${recipientEmail}`, refNumber)
-    await this.createTransaction(recipientUser.id, 'transfer_received', recipientAmount, recipientCurrency, `Received from ${recipientEmail}`, refNumber)
+      // Debit fee
+      await supabase.rpc('record_wallet_transaction', {
+        p_user_id: senderId,
+        p_wallet_id: senderWallet.id,
+        p_transaction_type: 'rake',
+        p_amount: fee,
+        p_currency_code: senderCurrency,
+        p_description: `Transfer fee`,
+        p_reference_id: refNumber
+      })
 
-    return transfer
+      // Credit recipient
+      await supabase.rpc('record_wallet_transaction', {
+        p_user_id: recipientUser.id,
+        p_wallet_id: recipientWallet.id,
+        p_transaction_type: 'transfer_in',
+        p_amount: recipientAmount,
+        p_currency_code: recipientCurrency,
+        p_description: `Received from ${recipientEmail}`,
+        p_reference_id: refNumber
+      })
+
+      // Record transfer if transfers table exists
+      const { data: transfer } = await supabase
+        .from('transfers')
+        .insert([
+          {
+            sender_id: senderId,
+            recipient_id: recipientUser.id,
+            sender_currency: senderCurrency,
+            recipient_currency: recipientCurrency,
+            sender_amount: senderAmount,
+            recipient_amount: recipientAmount,
+            exchange_rate: exchangeRate,
+            fee,
+            status: 'completed',
+            reference_number: refNumber
+          }
+        ])
+        .select()
+        .single()
+
+      return transfer || { reference_number: refNumber, sender_amount: senderAmount, recipient_amount: recipientAmount }
+    } catch (err) {
+      console.error('Send money error:', err)
+      throw err
+    }
   },
 
   async getTransfers(userId) {
@@ -332,54 +387,57 @@ export const wisegcashAPI = {
   },
 
   async payBill(billId, userId, amount, currencyCode = 'PHP') {
-    // Check wallet balance
     const wallet = await this.getWallet(userId, currencyCode)
     if (!wallet || wallet.balance < amount) {
       throw new Error('Insufficient balance')
     }
 
-    // Debit wallet
-    await supabase
-      .from('wallets')
-      .update({ balance: wallet.balance - amount, updated_at: new Date() })
-      .eq('user_id', userId)
-      .eq('currency_code', currencyCode)
-
-    // Record bill payment
     const txnId = `PAY-${Date.now()}`
-    const { data: payment, error } = await supabase
-      .from('bill_payments')
-      .insert([
-        {
-          bill_id: billId,
-          user_id: userId,
-          amount,
-          currency_code: currencyCode,
-          transaction_id: txnId,
-          status: 'completed'
-        }
-      ])
-      .select()
-      .single()
 
-    if (error) throw error
+    try {
+      await supabase.rpc('record_wallet_transaction', {
+        p_user_id: userId,
+        p_wallet_id: wallet.id,
+        p_transaction_type: 'purchase',
+        p_amount: amount,
+        p_currency_code: currencyCode,
+        p_description: `Bill payment`,
+        p_reference_id: txnId
+      })
 
-    // Update bill status
-    await supabase
-      .from('bills')
-      .update({ status: 'paid', updated_at: new Date() })
-      .eq('id', billId)
+      const { data: payment, error } = await supabase
+        .from('bill_payments')
+        .insert([
+          {
+            bill_id: billId,
+            user_id: userId,
+            amount,
+            currency_code: currencyCode,
+            transaction_id: txnId,
+            status: 'completed'
+          }
+        ])
+        .select()
+        .single()
 
-    // Record transaction
-    await this.createTransaction(userId, 'bill_payment', amount, currencyCode, `Bill payment`, txnId)
+      if (error) throw error
 
-    return payment
+      await supabase
+        .from('bills')
+        .update({ status: 'paid', updated_at: new Date() })
+        .eq('id', billId)
+
+      return payment
+    } catch (err) {
+      console.error('Pay bill error:', err)
+      throw err
+    }
   },
 
   async getBillPayments(userId) {
     const { data, error } = await supabase
       .from('bill_payments')
-      .select(`*`)
+      .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
 
@@ -387,7 +445,52 @@ export const wisegcashAPI = {
     return data || []
   },
 
-  // ============ Transactions ============
+  // ============ Wallet Transactions (NEW) ============
+  async getWalletTransactions(userId, limit = 50) {
+    if (!userId || userId === 'null' || userId === 'undefined') return []
+
+    const { data, error } = await supabase
+      .from('wallet_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data || []
+  },
+
+  async getWalletTransactionsByType(userId, type, limit = 50) {
+    if (!userId || userId === 'null' || userId === 'undefined') return []
+
+    const { data, error } = await supabase
+      .from('wallet_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('type', type)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data || []
+  },
+
+  async getWalletTransactionsByCurrency(userId, currencyCode, limit = 50) {
+    if (!userId || userId === 'null' || userId === 'undefined') return []
+
+    const { data, error } = await supabase
+      .from('wallet_transactions')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('currency_code', currencyCode)
+      .order('created_at', { ascending: false })
+      .limit(limit)
+
+    if (error) throw error
+    return data || []
+  },
+
+  // ============ Legacy Transactions (for compatibility) ============
   async createTransaction(userId, transactionType, amount, currencyCode, description, referenceNumber = null) {
     const { data, error } = await supabase
       .from('transactions')
@@ -410,7 +513,6 @@ export const wisegcashAPI = {
   },
 
   async getTransactions(userId, limit = 20) {
-    // Protect against bad input where userId might be the literal string "null" from client state
     if (!userId || userId === 'null' || userId === 'undefined') return []
 
     const { data, error } = await supabase
@@ -422,6 +524,32 @@ export const wisegcashAPI = {
 
     if (error) throw error
     return data || []
+  },
+
+  // ============ Currencies (NEW) ============
+  async getCurrencies(activeOnly = true) {
+    let query = supabase.from('currencies').select('*')
+    
+    if (activeOnly) {
+      query = query.eq('active', true)
+    }
+
+    const { data, error } = await query.order('is_default', { ascending: false }).order('code')
+
+    if (error) throw error
+    return data || []
+  },
+
+  async getCurrencyByCode(code) {
+    const { data, error } = await supabase
+      .from('currencies')
+      .select('*')
+      .eq('code', code)
+      .single()
+
+    if (error && error.code === 'PGRST116') return null
+    if (error) throw error
+    return data
   },
 
   // ============ Exchange Rates ============
@@ -439,32 +567,17 @@ export const wisegcashAPI = {
       console.warn(`Exchange rate not found for ${fromCurrency} to ${toCurrency}`)
       return null
     }
-
-    return data.rate
-  },
-
-  async updateExchangeRate(fromCurrency, toCurrency, rate) {
-    const { data, error } = await supabase
-      .from('currency_rates')
-      .upsert([
-        {
-          from_currency: fromCurrency,
-          to_currency: toCurrency,
-          rate,
-          last_updated: new Date()
-        }
-      ])
-      .select()
-      .single()
-
     if (error) throw error
-    return data
+    return data?.rate || null
   },
 
-  async getAllExchangeRates() {
+  async getExchangeRates(currencies = []) {
+    if (!currencies.length) return []
+
     const { data, error } = await supabase
       .from('currency_rates')
       .select('*')
+      .in('from_currency', currencies)
 
     if (error) throw error
     return data || []
