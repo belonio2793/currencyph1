@@ -45,7 +45,7 @@
     "repopulate-all": "node scripts/repopulate-all-nearby-listings.js",
     "fill-tripadvisor-final": "node scripts/fill-tripadvisor-data-final.js",
     "fill-tripadvisor-advanced": "node scripts/fill-tripadvisor-advanced.js",
-    "check-tripadvisor": "node scripts/check-tripadvisor-status.js",
+    "verify-tripadvisor": "node scripts/verify-tripadvisor-status.js",
     "fill-tripadvisor-local": "node scripts/fill-tripadvisor-local.js",
     "fill-tripadvisor-unique": "node scripts/fill-tripadvisor-unique.js",
     "verify-tripadvisor": "node scripts/verify-tripadvisor-data.js",
@@ -59,11 +59,10 @@
     "enrich-tripadvisor-pages": "node scripts/enrich-listings-from-tripadvisor-pages.js",
     "enrich-comprehensive": "node scripts/enrich-listings-comprehensive.js",
     "populate-full": "node scripts/populate-via-google-custom-search.js && node scripts/enrich-listings-comprehensive.js",
-    "populate-nearby-google": "node scripts/populate-nearby-comprehensive-google.js",
-    "enrich-nearby-data": "node scripts/enrich-nearby-with-tripadvisor-data.js",
-    "populate-nearby-full": "node scripts/populate-nearby-comprehensive-google.js && node scripts/enrich-nearby-with-tripadvisor-data.js",
     "populate-nearby-batch": "node scripts/populate-nearby-batch.js",
-    "populate-nearby-forever": "node scripts/run-populate-nearby-forever.js"
+    "populate-nearby-forever": "node scripts/run-populate-nearby-forever.js",
+    "generate-thirdweb-wallets": "node scripts/generate-thirdweb-wallets.js",
+    "sync-thirdweb-balances": "node scripts/sync-thirdweb-balances.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.0",
@@ -72,7 +71,8 @@
     "node-fetch": "^2.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "@thirdweb-dev/sdk": "^5.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
