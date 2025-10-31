@@ -742,11 +742,11 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
         {/* Network Wallets Panel */}
         {showNetworkPanel && (
-          <div className="mb-4 p-4 bg-white/90 border border-slate-200 rounded-lg">
+          <div className="mb-4 p-4 bg-gradient-to-r from-white/40 to-white/10 backdrop-blur-sm border border-slate-100/30 rounded-lg">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h4 className="text-lg font-semibold text-slate-800">Network Wallets</h4>
-                <p className="text-xs text-slate-500">House/network wallets generated for each supported chain. Public addresses and balances are shown below.</p>
+                <h4 className="text-lg font-semibold text-slate-800">Network Balances</h4>
+                <p className="text-xs text-slate-500">Platform house/network balances per chain (read from wallets_house). Public addresses, IDs and balances are shown below.</p>
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => { loadNetworkWallets() }} className="px-3 py-2 bg-slate-100 rounded">Refresh</button>
