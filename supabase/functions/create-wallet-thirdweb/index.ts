@@ -37,11 +37,9 @@ Deno.serve(async (req) => {
   try {
     const PROJECT_URL = Deno.env.get('SUPABASE_URL')
     const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    const THIRDWEB_CLIENT_ID = Deno.env.get('VITE_THIRDWEB_CLIENT_ID')
-    const THIRDWEB_SECRET_KEY = Deno.env.get('THIRDWEB_SECRET_KEY')
 
-    if (!PROJECT_URL || !SERVICE_ROLE_KEY || !THIRDWEB_CLIENT_ID || !THIRDWEB_SECRET_KEY) {
-      console.error('Missing environment variables')
+    if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase environment variables')
       return new Response(JSON.stringify({ error: 'Missing configuration' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
