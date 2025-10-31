@@ -7,15 +7,31 @@ if (!CLIENT_ID) {
   console.warn('VITE_THIRDWEB_CLIENT_ID environment variable not set')
 }
 
-// Supported chains for Thirdweb integration
+// Supported chains for Thirdweb integration (expanded)
 export const SUPPORTED_CHAINS = {
   ethereum: { chainId: 1, name: 'Ethereum', symbol: 'ETH', rpcUrl: 'https://eth.rpc.thirdweb.com' },
-  polygon: { chainId: 137, name: 'Polygon', symbol: 'MATIC', rpcUrl: 'https://polygon.rpc.thirdweb.com' },
-  base: { chainId: 8453, name: 'Base', symbol: 'BASE', rpcUrl: 'https://base.rpc.thirdweb.com' },
-  arbitrum: { chainId: 42161, name: 'Arbitrum', symbol: 'ARB', rpcUrl: 'https://arbitrum.rpc.thirdweb.com' },
   optimism: { chainId: 10, name: 'Optimism', symbol: 'OP', rpcUrl: 'https://optimism.rpc.thirdweb.com' },
-  solana: { chainId: 245022926, name: 'Solana', symbol: 'SOL', rpcUrl: 'https://solana.rpc.thirdweb.com' },
-  avalanche: { chainId: 43114, name: 'Avalanche', symbol: 'AVAX', rpcUrl: 'https://avalanche.rpc.thirdweb.com' }
+  bsc: { chainId: 56, name: 'BSC', symbol: 'BNB', rpcUrl: 'https://bsc.rpc.thirdweb.com' },
+  gnosis: { chainId: 100, name: 'Gnosis', symbol: 'GNO', rpcUrl: 'https://gnosis.rpc.thirdweb.com' },
+  polygon: { chainId: 137, name: 'Polygon', symbol: 'MATIC', rpcUrl: 'https://polygon.rpc.thirdweb.com' },
+  fantom: { chainId: 250, name: 'Fantom', symbol: 'FTM', rpcUrl: 'https://fantom.rpc.thirdweb.com' },
+  arbitrum: { chainId: 42161, name: 'Arbitrum', symbol: 'ARB', rpcUrl: 'https://arbitrum.rpc.thirdweb.com' },
+  arbitrum_nova: { chainId: 42170, name: 'Arbitrum Nova', symbol: 'ARB', rpcUrl: 'https://arbitrum-nova.rpc.thirdweb.com' },
+  base: { chainId: 8453, name: 'Base', symbol: 'BASE', rpcUrl: 'https://base.rpc.thirdweb.com' },
+  avalanche: { chainId: 43114, name: 'Avalanche', symbol: 'AVAX', rpcUrl: 'https://avalanche.rpc.thirdweb.com' },
+  moonbeam: { chainId: 1284, name: 'Moonbeam', symbol: 'GLMR', rpcUrl: 'https://moonbeam.rpc.thirdweb.com' },
+  moonriver: { chainId: 1285, name: 'Moonriver', symbol: 'MOVR', rpcUrl: 'https://moonriver.rpc.thirdweb.com' },
+  celo: { chainId: 42220, name: 'Celo', symbol: 'CELO', rpcUrl: 'https://celo.rpc.thirdweb.com' },
+  cronos: { chainId: 25, name: 'Cronos', symbol: 'CRO', rpcUrl: 'https://cronos.rpc.thirdweb.com' },
+  zksync: { chainId: 324, name: 'zkSync', symbol: 'ZK', rpcUrl: 'https://zksync.rpc.thirdweb.com' },
+  linea: { chainId: 59144, name: 'Linea', symbol: 'LINEA', rpcUrl: 'https://linea.rpc.thirdweb.com' },
+  mantle: { chainId: 5000, name: 'Mantle', symbol: 'MNT', rpcUrl: 'https://mantle.rpc.thirdweb.com' },
+  evmos: { chainId: 9001, name: 'Evmos', symbol: 'EVMOS', rpcUrl: 'https://evmos.rpc.thirdweb.com' },
+  boba: { chainId: 288, name: 'Boba', symbol: 'BOBA', rpcUrl: 'https://boba.rpc.thirdweb.com' },
+  metis: { chainId: 1088, name: 'Metis', symbol: 'METIS', rpcUrl: 'https://metis.rpc.thirdweb.com' },
+  okc: { chainId: 66, name: 'OKC', symbol: 'OKT', rpcUrl: 'https://okc.rpc.thirdweb.com' },
+  aurora: { chainId: 1313161554, name: 'Aurora', symbol: 'AURORA', rpcUrl: 'https://aurora.rpc.thirdweb.com' },
+  solana: { chainId: 245022926, name: 'Solana', symbol: 'SOL', rpcUrl: 'https://solana.rpc.thirdweb.com' }
 }
 
 export const CHAIN_IDS = Object.values(SUPPORTED_CHAINS).reduce((acc, chain) => {
