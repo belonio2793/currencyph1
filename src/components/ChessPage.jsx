@@ -193,8 +193,8 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                 <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                   <h2 className="text-xl font-bold text-slate-900 mb-6">Game Board</h2>
                   {/* Display Chess Board */}
-                  <div className="bg-gradient-to-br from-slate-400 to-slate-300 p-3 rounded-lg aspect-square max-w-lg mx-auto">
-                    <div className="grid grid-cols-8 gap-0 h-full">
+                  <div className="mx-auto max-w-lg">
+                    <div className="aspect-square grid grid-cols-8 gap-0 border-2 border-slate-400">
                       {board.map((piece, index) => {
                         const row = Math.floor(index / 8)
                         const col = index % 8
@@ -204,7 +204,7 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                           <div
                             key={index}
                             className={`
-                              flex items-center justify-center text-4xl font-bold
+                              aspect-square flex items-center justify-center text-3xl font-bold
                               ${isLight ? 'bg-blue-50' : 'bg-slate-700'}
                               transition-all
                             `}
