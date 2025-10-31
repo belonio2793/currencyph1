@@ -90,7 +90,6 @@ export default class ChessEngine {
 
   getLegalMoves() {
     const moves = []
-    const piece = (p, index) => this.board[index]
 
     for (let fromIndex = 0; fromIndex < 64; fromIndex++) {
       const p = this.board[fromIndex]
@@ -113,8 +112,11 @@ export default class ChessEngine {
   getPossibleMoves(square) {
     const moves = []
     const index = this.squareToIndex(square)
-    const piece = this.board[index].toLowerCase()
-    const isWhite = this.isWhitePiece(this.board[index])
+    const piece = this.board[index]
+    if (!piece) return moves
+
+    const lower = piece.toLowerCase()
+    const isWhite = this.isWhitePiece(piece)
 
     const addMove = (toIndex) => {
       if (toIndex < 0 || toIndex >= 64) return
@@ -127,7 +129,7 @@ export default class ChessEngine {
     const row = Math.floor(index / 8)
     const col = index % 8
 
-    if (piece === 'p') {
+    if (lower === 'p') {
       const direction = isWhite ? -1 : 1
       const startRow = isWhite ? 6 : 1
       const newIndex = index + direction * 8
@@ -137,7 +139,6 @@ export default class ChessEngine {
           moves.push(this.indexToSquare(newIndex + direction * 8))
         }
       }
-      // Captures
       const captureLeft = newIndex - 1
       const captureRight = newIndex + 1
       if (captureLeft >= 0 && captureLeft < 64 && Math.floor(captureLeft / 8) === Math.floor(newIndex / 8)) {
@@ -148,7 +149,7 @@ export default class ChessEngine {
         const target = this.board[captureRight]
         if (target && this.isWhitePiece(target) !== isWhite) moves.push(this.indexToSquare(captureRight))
       }
-    } else if (piece === 'n') {
+    } else if (lower === 'n') {
       const jumps = [
         [-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]
       ]
@@ -159,7 +160,7 @@ export default class ChessEngine {
           addMove(newRow * 8 + newCol)
         }
       })
-    } else if (piece === 'k') {
+    } else if (lower === 'k') {
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
           if (dr === 0 && dc === 0) continue
@@ -170,19 +171,12 @@ export default class ChessEngine {
           }
         }
       }
-      // Castling
-      if (this.canCastle(isWhite, true)) {
-        moves.push(isWhite ? 'g1' : 'g8')
-      }
-      if (this.canCastle(isWhite, false)) {
-        moves.push(isWhite ? 'c1' : 'c8')
-      }
-    } else if (piece === 'b' || piece === 'r' || piece === 'q') {
+    } else if (lower === 'b' || lower === 'r' || lower === 'q') {
       const directions = []
-      if (piece === 'b' || piece === 'q') {
+      if (lower === 'b' || lower === 'q') {
         directions.push([-1, -1], [-1, 1], [1, -1], [1, 1])
       }
-      if (piece === 'r' || piece === 'q') {
+      if (lower === 'r' || lower === 'q') {
         directions.push([-1, 0], [1, 0], [0, -1], [0, 1])
       }
       directions.forEach(([dr, dc]) => {
@@ -207,31 +201,6 @@ export default class ChessEngine {
     return moves
   }
 
-  canCastle(isWhite, kingSide) {
-    const rights = this.castlingRights
-    if (isWhite) {
-      if (kingSide && !rights.includes('K')) return false
-      if (!kingSide && !rights.includes('Q')) return false
-    } else {
-      if (kingSide && !rights.includes('k')) return false
-      if (!kingSide && !rights.includes('q')) return false
-    }
-
-    const kingIndex = isWhite ? 4 : 60
-    const rook1Index = isWhite ? 7 : 63
-    const rook2Index = isWhite ? 0 : 56
-
-    if (kingSide) {
-      return this.board[kingIndex] === (isWhite ? 'K' : 'k') &&
-             this.board[rook1Index] === (isWhite ? 'R' : 'r') &&
-             !this.board[5] && !this.board[6]
-    } else {
-      return this.board[kingIndex] === (isWhite ? 'K' : 'k') &&
-             this.board[rook2Index] === (isWhite ? 'R' : 'r') &&
-             !this.board[1] && !this.board[2] && !this.board[3]
-    }
-  }
-
   isLegalMove(move) {
     const fromIndex = this.squareToIndex(move.from)
     const toIndex = this.squareToIndex(move.to)
@@ -251,6 +220,7 @@ export default class ChessEngine {
   }
 
   isKingInCheck(board, kingIndex) {
+    if (kingIndex < 0) return false
     const kingSquare = this.indexToSquare(kingIndex)
     const isWhiteKing = board[kingIndex] === 'K'
 
@@ -270,10 +240,11 @@ export default class ChessEngine {
   getPossibleMovesForBoard(board, square) {
     const moves = []
     const index = this.squareToIndex(square)
-    const piece = board[index]?.toLowerCase()
+    const piece = board[index]
     if (!piece) return moves
 
-    const isWhite = board[index] === board[index].toUpperCase()
+    const lower = piece.toLowerCase()
+    const isWhite = piece === piece.toUpperCase()
     const row = Math.floor(index / 8)
     const col = index % 8
 
@@ -284,7 +255,7 @@ export default class ChessEngine {
       moves.push(this.indexToSquare(toIndex))
     }
 
-    if (piece === 'p') {
+    if (lower === 'p') {
       const direction = isWhite ? -1 : 1
       const newIndex = index + direction * 8
       if (newIndex >= 0 && newIndex < 64 && !board[newIndex]) {
@@ -300,20 +271,23 @@ export default class ChessEngine {
         const target = board[captureRight]
         if (target && this.isWhitePiece(target) !== isWhite) moves.push(this.indexToSquare(captureRight))
       }
-    } else if (piece === 'n') {
-      [[−2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]].forEach(([dr, dc]) => {
+    } else if (lower === 'n') {
+      const jumps = [
+        [-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]
+      ]
+      jumps.forEach(([dr, dc]) => {
         const newRow = row + dr
         const newCol = col + dc
         if (newRow >= 0 && newRow < 8 && newCol >= 0 && newCol < 8) {
           addMove(newRow * 8 + newCol)
         }
       })
-    } else if (piece === 'b' || piece === 'r' || piece === 'q') {
+    } else if (lower === 'b' || lower === 'r' || lower === 'q') {
       const directions = []
-      if (piece === 'b' || piece === 'q') {
+      if (lower === 'b' || lower === 'q') {
         directions.push([-1, -1], [-1, 1], [1, -1], [1, 1])
       }
-      if (piece === 'r' || piece === 'q') {
+      if (lower === 'r' || lower === 'q') {
         directions.push([-1, 0], [1, 0], [0, -1], [0, 1])
       }
       directions.forEach(([dr, dc]) => {
@@ -333,7 +307,7 @@ export default class ChessEngine {
           }
         }
       })
-    } else if (piece === 'k') {
+    } else if (lower === 'k') {
       for (let dr = -1; dr <= 1; dr++) {
         for (let dc = -1; dc <= 1; dc++) {
           if (dr === 0 && dc === 0) continue
@@ -384,13 +358,5 @@ export default class ChessEngine {
     }
 
     return 'in_progress'
-  }
-
-  isWhitePiece(piece) {
-    return piece && piece === piece.toUpperCase()
-  }
-
-  isBlackPiece(piece) {
-    return piece && piece === piece.toLowerCase()
   }
 }
