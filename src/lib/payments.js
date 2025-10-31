@@ -194,14 +194,28 @@ export const wisegcashAPI = {
   async getWallets(userId) {
     if (!userId || userId === 'null' || userId === 'undefined') return []
 
+    // Try querying the wallets table directly (more reliable than views for real-time data)
     const { data, error } = await supabase
-      .from('user_wallets_summary')
+      .from('wallets')
       .select('*')
       .eq('user_id', userId)
       .eq('is_active', true)
       .order('currency_code')
 
-    if (error) throw error
+    // If wallets table query fails, try the summary view as fallback
+    if (error) {
+      console.warn('Error querying wallets table, trying summary view:', error)
+      const { data: summaryData, error: summaryError } = await supabase
+        .from('user_wallets_summary')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('currency_code')
+
+      if (summaryError) throw summaryError
+      return summaryData || []
+    }
+
     return data || []
   },
 
