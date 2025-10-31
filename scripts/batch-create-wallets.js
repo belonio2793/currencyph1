@@ -85,13 +85,9 @@ async function createBitcoinWallet() {
 }
 
 async function createSolanaWallet() {
-  if (!ed25519Module || !base58Module) {
-    throw new Error('Required libraries not installed. Run: npm install @noble/ed25519 bs58');
-  }
-
-  const priv = ed25519Module.ed25519.utils.randomPrivateKey();
-  const pub = await ed25519Module.ed25519.getPublicKey(priv);
-  const address = base58Module.encode(pub);
+  const priv = ed25519.utils.randomPrivateKey();
+  const pub = await ed25519.getPublicKey(priv);
+  const address = bs58.encode(pub);
   const public_key = toHex(pub);
   const privateKeyHex = toHex(priv);
 
