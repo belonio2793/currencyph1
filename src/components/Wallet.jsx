@@ -780,6 +780,27 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => { loadNetworkWallets() }} className="px-3 py-2 bg-slate-100 rounded">Refresh</button>
+                <button
+                  onClick={async () => {
+                    try {
+                      setBatchCreating(true)
+                      setBatchResult(null)
+                      const { data, error } = await supabase.functions.invoke('create-wallet-batch', { body: { create_house: true } })
+                      if (error) throw error
+                      setBatchResult(data)
+                      await loadNetworkWallets()
+                    } catch (e) {
+                      console.error('Batch create error', e)
+                      setBatchResult({ ok: false, error: e.message || String(e) })
+                    } finally {
+                      setBatchCreating(false)
+                    }
+                  }}
+                  disabled={batchCreating}
+                  className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+                >
+                  {batchCreating ? 'Creating...' : 'Create ThirdWeb Wallets'}
+                </button>
                 <button onClick={() => setShowNetworkPanel(false)} className="px-3 py-2 bg-white border rounded">Close</button>
               </div>
             </div>
