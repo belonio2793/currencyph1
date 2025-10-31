@@ -623,13 +623,10 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             <p className="text-xs text-slate-500 mt-1">Manage your on-chain wallets. Connect a Web3 wallet or create a manual wallet for any supported chain.</p>
           </div>
           <div className="flex items-center gap-3">
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search chains (e.g. bitcoin, eth, polygon)"
-              className="px-3 py-2 border border-slate-300 rounded-lg text-sm w-64 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
+            <div>
+              <h3 className="text-xl font-light">Crypto Wallets</h3>
+              <p className="text-xs text-slate-500 mt-1">Manage your on-chain wallets. Connect a Web3 wallet or create a manual wallet for any supported chain.</p>
+            </div>
           </div>
         </div>
 
