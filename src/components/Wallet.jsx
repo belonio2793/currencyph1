@@ -163,8 +163,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         console.warn('Error loading wallets_crypto from Supabase:', e)
       }
 
-      // Keep a combined list for preferences and lookups
-      const combined = [...internal, ...(fiatWallets || []), ...(cryptoWallets || [])]
+      // Keep a combined list for preferences and lookups (use locally mapped arrays to avoid stale state)
+      const combined = [...internal, ...(typeof fiatMapped !== 'undefined' ? fiatMapped : []), ...(typeof cryptoMapped !== 'undefined' ? cryptoMapped : [])]
       setWallets(combined)
       setError('')
 
