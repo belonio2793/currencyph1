@@ -41,8 +41,8 @@ async function aesGcmEncryptString(plaintext, keyString) {
 
 async function run() {
   try {
-    // generate solana keypair
-    const priv = ed25519.utils.randomPrivateKey()
+    // generate solana keypair (use Node crypto for randomness)
+    const priv = crypto.randomBytes(32)
     const pub = await ed25519.getPublicKey(priv)
     const address = base58.encode(pub)
     const public_key = toHex(pub)
