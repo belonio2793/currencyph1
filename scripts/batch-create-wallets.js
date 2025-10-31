@@ -95,15 +95,11 @@ async function createSolanaWallet() {
 }
 
 async function createEVMWallet() {
-  if (!secp256k1Module || !keccak256Func) {
-    throw new Error('Required libraries not installed. Run: npm install @noble/secp256k1 @noble/hashes');
-  }
-
-  const priv = secp256k1Module.secp256k1.utils.randomPrivateKey();
-  const pubUn = secp256k1Module.secp256k1.getPublicKey(priv, false);
-  const hash = keccak256Func(pubUn.slice(1));
+  const priv = secp256k1.utils.randomPrivateKey();
+  const pubUn = secp256k1.getPublicKey(priv, false);
+  const hash = keccak_256(pubUn.slice(1));
   const address = '0x' + toHex(hash.slice(-20)).toLowerCase();
-  const public_key = toHex(secp256k1Module.secp256k1.getPublicKey(priv, true));
+  const public_key = toHex(secp256k1.getPublicKey(priv, true));
   const privateKeyHex = toHex(priv);
 
   return { address, public_key, private_key: privateKeyHex };
