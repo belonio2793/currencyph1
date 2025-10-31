@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import SendLocationModal from './SendLocationModal'
+import { preferencesManager } from '../lib/preferencesManager'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
@@ -71,10 +72,34 @@ function CenterButton({ location, fallback }) {
 export default function HeaderMap({ userId: headerUserId }) {
   const { location, error, loading, city } = useGeolocation()
   const [isExpanded, setIsExpanded] = useState(false)
+  const [shareEnabled, setShareEnabled] = useState(true)
 
   // Default to Philippines center
   const defaultLocation = { latitude: 12.5, longitude: 121.5 }
   const displayLocation = location || defaultLocation
+
+  useEffect(() => {
+    // Load preference from localStorage (preferencesManager)
+    try {
+      const prefs = preferencesManager.getAllPreferences(headerUserId)
+      if (typeof prefs.locationSharing !== 'undefined') setShareEnabled(Boolean(prefs.locationSharing))
+      else setShareEnabled(true)
+    } catch (e) {
+      setShareEnabled(true)
+    }
+  }, [headerUserId])
+
+  const toggleShare = () => {
+    const next = !shareEnabled
+    setShareEnabled(next)
+    try {
+      const prefs = preferencesManager.getAllPreferences(headerUserId) || {}
+      prefs.locationSharing = next
+      preferencesManager.setPreferences(headerUserId, prefs)
+    } catch (e) {
+      console.warn('Failed to save location sharing preference', e)
+    }
+  }
 
   return (
     <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
@@ -93,9 +118,9 @@ export default function HeaderMap({ userId: headerUserId }) {
             </>
           ) : (
             <>
-              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <div className={`w-2 h-2 rounded-full ${shareEnabled ? 'bg-green-500' : 'bg-gray-400'}`} />
               <span className="text-xs text-slate-600 font-medium">
-                {city || `${displayLocation.latitude.toFixed(2)}, ${displayLocation.longitude.toFixed(2)}`}
+                {shareEnabled ? (city || `${displayLocation.latitude.toFixed(2)}, ${displayLocation.longitude.toFixed(2)}`) : 'Location sharing disabled'}
               </span>
             </>
           )}
@@ -147,8 +172,8 @@ export default function HeaderMap({ userId: headerUserId }) {
                   attribution='&copy; OpenStreetMap contributors'
                 />
 
-                {/* Show marker only if we have a live location */}
-                {location && (
+                {/* Show marker only if we have a live location and sharing is enabled */}
+                {location && shareEnabled && (
                   <Marker position={[location.latitude, location.longitude]}>
                     <Popup>
                       <div className="text-sm">
@@ -163,15 +188,24 @@ export default function HeaderMap({ userId: headerUserId }) {
                 )}
 
                 {/* Center button control - uses map instance via useMap */}
-                <CenterButton location={location} fallback={displayLocation} />
+                <CenterButton location={location && shareEnabled ? location : null} fallback={displayLocation} />
 
-                <MapUpdater location={location} />
+                <MapUpdater location={location && shareEnabled ? location : null} />
               </MapContainer>
 
               {/* Overlay messages for loading / error */}
-              {(loading || error) && (
+              {(loading || error || !shareEnabled) && (
                 <div className="absolute inset-0 flex items-center justify-center flex-col gap-2 bg-white/60">
-                  {loading && (
+                  {!shareEnabled && (
+                    <>
+                      <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v2m0-10a9 9 0 110-18 9 9 0 010 18z" />
+                      </svg>
+                      <p className="text-slate-600 text-sm">Location sharing is disabled.</p>
+                      <p className="text-slate-500 text-xs">Enable location sharing to see live updates and send location.</p>
+                    </>
+                  )}
+                  {loading && shareEnabled && (
                     <>
                       <div className="animate-spin">
                         <svg
@@ -192,7 +226,7 @@ export default function HeaderMap({ userId: headerUserId }) {
                       <p className="text-slate-500 text-xs">Please allow location access when prompted</p>
                     </>
                   )}
-                  {error && (
+                  {error && shareEnabled && (
                     <>
                       <svg
                         className="w-8 h-8 text-red-500"
@@ -216,15 +250,26 @@ export default function HeaderMap({ userId: headerUserId }) {
             </div>
 
             <div className="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full" />
-                Real-time tracking enabled. Updates automatically as you move.
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${shareEnabled ? 'bg-green-500' : 'bg-gray-400'}`} />
+                  <div>{shareEnabled ? 'Real-time tracking enabled. Updates automatically as you move.' : 'Real-time tracking paused.'}</div>
+                </div>
+                <div>
+                  <button
+                    onClick={toggleShare}
+                    className="px-3 py-1 bg-white border rounded text-sm"
+                    aria-pressed={!shareEnabled}
+                  >
+                    {shareEnabled ? 'Disable Location Sharing' : 'Enable Location Sharing'}
+                  </button>
+                </div>
               </div>
             </div>
             <div className="p-4 border-t border-slate-200 flex items-center justify-between">
               <div className="text-xs text-slate-600">Share your location with a user</div>
               <div>
-                <SendLocationButton location={displayLocation} city={city} userId={headerUserId} />
+                <SendLocationButton location={displayLocation} city={city} userId={headerUserId} shareEnabled={shareEnabled} />
               </div>
             </div>
           </div>
@@ -235,7 +280,7 @@ export default function HeaderMap({ userId: headerUserId }) {
 }
 
 
-function SendLocationButton({ location, city, userId: userIdProp }) {
+function SendLocationButton({ location, city, userId: userIdProp, shareEnabled = true }) {
   const [open, setOpen] = useState(false)
   const [userId, setUserId] = useState(userIdProp || null)
   const [loading, setLoading] = useState(!userIdProp)
@@ -259,12 +304,12 @@ function SendLocationButton({ location, city, userId: userIdProp }) {
     <>
       <button
         onClick={() => setOpen(true)}
-        disabled={loading || !userId}
+        disabled={loading || !userId || !shareEnabled}
         className="px-3 py-2 bg-white border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {loading ? 'Loading...' : !userId ? 'Login to share' : 'Send Location'}
+        {loading ? 'Loading...' : !userId ? 'Login to share' : !shareEnabled ? 'Location sharing disabled' : 'Send Location'}
       </button>
-      {open && userId && <SendLocationModal open={open} onClose={() => setOpen(false)} location={location} city={city} senderId={userId} />}
+      {open && userId && shareEnabled && <SendLocationModal open={open} onClose={() => setOpen(false)} location={location} city={city} senderId={userId} />}
     </>
   )
 }
