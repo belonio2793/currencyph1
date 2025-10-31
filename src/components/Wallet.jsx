@@ -82,14 +82,14 @@ export default function Wallet({ userId }) {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">My Wallets</h2>
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">My Wallets</h2>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
       {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
 
       {/* Existing Wallets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {wallets.map(wallet => (
           <div key={wallet.id} className="bg-white border border-slate-200 rounded-xl p-8 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-6">
@@ -116,9 +116,9 @@ export default function Wallet({ userId }) {
       </div>
 
       {/* Create New Wallet */}
-      <div className="bg-white border border-slate-200 rounded-xl p-8">
-        <h3 className="text-lg font-light text-slate-900 mb-6 tracking-wide">Create New Wallet</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-6">
+        <h3 className="text-lg font-light text-slate-900 mb-4 tracking-wide">Create New Wallet</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {currencies.map(currency => {
             const exists = wallets.some(w => w.currency_code === currency)
             return (
