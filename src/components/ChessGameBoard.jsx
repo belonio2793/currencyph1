@@ -248,13 +248,23 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                       key={square}
                       onClick={() => handleSquareClick(square)}
                       className={`
-                        aspect-square flex items-center justify-center p-0 leading-none transition-all overflow-visible
-                        ${isSelected ? 'ring-4 ring-blue-500' : ''}
-                        ${isHighlighted ? 'ring-inset ring-4 ring-green-500' : ''}
-                        hover:opacity-90 cursor-pointer
+                        relative aspect-square flex items-center justify-center p-0 leading-none transition-all overflow-hidden
+                        hover:opacity-95 cursor-pointer
                       `}
                       style={{ backgroundColor: isLastMove ? (isLight ? '#baca44' : '#a9b33d') : (isLight ? '#EEEED2' : '#769656') }}
                     >
+                      {/* Selection overlay */}
+                      {isSelected && (
+                        <span className="absolute inset-0 bg-blue-400/25 pointer-events-none" />
+                      )}
+
+                      {/* Move destination overlays */}
+                      {isHighlighted && (
+                        piece
+                          ? <span className="absolute inset-0 bg-emerald-400/25 pointer-events-none" />
+                          : <span className="absolute w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-emerald-500/80 pointer-events-none" />
+                      )}
+
                       {piece && (
                         <span
                           className={`${piece === piece.toUpperCase() ? 'text-white' : 'text-gray-900'} text-6xl md:text-7xl`}
