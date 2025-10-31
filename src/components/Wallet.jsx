@@ -194,8 +194,8 @@ export default function Wallet({ userId }) {
 
       {/* Preferences Modal */}
       {showPreferences && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-2xl font-light text-slate-900">Customize Wallets</h3>
               <button
@@ -206,7 +206,7 @@ export default function Wallet({ userId }) {
               </button>
             </div>
 
-            <p className="text-sm text-slate-600 mb-4">Select which currencies to display in your wallet</p>
+            <p className="text-sm text-slate-600 mb-4">Select which currencies and cryptocurrencies to display</p>
 
             {/* Search */}
             <input
@@ -214,46 +214,94 @@ export default function Wallet({ userId }) {
               placeholder="Search currencies..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-4 text-sm"
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-6 text-sm"
             />
 
-            {/* Currency List */}
-            <div className="space-y-2">
-              {filteredCurrencies.map(currency => {
-                const walletExists = wallets.some(w => w.currency_code === currency)
-                const isEnabled = enabledCurrencies.includes(currency)
+            {/* Currency Grid - Two Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Fiat Currencies */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-900 mb-3">Fiat Currencies</h4>
+                <div className="space-y-2">
+                  {FIAT_CURRENCIES.filter(c => !searchQuery || c.toLowerCase().includes(searchQuery.toLowerCase())).map(currency => {
+                    const walletExists = wallets.some(w => w.currency_code === currency)
+                    const isEnabled = enabledCurrencies.includes(currency)
 
-                return (
-                  <label
-                    key={currency}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isEnabled}
-                      onChange={() => toggleCurrency(currency)}
-                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{currency}</p>
-                      <p className="text-xs text-slate-500">
-                        {walletExists ? `Balance: ${wallets.find(w => w.currency_code === currency)?.balance?.toFixed(2) || '0.00'}` : 'No wallet yet'}
-                      </p>
-                    </div>
-                    {!walletExists && isEnabled && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault()
-                          handleCreateWallet(currency)
-                        }}
-                        className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    return (
+                      <label
+                        key={currency}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
                       >
-                        Create
-                      </button>
-                    )}
-                  </label>
-                )
-              })}
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={() => toggleCurrency(currency)}
+                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-900">{currency}</p>
+                          <p className="text-xs text-slate-500 truncate">
+                            {walletExists ? `Balance: ${wallets.find(w => w.currency_code === currency)?.balance?.toFixed(2) || '0.00'}` : 'No wallet yet'}
+                          </p>
+                        </div>
+                        {!walletExists && isEnabled && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleCreateWallet(currency)
+                            }}
+                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shrink-0"
+                          >
+                            Create
+                          </button>
+                        )}
+                      </label>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* Cryptocurrencies */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-900 mb-3">Cryptocurrencies</h4>
+                <div className="space-y-2">
+                  {CRYPTO_CURRENCIES.filter(c => !searchQuery || c.toLowerCase().includes(searchQuery.toLowerCase())).map(currency => {
+                    const walletExists = wallets.some(w => w.currency_code === currency)
+                    const isEnabled = enabledCurrencies.includes(currency)
+
+                    return (
+                      <label
+                        key={currency}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={() => toggleCurrency(currency)}
+                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-900">{currency}</p>
+                          <p className="text-xs text-slate-500 truncate">
+                            {walletExists ? `Balance: ${wallets.find(w => w.currency_code === currency)?.balance?.toFixed(2) || '0.00'}` : 'No wallet yet'}
+                          </p>
+                        </div>
+                        {!walletExists && isEnabled && (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault()
+                              handleCreateWallet(currency)
+                            }}
+                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors shrink-0"
+                          >
+                            Create
+                          </button>
+                        )}
+                      </label>
+                    )
+                  })}
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-3 mt-6">
