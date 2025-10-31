@@ -52,15 +52,34 @@ Deno.serve(async (req) => {
     for (const key of Object.keys(CHAIN_CONFIGS)) {
       const chain = CHAIN_CONFIGS[key]
       try {
-        // Create wallet on ThirdWeb
-        const twRes = await fetch('https://api.thirdweb.com/v1/wallets', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${THIRDWEB_KEY}` },
-          body: JSON.stringify({ chain_id: chain.chainId, chain: chain.name })
-        })
-        const twJson = await twRes.json()
-        if (!twRes.ok) {
-          results.push({ chain: chain.name, ok: false, error: twJson })
+        // Create wallet on ThirdWeb - try multiple endpoints and header styles
+        let twJson = null
+        try {
+          const endpoints = [
+            { url: 'https://api.thirdweb.com/v1/embedded-wallets', headers: { 'x-secret-key': THIRDWEB_KEY } },
+            { url: 'https://api.thirdweb.com/v1/wallets', headers: { 'x-secret-key': THIRDWEB_KEY } },
+            { url: 'https://api.thirdweb.com/v1/wallets', headers: { 'Authorization': `Bearer ${THIRDWEB_KEY}` } }
+          ]
+          for (const ep of endpoints) {
+            try {
+              const res = await fetch(ep.url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', ...(ep.headers || {}) },
+                body: JSON.stringify({ chain_id: chain.chainId, chain: chain.name, chainId: chain.chainId })
+              })
+              const j = await res.json().catch(() => null)
+              if (res.ok && j) { twJson = j; break }
+            } catch (e) {
+              continue
+            }
+          }
+
+          if (!twJson) {
+            results.push({ chain: chain.name, ok: false, error: 'ThirdWeb wallet creation failed for all endpoints' })
+            continue
+          }
+        } catch (e) {
+          results.push({ chain: chain.name, ok: false, error: String(e) })
           continue
         }
 
