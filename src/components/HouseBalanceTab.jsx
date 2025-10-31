@@ -145,71 +145,71 @@ export default function HouseBalanceTab() {
       )}
 
       {/* House Balance Card */}
-      <div className="bg-gradient-to-br from-amber-600 to-amber-700 rounded-xl shadow-lg p-8 text-white">
+      <div className="bg-slate-800/40 border border-slate-600/30 rounded-xl backdrop-blur-sm p-8 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-amber-100 text-sm font-semibold mb-2">🏠 House Balance</p>
+            <p className="text-slate-300 text-sm font-semibold mb-2">🏠 House Balance</p>
             <h2 className="text-5xl font-bold font-mono">{formatCurrency(houseBalance)}</h2>
-            <p className="text-amber-100 text-sm mt-2">{currencyFilter}</p>
+            <p className="text-slate-400 text-sm mt-2">{currencyFilter}</p>
           </div>
           <div className="text-6xl opacity-20">🎰</div>
         </div>
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <div className="p-6 border-b border-slate-200">
+      <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg backdrop-blur-sm overflow-hidden">
+        <div className="p-6 border-b border-slate-600/30">
           <div className="flex items-center justify-between">
-            <h3 className="text-xl font-semibold text-slate-900">Rake Transactions</h3>
+            <h3 className="text-xl font-semibold text-white">Rake Transactions</h3>
             <select
               value={currencyFilter}
               onChange={(e) => setCurrencyFilter(e.target.value)}
-              className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white"
+              className="px-3 py-2 border border-slate-600/30 rounded-lg text-sm bg-slate-700/50 text-white"
             >
               <option value="PHP">PHP</option>
               <option value="USD">USD</option>
             </select>
           </div>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-slate-400 mt-1">
             {rakeTransactions.length} transactions recorded
           </p>
         </div>
 
         {rakeTransactions.length === 0 ? (
-          <div className="p-8 text-center text-slate-500">
+          <div className="p-8 text-center text-slate-400">
             <div className="text-4xl mb-2">📊</div>
             <p>No results to display</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-slate-700/30 border-b border-slate-600/30">
                 <tr>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">Player</th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">Tip %</th>
-                  <th className="px-6 py-3 text-right font-semibold text-slate-700">Rake Amount</th>
-                  <th className="px-6 py-3 text-right font-semibold text-slate-700">House Balance</th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-700">Date</th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-300">Player</th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-300">Tip %</th>
+                  <th className="px-6 py-3 text-right font-semibold text-slate-300">Rake Amount</th>
+                  <th className="px-6 py-3 text-right font-semibold text-slate-300">House Balance</th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-300">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {rakeTransactions.map((tx, idx) => (
-                  <tr key={tx.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-slate-50'}>
-                    <td className="px-6 py-3 text-slate-900 font-mono text-xs">
+                  <tr key={tx.id} className={idx % 2 === 0 ? 'bg-transparent' : 'bg-slate-700/20'}>
+                    <td className="px-6 py-3 text-slate-300 font-mono text-xs">
                       {tx.users?.email || tx.user_id}
                     </td>
-                    <td className="px-6 py-3 text-slate-700">
-                      <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded font-semibold">
+                    <td className="px-6 py-3 text-slate-300">
+                      <span className="inline-block px-2 py-1 bg-blue-600/30 text-blue-300 rounded font-semibold">
                         {tx.tip_percent}%
                       </span>
                     </td>
-                    <td className="px-6 py-3 text-right font-mono font-semibold text-emerald-600">
+                    <td className="px-6 py-3 text-right font-mono font-semibold text-emerald-400">
                       +{formatCurrency(tx.amount)} {tx.currency_code}
                     </td>
-                    <td className="px-6 py-3 text-right font-mono font-bold text-slate-900">
+                    <td className="px-6 py-3 text-right font-mono font-bold text-slate-200">
                       {formatCurrency(tx.balance_after)} {tx.currency_code}
                     </td>
-                    <td className="px-6 py-3 text-slate-600 text-xs">
+                    <td className="px-6 py-3 text-slate-400 text-xs">
                       {formatDate(tx.created_at)}
                     </td>
                   </tr>
