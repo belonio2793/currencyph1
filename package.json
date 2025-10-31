@@ -66,8 +66,12 @@
     "batch-create-wallets-thirdweb": "node scripts/batch-create-wallets.js --thirdweb-only"
   },
   "dependencies": {
+    "@noble/ed25519": "^3.0.0",
+    "@noble/hashes": "^2.0.1",
+    "@noble/secp256k1": "^3.0.0",
     "@supabase/supabase-js": "^2.38.0",
     "@thirdweb-dev/sdk": "^4.0.99",
+    "bs58": "^6.0.0",
     "cheerio": "^1.0.0-rc.12",
     "leaflet": "^1.9.4",
     "node-fetch": "^2.7.0",
