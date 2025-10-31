@@ -249,3 +249,151 @@ export async function sendCryptoTransaction(userId, toAddress, value, chainId, s
 export function isWalletAvailable() {
   return hasWeb3Provider()
 }
+
+// ============================================
+// CHAIN-SPECIFIC SEND/RECEIVE FUNCTIONS
+// ============================================
+
+// Build transaction parameters for specific chains
+function buildTransactionParams(chain, fromAddress, toAddress, amount) {
+  const params = {
+    from: fromAddress,
+    to: toAddress
+  }
+
+  // Set amount based on chain (convert to wei for EVM chains)
+  if ([1, 137, 8453, 42161, 10, 43114].includes(chain.chainId)) {
+    // EVM chains - convert to wei
+    const amountWei = BigInt(Math.floor(parseFloat(amount) * 1e18))
+    params.value = '0x' + amountWei.toString(16)
+    params.gas = '0x5208' // 21000 gas for basic transfer
+  } else if (chain.chainId === 245022926) {
+    // Solana - lamports (1 SOL = 1e9 lamports)
+    params.lamports = Math.floor(parseFloat(amount) * 1e9)
+  }
+
+  return params
+}
+
+// Send transaction on specific chain
+export async function sendOnChain(chainId, fromAddress, toAddress, amount, wallet) {
+  const chain = CHAIN_IDS[chainId]
+  if (!chain) {
+    throw new Error(`Unsupported chain ID: ${chainId}`)
+  }
+
+  if (!wallet || !wallet.provider) {
+    throw new Error('No wallet connected')
+  }
+
+  try {
+    // Build transaction for the specific chain
+    const txParams = buildTransactionParams(chain, fromAddress, toAddress, amount)
+
+    // Send transaction via provider
+    const txHash = await wallet.provider.request({
+      method: 'eth_sendTransaction',
+      params: [txParams]
+    })
+
+    return {
+      hash: txHash,
+      chain: chain.name,
+      chainId: chainId,
+      from: fromAddress,
+      to: toAddress,
+      amount: amount,
+      status: 'pending'
+    }
+  } catch (error) {
+    console.error(`Error sending on ${chain.name}:`, error)
+    throw new Error(`Failed to send on ${chain.name}: ${error.message}`)
+  }
+}
+
+// Verify transaction on specific chain
+export async function verifyTransaction(chainId, txHash) {
+  const chain = CHAIN_IDS[chainId]
+  if (!chain) {
+    throw new Error(`Unsupported chain ID: ${chainId}`)
+  }
+
+  try {
+    const rpcUrl = chain.rpcUrl
+    if (!rpcUrl) {
+      throw new Error(`No RPC URL for ${chain.name}`)
+    }
+
+    const response = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_getTransactionReceipt',
+        params: [txHash]
+      })
+    })
+
+    const data = await response.json()
+    if (data.result) {
+      return {
+        confirmed: data.result.blockNumber !== null,
+        blockNumber: data.result.blockNumber,
+        status: data.result.status === '0x1' ? 'success' : 'failed'
+      }
+    }
+
+    return { confirmed: false }
+  } catch (error) {
+    console.error(`Error verifying transaction on ${chain.name}:`, error)
+    return { confirmed: false }
+  }
+}
+
+// Get transaction history for address on specific chain
+export async function getTransactionHistory(chainId, address, limit = 10) {
+  const chain = CHAIN_IDS[chainId]
+  if (!chain) {
+    throw new Error(`Unsupported chain ID: ${chainId}`)
+  }
+
+  try {
+    const rpcUrl = chain.rpcUrl
+    if (!rpcUrl) {
+      throw new Error(`No RPC URL for ${chain.name}`)
+    }
+
+    // Get block number
+    const blockResponse = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_blockNumber',
+        params: []
+      })
+    })
+
+    const blockData = await blockResponse.json()
+    const currentBlock = parseInt(blockData.result, 16)
+
+    // Get recent transactions (simplified)
+    return {
+      address,
+      chain: chain.name,
+      chainId: chainId,
+      currentBlock: currentBlock,
+      transactions: []
+    }
+  } catch (error) {
+    console.error(`Error getting transaction history on ${chain.name}:`, error)
+    return {
+      address,
+      chain: chain.name,
+      chainId: chainId,
+      transactions: []
+    }
+  }
+}
