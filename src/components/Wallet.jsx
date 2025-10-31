@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
@@ -30,6 +31,8 @@ const CURRENCY_SYMBOLS = {
 
 export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [wallets, setWallets] = useState([])
+  const [fiatWallets, setFiatWallets] = useState([])
+  const [cryptoWallets, setCryptoWallets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
   const [showPreferences, setShowPreferences] = useState(false)
@@ -68,22 +71,57 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         return
       }
 
-      // Fetch wallets and ensure each has an account number
+      // Fetch wallets and ensure each has an account number (legacy/internal)
+      let mergedWallets = []
       try {
         const walletsWithAcct = await wisegcashAPI.ensureWalletsHaveAccountNumbers(userId)
-        setWallets(walletsWithAcct || [])
+        mergedWallets = walletsWithAcct || []
       } catch (err) {
         console.warn('Could not ensure account numbers for wallets:', err)
         const data = await wisegcashAPI.getWallets(userId)
-        setWallets(data || [])
+        mergedWallets = data || []
       }
 
+      // Fetch additional fiat and crypto wallets from Supabase (new tables)
+      try {
+        const { data: fData } = await supabase.from('wallets_fiat').select('*').eq('user_id', userId)
+        const fiatMapped = (fData || []).map(r => ({
+          id: r.id,
+          currency_code: r.currency,
+          balance: Number(r.balance || 0),
+          account_number: r.provider_account_id || null,
+          provider: r.provider,
+          source: 'fiat'
+        }))
+        setFiatWallets(fiatMapped)
+        mergedWallets = [...mergedWallets, ...fiatMapped]
+      } catch (e) {
+        console.warn('Error loading wallets_fiat from Supabase:', e)
+      }
+
+      try {
+        const { data: cData } = await supabase.from('wallets_crypto').select('*').eq('user_id', userId)
+        const cryptoMapped = (cData || []).map(r => ({
+          id: r.id,
+          currency_code: r.chain || r.currency || 'CRYPTO',
+          balance: Number(r.balance || 0),
+          address: r.address,
+          provider: r.provider,
+          source: 'crypto'
+        }))
+        setCryptoWallets(cryptoMapped)
+        mergedWallets = [...mergedWallets, ...cryptoMapped]
+      } catch (e) {
+        console.warn('Error loading wallets_crypto from Supabase:', e)
+      }
+
+      setWallets(mergedWallets)
       setError('')
 
       // Auto-populate preferences based on existing wallets if not set
       const prefs = preferencesManager.getAllPreferences(userId)
-      if (!prefs.walletCurrencies && wallets.length > 0) {
-        const walletCurrencies = wallets.map(w => w.currency_code)
+      if (!prefs.walletCurrencies && mergedWallets.length > 0) {
+        const walletCurrencies = mergedWallets.map(w => w.currency_code)
         savePreferences(walletCurrencies)
       } else if (!prefs.walletCurrencies) {
         savePreferences(['PHP', 'USD'])
@@ -235,6 +273,51 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       )}
 
       {/* Preferences Modal */}
+
+      {/* New: Fiat wallets from wallets_fiat table */}
+      {fiatWallets.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-xl font-light mb-3">Fiat Wallets</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {fiatWallets.map(w => (
+              <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
+                  <p className="text-sm text-slate-500">{w.provider}</p>
+                </div>
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
+                <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(2)}</p>
+                {w.account_number && <p className="text-xs text-slate-500 mb-4">Acct: {w.account_number}</p>}
+                <button className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">Deposit / Pay</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* New: Crypto wallets from wallets_crypto table */}
+      {cryptoWallets.length > 0 && (
+        <div className="mb-6">
+          <h3 className="text-xl font-light mb-3">Crypto Wallets</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {cryptoWallets.map(w => (
+              <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
+                  <p className="text-sm text-slate-500">{w.provider || w.chain}</p>
+                </div>
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
+                <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(6)}</p>
+                {w.address && <p className="text-xs text-slate-500 mb-4 truncate">Addr: {w.address}</p>}
+                <div className="flex gap-2">
+                  <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">Send</button>
+                  <button className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">Receive</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {showPreferences && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
