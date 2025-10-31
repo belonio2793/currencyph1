@@ -66,22 +66,18 @@ async function aesGcmEncryptString(plaintext, keyString) {
 }
 
 async function createBitcoinWallet() {
-  if (!secp256k1Module || !sha256Func || !ripemd160Func || !base58Module) {
-    throw new Error('Required libraries not installed. Run: npm install @noble/secp256k1 @noble/hashes bs58');
-  }
-
-  const priv = secp256k1Module.secp256k1.utils.randomPrivateKey();
-  const pub = secp256k1Module.secp256k1.getPublicKey(priv, true);
-  const sha = sha256Func(pub);
-  const pubHash = ripemd160Func(sha);
+  const priv = secp256k1.utils.randomPrivateKey();
+  const pub = secp256k1.getPublicKey(priv, true);
+  const shaHash = sha256(pub);
+  const pubHash = ripemd160(shaHash);
   const payload = new Uint8Array(1 + pubHash.length);
   payload[0] = 0x00;
   payload.set(pubHash, 1);
-  const checksum = sha256Func(sha256Func(payload)).slice(0, 4);
+  const checksum = sha256(sha256(payload)).slice(0, 4);
   const addrBytes = new Uint8Array(payload.length + 4);
   addrBytes.set(payload, 0);
   addrBytes.set(checksum, payload.length);
-  const address = base58Module.encode(addrBytes);
+  const address = bs58.encode(addrBytes);
   const public_key = toHex(pub);
   const privateKeyHex = toHex(priv);
 
