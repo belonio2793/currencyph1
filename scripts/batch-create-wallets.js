@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * Batch Create Real Onchain Wallets
- * Uses ThirdWeb SDK to create smart wallets
- * Syncs to wallets_house table
+ * Batch Create Real ThirdWeb Wallets
+ * Uses ONLY ThirdWeb API to create smart wallets
+ * No fallback to generated/mock addresses
+ * 
+ * Usage: node scripts/batch-create-wallets.js
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { ThirdwebSDK } from '@thirdweb-dev/sdk';
-import crypto from 'crypto';
 
 const CHAIN_CONFIGS = {
+  // EVM Chains supported by ThirdWeb
   1: { name: 'ethereum', chainId: 1, symbol: 'ETH' },
   10: { name: 'optimism', chainId: 10, symbol: 'OP' },
   56: { name: 'bsc', chainId: 56, symbol: 'BNB' },
@@ -32,16 +33,17 @@ const CHAIN_CONFIGS = {
   1088: { name: 'metis', chainId: 1088, symbol: 'METIS' },
   66: { name: 'okc', chainId: 66, symbol: 'OKT' },
   1313161554: { name: 'aurora', chainId: 1313161554, symbol: 'AURORA' },
+  
+  // Non-EVM chains (might require special handling)
   245022926: { name: 'solana', chainId: 245022926, symbol: 'SOL' },
   0: { name: 'bitcoin', chainId: 0, symbol: 'BTC' }
 };
 
-const toHex = (buf) => Buffer.from(buf).toString('hex');
-const toBase64 = (buf) => Buffer.from(buf).toString('base64');
-
-// Create wallet via ThirdWeb API
+// Create a ThirdWeb wallet via REST API
 async function createThirdwebWallet(chain, thirdwebKey) {
-  if (!thirdwebKey) return null;
+  if (!thirdwebKey) {
+    throw new Error(`THIRDWEB_SECRET_KEY not configured`);
+  }
 
   try {
     const res = await fetch('https://api.thirdweb.com/v1/wallets', {
@@ -50,105 +52,44 @@ async function createThirdwebWallet(chain, thirdwebKey) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${thirdwebKey}`
       },
-      body: JSON.stringify({ chain_id: chain.chainId, chain: chain.name })
+      body: JSON.stringify({ 
+        chain_id: chain.chainId, 
+        chain: chain.name 
+      })
     });
 
     if (!res.ok) {
       const text = await res.text();
-      console.warn(`⚠️  ThirdWeb API error for ${chain.name}: ${res.status}`);
-      return null;
+      throw new Error(`HTTP ${res.status}: ${text}`);
     }
 
     const data = await res.json();
+    
+    if (!data.address) {
+      throw new Error(`No address returned from ThirdWeb: ${JSON.stringify(data)}`);
+    }
+
     return {
-      address: data.address || data.wallet?.address,
+      address: data.address,
       walletId: data.walletId || data.id || data.wallet?.id,
+      rawData: data,
       provider: 'thirdweb'
     };
   } catch (e) {
-    console.warn(`⚠️  ThirdWeb error for ${chain.name}: ${e.message}`);
-    return null;
-  }
-}
-
-// Generate a simple wallet using crypto.randomBytes + deterministic address generation
-async function generateSimpleWallet(chain) {
-  try {
-    // For now, generate a deterministic address from random bytes
-    const randomBytes = crypto.randomBytes(32);
-    const hash = crypto.createHash('sha256').update(randomBytes).digest();
-    
-    let address;
-    if (chain.name === 'solana') {
-      // Solana addresses are base58-encoded public keys
-      address = '1' + toHex(hash).substring(0, 40);
-    } else if (chain.name === 'bitcoin') {
-      // Bitcoin addresses start with 1 for P2PKH
-      address = '1' + toHex(hash.slice(0, 20)).substring(0, 32);
-    } else {
-      // EVM addresses are 0x + 40 hex chars
-      address = '0x' + toHex(hash.slice(0, 20));
-    }
-    
-    return {
-      address,
-      publicKey: toHex(hash),
-      privateKey: toHex(randomBytes),
-      provider: 'generated'
-    };
-  } catch (e) {
-    console.error(`Failed to generate simple wallet for ${chain.name}:`, e.message);
-    return null;
-  }
-}
-
-// Encrypt private key with AES-GCM
-async function aesGcmEncryptString(plaintext, keyString) {
-  try {
-    const keyBuffer = Buffer.from(keyString, 'hex');
-    const key = await crypto.subtle.importKey('raw', keyBuffer, 'AES-GCM', false, ['encrypt']);
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const cipherBuf = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, Buffer.from(plaintext));
-    return {
-      cipher: toBase64(cipherBuf),
-      iv: toBase64(iv),
-      method: 'AES-GCM',
-      created_at: new Date().toISOString()
-    };
-  } catch (e) {
-    console.warn('Encryption failed:', e.message);
-    return null;
+    throw new Error(`Failed to create ThirdWeb wallet for ${chain.name}: ${e.message}`);
   }
 }
 
 // Sync wallet to wallets_house table
 async function syncToWalletsHouse(supabase, chain, wallet) {
-  const encryptionKey = process.env.WALLET_ENCRYPTION_KEY || process.env.BTC_ENCRYPTION_KEY;
-
   const metadata = {
     chainName: chain.name,
     chainSymbol: chain.symbol,
-    created_at: new Date().toISOString()
+    created_at: new Date().toISOString(),
+    thirdweb_data: wallet.rawData,
+    address: wallet.address
   };
 
-  if (wallet.publicKey) {
-    metadata.public_key = wallet.publicKey;
-  }
-
-  // Store private key (encrypted if encryption key available)
-  if (wallet.privateKey) {
-    if (encryptionKey) {
-      const encrypted = await aesGcmEncryptString(wallet.privateKey, encryptionKey);
-      if (encrypted) {
-        metadata.encrypted_private_key = encrypted;
-      }
-    } else {
-      // Store as plain if no encryption key (not recommended for production)
-      metadata.private_key = wallet.privateKey;
-    }
-  }
-
-  // Store ThirdWeb wallet ID if available
   if (wallet.walletId) {
     metadata.thirdweb_wallet_id = wallet.walletId;
   }
@@ -216,40 +157,38 @@ async function main() {
     process.exit(1);
   }
 
+  if (!THIRDWEB_KEY) {
+    console.error('❌ Missing THIRDWEB_SECRET_KEY - required for real wallet creation');
+    process.exit(1);
+  }
+
   const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
   const results = { success: [], failed: [] };
 
-  console.log(`🚀 Starting batch wallet creation`);
-  console.log(`📊 Total chains: ${Object.keys(CHAIN_CONFIGS).length}\n`);
+  console.log(`🚀 Creating REAL ThirdWeb Wallets (no mockups)`);
+  console.log(`📊 Total chains: ${Object.keys(CHAIN_CONFIGS).length}`);
+  console.log(`🔑 Using ThirdWeb API with key: ${THIRDWEB_KEY.substring(0, 20)}...`);
+  console.log('');
 
   for (const [, chain] of Object.entries(CHAIN_CONFIGS)) {
     try {
-      let wallet = null;
-
-      // Try ThirdWeb first (if API key available)
-      if (THIRDWEB_KEY) {
-        wallet = await createThirdwebWallet(chain, THIRDWEB_KEY);
-      }
-
-      // Fall back to simple wallet generation
-      if (!wallet) {
-        wallet = await generateSimpleWallet(chain);
-        if (!wallet) {
-          throw new Error('Failed to generate wallet');
-        }
+      // ONLY ThirdWeb - no fallback
+      const wallet = await createThirdwebWallet(chain, THIRDWEB_KEY);
+      
+      if (!wallet.address) {
+        throw new Error('No wallet address returned');
       }
 
       // Sync to database
-      const result = await syncToWalletsHouse(supabase, chain, wallet);
+      await syncToWalletsHouse(supabase, chain, wallet);
       
       results.success.push({
         chain: chain.name,
         symbol: chain.symbol,
-        address: wallet.address.substring(0, 20) + '...',
-        provider: wallet.provider
+        address: wallet.address
       });
 
-      console.log(`✅ ${chain.name.padEnd(20)} | ${chain.symbol.padEnd(6)} | ${wallet.provider.padEnd(10)} | ${wallet.address.substring(0, 16)}...`);
+      console.log(`✅ ${chain.name.padEnd(20)} | ${chain.symbol.padEnd(6)} | ${wallet.address.substring(0, 20)}...`);
     } catch (e) {
       results.failed.push({
         chain: chain.name,
@@ -268,11 +207,12 @@ async function main() {
   if (results.failed.length > 0) {
     console.log('Failed chains:');
     results.failed.forEach(r => console.log(`  - ${r.chain}: ${r.error}`));
-    console.log('');
+    console.log('\n⚠️  ONLY REAL ThirdWeb wallets created - no fallback to mock addresses\n');
   }
 
-  console.log('💾 Wallets synced to wallets_house table');
-  console.log('🔓 Private keys encrypted with WALLET_ENCRYPTION_KEY\n');
+  if (results.success.length > 0) {
+    console.log('💾 Real wallets synced to wallets_house table');
+  }
 }
 
 main().catch(e => {
