@@ -137,3 +137,35 @@ export function formatWalletAddress(address) {
   if (!address) return ''
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
+
+// Call the crypto-send edge function to record and process transaction
+export async function sendCryptoTransaction(userId, toAddress, value, chainId, supabaseClient) {
+  try {
+    if (!supabaseClient) {
+      throw new Error('Supabase client is required')
+    }
+
+    // Call the edge function
+    const { data, error } = await supabaseClient.functions.invoke('crypto-send', {
+      body: {
+        user_id: userId,
+        to_address: toAddress,
+        value: parseFloat(value).toString(),
+        chain_id: chainId
+      }
+    })
+
+    if (error) {
+      throw error
+    }
+
+    return {
+      success: true,
+      message: data.message,
+      transaction: data.transaction
+    }
+  } catch (error) {
+    console.error('Error sending crypto transaction:', error)
+    throw error
+  }
+}
