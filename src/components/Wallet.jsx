@@ -36,13 +36,22 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [cryptoWallets, setCryptoWallets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
-  const [showPreferences, setShowPreferences] = useState(false)
+
+  // Preference states (separate for each table)
+  const [enabledInternal, setEnabledInternal] = useState([])
+  const [enabledFiat, setEnabledFiat] = useState([])
+  const [enabledCrypto, setEnabledCrypto] = useState([])
+
+  // Which preference modal is shown
+  const [showPreferencesInternal, setShowPreferencesInternal] = useState(false)
+  const [showPreferencesFiat, setShowPreferencesFiat] = useState(false)
+  const [showPreferencesCrypto, setShowPreferencesCrypto] = useState(false)
+
   const [selectedWallet, setSelectedWallet] = useState(null)
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [enabledCurrencies, setEnabledCurrencies] = useState([])
 
   // Fiat modal state
   const [showFiatModal, setShowFiatModal] = useState(false)
@@ -120,23 +129,44 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
   const loadPreferences = () => {
     const prefs = preferencesManager.getAllPreferences(userId)
-    if (prefs.walletCurrencies) {
-      setEnabledCurrencies(prefs.walletCurrencies)
-    }
+
+    // Legacy key 'walletCurrencies' controls internal (public.wallets)
+    if (prefs.walletCurrencies) setEnabledInternal(prefs.walletCurrencies)
+
+    // New independent keys for fiat & crypto
+    if (prefs.walletCurrencies_fiat) setEnabledFiat(prefs.walletCurrencies_fiat)
+    if (prefs.walletCurrencies_crypto) setEnabledCrypto(prefs.walletCurrencies_crypto)
+
+    // Defaults when not set
+    if (!prefs.walletCurrencies) setEnabledInternal(['PHP', 'USD'])
+    if (!prefs.walletCurrencies_fiat) setEnabledFiat(['PHP', 'USD'])
+    if (!prefs.walletCurrencies_crypto) setEnabledCrypto(['BTC', 'ETH'])
   }
 
-  const savePreferences = (currencies) => {
+  const savePreferences = (type, currencies) => {
     const prefs = preferencesManager.getAllPreferences(userId)
-    prefs.walletCurrencies = currencies
-    preferencesManager.setPreferences(userId, prefs)
-    setEnabledCurrencies(currencies)
+    if (type === 'internal') {
+      prefs.walletCurrencies = currencies
+      preferencesManager.setPreferences(userId, prefs)
+      setEnabledInternal(currencies)
+    } else if (type === 'fiat') {
+      prefs.walletCurrencies_fiat = currencies
+      preferencesManager.setPreferences(userId, prefs)
+      setEnabledFiat(currencies)
+    } else if (type === 'crypto') {
+      prefs.walletCurrencies_crypto = currencies
+      preferencesManager.setPreferences(userId, prefs)
+      setEnabledCrypto(currencies)
+    }
   }
 
   const loadWallets = async () => {
     try {
       if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
         setWallets([])
-        setEnabledCurrencies(['PHP', 'USD'])
+        setEnabledInternal(['PHP', 'USD'])
+        setEnabledFiat(['PHP', 'USD'])
+        setEnabledCrypto(['BTC', 'ETH'])
         setLoading(false)
         return
       }
@@ -192,12 +222,9 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
       // Auto-populate preferences based on existing wallets if not set
       const prefs = preferencesManager.getAllPreferences(userId)
-      if (!prefs.walletCurrencies && combined.length > 0) {
-        const walletCurrencies = combined.map(w => w.currency_code)
-        savePreferences(walletCurrencies)
-      } else if (!prefs.walletCurrencies) {
-        savePreferences(['PHP', 'USD'])
-      }
+      if (!prefs.walletCurrencies && internal.length > 0) savePreferences('internal', internal.map(w => w.currency_code))
+      if (!prefs.walletCurrencies_fiat && fiatMapped.length > 0) savePreferences('fiat', fiatMapped.map(w => w.currency_code))
+      if (!prefs.walletCurrencies_crypto && cryptoMapped.length > 0) savePreferences('crypto', cryptoMapped.map(w => w.currency_code))
 
     } catch (err) {
       console.error('Error loading wallets:', err)
