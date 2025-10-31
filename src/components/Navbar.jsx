@@ -6,8 +6,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
-    { id: 'nearby', label: 'Nearby', public: true },
-    { id: 'poker', label: 'Poker', public: true }
+    { id: 'nearby', label: 'Nearby', public: true }
   ]
 
   const secondaryNav = [
