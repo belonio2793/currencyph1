@@ -7,6 +7,8 @@ const PIECE_SYMBOLS = {
   'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚'
 }
 
+const STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+
 export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   const [currentGame, setCurrentGame] = useState(game)
   const [legalMoves, setLegalMoves] = useState({})
@@ -67,6 +69,11 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   useEffect(() => {
     if (!currentGame.time_control || currentGame.time_control === 'unlimited') return
 
+    const bothPlayersSeated = Boolean(currentGame.white_player_id && currentGame.black_player_id)
+    const hasFirstMove = (currentGame.moves || []).length > 0
+
+    if (!bothPlayersSeated || !hasFirstMove) return
+
     const timer = setInterval(() => {
       if (engine.isWhiteTurn() && whiteTime > 0) {
         setWhiteTime(t => Math.max(0, t - 1))
@@ -76,7 +83,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [engine, whiteTime, blackTime, currentGame.time_control])
+  }, [engine, whiteTime, blackTime, currentGame.time_control, currentGame.white_player_id, currentGame.black_player_id, currentGame.moves])
 
   async function handleSquareClick(square) {
     if (!isMyTurn) {
@@ -99,13 +106,16 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
           const newFen = engine.getFen()
           const updatedMoves = [...(currentGame.moves || []), { ...move, timestamp: new Date().toISOString() }]
 
+          const isFirstMove = (currentGame.moves || []).length === 0
+
           const { error: updateError } = await supabase
             .from('chess_games')
             .update({
               fen: newFen,
               moves: updatedMoves,
               last_move_by: userId,
-              last_move_at: new Date().toISOString()
+              last_move_at: new Date().toISOString(),
+              started_at: isFirstMove ? new Date().toISOString() : undefined
             })
             .eq('id', currentGame.id)
 
@@ -141,6 +151,57 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
     rapid: 'Rapid (10 min)',
     classical: 'Classical (30 min)',
     unlimited: 'Unlimited'
+  }
+
+  async function handleLeaveSeat() {
+    try {
+      const amWhite = currentGame.white_player_id === userId
+      const amBlack = currentGame.black_player_id === userId
+      if (!amWhite && !amBlack) return onClose && onClose()
+
+      // If leaving would leave zero players, delete the table
+      const leavingOnlyPlayer = (amWhite && !currentGame.black_player_id) || (amBlack && !currentGame.white_player_id)
+      if (leavingOnlyPlayer) {
+        await supabase.from('chess_games').delete().eq('id', currentGame.id)
+        return onClose && onClose()
+      }
+
+      // Otherwise free the seat and reset game to waiting state
+      const updates = {
+        status: 'waiting',
+        started_at: null,
+        last_move_by: null,
+        last_move_at: null,
+        moves: [],
+        fen: STARTING_FEN
+      }
+      if (amWhite) {
+        updates.white_player_id = null
+        updates.white_player_email = null
+      }
+      if (amBlack) {
+        updates.black_player_id = null
+        updates.black_player_email = null
+      }
+
+      const { error } = await supabase.from('chess_games').update(updates).eq('id', currentGame.id)
+      if (error) throw error
+
+      // Safety: if both seats empty now, delete the row
+      const { data: check } = await supabase
+        .from('chess_games')
+        .select('id, white_player_id, black_player_id')
+        .eq('id', currentGame.id)
+        .single()
+      if (check && !check.white_player_id && !check.black_player_id) {
+        await supabase.from('chess_games').delete().eq('id', currentGame.id)
+      }
+
+      onClose && onClose()
+    } catch (e) {
+      setError(`Could not leave seat: ${e.message}`)
+      setTimeout(() => setError(null), 3000)
+    }
   }
 
   return (
@@ -265,12 +326,22 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             </div>
           </div>
 
-          <button
-            onClick={onClose}
-            className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors border border-white/20"
-          >
-            Back to Lobby
-          </button>
+          <div className="flex gap-3">
+            {(isWhitePlayer || isBlackPlayer) && (
+              <button
+                onClick={handleLeaveSeat}
+                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors border border-red-700/50"
+              >
+                Leave Seat
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors border border-white/20"
+            >
+              Back to Lobby
+            </button>
+          </div>
         </div>
       </div>
     </div>
