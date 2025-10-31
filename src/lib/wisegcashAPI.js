@@ -80,9 +80,22 @@ export const wisegcashAPI = {
       throw new Error('Invalid userId: ' + userId)
     }
 
+    // First check if wallet already exists for this user and currency
+    const { data: existing } = await supabase
+      .from('wallets')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('currency_code', currencyCode)
+      .single()
+
+    if (existing) {
+      return existing // Wallet already exists, return it
+    }
+
+    // Create new wallet if it doesn't exist
     const { data, error } = await supabase
       .from('wallets')
-      .upsert([
+      .insert([
         {
           user_id: userId,
           currency_code: currencyCode,
@@ -94,7 +107,7 @@ export const wisegcashAPI = {
 
     if (error) {
       console.error('Wallet creation error:', { code: error.code, message: error.message, details: error.details, userId, currencyCode })
-      if (error.code !== '23505') throw error // 23505 is unique constraint
+      throw error
     }
     return data
   },
