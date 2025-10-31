@@ -756,9 +756,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => { loadNetworkWallets() }} className="px-3 py-2 bg-slate-100 rounded">Refresh</button>
-                <button onClick={generateAllNetworkWallets} disabled={generatingNetwork} className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700">
-                  {generatingNetwork ? `Generating (${networkProgress.done}/${networkProgress.total})` : 'Generate All'}
-                </button>
                 <button onClick={() => setShowNetworkPanel(false)} className="px-3 py-2 bg-white border rounded">Close</button>
               </div>
             </div>
