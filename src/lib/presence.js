@@ -43,7 +43,7 @@ async function updatePresence(status) {
   if (!currentUserId) return
 
   try {
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('user_presence')
       .upsert([{
         user_id: currentUserId,
@@ -51,9 +51,15 @@ async function updatePresence(status) {
         updated_at: new Date().toISOString()
       }])
 
-    if (error) console.warn('Presence update error:', error)
+    if (error) {
+      if (error.code === 'PGRST116' || error.code === '404') {
+        // Table doesn't exist, silently skip
+        return
+      }
+      console.warn('Presence update error:', error)
+    }
   } catch (err) {
-    console.warn('Presence update failed:', err)
+    // Table might not exist, silently skip
   }
 }
 
