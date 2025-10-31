@@ -157,7 +157,7 @@ Deno.serve(async (req) => {
 
     if (upsertError) {
       console.error('Upsert error:', upsertError)
-      return new Response(JSON.stringify({ error: upsertError.message }), { status: 400, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+      return new Response(JSON.stringify({ error: upsertError.message }), { status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
     }
 
     // Optionally create/update a house wallet row with keys in metadata
