@@ -42,6 +42,12 @@ async function aesGcmEncryptString(plaintext, keyString) {
 
 async function run() {
   try {
+    // ensure sha512 is set for noble ed25519 (Node environment)
+    if (!ed25519.utils || !ed25519.utils.sha512) {
+      if (ed25519.utils) ed25519.utils.sha512 = sha512
+      else ed25519.utils = { sha512 }
+    }
+
     // generate solana keypair (use Node crypto for randomness)
     const priv = crypto.randomBytes(32)
     const pub = await ed25519.getPublicKey(priv)
