@@ -304,7 +304,7 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
           <div ref={gameViewRef}>
             <button
               onClick={closeGame}
-              className="mb-6 px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
+              className="mb-6 px-4 py-2 text-slate-300 hover:text-white font-medium"
             >
               ← Back to Lobby
             </button>
