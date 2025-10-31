@@ -184,12 +184,11 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                       onClick={() => handleSquareClick(square)}
                       className={`
                         flex items-center justify-center p-0 leading-none transition-all
-                        ${isLight ? 'bg-emerald-700' : 'bg-emerald-900'}
                         ${isSelected ? 'ring-4 ring-blue-500' : ''}
                         ${isHighlighted ? 'ring-inset ring-4 ring-green-500' : ''}
-                        ${isLastMove ? (isLight ? 'bg-yellow-600' : 'bg-yellow-800') : ''}
                         hover:opacity-90 cursor-pointer
                       `}
+                      style={{ backgroundColor: isLastMove ? (isLight ? '#9fbf6a' : '#88a95a') : (isLight ? '#F1F2D1' : '#6B8F4E') }}
                     >
                       {piece && (
                         <span
