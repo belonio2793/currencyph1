@@ -1,24 +1,21 @@
-import { createThirdwebClient, getContract, prepareContractCall, sendAndConfirmTransaction } from 'thirdweb'
-import { toWei, fromWei } from 'thirdweb/utils'
-import { ethereum, polygon, base, arbitrum, optimism, solana, avalanche } from 'thirdweb/chains'
+// Thirdweb integration using Web3 API + dynamic imports
+// Supports browser-injected wallet providers (MetaMask, WalletConnect, etc)
 
 const CLIENT_ID = import.meta.env.VITE_THIRDWEB_CLIENT_ID
 
 if (!CLIENT_ID) {
-  throw new Error('VITE_THIRDWEB_CLIENT_ID environment variable is required')
+  console.warn('VITE_THIRDWEB_CLIENT_ID environment variable not set')
 }
-
-export const thirdwebClient = createThirdwebClient({ clientId: CLIENT_ID })
 
 // Supported chains for Thirdweb integration
 export const SUPPORTED_CHAINS = {
-  ethereum: { chainId: 1, name: 'Ethereum', symbol: 'ETH', object: ethereum },
-  polygon: { chainId: 137, name: 'Polygon', symbol: 'MATIC', object: polygon },
-  base: { chainId: 8453, name: 'Base', symbol: 'BASE', object: base },
-  arbitrum: { chainId: 42161, name: 'Arbitrum', symbol: 'ARB', object: arbitrum },
-  optimism: { chainId: 10, name: 'Optimism', symbol: 'OP', object: optimism },
-  solana: { chainId: 245022926, name: 'Solana', symbol: 'SOL', object: solana },
-  avalanche: { chainId: 43114, name: 'Avalanche', symbol: 'AVAX', object: avalanche }
+  ethereum: { chainId: 1, name: 'Ethereum', symbol: 'ETH', rpcUrl: 'https://eth.rpc.thirdweb.com' },
+  polygon: { chainId: 137, name: 'Polygon', symbol: 'MATIC', rpcUrl: 'https://polygon.rpc.thirdweb.com' },
+  base: { chainId: 8453, name: 'Base', symbol: 'BASE', rpcUrl: 'https://base.rpc.thirdweb.com' },
+  arbitrum: { chainId: 42161, name: 'Arbitrum', symbol: 'ARB', rpcUrl: 'https://arbitrum.rpc.thirdweb.com' },
+  optimism: { chainId: 10, name: 'Optimism', symbol: 'OP', rpcUrl: 'https://optimism.rpc.thirdweb.com' },
+  solana: { chainId: 245022926, name: 'Solana', symbol: 'SOL', rpcUrl: 'https://solana.rpc.thirdweb.com' },
+  avalanche: { chainId: 43114, name: 'Avalanche', symbol: 'AVAX', rpcUrl: 'https://avalanche.rpc.thirdweb.com' }
 }
 
 export const CHAIN_IDS = Object.values(SUPPORTED_CHAINS).reduce((acc, chain) => {
@@ -26,38 +23,64 @@ export const CHAIN_IDS = Object.values(SUPPORTED_CHAINS).reduce((acc, chain) => 
   return acc
 }, {})
 
+// Check if browser has Web3 wallet support
+function hasWeb3Provider() {
+  return typeof window !== 'undefined' && window.ethereum !== undefined
+}
+
+// Request wallet connection via MetaMask/WalletConnect
 export async function connectWallet() {
+  if (!hasWeb3Provider()) {
+    throw new Error('No Web3 wallet provider found. Please install MetaMask or use WalletConnect.')
+  }
+
   try {
-    const { connect } = await import('thirdweb/wallets')
-    const { injected } = await import('thirdweb/wallets')
-    
-    const wallet = await connect({
-      client: thirdwebClient,
-      wallets: [
-        injected({ chains: Object.values(SUPPORTED_CHAINS).map(c => c.object) })
-      ]
+    const provider = window.ethereum
+    const accounts = await provider.request({
+      method: 'eth_requestAccounts'
     })
-    
-    return wallet
+
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts returned from wallet')
+    }
+
+    return {
+      address: accounts[0],
+      provider: provider,
+      connected: true
+    }
   } catch (error) {
-    console.error('Error connecting wallet:', error)
-    throw error
+    console.error('Wallet connection error:', error)
+    throw new Error(`Failed to connect wallet: ${error.message}`)
   }
 }
 
+// Get current wallet info
 export async function getWalletInfo(wallet) {
-  try {
-    const account = wallet.getAccount()
-    if (!account) return null
+  if (!wallet || !wallet.provider) {
+    return null
+  }
 
-    const address = account.address
-    const chainId = account.chainId
+  try {
+    const provider = wallet.provider
+    
+    // Get current chain ID
+    const chainIdHex = await provider.request({
+      method: 'eth_chainId'
+    })
+    const chainId = parseInt(chainIdHex, 16)
+
+    const chainInfo = CHAIN_IDS[chainId] || { 
+      chainId, 
+      name: `Chain ${chainId}`, 
+      symbol: 'UNKNOWN' 
+    }
 
     return {
-      address,
-      chainId,
-      chainName: CHAIN_IDS[chainId]?.name || `Chain ${chainId}`,
-      chainSymbol: CHAIN_IDS[chainId]?.symbol || 'UNKNOWN'
+      address: wallet.address,
+      chainId: chainId,
+      chainName: chainInfo.name,
+      chainSymbol: chainInfo.symbol
     }
   } catch (error) {
     console.error('Error getting wallet info:', error)
@@ -65,48 +88,77 @@ export async function getWalletInfo(wallet) {
   }
 }
 
+// Switch to a different chain
 export async function switchChain(wallet, chainId) {
+  if (!wallet || !wallet.provider) {
+    throw new Error('No wallet connected')
+  }
+
+  const chainInfo = SUPPORTED_CHAINS[Object.keys(SUPPORTED_CHAINS).find(k => SUPPORTED_CHAINS[k].chainId === chainId)]
+  if (!chainInfo) {
+    throw new Error(`Unsupported chain ID: ${chainId}`)
+  }
+
   try {
-    const chainObj = CHAIN_IDS[chainId]?.object
-    if (!chainObj) {
-      throw new Error(`Unsupported chain ID: ${chainId}`)
-    }
+    const provider = wallet.provider
+    const chainIdHex = `0x${chainId.toString(16)}`
 
-    const account = wallet.getAccount()
-    if (!account) throw new Error('No account connected')
+    await provider.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId: chainIdHex }]
+    })
 
-    await account.switchChain(chainObj)
     return true
   } catch (error) {
-    console.error('Error switching chain:', error)
+    // If chain doesn't exist, try to add it
+    if (error.code === 4902) {
+      try {
+        await wallet.provider.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: `0x${chainId.toString(16)}`,
+            chainName: chainInfo.name,
+            rpcUrls: [chainInfo.rpcUrl],
+            nativeCurrency: {
+              name: chainInfo.symbol,
+              symbol: chainInfo.symbol,
+              decimals: 18
+            }
+          }]
+        })
+        return true
+      } catch (addError) {
+        throw new Error(`Failed to add chain: ${addError.message}`)
+      }
+    }
     throw error
   }
 }
 
+// Send transaction via connected wallet
 export async function sendTransaction(wallet, to, value, chainId) {
-  try {
-    const account = wallet.getAccount()
-    if (!account) throw new Error('No account connected')
+  if (!wallet || !wallet.provider) {
+    throw new Error('No wallet connected')
+  }
 
-    if (account.chainId !== chainId) {
-      await switchChain(wallet, chainId)
+  try {
+    const provider = wallet.provider
+    const txParams = {
+      from: wallet.address,
+      to: to,
+      value: `0x${(BigInt(Math.floor(parseFloat(value) * 1e18))).toString(16)}`,
+      gas: '0x5208', // 21000 gas for ETH transfer
+      gasPrice: await provider.request({ method: 'eth_gasPrice' })
     }
 
-    const transaction = prepareContractCall({
-      contract: getContract({ client: thirdwebClient, address: to, chain: CHAIN_IDS[chainId].object }),
-      method: 'transfer',
-      params: [to, toWei(value)]
-    })
-
-    const receipt = await sendAndConfirmTransaction({
-      account,
-      transaction
+    const txHash = await provider.request({
+      method: 'eth_sendTransaction',
+      params: [txParams]
     })
 
     return {
-      hash: receipt.transactionHash,
-      blockNumber: receipt.blockNumber,
-      status: receipt.status === 'success' ? 'success' : 'failed'
+      hash: txHash,
+      status: 'pending'
     }
   } catch (error) {
     console.error('Error sending transaction:', error)
@@ -114,31 +166,54 @@ export async function sendTransaction(wallet, to, value, chainId) {
   }
 }
 
+// Get wallet balance
 export async function getBalance(wallet, address, chainId) {
   try {
-    const account = wallet.getAccount()
-    if (!account) throw new Error('No account connected')
+    if (!address && wallet) {
+      address = wallet.address
+    }
 
-    const contract = getContract({
-      client: thirdwebClient,
-      address: address || account.address,
-      chain: CHAIN_IDS[chainId].object
+    if (!address) {
+      throw new Error('No address provided')
+    }
+
+    const rpcUrl = CHAIN_IDS[chainId]?.rpcUrl
+    if (!rpcUrl) {
+      throw new Error(`No RPC URL for chain ${chainId}`)
+    }
+
+    const response = await fetch(rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 1,
+        method: 'eth_getBalance',
+        params: [address, 'latest']
+      })
     })
 
-    const balance = await contract.call('balanceOf', [address || account.address])
-    return fromWei(balance)
+    const data = await response.json()
+    if (data.error) {
+      throw new Error(data.error.message)
+    }
+
+    const balanceWei = BigInt(data.result)
+    const balanceEth = Number(balanceWei) / 1e18
+    return balanceEth.toString()
   } catch (error) {
     console.error('Error getting balance:', error)
     return '0'
   }
 }
 
+// Format wallet address for display
 export function formatWalletAddress(address) {
   if (!address) return ''
   return `${address.slice(0, 6)}...${address.slice(-4)}`
 }
 
-// Call the crypto-send edge function to record and process transaction
+// Call the crypto-send edge function to record transaction
 export async function sendCryptoTransaction(userId, toAddress, value, chainId, supabaseClient) {
   try {
     if (!supabaseClient) {
@@ -167,5 +242,23 @@ export async function sendCryptoTransaction(userId, toAddress, value, chainId, s
   } catch (error) {
     console.error('Error sending crypto transaction:', error)
     throw error
+  }
+}
+
+// Lazy load Thirdweb SDK if needed for advanced features
+export async function loadThirdwebSDK() {
+  if (window.__thirdwebSDKLoaded) {
+    return window.__thirdwebSDK
+  }
+
+  try {
+    const { createThirdwebClient } = await import('thirdweb')
+    const sdk = createThirdwebClient({ clientId: CLIENT_ID })
+    window.__thirdwebSDK = sdk
+    window.__thirdwebSDKLoaded = true
+    return sdk
+  } catch (error) {
+    console.warn('Failed to load Thirdweb SDK:', error)
+    return null
   }
 }
