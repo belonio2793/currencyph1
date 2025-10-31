@@ -18,9 +18,9 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   const [error, setError] = useState(null)
   const subscriptionRef = useRef(null)
 
-  const engine = new ChessEngine(game.fen)
-  const isWhitePlayer = game.white_player_id === userId
-  const isBlackPlayer = game.black_player_id === userId
+  const engine = new ChessEngine(currentGame.fen)
+  const isWhitePlayer = currentGame.white_player_id === userId
+  const isBlackPlayer = currentGame.black_player_id === userId
   const isMyTurn = (engine.isWhiteTurn() && isWhitePlayer) || (!engine.isWhiteTurn() && isBlackPlayer)
 
   function getInitialTime(timeControl) {
@@ -38,10 +38,34 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
 
     const status = engine.getGameStatus()
     setGameStatus(status)
-  }, [engine])
+  }, [currentGame.fen])
 
   useEffect(() => {
-    if (!game.time_control || game.time_control === 'unlimited') return
+    subscriptionRef.current = supabase
+      .channel(`chess_game_${currentGame.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'chess_games',
+          filter: `id=eq.${currentGame.id}`
+        },
+        (payload) => {
+          setCurrentGame(payload.new)
+        }
+      )
+      .subscribe()
+
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe()
+      }
+    }
+  }, [currentGame.id])
+
+  useEffect(() => {
+    if (!currentGame.time_control || currentGame.time_control === 'unlimited') return
 
     const timer = setInterval(() => {
       if (engine.isWhiteTurn() && whiteTime > 0) {
@@ -52,7 +76,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [engine, whiteTime, blackTime, game.time_control])
+  }, [engine, whiteTime, blackTime, currentGame.time_control])
 
   async function handleSquareClick(square) {
     if (!isMyTurn) {
@@ -84,6 +108,8 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
               last_move_at: new Date().toISOString()
             })
             .eq('id', currentGame.id)
+
+          if (updateError) throw updateError
 
           if (updateError) throw updateError
 
