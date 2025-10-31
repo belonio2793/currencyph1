@@ -25,7 +25,7 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
       const { data, error: err } = await supabase
         .from('chess_games')
         .select('*')
-        .or('status=eq.waiting,status=eq.in_progress')
+        .eq('status', 'waiting')
         .order('created_at', { ascending: false })
 
       if (err) {
@@ -136,137 +136,107 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
     loadGames()
   }
 
+  const timeControlLabels = {
+    blitz: 'Blitz (3 min)',
+    rapid: 'Rapid (10 min)',
+    classical: 'Classical (30 min)',
+    unlimited: 'Unlimited'
+  }
+
   return (
-    <div className="min-h-screen bg-slate-900 text-white py-8 px-4" ref={pageRef}>
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl font-light text-white mb-8">Chess</h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100" ref={pageRef}>
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <h1 className="text-5xl font-bold text-slate-900 mb-2">Play Chess</h1>
+        <p className="text-lg text-slate-600 mb-12">Challenge players and improve your skills</p>
 
         {error && (
-          <div className="p-4 bg-red-900/20 border border-red-600 rounded-lg text-red-200 text-sm mb-6">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             {error}
           </div>
         )}
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b border-slate-700">
-          <button
-            onClick={() => setActiveTab('lobby')}
-            className={`px-4 py-2 font-medium transition-colors ${
-              activeTab === 'lobby'
-                ? 'text-blue-400 border-b-2 border-blue-400'
-                : 'text-slate-400 hover:text-slate-300'
-            }`}
-          >
-            Lobby
-          </button>
-          {selectedGame && (
-            <button
-              onClick={() => setActiveTab('board')}
-              className={`px-4 py-2 font-medium transition-colors ${
-                activeTab === 'board'
-                  ? 'text-blue-400 border-b-2 border-blue-400'
-                  : 'text-slate-400 hover:text-slate-300'
-              }`}
-            >
-              Game
-            </button>
-          )}
-        </div>
-
         {activeTab === 'lobby' && (
-          <div className="space-y-6">
+          <div className="space-y-8">
             {/* Player Stats */}
             {userId && (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
-                  <p className="text-sm text-slate-400 mb-1">Record</p>
-                  <p className="text-2xl font-bold text-white">
+                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+                  <p className="text-sm font-medium text-slate-600 mb-2">Record</p>
+                  <p className="text-3xl font-bold text-slate-900">
                     {gameStats.wins}W - {gameStats.losses}L
                   </p>
+                  <p className="text-xs text-slate-500 mt-2">{gameStats.draws} draws</p>
                 </div>
-                <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
-                  <p className="text-sm text-slate-400 mb-1">Wins</p>
-                  <p className="text-2xl font-bold text-emerald-400">{gameStats.wins}</p>
+                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+                  <p className="text-sm font-medium text-slate-600 mb-2">Wins</p>
+                  <p className="text-3xl font-bold text-green-600">{gameStats.wins}</p>
                 </div>
-                <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
-                  <p className="text-sm text-slate-400 mb-1">Losses</p>
-                  <p className="text-2xl font-bold text-red-400">{gameStats.losses}</p>
+                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+                  <p className="text-sm font-medium text-slate-600 mb-2">Losses</p>
+                  <p className="text-3xl font-bold text-red-600">{gameStats.losses}</p>
                 </div>
-                <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
-                  <p className="text-sm text-slate-400 mb-1">Draws</p>
-                  <p className="text-2xl font-bold text-slate-300">{gameStats.draws}</p>
+                <div className="bg-white rounded-lg shadow-sm p-6 border border-slate-200">
+                  <p className="text-sm font-medium text-slate-600 mb-2">Draws</p>
+                  <p className="text-3xl font-bold text-slate-600">{gameStats.draws}</p>
                 </div>
               </div>
             )}
 
             {/* Create Game Section */}
-            <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-6 backdrop-blur-sm">
-              <h3 className="text-xl font-semibold text-white mb-4">Create New Game</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <button
-                  onClick={() => handleCreateGame('blitz')}
-                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  ⚡ Blitz (3 min)
-                </button>
-                <button
-                  onClick={() => handleCreateGame('rapid')}
-                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  🚀 Rapid (10 min)
-                </button>
-                <button
-                  onClick={() => handleCreateGame('classical')}
-                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  🎓 Classical (30 min)
-                </button>
-                <button
-                  onClick={() => handleCreateGame('unlimited')}
-                  className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
-                >
-                  ♾️ Unlimited
-                </button>
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Create New Game</h2>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                {['blitz', 'rapid', 'classical', 'unlimited'].map(tc => (
+                  <button
+                    key={tc}
+                    onClick={() => handleCreateGame(tc)}
+                    className="px-4 py-4 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-all duration-200 border border-slate-300 hover:border-slate-400"
+                  >
+                    {timeControlLabels[tc]}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Available Games */}
-            <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg backdrop-blur-sm overflow-hidden">
-              <div className="p-6 border-b border-slate-600/30">
-                <h3 className="text-xl font-semibold text-white">Available Games ({games.length})</h3>
+            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+              <div className="p-6 border-b border-slate-200 bg-slate-50">
+                <h2 className="text-2xl font-bold text-slate-900">Available Games</h2>
+                <p className="text-sm text-slate-600 mt-1">{games.length} game{games.length !== 1 ? 's' : ''} waiting for an opponent</p>
               </div>
 
               {loading ? (
-                <div className="p-8 text-center text-slate-400">
-                  <p>Loading games...</p>
+                <div className="p-12 text-center text-slate-500">
+                  <p className="text-lg">Loading games...</p>
                 </div>
               ) : games.length === 0 ? (
-                <div className="p-8 text-center text-slate-400">
-                  <p>No games waiting. Create one to get started!</p>
+                <div className="p-12 text-center">
+                  <p className="text-slate-600 text-lg mb-4">No games waiting. Create one to get started!</p>
+                  <button
+                    onClick={() => handleCreateGame('rapid')}
+                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
+                  >
+                    Create Game
+                  </button>
                 </div>
               ) : (
-                <div className="divide-y divide-slate-600/30">
+                <div className="divide-y divide-slate-200">
                   {games.map(game => (
                     <div
                       key={game.id}
-                      className="p-4 flex items-center justify-between hover:bg-slate-700/20 transition-colors"
+                      className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
                     >
                       <div className="flex-1">
-                        <p className="text-white font-medium">{game.white_player_email}</p>
-                        <p className="text-sm text-slate-400">
-                          {game.time_control === 'blitz' && '⚡ Blitz (3 min)'}
-                          {game.time_control === 'rapid' && '🚀 Rapid (10 min)'}
-                          {game.time_control === 'classical' && '🎓 Classical (30 min)'}
-                          {game.time_control === 'unlimited' && '♾️ Unlimited'}
-                          {game.status === 'waiting' && ' • Waiting for opponent'}
-                          {game.status === 'in_progress' && ' • In Progress'}
+                        <p className="text-slate-900 font-semibold">{game.white_player_email}</p>
+                        <p className="text-sm text-slate-600 mt-1">
+                          {timeControlLabels[game.time_control]} • Waiting for opponent
                         </p>
                       </div>
                       <button
-                        onClick={() => game.status === 'waiting' ? handleJoinGame(game) : setSelectedGame(game)}
-                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                        onClick={() => handleJoinGame(game)}
+                        className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
                       >
-                        {game.status === 'waiting' ? 'Join' : 'Watch'}
+                        Join Game
                       </button>
                     </div>
                   ))}
@@ -278,6 +248,12 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
 
         {activeTab === 'board' && selectedGame && (
           <div ref={gameViewRef}>
+            <button
+              onClick={closeGame}
+              className="mb-6 px-4 py-2 text-slate-600 hover:text-slate-900 font-medium"
+            >
+              ← Back to Lobby
+            </button>
             <ChessGameBoard game={selectedGame} userId={userId} userEmail={userEmail} onClose={closeGame} />
           </div>
         )}
