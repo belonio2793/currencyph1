@@ -39,7 +39,7 @@ Deno.serve(async (req) => {
     const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
     const THIRDWEB_KEY = Deno.env.get('THIRDWEB_SECRET_KEY')
     if (!PROJECT_URL || !SERVICE_ROLE_KEY || !THIRDWEB_KEY) {
-      return new Response(JSON.stringify({ error: 'Missing configuration (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, THIRDWEB_SECRET_KEY are required)' }), { status: 500, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
+      return new Response(JSON.stringify({ error: 'Missing configuration (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, THIRDWEB_SECRET_KEY are required)' }), { status: 500, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } })
     }
 
     const body = await req.json().catch(() => ({}))
