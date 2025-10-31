@@ -211,7 +211,6 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                             {piece && (
                               <span
                                 className={`${piece === piece.toUpperCase() ? 'text-slate-100' : 'text-slate-900'} text-5xl md:text-6xl`}
-                                style={{ WebkitTextStroke: piece === piece.toUpperCase() ? '2px #0f172a' : '1.5px #e2e8f0', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.6))' }}
                               >
                                 {PIECE_SYMBOLS[piece]}
                               </span>
