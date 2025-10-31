@@ -486,7 +486,25 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
             <p className="text-slate-500 mb-4">No crypto wallets created yet</p>
             <button
-              onClick={() => setShowPreferencesCrypto(true)}
+              onClick={async () => {
+                try {
+                  setError('')
+                  setSuccess('')
+                  // create a default crypto wallet (BTC)
+                  await supabase.from('wallets_crypto').insert([{
+                    user_id: userId,
+                    chain: 'BTC',
+                    balance: 0,
+                    address: null,
+                    provider: 'manual'
+                  }])
+                  setSuccess('Crypto wallet created')
+                  await loadWallets()
+                } catch (e) {
+                  console.error('Failed to create crypto wallet', e)
+                  setError('Failed to create crypto wallet')
+                }
+              }}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
             >
               Create Crypto Wallet
