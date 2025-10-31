@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import ChessEngine from '../lib/chessEngine'
 
 const PIECE_SYMBOLS = {
   'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔',
-  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚'
+  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '���'
 }
 
 export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
-  const [gameState, setGameState] = useState(null)
+  const [currentGame, setCurrentGame] = useState(game)
   const [legalMoves, setLegalMoves] = useState({})
   const [selectedSquare, setSelectedSquare] = useState(null)
   const [lastMove, setLastMove] = useState(null)
@@ -16,6 +16,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   const [whiteTime, setWhiteTime] = useState(game.time_control === 'unlimited' ? null : getInitialTime(game.time_control))
   const [blackTime, setBlackTime] = useState(game.time_control === 'unlimited' ? null : getInitialTime(game.time_control))
   const [error, setError] = useState(null)
+  const subscriptionRef = useRef(null)
 
   const engine = new ChessEngine(game.fen)
   const isWhitePlayer = game.white_player_id === userId
@@ -72,23 +73,17 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
 
         if (moveResult) {
           const newFen = engine.getFen()
-          const updatedGame = {
-            ...game,
-            fen: newFen,
-            moves: [...(game.moves || []), { ...move, timestamp: new Date().toISOString() }],
-            last_move_by: userId,
-            last_move_at: new Date().toISOString()
-          }
+          const updatedMoves = [...(currentGame.moves || []), { ...move, timestamp: new Date().toISOString() }]
 
           const { error: updateError } = await supabase
             .from('chess_games')
             .update({
               fen: newFen,
-              moves: updatedGame.moves,
+              moves: updatedMoves,
               last_move_by: userId,
               last_move_at: new Date().toISOString()
             })
-            .eq('id', game.id)
+            .eq('id', currentGame.id)
 
           if (updateError) throw updateError
 
@@ -132,7 +127,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             {/* Black Player Info */}
             <div className="mb-4 p-3 bg-slate-700/30 rounded-lg flex justify-between items-center">
               <div>
-                <p className="text-white font-medium">{game.black_player_email || 'Waiting for opponent...'}</p>
+                <p className="text-white font-medium">{currentGame.black_player_email || 'Waiting for opponent...'}</p>
                 <p className="text-xs text-slate-400">Black</p>
               </div>
               <div className={`text-xl font-mono font-bold ${blackTime !== null && blackTime < 60 ? 'text-red-400' : 'text-white'}`}>
@@ -175,7 +170,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             {/* White Player Info */}
             <div className="p-3 bg-slate-700/30 rounded-lg flex justify-between items-center">
               <div>
-                <p className="text-white font-medium">{game.white_player_email}</p>
+                <p className="text-white font-medium">{currentGame.white_player_email}</p>
                 <p className="text-xs text-slate-400">White</p>
               </div>
               <div className={`text-xl font-mono font-bold ${whiteTime !== null && whiteTime < 60 ? 'text-red-400' : 'text-white'}`}>
@@ -202,8 +197,8 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
         <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-6 backdrop-blur-sm h-fit">
           <h3 className="text-lg font-semibold text-white mb-4">Move History</h3>
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {game.moves && game.moves.length > 0 ? (
-              game.moves.map((move, idx) => (
+            {currentGame.moves && currentGame.moves.length > 0 ? (
+              currentGame.moves.map((move, idx) => (
                 <div
                   key={idx}
                   className={`p-2 rounded text-sm ${
