@@ -10,6 +10,28 @@ const PIECE_SYMBOLS = {
 
 const STARTING_BOARD = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
 
+function ComputerSection({ onStart }) {
+  const [difficulty, setDifficulty] = React.useState('medium')
+  const buttons = [
+    { id: 'easy', label: 'Easy' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'hard', label: 'Hard' },
+    { id: 'very_hard', label: 'Very Hard' }
+  ]
+  return (
+    <div>
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        {buttons.map(b => (
+          <button key={b.id} onClick={() => setDifficulty(b.id)}
+            className={`px-3 py-2 rounded-md text-sm font-semibold border transition-colors ${difficulty === b.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-white/10 text-white border-white/20 hover:bg-white/20'}`}
+          >{b.label}</button>
+        ))}
+      </div>
+      <button onClick={() => onStart(difficulty)} className="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold">Start vs Computer</button>
+    </div>
+  )
+}
+
 export default function ChessPage({ userId, userEmail, onShowAuth }) {
   const pageRef = useRef(null)
   const gameViewRef = useRef(null)
@@ -247,6 +269,30 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
 
               {/* Sidebar Right */}
               <div className="space-y-6">
+                {/* Play vs Computer */}
+                <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Play vs Computer</h3>
+                  <ComputerSection onStart={(difficulty) => {
+                    const localGame = {
+                      id: null,
+                      mode: 'computer',
+                      time_control: 'unlimited',
+                      fen: STARTING_BOARD,
+                      moves: [],
+                      white_player_id: userId,
+                      white_player_email: userEmail || 'You',
+                      black_player_id: 'computer',
+                      black_player_email: `Computer (${difficulty.charAt(0).toUpperCase() + difficulty.slice(1).replace('_',' ')})`,
+                      difficulty
+                    }
+                    setSelectedGame(localGame)
+                    setActiveTab('board')
+                    setTimeout(() => {
+                      if (gameViewRef.current) gameViewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    }, 50)
+                  }} />
+                </div>
+
                 {/* Create Game Section */}
                 <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
                   <h3 className="text-lg font-bold text-white mb-4">Create Game</h3>
