@@ -79,7 +79,14 @@ Deno.serve(async (req) => {
       })
     }
 
-    const { user_id, chain_id } = body
+    let { user_id, chain_id } = body
+    const createHouse = !!body.create_house
+    const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
+
+    if (createHouse) {
+      user_id = HOUSE_ID
+    }
+
     let chainConfig = CHAIN_CONFIGS[chain_id]
 
     // If the chain is not explicitly known, fall back to a generic config to remain flexible
