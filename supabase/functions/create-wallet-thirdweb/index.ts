@@ -127,34 +127,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // If ThirdWeb didn't return an address, fallback to deterministic generation for display only
+    // Require ThirdWeb to return a valid address — fail otherwise
     if (!address) {
-      if (chainConfig.name === 'bitcoin') {
-        const privBytes = secp.utils.randomPrivateKey()
-        const pubKeyComp = secp.getPublicKey(privBytes, true)
-        const pubKeyHash = ripemd160(sha256(pubKeyComp))
-        const versioned = new Uint8Array(1 + pubKeyHash.length)
-        versioned[0] = 0x00
-        versioned.set(pubKeyHash, 1)
-        const checksumFull = sha256(sha256(versioned))
-        const checksum = checksumFull.slice(0, 4)
-        const addrBytes = new Uint8Array(versioned.length + 4)
-        addrBytes.set(versioned)
-        addrBytes.set(checksum, versioned.length)
-        address = base58.encode(addrBytes)
-        publicKey = toHex(pubKeyComp)
-      } else if (chainConfig.name === 'solana') {
-        const priv = ed25519.utils.randomPrivateKey()
-        const pub = await ed25519.getPublicKey(priv)
-        address = base58.encode(pub)
-        publicKey = toHex(pub)
-      } else {
-        const priv = secp.utils.randomPrivateKey()
-        const pubUn = secp.getPublicKey(priv, false)
-        const hash = keccak_256(pubUn.slice(1))
-        address = '0x' + toHex(hash.slice(-20))
-        publicKey = toHex(secp.getPublicKey(priv, true))
-      }
+      console.error('ThirdWeb did not return an address for chain:', chainConfig.name, 'response:', thirdwebResp)
+      return new Response(JSON.stringify({ error: `ThirdWeb wallet creation failed for chain ${chainConfig.name}`, details: thirdwebResp }), { status: 502, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } })
     }
 
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
