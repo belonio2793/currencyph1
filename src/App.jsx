@@ -176,7 +176,8 @@ export default function App() {
         try {
           await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
         } catch (e) {
-          console.warn('wisegcash getOrCreateUser failed', e)
+          console.error('Failed to create user profile:', e)
+          setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
         }
         try { initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
         try { await loadTotalBalance(user.id) } catch (e) { console.warn('loadTotalBalance failed', e) }
