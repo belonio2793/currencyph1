@@ -432,6 +432,44 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     setSuccess('Wallet disconnected')
   }
 
+  const handleCreateManualWallet = async () => {
+    if (!selectedManualChainId) {
+      setError('Please select a blockchain')
+      return
+    }
+
+    if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
+      setError('Please sign in to create a wallet')
+      return
+    }
+
+    try {
+      setCreatingManualWallet(true)
+      setError('')
+
+      // Call edge function to create wallet
+      const { data, error: invokeError } = await supabase.functions.invoke('create-wallet-thirdweb', {
+        body: {
+          user_id: userId,
+          chain_id: selectedManualChainId
+        }
+      })
+
+      if (invokeError) throw invokeError
+      if (!data || !data.ok) throw new Error(data?.error || 'Failed to create wallet')
+
+      setSuccess(`Wallet created on ${data.wallet.chainName} (${formatWalletAddress(data.wallet.address)})`)
+      setShowCreateManualWalletModal(false)
+      setSelectedManualChainId(null)
+      await loadWallets()
+    } catch (err) {
+      console.error('Error creating wallet:', err)
+      setError(err.message || 'Failed to create wallet')
+    } finally {
+      setCreatingManualWallet(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-6">
