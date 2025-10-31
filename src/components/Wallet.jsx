@@ -1,41 +1,75 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/wisegcashAPI'
+import { preferencesManager } from '../lib/preferencesManager'
+
+const ALL_CURRENCIES = [
+  'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD', 
+  'CAD', 'CHF', 'SEK', 'NZD', 'SGD', 'HKD', 'IDR', 'MYR', 
+  'THB', 'VND', 'KRW', 'ZAR', 'BRL', 'MXN', 'NOK', 'DKK', 'AED'
+]
+
+const CURRENCY_SYMBOLS = {
+  'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+  'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
+  'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
+  'MYR': 'RM', 'THB': '฿', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
+  'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ'
+}
 
 export default function Wallet({ userId }) {
   const [wallets, setWallets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
+  const [showPreferences, setShowPreferences] = useState(false)
   const [selectedWallet, setSelectedWallet] = useState(null)
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-
-  const currencies = ['PHP', 'USD', 'EUR', 'GBP']
+  const [searchQuery, setSearchQuery] = useState('')
+  const [enabledCurrencies, setEnabledCurrencies] = useState([])
 
   useEffect(() => {
     loadWallets()
+    loadPreferences()
   }, [userId])
+
+  const loadPreferences = () => {
+    const prefs = preferencesManager.getAllPreferences(userId)
+    if (prefs.walletCurrencies) {
+      setEnabledCurrencies(prefs.walletCurrencies)
+    }
+  }
+
+  const savePreferences = (currencies) => {
+    const prefs = preferencesManager.getAllPreferences(userId)
+    prefs.walletCurrencies = currencies
+    preferencesManager.setPreferences(userId, prefs)
+    setEnabledCurrencies(currencies)
+  }
 
   const loadWallets = async () => {
     try {
-      // Skip for guest-local or invalid user IDs
       if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
-        setWallets([
-          { user_id: userId, currency_code: 'PHP', balance: 0 },
-          { user_id: userId, currency_code: 'USD', balance: 0 }
-        ])
+        setWallets([])
+        setEnabledCurrencies(['PHP', 'USD'])
         setLoading(false)
         return
       }
       const data = await wisegcashAPI.getWallets(userId)
-      setWallets(data || [])
+      const walletsData = data || []
+      setWallets(walletsData)
       setError('')
+
+      // Auto-populate preferences based on existing wallets if not set
+      const prefs = preferencesManager.getAllPreferences(userId)
+      if (!prefs.walletCurrencies && walletsData.length > 0) {
+        const walletCurrencies = walletsData.map(w => w.currency_code)
+        savePreferences(walletCurrencies)
+      } else if (!prefs.walletCurrencies) {
+        savePreferences(['PHP', 'USD'])
+      }
     } catch (err) {
-      // Fallback: initialize default wallets
-      setWallets([
-        { user_id: userId, currency_code: 'PHP', balance: 0 },
-        { user_id: userId, currency_code: 'USD', balance: 0 }
-      ])
+      setWallets([])
       setError('')
     } finally {
       setLoading(false)
@@ -73,9 +107,25 @@ export default function Wallet({ userId }) {
     }
   }
 
+  const toggleCurrency = (currency) => {
+    let updated
+    if (enabledCurrencies.includes(currency)) {
+      updated = enabledCurrencies.filter(c => c !== currency)
+    } else {
+      updated = [...enabledCurrencies, currency].sort()
+    }
+    savePreferences(updated)
+  }
+
+  const filteredCurrencies = ALL_CURRENCIES.filter(c =>
+    c.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const visibleWallets = wallets.filter(w => enabledCurrencies.includes(w.currency_code))
+
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="text-center text-slate-500">Loading wallets...</div>
       </div>
     )
@@ -83,62 +133,129 @@ export default function Wallet({ userId }) {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
-      <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">My Wallets</h2>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-3xl font-light text-slate-900 tracking-tight">My Wallets</h2>
+        <button
+          onClick={() => setShowPreferences(true)}
+          className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
+        >
+          ⚙️ Customize
+        </button>
+      </div>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
       {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
 
-      {/* Existing Wallets */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {wallets.map(wallet => (
-          <div key={wallet.id} className="bg-white border border-slate-200 rounded-xl p-8 hover:shadow-md transition-shadow">
-            <div className="flex items-center justify-between mb-6">
-              <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{wallet.currency_code}</p>
-              <span className="text-3xl font-light text-slate-900">
-                {wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : '$'}
-              </span>
+      {/* Wallets Display */}
+      {visibleWallets.length === 0 ? (
+        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center">
+          <p className="text-slate-500 mb-4">No wallets created yet</p>
+          <button
+            onClick={() => setShowPreferences(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+          >
+            Create Your First Wallet
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          {visibleWallets.map(wallet => (
+            <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{wallet.currency_code}</p>
+                <span className="text-2xl">{CURRENCY_SYMBOLS[wallet.currency_code] || '$'}</span>
+              </div>
+              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
+              <p className="text-3xl font-light text-slate-900 mb-4">{wallet.balance.toFixed(2)}</p>
+              <button
+                onClick={() => {
+                  setSelectedWallet(wallet)
+                  setShowAddFunds(true)
+                }}
+                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+              >
+                Add Funds
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Preferences Modal */}
+      {showPreferences && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-2xl font-light text-slate-900">Customize Wallets</h3>
+              <button
+                onClick={() => setShowPreferences(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                ✕
+              </button>
             </div>
 
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-2">Balance</p>
-            <p className="text-4xl font-light text-slate-900 mb-8">{wallet.balance.toFixed(2)}</p>
+            <p className="text-sm text-slate-600 mb-4">Select which currencies to display in your wallet</p>
 
-            <button
-              onClick={() => {
-                setSelectedWallet(wallet)
-                setShowAddFunds(true)
-              }}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-            >
-              Add Funds
-            </button>
-          </div>
-        ))}
-      </div>
+            {/* Search */}
+            <input
+              type="text"
+              placeholder="Search currencies..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-4 text-sm"
+            />
 
-      {/* Create New Wallet */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6">
-        <h3 className="text-lg font-light text-slate-900 mb-4 tracking-wide">Create New Wallet</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {currencies.map(currency => {
-            const exists = wallets.some(w => w.currency_code === currency)
-            return (
+            {/* Currency List */}
+            <div className="space-y-2">
+              {filteredCurrencies.map(currency => {
+                const walletExists = wallets.some(w => w.currency_code === currency)
+                const isEnabled = enabledCurrencies.includes(currency)
+
+                return (
+                  <label
+                    key={currency}
+                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer transition-colors"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={isEnabled}
+                      onChange={() => toggleCurrency(currency)}
+                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-600"
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-slate-900">{currency}</p>
+                      <p className="text-xs text-slate-500">
+                        {walletExists ? `Balance: ${wallets.find(w => w.currency_code === currency)?.balance?.toFixed(2) || '0.00'}` : 'No wallet yet'}
+                      </p>
+                    </div>
+                    {!walletExists && isEnabled && (
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault()
+                          handleCreateWallet(currency)
+                        }}
+                        className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      >
+                        Create
+                      </button>
+                    )}
+                  </label>
+                )
+              })}
+            </div>
+
+            <div className="flex gap-3 mt-6">
               <button
-                key={currency}
-                onClick={() => handleCreateWallet(currency)}
-                disabled={exists}
-                className={`p-4 rounded-lg border-2 transition-colors text-center ${
-                  exists
-                    ? 'border-slate-100 bg-slate-50 text-slate-400 cursor-not-allowed'
-                    : 'border-slate-200 hover:border-blue-600 hover:bg-blue-50 text-slate-900'
-                }`}
+                onClick={() => setShowPreferences(false)}
+                className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm"
               >
-                <p className="font-medium text-sm">{currency}</p>
-                <p className="text-xs mt-2 text-slate-500">{exists ? 'Created' : 'Create'}</p>
+                Done
               </button>
-            )
-          })}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Add Funds Modal */}
       {showAddFunds && (
