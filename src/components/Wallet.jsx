@@ -44,17 +44,41 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [enabledCurrencies, setEnabledCurrencies] = useState([])
 
+  // Fiat modal state
+  const [showFiatModal, setShowFiatModal] = useState(false)
+  const [selectedFiatWallet, setSelectedFiatWallet] = useState(null)
+  const [fiatAction, setFiatAction] = useState('deposit') // 'deposit' | 'pay'
+  const [fiatAmount, setFiatAmount] = useState('')
+
+  // Crypto modal state
+  const [showCryptoModal, setShowCryptoModal] = useState(false)
+  const [selectedCryptoWallet, setSelectedCryptoWallet] = useState(null)
+  const [cryptoAction, setCryptoAction] = useState('send') // 'send' | 'receive'
+  const [cryptoAmount, setCryptoAmount] = useState('')
+
   useEffect(() => {
     loadWallets()
     loadPreferences()
 
-    // Subscribe to realtime changes for wallets tables so UI updates automatically
+    // Subscribe to realtime changes so UI updates automatically
     const channels = []
+
+    try {
+      const chWallets = supabase
+        .channel('public:wallets')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets', filter: `user_id=eq.${userId}` }, () => {
+          loadWallets()
+        })
+        .subscribe()
+      channels.push(chWallets)
+    } catch (e) {
+      console.warn('Failed to subscribe to wallets realtime:', e)
+    }
 
     try {
       const chFiat = supabase
         .channel('public:wallets_fiat')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_fiat' }, () => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_fiat', filter: `user_id=eq.${userId}` }, () => {
           loadWallets()
         })
         .subscribe()
@@ -66,7 +90,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     try {
       const chCrypto = supabase
         .channel('public:wallets_crypto')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_crypto' }, () => {
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_crypto', filter: `user_id=eq.${userId}` }, () => {
           loadWallets()
         })
         .subscribe()
@@ -79,7 +103,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       const chHouse = supabase
         .channel('public:wallets_house')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_house' }, () => {
-          // House changes may affect summaries; reload wallets too for consistency
           loadWallets()
         })
         .subscribe()
@@ -91,9 +114,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     return () => {
       try {
         channels.forEach(c => c && c.unsubscribe && c.unsubscribe())
-      } catch (e) {
-        // ignore cleanup errors
-      }
+      } catch (e) {}
     }
   }, [userId])
 
@@ -165,15 +186,14 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         console.warn('Error loading wallets_crypto from Supabase:', e)
       }
 
-      // Keep a combined list for preferences and lookups (use locally mapped arrays to avoid stale state)
-      const combined = [...internal, ...(typeof fiatMapped !== 'undefined' ? fiatMapped : []), ...(typeof cryptoMapped !== 'undefined' ? cryptoMapped : [])]
+      const combined = [...internal, ...fiatMapped, ...cryptoMapped]
       setWallets(combined)
       setError('')
 
       // Auto-populate preferences based on existing wallets if not set
       const prefs = preferencesManager.getAllPreferences(userId)
-      if (!prefs.walletCurrencies && mergedWallets.length > 0) {
-        const walletCurrencies = mergedWallets.map(w => w.currency_code)
+      if (!prefs.walletCurrencies && combined.length > 0) {
+        const walletCurrencies = combined.map(w => w.currency_code)
         savePreferences(walletCurrencies)
       } else if (!prefs.walletCurrencies) {
         savePreferences(['PHP', 'USD'])
@@ -214,33 +234,21 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       setError('')
       setSuccess('')
 
-      // Validate user before attempting wallet creation
       if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
         setError('Please sign in to create wallets')
         return
       }
 
       await wisegcashAPI.createWallet(userId, currency)
-
-      // Add small delay to allow database to sync
       await new Promise(resolve => setTimeout(resolve, 500))
-
-      // Refresh wallet list
       await loadWallets()
-
-      // Close the modal to show updated wallet list
       setShowPreferences(false)
-
       setSuccess(`${currency} wallet created`)
-
-      // Clear success message after 3 seconds
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       console.error(`Wallet creation error for ${currency}:`, err)
       const errorMsg = err?.message || String(err) || 'Unknown error'
       setError(`Failed to create ${currency} wallet: ${errorMsg}`)
-
-      // Clear error after 5 seconds
       setTimeout(() => setError(''), 5000)
     }
   }
@@ -259,7 +267,71 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     c.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const visibleWallets = wallets.filter(w => enabledCurrencies.includes(w.currency_code))
+  // Fiat helpers
+  const changeFiatBalance = async (walletId, delta) => {
+    const w = fiatWallets.find(f => f.id === walletId)
+    if (!w) return
+    const newBalance = Math.max(0, Number(w.balance || 0) + delta)
+    const { error: updErr } = await supabase
+      .from('wallets_fiat')
+      .update({ balance: newBalance, updated_at: new Date() })
+      .eq('id', walletId)
+    if (updErr) throw updErr
+  }
+
+  const handleFiatSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    const amt = parseFloat(fiatAmount)
+    if (!selectedFiatWallet || !amt || amt <= 0) {
+      setError('Enter a valid amount')
+      return
+    }
+    try {
+      const delta = fiatAction === 'deposit' ? amt : -amt
+      await changeFiatBalance(selectedFiatWallet.id, delta)
+      setSuccess(`${fiatAction === 'deposit' ? 'Deposited' : 'Paid'} ${amt} ${selectedFiatWallet.currency_code}`)
+      setFiatAmount('')
+      setShowFiatModal(false)
+      loadWallets()
+    } catch (e) {
+      setError(e.message || 'Failed to update fiat wallet')
+    }
+  }
+
+  // Crypto helpers
+  const changeCryptoBalance = async (walletId, delta) => {
+    const w = cryptoWallets.find(c => c.id === walletId)
+    if (!w) return
+    const newBalance = Math.max(0, Number(w.balance || 0) + delta)
+    const { error: updErr } = await supabase
+      .from('wallets_crypto')
+      .update({ balance: newBalance, updated_at: new Date() })
+      .eq('id', walletId)
+    if (updErr) throw updErr
+  }
+
+  const handleCryptoSubmit = async (e) => {
+    e.preventDefault()
+    setError('')
+    setSuccess('')
+    const amt = parseFloat(cryptoAmount)
+    if (!selectedCryptoWallet || !amt || amt <= 0) {
+      setError('Enter a valid amount')
+      return
+    }
+    try {
+      const delta = cryptoAction === 'receive' ? amt : -amt
+      await changeCryptoBalance(selectedCryptoWallet.id, delta)
+      setSuccess(`${cryptoAction === 'receive' ? 'Received' : 'Sent'} ${amt} ${selectedCryptoWallet.currency_code}`)
+      setCryptoAmount('')
+      setShowCryptoModal(false)
+      loadWallets()
+    } catch (e) {
+      setError(e.message || 'Failed to update crypto wallet')
+    }
+  }
 
   if (loading) {
     return (
@@ -290,8 +362,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
       {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
 
-      {/* Wallets Display */}
-      {/* Internal Wallets row */}
+      {/* Internal Wallets row (public.wallets) */}
       <div className="mb-6">
         <h3 className="text-xl font-light mb-3">Internal Wallets</h3>
         {internalWallets.length === 0 ? (
@@ -332,14 +403,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         )}
       </div>
 
-      {/* Preferences Modal */}
-
-      {/* New: Fiat wallets from wallets_fiat table */}
-      {fiatWallets.length > 0 && (
+      {/* Fiat wallets from wallets_fiat */}
+      {fiatWallets.filter(w => enabledCurrencies.includes(w.currency_code)).length > 0 && (
         <div className="mb-6">
           <h3 className="text-xl font-light mb-3">Fiat Wallets</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {fiatWallets.map(w => (
+            {fiatWallets.filter(w => enabledCurrencies.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
@@ -348,19 +417,24 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(2)}</p>
                 {w.account_number && <p className="text-xs text-slate-500 mb-4">Acct: {w.account_number}</p>}
-                <button className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm">Deposit / Pay</button>
+                <button
+                  onClick={() => { setSelectedFiatWallet(w); setFiatAction('deposit'); setFiatAmount(''); setShowFiatModal(true) }}
+                  className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                >
+                  Deposit / Pay
+                </button>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* New: Crypto wallets from wallets_crypto table */}
-      {cryptoWallets.length > 0 && (
+      {/* Crypto wallets from wallets_crypto */}
+      {cryptoWallets.filter(w => enabledCurrencies.includes(w.currency_code)).length > 0 && (
         <div className="mb-6">
           <h3 className="text-xl font-light mb-3">Crypto Wallets</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cryptoWallets.map(w => (
+            {cryptoWallets.filter(w => enabledCurrencies.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
@@ -370,8 +444,18 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(6)}</p>
                 {w.address && <p className="text-xs text-slate-500 mb-4 truncate">Addr: {w.address}</p>}
                 <div className="flex gap-2">
-                  <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">Send</button>
-                  <button className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm">Receive</button>
+                  <button
+                    onClick={() => { setSelectedCryptoWallet(w); setCryptoAction('send'); setCryptoAmount(''); setShowCryptoModal(true) }}
+                    className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    Send
+                  </button>
+                  <button
+                    onClick={() => { setSelectedCryptoWallet(w); setCryptoAction('receive'); setCryptoAmount(''); setShowCryptoModal(true) }}
+                    className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                  >
+                    Receive
+                  </button>
                 </div>
               </div>
             ))}
@@ -394,7 +478,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
             <p className="text-sm text-slate-600 mb-4">Select which currencies and cryptocurrencies to display</p>
 
-            {/* Search */}
             <input
               type="text"
               placeholder="Search currencies..."
@@ -403,9 +486,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mb-6 text-sm"
             />
 
-            {/* Currency Grid - Two Columns */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Fiat Currencies */}
               <div>
                 <h4 className="text-sm font-semibold text-slate-900 mb-3">Fiat Currencies</h4>
                 <div className="space-y-2">
@@ -450,7 +531,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 </div>
               </div>
 
-              {/* Cryptocurrencies */}
               <div>
                 <h4 className="text-sm font-semibold text-slate-900 mb-3">Cryptocurrencies</h4>
                 <div className="space-y-2">
@@ -543,6 +623,72 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 >
                   Add Funds
                 </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Fiat Modal */}
+      {showFiatModal && selectedFiatWallet && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <h3 className="text-2xl font-light text-slate-900 mb-6">{fiatAction === 'deposit' ? 'Deposit' : 'Pay'} ({selectedFiatWallet.currency_code})</h3>
+            <form onSubmit={handleFiatSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={fiatAmount}
+                  onChange={e => setFiatAmount(e.target.value)}
+                  placeholder="0.00"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-slate-600">Action</label>
+                <select value={fiatAction} onChange={e => setFiatAction(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                  <option value="deposit">Deposit</option>
+                  <option value="pay">Pay</option>
+                </select>
+              </div>
+              <div className="flex space-x-4">
+                <button type="button" onClick={() => setShowFiatModal(false)} className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">Cancel</button>
+                <button type="submit" className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">Confirm</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Crypto Modal */}
+      {showCryptoModal && selectedCryptoWallet && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
+            <h3 className="text-2xl font-light text-slate-900 mb-6">{cryptoAction === 'receive' ? 'Receive' : 'Send'} ({selectedCryptoWallet.currency_code})</h3>
+            <form onSubmit={handleCryptoSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                <input
+                  type="number"
+                  step="0.000001"
+                  value={cryptoAmount}
+                  onChange={e => setCryptoAmount(e.target.value)}
+                  placeholder="0.000000"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-sm text-slate-600">Action</label>
+                <select value={cryptoAction} onChange={e => setCryptoAction(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+                  <option value="send">Send</option>
+                  <option value="receive">Receive</option>
+                </select>
+              </div>
+              <div className="flex space-x-4">
+                <button type="button" onClick={() => setShowCryptoModal(false)} className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">Cancel</button>
+                <button type="submit" className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">Confirm</button>
               </div>
             </form>
           </div>
