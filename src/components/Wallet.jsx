@@ -817,6 +817,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                 </button>
                 <button onClick={() => setShowNetworkPanel(false)} className="px-3 py-2 bg-white border rounded">Close</button>
               </div>
+
+              {batchResult && (
+                <div className="mt-3 p-3 bg-white border border-slate-200 rounded text-sm">
+                  <div className="font-medium mb-2">Batch Result:</div>
+                  <pre className="text-xs max-h-48 overflow-auto">{JSON.stringify(batchResult, null, 2)}</pre>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
