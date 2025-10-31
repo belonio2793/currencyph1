@@ -370,16 +370,23 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                 </div>
 
                                 {isSelected && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleSit(t.id)
-                                    }}
-                                    className="w-full mt-3 px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
-                                  >
-                                    <span className="relative z-10">Take a Seat</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
-                                  </button>
+                                  <div className="mt-3 grid grid-cols-2 gap-2">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleSit(t.id) }}
+                                      className="px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
+                                    >
+                                      <span className="relative z-10">Take a Seat</span>
+                                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
+                                    </button>
+                                    {isSeatedAt(t.id) && (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleLeaveTable(t.id) }}
+                                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                                      >
+                                        Leave Seat
+                                      </button>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             )
@@ -427,16 +434,23 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                 </div>
 
                                 {isSelected && (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation()
-                                      handleSit(t.id)
-                                    }}
-                                    className="w-full mt-3 px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
-                                  >
-                                    <span className="relative z-10">Take a Seat</span>
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
-                                  </button>
+                                  <div className="mt-3 grid grid-cols-2 gap-2">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleSit(t.id) }}
+                                      className="px-3 py-2 bg-white text-slate-900 font-semibold rounded-lg hover:bg-slate-100 transition relative overflow-hidden group"
+                                    >
+                                      <span className="relative z-10">Take a Seat</span>
+                                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-20 animate-pulse"></div>
+                                    </button>
+                                    {isSeatedAt(t.id) && (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); handleLeaveTable(t.id) }}
+                                        className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition"
+                                      >
+                                        Leave Seat
+                                      </button>
+                                    )}
+                                  </div>
                                 )}
                               </div>
                             )
