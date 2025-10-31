@@ -85,6 +85,22 @@ export const wisegcashAPI = {
       throw new Error('Invalid userId: ' + userId)
     }
 
+    // Guest-local users cannot have wallets
+    if (userId.includes('guest-local')) {
+      throw new Error('Guest accounts cannot create wallets. Please sign up to create wallets.')
+    }
+
+    // Verify user exists in the database before creating wallet
+    const { data: userExists, error: userCheckError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('id', userId)
+      .single()
+
+    if (userCheckError || !userExists) {
+      throw new Error('User account not found. Please try signing out and logging back in.')
+    }
+
     // Check if wallet already exists
     const { data: existing } = await supabase
       .from('wallets')
