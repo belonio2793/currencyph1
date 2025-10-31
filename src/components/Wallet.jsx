@@ -696,7 +696,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           </button>
           <div
             role="tab"
-            onClick={() => { setShowNetworkPanel(true); loadNetworkWallets(); generateAllNetworkWallets() }}
+            onClick={() => {
+              setShowNetworkPanel(prev => {
+                const next = !prev
+                if (next) loadNetworkWallets()
+                return next
+              })
+            }}
             className="px-4 py-2 text-sm font-medium rounded-lg cursor-pointer text-slate-700/70 hover:text-slate-900/90 bg-transparent border border-transparent hover:bg-white/5 transition-colors"
             aria-selected={showNetworkPanel}
           >
