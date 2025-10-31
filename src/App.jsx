@@ -24,6 +24,7 @@ import About from './components/About'
 import Inbox from './components/Inbox'
 import ChatBar from './components/ChatBar'
 import PokerPage from './components/PokerPage'
+import ChessPage from './components/ChessPage'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
@@ -392,6 +393,7 @@ export default function App() {
             {activeTab === 'profile' && <Profile userId={userId} />}
             {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
             {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+            {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
             {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
               setActiveTab('nearby')
