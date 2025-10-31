@@ -418,11 +418,11 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       </div>
 
       {/* Fiat wallets from wallets_fiat */}
-      {fiatWallets.filter(w => enabledCurrencies.includes(w.currency_code)).length > 0 && (
+      {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length > 0 && (
         <div className="mb-6">
           <h3 className="text-xl font-light mb-3">Fiat Wallets</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {fiatWallets.filter(w => enabledCurrencies.includes(w.currency_code)).map(w => (
+            {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
@@ -444,11 +444,11 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       )}
 
       {/* Crypto wallets from wallets_crypto */}
-      {cryptoWallets.filter(w => enabledCurrencies.includes(w.currency_code)).length > 0 && (
+      {cryptoWallets.filter(w => enabledCrypto.includes(w.currency_code)).length > 0 && (
         <div className="mb-6">
           <h3 className="text-xl font-light mb-3">Crypto Wallets</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {cryptoWallets.filter(w => enabledCurrencies.includes(w.currency_code)).map(w => (
+            {cryptoWallets.filter(w => enabledCrypto.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
