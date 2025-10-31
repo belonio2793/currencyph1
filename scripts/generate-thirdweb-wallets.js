@@ -28,18 +28,37 @@ const CHAINS = [
 async function createThirdwebWallet(chain) {
   // ThirdWeb REST: use server key to create a smart wallet. This endpoint may differ depending on ThirdWeb plans.
   // We'll call the ThirdWeb REST admin 'create wallet' endpoint. Adjust if your ThirdWeb account uses a different path.
-  const url = 'https://api.thirdweb.com/v1/wallets'
-  const body = { chainId: chain.chainId }
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${THIRDWEB_SECRET_KEY}` },
-    body: JSON.stringify(body)
-  })
-  if (!res.ok) {
-    const text = await res.text()
-    throw new Error(`Thirdweb create wallet failed (${res.status}): ${text}`)
+  // Try multiple ThirdWeb endpoints with different header styles
+  const endpoints = [
+    { url: 'https://api.thirdweb.com/v1/embedded-wallets', headers: { 'x-secret-key': THIRDWEB_SECRET_KEY } },
+    { url: 'https://api.thirdweb.com/v1/wallets', headers: { 'x-secret-key': THIRDWEB_SECRET_KEY } },
+    { url: 'https://api.thirdweb.com/v1/wallets', headers: { 'Authorization': `Bearer ${THIRDWEB_SECRET_KEY}` } }
+  ]
+
+  let data = null
+  let lastErr = null
+  for (const ep of endpoints) {
+    try {
+      const res = await fetch(ep.url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...(ep.headers || {}) },
+        body: JSON.stringify({ chainId: chain.chainId, chain_id: chain.chainId, chain: chain.name })
+      })
+      if (!res.ok) {
+        lastErr = `HTTP ${res.status}`
+        const txt = await res.text().catch(() => '')
+        lastErr += ` ${txt}`
+        continue
+      }
+      data = await res.json().catch(() => null)
+      if (data) break
+    } catch (e) {
+      lastErr = String(e)
+      continue
+    }
   }
-  const data = await res.json()
+
+  if (!data) throw new Error(`Thirdweb create wallet failed for ${chain.name}: ${lastErr}`)
   // Expected: data.walletId, data.address, etc. Adjust based on actual ThirdWeb response shape
   return data
 }
