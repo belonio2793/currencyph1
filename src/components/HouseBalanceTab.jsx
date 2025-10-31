@@ -62,6 +62,28 @@ export default function HouseBalanceTab() {
 
       const phpWallet = wallets?.find(w => w.currency_code === 'PHP')
       setHouseBalance(phpWallet ? Number(phpWallet.balance) : 0)
+
+      // Also load house crypto wallets (wallets_crypto) for display (e.g., BTC address)
+      try {
+        const { data: cryptoRows, error: cryptoErr } = await supabase
+          .from('wallets_crypto')
+          .select('*')
+          .eq('user_id', HOUSE_ID)
+          .limit(10)
+
+        if (!cryptoErr && cryptoRows && cryptoRows.length > 0) {
+          // Prefer Bitcoin if present
+          const btcRow = cryptoRows.find(r => (r.chain_id === 0 || (typeof r.chain === 'string' && r.chain.toLowerCase().includes('bitcoin'))))
+          if (btcRow) setHouseCryptoAddress(btcRow.address)
+          else setHouseCryptoAddress(cryptoRows[0].address)
+        } else {
+          setHouseCryptoAddress(null)
+        }
+      } catch (e) {
+        console.warn('Could not load house crypto wallets:', e)
+        setHouseCryptoAddress(null)
+      }
+
     } catch (err) {
       console.error('Error loading house balance:', err)
       setError('Failed to load house balance')
@@ -152,6 +174,12 @@ export default function HouseBalanceTab() {
             <p className="text-slate-300 text-sm font-semibold mb-2">🏠 House Balance</p>
             <h2 className="text-5xl font-bold font-mono">{formatCurrency(houseBalance)}</h2>
             <p className="text-slate-400 text-sm mt-2">{currencyFilter}</p>
+            {houseCryptoAddress && (
+              <p className="text-sm text-slate-300 mt-3">
+                <strong>Network BTC Address:</strong>
+                <span className="block font-mono text-amber-300 break-all">{houseCryptoAddress}</span>
+              </p>
+            )}
           </div>
           <div className="text-6xl opacity-20">🎰</div>
         </div>
