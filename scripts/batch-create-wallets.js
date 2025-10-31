@@ -1,29 +1,16 @@
 #!/usr/bin/env node
 /**
  * Batch Create Real Onchain Wallets
- * Creates Bitcoin, Solana, and EVM-compatible wallets for all chains
+ * Creates ThirdWeb smart wallets for all EVM chains + Bitcoin and Solana
  * Syncs to wallets_house table for transparent UI display
- *
- * Usage: node scripts/batch-create-wallets.js [--thirdweb-only]
- *
- * Requires env vars:
- *   - SUPABASE_URL
- *   - SUPABASE_SERVICE_ROLE_KEY
- *   - THIRDWEB_SECRET_KEY (optional for --thirdweb-only)
- *   - WALLET_ENCRYPTION_KEY (for private key encryption)
+ * 
+ * Usage: node scripts/batch-create-wallets.js
  */
 
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-import { secp256k1 } from '@noble/secp256k1';
-import { sha256 } from '@noble/hashes/sha256';
-import { ripemd160 } from '@noble/hashes/ripemd160';
-import { keccak_256 } from '@noble/hashes/sha3';
-import { ed25519 } from '@noble/ed25519';
-import bs58 from 'bs58';
 
 const CHAIN_CONFIGS = {
-  0: { name: 'bitcoin', chainId: 0, symbol: 'BTC', type: 'bitcoin' },
   1: { name: 'ethereum', chainId: 1, symbol: 'ETH', type: 'evm' },
   10: { name: 'optimism', chainId: 10, symbol: 'OP', type: 'evm' },
   56: { name: 'bsc', chainId: 56, symbol: 'BNB', type: 'evm' },
@@ -46,12 +33,71 @@ const CHAIN_CONFIGS = {
   1088: { name: 'metis', chainId: 1088, symbol: 'METIS', type: 'evm' },
   66: { name: 'okc', chainId: 66, symbol: 'OKT', type: 'evm' },
   1313161554: { name: 'aurora', chainId: 1313161554, symbol: 'AURORA', type: 'evm' },
-  245022926: { name: 'solana', chainId: 245022926, symbol: 'SOL', type: 'solana' }
+  245022926: { name: 'solana', chainId: 245022926, symbol: 'SOL', type: 'solana' },
+  0: { name: 'bitcoin', chainId: 0, symbol: 'BTC', type: 'bitcoin' }
 };
 
 const toHex = (buf) => Buffer.from(buf).toString('hex');
 const toBase64 = (buf) => Buffer.from(buf).toString('base64');
 
+// Generate a simple Bitcoin address (P2PKH format)
+async function generateBitcoinAddress() {
+  const secp256k1 = await import('@noble/secp256k1');
+  const hashLib = await import('@noble/hashes/sha256');
+  const ripemd = await import('@noble/hashes/ripemd160');
+  const bs58 = await import('bs58');
+
+  const priv = secp256k1.secp256k1.utils.randomPrivateKey();
+  const pub = secp256k1.secp256k1.getPublicKey(priv, true);
+  const sha = hashLib.sha256(pub);
+  const hash160 = ripemd.ripemd160(sha);
+  
+  const payload = new Uint8Array(1 + hash160.length);
+  payload[0] = 0x00;
+  payload.set(hash160, 1);
+  
+  const checksum = hashLib.sha256(hashLib.sha256(payload)).slice(0, 4);
+  const addrBytes = new Uint8Array(payload.length + 4);
+  addrBytes.set(payload, 0);
+  addrBytes.set(checksum, payload.length);
+  
+  const address = bs58.default.encode(addrBytes);
+  const publicKey = toHex(pub);
+  const privateKey = toHex(priv);
+
+  return { address, publicKey, privateKey };
+}
+
+// Generate a simple Solana address
+async function generateSolanaAddress() {
+  const ed25519 = await import('@noble/ed25519');
+  const bs58 = await import('bs58');
+
+  const priv = ed25519.ed25519.utils.randomPrivateKey();
+  const pub = await ed25519.ed25519.getPublicKey(priv);
+  const address = bs58.default.encode(pub);
+  const publicKey = toHex(pub);
+  const privateKey = toHex(priv);
+
+  return { address, publicKey, privateKey };
+}
+
+// Generate an EVM address
+async function generateEVMAddress() {
+  const secp256k1 = await import('@noble/secp256k1');
+  const hashes = await import('@noble/hashes/sha3');
+
+  const priv = secp256k1.secp256k1.utils.randomPrivateKey();
+  const pubUn = secp256k1.secp256k1.getPublicKey(priv, false);
+  const hash = hashes.keccak_256(pubUn.slice(1));
+  const address = '0x' + toHex(hash.slice(-20)).toLowerCase();
+  const publicKey = toHex(secp256k1.secp256k1.getPublicKey(priv, true));
+  const privateKey = toHex(priv);
+
+  return { address, publicKey, privateKey };
+}
+
+// Encrypt private key
 async function aesGcmEncryptString(plaintext, keyString) {
   const keyBuffer = Buffer.from(keyString, 'hex');
   const key = await crypto.subtle.importKey('raw', keyBuffer, 'AES-GCM', false, ['encrypt']);
@@ -65,51 +111,9 @@ async function aesGcmEncryptString(plaintext, keyString) {
   };
 }
 
-async function createBitcoinWallet() {
-  const priv = secp256k1.utils.randomPrivateKey();
-  const pub = secp256k1.getPublicKey(priv, true);
-  const shaHash = sha256(pub);
-  const pubHash = ripemd160(shaHash);
-  const payload = new Uint8Array(1 + pubHash.length);
-  payload[0] = 0x00;
-  payload.set(pubHash, 1);
-  const checksum = sha256(sha256(payload)).slice(0, 4);
-  const addrBytes = new Uint8Array(payload.length + 4);
-  addrBytes.set(payload, 0);
-  addrBytes.set(checksum, payload.length);
-  const address = bs58.encode(addrBytes);
-  const public_key = toHex(pub);
-  const privateKeyHex = toHex(priv);
-
-  return { address, public_key, private_key: privateKeyHex };
-}
-
-async function createSolanaWallet() {
-  const priv = ed25519.utils.randomPrivateKey();
-  const pub = await ed25519.getPublicKey(priv);
-  const address = bs58.encode(pub);
-  const public_key = toHex(pub);
-  const privateKeyHex = toHex(priv);
-
-  return { address, public_key, private_key: privateKeyHex };
-}
-
-async function createEVMWallet() {
-  const priv = secp256k1.utils.randomPrivateKey();
-  const pubUn = secp256k1.getPublicKey(priv, false);
-  const hash = keccak_256(pubUn.slice(1));
-  const address = '0x' + toHex(hash.slice(-20)).toLowerCase();
-  const public_key = toHex(secp256k1.getPublicKey(priv, true));
-  const privateKeyHex = toHex(priv);
-
-  return { address, public_key, private_key: privateKeyHex };
-}
-
+// Create ThirdWeb wallet
 async function createThirdwebWallet(chain, thirdwebKey) {
-  if (!thirdwebKey) {
-    console.warn(`⚠️  Skipping ThirdWeb wallet for ${chain.name} (THIRDWEB_SECRET_KEY not set)`);
-    return null;
-  }
+  if (!thirdwebKey) return null;
 
   try {
     const res = await fetch('https://api.thirdweb.com/v1/wallets', {
@@ -121,24 +125,21 @@ async function createThirdwebWallet(chain, thirdwebKey) {
       body: JSON.stringify({ chain_id: chain.chainId, chain: chain.name })
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.warn(`⚠️  ThirdWeb error for ${chain.name}: ${res.status} ${text}`);
-      return null;
-    }
+    if (!res.ok) return null;
 
     const data = await res.json();
     return {
       address: data.address || data.wallet?.address,
       walletId: data.walletId || data.id || data.wallet?.id,
-      data: data
+      rawData: data
     };
   } catch (e) {
-    console.warn(`⚠️  Failed to create ThirdWeb wallet for ${chain.name}: ${e.message}`);
+    console.warn(`⚠️  ThirdWeb error for ${chain.name}: ${e.message}`);
     return null;
   }
 }
 
+// Sync wallet to wallets_house
 async function syncToWalletsHouse(supabase, chain, wallet, provider) {
   const encryptionKey = process.env.WALLET_ENCRYPTION_KEY || process.env.BTC_ENCRYPTION_KEY;
   
@@ -146,15 +147,15 @@ async function syncToWalletsHouse(supabase, chain, wallet, provider) {
     chainName: chain.name,
     chainSymbol: chain.symbol,
     created_at: new Date().toISOString(),
-    public_key: wallet.public_key,
+    public_key: wallet.publicKey,
     address: wallet.address
   };
 
-  if (wallet.private_key && encryptionKey) {
+  if (wallet.privateKey && encryptionKey) {
     try {
-      metadata.encrypted_private_key = await aesGcmEncryptString(wallet.private_key, encryptionKey);
+      metadata.encrypted_private_key = await aesGcmEncryptString(wallet.privateKey, encryptionKey);
     } catch (e) {
-      console.warn(`⚠️  Failed to encrypt private key for ${chain.name}: ${e.message}`);
+      console.warn(`⚠️  Failed to encrypt private key for ${chain.name}`);
     }
   }
 
@@ -205,7 +206,6 @@ async function main() {
   const PROJECT_URL = process.env.SUPABASE_URL || process.env.PROJECT_URL;
   const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const THIRDWEB_KEY = process.env.THIRDWEB_SECRET_KEY;
-  const thirdwebOnly = process.argv.includes('--thirdweb-only');
 
   if (!PROJECT_URL || !SERVICE_ROLE_KEY) {
     console.error('❌ Missing SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY');
@@ -213,64 +213,69 @@ async function main() {
   }
 
   const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
-  const results = {
-    success: [],
-    failed: [],
-    skipped: []
-  };
+  const results = { success: [], failed: [], skipped: [] };
 
-  console.log(`🚀 Starting batch wallet creation (${thirdwebOnly ? 'ThirdWeb only' : 'all chains'})`);
-  console.log(`📊 Total chains: ${Object.keys(CHAIN_CONFIGS).length}`);
-  console.log('');
+  console.log(`🚀 Starting batch wallet creation`);
+  console.log(`📊 Total chains: ${Object.keys(CHAIN_CONFIGS).length}\n`);
 
   for (const [, chain] of Object.entries(CHAIN_CONFIGS)) {
     try {
       let wallet = null;
       let provider = null;
 
-      if (thirdwebOnly) {
+      // Try ThirdWeb first for EVM chains
+      if (chain.type === 'evm' && THIRDWEB_KEY) {
         const twWallet = await createThirdwebWallet(chain, THIRDWEB_KEY);
         if (twWallet) {
-          wallet = twWallet;
+          wallet = {
+            address: twWallet.address,
+            publicKey: null
+          };
           provider = 'thirdweb';
-        } else {
-          results.skipped.push({ chain: chain.name, reason: 'ThirdWeb creation failed or skipped' });
-          continue;
         }
-      } else {
-        if (chain.type === 'bitcoin') {
-          wallet = await createBitcoinWallet();
-          provider = 'generated';
-        } else if (chain.type === 'solana') {
-          wallet = await createSolanaWallet();
-          provider = 'generated';
-        } else if (chain.type === 'evm') {
-          wallet = await createEVMWallet();
-          provider = 'generated';
+      }
+
+      // Fall back to generated wallets
+      if (!wallet) {
+        try {
+          if (chain.type === 'bitcoin') {
+            wallet = await generateBitcoinAddress();
+            provider = 'generated';
+          } else if (chain.type === 'solana') {
+            wallet = await generateSolanaAddress();
+            provider = 'generated';
+          } else if (chain.type === 'evm') {
+            wallet = await generateEVMAddress();
+            provider = 'generated';
+          }
+        } catch (genErr) {
+          console.error(`❌ ${chain.name}: Generation failed - ${genErr.message}`);
+          results.failed.push({
+            chain: chain.name,
+            error: genErr.message
+          });
+          continue;
         }
       }
 
       if (!wallet || !wallet.address) {
-        results.failed.push({ chain: chain.name, reason: 'Failed to generate wallet' });
+        results.failed.push({ chain: chain.name, reason: 'No address generated' });
         continue;
       }
 
+      // Sync to database
       const houseResult = await syncToWalletsHouse(supabase, chain, wallet, provider);
       results.success.push({
         chain: chain.name,
         symbol: chain.symbol,
         address: wallet.address.substring(0, 20) + '...',
         provider,
-        houseId: houseResult.id,
-        isNew: houseResult.isNew
+        houseId: houseResult.id
       });
 
       console.log(`✅ ${chain.name.padEnd(20)} (${chain.symbol.padEnd(6)}) - ${provider.padEnd(10)}`);
     } catch (e) {
-      results.failed.push({
-        chain: chain.name,
-        error: e.message
-      });
+      results.failed.push({ chain: chain.name, error: e.message });
       console.error(`❌ ${chain.name}: ${e.message}`);
     }
   }
@@ -279,17 +284,14 @@ async function main() {
   console.log(`📈 Results:`);
   console.log(`  ✅ Success: ${results.success.length}`);
   console.log(`  ❌ Failed: ${results.failed.length}`);
-  console.log(`  ⏭️  Skipped: ${results.skipped.length}`);
   console.log('='.repeat(70) + '\n');
 
   if (results.failed.length > 0) {
     console.log('Failed chains:');
     results.failed.forEach(r => console.log(`  - ${r.chain}: ${r.error || r.reason}`));
-    console.log('');
   }
 
   console.log('💾 All wallets synced to wallets_house table');
-  console.log('🔓 Private keys are AES-GCM encrypted with WALLET_ENCRYPTION_KEY');
 }
 
 main().catch(e => {
