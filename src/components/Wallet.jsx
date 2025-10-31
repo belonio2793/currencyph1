@@ -354,6 +354,79 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     }
   }
 
+  // Thirdweb wallet functions
+  const handleConnectWallet = async () => {
+    try {
+      setThirdwebConnecting(true)
+      setError('')
+      const wallet = await connectWallet()
+      const walletInfo = await getWalletInfo(wallet)
+      setConnectedWallet(walletInfo)
+      setSelectedChainId(walletInfo.chainId)
+      setSuccess(`Connected to ${walletInfo.chainName}`)
+    } catch (err) {
+      console.error('Error connecting wallet:', err)
+      setError('Failed to connect wallet. Make sure you have a Web3 wallet extension (MetaMask, WalletConnect, etc.)')
+    } finally {
+      setThirdwebConnecting(false)
+    }
+  }
+
+  const handleSaveConnectedWallet = async () => {
+    if (!connectedWallet || !selectedChainId) {
+      setError('Please connect a wallet and select a chain')
+      return
+    }
+
+    try {
+      setThirdwebConnecting(true)
+      setError('')
+
+      if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
+        setError('Please sign in to save wallet connection')
+        return
+      }
+
+      // Upsert to wallets_crypto table
+      const { error: upsertErr } = await supabase
+        .from('wallets_crypto')
+        .upsert([{
+          user_id: userId,
+          chain: selectedChainId.toString(),
+          chain_id: selectedChainId,
+          address: connectedWallet.address,
+          provider: 'thirdweb',
+          balance: 0,
+          metadata: {
+            chainName: connectedWallet.chainName,
+            chainSymbol: connectedWallet.chainSymbol,
+            connected_at: new Date().toISOString()
+          }
+        }], {
+          onConflict: 'user_id,chain,address'
+        })
+
+      if (upsertErr) throw upsertErr
+
+      setSuccess(`Wallet connected and saved (${formatWalletAddress(connectedWallet.address)})`)
+      setShowThirdwebModal(false)
+      setConnectedWallet(null)
+      setSelectedChainId(null)
+      await loadWallets()
+    } catch (err) {
+      console.error('Error saving wallet:', err)
+      setError(err.message || 'Failed to save wallet connection')
+    } finally {
+      setThirdwebConnecting(false)
+    }
+  }
+
+  const disconnectWallet = async () => {
+    setConnectedWallet(null)
+    setSelectedChainId(null)
+    setSuccess('Wallet disconnected')
+  }
+
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-6">
