@@ -131,6 +131,25 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       } else if (!prefs.walletCurrencies) {
         savePreferences(['PHP', 'USD'])
       }
+
+      // Fetch house balances and recent house-related transactions
+      try {
+        const { data: hb } = await supabase.from('wallets_house').select('*')
+        setHouseBalances(hb || [])
+      } catch (e) {
+        console.warn('Failed to load wallets_house:', e)
+      }
+
+      try {
+        const { data: txs } = await supabase.from('wallet_transactions')
+          .select('*')
+          .in('type', ['rake','deposit','transfer_in'])
+          .order('created_at', { ascending: false })
+          .limit(50)
+        setHouseTransactions(txs || [])
+      } catch (e) {
+        console.warn('Failed to load house transactions:', e)
+      }
     } catch (err) {
       console.error('Error loading wallets:', err)
       setWallets([])
