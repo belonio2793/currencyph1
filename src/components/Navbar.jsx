@@ -10,7 +10,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   ]
 
   const secondaryNav = [
-    { id: 'investments', label: 'Invest In The Philippines' }
+    { id: 'investments', label: 'Manage Investments' }
   ]
 
   // Buttons that should appear under the Manage Investments row
