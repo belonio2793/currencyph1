@@ -829,11 +829,17 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option value="">Select blockchain...</option>
-                  {Object.values(SUPPORTED_CHAINS).map((chain) => (
-                    <option key={chain.chainId} value={chain.chainId}>
-                      {chain.name} ({chain.symbol}) • Chain ID: {chain.chainId}
-                    </option>
-                  ))}
+                  {(() => {
+                    const all = Object.values(SUPPORTED_CHAINS)
+                    const btc = all.find(c => (c.symbol && c.symbol.toLowerCase() === 'btc') || (c.name && c.name.toLowerCase() === 'bitcoin'))
+                    const others = all.filter(c => c !== btc).sort((a, b) => a.name.localeCompare(b.name))
+                    const ordered = btc ? [btc, ...others] : others
+                    return ordered.map((chain) => (
+                      <option key={chain.chainId} value={chain.chainId}>
+                        {chain.name} ({chain.symbol})
+                      </option>
+                    ))
+                  })()}
                 </select>
               </div>
 
