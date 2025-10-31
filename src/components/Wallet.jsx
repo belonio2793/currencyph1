@@ -21,7 +21,7 @@ const CURRENCY_SYMBOLS = {
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
   'MYR': 'RM', 'THB': '฿', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
   'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ',
-  'BTC': '₿', 'ETH': 'Ξ', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
+  'BTC': '���', 'ETH': 'Ξ', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
   'DOGE': 'Ð', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'Ł', 'BCH': 'BCH',
   'USDT': 'USDT', 'USDC': 'USDC', 'BUSD': 'BUSD', 'SHIB': 'SHIB',
   'AVAX': 'AVAX', 'DOT': 'DOT'
@@ -123,7 +123,10 @@ export default function Wallet({ userId }) {
 
       await wisegcashAPI.createWallet(userId, currency)
 
-      // Wait for wallets to load before showing success
+      // Add small delay to allow database to sync
+      await new Promise(resolve => setTimeout(resolve, 500))
+
+      // Refresh wallet list
       await loadWallets()
 
       // Close the modal to show updated wallet list
