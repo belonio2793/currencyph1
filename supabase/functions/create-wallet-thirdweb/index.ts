@@ -221,7 +221,7 @@ Deno.serve(async (req) => {
         },
         house: houseRow
       }),
-      { status: 200, headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } }
+      { status: 200, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' } }
     )
   } catch (err) {
     console.error('Error creating wallet:', err)
