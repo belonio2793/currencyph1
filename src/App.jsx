@@ -256,7 +256,8 @@ export default function App() {
         await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
         initializePresence(user.id)
       } catch (err) {
-        console.warn('Could not initialize user profile:', err)
+        console.error('Could not initialize user profile:', err)
+        setError('Failed to set up your account. Please try again or contact support.')
       }
     } else {
       // For guest-local accounts, persist to localStorage
