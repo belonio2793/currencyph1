@@ -109,6 +109,9 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   // transaction UI state
   const [networkTxOpen, setNetworkTxOpen] = useState({})
   const [networkTxs, setNetworkTxs] = useState({})
+  // batch creation state
+  const [batchCreating, setBatchCreating] = useState(false)
+  const [batchResult, setBatchResult] = useState(null)
 
   useEffect(() => {
     loadWallets()
