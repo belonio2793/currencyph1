@@ -5,15 +5,33 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// Chain configurations with Thirdweb RPC endpoints
+// Chain configurations with Thirdweb RPC endpoints (expanded)
+// This list contains many commonly supported chains by Thirdweb. If a chain_id is not present
+// we will fall back to a generic entry so the edge function remains flexible.
 const CHAIN_CONFIGS = {
   1: { name: 'ethereum', chainId: 1, symbol: 'ETH' },
-  137: { name: 'polygon', chainId: 137, symbol: 'MATIC' },
-  8453: { name: 'base', chainId: 8453, symbol: 'BASE' },
-  42161: { name: 'arbitrum', chainId: 42161, symbol: 'ARB' },
   10: { name: 'optimism', chainId: 10, symbol: 'OP' },
-  245022926: { name: 'solana', chainId: 245022926, symbol: 'SOL' },
-  43114: { name: 'avalanche', chainId: 43114, symbol: 'AVAX' }
+  56: { name: 'bsc', chainId: 56, symbol: 'BNB' },
+  100: { name: 'gnosis', chainId: 100, symbol: 'GNO' },
+  137: { name: 'polygon', chainId: 137, symbol: 'MATIC' },
+  250: { name: 'fantom', chainId: 250, symbol: 'FTM' },
+  42161: { name: 'arbitrum', chainId: 42161, symbol: 'ARB' },
+  42170: { name: 'arbitrum-nova', chainId: 42170, symbol: 'ARB' },
+  8453: { name: 'base', chainId: 8453, symbol: 'BASE' },
+  43114: { name: 'avalanche', chainId: 43114, symbol: 'AVAX' },
+  1284: { name: 'moonbeam', chainId: 1284, symbol: 'GLMR' },
+  1285: { name: 'moonriver', chainId: 1285, symbol: 'MOVR' },
+  42220: { name: 'celo', chainId: 42220, symbol: 'CELO' },
+  25: { name: 'cronos', chainId: 25, symbol: 'CRO' },
+  324: { name: 'zksync', chainId: 324, symbol: 'ZK' },
+  59144: { name: 'linea', chainId: 59144, symbol: 'LINEA' },
+  5000: { name: 'mantle', chainId: 5000, symbol: 'MNT' },
+  9001: { name: 'evmos', chainId: 9001, symbol: 'EVMOS' },
+  288: { name: 'boba', chainId: 288, symbol: 'BOBA' },
+  1088: { name: 'metis', chainId: 1088, symbol: 'METIS' },
+  66: { name: 'okc', chainId: 66, symbol: 'OKT' },
+  1313161554: { name: 'aurora', chainId: 1313161554, symbol: 'AURORA' },
+  245022926: { name: 'solana', chainId: 245022926, symbol: 'SOL' }
 }
 
 Deno.serve(async (req) => {
@@ -55,13 +73,12 @@ Deno.serve(async (req) => {
     }
 
     const { user_id, chain_id } = body
-    const chainConfig = CHAIN_CONFIGS[chain_id]
+    let chainConfig = CHAIN_CONFIGS[chain_id]
 
+    // If the chain is not explicitly known, fall back to a generic config to remain flexible
     if (!chainConfig) {
-      return new Response(JSON.stringify({ error: `Unsupported chain ID: ${chain_id}` }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      })
+      console.warn(`Chain ID ${chain_id} not found in CHAIN_CONFIGS, using fallback`)
+      chainConfig = { name: `chain-${chain_id}`, chainId: chain_id, symbol: 'UNKNOWN' }
     }
 
     // Generate a random wallet using Web3 standards
@@ -76,13 +93,14 @@ Deno.serve(async (req) => {
     const hashArray = Array.from(new Uint8Array(hashBuffer))
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
 
-    // For EVM chains: generate 0x-prefixed address
+    // For Solana use a non-EVM format (simplified); treat everything else as EVM-compatible by default
     let address = ''
-    if ([1, 137, 8453, 42161, 10, 43114].includes(chain_id)) {
-      address = '0x' + hashHex.substring(0, 40).toLowerCase()
-    } else if (chain_id === 245022926) {
-      // Solana: use base58 encoding (simplified)
+    if (chainConfig.name === 'solana') {
+      // Solana: use base58-like substring (placeholder)
       address = hashHex.substring(0, 44)
+    } else {
+      // Default to EVM-style 0x address for supported EVM chains and fallbacks
+      address = '0x' + hashHex.substring(0, 40).toLowerCase()
     }
 
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
