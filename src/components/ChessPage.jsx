@@ -193,7 +193,7 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                 <div className="bg-slate-900/40 backdrop-blur-md rounded-lg shadow-sm border border-slate-700/50 p-6">
                   <h2 className="text-xl font-bold text-white mb-6">Game Board</h2>
                   {/* Display Chess Board */}
-                  <div className="mx-auto max-w-lg">
+                  <div className="mx-auto w-full" style={{ maxWidth: 'min(92vw, 80vh)' }}>
                     <div className="aspect-square grid grid-cols-8 gap-0 border-2 border-slate-700/50 rounded-lg overflow-hidden">
                       {board.map((piece, index) => {
                         const row = Math.floor(index / 8)
@@ -204,13 +204,13 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
                           <div
                             key={index}
                             className={`
-                              aspect-square flex items-center justify-center p-0 leading-none transition-all
+                              aspect-square flex items-center justify-center p-0 leading-none transition-all overflow-visible
                             `}
                             style={{ backgroundColor: isLight ? '#EEEED2' : '#769656' }}
                           >
                             {piece && (
                               <span
-                                className={`${piece === piece.toUpperCase() ? 'text-white' : 'text-gray-900'} text-6xl md:text-7xl`}
+                                className={`${piece === piece.toUpperCase() ? 'text-white' : 'text-gray-900'} text-6xl md:text-6xl`}
                                 style={{ textShadow: piece === piece.toUpperCase()
                                   ? '0 0 1px #000, 0 0 2px #000, 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000'
                                   : '0 0 1px #fff, 0 0 2px #fff, 1px 1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff, -1px -1px 0 #fff' }}
