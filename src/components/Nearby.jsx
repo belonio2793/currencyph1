@@ -816,7 +816,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       {viewMode === 'listings' && (
       <>
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-12 px-6">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-6 px-6">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold mb-2">Explore Philippines</h1>
           <p className="text-blue-100 text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
