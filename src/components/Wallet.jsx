@@ -31,6 +31,7 @@ const CURRENCY_SYMBOLS = {
 
 export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [wallets, setWallets] = useState([])
+  const [internalWallets, setInternalWallets] = useState([])
   const [fiatWallets, setFiatWallets] = useState([])
   const [cryptoWallets, setCryptoWallets] = useState([])
   const [loading, setLoading] = useState(true)
@@ -119,16 +120,17 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         return
       }
 
-      // Fetch wallets and ensure each has an account number (legacy/internal)
-      let mergedWallets = []
+      // Fetch internal (legacy) wallets and ensure each has an account number
+      let internal = []
       try {
         const walletsWithAcct = await wisegcashAPI.ensureWalletsHaveAccountNumbers(userId)
-        mergedWallets = walletsWithAcct || []
+        internal = walletsWithAcct || []
       } catch (err) {
         console.warn('Could not ensure account numbers for wallets:', err)
         const data = await wisegcashAPI.getWallets(userId)
-        mergedWallets = data || []
+        internal = data || []
       }
+      setInternalWallets(internal)
 
       // Fetch additional fiat and crypto wallets from Supabase (new tables)
       try {
@@ -142,7 +144,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           source: 'fiat'
         }))
         setFiatWallets(fiatMapped)
-        mergedWallets = [...mergedWallets, ...fiatMapped]
       } catch (e) {
         console.warn('Error loading wallets_fiat from Supabase:', e)
       }
@@ -158,12 +159,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           source: 'crypto'
         }))
         setCryptoWallets(cryptoMapped)
-        mergedWallets = [...mergedWallets, ...cryptoMapped]
       } catch (e) {
         console.warn('Error loading wallets_crypto from Supabase:', e)
       }
 
-      setWallets(mergedWallets)
+      // Keep a combined list for preferences and lookups
+      const combined = [...internal, ...(fiatWallets || []), ...(cryptoWallets || [])]
+      setWallets(combined)
       setError('')
 
       // Auto-populate preferences based on existing wallets if not set
@@ -287,42 +289,46 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
 
       {/* Wallets Display */}
-      {visibleWallets.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-8 text-center">
-          <p className="text-slate-500 mb-4">No wallets created yet</p>
-          <button
-            onClick={() => setShowPreferences(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-          >
-            Create Your First Wallet
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-          {visibleWallets.map(wallet => (
-            <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{wallet.currency_code}</p>
-                <span className="text-2xl">{CURRENCY_SYMBOLS[wallet.currency_code] || '$'}</span>
+      {/* Internal Wallets row */}
+      <div className="mb-6">
+        <h3 className="text-xl font-light mb-3">Internal Wallets</h3>
+        {internalWallets.length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
+            <p className="text-slate-500 mb-4">No internal wallets created yet</p>
+            <button
+              onClick={() => setShowPreferences(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+            >
+              Create Your First Wallet
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {internalWallets.filter(w => enabledCurrencies.includes(w.currency_code)).map(wallet => (
+              <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{wallet.currency_code}</p>
+                  <span className="text-2xl">{CURRENCY_SYMBOLS[wallet.currency_code] || '$'}</span>
+                </div>
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
+                <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
+                {wallet.account_number && (
+                  <p className="text-xs text-slate-500 mb-4">Acct: {wallet.account_number}</p>
+                )}
+                <button
+                  onClick={() => {
+                    setSelectedWallet(wallet)
+                    setShowAddFunds(true)
+                  }}
+                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                >
+                  Add Funds
+                </button>
               </div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-              <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
-              {wallet.account_number && (
-                <p className="text-xs text-slate-500 mb-4">Acct: {wallet.account_number}</p>
-              )}
-              <button
-                onClick={() => {
-                  setSelectedWallet(wallet)
-                  setShowAddFunds(true)
-                }}
-                className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-              >
-                Add Funds
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Preferences Modal */}
 
