@@ -766,6 +766,9 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                     <div className="text-sm font-mono text-slate-600">{Number(nw.balance || 0).toFixed(6)}</div>
                   </div>
                   <div className="mt-2 text-xs text-slate-500 break-all">Address: {nw.metadata?.address || nw.address || '—'}</div>
+                  {nw?.metadata?.public_key && (
+                    <div className="mt-1 text-xs text-slate-500 break-all">Public Key: {nw.metadata.public_key}</div>
+                  )}
                 </div>
               )) : (
                 <div className="p-4 text-sm text-slate-500">No network wallets found. Click "Generate All" to create house wallets for all supported chains.</div>
