@@ -76,6 +76,10 @@ export const wisegcashAPI = {
 
   // ============ Wallet Management ============
   async createWallet(userId, currencyCode) {
+    if (!userId || userId === 'null' || userId === 'undefined') {
+      throw new Error('Invalid userId: ' + userId)
+    }
+
     const { data, error } = await supabase
       .from('wallets')
       .upsert([
@@ -88,7 +92,10 @@ export const wisegcashAPI = {
       .select()
       .single()
 
-    if (error && error.code !== '23505') throw error // 23505 is unique constraint
+    if (error) {
+      console.error('Wallet creation error:', { code: error.code, message: error.message, details: error.details, userId, currencyCode })
+      if (error.code !== '23505') throw error // 23505 is unique constraint
+    }
     return data
   },
 
