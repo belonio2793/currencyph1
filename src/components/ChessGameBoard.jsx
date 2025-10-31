@@ -330,18 +330,18 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3">
             {(isWhitePlayer || isBlackPlayer) && (
               <button
                 onClick={handleLeaveSeat}
-                className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors border border-red-700/50"
+                className="w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors border border-red-700/50"
               >
                 Leave Seat
               </button>
             )}
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors border border-white/20"
+              className="w-full px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-colors border border-white/20"
             >
               Back to Lobby
             </button>
