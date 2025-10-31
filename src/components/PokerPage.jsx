@@ -388,6 +388,9 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                     )}
                                   </div>
                                 )}
+                                {!isSelected && isSeatedAt(t.id) && (
+                                  <button onClick={(e) => { e.stopPropagation(); handleLeaveTable(t.id) }} className="w-full mt-3 px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">Leave Seat</button>
+                                )}
                               </div>
                             )
                           })}
@@ -451,6 +454,9 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                       </button>
                                     )}
                                   </div>
+                                )}
+                                {!isSelected && isSeatedAt(t.id) && (
+                                  <button onClick={(e) => { e.stopPropagation(); handleLeaveTable(t.id) }} className="w-full mt-3 px-3 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition">Leave Seat</button>
                                 )}
                               </div>
                             )
