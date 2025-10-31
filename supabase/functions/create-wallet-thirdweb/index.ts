@@ -97,22 +97,32 @@ Deno.serve(async (req) => {
     const THIRDWEB_KEY = Deno.env.get('THIRDWEB_SECRET_KEY') || Deno.env.get('VITE_THIRDWEB_CLIENT_ID')
     if (THIRDWEB_KEY) {
       try {
-        // Call ThirdWeb REST create wallet endpoint
-        const twRes = await fetch('https://api.thirdweb.com/v1/wallets', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${THIRDWEB_KEY}`
-          },
-          body: JSON.stringify({ chain_id: chainConfig.chainId, chain: chainConfig.name })
-        })
-        thirdwebResp = await twRes.json().catch(() => null)
-        if (twRes.ok && thirdwebResp) {
-          // Response may include different shapes; try common keys
-          address = thirdwebResp.address || thirdwebResp.wallet?.address || thirdwebResp.data?.address || ''
-          publicKey = thirdwebResp.publicKey || thirdwebResp.wallet?.publicKey || null
-        } else {
-          console.warn('ThirdWeb create wallet failed', thirdwebResp)
+        // Try multiple ThirdWeb endpoints/headers to support different plans and API shapes
+        const endpoints = [
+          { url: 'https://api.thirdweb.com/v1/embedded-wallets', headers: { 'x-secret-key': THIRDWEB_KEY } },
+          { url: 'https://api.thirdweb.com/v1/wallets', headers: { 'x-secret-key': THIRDWEB_KEY } },
+          { url: 'https://api.thirdweb.com/v1/wallets', headers: { 'Authorization': `Bearer ${THIRDWEB_KEY}` }, bearer: true }
+        ]
+
+        for (const ep of endpoints) {
+          try {
+            const headers: any = { 'Content-Type': 'application/json', ...(ep.headers || {}) }
+            const bodyPayload = { chain_id: chainConfig.chainId, chain: chainConfig.name, chainId: chainConfig.chainId }
+            const twRes = await fetch(ep.url, { method: 'POST', headers, body: JSON.stringify(bodyPayload) })
+            const j = await twRes.json().catch(() => null)
+            if (twRes.ok && j) {
+              thirdwebResp = j
+              address = j.address || j.wallet?.address || j.data?.address || j.result?.address || ''
+              publicKey = j.publicKey || j.wallet?.publicKey || null
+              break
+            } else {
+              // continue to next endpoint
+              console.warn('ThirdWeb create wallet attempt failed at', ep.url, j)
+            }
+          } catch (e) {
+            console.warn('ThirdWeb endpoint attempt error:', e)
+            continue
+          }
         }
       } catch (e) {
         console.warn('Failed calling ThirdWeb API:', e)
