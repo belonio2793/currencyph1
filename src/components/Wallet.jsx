@@ -645,6 +645,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           </button>
 
           <div className="ml-auto flex items-center gap-2">
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search chains (e.g. bitcoin, eth, polygon)"
+              className="px-3 py-2 border border-slate-300 rounded-lg text-sm w-80 md:w-96 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
             <select value={filterMode} onChange={(e) => setFilterMode(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white">
               <option value="all">All</option>
               <option value="favorites">Favorites</option>
