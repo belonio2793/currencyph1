@@ -227,7 +227,7 @@ Deno.serve(async (req) => {
     console.error('Error creating wallet:', err)
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' }
     })
   }
 })
