@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 import * as ed25519 from '@noble/ed25519'
 import base58 from 'bs58'
 import crypto from 'crypto'
+import { sha512 } from '@noble/hashes/sha512'
 
 const PROJECT_URL = process.env.SUPABASE_URL || process.env.PROJECT_URL
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
