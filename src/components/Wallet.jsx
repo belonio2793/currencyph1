@@ -59,40 +59,34 @@ export default function Wallet({ userId }) {
   }
 
   const loadWallets = async () => {
-    return new Promise((resolve) => {
-      (async () => {
-        try {
-          if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
-            setWallets([])
-            setEnabledCurrencies(['PHP', 'USD'])
-            setLoading(false)
-            resolve()
-            return
-          }
-          const data = await wisegcashAPI.getWallets(userId)
-          const walletsData = data || []
-          setWallets(walletsData)
-          setError('')
+    try {
+      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
+        setWallets([])
+        setEnabledCurrencies(['PHP', 'USD'])
+        setLoading(false)
+        return
+      }
 
-          // Auto-populate preferences based on existing wallets if not set
-          const prefs = preferencesManager.getAllPreferences(userId)
-          if (!prefs.walletCurrencies && walletsData.length > 0) {
-            const walletCurrencies = walletsData.map(w => w.currency_code)
-            savePreferences(walletCurrencies)
-          } else if (!prefs.walletCurrencies) {
-            savePreferences(['PHP', 'USD'])
-          }
-          resolve()
-        } catch (err) {
-          console.error('Error loading wallets:', err)
-          setWallets([])
-          setError('')
-          resolve()
-        } finally {
-          setLoading(false)
-        }
-      })()
-    })
+      const data = await wisegcashAPI.getWallets(userId)
+      const walletsData = data || []
+      setWallets(walletsData)
+      setError('')
+
+      // Auto-populate preferences based on existing wallets if not set
+      const prefs = preferencesManager.getAllPreferences(userId)
+      if (!prefs.walletCurrencies && walletsData.length > 0) {
+        const walletCurrencies = walletsData.map(w => w.currency_code)
+        savePreferences(walletCurrencies)
+      } else if (!prefs.walletCurrencies) {
+        savePreferences(['PHP', 'USD'])
+      }
+    } catch (err) {
+      console.error('Error loading wallets:', err)
+      setWallets([])
+      setError('')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleAddFunds = async (e) => {
