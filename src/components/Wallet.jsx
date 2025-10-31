@@ -458,9 +458,23 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       </div>
 
       {/* Crypto wallets from wallets_crypto */}
-      {cryptoWallets.filter(w => enabledCrypto.includes(w.currency_code)).length > 0 && (
-        <div className="mb-6">
-          <h3 className="text-xl font-light mb-3">Crypto Wallets</h3>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xl font-light">Crypto Wallets</h3>
+          <button onClick={() => setShowPreferencesCrypto(true)} className="text-sm px-3 py-1 bg-slate-100 rounded">Customize</button>
+        </div>
+
+        {cryptoWallets.filter(w => enabledCrypto.includes(w.currency_code)).length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
+            <p className="text-slate-500 mb-4">No crypto wallets created yet</p>
+            <button
+              onClick={() => setShowPreferencesCrypto(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+            >
+              Create Crypto Wallet
+            </button>
+          </div>
+        ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {cryptoWallets.filter(w => enabledCrypto.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
@@ -488,8 +502,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               </div>
             ))}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
 
       {/* Add Funds Modal */}
