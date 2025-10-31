@@ -144,6 +144,12 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Direct /wallets route should activate wallets page
+    if (path === '/wallets') {
+      setActiveTab('wallet')
+      setShowAuth(false)
+    }
+
     // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
