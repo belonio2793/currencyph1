@@ -16,31 +16,33 @@ export function useGeolocation() {
     // Request geolocation
     const requestLocation = () => {
       navigator.geolocation.getCurrentPosition(
-        async (position) => {
+        (position) => {
           const { latitude, longitude } = position.coords
           setLocation({ latitude, longitude })
           setError(null)
 
-          // Try reverse geocoding to get city name
-          try {
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            )
-            if (response.ok) {
-              const data = await response.json()
-              setCity(
-                data.address?.city ||
-                data.address?.town ||
-                data.address?.village ||
-                data.address?.county ||
-                null
+          // Try reverse geocoding to get city name — run async work and catch errors to avoid unhandled promise rejections
+          ;(async () => {
+            try {
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
               )
+              if (response.ok) {
+                const data = await response.json()
+                setCity(
+                  data.address?.city ||
+                  data.address?.town ||
+                  data.address?.village ||
+                  data.address?.county ||
+                  null
+                )
+              }
+            } catch (err) {
+              console.debug('Reverse geocoding failed:', err)
+            } finally {
+              setLoading(false)
             }
-          } catch (err) {
-            console.debug('Reverse geocoding failed:', err)
-          }
-
-          setLoading(false)
+          })()
         },
         (err) => {
           setError(err.message)
