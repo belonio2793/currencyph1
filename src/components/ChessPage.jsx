@@ -3,6 +3,13 @@ import { supabase } from '../lib/supabaseClient'
 import ChessGameBoard from './ChessGameBoard'
 import { preferencesManager } from '../lib/preferencesManager'
 
+const PIECE_SYMBOLS = {
+  'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔',
+  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚'
+}
+
+const STARTING_BOARD = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+
 export default function ChessPage({ userId, userEmail, onShowAuth }) {
   const pageRef = useRef(null)
   const gameViewRef = useRef(null)
@@ -12,6 +19,26 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('lobby')
   const [gameStats, setGameStats] = useState({ wins: 0, losses: 0, draws: 0 })
+  const [board, setBoard] = useState(fenToBoard(STARTING_BOARD))
+
+  function fenToBoard(fen) {
+    const boardArray = Array(64).fill(null)
+    const boardFen = fen.split(' ')[0]
+    const rows = boardFen.split('/')
+    
+    rows.forEach((row, rowIndex) => {
+      let col = 0
+      for (let char of row) {
+        if (/[0-9]/.test(char)) {
+          col += parseInt(char)
+        } else {
+          boardArray[rowIndex * 8 + col] = char
+          col++
+        }
+      }
+    })
+    return boardArray
+  }
 
   useEffect(() => {
     loadGames()
@@ -81,7 +108,7 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
           status: 'waiting',
           time_control: timeControl,
           moves: [],
-          fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+          fen: STARTING_BOARD
         }])
         .select()
         .single()
@@ -182,66 +209,89 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
               </div>
             )}
 
-            {/* Create Game Section */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Create New Game</h2>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {['blitz', 'rapid', 'classical', 'unlimited'].map(tc => (
-                  <button
-                    key={tc}
-                    onClick={() => handleCreateGame(tc)}
-                    className="px-4 py-4 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-all duration-200 border border-slate-300 hover:border-slate-400"
-                  >
-                    {timeControlLabels[tc]}
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Main Layout: Board Left, Sidebar Right */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Chess Board Left (col-span 2) */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                  <h2 className="text-xl font-bold text-slate-900 mb-6">Game Board</h2>
+                  {/* Display Chess Board */}
+                  <div className="bg-slate-300 p-2 rounded-lg aspect-square max-w-lg mx-auto">
+                    <div className="grid grid-cols-8 gap-0 h-full">
+                      {board.map((piece, index) => {
+                        const row = Math.floor(index / 8)
+                        const col = index % 8
+                        const isLight = (row + col) % 2 === 0
 
-            {/* Available Games */}
-            <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
-              <div className="p-6 border-b border-slate-200 bg-slate-50">
-                <h2 className="text-2xl font-bold text-slate-900">Available Games</h2>
-                <p className="text-sm text-slate-600 mt-1">{games.length} game{games.length !== 1 ? 's' : ''} waiting for an opponent</p>
-              </div>
-
-              {loading ? (
-                <div className="p-12 text-center text-slate-500">
-                  <p className="text-lg">Loading games...</p>
-                </div>
-              ) : games.length === 0 ? (
-                <div className="p-12 text-center">
-                  <p className="text-slate-600 text-lg mb-4">No games waiting. Create one to get started!</p>
-                  <button
-                    onClick={() => handleCreateGame('rapid')}
-                    className="px-6 py-3 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
-                  >
-                    Create Game
-                  </button>
-                </div>
-              ) : (
-                <div className="divide-y divide-slate-200">
-                  {games.map(game => (
-                    <div
-                      key={game.id}
-                      className="p-6 flex items-center justify-between hover:bg-slate-50 transition-colors"
-                    >
-                      <div className="flex-1">
-                        <p className="text-slate-900 font-semibold">{game.white_player_email}</p>
-                        <p className="text-sm text-slate-600 mt-1">
-                          {timeControlLabels[game.time_control]} • Waiting for opponent
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => handleJoinGame(game)}
-                        className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-colors"
-                      >
-                        Join Game
-                      </button>
+                        return (
+                          <div
+                            key={index}
+                            className={`
+                              flex items-center justify-center text-3xl font-bold
+                              ${isLight ? 'bg-amber-100' : 'bg-amber-700'}
+                            `}
+                          >
+                            {piece && PIECE_SYMBOLS[piece]}
+                          </div>
+                        )
+                      })}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
+              </div>
+
+              {/* Sidebar Right */}
+              <div className="space-y-6">
+                {/* Create Game Section */}
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">Create Game</h3>
+                  <div className="space-y-3">
+                    {['blitz', 'rapid', 'classical', 'unlimited'].map(tc => (
+                      <button
+                        key={tc}
+                        onClick={() => handleCreateGame(tc)}
+                        className="w-full px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-semibold transition-all duration-200 border border-slate-300 hover:border-slate-400"
+                      >
+                        {timeControlLabels[tc]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Available Games */}
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">Available Games</h3>
+                  <p className="text-sm text-slate-600 mb-4">
+                    {games.length} game{games.length !== 1 ? 's' : ''} waiting
+                  </p>
+
+                  {loading ? (
+                    <p className="text-sm text-slate-500">Loading...</p>
+                  ) : games.length === 0 ? (
+                    <p className="text-sm text-slate-500">No games available</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {games.slice(0, 5).map(game => (
+                        <div
+                          key={game.id}
+                          className="p-3 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+                        >
+                          <p className="text-sm font-semibold text-slate-900 truncate">{game.white_player_email}</p>
+                          <p className="text-xs text-slate-600 mb-2">
+                            {timeControlLabels[game.time_control]}
+                          </p>
+                          <button
+                            onClick={() => handleJoinGame(game)}
+                            className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded font-semibold transition-colors"
+                          >
+                            Join
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         )}
