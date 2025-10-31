@@ -89,28 +89,31 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY)
 
-    // Insert into wallets_crypto
-    const { data: inserted, error: insertError } = await supabase
+    // Upsert into wallets_crypto to avoid duplicates on retries
+    const { data: upserted, error: upsertError } = await supabase
       .from('wallets_crypto')
-      .insert([{
-        user_id,
-        chain: chainConfig.name.toUpperCase(),
-        chain_id: chain_id,
-        address: address,
-        provider: 'manual',
-        balance: 0,
-        metadata: {
-          chainName: chainConfig.name,
-          chainSymbol: chainConfig.symbol,
-          generated_at: new Date().toISOString()
+      .upsert([
+        {
+          user_id,
+          chain: chainConfig.name.toUpperCase(),
+          chain_id: chain_id,
+          address: address,
+          provider: 'manual',
+          balance: 0,
+          metadata: {
+            chainName: chainConfig.name,
+            chainSymbol: chainConfig.symbol,
+            generated_at: new Date().toISOString()
+          },
+          updated_at: new Date().toISOString()
         }
-      }])
+      ], { onConflict: 'user_id,chain,address' })
       .select()
       .single()
 
-    if (insertError) {
-      console.error('Insert error:', insertError)
-      return new Response(JSON.stringify({ error: insertError.message }), {
+    if (upsertError) {
+      console.error('Upsert error:', upsertError)
+      return new Response(JSON.stringify({ error: upsertError.message }), {
         status: 400,
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       })
@@ -119,10 +122,10 @@ Deno.serve(async (req) => {
     return new Response(JSON.stringify({
       ok: true,
       wallet: {
-        id: inserted.id,
-        address: inserted.address,
-        chain_id: inserted.chain_id,
-        chain: inserted.chain,
+        id: upserted.id,
+        address: upserted.address,
+        chain_id: upserted.chain_id,
+        chain: upserted.chain,
         provider: 'manual',
         chainName: chainConfig.name,
         chainSymbol: chainConfig.symbol
