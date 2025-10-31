@@ -3,9 +3,9 @@
  * Batch Create Real Onchain Wallets
  * Creates Bitcoin, Solana, and EVM-compatible wallets for all chains
  * Syncs to wallets_house table for transparent UI display
- * 
+ *
  * Usage: node scripts/batch-create-wallets.js [--thirdweb-only]
- * 
+ *
  * Requires env vars:
  *   - SUPABASE_URL
  *   - SUPABASE_SERVICE_ROLE_KEY
@@ -15,36 +15,10 @@
 
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
-
-// Try to load noble crypto libraries, fall back to built-in
-let secp256k1Module, sha256Func, ripemd160Func, keccak256Func, ed25519Module, base58Module;
-
-try {
-  secp256k1Module = await import('@noble/secp256k1');
-} catch (e) {
-  console.warn('⚠️  @noble/secp256k1 not installed. Install with: npm install @noble/secp256k1');
-}
-
-try {
-  const hashesModule = await import('@noble/hashes');
-  sha256Func = hashesModule.sha256;
-  ripemd160Func = hashesModule.ripemd160;
-  keccak256Func = hashesModule.keccak_256;
-} catch (e) {
-  console.warn('⚠️  @noble/hashes not installed. Install with: npm install @noble/hashes');
-}
-
-try {
-  ed25519Module = await import('@noble/ed25519');
-} catch (e) {
-  console.warn('⚠️  @noble/ed25519 not installed. Install with: npm install @noble/ed25519');
-}
-
-try {
-  base58Module = await import('bs58');
-} catch (e) {
-  console.warn('⚠️  bs58 not installed. Install with: npm install bs58');
-}
+import { secp256k1 } from '@noble/secp256k1';
+import { sha256, ripemd160, keccak_256 } from '@noble/hashes/sha3';
+import { ed25519 } from '@noble/ed25519';
+import bs58 from 'bs58';
 
 const CHAIN_CONFIGS = {
   0: { name: 'bitcoin', chainId: 0, symbol: 'BTC', type: 'bitcoin' },
