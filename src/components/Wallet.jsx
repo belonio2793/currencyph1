@@ -42,6 +42,9 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [success, setSuccess] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [enabledCurrencies, setEnabledCurrencies] = useState([])
+  const [activeTab, setActiveTab] = useState('mywallets')
+  const [houseBalances, setHouseBalances] = useState([])
+  const [houseTransactions, setHouseTransactions] = useState([])
 
   useEffect(() => {
     loadWallets()
