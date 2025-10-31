@@ -778,8 +778,69 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                   {nw.updated_at && <div className="text-xs text-slate-400">Updated: {new Date(nw.updated_at).toLocaleString()}</div> }
                 </div>
               )) : (
-                <div className="p-4 text-sm text-slate-500">No network wallets found. Click "Generate All" to create house wallets for all supported chains.</div>
+                <div className="p-4 text-sm text-slate-500">No network wallets found.</div>
               )}
+            </div>
+
+            {/* Transactions per network - toggle & list (for each wallet card) */}
+            <div className="mt-4">
+              {networkWallets && networkWallets.length > 0 && networkWallets.map(nw => (
+                <div key={`tx-${nw.id}`} className="mt-3 bg-white border border-slate-100 rounded-lg p-3">
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm text-slate-700 font-semibold">{nw.network || nw.currency} Transactions</div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={async () => {
+                          // toggle and load transactions
+                          const id = nw.id
+                          setNetworkTxOpen(prev => ({ ...prev, [id]: !prev[id] }))
+                          if (!networkTxs[id]) {
+                            try {
+                              const { data: txs, error } = await supabase.from('wallet_transactions')
+                                .select('id, user_id, type, amount, currency_code, balance_after, created_at, description')
+                                .eq('currency_code', nw.currency)
+                                .order('created_at', { ascending: false })
+                                .limit(50)
+                              if (error) throw error
+                              setNetworkTxs(prev => ({ ...prev, [id]: txs || [] }))
+                            } catch (e) {
+                              console.error('Failed loading transactions for', nw.currency, e)
+                              setNetworkTxs(prev => ({ ...prev, [id]: [] }))
+                            }
+                          }
+                        }}
+                        className="px-3 py-1 text-sm bg-slate-100 rounded">
+                        {networkTxOpen[nw.id] ? 'Hide Transactions' : 'Show Transactions'}
+                      </button>
+
+                      {nw && (nw.address || nw.metadata?.address) && (
+                        <a href={getExplorerUrl(nw.network || nw.currency, nw.address || nw.metadata?.address)} target="_blank" rel="noreferrer" className="px-3 py-1 text-sm bg-white border rounded">View on explorer</a>
+                      )}
+                    </div>
+                  </div>
+
+                  {networkTxOpen[nw.id] && (
+                    <div className="mt-3">
+                      {(networkTxs[nw.id] && networkTxs[nw.id].length > 0) ? (
+                        <div className="space-y-2">
+                          {networkTxs[nw.id].map(tx => (
+                            <div key={tx.id} className="p-2 border border-slate-100 rounded flex items-center justify-between text-sm">
+                              <div>
+                                <div className="font-mono text-xs text-slate-600">{tx.type} • {tx.currency_code}</div>
+                                <div className="text-slate-800">{Number(tx.amount || 0)}</div>
+                                <div className="text-xs text-slate-500">{tx.description}</div>
+                              </div>
+                              <div className="text-xs text-slate-400">{new Date(tx.created_at).toLocaleString()}</div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-xs text-slate-500">No recent transactions on record for this network.</div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </div>
         )}
