@@ -49,6 +49,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   useEffect(() => {
     loadWallets()
     loadPreferences()
+    // also refresh house/network data
+    loadHouseData()
   }, [userId])
 
   const loadPreferences = () => {
