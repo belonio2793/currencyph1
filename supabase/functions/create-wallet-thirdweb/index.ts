@@ -207,6 +207,43 @@ Deno.serve(async (req) => {
       })
     }
 
+    // If requested, also create/ensure a house (network) wallet record in wallets_house
+    let houseRow = null
+    if (createHouse) {
+      try {
+        const houseObj = {
+          wallet_type: 'crypto',
+          currency: chainConfig.symbol || chainConfig.name,
+          network: chainConfig.name,
+          balance: 0,
+          metadata: Object.assign({}, metadataObj, { address }),
+          updated_at: new Date().toISOString()
+        }
+        // Try insert first
+        const { data: insertedHouse, error: insertHouseErr } = await supabase
+          .from('wallets_house')
+          .insert([houseObj])
+          .select()
+          .single()
+
+        if (!insertHouseErr && insertedHouse) {
+          houseRow = insertedHouse
+        } else {
+          // If insert failed (possible duplicate), try to fetch existing row
+          const { data: existingHouse } = await supabase
+            .from('wallets_house')
+            .select('*')
+            .eq('network', chainConfig.name)
+            .eq('currency', chainConfig.symbol || chainConfig.name)
+            .maybeSingle()
+          houseRow = existingHouse || null
+        }
+      } catch (e) {
+        console.warn('Could not create/find house wallet row:', e)
+        houseRow = null
+      }
+    }
+
     return new Response(JSON.stringify({
       ok: true,
       wallet: {
@@ -217,7 +254,8 @@ Deno.serve(async (req) => {
         provider: 'manual',
         chainName: chainConfig.name,
         chainSymbol: chainConfig.symbol
-      }
+      },
+      house: houseRow
     }), {
       status: 200,
       headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
