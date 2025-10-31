@@ -159,6 +159,28 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     }
   }
 
+  const loadHouseData = async () => {
+    try {
+      const { data: hb, error: hbErr } = await supabase.from('wallets_house').select('*')
+      if (hbErr) throw hbErr
+      setHouseBalances(hb || [])
+    } catch (e) {
+      console.warn('Failed to load wallets_house:', e)
+    }
+
+    try {
+      const { data: txs, error: txErr } = await supabase.from('wallet_transactions')
+        .select('*')
+        .in('type', ['rake','deposit','transfer_in'])
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (txErr) throw txErr
+      setHouseTransactions(txs || [])
+    } catch (e) {
+      console.warn('Failed to load house transactions:', e)
+    }
+  }
+
   const handleAddFunds = async (e) => {
     e.preventDefault()
     setError('')
