@@ -36,12 +36,12 @@ export default function Inbox({ userId }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto py-8 px-4">
-      <h2 className="text-xl font-semibold mb-4">Inbox</h2>
+    <div className="max-w-5xl mx-auto py-6 px-4">
+      <h2 className="text-xl font-semibold mb-3">Inbox</h2>
       {loading && <div className="text-sm text-slate-500">Loading messages...</div>}
-      {error && <div className="text-sm text-red-600 mb-4">{error}</div>}
+      {error && <div className="text-sm text-red-600 mb-3">{error}</div>}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div className="col-span-1">
           <ul className="border rounded divide-y max-h-[60vh] overflow-auto">
             {messages.map(m => (

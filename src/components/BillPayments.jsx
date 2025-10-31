@@ -110,15 +110,15 @@ export default function BillPayments({ userId }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="text-center text-slate-500">Loading bills...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <div className="flex items-center justify-between mb-12">
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="flex items-center justify-between mb-6">
         <h2 className="text-3xl font-light text-slate-900 tracking-tight">Pay Bills</h2>
         <button
           onClick={() => setShowAddBill(true)}
@@ -133,7 +133,7 @@ export default function BillPayments({ userId }) {
 
       {/* Bills List */}
       {bills.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
           <p className="text-slate-500 text-sm mb-4">No bills added yet</p>
           <button
             onClick={() => setShowAddBill(true)}
@@ -189,7 +189,7 @@ export default function BillPayments({ userId }) {
           <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
             <h3 className="text-2xl font-light text-slate-900 mb-6">Add Bill</h3>
 
-            <form onSubmit={handleAddBill} className="space-y-4">
+            <form onSubmit={handleAddBill} className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Bill Category</label>
                 <select
@@ -252,7 +252,7 @@ export default function BillPayments({ userId }) {
             <h3 className="text-2xl font-light text-slate-900 mb-2">Pay Bill</h3>
             <p className="text-slate-500 text-sm mb-6">{selectedBill.biller_name}</p>
 
-            <form onSubmit={handlePayBill} className="space-y-4">
+            <form onSubmit={handlePayBill} className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
                 <input

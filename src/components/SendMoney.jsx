@@ -173,24 +173,24 @@ export default function SendMoney({ userId }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="text-center text-slate-500">Loading...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">Send Money</h2>
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">Send Money</h2>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
       {success && <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">{success}</div>}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Send Form */}
         <div className="lg:col-span-2">
-          <div className="bg-white border border-slate-200 rounded-xl p-8">
-            <form onSubmit={handleSendMoney} className="space-y-8">
+          <div className="bg-white border border-slate-200 rounded-xl p-6">
+            <form onSubmit={handleSendMoney} className="space-y-6">
               {/* Step Indicator */}
               <div className="flex items-center space-x-4">
                 { /* labels for steps */ }
@@ -216,7 +216,7 @@ export default function SendMoney({ userId }) {
               </div>
 
               {step === 1 && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h3 className="text-lg font-medium text-slate-900">Select Sender Account</h3>
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">From Account</label>
@@ -243,7 +243,7 @@ export default function SendMoney({ userId }) {
               )}
 
               {step === 2 && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h3 className="text-lg font-medium text-slate-900">Select Recipient</h3>
 
                   {/* Recipient Search */}
@@ -387,7 +387,7 @@ export default function SendMoney({ userId }) {
               )}
 
               {step === 3 && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <h3 className="text-lg font-medium text-slate-900">Enter Amount</h3>
 
                   <div>

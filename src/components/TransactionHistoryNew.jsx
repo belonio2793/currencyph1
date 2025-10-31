@@ -73,15 +73,15 @@ export default function TransactionHistory({ userId }) {
 
   if (loading) {
     return (
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-6">
         <div className="text-center text-slate-500">Loading transactions...</div>
       </div>
     )
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">Transaction History</h2>
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">Transaction History</h2>
 
       {/* Filters */}
       <div className="bg-white border border-slate-200 rounded-xl p-6 mb-8">
@@ -119,7 +119,7 @@ export default function TransactionHistory({ userId }) {
 
       {/* Transactions List */}
       {filteredTransactions.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center">
+        <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
           <p className="text-slate-500 text-sm">No transactions found</p>
         </div>
       ) : (
