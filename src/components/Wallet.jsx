@@ -270,6 +270,57 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     }
   }
 
+  // ============ Network Wallets (house) helpers ============
+  const loadNetworkWallets = async () => {
+    try {
+      const { data, error } = await supabase.from('wallets_house').select('*')
+      if (error) throw error
+      setNetworkWallets(data || [])
+    } catch (e) {
+      console.warn('Failed loading network wallets:', e)
+      setNetworkWallets([])
+    }
+  }
+
+  const generateNetworkWalletForChain = async (chain) => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-wallet-thirdweb', {
+        body: {
+          chain_id: chain.chainId,
+          create_house: true
+        }
+      })
+      if (error) throw error
+      return data
+    } catch (e) {
+      console.error('Failed creating network wallet for', chain.name, e)
+      return null
+    }
+  }
+
+  const generateAllNetworkWallets = async () => {
+    try {
+      setGeneratingNetwork(true)
+      const chains = Object.values(SUPPORTED_CHAINS)
+      setNetworkProgress({ done: 0, total: chains.length })
+      await loadNetworkWallets()
+      for (let i = 0; i < chains.length; i++) {
+        const chain = chains[i]
+        // skip if already present
+        const exists = networkWallets.some(nw => nw.network && nw.network.toLowerCase() === chain.name.toLowerCase())
+        if (!exists) {
+          await generateNetworkWalletForChain(chain)
+        }
+        setNetworkProgress(prev => ({ ...prev, done: prev.done + 1 }))
+      }
+      await loadNetworkWallets()
+      setGeneratingNetwork(false)
+    } catch (e) {
+      console.error('generateAllNetworkWallets error:', e)
+      setGeneratingNetwork(false)
+    }
+  }
+
   const handleAddFunds = async (e) => {
     e.preventDefault()
     setError('')
