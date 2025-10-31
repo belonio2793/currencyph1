@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function BalancesSummaryDashboard({ userId }) {
@@ -8,7 +9,7 @@ export default function BalancesSummaryDashboard({ userId }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [activeTab, setActiveTab] = useState('transactions')
-  
+
   // Search and filter states
   const [searchQuery, setSearchQuery] = useState('')
   const [minBalance, setMinBalance] = useState('')
@@ -18,10 +19,10 @@ export default function BalancesSummaryDashboard({ userId }) {
     fetchBalancesData()
 
     const channel = supabase
-      .channel('public:balances')
+      .channel('public:wallet_transactions')
       .on(
         'postgres_changes',
-        { event: '*', schema: 'public', table: 'balances' },
+        { event: '*', schema: 'public', table: 'wallet_transactions' },
         () => fetchBalancesData()
       )
       .subscribe()
@@ -38,8 +39,8 @@ export default function BalancesSummaryDashboard({ userId }) {
     // Search by email or user ID
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(b => 
-        b.user_id.toLowerCase().includes(query) || 
+      filtered = filtered.filter(b =>
+        b.user_id.toLowerCase().includes(query) ||
         (b.email && b.email.toLowerCase().includes(query))
       )
     }
@@ -59,29 +60,54 @@ export default function BalancesSummaryDashboard({ userId }) {
     setLoading(true)
     setError(null)
     try {
-      const { data, error: fetchError } = await supabase
-        .from('balances')
-        .select('id, user_id, transaction_type, amount, currency, new_balance, created_at, description')
+      // Recent transactions: from wallet_transactions
+      const { data: txData, error: txErr } = await supabase
+        .from('wallet_transactions')
+        .select('id, user_id, type, amount, currency_code, balance_after, created_at, description')
         .order('created_at', { ascending: false })
         .limit(200)
 
-      if (fetchError) throw fetchError
+      if (txErr) throw txErr
 
-      setRecentBalances(data || [])
+      // Normalize recent transactions
+      const recent = (txData || []).map(t => ({
+        id: t.id,
+        user_id: t.user_id,
+        transaction_type: t.type,
+        amount: t.amount,
+        currency: t.currency_code,
+        new_balance: t.balance_after,
+        created_at: t.created_at,
+        description: t.description
+      }))
 
-      // Get unique balances sorted by new_balance descending
+      setRecentBalances(recent)
+
+      // Aggregate current balances across wallets tables (wallets, wallets_fiat, wallets_crypto)
+      const [ { data: wData = [] } = {}, { data: fData = [] } = {}, { data: cData = [] } = {} ] = await Promise.all([
+        supabase.from('wallets').select('user_id, balance, currency_code'),
+        supabase.from('wallets_fiat').select('user_id, balance, currency'),
+        supabase.from('wallets_crypto').select('user_id, balance, chain')
+      ])
+
+      const combined = []
+
+      (wData || []).forEach(r => combined.push({ user_id: r.user_id, new_balance: r.balance, currency: r.currency_code }))
+      (fData || []).forEach(r => combined.push({ user_id: r.user_id, new_balance: r.balance, currency: r.currency }))
+      (cData || []).forEach(r => combined.push({ user_id: r.user_id, new_balance: r.balance, currency: r.chain || 'CRYPTO' }))
+
+      // Reduce to highest balances per (user_id, currency)
       const balanceMap = new Map()
-      ;(data || []).forEach(b => {
+      combined.forEach(b => {
         const key = `${b.user_id}-${b.currency}`
         const existing = balanceMap.get(key)
-        if (!existing || parseFloat(b.new_balance) > parseFloat(existing.new_balance)) {
+        if (!existing || parseFloat(b.new_balance || 0) > parseFloat(existing.new_balance || 0)) {
           balanceMap.set(key, b)
         }
       })
-      
-      const sorted = Array.from(balanceMap.values())
-        .sort((a, b) => parseFloat(b.new_balance || 0) - parseFloat(a.new_balance || 0))
-      
+
+      const sorted = Array.from(balanceMap.values()).sort((a, b) => parseFloat(b.new_balance || 0) - parseFloat(a.new_balance || 0))
+
       setAllBalances(sorted)
       setFilteredBalances(sorted)
     } catch (err) {
