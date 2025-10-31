@@ -783,38 +783,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => { loadNetworkWallets() }} className="px-3 py-2 bg-slate-100 rounded">Refresh</button>
-                <button
-                  onClick={async () => {
-                    try {
-                      setBatchCreating(true)
-                      setBatchResult(null)
-                      const url = `${import.meta.env.VITE_PROJECT_URL.replace(/\/+$/,'')}/functions/v1/create-wallet-batch`
-                      const res = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-                        },
-                        body: JSON.stringify({ create_house: true })
-                      })
-                      const data = await res.json().catch(() => null)
-                      if (!res.ok) {
-                        throw new Error(data?.error?.message || data?.message || `HTTP ${res.status}`)
-                      }
-                      setBatchResult(data)
-                      await loadNetworkWallets()
-                    } catch (e) {
-                      console.error('Batch create error', e)
-                      setBatchResult({ ok: false, error: e.message || String(e) })
-                    } finally {
-                      setBatchCreating(false)
-                    }
-                  }}
-                  disabled={batchCreating}
-                  className="px-3 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                >
-                  {batchCreating ? 'Creating...' : 'Create ThirdWeb Wallets'}
-                </button>
                 <button onClick={() => setShowNetworkPanel(false)} className="px-3 py-2 bg-white border rounded">Close</button>
               </div>
 
