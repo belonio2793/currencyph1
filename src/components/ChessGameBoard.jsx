@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import ChessEngine from '../lib/chessEngine'
 
 const PIECE_SYMBOLS = {
   'P': '♙', 'N': '♘', 'B': '♗', 'R': '♖', 'Q': '♕', 'K': '♔',
-  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '���'
+  'p': '♟', 'n': '♞', 'b': '♝', 'r': '♜', 'q': '♛', 'k': '♚'
 }
 
 export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
@@ -18,15 +18,15 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   const [error, setError] = useState(null)
   const subscriptionRef = useRef(null)
 
-  const engine = new ChessEngine(currentGame.fen)
-  const isWhitePlayer = currentGame.white_player_id === userId
-  const isBlackPlayer = currentGame.black_player_id === userId
-  const isMyTurn = (engine.isWhiteTurn() && isWhitePlayer) || (!engine.isWhiteTurn() && isBlackPlayer)
-
   function getInitialTime(timeControl) {
     const times = { blitz: 3, rapid: 10, classical: 30 }
     return (times[timeControl] || 10) * 60
   }
+
+  const engine = new ChessEngine(currentGame.fen)
+  const isWhitePlayer = currentGame.white_player_id === userId
+  const isBlackPlayer = currentGame.black_player_id === userId
+  const isMyTurn = (engine.isWhiteTurn() && isWhitePlayer) || (!engine.isWhiteTurn() && isBlackPlayer)
 
   useEffect(() => {
     const moves = engine.getLegalMoves()
@@ -128,7 +128,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
   }
 
   function formatTime(seconds) {
-    if (!seconds) return '∞'
+    if (!seconds) return '—'
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs.toString().padStart(2, '0')}`
@@ -136,10 +136,17 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
 
   const board = engine.getBoard()
 
+  const timeControlDisplay = {
+    blitz: 'Blitz (3 min)',
+    rapid: 'Rapid (10 min)',
+    classical: 'Classical (30 min)',
+    unlimited: 'Unlimited'
+  }
+
   return (
     <div className="space-y-6">
       {error && (
-        <div className="p-3 bg-red-900/20 border border-red-600 rounded-lg text-red-200 text-sm">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
           {error}
         </div>
       )}
@@ -147,20 +154,20 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chessboard */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-6 backdrop-blur-sm">
+          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             {/* Black Player Info */}
-            <div className="mb-4 p-3 bg-slate-700/30 rounded-lg flex justify-between items-center">
+            <div className="mb-6 pb-4 border-b border-slate-200 flex justify-between items-center">
               <div>
-                <p className="text-white font-medium">{currentGame.black_player_email || 'Waiting for opponent...'}</p>
-                <p className="text-xs text-slate-400">Black</p>
+                <p className="text-slate-900 font-semibold">{currentGame.black_player_email || 'Waiting for opponent...'}</p>
+                <p className="text-xs text-slate-600 mt-1">Black</p>
               </div>
-              <div className={`text-xl font-mono font-bold ${blackTime !== null && blackTime < 60 ? 'text-red-400' : 'text-white'}`}>
+              <div className={`text-2xl font-mono font-bold ${blackTime !== null && blackTime < 60 ? 'text-red-600' : 'text-slate-900'}`}>
                 {formatTime(blackTime)}
               </div>
             </div>
 
             {/* Board */}
-            <div className="bg-slate-900 p-1 rounded-lg mb-4 aspect-square max-w-md mx-auto">
+            <div className="bg-slate-300 p-2 rounded-lg mb-6 aspect-square max-w-md mx-auto">
               <div className="grid grid-cols-8 gap-0 h-full">
                 {board.map((piece, index) => {
                   const row = Math.floor(index / 8)
@@ -176,12 +183,12 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
                       key={square}
                       onClick={() => handleSquareClick(square)}
                       className={`
-                        flex items-center justify-center text-3xl font-bold transition-colors
+                        flex items-center justify-center text-3xl font-bold transition-all
                         ${isLight ? 'bg-amber-100' : 'bg-amber-700'}
-                        ${isSelected ? 'ring-4 ring-green-400' : ''}
-                        ${isHighlighted ? 'ring-4 ring-blue-400' : ''}
-                        ${isLastMove ? (isLight ? 'bg-yellow-200' : 'bg-yellow-600') : ''}
-                        hover:opacity-80 cursor-pointer
+                        ${isSelected ? 'ring-4 ring-blue-500' : ''}
+                        ${isHighlighted ? 'ring-inset ring-4 ring-green-500' : ''}
+                        ${isLastMove ? (isLight ? 'bg-yellow-300' : 'bg-yellow-600') : ''}
+                        hover:opacity-90 cursor-pointer
                       `}
                     >
                       {piece && PIECE_SYMBOLS[piece]}
@@ -192,24 +199,24 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             </div>
 
             {/* White Player Info */}
-            <div className="p-3 bg-slate-700/30 rounded-lg flex justify-between items-center">
+            <div className="pt-4 border-t border-slate-200 flex justify-between items-center">
               <div>
-                <p className="text-white font-medium">{currentGame.white_player_email}</p>
-                <p className="text-xs text-slate-400">White</p>
+                <p className="text-slate-900 font-semibold">{currentGame.white_player_email}</p>
+                <p className="text-xs text-slate-600 mt-1">White</p>
               </div>
-              <div className={`text-xl font-mono font-bold ${whiteTime !== null && whiteTime < 60 ? 'text-red-400' : 'text-white'}`}>
+              <div className={`text-2xl font-mono font-bold ${whiteTime !== null && whiteTime < 60 ? 'text-red-600' : 'text-slate-900'}`}>
                 {formatTime(whiteTime)}
               </div>
             </div>
 
             {/* Game Status */}
             {gameStatus !== 'in_progress' && (
-              <div className="mt-4 p-4 bg-blue-900/30 border border-blue-600/30 rounded-lg text-center">
-                <p className="text-blue-200 font-semibold">
+              <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+                <p className="text-blue-900 font-semibold">
                   {gameStatus === 'white_checkmate' && 'White is checkmated - Black wins!'}
                   {gameStatus === 'black_checkmate' && 'Black is checkmated - White wins!'}
-                  {gameStatus === 'stalemate' && "Game is a draw - Stalemate"}
-                  {gameStatus === 'insufficient_material' && "Game is a draw - Insufficient material"}
+                  {gameStatus === 'stalemate' && 'Game is a draw - Stalemate'}
+                  {gameStatus === 'insufficient_material' && 'Game is a draw - Insufficient material'}
                   {gameStatus === 'check' && 'Check!'}
                 </p>
               </div>
@@ -218,35 +225,44 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
         </div>
 
         {/* Move History & Info */}
-        <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-6 backdrop-blur-sm h-fit">
-          <h3 className="text-lg font-semibold text-white mb-4">Move History</h3>
-          <div className="space-y-2 max-h-96 overflow-y-auto">
-            {currentGame.moves && currentGame.moves.length > 0 ? (
-              currentGame.moves.map((move, idx) => (
-                <div
-                  key={idx}
-                  className={`p-2 rounded text-sm ${
-                    idx % 2 === 0
-                      ? 'bg-slate-700/30 text-slate-300'
-                      : 'bg-slate-600/20 text-slate-400'
-                  }`}
-                >
-                  <span className="font-mono font-semibold">{idx + 1}.</span> {move.from}{move.to}
-                </div>
-              ))
-            ) : (
-              <p className="text-slate-400 text-sm">No moves yet</p>
-            )}
+        <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 h-fit">
+          <h3 className="text-lg font-bold text-slate-900 mb-4">Game Info</h3>
+          
+          <div className="mb-6 pb-4 border-b border-slate-200">
+            <p className="text-sm text-slate-600 font-medium">Time Control</p>
+            <p className="text-slate-900 font-semibold mt-1">{timeControlDisplay[currentGame.time_control]}</p>
           </div>
 
-          <div className="mt-6 pt-6 border-t border-slate-600/30">
-            <button
-              onClick={onClose}
-              className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors"
-            >
-              Back to Lobby
-            </button>
+          <div className="mb-6">
+            <p className="text-sm text-slate-600 font-medium mb-3">Move History</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {currentGame.moves && currentGame.moves.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {currentGame.moves.map((move, idx) => (
+                    <div
+                      key={idx}
+                      className={`p-2 rounded text-sm font-mono text-center ${
+                        idx % 2 === 0
+                          ? 'bg-slate-100 text-slate-900'
+                          : 'bg-slate-50 text-slate-700'
+                      }`}
+                    >
+                      {Math.floor(idx / 2) + 1}. {move.from}{move.to}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-slate-500 text-sm">No moves yet</p>
+              )}
+            </div>
           </div>
+
+          <button
+            onClick={onClose}
+            className="w-full px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-900 rounded-lg font-medium transition-colors border border-slate-300"
+          >
+            Back to Lobby
+          </button>
         </div>
       </div>
     </div>
