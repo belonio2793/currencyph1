@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 /**
- * Batch Create Real ThirdWeb Wallets using ThirdWeb SDK
- * Creates embedded wallets for all supported chains
+ * Batch Create Real ThirdWeb Wallets
+ * Uses ThirdWeb API to create embedded wallets
  * 
  * Usage: node scripts/batch-create-wallets.js
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 
 const CHAIN_CONFIGS = [
   { name: 'ethereum', chainId: 1, symbol: 'ETH' },
@@ -34,81 +33,67 @@ const CHAIN_CONFIGS = [
   { name: 'arbitrum-nova', chainId: 42170, symbol: 'ARB' }
 ];
 
-// Create embedded wallet using ThirdWeb SDK
+// Create embedded wallet using ThirdWeb API
 async function createThirdwebWallet(chain, thirdwebKey) {
   if (!thirdwebKey) {
     throw new Error(`THIRDWEB_SECRET_KEY not configured`);
   }
 
-  try {
-    // Initialize SDK for this chain
-    const sdk = ThirdwebSDK.fromPrivateKey(thirdwebKey, chain.chainId, {
-      clientId: process.env.VITE_THIRDWEB_CLIENT_ID
-    });
-
-    // For embedded wallets, we need to create using the API differently
-    // Let's use the REST API with correct endpoint format
-    const res = await fetch('https://api.thirdweb.com/v1/embedded-wallet', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-secret-key': thirdwebKey
-      },
-      body: JSON.stringify({
-        chain: chain.chainId
-      })
-    });
-
-    if (!res.ok) {
-      const errorText = await res.text();
-      throw new Error(`HTTP ${res.status}: ${errorText}`);
+  // Try multiple endpoints in order
+  const endpoints = [
+    {
+      url: `https://api.thirdweb.com/v1/embedded-wallets`,
+      headers: { 'Authorization': `Bearer ${thirdwebKey}` },
+      body: { chainId: chain.chainId }
+    },
+    {
+      url: `https://api.thirdweb.com/v1/embedded-wallet`,
+      headers: { 'x-secret-key': thirdwebKey },
+      body: { chainId: chain.chainId }
+    },
+    {
+      url: `https://api.thirdweb.com/v1/wallet`,
+      headers: { 'Authorization': `Bearer ${thirdwebKey}` },
+      body: { chainId: chain.chainId, type: 'embedded' }
     }
+  ];
 
-    const data = await res.json();
-    
-    if (!data.address) {
-      throw new Error(`No address returned: ${JSON.stringify(data)}`);
-    }
+  let lastError = null;
 
-    return {
-      address: data.address || data.walletAddress,
-      walletId: data.walletId || data.id,
-      rawData: data,
-      provider: 'thirdweb'
-    };
-  } catch (e) {
-    // Try alternative endpoint
+  for (const endpoint of endpoints) {
     try {
-      const res = await fetch(`https://api.thirdweb.com/v1/embedded-wallets`, {
+      const res = await fetch(endpoint.url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${thirdwebKey}`
+          ...endpoint.headers
         },
-        body: JSON.stringify({
-          chainId: chain.chainId
-        })
+        body: JSON.stringify(endpoint.body)
       });
 
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
+        lastError = `HTTP ${res.status}`;
+        continue;
       }
 
       const data = await res.json();
-      if (!data.address) {
-        throw new Error(`No address in response`);
+      
+      if (data.address || data.walletAddress) {
+        return {
+          address: data.address || data.walletAddress,
+          walletId: data.walletId || data.id,
+          rawData: data,
+          provider: 'thirdweb',
+          endpoint: endpoint.url
+        };
       }
-
-      return {
-        address: data.address,
-        walletId: data.walletId || data.id,
-        rawData: data,
-        provider: 'thirdweb'
-      };
-    } catch (e2) {
-      throw new Error(`Failed to create ThirdWeb wallet for ${chain.name}: ${e.message} (also tried alternative endpoint)`);
+    } catch (e) {
+      lastError = e.message;
+      continue;
     }
   }
+
+  throw new Error(`Failed all endpoints for ${chain.name}: ${lastError}`);
 }
 
 // Sync wallet to wallets_house table
@@ -118,7 +103,8 @@ async function syncToWalletsHouse(supabase, chain, wallet) {
     chainSymbol: chain.symbol,
     created_at: new Date().toISOString(),
     thirdweb_data: wallet.rawData,
-    address: wallet.address
+    address: wallet.address,
+    endpoint_used: wallet.endpoint
   };
 
   if (wallet.walletId) {
@@ -196,14 +182,13 @@ async function main() {
   const supabase = createClient(PROJECT_URL, SERVICE_ROLE_KEY);
   const results = { success: [], failed: [] };
 
-  console.log(`🚀 Creating REAL ThirdWeb Embedded Wallets (Starter Plan)`);
+  console.log(`🚀 Creating REAL ThirdWeb Wallets (Starter Plan)`);
   console.log(`📊 Total chains: ${CHAIN_CONFIGS.length}`);
   console.log(`🔑 Using ThirdWeb Secret Key`);
   console.log('');
 
   for (const chain of CHAIN_CONFIGS) {
     try {
-      // ONLY ThirdWeb - no fallback
       const wallet = await createThirdwebWallet(chain, THIRDWEB_KEY);
       
       if (!wallet.address) {
@@ -238,11 +223,10 @@ async function main() {
   if (results.failed.length > 0) {
     console.log('Failed chains:');
     results.failed.forEach(r => console.log(`  - ${r.chain}: ${r.error}`));
-    console.log('\n⚠️  Check ThirdWeb dashboard for API endpoint and starter plan limits\n');
   }
 
   if (results.success.length > 0) {
-    console.log('💾 Real ThirdWeb wallets synced to wallets_house table');
+    console.log('\n💾 Real ThirdWeb wallets synced to wallets_house table');
   }
 }
 
