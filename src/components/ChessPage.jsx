@@ -196,9 +196,9 @@ export default function ChessPage({ userId, userEmail, onShowAuth }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-800 to-slate-900" ref={pageRef}>
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         <h1 className="text-5xl font-bold text-white mb-2">Play Chess</h1>
-        <p className="text-lg text-slate-300 mb-12">Challenge players and improve your skills</p>
+        <p className="text-lg text-slate-300 mb-6">Challenge players and improve your skills</p>
 
         {error && (
           <div className="mb-6 p-4 bg-red-900/30 border border-red-700/50 rounded-lg text-red-200 text-sm">
