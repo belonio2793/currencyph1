@@ -220,9 +220,11 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         cryptoMapped = (cData || []).map(r => ({
           id: r.id,
           currency_code: r.chain || r.currency || 'CRYPTO',
+          chain_id: r.chain_id || null,
           balance: Number(r.balance || 0),
           address: r.address,
           provider: r.provider,
+          chain: r.chain,
           source: 'crypto'
         }))
         setCryptoWallets(cryptoMapped)
