@@ -345,7 +345,7 @@ export default function Profile({ userId }) {
                 <div>
                   <div className="flex items-center justify-between">
                     <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                    {!emailEditable ? (<button type="button" onClick={() => setEmailEditable(true)} className="text-sm text-blue-600 hover:underline">Update email</button>) : (<button type="button" onClick={() => { setFormData({...formData, email: user?.email || ''}); setEmailEditable(false) }} className="text-sm text-slate-600 hover:underline">Cancel</button>)}
+                    {!emailEditable ? (<button type="button" onClick={() => setEmailEditable(true)} className="text-sm text-blue-600 hover:underline">Update email</button>) : (<div className="flex items-center gap-2"><button type="button" onClick={() => { setFormData({...formData, email: user?.email || ''}); setEmailEditable(false) }} className="text-sm text-slate-600 hover:underline">Cancel</button><button type="button" onClick={() => { document.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true })); setEmailEditable(false) }} className="text-sm text-blue-600 hover:text-blue-700 font-medium">Save</button></div>)}
                   </div>
 
                   <input type="email" value={formData.email || ''} onChange={e => setFormData({...formData, email: e.target.value})} disabled={!emailEditable} className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${emailEditable ? 'focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-slate-900' : 'bg-slate-50 text-slate-500 cursor-not-allowed border-slate-300'}`} />
