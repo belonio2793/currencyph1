@@ -6,10 +6,10 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
 // Crypto utilities for Bitcoin key generation and encoding
-import * as secp from 'https://cdn.jsdelivr.net/npm/@noble/secp256k1/+esm'
-import { sha256 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes/sha256/+esm'
-import { ripemd160 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes/ripemd160/+esm'
-import base58 from 'https://cdn.jsdelivr.net/npm/bs58/+esm'
+import * as secp from 'https://cdn.jsdelivr.net/npm/@noble/secp256k1@1.9.0/+esm'
+import { sha256 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.0/sha256/+esm'
+import { ripemd160 } from 'https://cdn.jsdelivr.net/npm/@noble/hashes@1.3.0/ripemd160/+esm'
+import base58 from 'https://cdn.jsdelivr.net/npm/bs58@4.0.1/+esm'
 
 // Chain configurations with Thirdweb RPC endpoints (expanded)
 // This list contains many commonly supported chains by Thirdweb. If a chain_id is not present
