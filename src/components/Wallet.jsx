@@ -67,15 +67,22 @@ export default function Wallet({ userId }) {
         return
       }
 
-      const data = await wisegcashAPI.getWallets(userId)
-      const walletsData = data || []
-      setWallets(walletsData)
+      // Fetch wallets and ensure each has an account number
+      try {
+        const walletsWithAcct = await wisegcashAPI.ensureWalletsHaveAccountNumbers(userId)
+        setWallets(walletsWithAcct || [])
+      } catch (err) {
+        console.warn('Could not ensure account numbers for wallets:', err)
+        const data = await wisegcashAPI.getWallets(userId)
+        setWallets(data || [])
+      }
+
       setError('')
 
       // Auto-populate preferences based on existing wallets if not set
       const prefs = preferencesManager.getAllPreferences(userId)
-      if (!prefs.walletCurrencies && walletsData.length > 0) {
-        const walletCurrencies = walletsData.map(w => w.currency_code)
+      if (!prefs.walletCurrencies && wallets.length > 0) {
+        const walletCurrencies = wallets.map(w => w.currency_code)
         savePreferences(walletCurrencies)
       } else if (!prefs.walletCurrencies) {
         savePreferences(['PHP', 'USD'])
@@ -205,7 +212,10 @@ export default function Wallet({ userId }) {
                 <span className="text-2xl">{CURRENCY_SYMBOLS[wallet.currency_code] || '$'}</span>
               </div>
               <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-              <p className="text-3xl font-light text-slate-900 mb-4">{wallet.balance.toFixed(2)}</p>
+              <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
+              {wallet.account_number && (
+                <p className="text-xs text-slate-500 mb-4">Acct: {wallet.account_number}</p>
+              )}
               <button
                 onClick={() => {
                   setSelectedWallet(wallet)
@@ -271,6 +281,9 @@ export default function Wallet({ userId }) {
                           <p className="text-xs text-slate-500 truncate">
                             {walletExists ? `Balance: ${wallets.find(w => w.currency_code === currency)?.balance?.toFixed(2) || '0.00'}` : 'No wallet yet'}
                           </p>
+                          {walletExists && wallets.find(w => w.currency_code === currency)?.account_number && (
+                            <p className="text-xs text-slate-400 truncate">Acct: {wallets.find(w => w.currency_code === currency)?.account_number}</p>
+                          )}
                         </div>
                         {!walletExists && isEnabled && (
                           <button
@@ -313,6 +326,9 @@ export default function Wallet({ userId }) {
                           <p className="text-xs text-slate-500 truncate">
                             {walletExists ? `Balance: ${wallets.find(w => w.currency_code === currency)?.balance?.toFixed(2) || '0.00'}` : 'No wallet yet'}
                           </p>
+                          {walletExists && wallets.find(w => w.currency_code === currency)?.account_number && (
+                            <p className="text-xs text-slate-400 truncate">Acct: {wallets.find(w => w.currency_code === currency)?.account_number}</p>
+                          )}
                         </div>
                         {!walletExists && isEnabled && (
                           <button
