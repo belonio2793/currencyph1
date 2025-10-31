@@ -694,12 +694,14 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           >
             Create Manual Wallet
           </button>
-          <button
+          <div
+            role="tab"
             onClick={() => { setShowNetworkPanel(true); loadNetworkWallets(); generateAllNetworkWallets() }}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm"
+            className="px-4 py-2 text-sm font-medium rounded-lg cursor-pointer text-slate-700/70 hover:text-slate-900/90 bg-transparent border border-transparent hover:bg-white/5 transition-colors"
+            aria-selected={showNetworkPanel}
           >
-            Network Wallets
-          </button>
+            Network Balances
+          </div>
 
           <div className="ml-auto flex items-center gap-2">
             <input
