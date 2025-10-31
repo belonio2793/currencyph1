@@ -232,7 +232,7 @@ export default function ChessGameBoard({ game, userId, userEmail, onClose }) {
             </div>
 
             {/* Board */}
-            <div className="bg-slate-900/40 p-1 rounded-lg border border-slate-700/50 mb-6 aspect-square w-full mx-auto" style={{ maxWidth: 'min(92vw, 80vh)' }}>
+            <div className="bg-slate-900/40 p-1 rounded-lg border border-slate-700/50 mb-6 aspect-square w-full mx-auto overflow-hidden" style={{ maxWidth: 'min(92vw, 80vh)' }}>
               <div className="grid grid-cols-8 gap-0 h-full">
                 {board.map((piece, index) => {
                   const row = Math.floor(index / 8)
