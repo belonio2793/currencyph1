@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
-import { thirdwebClient, connectWallet, getWalletInfo, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress } from '../lib/thirdwebClient'
+import { thirdwebClient, connectWallet, getWalletInfo, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress, sendCryptoTransaction } from '../lib/thirdwebClient'
 
 const FIAT_CURRENCIES = [
   'PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'INR', 'AUD',
