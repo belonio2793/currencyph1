@@ -167,6 +167,7 @@ Deno.serve(async (req) => {
       public_key: publicKey,
       address
     }
+    if (thirdwebResp) metadataObj.thirdweb = thirdwebResp
     if (encryptedKey) metadataObj.encrypted_private_key = encryptedKey
 
     const { data: upserted, error: upsertError } = await supabase
