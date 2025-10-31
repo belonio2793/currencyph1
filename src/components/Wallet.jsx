@@ -522,7 +522,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       setError('')
 
       // Call edge function to create wallet
-      const { data, error: invokeError } = await supabase.functions.invoke('create-wallet-thirdweb', {
+      const { data, error: invokeError } = await supabase.functions.invoke('create-wallet-pairs', {
         body: {
           user_id: userId,
           chain_id: selectedManualChainId
