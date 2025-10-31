@@ -52,26 +52,29 @@ async function upsertHouseRow(chain, walletData) {
     thirdweb: walletData
   }
 
-  const { data, error } = await supabase
-    .from('wallets_house')
-    .upsert([
-      {
-        wallet_type: 'crypto',
-        currency: chain.symbol,
-        network: chain.name,
-        address: walletData.address || null,
-        thirdweb_wallet_id: walletData.walletId || walletData.id || null,
-        provider: 'thirdweb',
-        balance: 0,
-        metadata,
-        updated_at: new Date().toISOString()
-      }
-    ], { onConflict: 'network,currency' })
-    .select()
-    .single()
+  // Try to find existing row
+  const { data: existing, error: selErr } = await supabase.from('wallets_house').select('*').eq('network', chain.name).eq('currency', chain.symbol).maybeSingle()
+  if (selErr) throw selErr
 
-  if (error) throw error
-  return data
+  if (existing) {
+    const { data: updated, error: updErr } = await supabase.from('wallets_house').update({ metadata, address: walletData.address || null, thirdweb_wallet_id: walletData.walletId || walletData.id || null, provider: 'thirdweb', updated_at: new Date().toISOString() }).eq('id', existing.id).select().single()
+    if (updErr) throw updErr
+    return updated
+  } else {
+    const { data: inserted, error: insErr } = await supabase.from('wallets_house').insert([{
+      wallet_type: 'crypto',
+      currency: chain.symbol,
+      network: chain.name,
+      address: walletData.address || null,
+      thirdweb_wallet_id: walletData.walletId || walletData.id || null,
+      provider: 'thirdweb',
+      balance: 0,
+      metadata,
+      updated_at: new Date().toISOString()
+    }]).select().single()
+    if (insErr) throw insErr
+    return inserted
+  }
 }
 
 async function run() {
