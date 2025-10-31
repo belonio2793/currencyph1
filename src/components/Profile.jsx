@@ -255,20 +255,20 @@ export default function Profile({ userId }) {
   const filteredCountries = COUNTRIES.filter(c => c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.toLowerCase().includes(countrySearch.toLowerCase()))
 
   if (loading) {
-    return (<div className="max-w-7xl mx-auto px-6 py-12"><div className="text-center text-slate-500">Loading profile...</div></div>)
+    return (<div className="max-w-7xl mx-auto px-6 py-6"><div className="text-center text-slate-500">Loading profile...</div></div>)
   }
 
   const isAccountPrivate = () => (privacySettings['listed_in_all'] === 'only_me')
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-12">
-      <h2 className="text-3xl font-light text-slate-900 mb-12 tracking-tight">Profile</h2>
+    <div className="max-w-7xl mx-auto px-6 py-6">
+      <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">Profile</h2>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
       {isGuestAccount && !isValidUUID(userId) && (<div className="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-sm">You are logged in as a guest. Create an account to save profile changes and access more features.</div>)}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="bg-white border border-slate-200 rounded-xl p-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="bg-white border border-slate-200 rounded-xl p-6">
           <div className="text-center mb-6">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-4xl mx-auto mb-4 font-light overflow-hidden">
               {formData.profile_picture_url ? (<img src={formData.profile_picture_url} alt="Profile" className="w-full h-full object-cover" />) : (formData.full_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?')}
@@ -302,7 +302,7 @@ export default function Profile({ userId }) {
         </div>
 
         <div className="lg:col-span-2">
-          <div className="bg-white border border-slate-200 rounded-xl p-8">
+          <div className="bg-white border border-slate-200 rounded-xl p-6">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-2xl font-light text-slate-900">Profile Information</h3>
               <button onClick={() => setEditing(!editing)} className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${editing ? 'text-slate-600 hover:bg-slate-100' : 'text-blue-600 hover:bg-blue-50'}`}>{editing ? 'Cancel' : 'Edit'}</button>
@@ -409,7 +409,7 @@ export default function Profile({ userId }) {
           </div>
 
           {editing && (
-            <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
+            <div className="bg-white border border-slate-200 rounded-xl p-6 mt-4">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-slate-900">Privacy Controls</h3>
                 <div className="flex items-center gap-2">
@@ -449,8 +449,8 @@ export default function Profile({ userId }) {
             </div>
           )}
 
-          <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
-            <h3 className="text-lg font-medium text-slate-900 mb-4">Preferences</h3>
+          <div className="bg-white border border-slate-200 rounded-xl p-6 mt-4">
+            <h3 className="text-lg font-medium text-slate-900 mb-3">Preferences</h3>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
@@ -472,8 +472,8 @@ export default function Profile({ userId }) {
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-8 mt-6">
-            <h3 className="text-lg font-medium text-slate-900 mb-4">Security</h3>
+          <div className="bg-white border border-slate-200 rounded-xl p-6 mt-4">
+            <h3 className="text-lg font-medium text-slate-900 mb-3">Security</h3>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
