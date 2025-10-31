@@ -66,6 +66,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [cryptoAction, setCryptoAction] = useState('send') // 'send' | 'receive'
   const [cryptoAmount, setCryptoAmount] = useState('')
 
+  // Thirdweb integration state
+  const [connectedWallet, setConnectedWallet] = useState(null)
+  const [selectedChainId, setSelectedChainId] = useState(null)
+  const [showThirdwebModal, setShowThirdwebModal] = useState(false)
+  const [thirdwebConnecting, setThirdwebConnecting] = useState(false)
+
   useEffect(() => {
     loadWallets()
     loadPreferences()
