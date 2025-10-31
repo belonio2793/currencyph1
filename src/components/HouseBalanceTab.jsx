@@ -223,19 +223,19 @@ export default function HouseBalanceTab() {
       {/* Stats Summary */}
       {rakeTransactions.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Total Transactions</p>
-            <p className="text-3xl font-bold text-slate-900">{rakeTransactions.length}</p>
+          <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
+            <p className="text-sm text-slate-400 mb-1">Total Transactions</p>
+            <p className="text-3xl font-bold text-white">{rakeTransactions.length}</p>
           </div>
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Avg. Tip Percent</p>
-            <p className="text-3xl font-bold text-slate-900">
+          <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
+            <p className="text-sm text-slate-400 mb-1">Avg. Tip Percent</p>
+            <p className="text-3xl font-bold text-white">
               {(rakeTransactions.reduce((sum, tx) => sum + tx.tip_percent, 0) / rakeTransactions.length).toFixed(1)}%
             </p>
           </div>
-          <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-            <p className="text-sm text-slate-600 mb-1">Avg. Rake/Transaction</p>
-            <p className="text-3xl font-bold text-slate-900">
+          <div className="bg-slate-800/40 border border-slate-600/30 rounded-lg p-4 backdrop-blur-sm">
+            <p className="text-sm text-slate-400 mb-1">Avg. Rake/Transaction</p>
+            <p className="text-3xl font-bold text-white">
               {formatCurrency(rakeTransactions.reduce((sum, tx) => sum + tx.amount, 0) / rakeTransactions.length)}
             </p>
           </div>
