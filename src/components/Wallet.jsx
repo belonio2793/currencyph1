@@ -269,7 +269,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       await wisegcashAPI.createWallet(userId, currency)
       await new Promise(resolve => setTimeout(resolve, 500))
       await loadWallets()
-      setShowPreferences(false)
+      setShowPreferencesInternal(false)
       setSuccess(`${currency} wallet created`)
       setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
@@ -280,19 +280,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     }
   }
 
-  const toggleCurrency = (currency) => {
-    let updated
-    if (enabledCurrencies.includes(currency)) {
-      updated = enabledCurrencies.filter(c => c !== currency)
-    } else {
-      updated = [...enabledCurrencies, currency].sort()
-    }
-    savePreferences(updated)
-  }
-
-  const filteredCurrencies = ALL_CURRENCIES.filter(c =>
-    c.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   // Fiat helpers
   const changeFiatBalance = async (walletId, delta) => {
@@ -378,7 +365,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
         <div>
           <button
-            onClick={() => setShowPreferences(true)}
+            onClick={() => setShowPreferencesInternal(true)}
             className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
           >
             ⚙️ Customize
@@ -396,7 +383,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
             <p className="text-slate-500 mb-4">No internal wallets created yet</p>
             <button
-              onClick={() => setShowPreferences(true)}
+              onClick={() => setShowPreferencesInternal(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
             >
               Create Your First Wallet
