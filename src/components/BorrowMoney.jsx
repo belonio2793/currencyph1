@@ -141,6 +141,54 @@ export default function BorrowMoney({ userId, loanType }) {
           </button>
         </div>
 
+        {/* Search & Filter Section */}
+        <div className="mb-6 space-y-4">
+          <div className="flex gap-3 flex-wrap">
+            {/* Search Input */}
+            <div className="flex-1 min-w-xs">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search by ID, city, name, or phone..."
+                className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
+              />
+            </div>
+
+            {/* Currency Filter */}
+            <select
+              value={filterCurrency}
+              onChange={(e) => setFilterCurrency(e.target.value)}
+              className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
+            >
+              <option value="all">All Currencies</option>
+              {uniqueCurrencies.map(currency => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+
+            {/* Clear Filters Button */}
+            {(searchQuery || filterCurrency !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('')
+                  setFilterCurrency('all')
+                }}
+                className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors text-sm font-medium"
+              >
+                Clear Filters
+              </button>
+            )}
+          </div>
+
+          {/* Results Counter */}
+          <div className="text-sm text-slate-600">
+            Showing {filteredLoans.length} of {loans.length} loans
+          </div>
+        </div>
+
         {/* Status Tabs */}
         <div className="mb-6 border-b border-slate-200">
           <div className="flex gap-4">
