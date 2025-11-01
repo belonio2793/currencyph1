@@ -63,7 +63,11 @@
     "generate-thirdweb-wallets": "node scripts/generate-thirdweb-wallets.js",
     "sync-thirdweb-balances": "node scripts/sync-thirdweb-balances.js",
     "batch-create-wallets": "node scripts/batch-create-wallets.js",
-    "batch-create-wallets-thirdweb": "node scripts/batch-create-wallets.js --thirdweb-only"
+    "batch-create-wallets-thirdweb": "node scripts/batch-create-wallets.js --thirdweb-only",
+    "reconcile-balances": "node scripts/reconcile-and-display.js",
+    "reconcile-all": "node scripts/reconcile-and-display.js --type=all",
+    "reconcile-house": "node scripts/reconcile-and-display.js --type=house",
+    "display-balances": "node scripts/reconcile-and-display.js --no-reconcile"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
