@@ -403,8 +403,8 @@ export default function BorrowMoney({ userId, loanType }) {
 
               {/* By Currency */}
               <div className="bg-white rounded-lg border border-slate-200 p-6">
-                <h3 className="text-sm font-semibold text-slate-900 mb-4">Loans by Currency</h3>
-                <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-slate-900 mb-3">Loans by Currency</h3>
+                <div className="space-y-2">
                   {uniqueCurrencies.map(currency => {
                     const currencyLoans = loans.filter(l => l.currency_code === currency)
                     const total = currencyLoans.reduce((sum, l) => sum + (l.remaining_balance || l.total_owed || 0), 0)
