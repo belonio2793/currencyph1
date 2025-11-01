@@ -244,110 +244,91 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Loans Table */}
         {!loading && filteredLoans.length > 0 && (
-          <div className="bg-white rounded-lg shadow border border-slate-200 overflow-hidden">
-            <div className="w-full">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-slate-50 border-b border-slate-200">
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">ID</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Requested</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Total Owed</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Paid</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Remaining</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Progress</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Status</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">City</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Phone</th>
-                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredLoans.map(loan => {
-                    const progressPercent = loan.total_owed ? Math.min(100, ((loan.amount_paid || 0) / loan.total_owed) * 100) : 0
-                    const isExpanded = expandedLoanId === loan.id
-                    return (
-                      <React.Fragment key={loan.id}>
-                        <tr
-                          className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors"
-                          onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}
+          <div className="space-y-3">
+            {filteredLoans.map(loan => {
+              const progressPercent = loan.total_owed ? Math.min(100, ((loan.amount_paid || 0) / loan.total_owed) * 100) : 0
+              const isExpanded = expandedLoanId === loan.id
+              return (
+                <div key={loan.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                  {/* Main Row */}
+                  <div
+                    className="grid grid-cols-10 gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors items-center"
+                    onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}
+                  >
+                    <div className="text-xs font-mono text-slate-600 truncate">{loan.id.slice(0, 6)}...</div>
+                    <div className="text-xs font-medium text-slate-900 whitespace-nowrap">
+                      {Number(loan.requested_amount).toFixed(0)} {loan.currency_code}
+                    </div>
+                    <div className="text-xs font-medium text-slate-900 whitespace-nowrap">
+                      {Number(loan.total_owed).toFixed(0)} {loan.currency_code}
+                    </div>
+                    <div className="text-xs text-slate-600 whitespace-nowrap">
+                      {Number(loan.amount_paid || 0).toFixed(0)} {loan.currency_code}
+                    </div>
+                    <div className="text-xs text-slate-600 whitespace-nowrap">
+                      {Number(loan.remaining_balance || loan.total_owed).toFixed(0)} {loan.currency_code}
+                    </div>
+                    <div className="text-xs">
+                      <div className="flex items-center gap-1">
+                        <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-blue-600 transition-all"
+                            style={{ width: `${progressPercent}%` }}
+                          />
+                        </div>
+                        <span className="font-medium text-slate-600 whitespace-nowrap text-xs">{progressPercent.toFixed(0)}%</span>
+                      </div>
+                    </div>
+                    <div>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getLoanStatusColor(loan.status)}`}>
+                        {loan.status.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-600 truncate">{loan.city || 'N/A'}</div>
+                    <div className="text-xs text-slate-600 whitespace-nowrap">{blurPhoneNumber(loan.phone_number)}</div>
+                    <div className="text-xs" onClick={(e) => e.stopPropagation()}>
+                      {(loan.status === 'active' || loan.status === 'pending') && (
+                        <button
+                          onClick={() => {
+                            setSelectedLoan(loan)
+                            setShowPaymentModal(true)
+                          }}
+                          className="text-blue-600 hover:text-blue-700 font-semibold"
                         >
-                          <td className="px-3 py-2 text-xs font-mono text-slate-600 truncate">{loan.id.slice(0, 6)}...</td>
-                          <td className="px-3 py-2 text-xs font-medium text-slate-900 whitespace-nowrap">
-                            {Number(loan.requested_amount).toFixed(0)} {loan.currency_code}
-                          </td>
-                          <td className="px-3 py-2 text-xs font-medium text-slate-900 whitespace-nowrap">
-                            {Number(loan.total_owed).toFixed(0)} {loan.currency_code}
-                          </td>
-                          <td className="px-3 py-2 text-xs text-slate-600 whitespace-nowrap">
-                            {Number(loan.amount_paid || 0).toFixed(0)} {loan.currency_code}
-                          </td>
-                          <td className="px-3 py-2 text-xs text-slate-600 whitespace-nowrap">
-                            {Number(loan.remaining_balance || loan.total_owed).toFixed(0)} {loan.currency_code}
-                          </td>
-                          <td className="px-3 py-2 text-xs">
-                            <div className="flex items-center gap-1">
-                              <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-blue-600 transition-all"
-                                  style={{ width: `${progressPercent}%` }}
-                                />
-                              </div>
-                              <span className="font-medium text-slate-600 whitespace-nowrap">{progressPercent.toFixed(0)}%</span>
-                            </div>
-                          </td>
-                          <td className="px-3 py-2">
-                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getLoanStatusColor(loan.status)}`}>
-                              {loan.status.toUpperCase()}
-                            </span>
-                          </td>
-                          <td className="px-3 py-2 text-xs text-slate-600 truncate">{loan.city || 'N/A'}</td>
-                          <td className="px-3 py-2 text-xs text-slate-600 whitespace-nowrap">{blurPhoneNumber(loan.phone_number)}</td>
-                          <td className="px-3 py-2 text-xs" onClick={(e) => e.stopPropagation()}>
-                            {(loan.status === 'active' || loan.status === 'pending') && (
-                              <button
-                                onClick={() => {
-                                  setSelectedLoan(loan)
-                                  setShowPaymentModal(true)
-                                }}
-                                className="text-blue-600 hover:text-blue-700 font-semibold"
-                              >
-                                Pay
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                        {isExpanded && (
-                          <tr className="border-b border-slate-100 bg-slate-50">
-                            <td colSpan="10" className="px-6 py-4">
-                              <div className="grid grid-cols-2 gap-6">
-                                <div>
-                                  <h4 className="text-sm font-semibold text-slate-900 mb-3">Loan Details</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div><span className="text-slate-600">Loan Type:</span> <span className="font-medium text-slate-900">{loan.loan_type}</span></div>
-                                    <div><span className="text-slate-600">Loan Purpose:</span> <span className="font-medium text-slate-900">{loan.loan_purpose || 'N/A'}</span></div>
-                                    <div><span className="text-slate-600">Interest Rate:</span> <span className="font-medium text-slate-900">{loan.interest_rate}%</span></div>
-                                    <div><span className="text-slate-600">Status:</span> <span className="font-medium text-slate-900 capitalize">{loan.status}</span></div>
-                                  </div>
-                                </div>
-                                <div>
-                                  <h4 className="text-sm font-semibold text-slate-900 mb-3">Contact Info</h4>
-                                  <div className="space-y-2 text-sm">
-                                    <div><span className="text-slate-600">Name:</span> <span className="font-medium text-slate-900">{loan.display_name || 'N/A'}</span></div>
-                                    <div><span className="text-slate-600">City:</span> <span className="font-medium text-slate-900">{loan.city || 'N/A'}</span></div>
-                                    <div><span className="text-slate-600">Phone:</span> <span className="font-medium text-slate-900">{loan.phone_number || 'N/A'}</span></div>
-                                    <div><span className="text-slate-600">Created:</span> <span className="font-medium text-slate-900">{new Date(loan.created_at).toLocaleDateString()}</span></div>
-                                  </div>
-                                </div>
-                              </div>
-                            </td>
-                          </tr>
-                        )}
-                      </React.Fragment>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          Pay
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Expanded Details */}
+                  {isExpanded && (
+                    <div className="border-t border-slate-200 bg-slate-50 px-4 py-4">
+                      <div className="grid grid-cols-2 gap-6">
+                        <div>
+                          <h4 className="text-sm font-semibold text-slate-900 mb-3">Loan Details</h4>
+                          <div className="space-y-2 text-sm">
+                            <div><span className="text-slate-600">Loan Type:</span> <span className="font-medium text-slate-900">{loan.loan_type}</span></div>
+                            <div><span className="text-slate-600">Loan Purpose:</span> <span className="font-medium text-slate-900">{loan.loan_purpose || 'N/A'}</span></div>
+                            <div><span className="text-slate-600">Interest Rate:</span> <span className="font-medium text-slate-900">{loan.interest_rate}%</span></div>
+                            <div><span className="text-slate-600">Status:</span> <span className="font-medium text-slate-900 capitalize">{loan.status}</span></div>
+                          </div>
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-semibold text-slate-900 mb-3">Contact Info</h4>
+                          <div className="space-y-2 text-sm">
+                            <div><span className="text-slate-600">Name:</span> <span className="font-medium text-slate-900">{loan.display_name || 'N/A'}</span></div>
+                            <div><span className="text-slate-600">City:</span> <span className="font-medium text-slate-900">{loan.city || 'N/A'}</span></div>
+                            <div><span className="text-slate-600">Phone:</span> <span className="font-medium text-slate-900">{loan.phone_number || 'N/A'}</span></div>
+                            <div><span className="text-slate-600">Created:</span> <span className="font-medium text-slate-900">{new Date(loan.created_at).toLocaleDateString()}</span></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
 
