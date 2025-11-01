@@ -10,6 +10,8 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [totalOwed, setTotalOwed] = useState(0)
+  const [loanReason, setLoanReason] = useState('other')
+  const [customReason, setCustomReason] = useState('')
 
   useEffect(() => {
     if (amount) {
