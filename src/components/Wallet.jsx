@@ -753,38 +753,43 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         </div>
 
         <div className="mb-4 flex flex-wrap gap-3 items-center">
-          <button
-            onClick={() => setShowThirdwebModal(true)}
-            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
-          >
-            Connect Web3 Wallet
-          </button>
+          {connectedWallet ? (
+            <div className="relative">
+              <button
+                onClick={() => setShowConnectedMenu(prev => !prev)}
+                className="px-4 py-2 text-sm font-medium rounded-lg cursor-pointer text-slate-700/70 hover:text-slate-900/90 bg-transparent border border-transparent hover:bg-white/5 transition-colors flex items-center gap-3"
+                aria-expanded={showConnectedMenu}
+              >
+                <span className="font-semibold text-sm">{(connectedWallet.providerName || connectedWallet.providerType || 'WALLET').toString().toUpperCase()}</span>
+                <span className="text-xs text-slate-500">{formatWalletAddress(connectedWallet.address)}</span>
+              </button>
+
+              {showConnectedMenu && (
+                <div className="mt-2 p-3 bg-white/95 border border-slate-100 rounded-lg shadow-sm w-64">
+                  <div className="flex flex-col gap-2">
+                    <button onClick={async () => { try { await handleSaveConnectedWallet(); setShowConnectedMenu(false) } catch(e){ console.warn(e); setShowConnectedMenu(false) } }} className="px-3 py-2 bg-indigo-600 text-white rounded">Save Connection</button>
+                    <button onClick={async () => { try { await disconnectWallet(); setShowConnectedMenu(false) } catch(e){ console.warn(e); setShowConnectedMenu(false) } }} className="px-3 py-2 bg-gray-100 rounded">Disconnect</button>
+                    <button onClick={async () => { try { if (connectedWallet && connectedWallet.provider) { if (connectedWallet.provider.disconnect) await connectedWallet.provider.disconnect(); else if (connectedWallet.provider.close) await connectedWallet.provider.close(); } } catch(e){ console.warn(e) } try { clearWalletCache() } catch(e){} setConnectedWallet(null); setSelectedChainId(null); setShowConnectedMenu(false); setSuccess('Connection reset') }} className="px-3 py-2 bg-red-500 text-white rounded">Reset Connection</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowThirdwebModal(true)}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
+            >
+              Connect Web3 Wallet
+            </button>
+          )}
+
           <button
             onClick={() => setShowCreateManualWalletModal(true)}
             className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium text-sm"
           >
             Create Manual Wallet
           </button>
-          <button
-            onClick={async () => {
-              // Reset connection and clear any cached provider info
-              try {
-                if (connectedWallet && connectedWallet.provider) {
-                  if (connectedWallet.provider.disconnect) await connectedWallet.provider.disconnect()
-                  else if (connectedWallet.provider.close) await connectedWallet.provider.close()
-                }
-              } catch (e) {
-                console.warn('Error during provider reset', e)
-              }
-              try { clearWalletCache() } catch(e) {}
-              setConnectedWallet(null)
-              setSelectedChainId(null)
-              setSuccess('Connection reset')
-            }}
-            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-sm"
-          >
-            Reset Connection
-          </button>
+
           <div
             role="tab"
             onClick={() => {
