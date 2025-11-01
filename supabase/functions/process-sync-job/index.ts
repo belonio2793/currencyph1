@@ -6,6 +6,21 @@ const CHAIN_RPC: Record<number, { name: string; type: 'evm' | 'solana' | 'other'
   42161: { name: 'arbitrum', type: 'evm', rpc: 'https://arb1.arbitrum.io/rpc', decimals: 18 },
   10: { name: 'optimism', type: 'evm', rpc: 'https://mainnet.optimism.io', decimals: 18 },
   56: { name: 'bsc', type: 'evm', rpc: 'https://bsc-dataseed.binance.org', decimals: 18 },
+  43114: { name: 'avalanche', type: 'evm', rpc: 'https://api.avax.network/ext/bc/C/rpc', decimals: 18 },
+  250: { name: 'fantom', type: 'evm', rpc: 'https://rpc.ftm.tools', decimals: 18 },
+  100: { name: 'gnosis', type: 'evm', rpc: 'https://rpc.gnosischain.com', decimals: 18 },
+  42220: { name: 'celo', type: 'evm', rpc: 'https://forno.celo.org', decimals: 18 },
+  8453: { name: 'base', type: 'evm', rpc: 'https://mainnet.base.org', decimals: 18 },
+  324: { name: 'zksync', type: 'evm', rpc: 'https://mainnet.era.zksync.io', decimals: 18 },
+  59140: { name: 'linea', type: 'evm', rpc: 'https://rpc.linea.build', decimals: 18 },
+  66: { name: 'okc', type: 'evm', rpc: 'https://exchainrpc.okex.org', decimals: 18 },
+  1284: { name: 'moonbeam', type: 'evm', rpc: 'https://rpc.api.moonbeam.network', decimals: 18 },
+  1285: { name: 'moonriver', type: 'evm', rpc: 'https://rpc.moonriver.moonbeam.network', decimals: 18 },
+  25: { name: 'cronos', type: 'evm', rpc: 'https://evm-cronos.crypto.org', decimals: 18 },
+  1313161554: { name: 'aurora', type: 'evm', rpc: 'https://mainnet.aurora.dev', decimals: 18 },
+  1088: { name: 'metis', type: 'evm', rpc: 'https://andromeda.metis.io/?owner=1088', decimals: 18 },
+  9001: { name: 'evmos', type: 'evm', rpc: 'https://evm.evmos.org:8545', decimals: 18 },
+  288: { name: 'boba', type: 'evm', rpc: 'https://mainnet.boba.network', decimals: 18 },
   245022926: { name: 'solana', type: 'solana', rpc: 'https://api.mainnet-beta.solana.com', decimals: 9 }
 }
 
