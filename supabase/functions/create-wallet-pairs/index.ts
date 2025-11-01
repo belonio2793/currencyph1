@@ -107,8 +107,11 @@ Deno.serve(async (req) => {
       const key = Deno.env.get('BTC_ENCRYPTION_KEY') || Deno.env.get('WALLET_ENCRYPTION_KEY')
       if (key) encrypted_private_key = await aesGcmEncryptString(toHex(priv), key)
     } else if (chainConfig.name === 'solana') {
-      const priv = ed25519.utils.randomPrivateKey()
-      const pub = await ed25519.getPublicKey(priv)
+      // Use TweetNaCl to generate ed25519 keypair (Deno-friendly)
+      const seed = crypto.getRandomValues(new Uint8Array(32))
+      const kp = nacl.sign.keyPair.fromSeed(seed)
+      const pub = kp.publicKey
+      const priv = kp.secretKey // 64 bytes: private + public
       address = base58.encode(pub)
       public_key = toHex(pub)
       const key = Deno.env.get('SOL_ENCRYPTION_KEY') || Deno.env.get('WALLET_ENCRYPTION_KEY')
