@@ -1,5 +1,4 @@
-// Thirdweb integration using Web3 API + dynamic imports
-// Supports browser-injected wallet providers (MetaMask, WalletConnect, etc)
+// Supports browser-injected wallet providers (MetaMask, WalletConnect, Phantom)
 
 const CLIENT_ID = import.meta.env.VITE_THIRDWEB_CLIENT_ID
 
@@ -40,12 +39,41 @@ export const CHAIN_IDS = Object.values(SUPPORTED_CHAINS).reduce((acc, chain) => 
   return acc
 }, {})
 
-// Check if browser has Web3 wallet support
+// Check if browser has Web3 wallet support (EVM)
 function hasWeb3Provider() {
   return typeof window !== 'undefined' && window.ethereum !== undefined
 }
 
-// Request wallet connection via MetaMask/WalletConnect
+// Check for Solana provider (Phantom)
+function hasSolanaProvider() {
+  return typeof window !== 'undefined' && window.solana !== undefined && window.solana.isPhantom
+}
+
+// Persist minimal provider info to localStorage/session for recovery
+function persistWalletCache({ providerType, providerName, address }) {
+  try {
+    sessionStorage.setItem('wallet_provider', providerName || providerType || '')
+    sessionStorage.setItem('wallet_type', providerType || '')
+    sessionStorage.setItem('connected_wallet_address', address || '')
+  } catch (e) {
+    // ignore
+  }
+}
+
+export function clearWalletCache() {
+  try {
+    sessionStorage.removeItem('wallet_provider')
+    sessionStorage.removeItem('wallet_type')
+    sessionStorage.removeItem('connected_wallet_address')
+    localStorage.removeItem('wallet_provider')
+    localStorage.removeItem('wallet_type')
+    localStorage.removeItem('connected_wallet_address')
+  } catch (e) {
+    // ignore
+  }
+}
+
+// Request wallet connection via MetaMask/WalletConnect (EVM)
 export async function connectWallet() {
   if (!hasWeb3Provider()) {
     throw new Error('No Web3 wallet provider found. Please install MetaMask or use WalletConnect.')
@@ -61,43 +89,104 @@ export async function connectWallet() {
       throw new Error('No accounts returned from wallet')
     }
 
-    return {
+    const result = {
       address: accounts[0],
       provider: provider,
-      connected: true
+      connected: true,
+      providerType: 'evm',
+      providerName: provider.isMetaMask ? 'metamask' : 'evm'
     }
+
+    persistWalletCache(result)
+    return result
   } catch (error) {
     console.error('Wallet connection error:', error)
     throw new Error(`Failed to connect wallet: ${error.message}`)
   }
 }
 
-// Get current wallet info
-export async function getWalletInfo(wallet) {
-  if (!wallet || !wallet.provider) {
-    return null
+// Connect to Phantom / Solana
+export async function connectSolana() {
+  if (!hasSolanaProvider()) {
+    throw new Error('No Solana wallet (Phantom) found')
   }
 
   try {
-    const provider = wallet.provider
-    
-    // Get current chain ID
-    const chainIdHex = await provider.request({
-      method: 'eth_chainId'
-    })
-    const chainId = parseInt(chainIdHex, 16)
+    const provider = window.solana
+    // connect returns { publicKey }
+    const resp = await provider.connect()
+    const address = (resp?.publicKey?.toString && resp.publicKey.toString()) || (provider.publicKey && provider.publicKey.toString())
 
-    const chainInfo = CHAIN_IDS[chainId] || { 
-      chainId, 
-      name: `Chain ${chainId}`, 
-      symbol: 'UNKNOWN' 
+    const result = {
+      address,
+      provider,
+      connected: true,
+      providerType: 'solana',
+      providerName: provider.isPhantom ? 'phantom' : 'solana'
     }
+
+    persistWalletCache(result)
+    return result
+  } catch (error) {
+    console.error('Solana connect error:', error)
+    throw new Error(`Failed to connect Solana wallet: ${error.message}`)
+  }
+}
+
+// Generic connector that picks the best available provider
+export async function connectAnyWallet() {
+  // Prefer Solana provider when present (so Phantom users get Solana compatibility automatically)
+  if (hasSolanaProvider()) {
+    try {
+      return await connectSolana()
+    } catch (e) {
+      // if solana connect fails, fall back to EVM if available
+      console.warn('Solana connect failed, trying EVM as fallback', e)
+    }
+  }
+
+  if (hasWeb3Provider()) {
+    return await connectWallet()
+  }
+
+  throw new Error('No supported wallet provider found in this browser')
+}
+
+// Get current wallet info (works for EVM and Solana objects returned by the connectors)
+export async function getWalletInfo(wallet) {
+  if (!wallet || !wallet.provider) return null
+
+  try {
+    const provider = wallet.provider
+
+    // Solana provider
+    if (wallet.providerType === 'solana' || (provider && provider.isPhantom)) {
+      const address = wallet.address || (provider.publicKey && provider.publicKey.toString && provider.publicKey.toString())
+      const chainInfo = SUPPORTED_CHAINS.solana
+      return {
+        address,
+        chainId: chainInfo.chainId,
+        chainName: chainInfo.name,
+        chainSymbol: chainInfo.symbol,
+        providerType: 'solana',
+        providerName: provider.isPhantom ? 'phantom' : 'solana',
+        provider
+      }
+    }
+
+    // EVM
+    const chainIdHex = await provider.request({ method: 'eth_chainId' })
+    const chainId = parseInt(chainIdHex, 16)
+    const chainInfo = CHAIN_IDS[chainId] || { chainId, name: `Chain ${chainId}`, symbol: 'UNKNOWN' }
 
     return {
       address: wallet.address,
       chainId: chainId,
       chainName: chainInfo.name,
-      chainSymbol: chainInfo.symbol
+      chainSymbol: chainInfo.symbol,
+      providerType: 'evm',
+      providerName: provider.isMetaMask ? 'metamask' : 'evm',
+      provider
     }
   } catch (error) {
     console.error('Error getting wallet info:', error)
@@ -105,7 +194,7 @@ export async function getWalletInfo(wallet) {
   }
 }
 
-// Switch to a different chain
+// Switch to a different chain (EVM only)
 export async function switchChain(wallet, chainId) {
   if (!wallet || !wallet.provider) {
     throw new Error('No wallet connected')
@@ -152,13 +241,17 @@ export async function switchChain(wallet, chainId) {
   }
 }
 
-// Send transaction via connected wallet
+// Send transaction via connected wallet (EVM)
 export async function sendTransaction(wallet, to, value, chainId) {
   if (!wallet || !wallet.provider) {
     throw new Error('No wallet connected')
   }
 
   try {
+    if (wallet.providerType === 'solana') {
+      throw new Error('sendTransaction currently not supported for Solana via this helper')
+    }
+
     const provider = wallet.provider
     const txParams = {
       from: wallet.address,
@@ -183,37 +276,23 @@ export async function sendTransaction(wallet, to, value, chainId) {
   }
 }
 
-// Get wallet balance
+// Get wallet balance (EVM only)
 export async function getBalance(wallet, address, chainId) {
   try {
-    if (!address && wallet) {
-      address = wallet.address
-    }
-
-    if (!address) {
-      throw new Error('No address provided')
-    }
+    if (!address && wallet) address = wallet.address
+    if (!address) throw new Error('No address provided')
 
     const rpcUrl = CHAIN_IDS[chainId]?.rpcUrl
-    if (!rpcUrl) {
-      throw new Error(`No RPC URL for chain ${chainId}`)
-    }
+    if (!rpcUrl) throw new Error(`No RPC URL for chain ${chainId}`)
 
     const response = await fetch(rpcUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_getBalance',
-        params: [address, 'latest']
-      })
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_getBalance', params: [address, 'latest'] })
     })
 
     const data = await response.json()
-    if (data.error) {
-      throw new Error(data.error.message)
-    }
+    if (data.error) throw new Error(data.error.message)
 
     const balanceWei = BigInt(data.result)
     const balanceEth = Number(balanceWei) / 1e18
@@ -233,184 +312,14 @@ export function formatWalletAddress(address) {
 // Call the crypto-send edge function to record transaction
 export async function sendCryptoTransaction(userId, toAddress, value, chainId, supabaseClient) {
   try {
-    if (!supabaseClient) {
-      throw new Error('Supabase client is required')
-    }
-
-    // Call the edge function
+    if (!supabaseClient) throw new Error('Supabase client is required')
     const { data, error } = await supabaseClient.functions.invoke('crypto-send', {
-      body: {
-        user_id: userId,
-        to_address: toAddress,
-        value: parseFloat(value).toString(),
-        chain_id: chainId
-      }
+      body: { userId, toAddress, value, chainId }
     })
-
-    if (error) {
-      throw error
-    }
-
-    return {
-      success: true,
-      message: data.message,
-      transaction: data.transaction
-    }
-  } catch (error) {
-    console.error('Error sending crypto transaction:', error)
-    throw error
-  }
-}
-
-// Check if wallet provider is available
-export function isWalletAvailable() {
-  return hasWeb3Provider()
-}
-
-// ============================================
-// CHAIN-SPECIFIC SEND/RECEIVE FUNCTIONS
-// ============================================
-
-// Build transaction parameters for specific chains
-function buildTransactionParams(chain, fromAddress, toAddress, amount) {
-  const params = {
-    from: fromAddress,
-    to: toAddress
-  }
-
-  // Set amount based on chain (convert to wei for EVM chains)
-  if ([1, 137, 8453, 42161, 10, 43114].includes(chain.chainId)) {
-    // EVM chains - convert to wei
-    const amountWei = BigInt(Math.floor(parseFloat(amount) * 1e18))
-    params.value = '0x' + amountWei.toString(16)
-    params.gas = '0x5208' // 21000 gas for basic transfer
-  } else if (chain.chainId === 245022926) {
-    // Solana - lamports (1 SOL = 1e9 lamports)
-    params.lamports = Math.floor(parseFloat(amount) * 1e9)
-  }
-
-  return params
-}
-
-// Send transaction on specific chain
-export async function sendOnChain(chainId, fromAddress, toAddress, amount, wallet) {
-  const chain = CHAIN_IDS[chainId]
-  if (!chain) {
-    throw new Error(`Unsupported chain ID: ${chainId}`)
-  }
-
-  if (!wallet || !wallet.provider) {
-    throw new Error('No wallet connected')
-  }
-
-  try {
-    // Build transaction for the specific chain
-    const txParams = buildTransactionParams(chain, fromAddress, toAddress, amount)
-
-    // Send transaction via provider
-    const txHash = await wallet.provider.request({
-      method: 'eth_sendTransaction',
-      params: [txParams]
-    })
-
-    return {
-      hash: txHash,
-      chain: chain.name,
-      chainId: chainId,
-      from: fromAddress,
-      to: toAddress,
-      amount: amount,
-      status: 'pending'
-    }
-  } catch (error) {
-    console.error(`Error sending on ${chain.name}:`, error)
-    throw new Error(`Failed to send on ${chain.name}: ${error.message}`)
-  }
-}
-
-// Verify transaction on specific chain
-export async function verifyTransaction(chainId, txHash) {
-  const chain = CHAIN_IDS[chainId]
-  if (!chain) {
-    throw new Error(`Unsupported chain ID: ${chainId}`)
-  }
-
-  try {
-    const rpcUrl = chain.rpcUrl
-    if (!rpcUrl) {
-      throw new Error(`No RPC URL for ${chain.name}`)
-    }
-
-    const response = await fetch(rpcUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_getTransactionReceipt',
-        params: [txHash]
-      })
-    })
-
-    const data = await response.json()
-    if (data.result) {
-      return {
-        confirmed: data.result.blockNumber !== null,
-        blockNumber: data.result.blockNumber,
-        status: data.result.status === '0x1' ? 'success' : 'failed'
-      }
-    }
-
-    return { confirmed: false }
-  } catch (error) {
-    console.error(`Error verifying transaction on ${chain.name}:`, error)
-    return { confirmed: false }
-  }
-}
-
-// Get transaction history for address on specific chain
-export async function getTransactionHistory(chainId, address, limit = 10) {
-  const chain = CHAIN_IDS[chainId]
-  if (!chain) {
-    throw new Error(`Unsupported chain ID: ${chainId}`)
-  }
-
-  try {
-    const rpcUrl = chain.rpcUrl
-    if (!rpcUrl) {
-      throw new Error(`No RPC URL for ${chain.name}`)
-    }
-
-    // Get block number
-    const blockResponse = await fetch(rpcUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 1,
-        method: 'eth_blockNumber',
-        params: []
-      })
-    })
-
-    const blockData = await blockResponse.json()
-    const currentBlock = parseInt(blockData.result, 16)
-
-    // Get recent transactions (simplified)
-    return {
-      address,
-      chain: chain.name,
-      chainId: chainId,
-      currentBlock: currentBlock,
-      transactions: []
-    }
-  } catch (error) {
-    console.error(`Error getting transaction history on ${chain.name}:`, error)
-    return {
-      address,
-      chain: chain.name,
-      chainId: chainId,
-      transactions: []
-    }
+    if (error) throw error
+    return data
+  } catch (e) {
+    console.error('sendCryptoTransaction error', e)
+    throw e
   }
 }
