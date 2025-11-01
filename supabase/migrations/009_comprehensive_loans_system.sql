@@ -7,6 +7,26 @@
 -- ============================================================================
 
 -- ============================================================================
+-- PREREQUISITE: Ensure currencies table exists (if not already created)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS currencies (
+  code VARCHAR(16) PRIMARY KEY,
+  name TEXT NOT NULL,
+  type TEXT NOT NULL CHECK (type IN ('fiat', 'crypto')),
+  symbol TEXT,
+  decimals INTEGER DEFAULT 2,
+  active BOOLEAN DEFAULT TRUE,
+  is_default BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Insert default currencies if not already present
+INSERT INTO currencies (code, name, type, symbol, decimals, is_default) 
+VALUES 
+  ('PHP', 'Philippine Peso', 'fiat', '₱', 2, TRUE)
+ON CONFLICT (code) DO NOTHING;
+
+-- ============================================================================
 -- 1️⃣ MAIN LOANS TABLE
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS loans (
@@ -61,12 +81,12 @@ CREATE TABLE IF NOT EXISTS loans (
   
   -- Purpose & Additional Details
   loan_purpose TEXT,
-  business_name VARCHAR(255), -- For business loans
-  business_type VARCHAR(255), -- For business loans
+  business_name VARCHAR(255),
+  business_type VARCHAR(255),
   
   -- Payment Method & Partner
-  primary_payment_method VARCHAR(50), -- 'gcash', 'crypto', 'bank_transfer', 'partner'
-  partner_id UUID REFERENCES partners(id),
+  primary_payment_method VARCHAR(50),
+  partner_id UUID,
   
   -- Risk & Assessment
   credit_score INTEGER,
@@ -91,14 +111,14 @@ CREATE TABLE IF NOT EXISTS loans (
 );
 
 -- Indexes
-CREATE INDEX idx_loans_user_id ON loans(user_id);
-CREATE INDEX idx_loans_status ON loans(status);
-CREATE INDEX idx_loans_type ON loans(loan_type);
-CREATE INDEX idx_loans_user_status ON loans(user_id, status);
-CREATE INDEX idx_loans_created_at ON loans(created_at DESC);
-CREATE INDEX idx_loans_currency_code ON loans(currency_code);
-CREATE INDEX idx_loans_due_date ON loans(due_date);
-CREATE INDEX idx_loans_reference ON loans(reference_number);
+CREATE INDEX IF NOT EXISTS idx_loans_user_id ON loans(user_id);
+CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status);
+CREATE INDEX IF NOT EXISTS idx_loans_type ON loans(loan_type);
+CREATE INDEX IF NOT EXISTS idx_loans_user_status ON loans(user_id, status);
+CREATE INDEX IF NOT EXISTS idx_loans_created_at ON loans(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_loans_currency_code ON loans(currency_code);
+CREATE INDEX IF NOT EXISTS idx_loans_due_date ON loans(due_date);
+CREATE INDEX IF NOT EXISTS idx_loans_reference ON loans(reference_number);
 
 -- ============================================================================
 -- 2️⃣ PAYMENT SCHEDULES TABLE
@@ -132,9 +152,9 @@ CREATE TABLE IF NOT EXISTS loan_payment_schedules (
   CONSTRAINT valid_amounts CHECK (principal_amount > 0 AND interest_amount >= 0)
 );
 
-CREATE INDEX idx_loan_schedules_loan_id ON loan_payment_schedules(loan_id);
-CREATE INDEX idx_loan_schedules_status ON loan_payment_schedules(status);
-CREATE INDEX idx_loan_schedules_due_date ON loan_payment_schedules(due_date);
+CREATE INDEX IF NOT EXISTS idx_loan_schedules_loan_id ON loan_payment_schedules(loan_id);
+CREATE INDEX IF NOT EXISTS idx_loan_schedules_status ON loan_payment_schedules(status);
+CREATE INDEX IF NOT EXISTS idx_loan_schedules_due_date ON loan_payment_schedules(due_date);
 
 -- ============================================================================
 -- 3️⃣ LOAN PAYMENTS TABLE
@@ -170,10 +190,10 @@ CREATE TABLE IF NOT EXISTS loan_payments (
   failed_reason TEXT
 );
 
-CREATE INDEX idx_loan_payments_loan_id ON loan_payments(loan_id);
-CREATE INDEX idx_loan_payments_user_id ON loan_payments(user_id);
-CREATE INDEX idx_loan_payments_status ON loan_payments(status);
-CREATE INDEX idx_loan_payments_created_at ON loan_payments(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_loan_payments_loan_id ON loan_payments(loan_id);
+CREATE INDEX IF NOT EXISTS idx_loan_payments_user_id ON loan_payments(user_id);
+CREATE INDEX IF NOT EXISTS idx_loan_payments_status ON loan_payments(status);
+CREATE INDEX IF NOT EXISTS idx_loan_payments_created_at ON loan_payments(created_at DESC);
 
 -- ============================================================================
 -- 4️⃣ LOAN DOCUMENTS TABLE
@@ -206,10 +226,10 @@ CREATE TABLE IF NOT EXISTS loan_documents (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_loan_docs_loan_id ON loan_documents(loan_id);
-CREATE INDEX idx_loan_docs_user_id ON loan_documents(user_id);
-CREATE INDEX idx_loan_docs_type ON loan_documents(document_type);
-CREATE INDEX idx_loan_docs_verified ON loan_documents(verified);
+CREATE INDEX IF NOT EXISTS idx_loan_docs_loan_id ON loan_documents(loan_id);
+CREATE INDEX IF NOT EXISTS idx_loan_docs_user_id ON loan_documents(user_id);
+CREATE INDEX IF NOT EXISTS idx_loan_docs_type ON loan_documents(document_type);
+CREATE INDEX IF NOT EXISTS idx_loan_docs_verified ON loan_documents(verified);
 
 -- ============================================================================
 -- 5️⃣ COLLATERAL TABLE
@@ -243,9 +263,9 @@ CREATE TABLE IF NOT EXISTS loan_collateral (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_collateral_loan_id ON loan_collateral(loan_id);
-CREATE INDEX idx_collateral_type ON loan_collateral(collateral_type);
-CREATE INDEX idx_collateral_status ON loan_collateral(status);
+CREATE INDEX IF NOT EXISTS idx_collateral_loan_id ON loan_collateral(loan_id);
+CREATE INDEX IF NOT EXISTS idx_collateral_type ON loan_collateral(collateral_type);
+CREATE INDEX IF NOT EXISTS idx_collateral_status ON loan_collateral(status);
 
 -- ============================================================================
 -- 6️⃣ INTEREST ACCRUAL TABLE
@@ -267,8 +287,8 @@ CREATE TABLE IF NOT EXISTS loan_interest_accrual (
   UNIQUE(loan_id, accrual_date)
 );
 
-CREATE INDEX idx_accrual_loan_id ON loan_interest_accrual(loan_id);
-CREATE INDEX idx_accrual_date ON loan_interest_accrual(accrual_date DESC);
+CREATE INDEX IF NOT EXISTS idx_accrual_loan_id ON loan_interest_accrual(loan_id);
+CREATE INDEX IF NOT EXISTS idx_accrual_date ON loan_interest_accrual(accrual_date DESC);
 
 -- ============================================================================
 -- 7️⃣ LOAN STATUS HISTORY TABLE
@@ -287,15 +307,15 @@ CREATE TABLE IF NOT EXISTS loan_status_history (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_status_history_loan_id ON loan_status_history(loan_id);
-CREATE INDEX idx_status_history_created_at ON loan_status_history(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_status_history_loan_id ON loan_status_history(loan_id);
+CREATE INDEX IF NOT EXISTS idx_status_history_created_at ON loan_status_history(created_at DESC);
 
 -- ============================================================================
 -- 8️⃣ LOAN DEFAULTS & RECOVERY TABLE
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS loan_defaults (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  loan_id UUID NOT NULL REFERENCES loans(id) ON DELETE CASCADE,
+  loan_id UUID NOT NULL REFERENCES loans(id) ON DELETE CASCADE UNIQUE,
   
   days_overdue INTEGER NOT NULL,
   amount_overdue NUMERIC(36, 8) NOT NULL,
@@ -312,13 +332,11 @@ CREATE TABLE IF NOT EXISTS loan_defaults (
   notes TEXT,
   
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  
-  UNIQUE(loan_id)
+  updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_defaults_loan_id ON loan_defaults(loan_id);
-CREATE INDEX idx_defaults_status ON loan_defaults(recovery_status);
+CREATE INDEX IF NOT EXISTS idx_defaults_loan_id ON loan_defaults(loan_id);
+CREATE INDEX IF NOT EXISTS idx_defaults_status ON loan_defaults(recovery_status);
 
 -- ============================================================================
 -- 9️⃣ LOAN DISBURSEMENTS TABLE
@@ -336,7 +354,7 @@ CREATE TABLE IF NOT EXISTS loan_disbursements (
     'bank_transfer', 'check', 'direct_deposit', 'crypto_wallet', 'partner_transfer'
   )),
   
-  bank_account_id UUID REFERENCES public.wallets_fiat(id),
+  bank_account_id UUID,
   wallet_address VARCHAR(255),
   
   status VARCHAR(50) NOT NULL DEFAULT 'pending' CHECK (status IN (
@@ -353,11 +371,11 @@ CREATE TABLE IF NOT EXISTS loan_disbursements (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_disbursements_loan_id ON loan_disbursements(loan_id);
-CREATE INDEX idx_disbursements_status ON loan_disbursements(status);
+CREATE INDEX IF NOT EXISTS idx_disbursements_loan_id ON loan_disbursements(loan_id);
+CREATE INDEX IF NOT EXISTS idx_disbursements_status ON loan_disbursements(status);
 
 -- ============================================================================
--- 🔟 LOAN PARTNERS TABLE (for partner loans)
+-- ��� LOAN PARTNERS TABLE
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS partners (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -380,13 +398,12 @@ CREATE TABLE IF NOT EXISTS partners (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
-CREATE INDEX idx_partners_active ON partners(is_active);
+CREATE INDEX IF NOT EXISTS idx_partners_active ON partners(is_active);
 
 -- ============================================================================
 -- 1️⃣1️⃣ VIEWS FOR EASY DATA ACCESS
 -- ============================================================================
 
--- Active loans summary with progress
 CREATE OR REPLACE VIEW v_active_loans AS
 SELECT 
   l.id,
@@ -420,7 +437,6 @@ FROM loans l
 JOIN currencies c ON c.code = l.currency_code
 WHERE l.status IN ('active', 'pending', 'approved');
 
--- Overdue payments summary
 CREATE OR REPLACE VIEW v_overdue_payments AS
 SELECT 
   l.id,
@@ -442,7 +458,6 @@ JOIN loan_payment_schedules lps ON lps.loan_id = l.id
 WHERE lps.status IN ('overdue', 'partially_paid')
 AND lps.due_date < NOW();
 
--- User loan portfolio summary
 CREATE OR REPLACE VIEW v_user_loan_portfolio AS
 SELECT 
   l.user_id,
@@ -463,17 +478,21 @@ GROUP BY l.user_id;
 -- 1️⃣2️⃣ ROW LEVEL SECURITY
 -- ============================================================================
 
-ALTER TABLE loans ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_payment_schedules ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_documents ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_collateral ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_interest_accrual ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_status_history ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_defaults ENABLE ROW LEVEL SECURITY;
-ALTER TABLE loan_disbursements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loans ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_payment_schedules ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_collateral ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_interest_accrual ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_status_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_defaults ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS loan_disbursements ENABLE ROW LEVEL SECURITY;
 
--- Loans: Users can only view their own loans
+-- Loans RLS
+DROP POLICY IF EXISTS loans_select_policy ON loans;
+DROP POLICY IF EXISTS loans_insert_policy ON loans;
+DROP POLICY IF EXISTS loans_update_policy ON loans;
+
 CREATE POLICY loans_select_policy ON loans FOR SELECT
   USING (auth.uid() = user_id OR auth.jwt() ->> 'role' = 'admin');
 
@@ -484,28 +503,38 @@ CREATE POLICY loans_update_policy ON loans FOR UPDATE
   USING (auth.uid() = user_id OR auth.jwt() ->> 'role' = 'admin')
   WITH CHECK (auth.uid() = user_id OR auth.jwt() ->> 'role' = 'admin');
 
--- Payment Schedules: Users can view their own loan schedules
+-- Payment Schedules RLS
+DROP POLICY IF EXISTS schedules_select_policy ON loan_payment_schedules;
+
 CREATE POLICY schedules_select_policy ON loan_payment_schedules FOR SELECT
   USING (
     EXISTS (SELECT 1 FROM loans l WHERE l.id = loan_payment_schedules.loan_id AND l.user_id = auth.uid())
     OR auth.jwt() ->> 'role' = 'admin'
   );
 
--- Loan Payments: Users can view and insert their own payments
+-- Loan Payments RLS
+DROP POLICY IF EXISTS payments_select_policy ON loan_payments;
+DROP POLICY IF EXISTS payments_insert_policy ON loan_payments;
+
 CREATE POLICY payments_select_policy ON loan_payments FOR SELECT
   USING (auth.uid() = user_id OR auth.jwt() ->> 'role' = 'admin');
 
 CREATE POLICY payments_insert_policy ON loan_payments FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- Documents: Users can view and insert their own documents
+-- Documents RLS
+DROP POLICY IF EXISTS documents_select_policy ON loan_documents;
+DROP POLICY IF EXISTS documents_insert_policy ON loan_documents;
+
 CREATE POLICY documents_select_policy ON loan_documents FOR SELECT
   USING (auth.uid() = user_id OR auth.jwt() ->> 'role' = 'admin');
 
 CREATE POLICY documents_insert_policy ON loan_documents FOR INSERT
   WITH CHECK (auth.uid() = user_id);
 
--- Collateral: Users can view their own collateral
+-- Collateral RLS
+DROP POLICY IF EXISTS collateral_select_policy ON loan_collateral;
+
 CREATE POLICY collateral_select_policy ON loan_collateral FOR SELECT
   USING (
     EXISTS (SELECT 1 FROM loans l WHERE l.id = loan_collateral.loan_id AND l.user_id = auth.uid())
@@ -516,7 +545,8 @@ CREATE POLICY collateral_select_policy ON loan_collateral FOR SELECT
 -- 1️⃣3️⃣ FUNCTIONS
 -- ============================================================================
 
--- Generate unique reference number for loans
+CREATE SEQUENCE IF NOT EXISTS loan_reference_seq START 1;
+
 CREATE OR REPLACE FUNCTION generate_loan_reference()
 RETURNS VARCHAR AS $$
 DECLARE
@@ -528,10 +558,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create sequence for loan reference numbers if it doesn't exist
-CREATE SEQUENCE IF NOT EXISTS loan_reference_seq START 1;
-
--- Calculate monthly payment
 CREATE OR REPLACE FUNCTION calculate_monthly_payment(
   p_principal NUMERIC,
   p_annual_rate NUMERIC,
@@ -553,7 +579,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create a new loan request
 CREATE OR REPLACE FUNCTION create_loan_request(
   p_user_id UUID,
   p_loan_type VARCHAR,
@@ -573,64 +598,27 @@ DECLARE
   v_total_owed NUMERIC;
   v_monthly_payment NUMERIC;
 BEGIN
-  -- Generate reference number
   v_reference := generate_loan_reference();
-  
-  -- Calculate total interest and owed amount
   v_total_interest := p_requested_amount * (p_interest_rate / 100);
   v_total_owed := p_requested_amount + v_total_interest;
-  
-  -- Calculate monthly payment
   v_monthly_payment := calculate_monthly_payment(p_requested_amount, p_interest_rate, p_loan_term_months);
   
-  -- Insert new loan
   INSERT INTO loans (
-    user_id,
-    reference_number,
-    loan_type,
-    requested_amount,
-    currency_code,
-    interest_rate,
-    total_interest,
-    total_owed,
-    loan_term_months,
-    monthly_payment,
-    amount_due,
-    remaining_balance,
-    status,
-    display_name,
-    email,
-    phone_number,
-    loan_purpose,
-    created_at,
-    updated_at
+    user_id, reference_number, loan_type, requested_amount, currency_code,
+    interest_rate, total_interest, total_owed, loan_term_months, monthly_payment,
+    amount_due, remaining_balance, status, display_name, email, phone_number,
+    loan_purpose, created_at, updated_at
   ) VALUES (
-    p_user_id,
-    v_reference,
-    p_loan_type,
-    p_requested_amount,
-    p_currency_code,
-    p_interest_rate,
-    v_total_interest,
-    v_total_owed,
-    p_loan_term_months,
-    v_monthly_payment,
-    v_total_owed,
-    v_total_owed,
-    'pending',
-    p_display_name,
-    p_email,
-    p_phone_number,
-    p_loan_purpose,
-    NOW(),
-    NOW()
+    p_user_id, v_reference, p_loan_type, p_requested_amount, p_currency_code,
+    p_interest_rate, v_total_interest, v_total_owed, p_loan_term_months, v_monthly_payment,
+    v_total_owed, v_total_owed, 'pending', p_display_name, p_email, p_phone_number,
+    p_loan_purpose, NOW(), NOW()
   ) RETURNING id INTO v_loan_id;
   
   RETURN v_loan_id;
 END;
 $$ LANGUAGE plpgsql;
 
--- Process loan payment with schedule updates
 CREATE OR REPLACE FUNCTION process_loan_payment(
   p_loan_id UUID,
   p_amount NUMERIC,
@@ -646,7 +634,6 @@ DECLARE
   v_interest_paid NUMERIC;
   v_schedule_id UUID;
 BEGIN
-  -- Get loan details
   SELECT remaining_balance, status INTO v_remaining_balance, v_loan_status
   FROM loans WHERE id = p_loan_id;
   
@@ -654,7 +641,6 @@ BEGIN
     RAISE EXCEPTION 'Loan not found';
   END IF;
   
-  -- Find applicable payment schedule
   SELECT id INTO v_schedule_id
   FROM loan_payment_schedules
   WHERE loan_id = p_loan_id
@@ -662,42 +648,22 @@ BEGIN
   ORDER BY scheduled_date ASC
   LIMIT 1;
   
-  -- Allocate payment: interest first, then principal
   SELECT interest_amount INTO v_interest_paid
   FROM loan_payment_schedules
   WHERE id = v_schedule_id;
   
-  v_interest_paid := LEAST(v_interest_paid, p_amount);
+  v_interest_paid := LEAST(COALESCE(v_interest_paid, 0), p_amount);
   v_principal_paid := p_amount - v_interest_paid;
   
-  -- Create payment record
   INSERT INTO loan_payments (
-    loan_id,
-    schedule_id,
-    user_id,
-    payment_type,
-    amount,
-    principal_paid,
-    interest_paid,
-    payment_method,
-    payment_reference,
-    status,
-    completed_at
+    loan_id, schedule_id, user_id, payment_type, amount, principal_paid,
+    interest_paid, payment_method, payment_reference, status, completed_at
   ) VALUES (
-    p_loan_id,
-    v_schedule_id,
-    (SELECT user_id FROM loans WHERE id = p_loan_id),
-    p_payment_type,
-    p_amount,
-    v_principal_paid,
-    v_interest_paid,
-    p_payment_method,
-    p_payment_reference,
-    'completed',
-    NOW()
+    p_loan_id, v_schedule_id, (SELECT user_id FROM loans WHERE id = p_loan_id),
+    p_payment_type, p_amount, v_principal_paid, v_interest_paid,
+    p_payment_method, p_payment_reference, 'completed', NOW()
   ) RETURNING id INTO v_payment_id;
   
-  -- Update payment schedule if exists
   IF v_schedule_id IS NOT NULL THEN
     UPDATE loan_payment_schedules SET
       amount_paid = COALESCE(amount_paid, 0) + p_amount,
@@ -714,7 +680,6 @@ BEGIN
     WHERE id = v_schedule_id;
   END IF;
   
-  -- Update loan record
   v_remaining_balance := v_remaining_balance - p_amount;
   
   UPDATE loans SET
@@ -740,7 +705,6 @@ BEGIN
     updated_at = NOW()
   WHERE id = p_loan_id;
   
-  -- Log status change if loan became active
   IF v_loan_status = 'pending' THEN
     INSERT INTO loan_status_history (loan_id, previous_status, new_status, status_reason, changed_by, created_at)
     VALUES (p_loan_id, 'pending', 'active', 'First payment received', NULL, NOW());
@@ -750,7 +714,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Generate payment schedule
 CREATE OR REPLACE FUNCTION generate_payment_schedule(
   p_loan_id UUID
 ) RETURNS INTEGER AS $$
@@ -763,7 +726,6 @@ DECLARE
   v_schedule_count INTEGER := 0;
   i INTEGER;
 BEGIN
-  -- Get loan details
   SELECT id, approved_amount, interest_rate, loan_term_months, monthly_payment, start_date
   INTO v_loan_record
   FROM loans
@@ -774,44 +736,26 @@ BEGIN
     RAISE EXCEPTION 'Loan not found or not in approved/active status';
   END IF;
   
-  -- Delete existing schedules
   DELETE FROM loan_payment_schedules WHERE loan_id = p_loan_id;
   
   v_remaining_principal := v_loan_record.approved_amount;
   v_scheduled_date := COALESCE(v_loan_record.start_date, NOW());
   
-  -- Generate payment schedule
   FOR i IN 1..v_loan_record.loan_term_months LOOP
     v_interest_per_payment := v_remaining_principal * (v_loan_record.interest_rate / 100 / 12);
     v_principal_per_payment := v_loan_record.monthly_payment - v_interest_per_payment;
     
     IF i = v_loan_record.loan_term_months THEN
-      -- Final payment covers remaining principal
       v_principal_per_payment := v_remaining_principal;
     END IF;
     
     INSERT INTO loan_payment_schedules (
-      loan_id,
-      payment_number,
-      scheduled_date,
-      due_date,
-      principal_amount,
-      interest_amount,
-      total_due,
-      status,
-      grace_period_end,
-      created_at
+      loan_id, payment_number, scheduled_date, due_date, principal_amount,
+      interest_amount, total_due, status, grace_period_end, created_at
     ) VALUES (
-      p_loan_id,
-      i,
-      v_scheduled_date,
-      v_scheduled_date,
-      v_principal_per_payment,
-      v_interest_per_payment,
-      v_principal_per_payment + v_interest_per_payment,
-      'scheduled',
-      v_scheduled_date + INTERVAL '15 days',
-      NOW()
+      p_loan_id, i, v_scheduled_date, v_scheduled_date, v_principal_per_payment,
+      v_interest_per_payment, v_principal_per_payment + v_interest_per_payment,
+      'scheduled', v_scheduled_date + INTERVAL '15 days', NOW()
     );
     
     v_remaining_principal := GREATEST(0, v_remaining_principal - v_principal_per_payment);
