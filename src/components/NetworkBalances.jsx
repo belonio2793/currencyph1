@@ -17,13 +17,48 @@ export default function NetworkBalances({ userId }) {
   })
 
   const tableOptions = [
-    { id: 'network_balances', label: 'Network Balances', description: 'Reconciled balances across all users and house accounts' },
-    { id: 'wallets', label: 'Wallets', description: 'Multi-currency wallets and balances' },
-    { id: 'loans', label: 'Loans', description: 'Loan requests and tracking' },
-    { id: 'wallet_transactions', label: 'Wallet Transactions', description: 'Audit trail of balance changes' },
-    { id: 'loan_payments', label: 'Loan Payments', description: 'Individual loan payment records' },
-    { id: 'currencies', label: 'Currencies', description: 'Supported currencies (fiat & crypto)' },
-    { id: 'users', label: 'User Profile', description: 'Account information and details' }
+    {
+      id: 'network_balances',
+      label: 'Network Balances',
+      description: 'Reconciled balances across all users and house accounts',
+      metadata: 'Status: reconciled/discrepancy | Currencies: all active | Updated: every 24 hours'
+    },
+    {
+      id: 'wallets',
+      label: 'Wallets',
+      description: 'Multi-currency wallets and balances',
+      metadata: 'Per-user wallets | Supports fiat & crypto | Tracks deposits/withdrawals'
+    },
+    {
+      id: 'loans',
+      label: 'Loans',
+      description: 'Loan requests and tracking',
+      metadata: 'Types: personal/business/partner | Interest rate: 10% | Status: pending/active/completed'
+    },
+    {
+      id: 'wallet_transactions',
+      label: 'Wallet Transactions',
+      description: 'Audit trail of balance changes',
+      metadata: 'Types: deposit/withdrawal/transfer/payment | Ordered by date | Supports all currencies'
+    },
+    {
+      id: 'loan_payments',
+      label: 'Loan Payments',
+      description: 'Individual loan payment records',
+      metadata: 'Methods: wallet/GCash/crypto | Tracks status | Linked to loans'
+    },
+    {
+      id: 'currencies',
+      label: 'Currencies',
+      description: 'Supported currencies (fiat & crypto)',
+      metadata: 'PHP (default) | BTC | USD | EUR | All with symbols & decimals'
+    },
+    {
+      id: 'users',
+      label: 'User Profile',
+      description: 'Account information and details',
+      metadata: 'Email | Full name | Country | Status | Created timestamp'
+    }
   ]
 
   useEffect(() => {
