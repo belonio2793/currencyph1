@@ -134,16 +134,17 @@ async function reconcileUserBalances(userId: string) {
         reconciliation_date: new Date().toISOString(),
         notes: isReconciled
           ? 'Automatically reconciled'
-          : `Discrepancy of ${Math.abs(difference)} detected`
+          : `Discrepancy of ${Math.abs(difference)} detected`,
+        updated_at: new Date().toISOString()
       }
 
       const { data, error } = await supabase
         .from('network_balances')
-        .insert([record])
+        .upsert(record, { onConflict: 'entity_type,entity_id,currency_code' })
         .select()
 
       if (error) {
-        console.error(`Failed to insert balance for user ${userId}:`, error)
+        console.error(`Failed to upsert balance for user ${userId}:`, error)
       } else {
         results.push(data)
       }
