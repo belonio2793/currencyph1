@@ -70,13 +70,18 @@ export default function NetworkBalances({ userId }) {
       setLoading(true)
 
       // Get user data
-      const { data: userData, error: userError } = await supabase
+      let userData = null
+      const { data: fetchedUser, error: userError } = await supabase
         .from('users')
         .select('*')
         .eq('id', userId)
         .single()
 
-      if (userError && userError.code !== 'PGRST116') throw userError
+      if (userError && userError.code !== 'PGRST116') {
+        console.warn('Could not fetch user data:', userError)
+      } else {
+        userData = fetchedUser
+      }
 
       // Get network balances (latest records) - be lenient with errors
       let networkBalancesData = []
