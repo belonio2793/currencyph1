@@ -538,20 +538,53 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     }
   }
 
+  // Check if any wallets are available in the browser
+  const checkWalletAvailability = () => {
+    const hasMetaMask = typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask
+    const hasWalletConnect = typeof window !== 'undefined' && window.walletconnect
+    const hasPhantom = typeof window !== 'undefined' && window.phantom && window.phantom.solana
+    const hasRainbow = typeof window !== 'undefined' && window.rainbow
+    const hasCoinbase = typeof window !== 'undefined' && window.coinbaseWalletExtension
+
+    return hasMetaMask || hasWalletConnect || hasPhantom || hasRainbow || hasCoinbase
+  }
+
   // Wallet connect (supports Solana Phantom and EVM)
   const handleConnectWallet = async () => {
     try {
       setThirdwebConnecting(true)
       setError('')
+      setNoWalletDetected(false)
+
+      // Check if any wallets are available
+      const hasAvailableWallets = checkWalletAvailability()
+      if (!hasAvailableWallets) {
+        setNoWalletDetected(true)
+        setWalletAvailable(false)
+        setError('No compatible wallet extensions detected in your browser')
+        return
+      }
+
       const wallet = await connectAnyWallet()
       const walletInfo = await getWalletInfo(wallet)
       setConnectedWallet(walletInfo)
       setSelectedChainId(walletInfo.chainId)
       setSuccess(`Connected to ${walletInfo.chainName}`)
+      setNoWalletDetected(false)
     } catch (err) {
       console.error('Error connecting wallet:', err)
       try { clearWalletCache() } catch(e) {}
-      setError(fmtErr(err) || 'Failed to connect wallet. Make sure you have a compatible wallet extension (Phantom, MetaMask, etc.)')
+
+      const errMsg = fmtErr(err)
+      if (errMsg && errMsg.toLowerCase().includes('user rejected') || errMsg.toLowerCase().includes('user closed')) {
+        setError('Wallet connection cancelled')
+      } else if (!checkWalletAvailability()) {
+        setNoWalletDetected(true)
+        setWalletAvailable(false)
+        setError('No compatible wallet extensions detected in your browser')
+      } else {
+        setError(errMsg || 'Failed to connect wallet. Make sure you have a compatible wallet extension installed.')
+      }
     } finally {
       setThirdwebConnecting(false)
     }
