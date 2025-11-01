@@ -48,20 +48,14 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               <div className="relative hidden sm:block">
                 <button
                   onClick={() => setBorrowDropdownOpen(!borrowDropdownOpen)}
-                  className="px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center gap-2"
+                  className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors cursor-pointer"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
                   Borrow Money
-                  <svg className={`w-4 h-4 transition-transform ${borrowDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                  </svg>
                 </button>
                 {borrowDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
-                    <div className="px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-slate-100 rounded-t-lg">
-                      <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">Borrow Money</p>
+                    <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 rounded-t-lg">
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Borrow Money</p>
                     </div>
                     {borrowOptions.map(option => (
                       <button
@@ -70,12 +64,9 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                           onTabChange(option.id)
                           setBorrowDropdownOpen(false)
                         }}
-                        className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-green-50 hover:text-green-700 transition-colors border-b border-slate-100 last:border-b-0 hover:font-medium"
+                        className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors border-b border-slate-100 last:border-b-0"
                       >
-                        <div className="flex items-center gap-2">
-                          <span className="text-green-600">→</span>
-                          {option.label}
-                        </div>
+                        {option.label}
                       </button>
                     ))}
                   </div>
