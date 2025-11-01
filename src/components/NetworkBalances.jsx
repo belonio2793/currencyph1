@@ -78,15 +78,17 @@ export default function NetworkBalances({ userId }) {
 
       if (userError && userError.code !== 'PGRST116') throw userError
 
-      // Get network balances (latest records) - try to fetch all first, then filter
-      let { data: networkBalancesData, error: networkBalancesError } = await supabase
+      // Get network balances (latest records) - be lenient with errors
+      let networkBalancesData = []
+      const { data: allBalances, error: networkBalancesError } = await supabase
         .from('network_balances')
         .select('*')
         .order('reconciliation_date', { ascending: false })
         .limit(100)
 
-      // If there's a permission error, try fetching house balances only
-      if (networkBalancesError?.code === 'PGRST001' || networkBalancesError?.code === 'PGRST003') {
+      if (networkBalancesError) {
+        console.warn('Could not fetch all network balances, trying house only:', networkBalancesError)
+        // Try fetching just house balances as fallback
         const { data: houseBalances, error: houseError } = await supabase
           .from('network_balances')
           .select('*')
@@ -95,13 +97,13 @@ export default function NetworkBalances({ userId }) {
           .limit(100)
 
         if (houseError) {
-          console.warn('Could not fetch house balances:', houseError)
+          console.warn('Could not fetch house balances either:', houseError)
           networkBalancesData = []
         } else {
-          networkBalancesData = houseBalances
+          networkBalancesData = houseBalances || []
         }
-      } else if (networkBalancesError && networkBalancesError.code !== 'PGRST116') {
-        throw networkBalancesError
+      } else {
+        networkBalancesData = allBalances || []
       }
 
       // Get user wallets
