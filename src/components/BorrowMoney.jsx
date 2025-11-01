@@ -165,20 +165,20 @@ export default function BorrowMoney({ userId, loanType }) {
         {/* Loans Table */}
         {!loading && filteredLoans.length > 0 && (
           <div className="bg-white rounded-lg shadow border border-slate-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
+            <div className="w-full">
+              <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-slate-50 border-b border-slate-200">
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">ID</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Requested Amount</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Total Owed (w/ 10%)</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Paid</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Remaining</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Progress</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">City</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Phone</th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-slate-700">Actions</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">ID</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Requested</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Total Owed</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Paid</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Remaining</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Progress</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Status</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">City</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Phone</th>
+                    <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -186,45 +186,45 @@ export default function BorrowMoney({ userId, loanType }) {
                     const progressPercent = loan.total_owed ? Math.min(100, ((loan.amount_paid || 0) / loan.total_owed) * 100) : 0
                     return (
                       <tr key={loan.id} className="border-b border-slate-100 hover:bg-slate-50">
-                        <td className="px-6 py-3 text-sm font-mono text-slate-600">{loan.id.slice(0, 8)}...</td>
-                        <td className="px-6 py-3 text-sm font-medium text-slate-900">
-                          {Number(loan.requested_amount).toFixed(2)} {loan.currency_code}
+                        <td className="px-3 py-2 text-xs font-mono text-slate-600 truncate">{loan.id.slice(0, 6)}...</td>
+                        <td className="px-3 py-2 text-xs font-medium text-slate-900 whitespace-nowrap">
+                          {Number(loan.requested_amount).toFixed(0)} {loan.currency_code}
                         </td>
-                        <td className="px-6 py-3 text-sm font-medium text-slate-900">
-                          {Number(loan.total_owed).toFixed(2)} {loan.currency_code}
+                        <td className="px-3 py-2 text-xs font-medium text-slate-900 whitespace-nowrap">
+                          {Number(loan.total_owed).toFixed(0)} {loan.currency_code}
                         </td>
-                        <td className="px-6 py-3 text-sm text-slate-600">
-                          {Number(loan.amount_paid || 0).toFixed(2)} {loan.currency_code}
+                        <td className="px-3 py-2 text-xs text-slate-600 whitespace-nowrap">
+                          {Number(loan.amount_paid || 0).toFixed(0)} {loan.currency_code}
                         </td>
-                        <td className="px-6 py-3 text-sm text-slate-600">
-                          {Number(loan.remaining_balance || loan.total_owed).toFixed(2)} {loan.currency_code}
+                        <td className="px-3 py-2 text-xs text-slate-600 whitespace-nowrap">
+                          {Number(loan.remaining_balance || loan.total_owed).toFixed(0)} {loan.currency_code}
                         </td>
-                        <td className="px-6 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                        <td className="px-3 py-2 text-xs">
+                          <div className="flex items-center gap-1">
+                            <div className="w-16 h-1.5 bg-slate-200 rounded-full overflow-hidden">
                               <div
                                 className="h-full bg-blue-600 transition-all"
                                 style={{ width: `${progressPercent}%` }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-slate-600">{progressPercent.toFixed(0)}%</span>
+                            <span className="font-medium text-slate-600 whitespace-nowrap">{progressPercent.toFixed(0)}%</span>
                           </div>
                         </td>
-                        <td className="px-6 py-3">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getLoanStatusColor(loan.status)}`}>
+                        <td className="px-3 py-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getLoanStatusColor(loan.status)}`}>
                             {loan.status.toUpperCase()}
                           </span>
                         </td>
-                        <td className="px-6 py-3 text-sm text-slate-600">{loan.city || 'N/A'}</td>
-                        <td className="px-6 py-3 text-sm text-slate-600">{blurPhoneNumber(loan.phone_number)}</td>
-                        <td className="px-6 py-3 text-sm">
+                        <td className="px-3 py-2 text-xs text-slate-600 truncate">{loan.city || 'N/A'}</td>
+                        <td className="px-3 py-2 text-xs text-slate-600 whitespace-nowrap">{blurPhoneNumber(loan.phone_number)}</td>
+                        <td className="px-3 py-2 text-xs">
                           {(loan.status === 'active' || loan.status === 'pending') && (
                             <button
                               onClick={() => {
                                 setSelectedLoan(loan)
                                 setShowPaymentModal(true)
                               }}
-                              className="text-blue-600 hover:text-blue-700 font-medium"
+                              className="text-blue-600 hover:text-blue-700 font-semibold"
                             >
                               Pay
                             </button>
