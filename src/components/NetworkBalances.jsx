@@ -7,7 +7,6 @@ export default function NetworkBalances({ userId }) {
   const [error, setError] = useState('')
   const [selectedTable, setSelectedTable] = useState('network_balances')
   const [expandedTables, setExpandedTables] = useState({
-    users: true,
     wallets: true,
     loans: true,
     currencies: true,
