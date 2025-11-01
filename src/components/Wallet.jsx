@@ -1067,8 +1067,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                       </>
                     ) : (
                       <>
-                        <button onClick={() => { setShowThirdwebModal(true) }} className="text-sm text-slate-600 hover:text-slate-700 font-medium transition-colors">Sync Existing Wallet</button>
-                        <button onClick={() => { setSelectedManualChainId(chain.chainId); setShowCreateManualWalletModal(true) }} className="text-sm text-emerald-600 hover:text-emerald-700 font-medium transition-colors">Create New Wallet</button>
+                        <button onClick={() => { setShowThirdwebModal(true) }} className="px-3 py-2 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors">Use New Wallet</button>
+                        <button onClick={() => { setSelectedManualChainId(chain.chainId); setShowCreateManualWalletModal(true) }} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">Create Wallet</button>
                       </>
                     )}
                   </div>
