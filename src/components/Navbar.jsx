@@ -3,6 +3,7 @@ import HeaderMap from './HeaderMap'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, userId, totalBalancePHP, onShowAuth, onSignOut }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [borrowDropdownOpen, setBorrowDropdownOpen] = useState(false)
 
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
@@ -21,6 +22,12 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'transactions', label: 'History', auth: true },
     { id: 'profile', label: 'Profile', auth: true },
     { id: 'inbox', label: 'Inbox', auth: true }
+  ]
+
+  // Borrow Money dropdown options
+  const borrowOptions = [
+    { id: 'borrow-personal', label: 'Personal Loan', auth: true },
+    { id: 'borrow-business', label: 'Business Loan', auth: true }
   ]
 
   return (
