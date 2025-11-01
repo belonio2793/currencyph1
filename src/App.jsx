@@ -475,7 +475,7 @@ export default function App() {
               <button onClick={() => setActiveTab('about')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                 About
               </button>
-              <button onClick={() => setActiveTab('network')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+              <button onClick={() => setActiveTab('network-balances')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                 Network Balances
               </button>
             </p>
