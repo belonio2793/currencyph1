@@ -52,12 +52,6 @@ export default function NetworkBalances({ userId }) {
       label: 'Currencies',
       description: 'Supported currencies (fiat & crypto)',
       metadata: 'PHP (default) | BTC | USD | EUR | All with symbols & decimals'
-    },
-    {
-      id: 'users',
-      label: 'User Profile',
-      description: 'Account information and details',
-      metadata: 'Email | Full name | Country | Status | Created timestamp'
     }
   ]
 
