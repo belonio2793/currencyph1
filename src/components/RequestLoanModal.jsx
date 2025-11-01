@@ -180,6 +180,41 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
             />
           </div>
 
+          {/* Reason for Loan */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-2">
+              Reason for Loan
+            </label>
+            <select
+              value={loanReason}
+              onChange={(e) => setLoanReason(e.target.value)}
+              className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+            >
+              <option value="business_expansion">Business Expansion</option>
+              <option value="emergency">Emergency/Personal</option>
+              <option value="education">Education</option>
+              <option value="medical">Medical</option>
+              <option value="debt_consolidation">Debt Consolidation</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          {/* Custom Reason Text Field (shown when "Other" is selected) */}
+          {loanReason === 'other' && (
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Please specify the reason
+              </label>
+              <textarea
+                value={customReason}
+                onChange={(e) => setCustomReason(e.target.value)}
+                placeholder="Enter your reason for the loan..."
+                rows="3"
+                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 resize-none"
+              />
+            </div>
+          )}
+
           {/* Terms Checkbox */}
           <div className="flex items-center gap-2 pt-2">
             <input
