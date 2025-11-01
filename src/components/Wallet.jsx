@@ -516,30 +516,32 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       if (!chainNameForDb) {
         throw new Error('Unsupported or unknown chain for this wallet')
       }
-      const res = await supabase
-        .from('wallets_crypto')
-        .upsert([{
-          user_id: userId,
-          chain: chainNameForDb,
-          chain_id: selectedChainId,
-          address: connectedWallet.address,
-          provider: providerValue,
-          balance: 0,
-          metadata: {
-            chainName: connectedWallet.chainName,
-            chainSymbol: connectedWallet.chainSymbol,
-            providerName: (connectedWallet && connectedWallet.providerName) || providerValue,
-            connected_at: new Date().toISOString()
-          }
-        }], {
-          onConflict: 'user_id,chain,address'
-        }).select()
-
-      if (res.error) {
-        console.error('Supabase upsert error for wallets_crypto:', res.error, res)
-        // Throw a stringified error so callers show useful text
-        throw new Error(res.error.message || JSON.stringify(res.error || res))
+      // Save via edge function (service-role) to avoid RLS issues
+      const payload = {
+        user_id: userId,
+        chain_id: selectedChainId,
+        address: connectedWallet.address,
+        provider: providerValue,
+        chainName: connectedWallet.chainName,
+        metadata: {
+          chainName: connectedWallet.chainName,
+          chainSymbol: connectedWallet.chainSymbol,
+          providerName: (connectedWallet && connectedWallet.providerName) || providerValue
+        }
       }
+
+      const { data: fnData, error: fnError } = await supabase.functions.invoke('save-connected-wallet', { body: payload })
+      if (fnError) {
+        console.error('Edge function save-connected-wallet error', fnError)
+        throw new Error(fnError.message || JSON.stringify(fnError))
+      }
+
+      if (!fnData || !fnData.ok) {
+        console.error('save-connected-wallet responded with error', fnData)
+        throw new Error(fnData?.error || 'Failed saving connected wallet')
+      }
+
+      const upserted = fnData.wallet
 
       setSuccess(`Wallet connected and saved (${formatWalletAddress(connectedWallet.address)})`)
       setShowThirdwebModal(false)
