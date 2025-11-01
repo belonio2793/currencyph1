@@ -109,6 +109,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [selectedChainId, setSelectedChainId] = useState(null)
   const [showThirdwebModal, setShowThirdwebModal] = useState(false)
   const [thirdwebConnecting, setThirdwebConnecting] = useState(false)
+  const [walletAvailable, setWalletAvailable] = useState(true)
+  const [noWalletDetected, setNoWalletDetected] = useState(false)
 
   // Manual wallet creation state
   const [showCreateManualWalletModal, setShowCreateManualWalletModal] = useState(false)
