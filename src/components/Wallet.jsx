@@ -520,7 +520,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         .from('wallets_crypto')
         .upsert([{
           user_id: userId,
-          chain: (CHAIN_IDS[selectedChainId]?.name || connectedWallet.chainName || '').toUpperCase(),
+          chain: chainNameForDb,
           chain_id: selectedChainId,
           address: connectedWallet.address,
           provider: providerValue,
