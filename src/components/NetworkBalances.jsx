@@ -119,37 +119,6 @@ export default function NetworkBalances({ userId }) {
     }))
   }
 
-  const triggerReconciliation = async () => {
-    try {
-      setReconciling(true)
-      setError('')
-
-      const response = await fetch('https://corcofbmafdxehvlbesx.supabase.co/functions/v1/reconcile-network-balances', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${supabase.auth.session?.access_token || ''}`,
-          'Content-Type': 'application/json'
-        }
-      })
-
-      if (!response.ok) {
-        throw new Error(`Reconciliation failed: ${response.statusText}`)
-      }
-
-      const result = await response.json()
-      console.log('Reconciliation result:', result)
-
-      // Reload the data
-      await loadSchemaData()
-      setError('Reconciliation completed successfully!')
-    } catch (err) {
-      console.error('Error triggering reconciliation:', err)
-      setError(`Failed to trigger reconciliation: ${err.message}`)
-    } finally {
-      setReconciling(false)
-    }
-  }
-
   const SchemaTable = ({ title, data, columns, tableName }) => (
     <div className="mb-6 bg-white rounded-lg border border-slate-200 overflow-hidden">
       <button
