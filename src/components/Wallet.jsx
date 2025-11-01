@@ -1059,16 +1059,11 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {existing ? (
+                    {existing && (
                       <>
                         <div className="text-sm text-slate-700 font-mono mr-2">{Number(existing.balance || 0).toFixed(6)}</div>
                         <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Send</button>
                         <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Receive</button>
-                      </>
-                    ) : (
-                      <>
-                        <button onClick={() => { setShowThirdwebModal(true) }} className="px-3 py-2 bg-slate-600 text-white rounded-lg text-sm font-medium hover:bg-slate-700 transition-colors">Use Existing Wallet</button>
-                        <button onClick={() => { setSelectedManualChainId(chain.chainId); setShowCreateManualWalletModal(true) }} className="px-3 py-2 bg-yellow-400 text-slate-900 rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors">Create Wallet</button>
                       </>
                     )}
                   </div>
