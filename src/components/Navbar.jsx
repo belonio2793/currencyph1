@@ -35,17 +35,15 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
       <div className="max-w-7xl mx-auto px-4">
         {/* Row 1: Logo and HeaderMap */}
         <div className="py-4 flex items-center justify-between">
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
             {userEmail && (
-              <div className="ml-4 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex items-center">
+              <div className="ml-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex items-center">
                 <span className="text-slate-400 mr-2 text-xs">Total</span>
                 <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
               </div>
             )}
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Borrow Money Dropdown - Top Right */}
+            {/* Borrow Money Dropdown - Next to Total Balance */}
             {userEmail && (
               <div className="relative hidden sm:block">
                 <button
@@ -61,7 +59,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   </svg>
                 </button>
                 {borrowDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
+                  <div className="absolute left-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
                     <div className="px-4 py-2 bg-gradient-to-r from-green-50 to-emerald-50 border-b border-slate-100 rounded-t-lg">
                       <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">Borrow Money</p>
                     </div>
@@ -84,9 +82,9 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 )}
               </div>
             )}
-            <div className="hidden md:block">
-              <HeaderMap userId={userId} />
-            </div>
+          </div>
+          <div className="hidden md:block">
+            <HeaderMap userId={userId} />
           </div>
         </div>
         <div className="md:hidden w-full pb-4">
