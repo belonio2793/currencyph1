@@ -239,9 +239,18 @@ export default function NetworkBalances({ userId }) {
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-light text-slate-900 tracking-wide mb-2">Network Balances</h1>
-          <p className="text-slate-600">View your financial data by category</p>
+        <div className="mb-8 flex items-start justify-between">
+          <div>
+            <h1 className="text-3xl font-light text-slate-900 tracking-wide mb-2">Network Balances</h1>
+            <p className="text-slate-600">View your financial data by category</p>
+          </div>
+          <button
+            onClick={triggerReconciliation}
+            disabled={reconciling}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white font-medium rounded-lg transition-colors whitespace-nowrap"
+          >
+            {reconciling ? 'Reconciling...' : 'Trigger Reconciliation'}
+          </button>
         </div>
 
         {/* Error Message */}
