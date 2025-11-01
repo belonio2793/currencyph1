@@ -77,8 +77,8 @@ async function reconcileUserBalances(userId: string) {
       const isDebit = isDebitType(tx.type)
       const amount = toNumber(tx.amount)
 
-      if (!computedByurrency[curr]) {
-        computedByurrency[curr] = {
+      if (!computedByCurrency[curr]) {
+        computedByCurrency[curr] = {
           computed: 0,
           deposits: 0,
           withdrawals: 0,
@@ -87,38 +87,38 @@ async function reconcileUserBalances(userId: string) {
       }
 
       if (isDebit) {
-        computedByurrency[curr].computed -= amount
-        computedByurrency[curr].withdrawals += amount
+        computedByCurrency[curr].computed -= amount
+        computedByCurrency[curr].withdrawals += amount
       } else {
-        computedByurrency[curr].computed += amount
-        computedByurrency[curr].deposits += amount
+        computedByCurrency[curr].computed += amount
+        computedByCurrency[curr].deposits += amount
       }
-      computedByurrency[curr].count += 1
+      computedByCurrency[curr].count += 1
     })
 
     // Get wallet balances
-    const walletByurrency: Record<string, number> = {}
+    const walletByCurrency: Record<string, number> = {}
     ;(wallets || []).forEach((w: WalletRow) => {
-      walletByurrency[w.currency_code] = toNumber(w.balance)
+      walletByCurrency[w.currency_code] = toNumber(w.balance)
     })
 
     // Get all currencies referenced
     const currencies = new Set([
-      ...Object.keys(computedByurrency),
-      ...Object.keys(walletByurrency)
+      ...Object.keys(computedByCurrency),
+      ...Object.keys(walletByCurrency)
     ])
 
     const results = []
 
     // Insert network balance records for each currency
     for (const curr of currencies) {
-      const computed = toNumber(computedByurrency[curr]?.computed) || 0
-      const walletBal = toNumber(walletByurrency[curr]) || 0
+      const computed = toNumber(computedByCurrency[curr]?.computed) || 0
+      const walletBal = toNumber(walletByCurrency[curr]) || 0
       const difference = walletBal - computed
       const isReconciled = Math.abs(difference) < 0.01 // Allow small floating-point differences
-      const txCount = computedByurrency[curr]?.count || 0
-      const deposits = toNumber(computedByurrency[curr]?.deposits) || 0
-      const withdrawals = toNumber(computedByurrency[curr]?.withdrawals) || 0
+      const txCount = computedByCurrency[curr]?.count || 0
+      const deposits = toNumber(computedByCurrency[curr]?.deposits) || 0
+      const withdrawals = toNumber(computedByCurrency[curr]?.withdrawals) || 0
 
       const record = {
         entity_type: 'user',
