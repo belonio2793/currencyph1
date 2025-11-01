@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
-import { connectWallet, getWalletInfo, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress, sendCryptoTransaction } from '../lib/thirdwebClient'
+import { connectAnyWallet, connectWallet, connectSolana, getWalletInfo, clearWalletCache, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress, sendCryptoTransaction } from '../lib/thirdwebClient'
 
 // Explorer helper (re-used in UI)
 function getExplorerUrl(networkOrCurrency, address) {
@@ -460,19 +460,20 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     }
   }
 
-  // Thirdweb wallet functions
+  // Wallet connect (supports Solana Phantom and EVM)
   const handleConnectWallet = async () => {
     try {
       setThirdwebConnecting(true)
       setError('')
-      const wallet = await connectWallet()
+      const wallet = await connectAnyWallet()
       const walletInfo = await getWalletInfo(wallet)
       setConnectedWallet(walletInfo)
       setSelectedChainId(walletInfo.chainId)
       setSuccess(`Connected to ${walletInfo.chainName}`)
     } catch (err) {
       console.error('Error connecting wallet:', err)
-      setError('Failed to connect wallet. Make sure you have a Web3 wallet extension (MetaMask, WalletConnect, etc.)')
+      try { clearWalletCache() } catch(e) {}
+      setError(err.message || 'Failed to connect wallet. Make sure you have a compatible wallet extension (Phantom, MetaMask, etc.)')
     } finally {
       setThirdwebConnecting(false)
     }
@@ -494,6 +495,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       }
 
       // Upsert to wallets_crypto table
+      const providerValue = (connectedWallet && (connectedWallet.providerType || connectedWallet.providerName)) || 'unknown'
       const { error: upsertErr } = await supabase
         .from('wallets_crypto')
         .upsert([{
@@ -501,11 +503,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           chain: (CHAIN_IDS[selectedChainId]?.name || connectedWallet.chainName || '').toUpperCase(),
           chain_id: selectedChainId,
           address: connectedWallet.address,
-          provider: 'thirdweb',
+          provider: providerValue,
           balance: 0,
           metadata: {
             chainName: connectedWallet.chainName,
             chainSymbol: connectedWallet.chainSymbol,
+            providerName: (connectedWallet && connectedWallet.providerName) || providerValue,
             connected_at: new Date().toISOString()
           }
         }], {
@@ -528,6 +531,20 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   }
 
   const disconnectWallet = async () => {
+    try {
+      if (connectedWallet && connectedWallet.provider) {
+        const p = connectedWallet.provider
+        if (p.disconnect && typeof p.disconnect === 'function') {
+          try { await p.disconnect() } catch(e) { /* ignore */ }
+        } else if (p.close && typeof p.close === 'function') {
+          try { await p.close() } catch(e) { /* ignore */ }
+        }
+      }
+    } catch (e) {
+      console.warn('Error disconnecting provider', e)
+    }
+
+    try { clearWalletCache() } catch(e) {}
     setConnectedWallet(null)
     setSelectedChainId(null)
     setSuccess('Wallet disconnected')
@@ -720,6 +737,26 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium text-sm"
           >
             Create Manual Wallet
+          </button>
+          <button
+            onClick={async () => {
+              // Reset connection and clear any cached provider info
+              try {
+                if (connectedWallet && connectedWallet.provider) {
+                  if (connectedWallet.provider.disconnect) await connectedWallet.provider.disconnect()
+                  else if (connectedWallet.provider.close) await connectedWallet.provider.close()
+                }
+              } catch (e) {
+                console.warn('Error during provider reset', e)
+              }
+              try { clearWalletCache() } catch(e) {}
+              setConnectedWallet(null)
+              setSelectedChainId(null)
+              setSuccess('Connection reset')
+            }}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-sm"
+          >
+            Reset Connection
           </button>
           <div
             role="tab"
