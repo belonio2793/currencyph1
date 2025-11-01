@@ -76,6 +76,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [favoriteCrypto, setFavoriteCrypto] = useState([])
   const [filterMode, setFilterMode] = useState('all') // all | favorites | owned
+  const [showConnectedMenu, setShowConnectedMenu] = useState(false)
 
   // Fiat modal state
   const [showFiatModal, setShowFiatModal] = useState(false)
