@@ -32,6 +32,11 @@ Deno.serve(async (req) => {
       try {
         const addr = nw.metadata?.address || nw.address
         if (!addr) continue
+        // Only enqueue supported networks to avoid worker failures
+        const supported = [
+          'ethereum','polygon','arbitrum','optimism','bsc','avalanche','fantom','gnosis','celo','base','zksync','linea','okc','moonbeam','moonriver','cronos','aurora','metis','evmos','boba','solana'
+        ]
+        if (!supported.map(s => s.toLowerCase()).includes(String(nw.network).toLowerCase())) continue
         // Check recent job
         const { data: recentJobs, error: rErr } = await supabase.from('wallet_sync_jobs').select('id,created_at,status').eq('wallet_house_id', nw.id).order('created_at', { ascending: false }).limit(1)
         if (rErr) continue
