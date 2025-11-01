@@ -167,13 +167,35 @@ export default function NetworkBalances({ userId }) {
     )
   }
 
+  const getTableData = () => {
+    switch(selectedTable) {
+      case 'wallets':
+        return { data: schemaData?.wallets || [], columns: ['id', 'currency_code', 'balance', 'total_deposited', 'total_withdrawn', 'is_active'] }
+      case 'loans':
+        return { data: schemaData?.loans || [], columns: ['id', 'loan_type', 'requested_amount', 'total_owed', 'amount_paid', 'status', 'created_at'] }
+      case 'wallet_transactions':
+        return { data: schemaData?.wallet_transactions || [], columns: ['id', 'type', 'amount', 'currency_code', 'description', 'created_at'] }
+      case 'loan_payments':
+        return { data: schemaData?.loan_payments || [], columns: ['id', 'loan_id', 'amount', 'payment_method', 'status', 'created_at'] }
+      case 'currencies':
+        return { data: schemaData?.currencies || [], columns: ['code', 'name', 'type', 'symbol', 'decimals', 'active'] }
+      case 'users':
+        return { data: schemaData?.user ? [schemaData.user] : [], columns: ['id', 'email', 'full_name', 'country_code', 'status', 'created_at'] }
+      default:
+        return { data: [], columns: [] }
+    }
+  }
+
+  const selectedTableInfo = tableOptions.find(t => t.id === selectedTable)
+  const { data: tableData, columns: tableColumns } = getTableData()
+
   return (
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-light text-slate-900 tracking-wide mb-2">Network Balances</h1>
-          <p className="text-slate-600">Complete view of your account schema and data structure</p>
+          <p className="text-slate-600">View your financial data by category</p>
         </div>
 
         {/* Error Message */}
@@ -204,51 +226,37 @@ export default function NetworkBalances({ userId }) {
             </div>
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <div className="text-sm text-slate-600 mb-2">Transactions</div>
-              <div className="text-2xl font-bold text-blue-600">{schemaData.transactions.length}</div>
+              <div className="text-2xl font-bold text-blue-600">{schemaData.wallet_transactions.length}</div>
             </div>
           </div>
         )}
 
-        {/* Schema Tables */}
+        {/* Table Selector Dropdown */}
         {schemaData && (
-          <>
-            <SchemaTable
-              title="User Profile"
-              data={schemaData.user}
-              columns={['id', 'email', 'full_name', 'country_code', 'status', 'created_at']}
-              tableName="users"
-            />
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-slate-700 mb-2">Select Data View</label>
+            <select
+              value={selectedTable}
+              onChange={(e) => setSelectedTable(e.target.value)}
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white"
+            >
+              {tableOptions.map(option => (
+                <option key={option.id} value={option.id}>
+                  {option.label} - {option.description}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
 
-            <SchemaTable
-              title="Wallets"
-              data={schemaData.wallets}
-              columns={['id', 'currency_code', 'balance', 'total_deposited', 'total_withdrawn', 'is_active']}
-              tableName="wallets"
-            />
-
-            <SchemaTable
-              title="Loans"
-              data={schemaData.loans}
-              columns={['id', 'loan_type', 'requested_amount', 'total_owed', 'amount_paid', 'status', 'created_at']}
-              tableName="loans"
-            />
-
-            <SchemaTable
-              title="Currencies"
-              data={schemaData.currencies}
-              columns={['code', 'name', 'type', 'symbol', 'decimals', 'active']}
-              tableName="currencies"
-            />
-
-            {schemaData.transactions.length > 0 && (
-              <SchemaTable
-                title="Recent Transactions"
-                data={schemaData.transactions}
-                columns={['id', 'type', 'amount', 'currency_code', 'description', 'created_at']}
-                tableName="transactions"
-              />
-            )}
-          </>
+        {/* Selected Table View */}
+        {schemaData && selectedTableInfo && (
+          <SchemaTable
+            title={selectedTableInfo.label}
+            data={tableData}
+            columns={tableColumns}
+            tableName={selectedTable}
+          />
         )}
 
         {/* Schema Information */}
