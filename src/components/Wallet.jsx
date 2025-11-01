@@ -516,7 +516,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       if (!chainNameForDb) {
         throw new Error('Unsupported or unknown chain for this wallet')
       }
-      const { error: upsertErr } = await supabase
+      const res = await supabase
         .from('wallets_crypto')
         .upsert([{
           user_id: userId,
@@ -533,9 +533,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           }
         }], {
           onConflict: 'user_id,chain,address'
-        })
+        }).select()
 
-      if (upsertErr) throw upsertErr
+      if (res.error) {
+        console.error('Supabase upsert error for wallets_crypto:', res.error, res)
+        // Throw a stringified error so callers show useful text
+        throw new Error(res.error.message || JSON.stringify(res.error || res))
+      }
 
       setSuccess(`Wallet connected and saved (${formatWalletAddress(connectedWallet.address)})`)
       setShowThirdwebModal(false)
