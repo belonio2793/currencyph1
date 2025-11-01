@@ -5,7 +5,6 @@ export default function NetworkBalances({ userId }) {
   const [schemaData, setSchemaData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [reconciling, setReconciling] = useState(false)
   const [selectedTable, setSelectedTable] = useState('network_balances')
   const [expandedTables, setExpandedTables] = useState({
     users: true,
