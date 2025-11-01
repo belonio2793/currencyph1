@@ -33,17 +33,16 @@ CREATE TABLE IF NOT EXISTS public.network_balances (
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now(),
   
-  -- Constraints
+  -- Ensure one reconciliation per entity per currency
   UNIQUE(entity_type, entity_id, currency_code)
 );
 
--- Indexes for performance
+-- Indexes for performance (no functions in indexes)
 CREATE INDEX IF NOT EXISTS idx_network_balances_entity ON public.network_balances(entity_type, entity_id);
 CREATE INDEX IF NOT EXISTS idx_network_balances_currency ON public.network_balances(currency_code);
 CREATE INDEX IF NOT EXISTS idx_network_balances_date ON public.network_balances(reconciliation_date DESC);
 CREATE INDEX IF NOT EXISTS idx_network_balances_status ON public.network_balances(status);
 CREATE INDEX IF NOT EXISTS idx_network_balances_user ON public.network_balances(entity_id) WHERE entity_type = 'user';
-CREATE UNIQUE INDEX IF NOT EXISTS idx_network_balances_daily ON public.network_balances(entity_type, entity_id, currency_code, date_trunc('day'::text, reconciliation_date));
 
 -- Summary view for quick access to latest balances by entity
 CREATE OR REPLACE VIEW public.network_balances_latest AS
@@ -83,7 +82,7 @@ SELECT
 FROM public.network_balances
 GROUP BY entity_type, currency_code;
 
--- Row-level security for user data (users can see their own, admins can see all)
+-- Row-level security for user data
 ALTER TABLE public.network_balances ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view their own network balances" ON public.network_balances
