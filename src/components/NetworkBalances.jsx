@@ -261,8 +261,6 @@ export default function NetworkBalances({ userId }) {
         return { data: schemaData?.loan_payments || [], columns: ['id', 'loan_id', 'amount', 'payment_method', 'status', 'created_at'] }
       case 'currencies':
         return { data: schemaData?.currencies || [], columns: ['code', 'name', 'type', 'symbol', 'decimals', 'active'] }
-      case 'users':
-        return { data: schemaData?.user ? [schemaData.user] : [], columns: ['id', 'email', 'full_name', 'country_code', 'status', 'created_at'] }
       default:
         return { data: [], columns: [] }
     }
