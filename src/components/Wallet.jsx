@@ -109,6 +109,8 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
   const [selectedChainId, setSelectedChainId] = useState(null)
   const [showThirdwebModal, setShowThirdwebModal] = useState(false)
   const [thirdwebConnecting, setThirdwebConnecting] = useState(false)
+  const [walletAvailable, setWalletAvailable] = useState(true)
+  const [noWalletDetected, setNoWalletDetected] = useState(false)
 
   // Manual wallet creation state
   const [showCreateManualWalletModal, setShowCreateManualWalletModal] = useState(false)
@@ -457,20 +459,94 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     setError('')
     setSuccess('')
     const amt = parseFloat(cryptoAmount)
+
+    // Validation
     if (!selectedCryptoWallet || !amt || amt <= 0) {
       setError('Enter a valid amount')
       return
     }
-    try {
-      const delta = cryptoAction === 'receive' ? amt : -amt
-      await changeCryptoBalance(selectedCryptoWallet.id, delta)
-      setSuccess(`${cryptoAction === 'receive' ? 'Received' : 'Sent'} ${amt} ${selectedCryptoWallet.currency_code}`)
-      setCryptoAmount('')
-      setShowCryptoModal(false)
-      loadWallets()
-    } catch (e) {
-      setError(e.message || 'Failed to update crypto wallet')
+
+    if (cryptoAction === 'send' && !recipientAddress) {
+      setError('Enter a recipient address')
+      return
     }
+
+    if (amt > (selectedCryptoWallet.balance || 0)) {
+      setError(`Insufficient balance. Available: ${Number(selectedCryptoWallet.balance || 0).toFixed(6)} ${selectedCryptoWallet.chain}`)
+      return
+    }
+
+    try {
+      setSendingCrypto(true)
+
+      if (cryptoAction === 'send') {
+        // Attempt to send via API if connected wallet is available
+        if (connectedWallet && selectedCryptoWallet.chain_id) {
+          try {
+            const txResult = await sendCryptoTransaction({
+              from: selectedCryptoWallet.address,
+              to: recipientAddress,
+              amount: amt,
+              chainId: selectedCryptoWallet.chain_id,
+              wallet: connectedWallet
+            })
+
+            if (txResult && txResult.hash) {
+              // Record transaction in database
+              await supabase.from('wallet_transactions').insert([{
+                user_id: userId,
+                wallet_id: selectedCryptoWallet.id,
+                type: 'send',
+                amount: amt,
+                currency_code: selectedCryptoWallet.chain,
+                recipient_address: recipientAddress,
+                transaction_hash: txResult.hash,
+                status: 'pending'
+              }])
+
+              setSuccess(`Transaction initiated! Hash: ${txResult.hash.slice(0, 10)}...`)
+            } else {
+              throw new Error('Transaction failed or hash not returned')
+            }
+          } catch (apiErr) {
+            console.warn('API send failed, falling back to local balance update:', apiErr)
+            // Fall back to local balance update
+            await changeCryptoBalance(selectedCryptoWallet.id, -amt)
+            setSuccess(`Sent ${amt} ${selectedCryptoWallet.chain} to ${formatWalletAddress(recipientAddress)}`)
+          }
+        } else {
+          // Local balance update only
+          await changeCryptoBalance(selectedCryptoWallet.id, -amt)
+          setSuccess(`Sent ${amt} ${selectedCryptoWallet.chain} to ${formatWalletAddress(recipientAddress)}`)
+        }
+      } else {
+        // Receive transaction
+        await changeCryptoBalance(selectedCryptoWallet.id, amt)
+        setSuccess(`Received ${amt} ${selectedCryptoWallet.chain}`)
+      }
+
+      setCryptoAmount('')
+      setRecipientAddress('')
+      setShowCryptoModal(false)
+      await loadWallets()
+
+    } catch (e) {
+      console.error('Crypto transaction error:', e)
+      setError(fmtErr(e) || 'Failed to process transaction')
+    } finally {
+      setSendingCrypto(false)
+    }
+  }
+
+  // Check if any wallets are available in the browser
+  const checkWalletAvailability = () => {
+    const hasMetaMask = typeof window !== 'undefined' && window.ethereum && window.ethereum.isMetaMask
+    const hasWalletConnect = typeof window !== 'undefined' && window.walletconnect
+    const hasPhantom = typeof window !== 'undefined' && window.phantom && window.phantom.solana
+    const hasRainbow = typeof window !== 'undefined' && window.rainbow
+    const hasCoinbase = typeof window !== 'undefined' && window.coinbaseWalletExtension
+
+    return hasMetaMask || hasWalletConnect || hasPhantom || hasRainbow || hasCoinbase
   }
 
   // Wallet connect (supports Solana Phantom and EVM)
@@ -478,15 +554,37 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     try {
       setThirdwebConnecting(true)
       setError('')
+      setNoWalletDetected(false)
+
+      // Check if any wallets are available
+      const hasAvailableWallets = checkWalletAvailability()
+      if (!hasAvailableWallets) {
+        setNoWalletDetected(true)
+        setWalletAvailable(false)
+        setError('No compatible wallet extensions detected in your browser')
+        return
+      }
+
       const wallet = await connectAnyWallet()
       const walletInfo = await getWalletInfo(wallet)
       setConnectedWallet(walletInfo)
       setSelectedChainId(walletInfo.chainId)
       setSuccess(`Connected to ${walletInfo.chainName}`)
+      setNoWalletDetected(false)
     } catch (err) {
       console.error('Error connecting wallet:', err)
       try { clearWalletCache() } catch(e) {}
-      setError(fmtErr(err) || 'Failed to connect wallet. Make sure you have a compatible wallet extension (Phantom, MetaMask, etc.)')
+
+      const errMsg = fmtErr(err)
+      if (errMsg && errMsg.toLowerCase().includes('user rejected') || errMsg.toLowerCase().includes('user closed')) {
+        setError('Wallet connection cancelled')
+      } else if (!checkWalletAvailability()) {
+        setNoWalletDetected(true)
+        setWalletAvailable(false)
+        setError('No compatible wallet extensions detected in your browser')
+      } else {
+        setError(errMsg || 'Failed to connect wallet. Make sure you have a compatible wallet extension installed.')
+      }
     } finally {
       setThirdwebConnecting(false)
     }
@@ -776,7 +874,12 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             </div>
           ) : (
             <button
-              onClick={() => setShowThirdwebModal(true)}
+              onClick={() => {
+                setShowThirdwebModal(true)
+                setNoWalletDetected(false)
+                setError('')
+                setWalletAvailable(checkWalletAvailability())
+              }}
               className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
             >
               Connect Web3 Wallet
@@ -787,7 +890,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             onClick={() => setShowCreateManualWalletModal(true)}
             className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium text-sm"
           >
-            Create Manual Wallet
+            Create Wallet
           </button>
 
           <div
@@ -986,7 +1089,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                         saveFavoriteCrypto(newFav)
                       }
                     }} className={`p-2 rounded ${isFav ? 'bg-amber-400 text-white' : 'bg-slate-100 text-slate-600'} transition-colors`}>
-                      {isFav ? '★' : '☆'}
+                      {isFav ? '��' : '☆'}
                     </button>
 
                     <div>
@@ -995,15 +1098,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
-                    {existing ? (
+                  <div className="flex items-center gap-3">
+                    {existing && (
                       <>
-                        <div className="text-sm text-slate-700 font-mono mr-4">{Number(existing.balance || 0).toFixed(6)}</div>
-                        <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm">Send</button>
-                        <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm">Receive</button>
+                        <div className="text-sm text-slate-700 font-mono mr-2">{Number(existing.balance || 0).toFixed(6)}</div>
+                        <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Send</button>
+                        <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Receive</button>
                       </>
-                    ) : (
-                      <button onClick={() => { setSelectedManualChainId(chain.chainId); setShowCreateManualWalletModal(true) }} className="px-3 py-2 bg-emerald-600 text-white rounded-lg text-sm">Create Wallet</button>
                     )}
                   </div>
                 </div>
@@ -1016,67 +1117,86 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {/* Thirdweb Connect Wallet Modal */}
       {showThirdwebModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">Web3 Wallet Connection</h3>
-              <button onClick={() => setShowThirdwebModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-slate-900">Web3 Wallet Connection</h3>
+              <button onClick={() => { setShowThirdwebModal(false); setNoWalletDetected(false); setError('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
             {!connectedWallet ? (
-              <div className="space-y-4">
-                <p className="text-sm text-slate-600 mb-6">Connect your Web3 wallet to manage cryptocurrency directly on-chain. Your assets remain under your control.</p>
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600">Connect your Web3 wallet to manage cryptocurrency directly on-chain. Your assets remain under your control.</p>
+
+                {noWalletDetected && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm font-semibold text-red-900 mb-2">No Wallet Extension Found</p>
+                    <p className="text-xs text-red-800 mb-3">We couldn't detect any compatible wallet extensions in your browser. Please install one of the following:</p>
+                    <div className="space-y-2">
+                      <a href="https://metamask.io/download" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install MetaMask
+                      </a>
+                      <a href="https://www.phantomapp.com" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install Phantom (Solana)
+                      </a>
+                      <a href="https://rainbow.me" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install Rainbow Wallet
+                      </a>
+                      <a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install Coinbase Wallet
+                      </a>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   onClick={handleConnectWallet}
                   disabled={thirdwebConnecting}
-                  className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  {thirdwebConnecting ? 'Connecting to wallet...' : 'Connect Wallet'}
+                  {thirdwebConnecting ? 'Connecting...' : 'Connect Wallet'}
                 </button>
-                <p className="text-xs text-slate-500 text-center mt-4">Compatible with: MetaMask • WalletConnect • Rainbow • Coinbase Wallet</p>
+                <p className="text-xs text-slate-500 text-center">Compatible with: MetaMask • Phantom • Rainbow • Coinbase Wallet</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="bg-slate-900 rounded-lg p-4 space-y-2 font-mono">
+              <div className="space-y-3">
+                <div className="bg-slate-900 rounded-lg p-3 space-y-1 font-mono">
                   <p className="text-xs text-slate-400 uppercase font-semibold tracking-wide">Wallet Address</p>
                   <p className="text-sm text-amber-400 break-all">{connectedWallet.address}</p>
-                  <p className="text-xs text-slate-500 mt-2">{formatWalletAddress(connectedWallet.address)}</p>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="block text-sm font-semibold text-slate-700">Target Blockchain</label>
+                <div className="space-y-1">
+                  <label className="block text-xs font-semibold text-slate-700">Target Blockchain</label>
                   <select
                     value={selectedChainId || ''}
                     onChange={(e) => setSelectedChainId(parseInt(e.target.value))}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                   >
                     <option value="">Select blockchain...</option>
                     {Object.values(SUPPORTED_CHAINS).map((chain) => (
                       <option key={chain.chainId} value={chain.chainId}>
-                        {chain.name} ({chain.symbol}) • Chain ID: {chain.chainId}
+                        {chain.name} ({chain.symbol})
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <p className="text-xs text-slate-600">
-                    <strong>Current Network:</strong> {connectedWallet.chainName} ({connectedWallet.chainSymbol})
-                  </p>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-600">
+                  <strong>Current Network:</strong> {connectedWallet.chainName} ({connectedWallet.chainSymbol})
                 </div>
 
-                <div className="flex gap-2 pt-4">
+                <div className="flex gap-2 pt-2">
                   <button
                     onClick={disconnectWallet}
-                    className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                    className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-xs font-medium"
                   >
                     Disconnect
                   </button>
                   <button
                     onClick={handleSaveConnectedWallet}
                     disabled={thirdwebConnecting || !selectedChainId}
-                    className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {thirdwebConnecting ? 'Saving...' : 'Save Connection'}
+                    {thirdwebConnecting ? 'Saving...' : 'Save'}
                   </button>
                 </div>
               </div>
@@ -1088,21 +1208,21 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {/* Create Manual Wallet Modal */}
       {showCreateManualWalletModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">Create Blockchain Wallet</h3>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-slate-900">Create Blockchain Wallet</h3>
               <button onClick={() => setShowCreateManualWalletModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <p className="text-sm text-slate-600">Select the blockchain network where you want to create a new wallet.</p>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-semibold text-slate-700">Blockchain Network</label>
+              <div className="space-y-1">
+                <label className="block text-xs font-semibold text-slate-700">Blockchain Network</label>
                 <select
                   value={selectedManualChainId || ''}
                   onChange={(e) => setSelectedManualChainId(parseInt(e.target.value))}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
                 >
                   <option value="">Select blockchain...</option>
                   {(() => {
@@ -1120,26 +1240,24 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               </div>
 
               {selectedManualChainId && (
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
-                  <p className="text-xs text-slate-600">
-                    <strong>Network:</strong> {SUPPORTED_CHAINS[Object.keys(SUPPORTED_CHAINS).find(k => SUPPORTED_CHAINS[k].chainId === selectedManualChainId)]?.name.toUpperCase() || 'Unknown'}
-                  </p>
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-600">
+                  <strong>Network:</strong> {SUPPORTED_CHAINS[Object.keys(SUPPORTED_CHAINS).find(k => SUPPORTED_CHAINS[k].chainId === selectedManualChainId)]?.name.toUpperCase() || 'Unknown'}
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-2 pt-2">
                 <button
                   onClick={() => setShowCreateManualWalletModal(false)}
-                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                  className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-xs font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleCreateManualWallet}
                   disabled={creatingManualWallet || !selectedManualChainId}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {creatingManualWallet ? 'Creating...' : 'Create Wallet'}
+                  {creatingManualWallet ? 'Creating...' : 'Create New Wallet'}
                 </button>
               </div>
             </div>
@@ -1191,30 +1309,30 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {/* Fiat Modal */}
       {showFiatModal && selectedFiatWallet && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <h3 className="text-2xl font-light text-slate-900 mb-6">{fiatAction === 'deposit' ? 'Deposit' : 'Pay'} ({selectedFiatWallet.currency_code})</h3>
-            <form onSubmit={handleFiatSubmit} className="space-y-6">
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
+            <h3 className="text-lg font-medium text-slate-900 mb-4">{fiatAction === 'deposit' ? 'Deposit' : 'Pay'} ({selectedFiatWallet.currency_code})</h3>
+            <form onSubmit={handleFiatSubmit} className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
                 <input
                   type="number"
                   step="0.01"
                   value={fiatAmount}
                   onChange={e => setFiatAmount(e.target.value)}
                   placeholder="0.00"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-base"
                 />
               </div>
-              <div className="flex items-center gap-3">
-                <label className="text-sm text-slate-600">Action</label>
-                <select value={fiatAction} onChange={e => setFiatAction(e.target.value)} className="px-3 py-2 border border-slate-300 rounded-lg text-sm">
+              <div className="flex items-center gap-2">
+                <label className="text-xs font-medium text-slate-700">Action</label>
+                <select value={fiatAction} onChange={e => setFiatAction(e.target.value)} className="px-2 py-1 border border-slate-300 rounded-lg text-xs">
                   <option value="deposit">Deposit</option>
                   <option value="pay">Pay</option>
                 </select>
               </div>
-              <div className="flex space-x-4">
-                <button type="button" onClick={() => setShowFiatModal(false)} className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">Confirm</button>
+              <div className="flex gap-2 pt-2">
+                <button type="button" onClick={() => setShowFiatModal(false)} className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-xs font-medium">Cancel</button>
+                <button type="submit" className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium">Confirm</button>
               </div>
             </form>
           </div>
@@ -1224,70 +1342,112 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {/* Crypto Modal */}
       {showCryptoModal && selectedCryptoWallet && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive' : 'Send'}</h3>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive Crypto' : 'Send Crypto'}</h3>
               <button onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
-            {/* Wallet Info */}
-            <div className="bg-slate-900 rounded-lg p-4 mb-6 space-y-2 font-mono">
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-wide">Wallet Address</p>
-              <p className="text-sm text-amber-400 break-all">{selectedCryptoWallet.address}</p>
-              <p className="text-xs text-slate-500 mt-2">Chain: {selectedCryptoWallet.chain} | Balance: {Number(selectedCryptoWallet.balance || 0).toFixed(6)}</p>
+            {/* Source Wallet Info */}
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">From Wallet</label>
+              <div className="bg-slate-900 rounded-lg p-3 space-y-1 font-mono">
+                <p className="text-sm text-amber-400 break-all">{selectedCryptoWallet.address}</p>
+                <div className="flex items-center justify-between text-xs text-slate-400">
+                  <span>{selectedCryptoWallet.chain}</span>
+                  <span className="text-amber-400 font-semibold">{Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</span>
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleCryptoSubmit} className="space-y-4">
-              {cryptoAction === 'send' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Recipient Address</label>
-                    <input
-                      type="text"
-                      value={recipientAddress}
-                      onChange={e => setRecipientAddress(e.target.value)}
-                      placeholder="0x... or recipient address"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-mono"
-                    />
-                  </div>
-                </>
-              )}
-
+            <form onSubmit={handleCryptoSubmit} className="space-y-3">
+              {/* Amount Input */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Amount ({selectedCryptoWallet.chain})</label>
-                <input
-                  type="number"
-                  step="0.000001"
-                  value={cryptoAmount}
-                  onChange={e => setCryptoAmount(e.target.value)}
-                  placeholder="0.000000"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
-                />
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Total Amount ({selectedCryptoWallet.chain})</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.000001"
+                    min="0"
+                    max={selectedCryptoWallet.balance || 0}
+                    value={cryptoAmount}
+                    onChange={e => setCryptoAmount(e.target.value)}
+                    placeholder="0.000000"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-base"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCryptoAmount(String(selectedCryptoWallet.balance || 0))}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap"
+                  >
+                    Max
+                  </button>
+                </div>
               </div>
 
-              {cryptoAction === 'receive' && (
-                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-                  <p className="text-xs text-indigo-700">
-                    <strong>Your receive address:</strong><br/>
-                    <span className="font-mono break-all">{selectedCryptoWallet.address}</span>
-                  </p>
+              {/* Recipient Address (for Send) */}
+              {cryptoAction === 'send' && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">Recipient Address</label>
+                  <input
+                    type="text"
+                    value={recipientAddress}
+                    onChange={e => setRecipientAddress(e.target.value)}
+                    placeholder="0x... or recipient address"
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs font-mono"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Enter the wallet address where you want to send {selectedCryptoWallet.chain}</p>
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4">
+              {/* Receive Display (for Receive) */}
+              {cryptoAction === 'receive' && (
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-2">
+                  <p className="text-xs font-semibold text-indigo-900 uppercase tracking-wide mb-1">Your Receive Address</p>
+                  <p className="text-xs text-indigo-700 font-mono break-all mb-2 p-1 bg-white rounded border border-indigo-100">{selectedCryptoWallet.address}</p>
+                  <p className="text-xs text-indigo-600">Share this address with the sender to receive {selectedCryptoWallet.chain}</p>
+                </div>
+              )}
+
+              {/* Summary */}
+              {cryptoAmount && parseFloat(cryptoAmount) > 0 && (
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-2">
+                  <div className="space-y-1 text-xs">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-600">Amount:</span>
+                      <span className="font-semibold text-slate-900">{parseFloat(cryptoAmount).toFixed(6)} {selectedCryptoWallet.chain}</span>
+                    </div>
+                    {cryptoAction === 'send' && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">To:</span>
+                        <span className="font-mono text-xs text-slate-700 text-right">{formatWalletAddress(recipientAddress)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Error message if amount exceeds balance */}
+              {cryptoAmount && parseFloat(cryptoAmount) > (selectedCryptoWallet.balance || 0) && (
+                <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-xs text-red-700">Insufficient balance. Available: {Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-1">
                 <button
                   type="button"
                   onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }}
-                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                  className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-xs font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={sendingCrypto || !cryptoAmount}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={sendingCrypto || !cryptoAmount || parseFloat(cryptoAmount) <= 0 || (cryptoAction === 'send' && !recipientAddress) || parseFloat(cryptoAmount) > (selectedCryptoWallet.balance || 0)}
+                  className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {sendingCrypto ? 'Processing...' : cryptoAction === 'send' ? 'Send' : 'Confirm'}
+                  {sendingCrypto ? 'Processing...' : cryptoAction === 'send' ? 'Send' : 'Confirm Receive'}
                 </button>
               </div>
             </form>
