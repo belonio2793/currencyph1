@@ -350,6 +350,143 @@ export default function BorrowMoney({ userId, loanType }) {
             </div>
           </div>
         )}
+
+        {/* Network Balances Tab */}
+        {activeTab === 'network-balances' && !loading && (
+          <div className="space-y-6">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Total Loans */}
+              <div className="bg-white rounded-lg border border-slate-200 p-4">
+                <div className="text-xs text-slate-600 mb-1">Total Loans</div>
+                <div className="text-2xl font-bold text-slate-900">{loans.length}</div>
+              </div>
+
+              {/* Total Debt */}
+              <div className="bg-white rounded-lg border border-slate-200 p-4">
+                <div className="text-xs text-slate-600 mb-1">Total Debt</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {Number(loans.reduce((sum, l) => sum + (l.remaining_balance || l.total_owed || 0), 0)).toFixed(2)} {loanType === 'personal' ? 'PHP' : 'PHP'}
+                </div>
+              </div>
+
+              {/* Total Paid */}
+              <div className="bg-white rounded-lg border border-slate-200 p-4">
+                <div className="text-xs text-slate-600 mb-1">Total Paid</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {Number(loans.reduce((sum, l) => sum + (l.amount_paid || 0), 0)).toFixed(2)} {loanType === 'personal' ? 'PHP' : 'PHP'}
+                </div>
+              </div>
+
+              {/* Active Loans */}
+              <div className="bg-white rounded-lg border border-slate-200 p-4">
+                <div className="text-xs text-slate-600 mb-1">Active Loans</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {loans.filter(l => l.status === 'active').length}
+                </div>
+              </div>
+            </div>
+
+            {/* Status Breakdown */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* By Status */}
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-sm font-semibold text-slate-900 mb-4">Loans by Status</h3>
+                <div className="space-y-3">
+                  {['pending', 'active', 'completed', 'rejected', 'defaulted'].map(status => {
+                    const count = loans.filter(l => l.status === status).length
+                    if (count === 0) return null
+                    return (
+                      <div key={status} className="flex items-center justify-between">
+                        <span className="text-sm text-slate-700 capitalize">{status}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${
+                                status === 'pending' ? 'bg-yellow-500'
+                                : status === 'active' ? 'bg-blue-500'
+                                : status === 'completed' ? 'bg-green-500'
+                                : status === 'rejected' ? 'bg-red-500'
+                                : 'bg-red-600'
+                              }`}
+                              style={{ width: `${(count / loans.length) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-slate-900 min-w-max">{count}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+              {/* By Currency */}
+              <div className="bg-white rounded-lg border border-slate-200 p-6">
+                <h3 className="text-sm font-semibold text-slate-900 mb-4">Loans by Currency</h3>
+                <div className="space-y-3">
+                  {uniqueCurrencies.map(currency => {
+                    const currencyLoans = loans.filter(l => l.currency_code === currency)
+                    const total = currencyLoans.reduce((sum, l) => sum + (l.remaining_balance || l.total_owed || 0), 0)
+                    return (
+                      <div key={currency} className="flex items-center justify-between">
+                        <span className="text-sm text-slate-700">{currency}</span>
+                        <div className="flex items-center gap-3">
+                          <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-slate-500"
+                              style={{ width: `${(currencyLoans.length / loans.length) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-slate-900 min-w-max">{Number(total).toFixed(0)}</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* All Loans Table */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <h3 className="text-sm font-semibold text-slate-900 mb-4">All {loanType === 'personal' ? 'Personal' : 'Business'} Loans</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">ID</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Amount</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Total Owed</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Remaining</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Status</th>
+                      <th className="px-3 py-2 text-left text-xs font-semibold text-slate-700">Currency</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {loans.map(loan => (
+                      <tr key={loan.id} className="border-b border-slate-100 hover:bg-slate-50">
+                        <td className="px-3 py-2 text-xs font-mono text-slate-600 truncate">{loan.id.slice(0, 6)}...</td>
+                        <td className="px-3 py-2 text-xs text-slate-900">{Number(loan.requested_amount).toFixed(0)}</td>
+                        <td className="px-3 py-2 text-xs text-slate-900 font-medium">{Number(loan.total_owed).toFixed(0)}</td>
+                        <td className="px-3 py-2 text-xs text-slate-900">{Number(loan.remaining_balance || loan.total_owed).toFixed(0)}</td>
+                        <td className="px-3 py-2">
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold border ${getLoanStatusColor(loan.status)}`}>
+                            {loan.status.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-3 py-2 text-xs text-slate-600">{loan.currency_code}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {loans.length === 0 && (
+                  <div className="text-center py-8 text-slate-600">
+                    No {loanType === 'personal' ? 'personal' : 'business'} loans found
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Request Loan Modal */}
