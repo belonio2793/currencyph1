@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
         const addr = nw.metadata?.address || nw.address
         const chainSymbol = nw.currency
         const chainName = nw.network
-        const chainEntry = Object.values(CHAIN_RPC).find(c => c.name === chainName) || null
+        const chainEntry = Object.values(CHAIN_RPC).find(c => String(c.name).toLowerCase() === String(chainName).toLowerCase()) || null
         let balance = null
 
         if (!addr) {
