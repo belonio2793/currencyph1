@@ -369,11 +369,11 @@ export default function BorrowMoney({ userId, loanType }) {
             </div>
 
             {/* Status Breakdown */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {/* By Status */}
               <div className="bg-white rounded-lg border border-slate-200 p-6">
-                <h3 className="text-sm font-semibold text-slate-900 mb-4">Loans by Status</h3>
-                <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-slate-900 mb-3">Loans by Status</h3>
+                <div className="space-y-2">
                   {['pending', 'active', 'completed', 'rejected', 'defaulted'].map(status => {
                     const count = loans.filter(l => l.status === status).length
                     if (count === 0) return null
