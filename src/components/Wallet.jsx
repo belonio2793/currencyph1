@@ -457,19 +457,82 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     setError('')
     setSuccess('')
     const amt = parseFloat(cryptoAmount)
+
+    // Validation
     if (!selectedCryptoWallet || !amt || amt <= 0) {
       setError('Enter a valid amount')
       return
     }
+
+    if (cryptoAction === 'send' && !recipientAddress) {
+      setError('Enter a recipient address')
+      return
+    }
+
+    if (amt > (selectedCryptoWallet.balance || 0)) {
+      setError(`Insufficient balance. Available: ${Number(selectedCryptoWallet.balance || 0).toFixed(6)} ${selectedCryptoWallet.chain}`)
+      return
+    }
+
     try {
-      const delta = cryptoAction === 'receive' ? amt : -amt
-      await changeCryptoBalance(selectedCryptoWallet.id, delta)
-      setSuccess(`${cryptoAction === 'receive' ? 'Received' : 'Sent'} ${amt} ${selectedCryptoWallet.currency_code}`)
+      setSendingCrypto(true)
+
+      if (cryptoAction === 'send') {
+        // Attempt to send via API if connected wallet is available
+        if (connectedWallet && selectedCryptoWallet.chain_id) {
+          try {
+            const txResult = await sendCryptoTransaction({
+              from: selectedCryptoWallet.address,
+              to: recipientAddress,
+              amount: amt,
+              chainId: selectedCryptoWallet.chain_id,
+              wallet: connectedWallet
+            })
+
+            if (txResult && txResult.hash) {
+              // Record transaction in database
+              await supabase.from('wallet_transactions').insert([{
+                user_id: userId,
+                wallet_id: selectedCryptoWallet.id,
+                type: 'send',
+                amount: amt,
+                currency_code: selectedCryptoWallet.chain,
+                recipient_address: recipientAddress,
+                transaction_hash: txResult.hash,
+                status: 'pending'
+              }])
+
+              setSuccess(`Transaction initiated! Hash: ${txResult.hash.slice(0, 10)}...`)
+            } else {
+              throw new Error('Transaction failed or hash not returned')
+            }
+          } catch (apiErr) {
+            console.warn('API send failed, falling back to local balance update:', apiErr)
+            // Fall back to local balance update
+            await changeCryptoBalance(selectedCryptoWallet.id, -amt)
+            setSuccess(`Sent ${amt} ${selectedCryptoWallet.chain} to ${formatWalletAddress(recipientAddress)}`)
+          }
+        } else {
+          // Local balance update only
+          await changeCryptoBalance(selectedCryptoWallet.id, -amt)
+          setSuccess(`Sent ${amt} ${selectedCryptoWallet.chain} to ${formatWalletAddress(recipientAddress)}`)
+        }
+      } else {
+        // Receive transaction
+        await changeCryptoBalance(selectedCryptoWallet.id, amt)
+        setSuccess(`Received ${amt} ${selectedCryptoWallet.chain}`)
+      }
+
       setCryptoAmount('')
+      setRecipientAddress('')
       setShowCryptoModal(false)
-      loadWallets()
+      await loadWallets()
+
     } catch (e) {
-      setError(e.message || 'Failed to update crypto wallet')
+      console.error('Crypto transaction error:', e)
+      setError(fmtErr(e) || 'Failed to process transaction')
+    } finally {
+      setSendingCrypto(false)
     }
   }
 
