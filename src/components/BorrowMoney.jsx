@@ -244,7 +244,7 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Loans Table */}
         {!loading && filteredLoans.length > 0 && (
-          <div className="space-y-3">
+          <div className="space-y-3 mb-12">
             {filteredLoans.map(loan => {
               const progressPercent = loan.total_owed ? Math.min(100, ((loan.amount_paid || 0) / loan.total_owed) * 100) : 0
               const isExpanded = expandedLoanId === loan.id
