@@ -111,47 +111,47 @@ export default function NetworkBalances({ userId }) {
         networkBalancesData = allBalances || []
       }
 
-      // Get user wallets
+      // Get user wallets (lenient error handling)
       const { data: walletsData, error: walletsError } = await supabase
         .from('wallets')
         .select('*')
         .eq('user_id', userId)
 
-      if (walletsError) throw walletsError
+      if (walletsError) console.warn('Could not fetch wallets:', walletsError)
 
-      // Get user loans
+      // Get user loans (lenient error handling)
       const { data: loansData, error: loansError } = await supabase
         .from('loans')
         .select('*')
         .eq('user_id', userId)
 
-      if (loansError) throw loansError
+      if (loansError) console.warn('Could not fetch loans:', loansError)
 
-      // Get currencies
+      // Get currencies (lenient error handling)
       const { data: currenciesData, error: currenciesError } = await supabase
         .from('currencies')
         .select('*')
         .limit(10)
 
-      if (currenciesError) throw currenciesError
+      if (currenciesError) console.warn('Could not fetch currencies:', currenciesError)
 
-      // Get wallet transactions
+      // Get wallet transactions (lenient error handling)
       const { data: transactionsData, error: transactionsError } = await supabase
         .from('wallet_transactions')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
-      if (transactionsError && transactionsError.code !== 'PGRST116') throw transactionsError
+      if (transactionsError && transactionsError.code !== 'PGRST116') console.warn('Could not fetch wallet transactions:', transactionsError)
 
-      // Get loan payments
+      // Get loan payments (lenient error handling)
       const { data: loanPaymentsData, error: loanPaymentsError } = await supabase
         .from('loan_payments')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
-      if (loanPaymentsError && loanPaymentsError.code !== 'PGRST116') throw loanPaymentsError
+      if (loanPaymentsError && loanPaymentsError.code !== 'PGRST116') console.warn('Could not fetch loan payments:', loanPaymentsError)
 
       setSchemaData({
         user: userData,
