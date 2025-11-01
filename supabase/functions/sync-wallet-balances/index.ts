@@ -25,7 +25,8 @@ const CHAIN_RPC: Record<number, { name: string; type: 'evm' | 'solana' | 'other'
   1088: { name: 'metis', type: 'evm', rpc: 'https://andromeda.metis.io/?owner=1088', decimals: 18 },
   9001: { name: 'evmos', type: 'evm', rpc: 'https://evm.evmos.org:8545', decimals: 18 },
   288: { name: 'boba', type: 'evm', rpc: 'https://mainnet.boba.network', decimals: 18 },
-  245022926: { name: 'solana', type: 'solana', rpc: 'https://api.mainnet-beta.solana.com', decimals: 9 }
+  245022926: { name: 'solana', type: 'solana', rpc: 'https://api.mainnet-beta.solana.com', decimals: 9 },
+  5000: { name: 'mantle', type: 'evm', rpc: 'https://rpc.mantle.xyz', decimals: 18 }
 }
 
 function weiToDecimal(weiHex: string, decimals = 18) {
