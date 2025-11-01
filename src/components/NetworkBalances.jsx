@@ -5,17 +5,19 @@ export default function NetworkBalances({ userId }) {
   const [schemaData, setSchemaData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [selectedTable, setSelectedTable] = useState('wallets')
+  const [selectedTable, setSelectedTable] = useState('network_balances')
   const [expandedTables, setExpandedTables] = useState({
     users: true,
     wallets: true,
     loans: true,
     currencies: true,
     wallet_transactions: true,
-    loan_payments: true
+    loan_payments: true,
+    network_balances: true
   })
 
   const tableOptions = [
+    { id: 'network_balances', label: 'Network Balances', description: 'Reconciled balances across all users and house accounts' },
     { id: 'wallets', label: 'Wallets', description: 'Multi-currency wallets and balances' },
     { id: 'loans', label: 'Loans', description: 'Loan requests and tracking' },
     { id: 'wallet_transactions', label: 'Wallet Transactions', description: 'Audit trail of balance changes' },
