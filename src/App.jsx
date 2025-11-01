@@ -433,6 +433,9 @@ export default function App() {
               window.history.pushState(null, '', '/nearby')
             }} /> }
             {activeTab === 'network' && <Network userId={userId} />}
+            {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
+            {activeTab === 'borrow-personal' && <BorrowMoney userId={userId} loanType="personal" />}
+            {activeTab === 'borrow-business' && <BorrowMoney userId={userId} loanType="business" />}
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
           </>
