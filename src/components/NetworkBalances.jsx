@@ -71,16 +71,25 @@ export default function NetworkBalances({ userId }) {
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
-        .limit(5)
 
       if (transactionsError && transactionsError.code !== 'PGRST116') throw transactionsError
+
+      // Get loan payments
+      const { data: loanPaymentsData, error: loanPaymentsError } = await supabase
+        .from('loan_payments')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      if (loanPaymentsError && loanPaymentsError.code !== 'PGRST116') throw loanPaymentsError
 
       setSchemaData({
         user: userData,
         wallets: walletsData || [],
         loans: loansData || [],
         currencies: currenciesData || [],
-        transactions: transactionsData || []
+        wallet_transactions: transactionsData || [],
+        loan_payments: loanPaymentsData || []
       })
       setError('')
     } catch (err) {
