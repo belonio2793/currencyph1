@@ -181,6 +181,8 @@ export default function NetworkBalances({ userId }) {
 
   const getTableData = () => {
     switch(selectedTable) {
+      case 'network_balances':
+        return { data: schemaData?.network_balances || [], columns: ['id', 'entity_type', 'currency_code', 'wallet_balance', 'computed_balance', 'balance_difference', 'status', 'reconciliation_date'] }
       case 'wallets':
         return { data: schemaData?.wallets || [], columns: ['id', 'currency_code', 'balance', 'total_deposited', 'total_withdrawn', 'is_active'] }
       case 'loans':
