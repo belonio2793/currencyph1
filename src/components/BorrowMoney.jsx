@@ -244,7 +244,7 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Loans Table */}
         {!loading && filteredLoans.length > 0 && (
-          <div className="space-y-3 mb-12">
+          <div className="space-y-2 mb-6">
             {filteredLoans.map(loan => {
               const progressPercent = loan.total_owed ? Math.min(100, ((loan.amount_paid || 0) / loan.total_owed) * 100) : 0
               const isExpanded = expandedLoanId === loan.id
@@ -334,7 +334,7 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Network Balances Tab */}
         {activeTab === 'network-balances' && !loading && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Total Loans */}
