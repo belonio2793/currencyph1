@@ -69,6 +69,21 @@ export default function NetworkBalances({ userId }) {
     try {
       setLoading(true)
 
+      // Guard against missing userId
+      if (!userId) {
+        setSchemaData({
+          user: null,
+          network_balances: [],
+          wallets: [],
+          loans: [],
+          currencies: [],
+          wallet_transactions: [],
+          loan_payments: []
+        })
+        setError('User ID not available')
+        return
+      }
+
       // Get user data
       let userData = null
       const { data: fetchedUser, error: userError } = await supabase
