@@ -128,8 +128,8 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full my-8">
         {/* Header */}
         <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold text-slate-900">
