@@ -146,130 +146,243 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
         </div>
 
         {/* Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6">
           {/* Error Message */}
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+            <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm mb-6">
               {error}
             </div>
           )}
 
-          {/* Amount */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Requested Amount *
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Enter amount"
-                className="flex-1 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                step="0.01"
-                min="0"
-              />
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-              >
-                <option value="PHP">PHP</option>
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Total Owed Preview */}
-          {amount && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="text-sm text-slate-600">Total Amount to Pay (with 10% interest)</div>
-              <div className="text-xl font-semibold text-blue-600">
-                {Number(totalOwed).toFixed(2)} {currency}
-              </div>
-            </div>
-          )}
-
-          {/* Display Name */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Full Name *
-            </label>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="Your full name"
-              className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-            />
-          </div>
-
-          {/* City */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              City *
-            </label>
-            <input
-              type="text"
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
-              placeholder="Your city"
-              className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-            />
-          </div>
-
-          {/* Phone Number */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Phone Number * (Will be stored securely)
-            </label>
-            <input
-              type="tel"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="+63 9XX XXX XXXX"
-              className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-            />
-          </div>
-
-          {/* Reason for Loan */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-2">
-              Reason for Loan
-            </label>
-            <select
-              value={loanReason}
-              onChange={(e) => setLoanReason(e.target.value)}
-              className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-            >
-              <option value="business_expansion">Business Expansion</option>
-              <option value="emergency">Emergency/Personal</option>
-              <option value="education">Education</option>
-              <option value="medical">Medical</option>
-              <option value="debt_consolidation">Debt Consolidation</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          {/* Custom Reason Text Field (shown when "Other" is selected) */}
-          {loanReason === 'other' && (
+          {/* Form Grid */}
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            {/* Amount */}
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
-                Please specify the reason
+                Requested Amount *
               </label>
-              <textarea
-                value={customReason}
-                onChange={(e) => setCustomReason(e.target.value)}
-                placeholder="Enter your reason for the loan..."
-                rows="3"
-                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 resize-none"
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  placeholder="Enter amount"
+                  className="flex-1 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  step="0.01"
+                  min="0"
+                />
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                >
+                  <option value="PHP">PHP</option>
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Total Owed Preview */}
+            {amount && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col justify-center">
+                <div className="text-xs text-slate-600">Total with 10% interest</div>
+                <div className="text-lg font-semibold text-blue-600">
+                  {Number(totalOwed).toFixed(2)} {currency}
+                </div>
+              </div>
+            )}
+
+            {/* Display Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Full Name *
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Your full name"
+                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
               />
             </div>
-          )}
+
+            {/* City */}
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                City *
+              </label>
+              <input
+                type="text"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                placeholder="Your city"
+                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+              />
+            </div>
+
+            {/* Phone Number */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Phone Number * (Will be stored securely)
+              </label>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="+63 9XX XXX XXXX"
+                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+              />
+            </div>
+
+            {/* Business Fields - Only show for business loans */}
+            {loanType === 'business' && (
+              <>
+                {/* Business Name */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Business Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder="Your business name"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                {/* Business Type */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Business Type/Industry *
+                  </label>
+                  <input
+                    type="text"
+                    value={businessType}
+                    onChange={(e) => setBusinessType(e.target.value)}
+                    placeholder="e.g., Retail, Manufacturing, Services"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+
+                {/* Registration Status */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Registration Status *
+                  </label>
+                  <select
+                    value={registrationStatus}
+                    onChange={(e) => setRegistrationStatus(e.target.value)}
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="registered">Registered</option>
+                    <option value="not_registered">Not Registered</option>
+                    <option value="in_process">In Process</option>
+                  </select>
+                </div>
+
+                {/* Registration Number - Only show if registered */}
+                {registrationStatus === 'registered' && (
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Business Registration Number *
+                    </label>
+                    <input
+                      type="text"
+                      value={registrationNumber}
+                      onChange={(e) => setRegistrationNumber(e.target.value)}
+                      placeholder="e.g., BIR/SEC/DTI Number"
+                      className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    />
+                  </div>
+                )}
+
+                {/* Years in Business */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Years in Business *
+                  </label>
+                  <input
+                    type="number"
+                    value={yearsInBusiness}
+                    onChange={(e) => setYearsInBusiness(e.target.value)}
+                    placeholder="e.g., 5"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    step="0.5"
+                    min="0"
+                  />
+                </div>
+
+                {/* Number of Employees */}
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Number of Employees *
+                  </label>
+                  <input
+                    type="number"
+                    value={employees}
+                    onChange={(e) => setEmployees(e.target.value)}
+                    placeholder="e.g., 10"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    min="0"
+                  />
+                </div>
+
+                {/* Certifications */}
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Certifications & Licenses
+                  </label>
+                  <textarea
+                    value={certifications}
+                    onChange={(e) => setCertifications(e.target.value)}
+                    placeholder="List any business certifications, licenses, or accreditations..."
+                    rows="2"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 resize-none"
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Reason for Loan */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Reason for Loan
+              </label>
+              <select
+                value={loanReason}
+                onChange={(e) => setLoanReason(e.target.value)}
+                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+              >
+                <option value="business_expansion">Business Expansion</option>
+                <option value="emergency">Emergency/Personal</option>
+                <option value="education">Education</option>
+                <option value="medical">Medical</option>
+                <option value="debt_consolidation">Debt Consolidation</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            {/* Custom Reason Text Field (shown when "Other" is selected) */}
+            {loanReason === 'other' && (
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Please specify the reason
+                </label>
+                <textarea
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  placeholder="Enter your reason for the loan..."
+                  rows="2"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 resize-none"
+                />
+              </div>
+            )}
+          </div>
 
           {/* Terms Checkbox */}
-          <div className="flex items-center gap-2 pt-2">
+          <div className="flex items-center gap-2 mb-6">
             <input
               type="checkbox"
               id="terms"
@@ -282,7 +395,7 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
           </div>
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-4 border-t border-slate-200">
+          <div className="flex gap-3 border-t border-slate-200 pt-4">
             <button
               type="button"
               onClick={onClose}
