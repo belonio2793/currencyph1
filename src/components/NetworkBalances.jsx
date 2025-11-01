@@ -140,8 +140,9 @@ export default function NetworkBalances({ userId }) {
       })
       setError('')
     } catch (err) {
-      console.error('Error loading schema data:', err)
-      setError('Failed to load network balances data')
+      const errorMessage = err?.message || err?.details || JSON.stringify(err)
+      console.error('Error loading schema data:', errorMessage, err)
+      setError(`Failed to load network balances data: ${errorMessage}`)
     } finally {
       setLoading(false)
     }
