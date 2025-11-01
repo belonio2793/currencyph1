@@ -71,7 +71,7 @@ async function runReconciliation() {
   try {
     log(colors.bright + colors.blue, '⏳ Running reconciliation...')
     
-    const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/reconcile-balances?type=${options.type}${
+    const edgeFunctionUrl = `${SUPABASE_URL}/functions/v1/reconcile-network-balances?type=${options.type}${
       options.userId ? `&userId=${options.userId}` : ''
     }`
     
