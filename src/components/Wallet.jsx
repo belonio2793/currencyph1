@@ -311,7 +311,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
   const generateNetworkWalletForChain = async (chain) => {
     try {
-      const { data, error } = await supabase.functions.invoke('create-wallet-pairs', {
+      const { data, error } = await supabase.functions.invoke('create-wallet-unified', {
         body: {
           chain_id: chain.chainId,
           create_house: true
@@ -549,7 +549,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       setError('')
 
       // Call edge function to create wallet
-      const { data, error: invokeError } = await supabase.functions.invoke('create-wallet-pairs', {
+      const { data, error: invokeError } = await supabase.functions.invoke('create-wallet-unified', {
         body: {
           user_id: userId,
           chain_id: selectedManualChainId
