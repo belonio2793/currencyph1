@@ -211,16 +211,17 @@ async function reconcileHouseBalances() {
         reconciliation_date: new Date().toISOString(),
         notes: isReconciled
           ? 'House balance automatically reconciled'
-          : `House discrepancy of ${Math.abs(difference)} detected`
+          : `House discrepancy of ${Math.abs(difference)} detected`,
+        updated_at: new Date().toISOString()
       }
 
       const { data, error } = await supabase
         .from('network_balances')
-        .insert([record])
+        .upsert(record, { onConflict: 'entity_type,entity_id,currency_code' })
         .select()
 
       if (error) {
-        console.error('Failed to insert house balance:', error)
+        console.error('Failed to upsert house balance:', error)
       } else {
         results.push(data)
       }
