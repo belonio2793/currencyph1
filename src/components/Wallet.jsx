@@ -79,6 +79,18 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
   // Fiat modal state
   const [showFiatModal, setShowFiatModal] = useState(false)
+
+  const fmtErr = (e) => {
+    if (!e) return ''
+    if (typeof e === 'string') return e
+    if (e instanceof Error && e.message) return e.message
+    if (e && typeof e === 'object') {
+      if (e.message) return e.message
+      if (e.error) return typeof e.error === 'string' ? e.error : (e.error.message || JSON.stringify(e.error))
+      try { return JSON.stringify(e) } catch (ex) { return String(e) }
+    }
+    return String(e)
+  }
   const [selectedFiatWallet, setSelectedFiatWallet] = useState(null)
   const [fiatAction, setFiatAction] = useState('deposit') // 'deposit' | 'pay'
   const [fiatAmount, setFiatAmount] = useState('')
@@ -473,7 +485,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
     } catch (err) {
       console.error('Error connecting wallet:', err)
       try { clearWalletCache() } catch(e) {}
-      setError(err.message || 'Failed to connect wallet. Make sure you have a compatible wallet extension (Phantom, MetaMask, etc.)')
+      setError(fmtErr(err) || 'Failed to connect wallet. Make sure you have a compatible wallet extension (Phantom, MetaMask, etc.)')
     } finally {
       setThirdwebConnecting(false)
     }
@@ -524,7 +536,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       await loadWallets()
     } catch (err) {
       console.error('Error saving wallet:', err)
-      setError(err.message || 'Failed to save wallet connection')
+      setError(fmtErr(err) || 'Failed to save wallet connection')
     } finally {
       setThirdwebConnecting(false)
     }
@@ -582,7 +594,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       await loadWallets()
     } catch (err) {
       console.error('Error creating wallet:', err)
-      setError(err.message || 'Failed to create wallet')
+      setError(fmtErr(err) || 'Failed to create wallet')
     } finally {
       setCreatingManualWallet(false)
     }
