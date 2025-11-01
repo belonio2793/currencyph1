@@ -49,6 +49,30 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
       setError('Please enter a valid phone number')
       return false
     }
+
+    // Business-specific validation
+    if (loanType === 'business') {
+      if (!businessName.trim()) {
+        setError('Please enter your business name')
+        return false
+      }
+      if (!businessType.trim()) {
+        setError('Please enter your business type/industry')
+        return false
+      }
+      if (registrationStatus === 'registered' && !registrationNumber.trim()) {
+        setError('Please enter your business registration number')
+        return false
+      }
+      if (!yearsInBusiness || parseFloat(yearsInBusiness) < 0) {
+        setError('Please enter valid years in business')
+        return false
+      }
+      if (!employees || parseFloat(employees) < 0) {
+        setError('Please enter number of employees')
+        return false
+      }
+    }
     return true
   }
 
