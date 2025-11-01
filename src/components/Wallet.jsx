@@ -821,13 +821,23 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
                           setNetworkTxOpen(prev => ({ ...prev, [id]: !prev[id] }))
                           if (!networkTxs[id]) {
                             try {
-                              const { data: txs, error } = await supabase.from('wallet_transactions')
-                                .select('id, user_id, type, amount, currency_code, balance_after, created_at, description')
-                                .eq('currency_code', nw.currency)
+                              // Prefer network_transactions for house/network wallets
+                              const { data: txs, error } = await supabase.from('network_transactions')
+                                .select('id, wallet_house_id, chain_id, tx_hash, from_address, to_address, value, raw, created_at')
+                                .eq('wallet_house_id', nw.id)
                                 .order('created_at', { ascending: false })
                                 .limit(50)
                               if (error) throw error
-                              setNetworkTxs(prev => ({ ...prev, [id]: txs || [] }))
+                              // Normalize to expected shape for the UI
+                              const normalized = (txs || []).map(t => ({
+                                id: t.id,
+                                type: 'onchain',
+                                amount: Number(t.value || 0),
+                                currency_code: nw.currency,
+                                description: t.tx_hash || JSON.stringify(t.raw || {}),
+                                created_at: t.created_at
+                              }))
+                              setNetworkTxs(prev => ({ ...prev, [id]: normalized || [] }))
                             } catch (e) {
                               console.error('Failed loading transactions for', nw.currency, e)
                               setNetworkTxs(prev => ({ ...prev, [id]: [] }))
