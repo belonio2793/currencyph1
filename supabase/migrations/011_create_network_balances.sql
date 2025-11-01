@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS public.network_balances (
   updated_at timestamptz DEFAULT now(),
   
   -- Constraints
-  UNIQUE(entity_type, entity_id, currency_code, date_trunc('day', reconciliation_date))
+  UNIQUE(entity_type, entity_id, currency_code)
 );
 
 -- Indexes for performance
