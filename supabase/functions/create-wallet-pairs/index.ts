@@ -7,7 +7,7 @@ import * as secp from 'https://esm.sh/@noble/secp256k1@2.0.0'
 import { sha256 } from 'https://esm.sh/@noble/hashes@1.3.2/sha256'
 import { ripemd160 } from 'https://esm.sh/@noble/hashes@1.3.2/ripemd160'
 import { keccak_256 } from 'https://esm.sh/@noble/hashes@1.3.2/sha3'
-import * as ed25519 from 'https://esm.sh/@noble/ed25519@2.0.0'
+import nacl from 'https://cdn.jsdelivr.net/npm/tweetnacl@1.0.3/+esm'
 import base58 from 'https://esm.sh/bs58@5.0.0'
 
 const CHAIN_CONFIGS = {
