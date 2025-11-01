@@ -43,6 +43,15 @@ export default function NetworkBalances({ userId }) {
 
       if (userError && userError.code !== 'PGRST116') throw userError
 
+      // Get network balances (latest records)
+      const { data: networkBalancesData, error: networkBalancesError } = await supabase
+        .from('network_balances')
+        .select('*')
+        .order('reconciliation_date', { ascending: false })
+        .limit(100)
+
+      if (networkBalancesError && networkBalancesError.code !== 'PGRST116') throw networkBalancesError
+
       // Get user wallets
       const { data: walletsData, error: walletsError } = await supabase
         .from('wallets')
@@ -87,6 +96,7 @@ export default function NetworkBalances({ userId }) {
 
       setSchemaData({
         user: userData,
+        network_balances: networkBalancesData || [],
         wallets: walletsData || [],
         loans: loansData || [],
         currencies: currenciesData || [],
