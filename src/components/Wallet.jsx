@@ -1342,25 +1342,25 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {/* Crypto Modal */}
       {showCryptoModal && selectedCryptoWallet && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive Crypto' : 'Send Crypto'}</h3>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive Crypto' : 'Send Crypto'}</h3>
               <button onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
             {/* Source Wallet Info */}
-            <div className="mb-6">
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">From Wallet</label>
-              <div className="bg-slate-900 rounded-lg p-4 space-y-2 font-mono">
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">From Wallet</label>
+              <div className="bg-slate-900 rounded-lg p-3 space-y-1 font-mono">
                 <p className="text-sm text-amber-400 break-all">{selectedCryptoWallet.address}</p>
-                <div className="flex items-center justify-between text-xs text-slate-400 mt-2">
+                <div className="flex items-center justify-between text-xs text-slate-400">
                   <span>{selectedCryptoWallet.chain}</span>
                   <span className="text-amber-400 font-semibold">{Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</span>
                 </div>
               </div>
             </div>
 
-            <form onSubmit={handleCryptoSubmit} className="space-y-5">
+            <form onSubmit={handleCryptoSubmit} className="space-y-3">
               {/* Amount Input */}
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-2">Total Amount ({selectedCryptoWallet.chain})</label>
