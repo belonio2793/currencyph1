@@ -278,6 +278,9 @@ export default function NetworkBalances({ userId }) {
           <h3 className="text-lg font-semibold text-slate-900 mb-4">Database Schema Overview</h3>
           <div className="space-y-3 text-sm text-slate-600">
             <div>
+              <strong className="text-slate-900">Network Balances:</strong> Reconciled balances across all users and house accounts. Automatically updated every 24 hours. Compares wallet balances against computed balances from transactions and flags discrepancies. Tracks deposits, withdrawals, and transaction counts per currency per entity (user or house).
+            </div>
+            <div>
               <strong className="text-slate-900">Users Table:</strong> Stores user account information including email, full name, and country code. Each user gets a UUID primary key.
             </div>
             <div>
