@@ -87,7 +87,7 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
       // Call the create_loan_request function
       const reasonText = loanReason === 'other' ? customReason : loanReason.replace('_', ' ').charAt(0).toUpperCase() + loanReason.slice(1).replace('_', ' ')
 
-      const { data, error: err } = await supabase.rpc('create_loan_request', {
+      const basePayload = {
         p_user_id: userId,
         p_loan_type: loanType,
         p_requested_amount: parseFloat(amount),
@@ -96,7 +96,24 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
         p_city: city,
         p_phone_number: phoneNumber,
         p_loan_purpose: reasonText
-      })
+      }
+
+      // Add business-specific fields if it's a business loan
+      let payload = basePayload
+      if (loanType === 'business') {
+        payload = {
+          ...basePayload,
+          p_business_name: businessName,
+          p_business_type: businessType,
+          p_registration_number: registrationStatus === 'registered' ? registrationNumber : null,
+          p_registration_status: registrationStatus,
+          p_years_in_business: parseFloat(yearsInBusiness),
+          p_employees: parseFloat(employees),
+          p_certifications: certifications || null
+        }
+      }
+
+      const { data, error: err } = await supabase.rpc('create_loan_request', payload)
 
       if (err) throw err
 
