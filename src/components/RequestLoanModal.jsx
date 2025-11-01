@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function RequestLoanModal({ userId, loanType, onClose, onSuccess, wallets }) {
+  const [currentPage, setCurrentPage] = useState(1)
   const [amount, setAmount] = useState('')
   const [currency, setCurrency] = useState('PHP')
   const [displayName, setDisplayName] = useState('')
@@ -12,6 +13,7 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
   const [totalOwed, setTotalOwed] = useState(0)
   const [loanReason, setLoanReason] = useState('other')
   const [customReason, setCustomReason] = useState('')
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   // Business-specific fields
   const [businessName, setBusinessName] = useState('')
@@ -32,7 +34,10 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
     }
   }, [amount])
 
-  const validateForm = () => {
+  // Total pages: personal loans = 1 page, business loans = 2 pages
+  const totalPages = loanType === 'business' ? 2 : 1
+
+  const validatePage1 = () => {
     if (!amount || parseFloat(amount) <= 0) {
       setError('Please enter a valid amount')
       return false
@@ -49,42 +54,69 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
       setError('Please enter a valid phone number')
       return false
     }
+    return true
+  }
 
-    // Business-specific validation
-    if (loanType === 'business') {
-      if (!businessName.trim()) {
-        setError('Please enter your business name')
-        return false
-      }
-      if (!businessType.trim()) {
-        setError('Please enter your business type/industry')
-        return false
-      }
-      if (registrationStatus === 'registered' && !registrationNumber.trim()) {
-        setError('Please enter your business registration number')
-        return false
-      }
-      if (!yearsInBusiness || parseFloat(yearsInBusiness) < 0) {
-        setError('Please enter valid years in business')
-        return false
-      }
-      if (!employees || parseFloat(employees) < 0) {
-        setError('Please enter number of employees')
-        return false
-      }
+  const validatePage2 = () => {
+    if (!businessName.trim()) {
+      setError('Please enter your business name')
+      return false
+    }
+    if (!businessType.trim()) {
+      setError('Please enter your business type/industry')
+      return false
+    }
+    if (registrationStatus === 'registered' && !registrationNumber.trim()) {
+      setError('Please enter your business registration number')
+      return false
+    }
+    if (!yearsInBusiness || parseFloat(yearsInBusiness) < 0) {
+      setError('Please enter valid years in business')
+      return false
+    }
+    if (!employees || parseFloat(employees) < 0) {
+      setError('Please enter number of employees')
+      return false
     }
     return true
   }
 
+  const handleNext = () => {
+    setError('')
+    if (currentPage === 1 && validatePage1()) {
+      setCurrentPage(2)
+    }
+  }
+
+  const handlePrevious = () => {
+    setError('')
+    setCurrentPage(currentPage - 1)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!validateForm()) return
+    
+    if (!termsAccepted) {
+      setError('Please agree to the loan terms')
+      return
+    }
+
+    if (currentPage === 1) {
+      if (!validatePage1()) return
+      if (loanType === 'business') {
+        setCurrentPage(2)
+        return
+      }
+    }
+
+    if (currentPage === 2 && loanType === 'business') {
+      if (!validatePage2()) return
+    }
 
     try {
       setLoading(true)
       setError('')
 
-      // Call the create_loan_request function
       const reasonText = loanReason === 'other' ? customReason : loanReason.replace('_', ' ').charAt(0).toUpperCase() + loanReason.slice(1).replace('_', ' ')
 
       const basePayload = {
@@ -98,7 +130,6 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
         p_loan_purpose: reasonText
       }
 
-      // Add business-specific fields if it's a business loan
       let payload = basePayload
       if (loanType === 'business') {
         payload = {
@@ -117,7 +148,6 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
 
       if (err) throw err
 
-      // Success
       onSuccess()
     } catch (err) {
       console.error('Error creating loan request:', err)
@@ -132,9 +162,16 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
       <div className="bg-white rounded-lg shadow-lg max-w-4xl w-full my-8">
         {/* Header */}
         <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-slate-900">
-            Request {loanType === 'personal' ? 'Personal' : 'Business'} Loan
-          </h2>
+          <div>
+            <h2 className="text-xl font-semibold text-slate-900">
+              Request {loanType === 'personal' ? 'Personal' : 'Business'} Loan
+            </h2>
+            {loanType === 'business' && (
+              <p className="text-sm text-slate-600 mt-1">
+                Step {currentPage} of {totalPages}
+              </p>
+            )}
+          </div>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-600 transition-colors"
@@ -154,245 +191,250 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
             </div>
           )}
 
-          {/* Form Grid */}
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            {/* Amount */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Requested Amount *
-              </label>
-              <div className="flex gap-2">
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="flex-1 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                  step="0.01"
-                  min="0"
-                />
-                <select
-                  value={currency}
-                  onChange={(e) => setCurrency(e.target.value)}
-                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                >
-                  <option value="PHP">PHP</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Total Owed Preview */}
-            {amount && (
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col justify-center">
-                <div className="text-xs text-slate-600">Total with 10% interest</div>
-                <div className="text-lg font-semibold text-blue-600">
-                  {Number(totalOwed).toFixed(2)} {currency}
-                </div>
-              </div>
-            )}
-
-            {/* Display Name */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Full Name *
-              </label>
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Your full name"
-                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-              />
-            </div>
-
-            {/* City */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                City *
-              </label>
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                placeholder="Your city"
-                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-              />
-            </div>
-
-            {/* Phone Number */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Phone Number * (Will be stored securely)
-              </label>
-              <input
-                type="tel"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder="+63 9XX XXX XXXX"
-                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-              />
-            </div>
-
-            {/* Business Fields - Only show for business loans */}
-            {loanType === 'business' && (
-              <>
-                {/* Business Name */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Business Name *
-                  </label>
+          {/* PAGE 1: PERSONAL INFORMATION */}
+          {currentPage === 1 && (
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {/* Amount */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Requested Amount *
+                </label>
+                <div className="flex gap-2">
                   <input
-                    type="text"
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    placeholder="Your business name"
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="flex-1 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    step="0.01"
+                    min="0"
                   />
-                </div>
-
-                {/* Business Type */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Business Type/Industry *
-                  </label>
-                  <input
-                    type="text"
-                    value={businessType}
-                    onChange={(e) => setBusinessType(e.target.value)}
-                    placeholder="e.g., Retail, Manufacturing, Services"
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                  />
-                </div>
-
-                {/* Registration Status */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Registration Status *
-                  </label>
                   <select
-                    value={registrationStatus}
-                    onChange={(e) => setRegistrationStatus(e.target.value)}
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    value={currency}
+                    onChange={(e) => setCurrency(e.target.value)}
+                    className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
                   >
-                    <option value="registered">Registered</option>
-                    <option value="not_registered">Not Registered</option>
-                    <option value="in_process">In Process</option>
+                    <option value="PHP">PHP</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
                   </select>
                 </div>
+              </div>
 
-                {/* Registration Number - Only show if registered */}
-                {registrationStatus === 'registered' && (
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Business Registration Number *
-                    </label>
-                    <input
-                      type="text"
-                      value={registrationNumber}
-                      onChange={(e) => setRegistrationNumber(e.target.value)}
-                      placeholder="e.g., BIR/SEC/DTI Number"
-                      className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                    />
+              {/* Total Owed Preview */}
+              {amount && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col justify-center">
+                  <div className="text-xs text-slate-600">Total with 10% interest</div>
+                  <div className="text-lg font-semibold text-blue-600">
+                    {Number(totalOwed).toFixed(2)} {currency}
                   </div>
-                )}
-
-                {/* Years in Business */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Years in Business *
-                  </label>
-                  <input
-                    type="number"
-                    value={yearsInBusiness}
-                    onChange={(e) => setYearsInBusiness(e.target.value)}
-                    placeholder="e.g., 5"
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                    step="0.5"
-                    min="0"
-                  />
                 </div>
+              )}
 
-                {/* Number of Employees */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Number of Employees *
-                  </label>
-                  <input
-                    type="number"
-                    value={employees}
-                    onChange={(e) => setEmployees(e.target.value)}
-                    placeholder="e.g., 10"
-                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                    min="0"
-                  />
-                </div>
+              {/* Display Name */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Full Name *
+                </label>
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="Your full name"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                />
+              </div>
 
-                {/* Certifications */}
+              {/* City */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  City *
+                </label>
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="Your city"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                />
+              </div>
+
+              {/* Phone Number */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Phone Number * (Will be stored securely)
+                </label>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  placeholder="+63 9XX XXX XXXX"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                />
+              </div>
+
+              {/* Reason for Loan */}
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Reason for Loan
+                </label>
+                <select
+                  value={loanReason}
+                  onChange={(e) => setLoanReason(e.target.value)}
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                >
+                  <option value="business_expansion">Business Expansion</option>
+                  <option value="emergency">Emergency/Personal</option>
+                  <option value="education">Education</option>
+                  <option value="medical">Medical</option>
+                  <option value="debt_consolidation">Debt Consolidation</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+              {/* Custom Reason Text Field (shown when "Other" is selected) */}
+              {loanReason === 'other' && (
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Certifications & Licenses
+                    Please specify the reason
                   </label>
                   <textarea
-                    value={certifications}
-                    onChange={(e) => setCertifications(e.target.value)}
-                    placeholder="List any business certifications, licenses, or accreditations..."
+                    value={customReason}
+                    onChange={(e) => setCustomReason(e.target.value)}
+                    placeholder="Enter your reason for the loan..."
                     rows="2"
                     className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 resize-none"
                   />
                 </div>
-              </>
-            )}
-
-            {/* Reason for Loan */}
-            <div className="col-span-2">
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Reason for Loan
-              </label>
-              <select
-                value={loanReason}
-                onChange={(e) => setLoanReason(e.target.value)}
-                className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-              >
-                <option value="business_expansion">Business Expansion</option>
-                <option value="emergency">Emergency/Personal</option>
-                <option value="education">Education</option>
-                <option value="medical">Medical</option>
-                <option value="debt_consolidation">Debt Consolidation</option>
-                <option value="other">Other</option>
-              </select>
+              )}
             </div>
+          )}
 
-            {/* Custom Reason Text Field (shown when "Other" is selected) */}
-            {loanReason === 'other' && (
+          {/* PAGE 2: BUSINESS INFORMATION (only for business loans) */}
+          {currentPage === 2 && loanType === 'business' && (
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {/* Business Name */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Business Name *
+                </label>
+                <input
+                  type="text"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder="Your business name"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                />
+              </div>
+
+              {/* Business Type */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Business Type/Industry *
+                </label>
+                <input
+                  type="text"
+                  value={businessType}
+                  onChange={(e) => setBusinessType(e.target.value)}
+                  placeholder="e.g., Retail, Manufacturing, Services"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                />
+              </div>
+
+              {/* Registration Status */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Registration Status *
+                </label>
+                <select
+                  value={registrationStatus}
+                  onChange={(e) => setRegistrationStatus(e.target.value)}
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                >
+                  <option value="registered">Registered</option>
+                  <option value="not_registered">Not Registered</option>
+                  <option value="in_process">In Process</option>
+                </select>
+              </div>
+
+              {/* Registration Number - Only show if registered */}
+              {registrationStatus === 'registered' && (
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Business Registration Number *
+                  </label>
+                  <input
+                    type="text"
+                    value={registrationNumber}
+                    onChange={(e) => setRegistrationNumber(e.target.value)}
+                    placeholder="e.g., BIR/SEC/DTI Number"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+              )}
+
+              {/* Years in Business */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Years in Business *
+                </label>
+                <input
+                  type="number"
+                  value={yearsInBusiness}
+                  onChange={(e) => setYearsInBusiness(e.target.value)}
+                  placeholder="e.g., 5"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  step="0.5"
+                  min="0"
+                />
+              </div>
+
+              {/* Number of Employees */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Number of Employees *
+                </label>
+                <input
+                  type="number"
+                  value={employees}
+                  onChange={(e) => setEmployees(e.target.value)}
+                  placeholder="e.g., 10"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  min="0"
+                />
+              </div>
+
+              {/* Certifications */}
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Please specify the reason
+                  Certifications & Licenses
                 </label>
                 <textarea
-                  value={customReason}
-                  onChange={(e) => setCustomReason(e.target.value)}
-                  placeholder="Enter your reason for the loan..."
-                  rows="2"
+                  value={certifications}
+                  onChange={(e) => setCertifications(e.target.value)}
+                  placeholder="List any business certifications, licenses, or accreditations..."
+                  rows="3"
                   className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 resize-none"
                 />
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
-          {/* Terms Checkbox */}
-          <div className="flex items-center gap-2 mb-6">
-            <input
-              type="checkbox"
-              id="terms"
-              required
-              className="w-4 h-4"
-            />
-            <label htmlFor="terms" className="text-sm text-slate-600">
-              I agree to the loan terms and will repay the full amount with interest
-            </label>
-          </div>
+          {/* Terms Checkbox - Show on final page only */}
+          {(currentPage === totalPages) && (
+            <div className="flex items-center gap-2 mb-6">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                className="w-4 h-4"
+              />
+              <label htmlFor="terms" className="text-sm text-slate-600">
+                I agree to the loan terms and will repay the full amount with interest
+              </label>
+            </div>
+          )}
 
           {/* Buttons */}
           <div className="flex gap-3 border-t border-slate-200 pt-4">
@@ -403,13 +445,39 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
             >
               Cancel
             </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Submitting...' : 'Request Loan'}
-            </button>
+
+            {/* Previous Button - Show on page 2+ */}
+            {currentPage > 1 && (
+              <button
+                type="button"
+                onClick={handlePrevious}
+                className="flex-1 px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+              >
+                Previous
+              </button>
+            )}
+
+            {/* Next Button - Show on page 1 for business loans */}
+            {currentPage < totalPages && (
+              <button
+                type="button"
+                onClick={handleNext}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                Next
+              </button>
+            )}
+
+            {/* Submit Button - Show on final page */}
+            {currentPage === totalPages && (
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Submitting...' : 'Request Loan'}
+              </button>
+            )}
           </div>
         </form>
       </div>
