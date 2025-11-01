@@ -25,10 +25,26 @@ slug = "scrape-nearby-listings"
 # Run every 6 hours at minute 30
 cron = "30 */6 * * *"
 
-# Cron Job Configuration for Wallet Sync
+# Cron Job Configuration for Wallet Sync (legacy/full)
 [[functions]]
 slug = "sync-wallet-balances"
 
 [functions.scheduling]
-# Run every 5 minutes
+# Run every 5 minutes (legacy full sync - may time out if many wallets)
 cron = "*/5 * * * *"
+
+# Lightweight enqueue that will create short jobs (fast)
+[[functions]]
+slug = "enqueue-sync-wallets"
+
+[functions.scheduling]
+# Run every 5 minutes to enqueue a small batch
+cron = "*/5 * * * *"
+
+# Worker that processes one job per invocation (keeps each run short)
+[[functions]]
+slug = "process-sync-job"
+
+[functions.scheduling]
+# Run every minute to process queued jobs (short per-run work)
+cron = "* * * * *"
