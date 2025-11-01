@@ -170,37 +170,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   </button>
                 ))}
 
-                {/* Borrow Money Dropdown */}
-                {userEmail && (
-                  <div className="relative ml-2">
-                    <button
-                      onClick={() => setBorrowDropdownOpen(!borrowDropdownOpen)}
-                      className="px-4 py-2 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 rounded-md transition-colors flex items-center gap-1"
-                    >
-                      Borrow Money
-                      <svg className={`w-4 h-4 transition-transform ${borrowDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                      </svg>
-                    </button>
-                    {borrowDropdownOpen && (
-                      <div className="absolute left-0 mt-1 w-48 bg-white border border-slate-200 rounded-md shadow-lg z-50">
-                        {borrowOptions.map(option => (
-                          <button
-                            key={option.id}
-                            onClick={() => {
-                              onTabChange(option.id)
-                              setBorrowDropdownOpen(false)
-                            }}
-                            className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-blue-50 hover:text-blue-600 transition-colors first:rounded-t-md last:rounded-b-md"
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-
                 {/* Buttons moved into the Manage Investments row */}
                 <div className="ml-2 flex items-center gap-2">
                   {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
