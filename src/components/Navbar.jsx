@@ -223,6 +223,25 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 </button>
               ))}
 
+              {/* Mobile Borrow Money dropdown */}
+              {userEmail && (
+                <div className="border-t border-slate-100 mt-2 pt-2">
+                  <div className="text-sm font-medium text-slate-700 px-3 py-2">Borrow Money</div>
+                  {borrowOptions.map(option => (
+                    <button
+                      key={option.id}
+                      onClick={() => {
+                        onTabChange(option.id)
+                        setMobileMenuOpen(false)
+                      }}
+                      className="block w-full text-left px-6 py-2 rounded-lg text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+
               {/* Mobile auth buttons */}
               <div className="pt-2 border-t border-slate-100 space-y-1">
                 {userEmail ? (
