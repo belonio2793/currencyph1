@@ -14,6 +14,8 @@ export default function BorrowMoney({ userId, loanType }) {
   const [selectedLoan, setSelectedLoan] = useState(null)
   const [wallets, setWallets] = useState([])
   const [expandedLoanId, setExpandedLoanId] = useState(null)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterCurrency, setFilterCurrency] = useState('all')
 
   useEffect(() => {
     if (userId) {
