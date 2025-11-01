@@ -507,7 +507,15 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       }
 
       // Upsert to wallets_crypto table
+      // Validate connected wallet payload
+      if (!connectedWallet || !connectedWallet.address) {
+        throw new Error('Connected wallet missing address')
+      }
       const providerValue = (connectedWallet && (connectedWallet.providerType || connectedWallet.providerName)) || 'unknown'
+      const chainNameForDb = (CHAIN_IDS[selectedChainId]?.name || connectedWallet.chainName || '').toUpperCase()
+      if (!chainNameForDb) {
+        throw new Error('Unsupported or unknown chain for this wallet')
+      }
       const { error: upsertErr } = await supabase
         .from('wallets_crypto')
         .upsert([{
