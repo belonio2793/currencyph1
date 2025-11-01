@@ -334,7 +334,7 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Network Balances Tab */}
         {activeTab === 'network-balances' && !loading && (
-          <div className="space-y-1">
+          <div className="space-y-3">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Total Loans */}
