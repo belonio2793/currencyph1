@@ -236,7 +236,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               {/* Mobile Borrow Money dropdown */}
               {userEmail && (
                 <div className="border-t border-slate-100 mt-2 pt-2">
-                  <div className="text-sm font-medium text-slate-700 px-3 py-2">Borrow Money</div>
+                  <div className="text-xs font-bold text-green-700 px-3 py-2 uppercase tracking-wide">Borrow Money</div>
                   {borrowOptions.map(option => (
                     <button
                       key={option.id}
@@ -244,8 +244,9 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                         onTabChange(option.id)
                         setMobileMenuOpen(false)
                       }}
-                      className="block w-full text-left px-6 py-2 rounded-lg text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                      className="block w-full text-left px-6 py-2 rounded-lg text-sm text-slate-600 hover:bg-green-50 hover:text-green-700 transition-colors hover:font-medium"
                     >
+                      <span className="text-green-600 mr-2">→</span>
                       {option.label}
                     </button>
                   ))}
