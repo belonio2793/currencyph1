@@ -52,6 +52,8 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
       setError('')
 
       // Call the create_loan_request function
+      const reasonText = loanReason === 'other' ? customReason : loanReason.replace('_', ' ').charAt(0).toUpperCase() + loanReason.slice(1).replace('_', ' ')
+
       const { data, error: err } = await supabase.rpc('create_loan_request', {
         p_user_id: userId,
         p_loan_type: loanType,
@@ -59,7 +61,8 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
         p_currency_code: currency,
         p_display_name: displayName,
         p_city: city,
-        p_phone_number: phoneNumber
+        p_phone_number: phoneNumber,
+        p_loan_purpose: reasonText
       })
 
       if (err) throw err
