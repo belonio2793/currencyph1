@@ -57,11 +57,28 @@ export default function BorrowMoney({ userId, loanType }) {
   }
 
   const filteredLoans = loans.filter(loan => {
-    if (activeTab === 'pending') return loan.status === 'pending'
-    if (activeTab === 'active') return loan.status === 'active'
-    if (activeTab === 'completed') return loan.status === 'completed'
-    return true
+    // Status filter
+    const statusMatch = activeTab === 'pending' ? loan.status === 'pending'
+      : activeTab === 'active' ? loan.status === 'active'
+      : activeTab === 'completed' ? loan.status === 'completed'
+      : true
+
+    // Currency filter
+    const currencyMatch = filterCurrency === 'all' || loan.currency_code === filterCurrency
+
+    // Search filter (search by ID, city, or display name)
+    const searchLower = searchQuery.toLowerCase()
+    const searchMatch = !searchQuery ||
+      loan.id.toLowerCase().includes(searchLower) ||
+      (loan.city || '').toLowerCase().includes(searchLower) ||
+      (loan.display_name || '').toLowerCase().includes(searchLower) ||
+      (loan.phone_number || '').includes(searchQuery)
+
+    return statusMatch && currencyMatch && searchMatch
   })
+
+  // Get unique currencies for filter
+  const uniqueCurrencies = [...new Set(loans.map(l => l.currency_code))]
 
   const handleRequestSuccess = async () => {
     setShowRequestModal(false)
