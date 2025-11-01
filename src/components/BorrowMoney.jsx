@@ -124,34 +124,20 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Status Tabs */}
         <div className="mb-6 border-b border-slate-200">
-          <div className="flex justify-between items-end">
-            <div className="flex gap-4">
-              {['pending', 'active', 'completed'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-px ${
-                    activeTab === tab
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)} ({filteredLoans.length})
-                </button>
-              ))}
-            </div>
-            <div className="flex gap-3 mb-3">
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F52ec42d8ebe84dc5967a127c308e9c42%2Fcff2e2984cd14588a094773ccba89df0?format=webp&width=800"
-                alt="Loan info"
-                className="h-8 object-contain"
-              />
-              <img
-                src="https://cdn.builder.io/api/v1/image/assets%2F52ec42d8ebe84dc5967a127c308e9c42%2F9ba5ae7d90b24d5d86363e6b035f4814?format=webp&width=800"
-                alt="Loan terms"
-                className="h-8 object-contain"
-              />
-            </div>
+          <div className="flex gap-4">
+            {['pending', 'active', 'completed'].map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-px ${
+                  activeTab === tab
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)} ({filteredLoans.length})
+              </button>
+            ))}
           </div>
         </div>
 
