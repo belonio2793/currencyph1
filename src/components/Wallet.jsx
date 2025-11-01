@@ -1229,68 +1229,110 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive' : 'Send'}</h3>
+              <h3 className="text-2xl font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive Crypto' : 'Send Crypto'}</h3>
               <button onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
-            {/* Wallet Info */}
-            <div className="bg-slate-900 rounded-lg p-4 mb-6 space-y-2 font-mono">
-              <p className="text-xs text-slate-400 uppercase font-semibold tracking-wide">Wallet Address</p>
-              <p className="text-sm text-amber-400 break-all">{selectedCryptoWallet.address}</p>
-              <p className="text-xs text-slate-500 mt-2">Chain: {selectedCryptoWallet.chain} | Balance: {Number(selectedCryptoWallet.balance || 0).toFixed(6)}</p>
+            {/* Source Wallet Info */}
+            <div className="mb-6">
+              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2">From Wallet</label>
+              <div className="bg-slate-900 rounded-lg p-4 space-y-2 font-mono">
+                <p className="text-sm text-amber-400 break-all">{selectedCryptoWallet.address}</p>
+                <div className="flex items-center justify-between text-xs text-slate-400 mt-2">
+                  <span>{selectedCryptoWallet.chain}</span>
+                  <span className="text-amber-400 font-semibold">{Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</span>
+                </div>
+              </div>
             </div>
 
-            <form onSubmit={handleCryptoSubmit} className="space-y-4">
-              {cryptoAction === 'send' && (
-                <>
-                  <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">Recipient Address</label>
-                    <input
-                      type="text"
-                      value={recipientAddress}
-                      onChange={e => setRecipientAddress(e.target.value)}
-                      placeholder="0x... or recipient address"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-mono"
-                    />
-                  </div>
-                </>
-              )}
-
+            <form onSubmit={handleCryptoSubmit} className="space-y-5">
+              {/* Amount Input */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Amount ({selectedCryptoWallet.chain})</label>
-                <input
-                  type="number"
-                  step="0.000001"
-                  value={cryptoAmount}
-                  onChange={e => setCryptoAmount(e.target.value)}
-                  placeholder="0.000000"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
-                />
+                <label className="block text-sm font-semibold text-slate-700 mb-2">Total Amount ({selectedCryptoWallet.chain})</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="0.000001"
+                    min="0"
+                    max={selectedCryptoWallet.balance || 0}
+                    value={cryptoAmount}
+                    onChange={e => setCryptoAmount(e.target.value)}
+                    placeholder="0.000000"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCryptoAmount(String(selectedCryptoWallet.balance || 0))}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap"
+                  >
+                    Max
+                  </button>
+                </div>
               </div>
 
-              {cryptoAction === 'receive' && (
-                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
-                  <p className="text-xs text-indigo-700">
-                    <strong>Your receive address:</strong><br/>
-                    <span className="font-mono break-all">{selectedCryptoWallet.address}</span>
-                  </p>
+              {/* Recipient Address (for Send) */}
+              {cryptoAction === 'send' && (
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-2">Recipient Address</label>
+                  <input
+                    type="text"
+                    value={recipientAddress}
+                    onChange={e => setRecipientAddress(e.target.value)}
+                    placeholder="0x... or recipient address"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm font-mono"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Enter the wallet address where you want to send {selectedCryptoWallet.chain}</p>
                 </div>
               )}
 
-              <div className="flex gap-2 pt-4">
+              {/* Receive Display (for Receive) */}
+              {cryptoAction === 'receive' && (
+                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                  <p className="text-xs font-semibold text-indigo-900 uppercase tracking-wide mb-2">Your Receive Address</p>
+                  <p className="text-sm text-indigo-700 font-mono break-all mb-3 p-2 bg-white rounded border border-indigo-100">{selectedCryptoWallet.address}</p>
+                  <p className="text-xs text-indigo-600">Share this address with the sender to receive {selectedCryptoWallet.chain}</p>
+                </div>
+              )}
+
+              {/* Summary */}
+              {cryptoAmount && parseFloat(cryptoAmount) > 0 && (
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-600">Amount:</span>
+                      <span className="font-semibold text-slate-900">{parseFloat(cryptoAmount).toFixed(6)} {selectedCryptoWallet.chain}</span>
+                    </div>
+                    {cryptoAction === 'send' && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-600">To:</span>
+                        <span className="font-mono text-xs text-slate-700 text-right">{formatWalletAddress(recipientAddress)}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Error message if amount exceeds balance */}
+              {cryptoAmount && parseFloat(cryptoAmount) > (selectedCryptoWallet.balance || 0) && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-700">Insufficient balance. Available: {Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</p>
+                </div>
+              )}
+
+              <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }}
-                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
+                  className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-sm font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  disabled={sendingCrypto || !cryptoAmount}
-                  className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={sendingCrypto || !cryptoAmount || parseFloat(cryptoAmount) <= 0 || (cryptoAction === 'send' && !recipientAddress) || parseFloat(cryptoAmount) > (selectedCryptoWallet.balance || 0)}
+                  className="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {sendingCrypto ? 'Processing...' : cryptoAction === 'send' ? 'Send' : 'Confirm'}
+                  {sendingCrypto ? 'Processing...' : cryptoAction === 'send' ? 'Send' : 'Confirm Receive'}
                 </button>
               </div>
             </form>
