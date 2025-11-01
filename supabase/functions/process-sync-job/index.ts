@@ -84,7 +84,7 @@ Deno.serve(async (req) => {
     const nw = rows
     const addr = nw.metadata?.address || nw.address
     const chainName = nw.network
-    const chainEntry = Object.values(CHAIN_RPC).find(c => c.name === chainName) || null
+    const chainEntry = Object.values(CHAIN_RPC).find(c => String(c.name).toLowerCase() === String(chainName).toLowerCase()) || null
     let balance: number | null = null
 
     try {
