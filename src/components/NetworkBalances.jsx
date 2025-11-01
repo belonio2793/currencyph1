@@ -5,12 +5,24 @@ export default function NetworkBalances({ userId }) {
   const [schemaData, setSchemaData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [selectedTable, setSelectedTable] = useState('wallets')
   const [expandedTables, setExpandedTables] = useState({
     users: true,
     wallets: true,
     loans: true,
-    currencies: true
+    currencies: true,
+    wallet_transactions: true,
+    loan_payments: true
   })
+
+  const tableOptions = [
+    { id: 'wallets', label: 'Wallets', description: 'Multi-currency wallets and balances' },
+    { id: 'loans', label: 'Loans', description: 'Loan requests and tracking' },
+    { id: 'wallet_transactions', label: 'Wallet Transactions', description: 'Audit trail of balance changes' },
+    { id: 'loan_payments', label: 'Loan Payments', description: 'Individual loan payment records' },
+    { id: 'currencies', label: 'Currencies', description: 'Supported currencies (fiat & crypto)' },
+    { id: 'users', label: 'User Profile', description: 'Account information and details' }
+  ]
 
   useEffect(() => {
     loadSchemaData()
