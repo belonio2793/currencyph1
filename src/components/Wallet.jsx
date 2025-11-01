@@ -1112,23 +1112,45 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
       {/* Thirdweb Connect Wallet Modal */}
       {showThirdwebModal && (
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-8 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-semibold text-slate-900">Web3 Wallet Connection</h3>
-              <button onClick={() => setShowThirdwebModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold text-slate-900">Web3 Wallet Connection</h3>
+              <button onClick={() => { setShowThirdwebModal(false); setNoWalletDetected(false); setError('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
             {!connectedWallet ? (
-              <div className="space-y-4">
-                <p className="text-sm text-slate-600 mb-6">Connect your Web3 wallet to manage cryptocurrency directly on-chain. Your assets remain under your control.</p>
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600">Connect your Web3 wallet to manage cryptocurrency directly on-chain. Your assets remain under your control.</p>
+
+                {noWalletDetected && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                    <p className="text-sm font-semibold text-red-900 mb-2">No Wallet Extension Found</p>
+                    <p className="text-xs text-red-800 mb-3">We couldn't detect any compatible wallet extensions in your browser. Please install one of the following:</p>
+                    <div className="space-y-2">
+                      <a href="https://metamask.io/download" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install MetaMask
+                      </a>
+                      <a href="https://www.phantomapp.com" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install Phantom (Solana)
+                      </a>
+                      <a href="https://rainbow.me" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install Rainbow Wallet
+                      </a>
+                      <a href="https://www.coinbase.com/wallet" target="_blank" rel="noopener noreferrer" className="block px-3 py-2 bg-white border border-red-200 rounded text-xs font-medium text-red-700 hover:bg-red-50 transition-colors text-center">
+                        → Install Coinbase Wallet
+                      </a>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   onClick={handleConnectWallet}
                   disabled={thirdwebConnecting}
-                  className="w-full px-4 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                 >
-                  {thirdwebConnecting ? 'Connecting to wallet...' : 'Connect Wallet'}
+                  {thirdwebConnecting ? 'Connecting...' : 'Connect Wallet'}
                 </button>
-                <p className="text-xs text-slate-500 text-center mt-4">Compatible with: MetaMask • WalletConnect • Rainbow • Coinbase Wallet</p>
+                <p className="text-xs text-slate-500 text-center">Compatible with: MetaMask • Phantom • Rainbow • Coinbase Wallet</p>
               </div>
             ) : (
               <div className="space-y-4">
