@@ -229,7 +229,7 @@ export default function BorrowMoney({ userId, loanType }) {
 
         {/* Loans List */}
         {!loading && filteredLoans.length === 0 && (
-          <div className="bg-white rounded-lg p-12 text-center border border-slate-200">
+          <div className={`bg-white rounded-lg p-12 text-center border border-slate-200 ${activeTab === 'network-balances' ? 'mb-3' : ''}`}>
             <p className="text-slate-600 mb-4">No {activeTab} loans found</p>
             {activeTab === 'pending' && (
               <button
