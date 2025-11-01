@@ -121,7 +121,7 @@ CREATE INDEX IF NOT EXISTS idx_loans_due_date ON loans(due_date);
 CREATE INDEX IF NOT EXISTS idx_loans_reference ON loans(reference_number);
 
 -- ============================================================================
--- 2️⃣ PAYMENT SCHEDULES TABLE
+-- 2️��� PAYMENT SCHEDULES TABLE
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS loan_payment_schedules (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -375,7 +375,7 @@ CREATE INDEX IF NOT EXISTS idx_disbursements_loan_id ON loan_disbursements(loan_
 CREATE INDEX IF NOT EXISTS idx_disbursements_status ON loan_disbursements(status);
 
 -- ============================================================================
--- ��� LOAN PARTNERS TABLE
+-- 🔟 LOAN PARTNERS TABLE
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS partners (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -584,11 +584,12 @@ CREATE OR REPLACE FUNCTION create_loan_request(
   p_loan_type VARCHAR,
   p_requested_amount NUMERIC,
   p_currency_code VARCHAR,
+  p_display_name VARCHAR DEFAULT NULL,
+  p_city VARCHAR DEFAULT NULL,
+  p_phone_number VARCHAR DEFAULT NULL,
   p_loan_term_months INTEGER DEFAULT 12,
   p_interest_rate NUMERIC DEFAULT 10.00,
-  p_display_name VARCHAR DEFAULT NULL,
   p_email VARCHAR DEFAULT NULL,
-  p_phone_number VARCHAR DEFAULT NULL,
   p_loan_purpose TEXT DEFAULT NULL
 ) RETURNS UUID AS $$
 DECLARE
@@ -602,19 +603,19 @@ BEGIN
   v_total_interest := p_requested_amount * (p_interest_rate / 100);
   v_total_owed := p_requested_amount + v_total_interest;
   v_monthly_payment := calculate_monthly_payment(p_requested_amount, p_interest_rate, p_loan_term_months);
-  
+
   INSERT INTO loans (
     user_id, reference_number, loan_type, requested_amount, currency_code,
     interest_rate, total_interest, total_owed, loan_term_months, monthly_payment,
-    amount_due, remaining_balance, status, display_name, email, phone_number,
+    amount_due, remaining_balance, status, display_name, city, email, phone_number,
     loan_purpose, created_at, updated_at
   ) VALUES (
     p_user_id, v_reference, p_loan_type, p_requested_amount, p_currency_code,
     p_interest_rate, v_total_interest, v_total_owed, p_loan_term_months, v_monthly_payment,
-    v_total_owed, v_total_owed, 'pending', p_display_name, p_email, p_phone_number,
+    v_total_owed, v_total_owed, 'pending', p_display_name, p_city, p_email, p_phone_number,
     p_loan_purpose, NOW(), NOW()
   ) RETURNING id INTO v_loan_id;
-  
+
   RETURN v_loan_id;
 END;
 $$ LANGUAGE plpgsql;
