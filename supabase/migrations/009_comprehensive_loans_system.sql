@@ -128,7 +128,7 @@ CREATE TABLE IF NOT EXISTS loan_payment_schedules (
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   
-  CONSTRAINT payment_number_unique PER LOAN UNIQUE (loan_id, payment_number),
+  CONSTRAINT payment_number_unique UNIQUE (loan_id, payment_number),
   CONSTRAINT valid_amounts CHECK (principal_amount > 0 AND interest_amount >= 0)
 );
 
