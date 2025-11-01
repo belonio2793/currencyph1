@@ -252,7 +252,7 @@ export default function BorrowMoney({ userId, loanType }) {
                 <div key={loan.id} className="bg-white rounded-lg border border-slate-200 overflow-hidden">
                   {/* Main Row */}
                   <div
-                    className="grid grid-cols-10 gap-3 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors items-center"
+                    className="grid grid-cols-10 gap-2 px-4 py-3 hover:bg-slate-50 cursor-pointer transition-colors items-center"
                     onClick={() => setExpandedLoanId(isExpanded ? null : loan.id)}
                   >
                     <div className="text-xs font-mono text-slate-600 truncate">{loan.id.slice(0, 6)}...</div>
