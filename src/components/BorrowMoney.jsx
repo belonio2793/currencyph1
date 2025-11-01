@@ -205,6 +205,18 @@ export default function BorrowMoney({ userId, loanType }) {
                 {tab.charAt(0).toUpperCase() + tab.slice(1)} ({filteredLoans.length})
               </button>
             ))}
+
+            {/* Network Balances Tab */}
+            <button
+              onClick={() => setActiveTab('network-balances')}
+              className={`px-4 py-3 font-medium text-sm transition-colors border-b-2 -mb-px ml-auto ${
+                activeTab === 'network-balances'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Network Balances
+            </button>
           </div>
         </div>
 
