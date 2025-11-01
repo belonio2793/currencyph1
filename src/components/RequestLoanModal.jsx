@@ -13,6 +13,15 @@ export default function RequestLoanModal({ userId, loanType, onClose, onSuccess,
   const [loanReason, setLoanReason] = useState('other')
   const [customReason, setCustomReason] = useState('')
 
+  // Business-specific fields
+  const [businessName, setBusinessName] = useState('')
+  const [businessType, setBusinessType] = useState('')
+  const [registrationNumber, setRegistrationNumber] = useState('')
+  const [registrationStatus, setRegistrationStatus] = useState('registered')
+  const [yearsInBusiness, setYearsInBusiness] = useState('')
+  const [employees, setEmployees] = useState('')
+  const [certifications, setCertifications] = useState('')
+
   useEffect(() => {
     if (amount) {
       const parsedAmount = parseFloat(amount)
