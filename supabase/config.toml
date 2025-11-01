@@ -24,3 +24,11 @@ slug = "scrape-nearby-listings"
 [functions.scheduling]
 # Run every 6 hours at minute 30
 cron = "30 */6 * * *"
+
+# Cron Job Configuration for Wallet Sync
+[[functions]]
+slug = "sync-wallet-balances"
+
+[functions.scheduling]
+# Run every 5 minutes
+cron = "*/5 * * * *"
