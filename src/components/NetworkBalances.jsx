@@ -288,12 +288,12 @@ export default function NetworkBalances({ userId }) {
 
         {/* Table Selector Dropdown */}
         {schemaData && (
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-slate-700 mb-2">Select Data View</label>
+          <div className="mb-6 bg-white rounded-lg border border-slate-200 p-6">
+            <label className="block text-sm font-semibold text-slate-900 mb-3">Select Data View</label>
             <select
               value={selectedTable}
               onChange={(e) => setSelectedTable(e.target.value)}
-              className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white"
+              className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white mb-4"
             >
               {tableOptions.map(option => (
                 <option key={option.id} value={option.id}>
@@ -301,6 +301,19 @@ export default function NetworkBalances({ userId }) {
                 </option>
               ))}
             </select>
+
+            {/* Display metadata for selected table */}
+            {tableOptions.find(t => t.id === selectedTable) && (
+              <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                <div className="text-sm text-slate-900 mb-2">
+                  <strong>{tableOptions.find(t => t.id === selectedTable)?.label}</strong>
+                </div>
+                <div className="text-xs text-slate-600 space-y-1">
+                  <div><span className="font-medium">Description:</span> {tableOptions.find(t => t.id === selectedTable)?.description}</div>
+                  <div><span className="font-medium">Metadata:</span> {tableOptions.find(t => t.id === selectedTable)?.metadata}</div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
