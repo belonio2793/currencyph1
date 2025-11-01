@@ -221,7 +221,19 @@ export default function NetworkBalances({ userId }) {
 
         {/* Summary Cards */}
         {schemaData && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="text-sm text-slate-600 mb-2">Reconciled Records</div>
+              <div className="text-2xl font-bold text-blue-600">
+                {schemaData.network_balances.filter(r => r.status === 'reconciled').length}
+              </div>
+            </div>
+            <div className="bg-white rounded-lg border border-slate-200 p-6">
+              <div className="text-sm text-slate-600 mb-2">Discrepancies</div>
+              <div className="text-2xl font-bold text-orange-600">
+                {schemaData.network_balances.filter(r => r.status === 'discrepancy').length}
+              </div>
+            </div>
             <div className="bg-white rounded-lg border border-slate-200 p-6">
               <div className="text-sm text-slate-600 mb-2">Total Wallets</div>
               <div className="text-2xl font-bold text-blue-600">{schemaData.wallets.length}</div>
@@ -230,12 +242,6 @@ export default function NetworkBalances({ userId }) {
               <div className="text-sm text-slate-600 mb-2">Active Loans</div>
               <div className="text-2xl font-bold text-blue-600">
                 {schemaData.loans.filter(l => l.status === 'active').length}
-              </div>
-            </div>
-            <div className="bg-white rounded-lg border border-slate-200 p-6">
-              <div className="text-sm text-slate-600 mb-2">Total Balance</div>
-              <div className="text-2xl font-bold text-green-600">
-                {Number(schemaData.wallets.reduce((sum, w) => sum + (w.balance || 0), 0)).toFixed(2)} PHP
               </div>
             </div>
             <div className="bg-white rounded-lg border border-slate-200 p-6">
