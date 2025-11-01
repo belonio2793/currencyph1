@@ -43,6 +43,7 @@ CREATE INDEX IF NOT EXISTS idx_network_balances_currency ON public.network_balan
 CREATE INDEX IF NOT EXISTS idx_network_balances_date ON public.network_balances(reconciliation_date DESC);
 CREATE INDEX IF NOT EXISTS idx_network_balances_status ON public.network_balances(status);
 CREATE INDEX IF NOT EXISTS idx_network_balances_user ON public.network_balances(entity_id) WHERE entity_type = 'user';
+CREATE UNIQUE INDEX IF NOT EXISTS idx_network_balances_daily ON public.network_balances(entity_type, entity_id, currency_code, date_trunc('day'::text, reconciliation_date));
 
 -- Summary view for quick access to latest balances by entity
 CREATE OR REPLACE VIEW public.network_balances_latest AS
