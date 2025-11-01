@@ -20,7 +20,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'send', label: 'Send', auth: true },
     { id: 'bills', label: 'Bills', auth: true },
     { id: 'transactions', label: 'History', auth: true },
-    { id: 'network-balances', label: 'Network Balances', auth: true },
     { id: 'profile', label: 'Profile', auth: true },
     { id: 'inbox', label: 'Inbox', auth: true }
   ]
