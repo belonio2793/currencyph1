@@ -429,6 +429,11 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
   ctx.fillStyle = '#0f172a'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
+  // Draw map tiles underneath (async-safe - may draw on top later)
+  try {
+    drawTiles(ctx, canvas, camera || { x: 0, y: 0, zoom: 1 }, world.mapData.width, world.mapData.height)
+  } catch (e) {}
+
   // Apply camera transform: scale then translate
   const cam = camera || { x: 0, y: 0, zoom: 1 }
   ctx.scale(cam.zoom, cam.zoom)
