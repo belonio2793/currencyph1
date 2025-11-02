@@ -12,6 +12,8 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
   const [exportedData, setExportedData] = useState(null)
   const [newName, setNewName] = useState('')
   const [newHomeCity, setNewHomeCity] = useState('Manila')
+  const [editingCharacter, setEditingCharacter] = useState(null)
+  const [showEditor, setShowEditor] = useState(false)
 
   useEffect(() => {
     if (!userId) return
