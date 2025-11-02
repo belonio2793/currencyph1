@@ -146,8 +146,25 @@ export default function CityManager({ city, onUpdate, onClose }) {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-0 border-b border-slate-700 px-4">
+        {/* Real World View */}
+        {viewMode === 'realworld' && (
+          <div className="p-6">
+            <CityStreetView city={cityState} mode="map" />
+          </div>
+        )}
+
+        {/* Street View */}
+        {viewMode === 'streetview' && (
+          <div className="p-6">
+            <CityStreetView city={cityState} mode="streetview" />
+          </div>
+        )}
+
+        {/* Manager View */}
+        {viewMode === 'manager' && (
+          <>
+            {/* Tabs */}
+            <div className="flex gap-0 border-b border-slate-700 px-4">
           {['overview', 'zones', 'budget', 'stats'].map(tab => (
             <button
               key={tab}
@@ -163,8 +180,8 @@ export default function CityManager({ city, onUpdate, onClose }) {
           ))}
         </div>
 
-        {/* Content */}
-        <div className="p-6 space-y-4">
+            {/* Content */}
+            <div className="p-6 space-y-4">
           {activeTab === 'overview' && (
             <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
@@ -391,7 +408,9 @@ export default function CityManager({ city, onUpdate, onClose }) {
               </div>
             </div>
           )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
