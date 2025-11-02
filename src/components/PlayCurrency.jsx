@@ -7,6 +7,8 @@ import GameInventory from './game/GameInventory'
 import GameMarketplace from './game/GameMarketplace'
 import GameProperties from './game/GameProperties'
 import GameCombat from './game/GameCombat'
+import CityMap from './game/CityMap'
+import CityManager from './game/CityManager'
 
 export default function PlayCurrency({ userId }) {
   const [character, setCharacter] = useState(null)
