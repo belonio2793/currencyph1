@@ -226,7 +226,7 @@ export default function PlayCurrency({ userId }) {
 
       {/* Characters Panel */}
       {showCharactersPanel && (
-        <CharactersPanel userId={userId} currentCharacter={character} onSelectCharacter={(c) => { setCharacter(c); setShowCharactersPanel(false); loadGameData(c.id) }} />
+        <CharactersPanel userId={userId} currentCharacter={character} onSelectCharacter={(c) => { setCharacter(c); setShowCharactersPanel(false); loadGameData(c.id) }} onClose={() => setShowCharactersPanel(false)} />
       )}
 
       {/* Main Content */}
