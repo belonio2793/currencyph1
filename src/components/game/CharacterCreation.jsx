@@ -17,6 +17,20 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [showGallery, setShowGallery] = useState(false)
   const [search, setSearch] = useState('')
   const [rgbSkin, setRgbSkin] = useState(() => hexToRgb(appearance.skin_color))
+  const [homeCity, setHomeCity] = useState('Manila')
+
+  const PHILIPPINES_CITIES = [
+    { name: 'Manila', region: 'NCR', description: 'Capital city - Economic hub' },
+    { name: 'Quezon City', region: 'NCR', description: 'Business district & tech hub' },
+    { name: 'Cebu', region: 'Visayas', description: 'Beach paradise & commerce' },
+    { name: 'Davao', region: 'Mindanao', description: 'Tropical metropolis' },
+    { name: 'Cagayan de Oro', region: 'Mindanao', description: 'Adventure capital' },
+    { name: 'Makati', region: 'NCR', description: 'Financial district' },
+    { name: 'Iloilo', region: 'Visayas', description: 'Heritage & culture' },
+    { name: 'Baguio', region: 'Cordillera', description: 'Cool highland city' },
+    { name: 'Bacolod', region: 'Visayas', description: 'Sugar city & beaches' },
+    { name: 'Cagayan', region: 'Cagayan', description: 'Northern frontier' }
+  ]
 
   function handlePrepareCreate(e) {
     e.preventDefault()
