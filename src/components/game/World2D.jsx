@@ -10,6 +10,9 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const aiRef = useRef(null)
   const conversationRef = useRef(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: 1 })
+  const [panMode, setPanMode] = useState(false)
+  const draggingRef = useRef(false)
+  const lastMouseRef = useRef({ x: 0, y: 0 })
 
   const [otherPlayers, setOtherPlayers] = useState([])
   const [nearbyNPCs, setNearbyNPCs] = useState([])
@@ -46,10 +49,12 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       if (!canvas || !world) return
       const map = world.mapData
       const fitZoom = Math.min(canvas.width / map.width, canvas.height / map.height)
-      const zoom = Math.max(0.2, Math.min(2, fitZoom))
+      // For FP feel start with tighter zoom
+      const zoom = Math.max(0.4, Math.min(2, fitZoom * 1.2))
       cameraRef.current.zoom = zoom
+      // place player lower on screen for first-person feel
       cameraRef.current.x = Math.max(0, world.player.x - canvas.width / (2 * zoom))
-      cameraRef.current.y = Math.max(0, world.player.y - canvas.height / (2 * zoom))
+      cameraRef.current.y = Math.max(0, world.player.y - (canvas.height * 0.65) / zoom)
       // expose for legacy helpers/debugging
       try { window.__cameraRef = cameraRef } catch (e) { /* ignore */ }
     }, 50)
@@ -68,6 +73,18 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     const ctx = canvas.getContext('2d')
     const world = worldRef.current
 
+    // attach mouse events for pan
+    canvas.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
+    // cleanup on unmount
+    const cleanupMouse = () => {
+      canvas.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+
     const gameLoop = () => {
       // Update world state
       world.update()
@@ -79,16 +96,18 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // Sync position
       syncRef.current?.broadcastMove(world.player.x, world.player.y, world.player.direction)
 
-      // Keep camera centered on player with smoothing
+      // Keep camera centered on player with smoothing (unless panMode active)
       try {
         const cam = cameraRef.current || { x: 0, y: 0, zoom: 1 }
         const zoom = cam.zoom || 1
-        const targetX = world.player.x - canvas.width / (2 * zoom)
-        const targetY = world.player.y - canvas.height / (2 * zoom)
-        // smoothing factor (0 = snap, 1 = instant follow)
-        const smoothing = 0.18
-        cam.x = cam.x + (targetX - cam.x) * smoothing
-        cam.y = cam.y + (targetY - cam.y) * smoothing
+        if (!panMode) {
+          const targetX = world.player.x - canvas.width / (2 * zoom)
+          const targetY = world.player.y - (canvas.height * 0.65) / zoom // player lower on screen
+          // smoothing factor (0 = snap, 1 = instant follow)
+          const smoothing = 0.18
+          cam.x = cam.x + (targetX - cam.x) * smoothing
+          cam.y = cam.y + (targetY - cam.y) * smoothing
+        }
 
         // Clamp to map bounds so we don't show beyond map edges
         const maxX = Math.max(0, world.mapData.width - canvas.width / zoom)
@@ -107,7 +126,11 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
 
     gameLoopRef.current = requestAnimationFrame(gameLoop)
 
-    return () => cancelAnimationFrame(gameLoopRef.current)
+    return () => {
+      cancelAnimationFrame(gameLoopRef.current)
+      // remove attached listeners
+      try { cleanupMouse() } catch(e){}
+    }
   }, [otherPlayers])
 
   // Handle keyboard input
@@ -154,12 +177,17 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     }
   }, [])
 
-  // Handle canvas click for movement
+  // Handle canvas click for movement (or start drag for pan)
   const handleCanvasClick = (e) => {
     const canvas = canvasRef.current
     const rect = canvas.getBoundingClientRect()
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
+
+    if (panMode) {
+      // in pan mode, clicking does not move character
+      return
+    }
 
     // Convert screen coords to world coords using camera zoom/position
     const camera = cameraRef.current
@@ -167,6 +195,25 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     const worldY = clickY / camera.zoom + camera.y
 
     worldRef.current.movePlayer(worldX, worldY)
+  }
+
+  // Mouse drag handlers for pan
+  const handleMouseDown = (e) => {
+    if (!panMode) return
+    draggingRef.current = true
+    lastMouseRef.current = { x: e.clientX, y: e.clientY }
+  }
+  const handleMouseMove = (e) => {
+    if (!panMode || !draggingRef.current) return
+    const dx = e.clientX - lastMouseRef.current.x
+    const dy = e.clientY - lastMouseRef.current.y
+    lastMouseRef.current = { x: e.clientX, y: e.clientY }
+    const cam = cameraRef.current
+    cam.x -= dx / (cam.zoom || 1)
+    cam.y -= dy / (cam.zoom || 1)
+  }
+  const handleMouseUp = () => {
+    draggingRef.current = false
   }
 
   // Handle NPC interaction
@@ -386,7 +433,7 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
   ctx.scale(cam.zoom, cam.zoom)
   ctx.translate(-cam.x, -cam.y)
 
-  // Draw grid in world-space
+  // Draw grid in world-space (subtle)
   ctx.strokeStyle = '#1e293b'
   ctx.lineWidth = 1 / Math.max(0.0001, cam.zoom)
   const worldViewWidth = canvas.width / cam.zoom
@@ -407,8 +454,12 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
     ctx.stroke()
   }
 
-  // Draw buildings
+  // Draw buildings with slight shadow for depth
   world.mapData.buildings.forEach(building => {
+    // shadow
+    ctx.fillStyle = 'rgba(0,0,0,0.25)'
+    ctx.fillRect(building.x + 6, building.y + 6, building.width, building.height)
+
     ctx.fillStyle = '#475569'
     ctx.fillRect(building.x, building.y, building.width, building.height)
 
@@ -417,11 +468,13 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
     ctx.fillText(building.name, building.x + 5, building.y + 15)
   })
 
-  // Draw NPCs
+  // Draw NPCs with depth scale (closer to bottom appear larger)
   world.npcs.forEach(npc => {
+    const depthFactor = 1 + ((npc.y - world.player.y) / Math.max(100, world.mapData.height)) * 0.5
+    const r = Math.max(4, 8 * depthFactor)
     ctx.fillStyle = '#3b82f6'
     ctx.beginPath()
-    ctx.arc(npc.x, npc.y, 8, 0, Math.PI * 2)
+    ctx.arc(npc.x, npc.y, r, 0, Math.PI * 2)
     ctx.fill()
 
     ctx.fillStyle = '#fff'
@@ -443,10 +496,10 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
     ctx.fillText(player.character_name, player.x, player.y - 12)
   })
 
-  // Draw player
+  // Draw player (centered lower for FP feel)
   ctx.fillStyle = '#10b981'
   ctx.beginPath()
-  ctx.arc(world.player.x, world.player.y, 10, 0, Math.PI * 2)
+  ctx.arc(world.player.x, world.player.y, 12, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#fff'
@@ -454,5 +507,16 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
   ctx.textAlign = 'center'
   ctx.fillText('👤', world.player.x, world.player.y + 1)
 
+  ctx.restore()
+
+  // Post-process: vignette for FP feel
+  ctx.save()
+  ctx.globalCompositeOperation = 'multiply'
+  const g = ctx.createRadialGradient(canvas.width/2, canvas.height*0.45, canvas.width*0.05, canvas.width/2, canvas.height*0.45, Math.max(canvas.width, canvas.height))
+  g.addColorStop(0, 'rgba(255,255,255,0)')
+  g.addColorStop(0.6, 'rgba(0,0,0,0.15)')
+  g.addColorStop(1, 'rgba(0,0,0,0.6)')
+  ctx.fillStyle = g
+  ctx.fillRect(0,0,canvas.width,canvas.height)
   ctx.restore()
 }
