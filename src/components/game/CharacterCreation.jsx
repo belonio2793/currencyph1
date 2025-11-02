@@ -13,6 +13,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [appearance, setAppearance] = useState({
     gender: 'male',
     skin_tone: 'medium',
+    skin_color: '#d4a574',
     hair_style: 'buzz_cut',
     hair_color: '#4b2e2e',
     height: 175,
@@ -24,6 +25,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [showGallery, setShowGallery] = useState(false)
   const [search, setSearch] = useState('')
   const [rgb, setRgb] = useState(() => hexToRgb(appearance.hair_color))
+  const [rgbSkin, setRgbSkin] = useState(() => hexToRgb(appearance.skin_color))
 
   const hairstyles = useMemo(() => (appearance.gender === 'male' ? MALE_HAIRSTYLES : FEMALE_HAIRSTYLES), [appearance.gender])
 
@@ -55,6 +57,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     const defaultAppearance = {
       gender: 'male',
       skin_tone: 'medium',
+      skin_color: '#d4a574',
       hair_style: 'buzz_cut',
       hair_color: '#4b2e2e',
       height: 175,
@@ -67,8 +70,25 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
   function handleAppearanceChange(key, value) {
     if (key === 'gender' && value !== 'male' && value !== 'female') return
+    // handle skin tone presets
+    if (key === 'skin_tone') {
+      const mapping = { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }
+      const color = mapping[value] || '#d4a574'
+      setAppearance(prev => ({ ...prev, skin_tone: value, skin_color: color }))
+      setRgbSkin(hexToRgb(color))
+      return
+    }
+    if (key === 'skin_color') {
+      setAppearance(prev => ({ ...prev, skin_color: value }))
+      setRgbSkin(hexToRgb(value))
+      return
+    }
+    if (key === 'hair_color') {
+      setAppearance(prev => ({ ...prev, hair_color: value }))
+      setRgb(hexToRgb(value))
+      return
+    }
     setAppearance(prev => ({ ...prev, [key]: value }))
-    if (key === 'hair_color') setRgb(hexToRgb(value))
   }
 
   function handleRgbChange(part, val) {
@@ -110,10 +130,30 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Skin Tone</label>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 items-center mb-2">
                       {[{n:'light',c:'#fdbcb4'},{n:'medium',c:'#d4a574'},{n:'dark',c:'#8b5a3c'},{n:'olive',c:'#9a7c5c'}].map(t=> (
                         <button key={t.n} type="button" onClick={()=>handleAppearanceChange('skin_tone', t.n)} className={`w-10 h-10 rounded border-2 ${appearance.skin_tone===t.n ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-600'}`} style={{backgroundColor:t.c}} title={t.n} />
                       ))}
+
+                      <div className="flex items-center gap-2 ml-3">
+                        <input type="color" value={appearance.skin_color || '#d4a574'} onChange={(e)=>handleAppearanceChange('skin_color', e.target.value)} className="w-10 h-8 p-0 border-2 border-slate-600 rounded-md" />
+                        <div className="text-xs text-slate-400">Custom</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="text-xs text-slate-400">R</label>
+                        <input type="number" min="0" max="255" value={rgbSkin.r} onChange={(e)=>{ const v = clamp(parseInt(e.target.value||0),0,255); setRgbSkin(prev=>({ ...prev, r: v })); handleAppearanceChange('skin_color', rgbToHex({ ...rgbSkin, r: v })) }} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-400">G</label>
+                        <input type="number" min="0" max="255" value={rgbSkin.g} onChange={(e)=>{ const v = clamp(parseInt(e.target.value||0),0,255); setRgbSkin(prev=>({ ...prev, g: v })); handleAppearanceChange('skin_color', rgbToHex({ ...rgbSkin, g: v })) }} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
+                      </div>
+                      <div>
+                        <label className="text-xs text-slate-400">B</label>
+                        <input type="number" min="0" max="255" value={rgbSkin.b} onChange={(e)=>{ const v = clamp(parseInt(e.target.value||0),0,255); setRgbSkin(prev=>({ ...prev, b: v })); handleAppearanceChange('skin_color', rgbToHex({ ...rgbSkin, b: v })) }} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -333,7 +373,7 @@ function renderHairSVG(style, color, r) {
 function AvatarPreview({ appearance, name = '', large = false }) {
   const size = large ? 260 : 160
   const headRadius = Math.round(size * 0.26)
-  const faceColor = { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }[appearance.skin_tone] || '#d4a574'
+  const faceColor = appearance.skin_color || { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }[appearance.skin_tone] || '#d4a574'
 
   // Build mapping influences body width and belly
   const buildMap = {
