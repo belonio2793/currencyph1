@@ -118,7 +118,9 @@ export function useGeolocation() {
                 }
               }
             } catch (err) {
-              console.debug('Reverse geocoding failed:', err)
+              // Silently ignore outer error
+            } finally {
+              // Always reset loading state
               if (isMountedRef.current) {
                 setLoading(false)
               }
