@@ -224,6 +224,11 @@ export default function PlayCurrency({ userId }) {
         </div>
       )}
 
+      {/* Characters Panel */}
+      {showCharactersPanel && (
+        <CharactersPanel userId={userId} currentCharacter={character} onSelectCharacter={(c) => { setCharacter(c); setShowCharactersPanel(false); loadGameData(c.id) }} />
+      )}
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-6">
         {/* Navigation Tabs */}
