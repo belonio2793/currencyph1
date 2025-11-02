@@ -82,10 +82,15 @@ export function useGeolocation() {
                 let timeoutId = null
                 try {
                   timeoutId = setTimeout(() => {
-                    if (!controller2.signal.aborted) {
-                      controller2.abort()
+                    try {
+                      if (!controller2.signal.aborted) {
+                        controller2.abort()
+                      }
+                    } catch (e) {
+                      // ignore abort errors
                     }
                   }, 7000)
+
                   const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
                     { signal: controller2.signal, headers: { 'Accept-Language': 'en' } }
@@ -100,12 +105,13 @@ export function useGeolocation() {
                   }
                 } catch (err) {
                   if (timeoutId) clearTimeout(timeoutId)
-                  if (err.name !== 'AbortError' && err.code !== 'ABORT_ERR') {
-                    console.debug('Nominatim reverse geocoding failed:', err)
+                  // Silently fail for network/abort errors - not user-facing
+                  if (err.name !== 'AbortError' && err.code !== 'ABORT_ERR' && err.message !== 'Failed to fetch') {
+                    console.debug('Nominatim reverse geocoding failed:', err.message)
                   }
                 }
               } catch (err) {
-                console.debug('Reverse geocoding failed:', err)
+                // Silently ignore outer catch
               } finally {
                 if (isMountedRef.current) {
                   setLoading(false)
