@@ -101,25 +101,48 @@ export default function CityManager({ city, onUpdate, onClose }) {
     <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 overflow-y-auto">
       <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-slate-800 border-b border-slate-700 p-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-slate-100">{cityState.name}</h2>
-            <p className="text-sm text-slate-400">City Manager</p>
+        <div className="sticky top-0 bg-slate-800 border-b border-slate-700 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-100">{cityState.name}</h2>
+              <p className="text-sm text-slate-400">City Manager</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={runSimulation}
+                disabled={simulationRunning}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded text-sm"
+              >
+                {simulationRunning ? `Running... ${monthsPassed}/12` : 'Simulate Year'}
+              </button>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm"
+              >
+                Close
+              </button>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={runSimulation}
-              disabled={simulationRunning}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded text-sm"
-            >
-              {simulationRunning ? `Running... ${monthsPassed}/12` : 'Simulate Year'}
-            </button>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm"
-            >
-              Close
-            </button>
+
+          {/* View Mode Tabs */}
+          <div className="flex gap-2">
+            {[
+              { id: 'manager', label: '⚙️ Manager' },
+              { id: 'realworld', label: '🗺️ Real World' },
+              { id: 'streetview', label: '📸 Street View' }
+            ].map(mode => (
+              <button
+                key={mode.id}
+                onClick={() => setViewMode(mode.id)}
+                className={`px-3 py-1 rounded text-sm ${
+                  viewMode === mode.id
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                {mode.label}
+              </button>
+            ))}
           </div>
         </div>
 
