@@ -11,7 +11,7 @@ function getAvatarEditorUrl(avatarUrl = null) {
   return `${baseUrl}&clearCache=1`
 }
 
-export default function AvatarCreatorRPM({ open, onClose, characterId, userId, onExport, onSaved, showCloseButton = true }) {
+export default function AvatarCreatorRPM({ open, onClose, characterId, userId, userEmail, onExport, onSaved, showCloseButton = true }) {
   const iframeRef = useRef(null)
   const [status, setStatus] = useState('Initializing…')
   const [saving, setSaving] = useState(false)
