@@ -96,6 +96,9 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [communityError, setCommunityError] = useState('')
   const [voteCounts, setVoteCounts] = useState({})
   const [userVotes, setUserVotes] = useState({})
+  const [communityPage, setCommunityPage] = useState(1)
+  const communityPerPage = 10
+  const [communityTotal, setCommunityTotal] = useState(0)
   const [showAddBusiness, setShowAddBusiness] = useState(false)
 
   const itemsPerPage = 12
