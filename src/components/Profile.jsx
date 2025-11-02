@@ -62,8 +62,51 @@ export default function Profile({ userId, onSignOut }) {
 
   useEffect(() => {
     loadUser()
+    loadDeviceInfo()
     setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
   }, [userId])
+
+  const loadDeviceInfo = async () => {
+    try {
+      const stored = deviceFingerprint.retrieve()
+      if (stored) {
+        setDeviceInfo({
+          fingerprint: stored.fingerprint,
+          timestamp: new Date(stored.timestamp).toLocaleDateString(),
+          expiresAt: new Date(stored.expiresAt).toLocaleDateString()
+        })
+      }
+    } catch (error) {
+      console.warn('Error loading device info:', error)
+    }
+  }
+
+  const handleSignOut = async () => {
+    try {
+      setSigningOut(true)
+
+      // Clear device fingerprint
+      deviceFingerprint.clear()
+
+      // Sign out from Supabase
+      await supabase.auth.signOut()
+
+      // Callback to parent component
+      if (onSignOut) {
+        onSignOut()
+      }
+
+      // Redirect or reset state
+      setSuccess('Signed out successfully')
+      setTimeout(() => {
+        window.location.href = '/'
+      }, 1000)
+    } catch (err) {
+      setError('Failed to sign out: ' + (err.message || 'Unknown error'))
+    } finally {
+      setSigningOut(false)
+    }
+  }
 
   const loadUser = async () => {
     try {
