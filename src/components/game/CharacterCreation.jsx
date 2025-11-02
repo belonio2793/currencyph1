@@ -84,15 +84,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     setAppearance(prev => ({ ...prev, [key]: value }))
   }
 
-  function handleRgbChange(part, val) {
-    const next = { ...rgb, [part]: clamp(parseInt(val || 0), 0, 255) }
-    setRgb(next)
-    const hex = rgbToHex(next)
-    setAppearance(prev => ({ ...prev, hair_color: hex }))
-  }
-
-  // gallery list (filtered)
-  const galleryList = hairstyles.filter(s => s.includes(search.toLowerCase()))
+  // gallery removed
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-start justify-center p-3">
