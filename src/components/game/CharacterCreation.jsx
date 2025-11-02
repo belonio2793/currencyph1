@@ -163,51 +163,9 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                   </div>
                 </div>
 
-                {/* Hair row: gallery open, suggest popular quick picks */}
+                {/* Hairstyle removed — using default per-gender preview */}
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-slate-300">Hairstyle</label>
-                    <div className="flex items-center gap-2">
-                      <button type="button" onClick={()=>setShowGallery(true)} className="px-2 py-1 text-xs bg-slate-700 border border-slate-600 rounded text-slate-200">Open Hairstyle Gallery</button>
-                      <button type="button" onClick={()=>{ const idx = hairstyles.indexOf(appearance.hair_style); const next = hairstyles[(idx+1)%hairstyles.length]; handleAppearanceChange('hair_style', next)}} className="px-2 py-1 text-xs bg-slate-700 border border-slate-600 rounded text-slate-200">Cycle</button>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 items-center flex-wrap">
-                    <div className="w-12 h-12 bg-slate-900 border border-slate-700 rounded flex items-center justify-center">
-                      <HairIcon styleId={appearance.hair_style} color={appearance.hair_color} gender={appearance.gender} largeIcon />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm text-slate-300 font-medium truncate">{appearance.hair_style.replace('_',' ')}</div>
-                      <div className="text-xs text-slate-400">Tap "Open Hairstyle Gallery" for many options</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Color picks + RGB */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Hair Color</label>
-                  <div className="flex gap-2 items-center mb-2">
-                    {['#1b1b1b','#4b2e2e','#6b3a2a','#c09c6b','#f1c27d','#f9e0c7','#2e4b6b','#5a2f5a','#ffffff','#ff0000','#b8860b','#8b5a2b'].map(c => (
-                      <button key={c} type="button" onClick={()=>handleAppearanceChange('hair_color', c)} className={`w-8 h-8 rounded-full border-2 ${appearance.hair_color===c ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-600'}`} style={{backgroundColor:c}} />
-                    ))}
-                    <input type="color" value={appearance.hair_color} onChange={(e)=>handleAppearanceChange('hair_color', e.target.value)} className="w-10 h-8 p-0 border-2 border-slate-600 rounded-md" />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <label className="text-xs text-slate-400">R</label>
-                      <input type="number" min="0" max="255" value={rgb.r} onChange={(e)=>handleRgbChange('r', e.target.value)} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-                    </div>
-                    <div>
-                      <label className="text-xs text-slate-400">G</label>
-                      <input type="number" min="0" max="255" value={rgb.g} onChange={(e)=>handleRgbChange('g', e.target.value)} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-                    </div>
-                    <div>
-                      <label className="text-xs text-slate-400">B</label>
-                      <input type="number" min="0" max="255" value={rgb.b} onChange={(e)=>handleRgbChange('b', e.target.value)} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-                    </div>
-                  </div>
+                  <p className="text-sm text-slate-300">Using default appearance for selected gender. Hairstyle and hair color controls were removed to ensure consistent placement.</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
