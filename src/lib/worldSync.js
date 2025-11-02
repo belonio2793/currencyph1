@@ -1,0 +1,247 @@
+import { supabase } from './supabaseClient'
+
+// Manage real-time player position sync
+export class WorldSync {
+  constructor(userId, characterId, cityName) {
+    this.userId = userId
+    this.characterId = characterId
+    this.cityName = cityName
+    this.subscription = null
+    this.lastSyncTime = 0
+    this.syncInterval = 500 // ms between syncs
+    this.otherPlayers = new Map()
+    this.callbacks = {
+      onPlayerUpdate: null,
+      onPlayerJoined: null,
+      onPlayerLeft: null,
+      onChatMessage: null
+    }
+  }
+
+  // Initialize real-time subscriptions
+  async connect() {
+    try {
+      // Subscribe to player position updates
+      this.subscription = supabase
+        .channel(`world:${this.cityName}`)
+        .on('broadcast', { event: 'player_move' }, (payload) => {
+          this.handlePlayerMove(payload)
+        })
+        .on('broadcast', { event: 'player_chat' }, (payload) => {
+          this.handlePlayerChat(payload)
+        })
+        .on('presence', { event: 'sync' }, (payload) => {
+          this.handlePresenceSync(payload)
+        })
+        .on('presence', { event: 'join' }, (payload) => {
+          this.handlePlayerJoined(payload)
+        })
+        .on('presence', { event: 'leave' }, (payload) => {
+          this.handlePlayerLeft(payload)
+        })
+        .subscribe((status) => {
+          if (status === 'SUBSCRIBED') {
+            console.log('World sync connected to', this.cityName)
+            this.updatePresence()
+          }
+        })
+
+      return true
+    } catch (error) {
+      console.error('World sync connection error:', error)
+      return false
+    }
+  }
+
+  // Update player presence
+  async updatePresence(playerData = {}) {
+    try {
+      if (!this.subscription) return
+
+      const presence = {
+        user_id: this.userId,
+        character_id: this.characterId,
+        character_name: playerData.name || 'Player',
+        city: this.cityName,
+        x: playerData.x || 0,
+        y: playerData.y || 0,
+        direction: playerData.direction || 'down',
+        timestamp: Date.now()
+      }
+
+      await this.subscription.track(presence)
+    } catch (error) {
+      console.error('Presence update error:', error)
+    }
+  }
+
+  // Broadcast player movement
+  async broadcastMove(x, y, direction = 'down') {
+    const now = Date.now()
+    if (now - this.lastSyncTime < this.syncInterval) return
+
+    try {
+      await this.subscription?.send({
+        type: 'broadcast',
+        event: 'player_move',
+        payload: {
+          user_id: this.userId,
+          character_id: this.characterId,
+          x,
+          y,
+          direction,
+          timestamp: now
+        }
+      })
+
+      this.lastSyncTime = now
+    } catch (error) {
+      console.error('Move broadcast error:', error)
+    }
+  }
+
+  // Broadcast chat message
+  async broadcastChat(message, targetNpcId = null) {
+    try {
+      await this.subscription?.send({
+        type: 'broadcast',
+        event: 'player_chat',
+        payload: {
+          user_id: this.userId,
+          character_id: this.characterId,
+          character_name: 'Player',
+          message,
+          targetNpcId,
+          city: this.cityName,
+          timestamp: Date.now()
+        }
+      })
+    } catch (error) {
+      console.error('Chat broadcast error:', error)
+    }
+  }
+
+  // Handle incoming player movement
+  handlePlayerMove(payload) {
+    if (payload.payload.user_id === this.userId) return
+
+    const playerId = payload.payload.user_id
+    this.otherPlayers.set(playerId, {
+      ...payload.payload,
+      characterId: payload.payload.character_id
+    })
+
+    if (this.callbacks.onPlayerUpdate) {
+      this.callbacks.onPlayerUpdate(Array.from(this.otherPlayers.values()))
+    }
+  }
+
+  // Handle incoming chat
+  handlePlayerChat(payload) {
+    if (this.callbacks.onChatMessage) {
+      this.callbacks.onChatMessage(payload.payload)
+    }
+  }
+
+  // Handle presence sync
+  handlePresenceSync(payload) {
+    this.otherPlayers.clear()
+    payload.forEach(presence => {
+      if (presence.user_id !== this.userId) {
+        this.otherPlayers.set(presence.user_id, presence)
+      }
+    })
+
+    if (this.callbacks.onPlayerUpdate) {
+      this.callbacks.onPlayerUpdate(Array.from(this.otherPlayers.values()))
+    }
+  }
+
+  // Handle player joined
+  handlePlayerJoined(payload) {
+    if (payload.presence_event.user_id !== this.userId) {
+      this.otherPlayers.set(payload.presence_event.user_id, payload.presence_event)
+
+      if (this.callbacks.onPlayerJoined) {
+        this.callbacks.onPlayerJoined(payload.presence_event)
+      }
+    }
+  }
+
+  // Handle player left
+  handlePlayerLeft(payload) {
+    this.otherPlayers.delete(payload.presence_event.user_id)
+
+    if (this.callbacks.onPlayerLeft) {
+      this.callbacks.onPlayerLeft(payload.presence_event.user_id)
+    }
+  }
+
+  // Register callback
+  on(event, callback) {
+    if (event === 'playerUpdate') {
+      this.callbacks.onPlayerUpdate = callback
+    } else if (event === 'playerJoined') {
+      this.callbacks.onPlayerJoined = callback
+    } else if (event === 'playerLeft') {
+      this.callbacks.onPlayerLeft = callback
+    } else if (event === 'chatMessage') {
+      this.callbacks.onChatMessage = callback
+    }
+  }
+
+  // Disconnect
+  disconnect() {
+    if (this.subscription) {
+      this.subscription.unsubscribe()
+      this.subscription = null
+    }
+    this.otherPlayers.clear()
+  }
+
+  getOtherPlayers() {
+    return Array.from(this.otherPlayers.values())
+  }
+}
+
+// Database operations for persistence
+export const WorldDB = {
+  async saveWorldEvent(userId, characterId, city, eventType, data) {
+    try {
+      const { error } = await supabase
+        .from('world_events')
+        .insert([{
+          user_id: userId,
+          character_id: characterId,
+          city,
+          event_type: eventType,
+          event_data: data,
+          created_at: new Date()
+        }])
+
+      if (error) throw error
+      return true
+    } catch (error) {
+      console.error('World event save error:', error)
+      return false
+    }
+  },
+
+  async getNPCInteractions(npcId, limit = 50) {
+    try {
+      const { data, error } = await supabase
+        .from('world_events')
+        .select('*')
+        .eq('event_type', 'npc_chat')
+        .filter('event_data->>npcId', 'eq', npcId)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('NPC interactions fetch error:', error)
+      return []
+    }
+  }
+}
