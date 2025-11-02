@@ -486,12 +486,10 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       {/* Game Canvas */}
       <canvas
         ref={canvasRef}
-        width={800}
-        height={600}
         onClick={handleCanvasClick}
         onWheel={handleWheel}
         className="absolute inset-0 w-full h-full z-10 cursor-crosshair block"
-        style={{ imageRendering: 'auto' }}
+        style={{ imageRendering: 'crisp-edges', display: 'block' }}
       />
 
       {/* HUD Overlay */}
