@@ -1240,29 +1240,39 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
               return (
                 <div key={listing.id} className="bg-white border rounded-lg p-6 shadow-sm">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-slate-900">{listing.name}</h3>
-                      <p className="text-sm text-slate-500 mt-1">{listing.address}</p>
+                    <div className="flex items-start gap-4 flex-1">
+                      {(listing.primary_image_url || (listing.image_urls && listing.image_urls[0])) && (
+                        <img src={listing.primary_image_url || listing.image_urls[0]} alt="preview" className="w-24 h-24 object-cover rounded" />
+                      )}
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-slate-900">{listing.name}</h3>
+                        <p className="text-sm text-slate-500 mt-1">{listing.address}</p>
+                        <div className="text-xs text-slate-500 mt-1 flex flex-wrap gap-2">
+                          {listing.city && <span>📍 {listing.city}</span>}
+                          {listing.phone_number && <span>☎ {listing.phone_number}</span>}
+                          {listing.website && <a href={listing.website} target="_blank" rel="noreferrer" className="text-blue-600 underline">Website</a>}
+                        </div>
 
-                      <div className="mt-3 flex items-center gap-4">
-                        {listing.category && (
-                          <span className="text-sm px-2 py-1 bg-slate-100 rounded text-slate-700">
-                            {listing.category}
-                          </span>
-                        )}
-                        {listing.rating && (
-                          <span className="text-sm text-yellow-600">★ {listing.rating}</span>
-                        )}
-                        {listing.description && (
-                          <p className="text-sm text-slate-600 mt-2">{listing.description}</p>
-                        )}
-                      </div>
+                        <div className="mt-3 flex items-center gap-4">
+                          {listing.category && (
+                            <span className="text-sm px-2 py-1 bg-slate-100 rounded text-slate-700">
+                              {listing.category}
+                            </span>
+                          )}
+                          {listing.rating && (
+                            <span className="text-sm text-yellow-600">★ {listing.rating}</span>
+                          )}
+                          {listing.description && (
+                            <p className="text-sm text-slate-600 mt-2">{listing.description}</p>
+                          )}
+                        </div>
 
-                      <div className="mt-4 flex items-center gap-6">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-slate-700">Community Votes:</span>
-                          <span className="text-sm text-green-600 font-semibold">{counts.approvals} approve</span>
-                          <span className="text-sm text-red-600 font-semibold">{counts.rejections} reject</span>
+                        <div className="mt-4 flex items-center gap-6">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-slate-700">Community Votes:</span>
+                            <span className="text-sm text-green-600 font-semibold">{counts.approvals} approve</span>
+                            <span className="text-sm text-red-600 font-semibold">{counts.rejections} reject</span>
+                          </div>
                         </div>
                       </div>
                     </div>
