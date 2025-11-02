@@ -107,7 +107,7 @@ export class NPCAIEngine {
 
   async generateTradeOffer(npc, cityName) {
     try {
-      const systemPrompt = `You are ${npc.name}, a ${npc.role} in ${city}.
+      const systemPrompt = `You are ${npc.name}, a ${npc.role} in ${cityName}.
 Generate a brief, realistic trade offer or business opportunity for a visitor.
 Format: "I can offer you: [item/service] for [price] PHP. Interested?"`
 
