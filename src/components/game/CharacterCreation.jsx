@@ -9,9 +9,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     skin_tone: 'medium',
     skin_color: '#d4a574',
     height: 175,
-    build: 'average',
-    hair_style: 'crew_cut',
-    hair_color: '#333'
+    build: 'average'
   })
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
@@ -54,9 +52,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       skin_tone: 'medium',
       skin_color: '#d4a574',
       height: 175,
-      build: 'average',
-      hair_style: 'crew_cut',
-      hair_color: '#333'
+      build: 'average'
     }
     setAppearance(defaultAppearance)
     setRgbSkin(hexToRgb(defaultAppearance.skin_color))
@@ -141,10 +137,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                   </div>
                 </div>
 
-                {/* Hairstyle removed — using default per-gender preview */}
-                <div>
-                  <p className="text-sm text-slate-300">Using default appearance for selected gender. Hairstyle and hair color controls were removed to ensure consistent placement.</p>
-                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
@@ -278,131 +270,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   )
 }
 
-function HairIcon({ styleId, color = '#333', gender, largeIcon = false, offsetX = 0, offsetY = 0, scale = 1 }) {
-  const size = largeIcon ? 44 : 28
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      <g transform={`translate(${size/2}, ${size/2})`}>
-        <g transform={`translate(${offsetX}, ${offsetY}) scale(${scale})`}>
-          {renderHairSVG(styleId, color, size/2)}
-        </g>
-      </g>
-    </svg>
-  )
-}
-
-function renderHairSVG(style, color, r) {
-  const h = r
-  // clip so hair wraps to head circle
-  const clipId = `clip_${style}`
-
-  // helper to create a smooth back hair shape
-  const backPath = (wFactor = 1.0, downOffset = 0) => `M ${-h*wFactor} ${-h*0.6+downOffset} q ${h*wFactor*0.6} ${-h*0.9} ${h*wFactor*1.6} ${-h*0.25} q ${-h*wFactor*0.2} ${h*0.6} ${-h*wFactor*1.6} ${h*0.4} v ${h*1.5} q ${-h*0.3} ${h*0.4} ${-h*wFactor*1.6} ${0} z`
-
-  // bangs/front path
-  const bangsPath = (depth = 0.35) => `M ${-h*0.9} ${-h*0.1} q ${h*0.45} ${-h*depth} ${h*0.9} ${-h*0.05} q ${-h*0.25} ${h*0.25} ${-h*0.9} ${h*0.05} z`
-
-  switch (style) {
-    case 'buzz_cut':
-    case 'crew_cut':
-    case 'fade':
-      return (
-        <g>
-          <defs>
-            <clipPath id={clipId}><circle r={h*0.98} cx="0" cy="0" /></clipPath>
-          </defs>
-          <g clipPath={`url(#${clipId})`}>
-            <rect x={-h*0.95} y={-h*0.6} width={h*1.9} height={h*1.05} rx={h*0.18} fill={color} />
-          </g>
-        </g>
-      )
-
-    case 'pompadour':
-    case 'quiff':
-    case 'comb_over':
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.02} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            <path d={backPath(1.05, -h*0.12)} fill={color} opacity={1} />
-            <path d={bangsPath(0.6)} fill={shade(color, -12)} opacity={1} />
-          </g>
-        </g>
-      )
-
-    case 'slick_back':
-    case 'undercut':
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.02} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            <path d={backPath(1.0, -h*0.06)} fill={color} />
-            <path d={bangsPath(0.25)} fill={shade(color, -8)} opacity={0.95} />
-          </g>
-        </g>
-      )
-
-    case 'man_bun':
-    case 'top_knot':
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.05} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            <path d={backPath(1.05, 0)} fill={color} />
-            <circle cx={h*0.45} cy={-h*1.08} r={h*0.36} fill={color} />
-          </g>
-        </g>
-      )
-
-    case 'long_layers':
-    case 'long_flow':
-    case 'layered_long':
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.1} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            <path d={`M ${-h*1.4} ${-h*0.5} q ${h*1.8} ${-h*0.8} ${h*3.0} ${0} v ${h*2.1} q ${-h*0.4} ${h*0.5} ${-h*3.0} ${0} z`} fill={color} />
-            <path d={bangsPath(0.5)} fill={shade(color, -10)} opacity={0.95} />
-          </g>
-        </g>
-      )
-
-    case 'curly_male':
-    case 'curly_female':
-    case 'afro':
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.12} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            {Array.from({length:9}).map((_,i)=>(<circle key={i} cx={Math.cos(i/9*Math.PI*2)*h*0.55} cy={Math.sin(i/9*Math.PI*2)*h*0.35 - h*0.45} r={h*0.32} fill={color} />))}
-          </g>
-        </g>
-      )
-
-    case 'braid':
-    case 'french_braid':
-    case 'fishtail':
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.05} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            <path d={backPath(0.95, 0.08)} fill={color} />
-            {Array.from({length:4}).map((_,i)=>(<ellipse key={i} cx={h*(0.9 - i*0.18)} cy={-h*0.0 + i*7} rx={h*0.19} ry={h*0.11} fill={shade(color, i%2? -6:6)} />))}
-          </g>
-        </g>
-      )
-
-    default:
-      return (
-        <g>
-          <defs><clipPath id={clipId}><circle r={h*1.02} cx="0" cy="0" /></clipPath></defs>
-          <g clipPath={`url(#${clipId})`}>
-            <rect x={-h} y={-h*0.6} width={h*2} height={h*1.05} rx={h*0.2} fill={color} />
-          </g>
-        </g>
-      )
-  }
-}
 
 function AvatarPreview({ appearance, name = '', large = false }) {
   const size = large ? 260 : 160
@@ -457,7 +324,6 @@ function AvatarPreview({ appearance, name = '', large = false }) {
         {/* head group */}
         <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.24})`}>
           <circle r={headRadius} fill={faceColor} />
-          <g>{renderHairSVG(appearance.hair_style, appearance.hair_color, headRadius)}</g>
 
           <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
           <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
@@ -467,7 +333,7 @@ function AvatarPreview({ appearance, name = '', large = false }) {
 
       <div className="mt-3">
         <p className="text-sm md:text-base font-semibold text-slate-100 truncate max-w-[220px]">{name || 'Unnamed'}</p>
-        <p className="text-xs text-slate-400">{appearance.gender === 'male' ? 'Male' : 'Female'} • {(appearance.hair_style || 'crew_cut').replace('_',' ')}</p>
+        <p className="text-xs text-slate-400">{appearance.gender === 'male' ? 'Male' : 'Female'}</p>
       </div>
     </div>
   )
