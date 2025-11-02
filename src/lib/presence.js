@@ -171,6 +171,40 @@ export async function getMultipleUsersPresence(userIds) {
   }
 }
 
+export async function getOnlineUsers() {
+  try {
+    const { data, error } = await supabase
+      .from('user_presence')
+      .select('user_id, status, latitude, longitude, city, updated_at')
+      .eq('status', 'online')
+      .not('latitude', 'is', null)
+      .not('longitude', 'is', null)
+      .order('updated_at', { ascending: false })
+
+    if (error && error.code !== 'PGRST116') throw error
+
+    return data || []
+  } catch (err) {
+    console.warn('Get online users error:', err)
+    return []
+  }
+}
+
+export async function subscribeToOnlineUsers(callback) {
+  const channel = supabase
+    .channel('online_users')
+    .on('postgres_changes', {
+      event: '*',
+      schema: 'public',
+      table: 'user_presence'
+    }, (payload) => {
+      callback(payload)
+    })
+    .subscribe()
+
+  return () => supabase.removeChannel(channel)
+}
+
 export async function markMessagesAsRead(messageIds, readerId) {
   if (!messageIds.length) return
 
