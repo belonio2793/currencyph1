@@ -545,5 +545,124 @@ export const wisegcashAPI = {
       }
     }
     return updated
+  },
+
+  // ============ Transactions =========
+  async getTransactions(userId, limit = 100) {
+    if (!userId) return []
+    try {
+      const { data, error } = await supabase
+        .from('wallet_transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(limit)
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.warn('getTransactions failed:', err)
+      return []
+    }
+  },
+
+  // ============ Loans =========
+  async getLoans(userId) {
+    if (!userId) return []
+    try {
+      const { data, error } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.warn('getLoans failed:', err)
+      return []
+    }
+  },
+
+  // ============ Beneficiaries =========
+  async getBeneficiaries(userId) {
+    if (!userId) return []
+    try {
+      const { data, error } = await supabase
+        .from('beneficiaries')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.warn('getBeneficiaries failed:', err)
+      return []
+    }
+  },
+
+  // ============ Bills =========
+  async getBills(userId) {
+    if (!userId) return []
+    try {
+      const { data, error } = await supabase
+        .from('bills')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.warn('getBills failed:', err)
+      return []
+    }
+  },
+
+  async createBill(userId, billForm) {
+    if (!userId) throw new Error('userId is required')
+    const payload = {
+      user_id: userId,
+      biller_category: billForm.biller_category,
+      biller_name: billForm.biller_name,
+      account_number: billForm.account_number,
+      status: 'pending'
+    }
+    const { data, error } = await supabase
+      .from('bills')
+      .insert([payload])
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  async payBill(billId, userId, amount, currencyCode = 'PHP') {
+    if (!billId || !userId || !amount || amount <= 0) throw new Error('Invalid parameters for payBill')
+
+    // Ensure wallet exists and has funds
+    const wallet = await this.getWallet(userId, currencyCode)
+    if (!wallet) throw new Error(`No ${currencyCode} wallet found`)
+    if (Number(wallet.balance) < Number(amount)) throw new Error('Insufficient balance')
+
+    // 1) Record wallet withdrawal
+    await supabase.rpc('record_wallet_transaction', {
+      p_user_id: userId,
+      p_wallet_id: wallet.id,
+      p_transaction_type: 'withdrawal',
+      p_amount: amount,
+      p_currency_code: currencyCode,
+      p_description: `Bill payment for ${billId}`,
+      p_reference_id: billId
+    })
+
+    // 2) Mark bill as paid (if table exists)
+    try {
+      await supabase
+        .from('bills')
+        .update({ status: 'paid', paid_at: new Date() })
+        .eq('id', billId)
+    } catch (e) {
+      console.warn('Failed to update bill status (continuing):', e)
+    }
+
+    return { bill_id: billId, amount, currency: currencyCode, status: 'paid' }
   }
 }
