@@ -1346,6 +1346,26 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
               )
             })}
           </div>
+
+          {communityTotal > communityPerPage && (
+            <div className="flex items-center justify-center gap-3 mt-6">
+              <button
+                onClick={() => setCommunityPage(p => Math.max(1, p - 1))}
+                disabled={communityPage === 1}
+                className="px-3 py-1 bg-slate-100 rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="text-sm text-slate-600">Page {communityPage} of {Math.ceil(communityTotal / communityPerPage)}</span>
+              <button
+                onClick={() => setCommunityPage(p => p + 1)}
+                disabled={communityPage >= Math.ceil(communityTotal / communityPerPage)}
+                className="px-3 py-1 bg-slate-100 rounded disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
