@@ -591,6 +591,21 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           </button>
         </div>
       </div>
+
+      {/* Street View modal */}
+      {streetViewOpen && (
+        <div className="absolute inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl h-[70vh] bg-black rounded">
+            <button className="absolute top-2 right-2 z-60 px-3 py-1 bg-slate-700 rounded" onClick={()=>{ setStreetViewOpen(false); setStreetViewImage(null) }}>Close</button>
+            {streetViewImage ? (
+              <img src={streetViewImage} alt="Street View" className="w-full h-full object-cover rounded" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white">Loading...</div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
