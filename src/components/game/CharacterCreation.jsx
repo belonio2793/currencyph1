@@ -386,12 +386,12 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   )
 }
 
-function HairIcon({ styleId, color = '#333', gender, largeIcon = false }) {
+function HairIcon({ styleId, color = '#333', gender, largeIcon = false, offsetX = 0, offsetY = 0, scale = 1 }) {
   const size = largeIcon ? 44 : 28
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       <g transform={`translate(${size/2}, ${size/2})`}>
-        {renderHairSVG(styleId, color, size/2)}
+        {renderHairSVG(styleId, color, size/2, offsetX, offsetY, scale)}
       </g>
     </svg>
   )
