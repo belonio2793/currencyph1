@@ -170,7 +170,7 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
       <iframe
         ref={iframeRef}
         title="Ready Player Me"
-        src={`https://readyplayer.me/avatar?frameApi=1${savedAvatarUrl ? '&avatarUrl=' + encodeURIComponent(savedAvatarUrl) : '&clearCache=1'}&bodyType=fullbody`}
+        src={getAvatarEditorUrl(savedAvatarUrl)}
         allow="camera *; clipboard-write"
         className="w-full h-full border-0"
         key={savedAvatarUrl ? `rpm-${savedAvatarUrl}` : 'rpm-new'}
