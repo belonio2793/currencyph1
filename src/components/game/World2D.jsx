@@ -9,6 +9,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const syncRef = useRef(null)
   const aiRef = useRef(null)
   const conversationRef = useRef(null)
+  const cameraRef = useRef({ x: 0, y: 0, zoom: 1 })
 
   const [otherPlayers, setOtherPlayers] = useState([])
   const [nearbyNPCs, setNearbyNPCs] = useState([])
@@ -38,6 +39,19 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
     })
 
+    // Set initial camera to fit the map and center on player when available
+    setTimeout(() => {
+      const canvas = canvasRef.current
+      const world = worldRef.current
+      if (!canvas || !world) return
+      const map = world.mapData
+      const fitZoom = Math.min(canvas.width / map.width, canvas.height / map.height)
+      const zoom = Math.max(0.2, Math.min(2, fitZoom))
+      cameraRef.current.zoom = zoom
+      cameraRef.current.x = Math.max(0, world.player.x - canvas.width / (2 * zoom))
+      cameraRef.current.y = Math.max(0, world.player.y - canvas.height / (2 * zoom))
+    }, 50)
+
     return () => {
       if (syncRef.current) syncRef.current.disconnect()
       if (gameLoopRef.current) cancelAnimationFrame(gameLoopRef.current)
@@ -63,8 +77,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // Sync position
       syncRef.current?.broadcastMove(world.player.x, world.player.y, world.player.direction)
 
-      // Render
-      renderWorld(ctx, canvas, world, otherPlayers)
+      // Render (pass current camera)
+      renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current)
 
       gameLoopRef.current = requestAnimationFrame(gameLoop)
     }
@@ -125,10 +139,10 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     const clickX = e.clientX - rect.left
     const clickY = e.clientY - rect.top
 
-    // Convert screen coords to world coords
-    const camera = getCameraPos()
-    const worldX = clickX / 2 + camera.x
-    const worldY = clickY / 2 + camera.y
+    // Convert screen coords to world coords using camera zoom/position
+    const camera = cameraRef.current
+    const worldX = clickX / camera.zoom + camera.x
+    const worldY = clickY / camera.zoom + camera.y
 
     worldRef.current.movePlayer(worldX, worldY)
   }
@@ -138,6 +152,28 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     conversationRef.current.openChat(npc)
     setChatUI({ isOpen: true, npc, messages: [{ sender: npc.name, text: `Hi, I'm ${npc.name}! What can I help you with?` }] })
     setPlayerInput('')
+  }
+
+  // Handle canvas wheel zoom
+  const handleWheel = (e) => {
+    e.preventDefault()
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const rect = canvas.getBoundingClientRect()
+    const mx = e.clientX - rect.left
+    const my = e.clientY - rect.top
+    const cam = cameraRef.current
+    const prevZoom = cam.zoom || 1
+    const delta = -e.deltaY
+    const factor = delta > 0 ? 1.1 : 0.9
+    const newZoom = Math.max(0.2, Math.min(3, prevZoom * factor))
+
+    // Compute world coord under mouse before and after zoom, adjust camera to keep mouse focus
+    const worldX = mx / prevZoom + cam.x
+    const worldY = my / prevZoom + cam.y
+    cam.zoom = newZoom
+    cam.x = worldX - mx / newZoom
+    cam.y = worldY - my / newZoom
   }
 
   // Handle chat send
@@ -281,76 +317,95 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
 
 // Utility functions
 function getCameraPos() {
-  return { x: 0, y: 0 }
+  // Legacy helper: read from cameraRef if available in runtime
+  try {
+    return (window && window.__cameraRef && window.__cameraRef.current) || { x: 0, y: 0, zoom: 1 }
+  } catch (e) {
+    return { x: 0, y: 0, zoom: 1 }
+  }
 }
 
-function renderWorld(ctx, canvas, world, otherPlayers) {
+function renderWorld(ctx, canvas, world, otherPlayers, camera) {
   const tileSize = 32
-  const viewSize = Math.min(canvas.width, canvas.height) / tileSize
 
-  // Clear canvas
+  // Clear canvas (screen-space)
+  ctx.save()
+  ctx.setTransform(1,0,0,1,0,0)
   ctx.fillStyle = '#0f172a'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  // Draw grid
+  // Apply camera transform: scale then translate
+  const cam = camera || { x: 0, y: 0, zoom: 1 }
+  ctx.scale(cam.zoom, cam.zoom)
+  ctx.translate(-cam.x, -cam.y)
+
+  // Draw grid in world-space
   ctx.strokeStyle = '#1e293b'
-  ctx.lineWidth = 1
-  for (let i = 0; i <= viewSize; i++) {
+  ctx.lineWidth = 1 / Math.max(0.0001, cam.zoom)
+  const worldViewWidth = canvas.width / cam.zoom
+  const worldViewHeight = canvas.height / cam.zoom
+  const cols = Math.ceil(worldViewWidth / tileSize) + 2
+  const rows = Math.ceil(worldViewHeight / tileSize) + 2
+
+  for (let i = 0; i <= cols; i++) {
     ctx.beginPath()
     ctx.moveTo(i * tileSize, 0)
-    ctx.lineTo(i * tileSize, canvas.height)
+    ctx.lineTo(i * tileSize, worldViewHeight)
     ctx.stroke()
-
+  }
+  for (let j = 0; j <= rows; j++) {
     ctx.beginPath()
-    ctx.moveTo(0, i * tileSize)
-    ctx.lineTo(canvas.width, i * tileSize)
+    ctx.moveTo(0, j * tileSize)
+    ctx.lineTo(worldViewWidth, j * tileSize)
     ctx.stroke()
   }
 
   // Draw buildings
   world.mapData.buildings.forEach(building => {
     ctx.fillStyle = '#475569'
-    ctx.fillRect(building.x / 5, building.y / 5, building.width / 5, building.height / 5)
+    ctx.fillRect(building.x, building.y, building.width, building.height)
 
     ctx.fillStyle = '#94a3b8'
-    ctx.font = '10px Arial'
-    ctx.fillText(building.name, building.x / 5 + 5, building.y / 5 + 15)
+    ctx.font = `${10 / cam.zoom}px Arial`
+    ctx.fillText(building.name, building.x + 5, building.y + 15)
   })
 
   // Draw NPCs
   world.npcs.forEach(npc => {
     ctx.fillStyle = '#3b82f6'
     ctx.beginPath()
-    ctx.arc(npc.x / 5, npc.y / 5, 8, 0, Math.PI * 2)
+    ctx.arc(npc.x, npc.y, 8, 0, Math.PI * 2)
     ctx.fill()
 
     ctx.fillStyle = '#fff'
-    ctx.font = 'bold 12px Arial'
+    ctx.font = `${12 / cam.zoom}px Arial`
     ctx.textAlign = 'center'
-    ctx.fillText(npc.emoji, npc.x / 5, npc.y / 5 + 2)
+    ctx.fillText(npc.emoji, npc.x, npc.y + 2)
   })
 
   // Draw other players
   otherPlayers.forEach(player => {
     ctx.fillStyle = '#8b5cf6'
     ctx.beginPath()
-    ctx.arc(player.x / 5, player.y / 5, 7, 0, Math.PI * 2)
+    ctx.arc(player.x, player.y, 7, 0, Math.PI * 2)
     ctx.fill()
 
     ctx.fillStyle = '#e0e7ff'
-    ctx.font = '10px Arial'
+    ctx.font = `${10 / cam.zoom}px Arial`
     ctx.textAlign = 'center'
-    ctx.fillText(player.character_name, player.x / 5, player.y / 5 - 12)
+    ctx.fillText(player.character_name, player.x, player.y - 12)
   })
 
   // Draw player
   ctx.fillStyle = '#10b981'
   ctx.beginPath()
-  ctx.arc(world.player.x / 5, world.player.y / 5, 10, 0, Math.PI * 2)
+  ctx.arc(world.player.x, world.player.y, 10, 0, Math.PI * 2)
   ctx.fill()
 
   ctx.fillStyle = '#fff'
-  ctx.font = 'bold 14px Arial'
+  ctx.font = `${14 / cam.zoom}px Arial`
   ctx.textAlign = 'center'
-  ctx.fillText('👤', world.player.x / 5, world.player.y / 5 + 1)
+  ctx.fillText('👤', world.player.x, world.player.y + 1)
+
+  ctx.restore()
 }
