@@ -18,17 +18,17 @@ export default function GameCombat({ combatData, onClose }) {
       <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-lg max-w-md w-full p-8 border-2 border-yellow-500">
         <div className="text-center">
           <div className="text-6xl mb-4 animate-bounce">
-            {won ? '⚔️' : '💥'}
+            {won ? '💰' : '📉'}
           </div>
-          
+
           <h2 className={`text-3xl font-bold mb-4 ${won ? 'text-green-400' : 'text-red-400'}`}>
-            {won ? 'Victory!' : 'Defeated!'}
+            {won ? 'Trade Successful!' : 'Trade Failed!'}
           </h2>
 
           <div className="bg-slate-700/50 rounded-lg p-4 mb-6">
-            <p className="text-slate-400 text-sm">You fought a</p>
+            <p className="text-slate-400 text-sm">Traded with</p>
             <p className="text-2xl font-bold capitalize">{enemy}</p>
-            <p className="text-slate-400 text-sm mt-1">Level {combatLog.enemy_level}</p>
+            <p className="text-slate-400 text-sm mt-1">Tier {combatLog.enemy_level}</p>
           </div>
 
           {won && (
@@ -57,7 +57,7 @@ export default function GameCombat({ combatData, onClose }) {
 
           {!won && (
             <div className="bg-red-500/10 border border-red-500/30 rounded p-4 mb-6">
-              <p className="text-slate-400">You were defeated. Recover and try again!</p>
+              <p className="text-slate-400">Trade didn't go as planned. Try again!</p>
             </div>
           )}
 

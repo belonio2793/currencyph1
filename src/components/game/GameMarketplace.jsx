@@ -48,11 +48,11 @@ export default function GameMarketplace({ character, onInventoryUpdate }) {
   const getItemIcon = (itemType) => {
     const icons = {
       clothing: '👕',
-      equipment: '⚔️',
+      equipment: '💼',
       tool: '🛠️',
       consumable: '🍎',
-      weapon: '⚔️',
-      armor: '🛡️',
+      weapon: '💼',
+      armor: '🧥',
       accessory: '💍',
       property: '🏠'
     }

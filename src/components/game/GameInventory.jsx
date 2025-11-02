@@ -38,12 +38,12 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
 
   const getItemIcon = (itemType) => {
     const icons = {
-      clothing: '👕',
-      equipment: '⚔️',
+      clothing: '��',
+      equipment: '💼',
       tool: '🛠️',
       consumable: '🍎',
-      weapon: '⚔️',
-      armor: '🛡️',
+      weapon: '💼',
+      armor: '🧥',
       accessory: '💍'
     }
     return icons[itemType] || '📦'

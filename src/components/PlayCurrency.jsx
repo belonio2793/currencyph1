@@ -147,7 +147,7 @@ export default function PlayCurrency({ userId }) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl font-bold text-blue-400 mb-4">⚔️ Play Currency</div>
+          <div className="text-4xl font-bold text-blue-400 mb-4">🌏 Play Currency</div>
           <p className="text-slate-400">Loading your adventure...</p>
         </div>
       </div>
@@ -165,7 +165,13 @@ export default function PlayCurrency({ userId }) {
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-blue-400">⚔️ {character.name}</h1>
+              <h1
+                onClick={() => setShowCharacterCustomizer(true)}
+                className="text-3xl font-bold text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
+                title="Click to customize"
+              >
+                {character.name}
+              </h1>
               <p className="text-slate-400 text-sm">Level {character.level} • Location: {character.current_location}</p>
             </div>
             <div className="flex items-center gap-8">
@@ -220,7 +226,7 @@ export default function PlayCurrency({ userId }) {
             { id: 'world', label: '🌍 World', icon: '���️' },
             { id: 'cities', label: '🏙️ Cities', icon: '🌆' },
             { id: 'inventory', label: '🎒 Inventory', icon: '📦' },
-            { id: 'equipment', label: '👕 Equipment', icon: '⚔️' },
+            { id: 'equipment', label: '👕 Equipment', icon: '👗' },
             { id: 'marketplace', label: '🏪 Marketplace', icon: '💰' },
             { id: 'properties', label: '🏠 Properties', icon: '🏢' },
             { id: 'banking', label: '🏦 Banking', icon: '💳' }
