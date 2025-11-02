@@ -1,7 +1,9 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 const gltfLoader = new GLTFLoader()
+const fbxLoader = new FBXLoader()
 const modelCache = new Map()
 
 export class World3D {
@@ -10,52 +12,73 @@ export class World3D {
     this.mapCenter = mapCenter
     this.scene = new THREE.Scene()
     this.scene.background = new THREE.Color(0x1a1a2e)
-    this.scene.fog = new THREE.Fog(0x1a1a2e, 1000, 5000)
-    
-    // Camera settings
+    this.scene.fog = new THREE.Fog(0x1a1a2e, 2000, 8000)
+
+    // Camera settings with presets
     this.cameraConfig = {
-      mode: 'topdown', // topdown, isometric, thirdperson, freecam
-      height: 800,
-      distance: 500,
+      mode: 'isometric', // topdown, isometric, thirdperson, freecam
+      height: 600,
+      distance: 400,
       angle: 45,
       fov: 75,
-      zoom: 1
+      zoom: 1.2,
+      enableShadows: true,
+      enableFog: true,
+      showNameplates: true
     }
-    
+
     // Setup camera
     this.camera = new THREE.PerspectiveCamera(
       this.cameraConfig.fov,
       container.clientWidth / container.clientHeight,
       0.1,
-      5000
+      8000
     )
-    this.updateCameraPosition()
-    
-    // Setup renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+    this.camera.position.set(0, 600, 400)
+
+    // Setup renderer with better quality
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: false,
+      powerPreference: 'high-performance',
+      precision: 'highp'
+    })
     this.renderer.setSize(container.clientWidth, container.clientHeight)
-    this.renderer.setPixelRatio(window.devicePixelRatio)
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.shadowMap.enabled = true
     this.renderer.shadowMap.type = THREE.PCFShadowShadowMap
+    this.renderer.shadowMap.resolution = 2048
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping
+    this.renderer.toneMappingExposure = 1.0
     this.container.appendChild(this.renderer.domElement)
-    
-    // Lighting
+
+    // Scene setup
     this.setupLighting()
-    
-    // Ground plane
+    this.setupEnvironment()
     this.setupGround()
-    
+
     // Players and NPCs
     this.players = new Map()
     this.npcs = new Map()
-    
-    // Animation loop
+    this.selectedPlayer = null
+
+    // Animation and state
     this.animationFrameId = null
     this.clock = new THREE.Clock()
-    
+    this.deltaTime = 0
+
+    // Raycaster for interactions
+    this.raycaster = new THREE.Raycaster()
+    this.mouse = new THREE.Vector2()
+
     // Handle window resize
     this.onWindowResize = () => this.handleResize()
     window.addEventListener('resize', this.onWindowResize)
+
+    // Listen for interaction clicks
+    this.onMouseClick = (e) => this.handleMouseClick(e)
+    this.renderer.domElement.addEventListener('click', this.onMouseClick)
   }
   
   setupLighting() {
