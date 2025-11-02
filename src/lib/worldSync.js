@@ -66,6 +66,7 @@ export class WorldSync {
         x: playerData.x || 0,
         y: playerData.y || 0,
         direction: playerData.direction || 'down',
+        rpm_avatar: playerData.rpm_avatar || playerData.avatarUrl || null,
         timestamp: Date.now()
       }
 
