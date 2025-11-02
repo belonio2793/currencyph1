@@ -126,7 +126,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     setTimeout(() => {
       const canvas = canvasRef.current
       const world = worldRef.current
-      if (!canvas || !world) return
+      if (!canvas || !world || canvas.width === 0 || canvas.height === 0) return
       const map = world.mapData
 
       // target tile zoom (MapTiler zoom level) for street-level detail
