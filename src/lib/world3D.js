@@ -208,48 +208,127 @@ export class World3D {
   
   setCameraMode(mode, config = {}) {
     this.cameraConfig.mode = mode
-    if (config.height) this.cameraConfig.height = config.height
-    if (config.distance) this.cameraConfig.distance = config.distance
+    if (config.height !== undefined) this.cameraConfig.height = config.height
+    if (config.distance !== undefined) this.cameraConfig.distance = config.distance
     if (config.angle !== undefined) this.cameraConfig.angle = config.angle
-    if (config.fov) {
+    if (config.fov !== undefined) {
       this.cameraConfig.fov = config.fov
       this.camera.fov = config.fov
       this.camera.updateProjectionMatrix()
     }
-    if (config.zoom) this.cameraConfig.zoom = config.zoom
+    if (config.zoom !== undefined) this.cameraConfig.zoom = Math.max(0.3, Math.min(3, config.zoom))
+    if (config.enableShadows !== undefined) this.cameraConfig.enableShadows = config.enableShadows
+    if (config.enableFog !== undefined) {
+      this.cameraConfig.enableFog = config.enableFog
+      if (this.scene.fog) {
+        this.scene.fog.visible = config.enableFog
+      }
+    }
+    if (config.showNameplates !== undefined) this.cameraConfig.showNameplates = config.showNameplates
   }
-  
+
   setZoom(zoomLevel) {
-    this.cameraConfig.zoom = Math.max(0.5, Math.min(3, zoomLevel))
+    this.cameraConfig.zoom = Math.max(0.3, Math.min(3, zoomLevel))
   }
-  
+
   async loadAvatarModel(url) {
+    if (!url) {
+      throw new Error('Avatar URL is required')
+    }
+
     if (modelCache.has(url)) {
       return modelCache.get(url).clone()
     }
-    
+
     return new Promise((resolve, reject) => {
-      gltfLoader.load(
-        url,
-        (gltf) => {
-          const model = gltf.scene
-          
-          // Setup shadows
-          model.traverse((node) => {
-            if (node.isMesh) {
-              node.castShadow = true
-              node.receiveShadow = true
-            }
-          })
-          
-          // Cache and clone
-          modelCache.set(url, model)
-          resolve(model.clone())
-        },
-        undefined,
-        reject
-      )
+      const timeout = setTimeout(() => {
+        reject(new Error('Avatar loading timeout'))
+      }, 15000)
+
+      const onSuccess = (model) => {
+        clearTimeout(timeout)
+
+        // Setup shadows
+        model.traverse((node) => {
+          if (node.isMesh) {
+            node.castShadow = true
+            node.receiveShadow = true
+          }
+          if (node.isSkinnedMesh) {
+            node.castShadow = true
+            node.receiveShadow = true
+          }
+        })
+
+        // Cache and clone
+        modelCache.set(url, model)
+        resolve(model.clone())
+      }
+
+      const onError = (error) => {
+        clearTimeout(timeout)
+        console.error('Avatar loading error:', error)
+        reject(error)
+      }
+
+      // Try loading as GLTF first
+      gltfLoader.load(url, (gltf) => onSuccess(gltf.scene), undefined, (err) => {
+        // Fall back to FBX if GLTF fails
+        fbxLoader.load(url, onSuccess, undefined, onError)
+      })
     })
+  }
+
+  createSimpleAvatar(name, color = 0x0ea5a5) {
+    const group = new THREE.Group()
+
+    // Head
+    const headGeometry = new THREE.SphereGeometry(10, 32, 32)
+    const material = new THREE.MeshStandardMaterial({ color })
+    const head = new THREE.Mesh(headGeometry, material)
+    head.position.y = 30
+    head.castShadow = true
+    head.receiveShadow = true
+    group.add(head)
+
+    // Body
+    const bodyGeometry = new THREE.BoxGeometry(8, 20, 8)
+    const body = new THREE.Mesh(bodyGeometry, material)
+    body.position.y = 10
+    body.castShadow = true
+    body.receiveShadow = true
+    group.add(body)
+
+    // Left arm
+    const armGeometry = new THREE.BoxGeometry(4, 18, 4)
+    const leftArm = new THREE.Mesh(armGeometry, material)
+    leftArm.position.set(-8, 12, 0)
+    leftArm.castShadow = true
+    leftArm.receiveShadow = true
+    group.add(leftArm)
+
+    // Right arm
+    const rightArm = new THREE.Mesh(armGeometry, material)
+    rightArm.position.set(8, 12, 0)
+    rightArm.castShadow = true
+    rightArm.receiveShadow = true
+    group.add(rightArm)
+
+    // Legs
+    const legGeometry = new THREE.BoxGeometry(4, 18, 4)
+    const leftLeg = new THREE.Mesh(legGeometry, material)
+    leftLeg.position.set(-4, -8, 0)
+    leftLeg.castShadow = true
+    leftLeg.receiveShadow = true
+    group.add(leftLeg)
+
+    const rightLeg = new THREE.Mesh(legGeometry, material)
+    rightLeg.position.set(4, -8, 0)
+    rightLeg.castShadow = true
+    rightLeg.receiveShadow = true
+    group.add(rightLeg)
+
+    return group
   }
   
   async addPlayer(userId, name, avatarUrl, x, z) {
