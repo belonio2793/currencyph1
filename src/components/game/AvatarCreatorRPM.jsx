@@ -81,7 +81,9 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
         {saving ? 'Saving…' : status}
         {error ? <span className="text-red-400 ml-2">{error}</span> : null}
       </div>
-      <button onClick={onClose} className="absolute top-2 right-2 z-30 bg-slate-700 hover:bg-slate-600 text-white rounded px-3 py-1 text-xs">Close</button>
+      {showCloseButton ? (
+        <button onClick={onClose} className="absolute top-2 right-2 z-30 bg-slate-700 hover:bg-slate-600 text-white rounded px-3 py-1 text-xs">Close</button>
+      ) : null}
       <iframe
         ref={iframeRef}
         title="Ready Player Me"
