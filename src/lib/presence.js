@@ -5,6 +5,12 @@ const OFFLINE_TIMEOUT = 120000 // 2 minutes
 
 let presenceIntervalId = null
 let currentUserId = null
+let currentLocation = null
+
+// Store location globally for presence updates
+function setCurrentLocation(location) {
+  currentLocation = location
+}
 
 export function initializePresence(userId) {
   currentUserId = userId
@@ -43,13 +49,23 @@ async function updatePresence(status) {
   if (!currentUserId) return
 
   try {
+    const updateData = {
+      user_id: currentUserId,
+      status,
+      updated_at: new Date().toISOString()
+    }
+
+    // Add location data if available
+    if (currentLocation) {
+      updateData.latitude = currentLocation.latitude
+      updateData.longitude = currentLocation.longitude
+      updateData.city = currentLocation.city || null
+      updateData.location_updated_at = new Date().toISOString()
+    }
+
     const { error } = await supabase
       .from('user_presence')
-      .upsert([{
-        user_id: currentUserId,
-        status,
-        updated_at: new Date().toISOString()
-      }])
+      .upsert([updateData])
 
     if (error) {
       if (error.code === 'PGRST116' || error.code === '404') {
@@ -60,6 +76,14 @@ async function updatePresence(status) {
     }
   } catch (err) {
     // Table might not exist, silently skip
+  }
+}
+
+export function updatePresenceLocation(location) {
+  setCurrentLocation(location)
+  // Update immediately if online
+  if (currentUserId) {
+    updatePresence('online')
   }
 }
 
