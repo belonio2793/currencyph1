@@ -69,15 +69,21 @@ async function migrate(batchSize = 500) {
     }
 
     if (updates.length > 0) {
-      const { error: upErr } = await supabase
-        .from('nearby_listings')
-        .upsert(updates, { onConflict: 'id' })
-      if (upErr) {
-        console.error('Upsert error', upErr)
-        break
+      // Update rows individually to avoid nulling other NOT NULL columns
+      for (const u of updates) {
+        const { error: upErr } = await supabase
+          .from('nearby_listings')
+          .update({ world_x: u.world_x, world_y: u.world_y })
+          .eq('id', u.id)
+        if (upErr) {
+          console.error('Update error for id', u.id, upErr)
+        } else {
+          updated += 1
+        }
+        // small delay to avoid bursts
+        await new Promise(r => setTimeout(r, 20))
       }
-      updated += updates.length
-      console.log(`Updated ${updates.length} rows (total ${updated})`)
+      console.log(`Processed ${updates.length} rows (total updated ${updated})`)
     }
 
     offset += batchSize
