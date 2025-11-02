@@ -34,7 +34,7 @@ const COUNTRIES = [
 
 const RELATIONSHIP_STATUS = ['Single', 'In a relationship', 'Engaged', 'Married', "It's complicated", 'Prefer not to say']
 
-export default function Profile({ userId }) {
+export default function Profile({ userId, onSignOut }) {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)
@@ -51,6 +51,8 @@ export default function Profile({ userId }) {
   const [displayNameType, setDisplayNameType] = useState('full_name')
   const [emailEditable, setEmailEditable] = useState(false)
   const [autoScrollToTop, setAutoScrollToTop] = useState(true)
+  const [signingOut, setSigningOut] = useState(false)
+  const [deviceInfo, setDeviceInfo] = useState(null)
 
   const isValidUUID = (id) => {
     return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
