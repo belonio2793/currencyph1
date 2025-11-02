@@ -127,7 +127,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       try {
         if (mapDivRef.current && !leafletRef.current) {
           const map = L.map(mapDivRef.current, { zoomControl: false, attributionControl: false, interactive: false })
-          const key = 'Epg2ZBCTb2mrWoiUKQRL'
+          const key = import.meta.env?.VITE_MAPTILER_KEY || ''
           const satUrl = `https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=${key}`
           const sat = L.tileLayer(satUrl, { maxZoom: 19 })
           sat.addTo(map)
