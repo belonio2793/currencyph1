@@ -112,6 +112,19 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
           <h1 className="text-3xl md:text-4xl font-bold text-center text-blue-400 mb-2">⚔️ Play Currency</h1>
           <p className="text-center text-slate-400 mb-4 md:mb-6">Create Your Adventure — pro customization</p>
 
+          {/* Disclaimer: users can always reset or change appearance later */}
+          <div className="mb-4 p-3 bg-yellow-600/10 border border-yellow-600/20 rounded text-yellow-200 text-sm">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <strong className="block text-yellow-100">Note:</strong>
+                <p className="text-xs text-yellow-100 mt-1">You can always reset or change your character's style, outfit, hairstyle, or appearance later. If a hairstyle or placement doesn't look right, use "Reset" and try different options — you'll be able to update your character anytime after creation.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button onClick={cancelPending} className="px-3 py-1 bg-yellow-600 text-slate-900 rounded font-semibold">Reset Now</button>
+              </div>
+            </div>
+          </div>
+
           {error && (<div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">{error}</div>)}
 
           <div className="flex flex-col lg:flex-row gap-6">
