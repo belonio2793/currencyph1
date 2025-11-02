@@ -26,6 +26,9 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [search, setSearch] = useState('')
   const [rgb, setRgb] = useState(() => hexToRgb(appearance.hair_color))
   const [rgbSkin, setRgbSkin] = useState(() => hexToRgb(appearance.skin_color))
+  const [photoMode, setPhotoMode] = useState(false)
+  const [photoUrl, setPhotoUrl] = useState('')
+  const [generating, setGenerating] = useState(false)
 
   const hairstyles = useMemo(() => (appearance.gender === 'male' ? MALE_HAIRSTYLES : FEMALE_HAIRSTYLES), [appearance.gender])
 
@@ -238,9 +241,52 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
             </div>
 
             <div className="w-full lg:w-96 flex-shrink-0">
-              <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-col items-center">
-                <AvatarPreview appearance={appearance} name={name} />
-                <p className="text-slate-400 text-sm mt-3 text-center px-3">Preview updates live. Open the gallery for dozens more real styles.</p>
+              <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-col items-center w-full">
+                <div className="w-full flex items-center justify-between mb-3">
+                  <div className="text-sm text-slate-200">Preview</div>
+                  <div className="flex items-center gap-2">
+                    <label className="text-xs text-slate-400">SVG</label>
+                    <input type="checkbox" checked={photoMode} onChange={(e)=>setPhotoMode(e.target.checked)} className="accent-blue-500" />
+                    <label className="text-xs text-slate-400">Photo</label>
+                  </div>
+                </div>
+
+                <div className="w-full flex items-center justify-center mb-3">
+                  {photoMode ? (
+                    <div className="w-full flex flex-col items-center">
+                      {photoUrl ? (
+                        <img src={photoUrl} alt="avatar" className="w-full rounded-lg border border-slate-700 object-cover max-h-72" />
+                      ) : (
+                        <div className="w-full h-48 bg-slate-800 rounded border border-dashed border-slate-700 flex items-center justify-center text-slate-400">No photoreal image yet</div>
+                      )}
+                    </div>
+                  ) : (
+                    <AvatarPreview appearance={appearance} name={name} />
+                  )}
+                </div>
+
+                <div className="w-full flex gap-2">
+                  <button onClick={async ()=>{
+                    if (!photoMode) return
+                    setGenerating(true)
+                    setError('')
+                    try {
+                      const { generatePhotorealAvatar } = await import('../../lib/imageGen.js')
+                      const url = await generatePhotorealAvatar(appearance, userId || 'guest')
+                      setPhotoUrl(url)
+                    } catch (err) {
+                      console.error(err)
+                      setError('Photo generation failed: ' + (err.message || err))
+                    } finally {
+                      setGenerating(false)
+                    }
+                  }} className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded disabled:opacity-50" disabled={!photoMode || generating}>
+                    {generating ? 'Generating…' : 'Generate Photo'}
+                  </button>
+                  <button onClick={()=>{ setPhotoUrl(''); setPhotoMode(false) }} className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded">Reset</button>
+                </div>
+
+                <p className="text-slate-400 text-sm mt-3 text-center px-3">Toggle between SVG preview and photorealistic composite. Use Generate Photo to create and store an image.</p>
               </div>
             </div>
           </div>
