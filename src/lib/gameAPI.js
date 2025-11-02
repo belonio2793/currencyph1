@@ -2,22 +2,24 @@ import { supabase } from './supabaseClient'
 
 export const gameAPI = {
   // CHARACTER MANAGEMENT
-  async createCharacter(userId, name, appearance) {
+  async createCharacter(userId, name, appearance, homeCity = 'Manila') {
     try {
       const { data, error } = await supabase
         .from('game_characters')
         .insert([{
           user_id: userId,
           name,
-          appearance
+          appearance,
+          home_city: homeCity,
+          current_location: homeCity
         }])
         .select()
         .single()
       if (error) throw error
-      
+
       // Create default bank account
       await this.createBankAccount(data.id, 'savings', 'PHP', 1000)
-      
+
       return data
     } catch (err) {
       console.error('Error creating character:', err)
