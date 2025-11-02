@@ -175,7 +175,7 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => { setShowEditor(false); setEditingCharacter(null) }} />
           <div className="relative w-full max-w-5xl h-[85vh] bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
-            <AvatarCreatorRPM open={true} onClose={() => { setShowEditor(false); setEditingCharacter(null) }} characterId={editingCharacter.id} userId={userId} onSaved={async (updatedChar) => {
+            <AvatarCreatorRPM open={true} onClose={() => { setShowEditor(false); setEditingCharacter(null) }} characterId={editingCharacter.id} userId={userId} showCloseButton={false} onSaved={async (updatedChar) => {
               try {
                 // refresh list and notify parent
                 await fetchCharacters()
