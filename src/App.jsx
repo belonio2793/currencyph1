@@ -292,6 +292,14 @@ export default function App() {
     setUserId(user.id)
     setUserEmail(user.email)
 
+    // Store device fingerprint on successful authentication
+    try {
+      const fingerprint = await deviceFingerprint.generate()
+      deviceFingerprint.store(fingerprint, user.id)
+    } catch (e) {
+      console.warn('Could not store device fingerprint:', e)
+    }
+
     // For guest-local users (not real Supabase auth), don't try database operations
     if (!user.id.includes('guest-local')) {
       try {
@@ -318,6 +326,15 @@ export default function App() {
     setActiveTab('home')
     // load balance for new user session
     loadTotalBalance(user.id)
+  }
+
+  const handleSignOut = () => {
+    // Sign out handler - clears device fingerprint and resets state
+    deviceFingerprint.clear()
+    setUserId(null)
+    setUserEmail(null)
+    setShowAuth(false)
+    setActiveTab('home')
   }
 
   if (loading) {
