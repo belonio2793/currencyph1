@@ -20,6 +20,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const [showNPCs, setShowNPCs] = useState(false) // hide NPCs by default for clean satellite view
   const draggingRef = useRef(false)
   const lastMouseRef = useRef({ x: 0, y: 0 })
+  const offscreenRef = useRef(null) // for post-processing passes
 
   const [otherPlayers, setOtherPlayers] = useState([])
   const [nearbyNPCs, setNearbyNPCs] = useState([])
@@ -143,6 +144,20 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
 
     const ctx = canvas.getContext('2d')
     const world = worldRef.current
+
+    // ensure offscreen canvas for post-processing
+    if (!offscreenRef.current) {
+      const o = document.createElement('canvas')
+      o.width = canvas.width
+      o.height = canvas.height
+      offscreenRef.current = o
+    } else {
+      const o = offscreenRef.current
+      if (o.width !== canvas.width || o.height !== canvas.height) {
+        o.width = canvas.width
+        o.height = canvas.height
+      }
+    }
 
     // attach mouse events for pan
     canvas.addEventListener('mousedown', handleMouseDown)
@@ -644,4 +659,39 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   ctx.fillStyle = g
   ctx.fillRect(0,0,canvas.width,canvas.height)
   ctx.restore()
+
+  // Simple bloom + color grade pass using offscreen canvas
+  try {
+    const o = offscreenRef.current
+    if (o) {
+      const ox = o.getContext('2d')
+      // copy current canvas to offscreen
+      ox.clearRect(0,0,o.width,o.height)
+      ox.drawImage(canvas, 0, 0)
+
+      // bloom: draw a blurred, brightened version additively
+      ox.globalCompositeOperation = 'source-over'
+      ox.filter = 'blur(8px) brightness(1.2)'
+      ox.drawImage(canvas, 0, 0)
+
+      // draw back to main with lighter blend for glow
+      ctx.save()
+      ctx.globalCompositeOperation = 'lighter'
+      ctx.globalAlpha = 0.35
+      ctx.drawImage(o, 0, 0)
+      ctx.restore()
+
+      // color grade overlay (subtle warm tone)
+      ctx.save()
+      ctx.globalCompositeOperation = 'overlay'
+      ctx.fillStyle = 'rgba(255,244,229,0.02)'
+      ctx.fillRect(0,0,canvas.width,canvas.height)
+      ctx.restore()
+
+      // reset filters
+      ox.filter = 'none'
+    }
+  } catch(e) {
+    // ignore post-process errors
+  }
 }
