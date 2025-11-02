@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
+import { supabase } from '../lib/supabaseClient'
 
 export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [form, setForm] = useState({
@@ -13,9 +14,11 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     longitude: '',
     phone_number: '',
     website: '',
-    description: ''
+    description: '',
+    primary_image_url: ''
   })
   const { location, city: detectedCity } = useGeolocation()
+  const [selectedFiles, setSelectedFiles] = useState([])
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
