@@ -1,5 +1,5 @@
 // Utility functions for WebMercator projection and tile rendering (MapTiler)
-const MAPTILER_KEY = 'Epg2ZBCTb2mrWoiUKQRL'
+const MAPTILER_KEY = typeof import.meta !== 'undefined' ? (import.meta.env?.VITE_MAPTILER_KEY || import.meta.env?.VITE_PROJECT_URL?.MAPTILER_KEY || 'Epg2ZBCTb2mrWoiUKQRL') : 'Epg2ZBCTb2mrWoiUKQRL'
 const TILE_SIZE = 256
 
 // Philippines bounds and center
