@@ -138,7 +138,9 @@ export function useGeolocation() {
       // Abort all pending fetch requests
       controllersRef.current.forEach(controller => {
         try {
-          controller.abort()
+          if (!controller.signal.aborted) {
+            controller.abort()
+          }
         } catch (e) {
           // ignore abort errors during cleanup
         }
