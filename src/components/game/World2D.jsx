@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { World2D, CITY_COORDS, CITY_MAPS } from '../../lib/world2D'
 import { drawTiles, latLngToWorldCoords } from '../../lib/mapUtils'
+import { supabase } from '../../lib/supabaseClient'
 import { WorldSync } from '../../lib/worldSync'
 import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 
