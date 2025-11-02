@@ -178,11 +178,26 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
                   <div className="flex gap-2 items-center flex-wrap">
                     <div className="w-12 h-12 bg-slate-900 border border-slate-700 rounded flex items-center justify-center">
-                      <HairIcon styleId={appearance.hair_style} color={appearance.hair_color} gender={appearance.gender} largeIcon />
+                      <HairIcon styleId={appearance.hair_style} color={appearance.hair_color} gender={appearance.gender} largeIcon offsetX={appearance.hair_offset_x} offsetY={appearance.hair_offset_y} scale={appearance.hair_scale} />
                     </div>
                     <div className="flex-1">
                       <div className="text-sm text-slate-300 font-medium truncate">{appearance.hair_style.replace('_',' ')}</div>
                       <div className="text-xs text-slate-400">Tap "Open Hairstyle Gallery" for many options</div>
+
+                      <div className="mt-3 grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="text-xs text-slate-400">Horizontal offset</label>
+                          <input type="range" min={-20} max={20} value={appearance.hair_offset_x} onChange={(e)=>handleAppearanceChange('hair_offset_x', parseInt(e.target.value))} className="w-full" />
+                        </div>
+                        <div>
+                          <label className="text-xs text-slate-400">Vertical offset</label>
+                          <input type="range" min={-30} max={30} value={appearance.hair_offset_y} onChange={(e)=>handleAppearanceChange('hair_offset_y', parseInt(e.target.value))} className="w-full" />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="text-xs text-slate-400">Scale</label>
+                          <input type="range" min={0.6} max={1.6} step={0.01} value={appearance.hair_scale} onChange={(e)=>handleAppearanceChange('hair_scale', parseFloat(e.target.value))} className="w-full" />
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
