@@ -236,9 +236,9 @@ export default function PlayCurrency({ userId }) {
           ].map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => { setActiveTab(tab.id); setOpenModal(tab.id) }}
               className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                activeTab === tab.id
+                openModal === tab.id
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
