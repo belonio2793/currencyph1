@@ -42,10 +42,15 @@ export function useGeolocation() {
                 let timeoutId = null
                 try {
                   timeoutId = setTimeout(() => {
-                    if (!controller.signal.aborted) {
-                      controller.abort()
+                    try {
+                      if (!controller.signal.aborted) {
+                        controller.abort()
+                      }
+                    } catch (e) {
+                      // ignore abort errors
                     }
                   }, 7000)
+
                   const resp = await fetch(url, { signal: controller.signal })
                   if (timeoutId) clearTimeout(timeoutId)
 
@@ -54,9 +59,9 @@ export function useGeolocation() {
                   }
                 } catch (e) {
                   if (timeoutId) clearTimeout(timeoutId)
-                  // Only log non-abort errors
-                  if (e.name !== 'AbortError' && e.code !== 'ABORT_ERR') {
-                    console.debug('MapTiler reverse geocoding failed:', e)
+                  // Silently fail for network/abort errors - not user-facing
+                  if (e.name !== 'AbortError' && e.code !== 'ABORT_ERR' && e.message !== 'Failed to fetch') {
+                    console.debug('MapTiler reverse geocoding failed:', e.message)
                   }
                 }
 
