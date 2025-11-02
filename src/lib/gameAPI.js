@@ -4,12 +4,43 @@ export const gameAPI = {
   // CHARACTER MANAGEMENT
   async createCharacter(userId, name, appearance, homeCity = 'Manila') {
     try {
+      // If avatar has a thumbnail URL from ReadyPlayer.me, upload it to storage
+      let finalAppearance = { ...appearance }
+      if (appearance?.rpm?.thumbnail && !appearance.rpm.thumbnail.includes('supabase')) {
+        try {
+          // Download the image from the temporary URL
+          const res = await fetch(appearance.rpm.thumbnail)
+          if (res.ok) {
+            const blob = await res.blob()
+            const ext = blob.type?.split('/')?.[1] || 'png'
+            const path = `${userId}/${name}-${Date.now()}.${ext}`
+
+            // Upload to Supabase storage
+            const { error: upErr } = await supabase.storage.from('avatars').upload(path, blob)
+            if (!upErr) {
+              // Get public URL
+              const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(path)
+              finalAppearance = {
+                ...appearance,
+                rpm: {
+                  ...appearance.rpm,
+                  thumbnail: publicData.publicUrl
+                }
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Failed to upload avatar thumbnail:', e.message)
+          // Continue with original URL if upload fails
+        }
+      }
+
       const { data, error } = await supabase
         .from('game_characters')
         .insert([{
           user_id: userId,
           name,
-          appearance,
+          appearance: finalAppearance,
           home_city: homeCity,
           current_location: homeCity
         }])
