@@ -291,7 +291,6 @@ export default function OnlineUsers({ userId, userEmail }) {
           ) : (
             <div className="h-full flex items-center justify-center bg-slate-100">
               <div className="text-center">
-                <div className="text-4xl mb-2">📍</div>
                 <p className="text-slate-600 font-medium">No users online</p>
                 <p className="text-slate-500 text-sm">Try switching to "All Users" to see everyone</p>
               </div>
