@@ -46,9 +46,13 @@ function loadTile(z, x, y) {
 // Draw visible tiles given camera and world mapping
 export async function drawTiles(ctx, canvas, cam, worldWidth, worldHeight) {
   if (!ctx || !cam) return
-  // Use base tile zoom for country-level
-  const z = 6
-  // Compute mercator pixel bounds for Philippines
+  // Choose a tile zoom based on base and camera zoom, add extra detail for hi-dpi
+  const baseZ = 6
+  const camZoomOffset = Math.round(Math.log2(Math.max(1, cam.zoom)))
+  const hiDpiOffset = (typeof window !== 'undefined' && window.devicePixelRatio && window.devicePixelRatio > 1) ? 1 : 0
+  const z = Math.max(2, Math.min(19, baseZ + camZoomOffset + hiDpiOffset))
+
+  // Compute mercator pixel bounds for Philippines at selected zoom
   const westPx = latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.west, z).x // note using south lat for consistent span
   const eastPx = latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.east, z).x
   const northPx = latLngToPixels(PHILIPPINES_BOUNDS.north, PHILIPPINES_BOUNDS.west, z).y
