@@ -6,6 +6,7 @@ export default function CityManager({ city, onUpdate, onClose }) {
   const [cityState, setCityState] = useState(city)
   const [simulation, setSimulation] = useState(new CitySimulation(city))
   const [activeTab, setActiveTab] = useState('overview')
+  const [viewMode, setViewMode] = useState('manager')
   const [simulationRunning, setSimulationRunning] = useState(false)
   const [monthsPassed, setMonthsPassed] = useState(0)
 
