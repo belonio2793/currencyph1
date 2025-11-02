@@ -660,6 +660,33 @@ function getCameraPos() {
   }
 }
 
+const avatarImageCache = new Map()
+
+function getAvatarImage(url) {
+  if (!url) return null
+  try {
+    if (avatarImageCache.has(url)) return avatarImageCache.get(url)
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.src = url
+    avatarImageCache.set(url, img)
+    return img
+  } catch (e) {
+    return null
+  }
+}
+
+function drawCircularImage(ctx, img, x, y, radius) {
+  if (!img || !img.complete) return
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(x, y, radius, 0, Math.PI * 2)
+  ctx.closePath()
+  ctx.clip()
+  ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2)
+  ctx.restore()
+}
+
 function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   const tileSize = 32
   const showNPCsOpt = options && options.showNPCs !== undefined ? options.showNPCs : true
@@ -704,10 +731,24 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
 
   // Draw other players
   otherPlayers.forEach(player => {
-    ctx.fillStyle = '#8b5cf6'
-    ctx.beginPath()
-    ctx.arc(player.x, player.y, 7, 0, Math.PI * 2)
-    ctx.fill()
+    const avatarUrl = player.rpm_avatar || player.avatarUrl || player.rpm_model_url || (player.presence && player.presence.rpm_avatar)
+    if (avatarUrl) {
+      const img = getAvatarImage(avatarUrl)
+      const r = 10
+      if (img && img.complete) {
+        drawCircularImage(ctx, img, player.x, player.y, r)
+      } else {
+        ctx.fillStyle = '#8b5cf6'
+        ctx.beginPath()
+        ctx.arc(player.x, player.y, r, 0, Math.PI * 2)
+        ctx.fill()
+      }
+    } else {
+      ctx.fillStyle = '#8b5cf6'
+      ctx.beginPath()
+      ctx.arc(player.x, player.y, 7, 0, Math.PI * 2)
+      ctx.fill()
+    }
 
     ctx.fillStyle = '#e0e7ff'
     ctx.font = `${10 / cam.zoom}px Arial`
@@ -736,14 +777,31 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   ctx.beginPath()
   ctx.arc(px, py, 24, 0, Math.PI * 2)
   ctx.fill()
-  // core avatar
-  ctx.fillStyle = '#0ea5a5'
-  ctx.strokeStyle = '#ecfeff'
-  ctx.lineWidth = 2.5 / cam.zoom
-  ctx.beginPath()
-  ctx.arc(px, py, baseR, 0, Math.PI * 2)
-  ctx.fill()
-  ctx.stroke()
+  // core avatar (or image if available)
+  const localAvatar = world.player.avatarUrl || world.player.rpm_avatar || null
+  if (localAvatar) {
+    const img = getAvatarImage(localAvatar)
+    const r = baseR
+    if (img && img.complete) {
+      drawCircularImage(ctx, img, px, py, r)
+    } else {
+      ctx.fillStyle = '#0ea5a5'
+      ctx.strokeStyle = '#ecfeff'
+      ctx.lineWidth = 2.5 / cam.zoom
+      ctx.beginPath()
+      ctx.arc(px, py, baseR, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.stroke()
+    }
+  } else {
+    ctx.fillStyle = '#0ea5a5'
+    ctx.strokeStyle = '#ecfeff'
+    ctx.lineWidth = 2.5 / cam.zoom
+    ctx.beginPath()
+    ctx.arc(px, py, baseR, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.stroke()
+  }
   // heading wedge
   const dir = world.player.direction || 0
   const angle = (dir * Math.PI) / 180
