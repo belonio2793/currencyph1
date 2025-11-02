@@ -242,8 +242,19 @@ export default function OnlineUsers({ userId, userEmail }) {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex gap-4 p-4">
         {/* Map */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden">
-          {filteredUsers.length > 0 ? (
+        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+          {loading ? (
+            <div className="h-full flex items-center justify-center bg-slate-100">
+              <div className="text-center">
+                <div className="animate-spin mb-4">
+                  <svg className="w-8 h-8 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <p className="text-slate-600 font-medium">Fetching online users...</p>
+              </div>
+            </div>
+          ) : filteredUsers.length > 0 ? (
             <MapContainer
               center={[12.5, 121.5]}
               zoom={13}
@@ -291,8 +302,14 @@ export default function OnlineUsers({ userId, userEmail }) {
           ) : (
             <div className="h-full flex items-center justify-center bg-slate-100">
               <div className="text-center">
-                <p className="text-slate-600 font-medium">No users online</p>
-                <p className="text-slate-500 text-sm">Try switching to "All Users" to see everyone</p>
+                <p className="text-slate-600 font-medium">
+                  {filter === 'friends' ? 'No friends online' : 'No users online.'}
+                </p>
+                <p className="text-slate-500 text-sm mt-2">
+                  {filter === 'friends'
+                    ? 'Add friends to see them here when they come online'
+                    : 'Check back soon or share your location to be discovered'}
+                </p>
               </div>
             </div>
           )}
