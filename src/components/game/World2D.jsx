@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { World2D, CITY_COORDS, CITY_MAPS } from '../../lib/world2D'
-import { drawTiles, latLngToWorldCoords } from '../../lib/mapUtils'
+import { drawTiles, latLngToWorldCoords, worldToLatLng } from '../../lib/mapUtils'
 import { supabase } from '../../lib/supabaseClient'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import { WorldSync } from '../../lib/worldSync'
 import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 
