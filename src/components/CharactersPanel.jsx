@@ -161,7 +161,7 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
                         <div className="text-xs text-slate-400">Level {c.level || 0} • {c.current_location || c.home_city || '—'}</div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <button onClick={() => { onSelectCharacter(c); onClose && onClose() }} className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-xs text-white">Select</button>
+                        <button onClick={() => { setEditingCharacter(c); setShowEditor(true) }} className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 rounded text-xs text-white">Edit</button>
                         <button onClick={() => handleDelete(c.id)} className="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs text-white">Delete</button>
                       </div>
                     </div>
