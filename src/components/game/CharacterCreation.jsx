@@ -168,16 +168,26 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Height: {appearance.height}cm</label>
-                    <input type="range" min="150" max="210" value={appearance.height} onChange={(e)=>handleAppearanceChange('height', parseInt(e.target.value))} className="w-full" />
+                    <input type="range" min="140" max="230" value={appearance.height} onChange={(e)=>handleAppearanceChange('height', parseInt(e.target.value))} className="w-full" />
+                    <div className="flex items-center gap-2 mt-2">
+                      <FeetInchesDisplay cm={appearance.height} onChange={(ft, inch) => {
+                        const cm = feetInchesToCm(ft, inch)
+                        handleAppearanceChange('height', cm)
+                      }} />
+                    </div>
                   </div>
+
                   <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2">Build</label>
                     <select value={appearance.build} onChange={(e)=>handleAppearanceChange('build', e.target.value)} className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100">
+                      <option value="very_slim">Very Slim</option>
                       <option value="slim">Slim</option>
                       <option value="average">Average</option>
                       <option value="athletic">Athletic</option>
-                      <option value="stocky">Stocky</option>
+                      <option value="heavy">Heavy</option>
+                      <option value="obese">Obese</option>
                     </select>
+                    <p className="text-xs text-slate-400 mt-2">Body proportions update live in preview (waist, limbs, torso).</p>
                   </div>
                 </div>
 
@@ -321,29 +331,62 @@ function renderHairSVG(style, color, r) {
 }
 
 function AvatarPreview({ appearance, name = '', large = false }) {
-  const size = large ? 220 : 140
-  const headRadius = Math.round(size * 0.28)
+  const size = large ? 260 : 160
+  const headRadius = Math.round(size * 0.26)
   const faceColor = { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }[appearance.skin_tone] || '#d4a574'
-  const bodyScale = appearance.build === 'slim' ? 0.86 : appearance.build === 'athletic' ? 1.05 : appearance.build === 'stocky' ? 1.18 : 1
-  const heightScale = (appearance.height - 150) / 60
-  const avatarStyle = { width: size, height: Math.round(size * (1 + heightScale * 0.25) * bodyScale) }
+
+  // Build mapping influences body width and belly
+  const buildMap = {
+    very_slim: { bodyScale: 0.8, waist: 0.55, limb: 0.6 },
+    slim: { bodyScale: 0.9, waist: 0.7, limb: 0.75 },
+    average: { bodyScale: 1, waist: 0.9, limb: 0.9 },
+    athletic: { bodyScale: 1.02, waist: 0.85, limb: 1.0 },
+    heavy: { bodyScale: 1.18, waist: 1.2, limb: 1.2 },
+    obese: { bodyScale: 1.35, waist: 1.45, limb: 1.35 }
+  }
+
+  const b = buildMap[appearance.build] || buildMap['average']
+  const heightScale = (appearance.height - 140) / 90 // 140..230
+  const avatarHeight = Math.round(size * (1 + heightScale * 0.25))
+  const avatarStyle = { width: size, height: avatarHeight }
+
+  // torso dims
+  const torsoW = avatarStyle.width * 0.36 * b.bodyScale
+  const torsoH = avatarStyle.height * 0.34 * b.bodyScale
+
+  // limb widths influenced by build
+  const armW = Math.max(6, Math.round(avatarStyle.width * 0.06 * b.limb))
+  const legW = Math.max(8, Math.round(avatarStyle.width * 0.08 * b.limb))
 
   return (
     <div className="flex flex-col items-center text-center px-2">
       <svg width={avatarStyle.width} height={avatarStyle.height} viewBox={`0 0 ${avatarStyle.width} ${avatarStyle.height}`}>
-        <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.62}) scale(${bodyScale})`}>
-          <rect x={-avatarStyle.width * 0.18} y={-avatarStyle.height * 0.12} width={avatarStyle.width * 0.36} height={avatarStyle.height * 0.36} rx="14" fill="#293241" />
+        {/* legs */}
+        <g transform={`translate(${avatarStyle.width/2}, ${avatarStyle.height*0.9})`}>
+          <rect x={-torsoW*0.45 - legW} y={-0} width={legW} height={avatarStyle.height*0.4} rx={legW/2} fill="#24303b" />
+          <rect x={torsoW*0.45} y={-0} width={legW} height={avatarStyle.height*0.4} rx={legW/2} fill="#24303b" />
         </g>
 
-        <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.28})`}>
+        {/* torso */}
+        <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.62})`}>
+          <rect x={-torsoW/2} y={-torsoH/2} width={torsoW} height={torsoH} rx="14" fill="#293241" />
+
+          {/* belly overlay for heavy/obese */}
+          {appearance.build === 'heavy' && <ellipse cx={0} cy={torsoH*0.12} rx={torsoW*0.55} ry={torsoH*0.25} fill="#2f3337" />}
+          {appearance.build === 'obese' && <ellipse cx={0} cy={torsoH*0.2} rx={torsoW*0.68} ry={torsoH*0.33} fill="#2f3337" />}
+
+          {/* arms */}
+          <rect x={-torsoW/2 - armW - 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
+          <rect x={torsoW/2 + 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
+        </g>
+
+        {/* head group */}
+        <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.24})`}>
           <circle r={headRadius} fill={faceColor} />
-          <g>
-            {renderHairSVG(appearance.hair_style, appearance.hair_color, headRadius)}
-          </g>
+          <g>{renderHairSVG(appearance.hair_style, appearance.hair_color, headRadius)}</g>
 
           <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
           <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
-
           <path d={`M ${-headRadius * 0.28} ${Math.round(headRadius * 0.45)} q ${headRadius * 0.28} ${headRadius * 0.18} ${headRadius * 0.56} 0`} stroke="#7f1d1d" strokeWidth={Math.max(1, Math.round(headRadius * 0.05))} fill="none" strokeLinecap="round" />
         </g>
       </svg>
