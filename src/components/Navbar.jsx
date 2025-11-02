@@ -8,7 +8,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
     { id: 'nearby', label: 'Nearby', public: true },
-    { id: 'play-currency', label: 'Play Currency', auth: true },
     { id: 'online-users', label: 'Online Users', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
     { id: 'rates', label: 'Rates', public: true }
@@ -46,6 +45,15 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 <span className="text-slate-400 mr-2 text-xs">Total</span>
                 <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
               </div>
+            )}
+            {/* Play Currency - Left of Borrow Money */}
+            {userEmail && (
+              <button
+                onClick={() => onTabChange('play-currency')}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer hidden sm:block"
+              >
+                Play Currency
+              </button>
             )}
             {/* Borrow Money Dropdown - Next to Total Balance */}
             {userEmail && (
@@ -225,6 +233,16 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   {btn.label}
                 </button>
               ))}
+
+              {/* Play Currency (Mobile) */}
+              {userEmail && (
+                <button
+                  onClick={() => { onTabChange('play-currency'); setMobileMenuOpen(false) }}
+                  className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50"
+                >
+                  Play Currency
+                </button>
+              )}
 
               {/* Mobile Borrow Money dropdown */}
               {userEmail && (
