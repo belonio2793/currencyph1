@@ -22,7 +22,6 @@ export default function PlayCurrency({ userId }) {
   const [equipment, setEquipment] = useState([])
   const [properties, setProperties] = useState([])
   const [bankAccounts, setBankAccounts] = useState([])
-  const [showCharacterCustomizer, setShowCharacterCustomizer] = useState(false)
   const [combatActive, setCombatActive] = useState(false)
   const [combatData, setCombatData] = useState(null)
   const [claimingReward, setClaimingReward] = useState(false)
@@ -171,7 +170,7 @@ export default function PlayCurrency({ userId }) {
           <div className="flex items-center justify-between">
             <div>
               <h1
-                onClick={() => setShowCharacterCustomizer(true)}
+                onClick={() => setShowRPM(true)}
                 className="text-3xl font-bold text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
                 title="Click to customize"
               >
@@ -249,7 +248,7 @@ export default function PlayCurrency({ userId }) {
             </button>
           ))}
           <button
-            onClick={() => setShowCharacterCustomizer(!showCharacterCustomizer)}
+            onClick={() => setShowRPM(true)}
             className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 whitespace-nowrap transition-colors"
           >
             👤 Customize
@@ -478,159 +477,10 @@ export default function PlayCurrency({ userId }) {
           </div>
         )}
 
-        {/* Character Customizer Modal */}
-        {showCharacterCustomizer && character && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-slate-700 flex items-center justify-between">
-                <h3 className="text-2xl font-bold">Customize Character</h3>
-                <button 
-                  onClick={() => setShowCharacterCustomizer(false)}
-                  className="text-slate-400 hover:text-slate-200"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="p-6">
-                <CharacterCustomizer
-                  character={character}
-                  onUpdate={handleCharacterCustomization}
-                  onClose={() => setShowCharacterCustomizer(false)}
-                  onOpenRPM={() => setShowRPM(true)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     {showRPM && (
       <AvatarCreatorRPM open={true} onClose={()=>setShowRPM(false)} characterId={character.id} userId={userId} />
     )}
-    </div>
-  )
-}
-
-function CharacterCustomizer({ character, onUpdate, onClose, onOpenRPM }) {
-  const [appearance, setAppearance] = useState(character.appearance || {})
-
-  const handleChange = (key, value) => {
-    setAppearance(prev => ({ ...prev, [key]: value }))
-  }
-
-  const handleSave = async () => {
-    await onUpdate(appearance)
-    onClose()
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      <div>
-        <label className="block text-sm font-medium mb-2">Gender</label>
-        <select 
-          value={appearance.gender || 'male'}
-          onChange={(e) => handleChange('gender', e.target.value)}
-          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100"
-        >
-          <option>male</option>
-          <option>female</option>
-          <option>other</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Skin Tone</label>
-        <div className="flex gap-2">
-          {['light', 'medium', 'dark', 'olive'].map(tone => (
-            <button
-              key={tone}
-              onClick={() => handleChange('skin_tone', tone)}
-              className={`w-12 h-12 rounded-lg border-2 ${appearance.skin_tone === tone ? 'border-blue-500' : 'border-slate-600'}`}
-              style={{
-                backgroundColor: {
-                  light: '#fdbcb4',
-                  medium: '#d4a574',
-                  dark: '#8b5a3c',
-                  olive: '#9a7c5c'
-                }[tone]
-              }}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Hair Style</label>
-        <select 
-          value={appearance.hair_style || 'short'}
-          onChange={(e) => handleChange('hair_style', e.target.value)}
-          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100"
-        >
-          <option>short</option>
-          <option>medium</option>
-          <option>long</option>
-          <option>curly</option>
-          <option>wavy</option>
-        </select>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Hair Color</label>
-        <input 
-          type="color" 
-          value={appearance.hair_color || '#000000'}
-          onChange={(e) => handleChange('hair_color', e.target.value)}
-          className="w-full h-10 rounded cursor-pointer"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Height: {appearance.height || 175}cm</label>
-        <input 
-          type="range" 
-          min="150" 
-          max="210" 
-          value={appearance.height || 175}
-          onChange={(e) => handleChange('height', parseInt(e.target.value))}
-          className="w-full"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium mb-2">Build</label>
-        <select 
-          value={appearance.build || 'average'}
-          onChange={(e) => handleChange('build', e.target.value)}
-          className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100"
-        >
-          <option>slim</option>
-          <option>average</option>
-          <option>athletic</option>
-          <option>stocky</option>
-        </select>
-      </div>
-
-      </div>
-      <div className="flex gap-2 mt-6 items-center">
-        <button 
-          onClick={onClose}
-          className="flex-1 px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600"
-        >
-          Cancel
-        </button>
-        <button
-          onClick={handleSave}
-          className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Save
-        </button>
-        <button
-          onClick={onOpenRPM}
-          className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-        >
-          3D Avatar (Ready Player Me)
-        </button>
-      </div>
     </div>
   )
 }
