@@ -27,6 +27,8 @@ export default function PlayCurrency({ userId }) {
   const [claimingReward, setClaimingReward] = useState(false)
   const [selectedCity, setSelectedCity] = useState(null)
   const [showCityManager, setShowCityManager] = useState(false)
+  // Modal state: which tab opens as modal
+  const [openModal, setOpenModal] = useState(null)
 
   useEffect(() => {
     initializeGame()
