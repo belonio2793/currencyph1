@@ -184,7 +184,7 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, u
 
     window.addEventListener('message', handleMessage)
     return () => window.removeEventListener('message', handleMessage)
-  }, [open, characterId, userId, onExport, savedAvatarUrl])
+  }, [open, characterId, userId, userEmail, onExport, savedAvatarUrl])
 
   if (!open) return null
 
