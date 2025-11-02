@@ -331,37 +331,71 @@ export class World3D {
     return group
   }
   
-  async addPlayer(userId, name, avatarUrl, x, z) {
+  async addPlayer(userId, name, avatarUrl, x = 0, z = 0) {
     try {
-      const model = await this.loadAvatarModel(avatarUrl)
-      model.position.set(x, 0, z)
-      
+      let model = null
+
+      // Try loading the avatar model if URL is provided
+      if (avatarUrl) {
+        try {
+          model = await this.loadAvatarModel(avatarUrl)
+        } catch (e) {
+          console.warn('Failed to load avatar, using fallback:', e)
+          model = this.createSimpleAvatar(name, 0x00a8ff)
+        }
+      } else {
+        // Create a simple avatar if no URL
+        model = this.createSimpleAvatar(name, 0x00a8ff)
+      }
+
       // Container for player (model + nameplate)
       const group = new THREE.Group()
       group.position.set(x, 0, z)
       group.add(model)
-      
-      // Nameplate
-      const canvas = document.createElement('canvas')
-      canvas.width = 256
-      canvas.height = 64
-      const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#00f5ff'
-      ctx.font = 'bold 32px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText(name, 128, 40)
-      
-      const texture = new THREE.CanvasTexture(canvas)
-      const spriteMaterial = new THREE.SpriteMaterial({ map: texture })
-      const sprite = new THREE.Sprite(spriteMaterial)
-      sprite.scale.set(100, 25, 1)
-      sprite.position.y = 100
-      group.add(sprite)
-      
+
+      // Nameplate (only if enabled)
+      if (this.cameraConfig.showNameplates) {
+        const canvas = document.createElement('canvas')
+        canvas.width = 256
+        canvas.height = 64
+        const ctx = canvas.getContext('2d')
+        ctx.fillStyle = '#00f5ff'
+        ctx.shadowColor = '#000000'
+        ctx.shadowBlur = 4
+        ctx.font = 'bold 32px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(name, 128, 40)
+
+        const texture = new THREE.CanvasTexture(canvas)
+        const spriteMaterial = new THREE.SpriteMaterial({ map: texture })
+        const sprite = new THREE.Sprite(spriteMaterial)
+        sprite.scale.set(100, 25, 1)
+        sprite.position.y = 80
+        group.add(sprite)
+      }
+
       this.scene.add(group)
-      this.players.set(userId, { group, model, targetPos: { x, z } })
+
+      // Store with animation state
+      this.players.set(userId, {
+        group,
+        model,
+        targetPos: { x, z },
+        velocity: { x: 0, z: 0 },
+        isMoving: false,
+        direction: 0,
+        animations: null
+      })
+
+      // If this is the first player added, select it
+      if (this.players.size === 1) {
+        this.selectedPlayer = userId
+      }
+
+      return group
     } catch (e) {
-      console.error('Failed to load avatar model:', e)
+      console.error('Failed to add player:', e)
+      throw e
     }
   }
   
