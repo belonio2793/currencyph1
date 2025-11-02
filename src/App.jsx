@@ -453,7 +453,7 @@ export default function App() {
             {activeTab === 'investments' && <Investments userId={userId} />}
             {activeTab === 'bills' && <BillPayments userId={userId} />}
             {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
-            {activeTab === 'profile' && <Profile userId={userId} />}
+            {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
             {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
             {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
