@@ -76,7 +76,11 @@ export function useGeolocation() {
 
                 let timeoutId = null
                 try {
-                  timeoutId = setTimeout(() => controller2.abort(), 7000)
+                  timeoutId = setTimeout(() => {
+                    if (!controller2.signal.aborted) {
+                      controller2.abort()
+                    }
+                  }, 7000)
                   const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
                     { signal: controller2.signal, headers: { 'Accept-Language': 'en' } }
@@ -91,7 +95,7 @@ export function useGeolocation() {
                   }
                 } catch (err) {
                   if (timeoutId) clearTimeout(timeoutId)
-                  if (err.name !== 'AbortError') {
+                  if (err.name !== 'AbortError' && err.code !== 'ABORT_ERR') {
                     console.debug('Nominatim reverse geocoding failed:', err)
                   }
                 }
