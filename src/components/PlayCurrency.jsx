@@ -83,10 +83,10 @@ export default function PlayCurrency({ userId }) {
     }
   }
 
-  const handleCreateCharacter = async (name, appearance) => {
+  const handleCreateCharacter = async (name, appearance, homeCity) => {
     try {
       setLoading(true)
-      const char = await gameAPI.createCharacter(userId, name, appearance)
+      const char = await gameAPI.createCharacter(userId, name, appearance, homeCity)
       setCharacter(char)
       await loadGameData(char.id)
     } catch (err) {
