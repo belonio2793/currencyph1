@@ -363,6 +363,119 @@ export default function PlayCurrency({ userId }) {
           )}
         </div>
 
+        {/* Modal for tabs */}
+        {openModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+                <h3 className="text-2xl font-bold">
+                  {openModal === 'world' && '🌍 Immersive World'}
+                  {openModal === 'cities' && '🌍 Philippines World Map'}
+                  {openModal === 'inventory' && '🎒 Inventory'}
+                  {openModal === 'equipment' && '👕 Equipment'}
+                  {openModal === 'marketplace' && '🏪 Marketplace'}
+                  {openModal === 'properties' && '🏠 Properties'}
+                  {openModal === 'banking' && '🏦 Banking'}
+                </h3>
+                <button onClick={() => setOpenModal(null)} className="text-slate-400 hover:text-slate-200">✕</button>
+              </div>
+              <div className="p-6">
+                {openModal === 'world' && (
+                  <div style={{ height: '600px' }}>
+                    <World2DRenderer character={character} userId={userId} city={character.current_location || character.home_city || 'Manila'} />
+                  </div>
+                )}
+
+                {openModal === 'inventory' && (
+                  <GameInventory character={character} inventory={inventory} onInventoryUpdate={handleInventoryUpdate} />
+                )}
+
+                {openModal === 'cities' && (
+                  <div className="space-y-6">
+                    <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700" style={{ height: '600px' }}>
+                      <CityMap userId={userId} onCitySelect={setSelectedCity} />
+                    </div>
+                    {selectedCity && (
+                      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                        <h3 className="text-xl font-bold mb-2">{selectedCity.name}</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-slate-400 text-sm">Population</p>
+                            <p className="text-2xl font-bold text-blue-400">{(selectedCity.population || 0).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-sm">Budget</p>
+                            <p className="text-2xl font-bold text-emerald-400">₱{(selectedCity.budget || 0).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-sm">Happiness</p>
+                            <p className="text-2xl font-bold text-yellow-400">{Math.floor(selectedCity.happiness || 0)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-sm">Region</p>
+                            <p className="text-2xl font-bold text-purple-400">{selectedCity.region || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {openModal === 'equipment' && (
+                  <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6">Equipment</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
+                        const equipped = equipment.find(e => e.equipment_slot === slot)
+                        return (
+                          <div key={slot} className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+                            <p className="text-xs text-slate-400 uppercase mb-2">{slot.replace('_', ' ')}</p>
+                            {equipped ? (
+                              <div>
+                                <p className="font-bold text-sm">{equipped.game_items?.name}</p>
+                                <p className="text-xs text-slate-400">{equipped.game_items?.brand}</p>
+                              </div>
+                            ) : (
+                              <p className="text-slate-500 text-sm">Empty</p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {openModal === 'marketplace' && (
+                  <GameMarketplace character={character} onInventoryUpdate={handleInventoryUpdate} />
+                )}
+
+                {openModal === 'properties' && (
+                  <GameProperties character={character} properties={properties} />
+                )}
+
+                {openModal === 'banking' && (
+                  <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6">Banking System</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {bankAccounts.map(account => (
+                        <div key={account.id} className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+                          <p className="text-slate-400 text-sm uppercase">{account.account_type} Account</p>
+                          <p className="text-2xl font-bold mt-2">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
+                          <p className="text-xs text-slate-500 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-6 flex gap-2 justify-end">
+                  <button onClick={() => setOpenModal(null)} className="px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Character Customizer Modal */}
         {showCharacterCustomizer && character && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
