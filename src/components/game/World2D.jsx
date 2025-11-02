@@ -31,6 +31,25 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const keysPressed = useRef({})
   const gameLoopRef = useRef(null)
 
+  // Handle canvas resize to fill parent
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+
+    const resizeCanvas = () => {
+      const parent = canvas.parentElement
+      if (!parent) return
+
+      const rect = parent.getBoundingClientRect()
+      canvas.width = rect.width
+      canvas.height = rect.height
+    }
+
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+    return () => window.removeEventListener('resize', resizeCanvas)
+  }, [])
+
   // Initialize world
   useEffect(() => {
     if (!character) return
