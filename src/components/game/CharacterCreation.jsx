@@ -9,7 +9,9 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     skin_tone: 'medium',
     skin_color: '#d4a574',
     height: 175,
-    build: 'average'
+    build: 'average',
+    hair_style: 'crew_cut',
+    hair_color: '#333'
   })
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
@@ -52,7 +54,9 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       skin_tone: 'medium',
       skin_color: '#d4a574',
       height: 175,
-      build: 'average'
+      build: 'average',
+      hair_style: 'crew_cut',
+      hair_color: '#333'
     }
     setAppearance(defaultAppearance)
     setRgbSkin(hexToRgb(defaultAppearance.skin_color))
