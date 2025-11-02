@@ -14,7 +14,7 @@ import GameCombat from './game/GameCombat'
 import CityMap from './game/CityMap'
 import CityManager from './game/CityManager'
 
-export default function PlayCurrency({ userId }) {
+export default function PlayCurrency({ userId, userEmail }) {
   const [character, setCharacter] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
