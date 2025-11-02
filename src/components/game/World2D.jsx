@@ -102,12 +102,12 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       if (!canvas || !world) return
       const map = world.mapData
       const fitZoom = Math.min(canvas.width / map.width, canvas.height / map.height)
-      // For FP feel start with tighter zoom
-      const zoom = Math.max(0.4, Math.min(2, fitZoom * 1.2))
+      // Default to country-fit zoom (zoomed out). Allow zooming in later.
+      const zoom = Math.max(0.15, Math.min(1.2, fitZoom * 0.9))
       cameraRef.current.zoom = zoom
-      // place player lower on screen for first-person feel
+      // center on player but allow large view
       cameraRef.current.x = Math.max(0, world.player.x - canvas.width / (2 * zoom))
-      cameraRef.current.y = Math.max(0, world.player.y - (canvas.height * 0.65) / zoom)
+      cameraRef.current.y = Math.max(0, world.player.y - (canvas.height * 0.5) / zoom)
       // expose for legacy helpers/debugging
       try { window.__cameraRef = cameraRef } catch (e) { /* ignore */ }
 
