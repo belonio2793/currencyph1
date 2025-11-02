@@ -514,14 +514,22 @@ function FeetInchesDisplay({ cm, onChange }) {
   const [feet, setFeet] = useState(fi.feet)
   const [inches, setInches] = useState(fi.inches)
 
+  // Keep local feet/inches in sync when cm prop changes (e.g., slider updates)
+  React.useEffect(() => {
+    const updated = cmToFeetInches(cm)
+    setFeet(updated.feet)
+    setInches(updated.inches)
+  }, [cm])
+
   function updateFeet(f) {
-    setFeet(f)
-    const cmVal = feetInchesToCm(f, inches)
-    onChange(f, inches)
+    const fv = Number.isNaN(Number(f)) ? 0 : Number(f)
+    setFeet(fv)
+    const cmVal = feetInchesToCm(fv, inches)
+    onChange(fv, inches)
   }
   function updateInches(i) {
     let iv = Number(i)
-    if (iv < 0) iv = 0
+    if (isNaN(iv) || iv < 0) iv = 0
     if (iv > 11) iv = 11
     setInches(iv)
     onChange(feet, iv)
