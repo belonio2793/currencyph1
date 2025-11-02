@@ -174,6 +174,29 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                   </div>
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-slate-300 mb-3">🏠 Home City</label>
+                  <p className="text-xs text-slate-400 mb-3">Choose your home city to start your economic adventure</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {PHILIPPINES_CITIES.map(city => (
+                      <button
+                        key={city.name}
+                        type="button"
+                        onClick={() => setHomeCity(city.name)}
+                        className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                          homeCity === city.name
+                            ? 'border-blue-500 bg-blue-500/10'
+                            : 'border-slate-600 bg-slate-700 hover:bg-slate-600'
+                        }`}
+                      >
+                        <p className="font-semibold text-slate-100">{city.name}</p>
+                        <p className="text-xs text-slate-400">{city.region}</p>
+                        <p className="text-xs text-slate-500">{city.description}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="pt-2">
                   <button type="submit" disabled={creating} className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50">{creating ? '⏳ Creating Adventure...' : '🎮 Begin Adventure'}</button>
                 </div>
