@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { CitySimulation, saveCityToDatabase, loadCitiesForUser } from '../../lib/citySimulation'
+import CityIsometric from './CityIsometric'
 
 const PHILIPPINES_CENTER = [12.8797, 121.7740]
 const PHILIPPINES_BOUNDS = [[4.6724, 116.1196], [20.6300, 128.3154]]
