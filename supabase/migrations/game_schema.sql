@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS game_characters (
   position_x FLOAT DEFAULT 0,
   position_y FLOAT DEFAULT 0,
   current_location TEXT DEFAULT 'Manila',
+  home_city TEXT DEFAULT 'Manila',
   health INT DEFAULT 100,
   max_health INT DEFAULT 100,
   energy INT DEFAULT 100,
@@ -18,7 +19,7 @@ CREATE TABLE IF NOT EXISTS game_characters (
   hunger INT DEFAULT 100,
   base_speed INT DEFAULT 5,
   money BIGINT DEFAULT 1000,
-  appearance JSONB DEFAULT '{"gender":"male","skin_tone":"medium","hair_style":"short","height":175,"build":"average","hair_color":"black"}',
+  appearance JSONB DEFAULT '{"gender":"male","skin_tone":"medium","hair_style":"short","height":175,"build":"average","hair_color":"black","rpm":{"model_url":null,"thumbnail":null,"meta":null}}',
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW(),
   UNIQUE(user_id)
