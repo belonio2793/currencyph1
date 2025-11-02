@@ -43,6 +43,30 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
     })
 
+    // Map real-world city coordinates into the world map as buildings/markers
+    try {
+      const world = worldRef.current
+      const mapData = world.mapData
+      const worldW = mapData.width
+      const worldH = mapData.height
+      // Add major cities from CITY_COORDS as buildings
+      Object.entries(CITY_COORDS).forEach(([cName, c]) => {
+        const pop = c.population || 0
+        if (pop < 10000) return // skip tiny places
+        const pos = latLngToWorldCoords(worldW, worldH, c.lat, c.lng)
+        const bx = Math.max(0, Math.min(worldW - 40, Math.round(pos.x)))
+        const by = Math.max(0, Math.min(worldH - 40, Math.round(pos.y)))
+        mapData.buildings.push({ x: bx, y: by, width: 60, height: 40, name: cName, type: 'city' })
+        // spawn a couple NPCs near the city
+        for (let i=0;i< Math.min(3, Math.floor(pop/500000)+1); i++) {
+          mapData.npcSpawns.push({ x: bx + 10 + i*12, y: by + 10 + (i%2)*8, templateIdx: i % 6 })
+        }
+      })
+    } catch (e) {
+      // ignore mapping errors
+      console.warn('City mapping failed', e)
+    }
+
     // Set initial camera to fit the map and center on player when available
     setTimeout(() => {
       const canvas = canvasRef.current
