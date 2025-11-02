@@ -480,7 +480,20 @@ export default function PlayCurrency({ userId }) {
 
       </div>
     {showRPM && (
-      <AvatarCreatorRPM open={true} onClose={()=>setShowRPM(false)} characterId={character.id} userId={userId} />
+      <AvatarCreatorRPM
+        open={true}
+        onClose={()=>setShowRPM(false)}
+        characterId={character.id}
+        userId={userId}
+        onSaved={async (updatedChar) => {
+          try {
+            setCharacter(updatedChar)
+            setShowRPM(false)
+          } catch(e) {
+            console.warn('Avatar save handler error', e)
+          }
+        }}
+      />
     )}
     </div>
   )
