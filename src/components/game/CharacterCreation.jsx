@@ -467,7 +467,7 @@ function AvatarPreview({ appearance, name = '', large = false }) {
 
       <div className="mt-3">
         <p className="text-sm md:text-base font-semibold text-slate-100 truncate max-w-[220px]">{name || 'Unnamed'}</p>
-        <p className="text-xs text-slate-400">{appearance.gender === 'male' ? 'Male' : 'Female'} • {appearance.hair_style.replace('_',' ')}</p>
+        <p className="text-xs text-slate-400">{appearance.gender === 'male' ? 'Male' : 'Female'} • {(appearance.hair_style || 'crew_cut').replace('_',' ')}</p>
       </div>
     </div>
   )
