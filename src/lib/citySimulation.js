@@ -268,7 +268,7 @@ export async function loadCitiesForUser(userId) {
     if (error) throw error
     return data || []
   } catch (err) {
-    console.error('Failed to load cities:', err)
+    console.error('Failed to load cities:', err?.message || String(err))
     return []
   }
 }

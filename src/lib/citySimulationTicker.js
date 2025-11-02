@@ -43,7 +43,7 @@ class CitySimulationTicker {
       })
       return Array.from(this.cities.values()).map(sim => sim.export())
     } catch (err) {
-      console.error('Failed to load cities:', err)
+      console.error('Failed to load cities:', err?.message || String(err))
       return []
     }
   }

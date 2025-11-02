@@ -68,7 +68,7 @@ export default function CityMap({ userId, onCitySelect }) {
       })
       drawCities(userCities)
     } catch (err) {
-      console.error('Failed to load cities:', err)
+      console.error('Failed to load cities:', err?.message || String(err))
     } finally {
       setLoading(false)
     }
