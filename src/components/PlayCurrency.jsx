@@ -364,9 +364,9 @@ export default function PlayCurrency({ userId }) {
         {/* Character Customizer Modal */}
         {showCharacterCustomizer && character && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-lg max-w-2xl w-full max-h-96 overflow-y-auto">
+            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-slate-700 flex items-center justify-between">
-                <h3 className="text-xl font-bold">Customize Character</h3>
+                <h3 className="text-2xl font-bold">Customize Character</h3>
                 <button 
                   onClick={() => setShowCharacterCustomizer(false)}
                   className="text-slate-400 hover:text-slate-200"
@@ -403,6 +403,7 @@ function CharacterCustomizer({ character, onUpdate, onClose }) {
 
   return (
     <div className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div>
         <label className="block text-sm font-medium mb-2">Gender</label>
         <select 
@@ -488,6 +489,7 @@ function CharacterCustomizer({ character, onUpdate, onClose }) {
         </select>
       </div>
 
+      </div>
       <div className="flex gap-2 mt-6">
         <button 
           onClick={onClose}
