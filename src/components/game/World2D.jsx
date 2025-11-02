@@ -220,6 +220,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         width={800}
         height={600}
         onClick={handleCanvasClick}
+        onWheel={handleWheel}
         className="w-full h-full bg-slate-800 cursor-crosshair block"
         style={{ imageRendering: 'pixelated' }}
       />
