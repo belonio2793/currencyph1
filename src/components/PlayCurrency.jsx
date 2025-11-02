@@ -31,6 +31,23 @@ export default function PlayCurrency({ userId }) {
     initializeGame()
   }, [userId])
 
+  useEffect(() => {
+    if (userId) {
+      citySimulationTicker.setUser(userId)
+      citySimulationTicker.start()
+
+      const handleCityUpdate = (cities) => {
+      }
+
+      citySimulationTicker.addCallback(handleCityUpdate)
+
+      return () => {
+        citySimulationTicker.stop()
+        citySimulationTicker.removeCallback(handleCityUpdate)
+      }
+    }
+  }, [userId])
+
   const initializeGame = async () => {
     try {
       setLoading(true)
@@ -200,7 +217,7 @@ export default function PlayCurrency({ userId }) {
         {/* Navigation Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
-            { id: 'world', label: '🌍 World', icon: '🗺️' },
+            { id: 'world', label: '🌍 World', icon: '���️' },
             { id: 'cities', label: '🏙️ Cities', icon: '🌆' },
             { id: 'inventory', label: '🎒 Inventory', icon: '📦' },
             { id: 'equipment', label: '👕 Equipment', icon: '⚔️' },
