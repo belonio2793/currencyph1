@@ -512,6 +512,16 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           <button aria-label="Zoom out" onClick={() => handleZoomButton(0.8)} className="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded">−</button>
         </div>
       </div>
+
+      {/* NPC toggle */}
+      <div className="absolute bottom-6 left-20 z-40">
+        <div className="bg-black/60 rounded border border-slate-700 p-2 flex items-center gap-2 text-xs text-slate-200">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" checked={showNPCs} onChange={(e)=>setShowNPCs(e.target.checked)} className="accent-blue-500" />
+            Show NPCs
+          </label>
+        </div>
+      </div>
     </div>
   )
 }
