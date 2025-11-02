@@ -400,6 +400,49 @@ function AvatarPreview({ appearance, name = '', large = false }) {
 }
 
 // Helpers
+function cmToFeetInches(cm) {
+  const totalInches = Math.round(cm / 2.54)
+  const feet = Math.floor(totalInches / 12)
+  const inches = totalInches % 12
+  return { feet, inches }
+}
+function feetInchesToCm(feet, inches) {
+  const totalInches = (Number(feet) || 0) * 12 + (Number(inches) || 0)
+  return Math.round(totalInches * 2.54)
+}
+
+function FeetInchesDisplay({ cm, onChange }) {
+  const fi = cmToFeetInches(cm)
+  const [feet, setFeet] = useState(fi.feet)
+  const [inches, setInches] = useState(fi.inches)
+
+  function updateFeet(f) {
+    setFeet(f)
+    const cmVal = feetInchesToCm(f, inches)
+    onChange(f, inches)
+  }
+  function updateInches(i) {
+    let iv = Number(i)
+    if (iv < 0) iv = 0
+    if (iv > 11) iv = 11
+    setInches(iv)
+    onChange(feet, iv)
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
+        <input value={feet} onChange={(e)=>{ const v = parseInt(e.target.value||0); setFeet(isNaN(v)?0:v)}} onBlur={(e)=>updateFeet(parseInt(e.target.value||0))} className="w-12 px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
+        <span className="text-xs text-slate-400">ft</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <input value={inches} onChange={(e)=>{ const v = parseInt(e.target.value||0); setInches(isNaN(v)?0:v)}} onBlur={(e)=>updateInches(parseInt(e.target.value||0))} className="w-12 px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
+        <span className="text-xs text-slate-400">in</span>
+      </div>
+    </div>
+  )
+}
+
 function hexToRgb(hex) {
   const h = hex.replace('#','')
   const bigint = parseInt(h,16)
