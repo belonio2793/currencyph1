@@ -96,23 +96,32 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       console.warn('City mapping failed', e)
     }
 
-    // Set initial camera to fit the map and center on player when available
+    // Set initial camera to street-level view by default and center on player
     setTimeout(() => {
       const canvas = canvasRef.current
       const world = worldRef.current
       if (!canvas || !world) return
       const map = world.mapData
-      const fitZoom = Math.min(canvas.width / map.width, canvas.height / map.height)
-      // Default to country-fit zoom (zoomed out). Allow zooming in later.
-      const zoom = Math.max(0.15, Math.min(1.2, fitZoom * 0.9))
+
+      // target tile zoom (MapTiler zoom level) for street-level detail
+      const BASE_TILE_ZOOM = 6
+      const TARGET_TILE_ZOOM = 16
+      // Compute camera zoom factor so that drawTiles will select TARGET_TILE_ZOOM
+      // camZoomOffset = round(log2(cam.zoom)) -> cam.zoom = 2^(TARGET_TILE_ZOOM - BASE_TILE_ZOOM)
+      let zoom = Math.pow(2, TARGET_TILE_ZOOM - BASE_TILE_ZOOM)
+      // clamp to sensible range
+      zoom = Math.max(0.2, Math.min(2048, zoom))
+
       cameraRef.current.zoom = zoom
-      // center on player but allow large view
+
+      // center on player at this zoom
       cameraRef.current.x = Math.max(0, world.player.x - canvas.width / (2 * zoom))
       cameraRef.current.y = Math.max(0, world.player.y - (canvas.height * 0.5) / zoom)
+
       // expose for legacy helpers/debugging
       try { window.__cameraRef = cameraRef } catch (e) { /* ignore */ }
 
-      // initialize Leaflet map under the canvas
+      // initialize Leaflet map under the canvas and match zoom
       try {
         if (mapDivRef.current && !leafletRef.current) {
           const map = L.map(mapDivRef.current, { zoomControl: false, attributionControl: false, interactive: false })
@@ -124,7 +133,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           // set initial view to player
           const { x: wx, y: wy } = world.player
           const ll = worldToLatLng(map.mapData?.width || world.mapData.width, map.mapData?.height || world.mapData.height, wx, wy)
-          map.setView([ll.lat, ll.lng], 6)
+          // use the target tile zoom for Leaflet as well
+          map.setView([ll.lat, ll.lng], TARGET_TILE_ZOOM)
         }
       } catch (e) {
         console.warn('Leaflet init failed', e)
