@@ -77,7 +77,7 @@ export class WorldSync {
   }
 
   // Broadcast player movement
-  async broadcastMove(x, y, direction = 'down') {
+  async broadcastMove(x, y, direction = 'down', rpm_avatar = null) {
     const now = Date.now()
     if (now - this.lastSyncTime < this.syncInterval) return
 
@@ -91,6 +91,7 @@ export class WorldSync {
           x,
           y,
           direction,
+          rpm_avatar: rpm_avatar || null,
           timestamp: now
         }
       })
