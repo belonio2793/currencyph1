@@ -23,6 +23,8 @@ export default function PlayCurrency({ userId }) {
   const [combatActive, setCombatActive] = useState(false)
   const [combatData, setCombatData] = useState(null)
   const [claimingReward, setClaimingReward] = useState(false)
+  const [selectedCity, setSelectedCity] = useState(null)
+  const [showCityManager, setShowCityManager] = useState(false)
 
   useEffect(() => {
     initializeGame()
