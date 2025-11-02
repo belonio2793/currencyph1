@@ -29,6 +29,7 @@ export default function PlayCurrency({ userId }) {
   const [selectedCity, setSelectedCity] = useState(null)
   const [showRPM, setShowRPM] = useState(false)
   const [showCityManager, setShowCityManager] = useState(false)
+  const [showCharactersPanel, setShowCharactersPanel] = useState(false)
   // Modal state: which tab opens as modal
   const [openModal, setOpenModal] = useState(null)
 
