@@ -1,10 +1,4 @@
 // Extensive hairstyle definitions (real-world names)
-const MALE_HAIRSTYLES = [
-  'buzz_cut','crew_cut','fade','undercut','quiff','pompadour','slick_back','man_bun','top_knot','mullet','long_layers','curly_male','shag_male','comb_over','side_part'
-]
-const FEMALE_HAIRSTYLES = [
-  'pixie','bob','lob','blunt_bob','asym_bob','long_flow','layered_long','curly_female','beach_waves','ponytail','high_ponytail','low_bun','braid','french_braid','fishtail','afro','twists'
-]
 
 import React, { useState, useMemo, useEffect } from 'react'
 
