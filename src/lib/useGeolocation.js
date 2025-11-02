@@ -41,7 +41,11 @@ export function useGeolocation() {
 
                 let timeoutId = null
                 try {
-                  timeoutId = setTimeout(() => controller.abort(), 7000)
+                  timeoutId = setTimeout(() => {
+                    if (!controller.signal.aborted) {
+                      controller.abort()
+                    }
+                  }, 7000)
                   const resp = await fetch(url, { signal: controller.signal })
                   if (timeoutId) clearTimeout(timeoutId)
 
@@ -51,7 +55,7 @@ export function useGeolocation() {
                 } catch (e) {
                   if (timeoutId) clearTimeout(timeoutId)
                   // Only log non-abort errors
-                  if (e.name !== 'AbortError') {
+                  if (e.name !== 'AbortError' && e.code !== 'ABORT_ERR') {
                     console.debug('MapTiler reverse geocoding failed:', e)
                   }
                 }
