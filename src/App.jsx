@@ -186,6 +186,13 @@ export default function App() {
       if (user) {
         setUserId(user.id)
         setUserEmail(user.email)
+        // Store device fingerprint on successful authentication
+        try {
+          const fingerprint = await deviceFingerprint.generate()
+          deviceFingerprint.store(fingerprint, user.id)
+        } catch (e) {
+          console.warn('Could not store device fingerprint:', e)
+        }
         try {
           await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
         } catch (e) {
