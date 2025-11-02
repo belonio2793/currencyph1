@@ -227,7 +227,20 @@ export default function CityMap({ userId, onCitySelect }) {
       </div>
 
       {/* Map Container */}
-      <div ref={mapContainer} className="flex-1" style={{ height: 'calc(100% - 60px)' }} />
+      {mapMode === '2d' ? (
+        <div ref={mapContainer} className="flex-1" style={{ height: 'calc(100% - 60px)' }} />
+      ) : (
+        <div className="flex-1 overflow-auto flex items-center justify-center bg-slate-900">
+          {selectedCity ? (
+            <CityIsometric city={selectedCity} />
+          ) : (
+            <div className="text-slate-400 text-center">
+              <p className="text-lg mb-2">Select a city to view in 3D</p>
+              <p className="text-sm">Click on a city marker to see its isometric view</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Create City Modal */}
       {showCreate && (
