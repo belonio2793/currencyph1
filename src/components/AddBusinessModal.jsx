@@ -4,6 +4,7 @@ import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
 
 export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
+  const [currentPage, setCurrentPage] = useState(1)
   const [form, setForm] = useState({
     name: '',
     category: '',
@@ -17,9 +18,12 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     description: '',
     primary_image_url: ''
   })
+  const [photoUrls, setPhotoUrls] = useState('')
   const { location, city: detectedCity } = useGeolocation()
   const [selectedFiles, setSelectedFiles] = useState([])
+  const [filePreview, setFilePreview] = useState([])
   const [submitting, setSubmitting] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
   const [paying, setPaying] = useState(false)
@@ -41,15 +45,85 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     setForm(prev => ({ ...prev, [name]: value }))
   }
 
+  const handleFileSelect = (e) => {
+    const files = Array.from(e.target.files || [])
+    setSelectedFiles(files)
+    
+    const previews = files.map(file => ({
+      name: file.name,
+      url: URL.createObjectURL(file),
+      type: 'file'
+    }))
+    setFilePreview(previews)
+  }
+
+  const handlePhotoUrlsChange = (e) => {
+    const value = e.target.value
+    setPhotoUrls(value)
+    
+    const urls = value
+      .split(',')
+      .map(url => url.trim())
+      .filter(url => url.length > 0)
+    
+    const urlPreviews = urls.map(url => ({
+      name: url.split('/').pop() || 'image',
+      url: url,
+      type: 'url'
+    }))
+    
+    setFilePreview(prev => [
+      ...prev.filter(p => p.type === 'file'),
+      ...urlPreviews
+    ])
+  }
+
+  const removePreview = (index) => {
+    const preview = filePreview[index]
+    if (preview.type === 'file') {
+      const fileIndex = selectedFiles.findIndex(f => f.name === preview.name)
+      if (fileIndex > -1) {
+        setSelectedFiles(selectedFiles.filter((_, i) => i !== fileIndex))
+      }
+    }
+    setFilePreview(filePreview.filter((_, i) => i !== index))
+  }
+
+  const validatePage1 = () => {
+    if (!form.name || !form.category || !form.city) {
+      setError('Please fill in Business Name, Category, and City')
+      return false
+    }
+    if (form.latitude && isNaN(parseFloat(form.latitude))) {
+      setError('Latitude must be a valid number')
+      return false
+    }
+    if (form.longitude && isNaN(parseFloat(form.longitude))) {
+      setError('Longitude must be a valid number')
+      return false
+    }
+    return true
+  }
+
+  const handleNextPage = () => {
+    if (validatePage1()) {
+      setError('')
+      setCurrentPage(2)
+    }
+  }
+
+  const handlePrevPage = () => {
+    setError('')
+    setCurrentPage(1)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
-    if (!form.name || !form.category || !form.city) {
-      setError('Please fill in name, category, and city')
-      return
-    }
+    
     try {
       setSubmitting(true)
+      
       const payload = {
         name: form.name,
         category: form.category,
@@ -64,33 +138,63 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
         primary_image_url: form.primary_image_url || null,
         raw: { source: 'community_submission' }
       }
+      
       const created = await nearbyUtils.submitPendingListing(userId, payload)
+      
+      const uploadedUrls = []
+      
       // Upload files if any
       if (selectedFiles && selectedFiles.length > 0) {
-        const uploadedUrls = []
+        setUploading(true)
         for (const file of selectedFiles) {
-          const path = `pending/${created.id}/${Date.now()}-${file.name}`
-          const { error: upErr } = await supabase.storage.from('nearby_listings').upload(path, file, { upsert: true })
-          if (!upErr) {
-            const { data: pub } = supabase.storage.from('nearby_listings').getPublicUrl(path)
-            if (pub?.publicUrl) uploadedUrls.push(pub.publicUrl)
+          try {
+            const path = `pending/${created.id}/${Date.now()}-${file.name}`
+            const { error: upErr } = await supabase.storage.from('nearby_listings').upload(path, file, { upsert: true })
+            if (!upErr) {
+              const { data: pub } = supabase.storage.from('nearby_listings').getPublicUrl(path)
+              if (pub?.publicUrl) uploadedUrls.push(pub.publicUrl)
+            }
+          } catch (err) {
+            console.warn('File upload error:', err)
           }
         }
-        if (uploadedUrls.length > 0) {
-          const primary = created.primary_image_url || uploadedUrls[0]
-          await supabase
-            .from('pending_listings')
-            .update({ image_urls: uploadedUrls, primary_image_url: primary, updated_at: new Date() })
-            .eq('id', created.id)
-        }
+        setUploading(false)
       }
-      const refreshed = created
-      setPending(refreshed)
-      onSubmitted && onSubmitted(refreshed)
+      
+      // Add URL-based photos
+      const urlPhotos = photoUrls
+        .split(',')
+        .map(url => url.trim())
+        .filter(url => url.length > 0)
+      
+      const allUrls = [...uploadedUrls, ...urlPhotos]
+      
+      // Update pending listing with all photo URLs
+      if (allUrls.length > 0) {
+        const primary = form.primary_image_url || allUrls[0]
+        await supabase
+          .from('pending_listings')
+          .update({ 
+            image_urls: allUrls, 
+            primary_image_url: primary, 
+            updated_at: new Date() 
+          })
+          .eq('id', created.id)
+      }
+      
+      const refreshed = await supabase
+        .from('pending_listings')
+        .select('*')
+        .eq('id', created.id)
+        .single()
+      
+      setPending(refreshed.data || created)
+      onSubmitted && onSubmitted(refreshed.data || created)
     } catch (err) {
       setError(err.message || 'Failed to submit')
     } finally {
       setSubmitting(false)
+      setUploading(false)
     }
   }
 
@@ -108,93 +212,318 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     }
   }
 
+  if (pending) {
+    return (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
+          <div className="flex items-center justify-between border-b p-4">
+            <h3 className="text-lg font-semibold">Submission Complete</h3>
+            <button onClick={onClose} className="text-slate-500 hover:text-slate-700">✕</button>
+          </div>
+
+          <div className="p-4">
+            <div className="space-y-4">
+              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-700 text-sm">
+                Submission created! Your business is now pending review. Pay the approval fee to finalize review.
+              </div>
+              {pending.image_urls && pending.image_urls.length > 0 && (
+                <div>
+                  <p className="text-sm font-medium text-slate-700 mb-2">Submitted Photos ({pending.image_urls.length})</p>
+                  <div className="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                    {pending.image_urls.map((url, idx) => (
+                      <div key={idx} className="w-full h-20 bg-slate-100 rounded overflow-hidden">
+                        <img src={url} alt={`Photo ${idx + 1}`} className="w-full h-full object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div className="flex items-center justify-between border-t pt-4">
+                <div className="text-sm text-slate-700">Approval fee</div>
+                <div className="text-base font-semibold">₱{APPROVAL_FEE.toLocaleString()}</div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <button onClick={onClose} className="px-4 py-2 border rounded hover:bg-slate-50">Close</button>
+                <button onClick={handlePayFee} disabled={paying} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700">
+                  {paying ? 'Processing...' : 'Pay now'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl">
-        <div className="flex items-center justify-between border-b p-4">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between border-b p-4 sticky top-0 bg-white">
           <h3 className="text-lg font-semibold">Add your business</h3>
           <button onClick={onClose} className="text-slate-500 hover:text-slate-700">✕</button>
         </div>
 
         <div className="p-4">
-          <p className="text-sm text-slate-600 mb-4">Submit your business for community review. Final approval requires a one-time fee of 1,000 PHP.</p>
+          <p className="text-sm text-slate-600 mb-4">
+            {currentPage === 1 
+              ? 'Basic business information' 
+              : 'Add photos for your business'}
+          </p>
+          <div className="text-xs text-slate-500 mb-4">
+            Page {currentPage} of 2
+          </div>
 
           {error && (
             <div className="mb-3 p-3 bg-red-50 text-red-700 border border-red-200 rounded text-sm">{error}</div>
           )}
 
-          {!pending ? (
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Business Name *</label>
-                <input name="name" value={form.name} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="e.g., Juan's Eatery" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Category *</label>
-                <input name="category" value={form.category} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="Restaurant, Hotel, Attraction..." />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">City *</label>
-                <input name="city" value={form.city} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="City" />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Address</label>
-                <input name="address" value={form.address} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="Street, Barangay, City" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Latitude</label>
-                <input name="latitude" value={form.latitude} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="14.5995" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Longitude</label>
-                <input name="longitude" value={form.longitude} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="120.9842" />
-              </div>
-              <div className="md:col-span-2 -mt-1">
-                <button type="button" onClick={() => {
-                  if (location) setForm(prev => ({ ...prev, latitude: String(location.latitude), longitude: String(location.longitude), city: prev.city || detectedCity || prev.city }))
-                }} className="text-sm text-blue-600 hover:text-blue-700">
-                  Use my current location
-                </button>
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Phone</label>
-                <input name="phone_number" value={form.phone_number} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="09xx xxx xxxx" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Website</label>
-                <input name="website" value={form.website} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="https://..." />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Primary Photo URL</label>
-                <input name="primary_image_url" value={form.primary_image_url} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="https://..." />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Upload Images</label>
-                <input type="file" accept="image/*" multiple onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))} className="w-full border rounded px-3 py-2" />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea name="description" value={form.description} onChange={handleChange} className="w-full border rounded px-3 py-2" rows={3} />
-              </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {currentPage === 1 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1">Business Name *</label>
+                    <input 
+                      name="name" 
+                      value={form.name} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="e.g., Juan's Eatery" 
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Category *</label>
+                    <input 
+                      name="category" 
+                      value={form.category} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="Restaurant, Hotel, Attraction..." 
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">City *</label>
+                    <input 
+                      name="city" 
+                      value={form.city} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="City" 
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <input 
+                      name="address" 
+                      value={form.address} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="Street, Barangay, City" 
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Latitude</label>
+                    <input 
+                      name="latitude" 
+                      value={form.latitude} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="14.5995" 
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Longitude</label>
+                    <input 
+                      name="longitude" 
+                      value={form.longitude} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="120.9842" 
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        if (location) setForm(prev => ({ 
+                          ...prev, 
+                          latitude: String(location.latitude), 
+                          longitude: String(location.longitude), 
+                          city: prev.city || detectedCity || prev.city 
+                        }))
+                      }} 
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      📍 Use my current location
+                    </button>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Phone</label>
+                    <input 
+                      name="phone_number" 
+                      value={form.phone_number} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="09xx xxx xxxx" 
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Website</label>
+                    <input 
+                      name="website" 
+                      value={form.website} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="https://..." 
+                    />
+                  </div>
+                  
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1">Description</label>
+                    <textarea 
+                      name="description" 
+                      value={form.description} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      rows={3}
+                      placeholder="Tell us about your business..."
+                    />
+                  </div>
+                </div>
 
-              <div className="md:col-span-2 flex justify-end gap-2 mt-2">
-                <button type="button" onClick={onClose} className="px-4 py-2 border rounded">Cancel</button>
-                <button type="submit" disabled={submitting} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">{submitting ? 'Submitting...' : 'Submit for review'}</button>
-              </div>
-            </form>
-          ) : (
-            <div className="space-y-4">
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded text-emerald-700 text-sm">Submission created. Pay the approval fee to finalize review.</div>
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-slate-700">Approval fee</div>
-                <div className="text-base font-semibold">₱{APPROVAL_FEE.toLocaleString()}</div>
-              </div>
-              <div className="flex justify-end gap-2">
-                <button onClick={onClose} className="px-4 py-2 border rounded">Close</button>
-                <button onClick={handlePayFee} disabled={paying} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">{paying ? 'Processing...' : 'Pay now'}</button>
-              </div>
-            </div>
-          )}
+                <div className="flex justify-end gap-2 mt-6">
+                  <button 
+                    type="button" 
+                    onClick={onClose} 
+                    className="px-4 py-2 border rounded hover:bg-slate-50"
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={handleNextPage}
+                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                  >
+                    Next: Add Photos
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Primary Photo URL</label>
+                    <input 
+                      name="primary_image_url" 
+                      value={form.primary_image_url} 
+                      onChange={handleChange} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      placeholder="https://example.com/photo.jpg" 
+                    />
+                    <p className="text-xs text-slate-500 mt-1">This will be the main photo displayed for your business</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Upload Images from Device</label>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      multiple 
+                      onChange={handleFileSelect} 
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      disabled={uploading}
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Select multiple images to upload</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Or Add Photo URLs</label>
+                    <textarea 
+                      value={photoUrls} 
+                      onChange={handlePhotoUrlsChange}
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                      rows={3}
+                      placeholder="Paste image URLs separated by commas&#10;Example: https://example.com/photo1.jpg, https://example.com/photo2.jpg"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Enter URLs separated by commas</p>
+                  </div>
+
+                  {filePreview.length > 0 && (
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Preview ({filePreview.length} photo{filePreview.length !== 1 ? 's' : ''})</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-64 overflow-y-auto p-2 border rounded bg-slate-50">
+                        {filePreview.map((preview, idx) => (
+                          <div key={idx} className="relative group">
+                            <div className="w-full aspect-square bg-slate-200 rounded overflow-hidden border">
+                              <img 
+                                src={preview.url} 
+                                alt={preview.name} 
+                                className="w-full h-full object-cover"
+                                onError={(e) => {
+                                  e.target.style.display = 'none'
+                                }}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => removePreview(idx)}
+                              className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ✕
+                            </button>
+                            <p className="text-xs text-slate-600 mt-1 truncate">{preview.name}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex justify-between gap-2 mt-6">
+                  <button 
+                    type="button" 
+                    onClick={handlePrevPage}
+                    disabled={submitting || uploading}
+                    className="px-4 py-2 border rounded hover:bg-slate-50 disabled:opacity-50"
+                  >
+                    ← Back
+                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      type="button" 
+                      onClick={onClose}
+                      disabled={submitting || uploading}
+                      className="px-4 py-2 border rounded hover:bg-slate-50 disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button 
+                      type="submit"
+                      disabled={submitting || uploading}
+                      className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700"
+                    >
+                      {uploading ? 'Uploading...' : submitting ? 'Submitting...' : 'Submit for review'}
+                    </button>
+                  </div>
+                </div>
+
+                {(uploading || submitting) && (
+                  <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-blue-700 text-sm">
+                    {uploading && 'Uploading images to cloud...'}
+                    {submitting && !uploading && 'Processing your submission...'}
+                  </div>
+                )}
+              </>
+            )}
+          </form>
         </div>
       </div>
     </div>
