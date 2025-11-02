@@ -146,9 +146,16 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
           } else if (typeof onExport === 'function') {
             // If no characterId provided, call onExport with exported data
             setStatus('Avatar exported — ready to create character')
-            try { onExport({ rpm_model_url: modelUrl, rpm_meta: meta }) } catch(e) { console.warn('onExport handler error', e) }
+            const exportedAppearance = {
+              rpm: {
+                model_url: modelUrl || null,
+                thumbnail: meta?.imageUrl || null,
+                meta: meta || null
+              }
+            }
+            try { onExport(exportedAppearance) } catch(e) { console.warn('onExport handler error', e) }
             if (typeof onSaved === 'function') {
-              try { onSaved({ rpm_model_url: modelUrl, rpm_meta: meta }) } catch(e) { console.warn('onSaved handler error', e) }
+              try { onSaved(exportedAppearance) } catch(e) { console.warn('onSaved handler error', e) }
             }
           } else {
             setStatus('Avatar exported — no handler to receive it')
