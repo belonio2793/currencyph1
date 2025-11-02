@@ -1,5 +1,6 @@
 import { supabase } from './supabaseClient'
 import { generateSlug } from './slugUtils'
+import { wisegcashAPI } from './payments'
 
 export const nearbyUtils = {
   // Get vote for a listing by current user
@@ -86,26 +87,48 @@ export const nearbyUtils = {
   // Submit a pending listing (new business)
   async submitPendingListing(userId, listing) {
     if (!userId) throw new Error('User not authenticated')
-    
+
+    const payload = {
+      submitted_by_user_id: userId,
+      name: listing.name,
+      address: listing.address || null,
+      city: listing.city || null,
+      country: listing.country || 'Philippines',
+      latitude: listing.latitude ? Number(listing.latitude) : null,
+      longitude: listing.longitude ? Number(listing.longitude) : null,
+      rating: listing.rating ? Number(listing.rating) : null,
+      category: listing.category || null,
+      phone_number: listing.phone_number || null,
+      website: listing.website || null,
+      description: listing.description || null,
+      approval_fee_amount: 1000,
+      approval_fee_currency: 'PHP',
+      approval_fee_status: 'unpaid',
+      status: 'pending',
+      raw: listing.raw || {}
+    }
+
     const { data, error } = await supabase
       .from('pending_listings')
-      .insert([{
-        submitted_by_user_id: userId,
-        name: listing.name,
-        address: listing.address,
-        latitude: listing.latitude ? Number(listing.latitude) : null,
-        longitude: listing.longitude ? Number(listing.longitude) : null,
-        rating: listing.rating ? Number(listing.rating) : null,
-        category: listing.category,
-        description: listing.description || null,
-        status: 'pending',
-        raw: listing.raw || {}
-      }])
+      .insert([payload])
       .select()
       .single()
-    
+
     if (error) throw error
     return data
+  },
+
+  async payApprovalFee(pendingListingId, userId, currency = 'PHP', amount = 1000) {
+    if (!userId) throw new Error('User not authenticated')
+    const tx = await wisegcashAPI.withdrawFunds(userId, currency, amount)
+    try {
+      await supabase
+        .from('pending_listings')
+        .update({ approval_fee_status: 'paid', approval_fee_tx_id: tx?.id || null, updated_at: new Date() })
+        .eq('id', pendingListingId)
+    } catch (e) {
+      console.warn('Failed to update approval fee status:', e)
+    }
   },
 
   // Get approval votes for a pending listing
@@ -169,6 +192,10 @@ export const nearbyUtils = {
     if (fetchError) throw fetchError
     if (!pending) throw new Error('Pending listing not found')
 
+    if (pending.approval_fee_status && pending.approval_fee_status !== 'paid') {
+      throw new Error('Approval fee not paid')
+    }
+
     // Create nearby listing
     const { error: insertError } = await supabase
       .from('nearby_listings')
@@ -177,14 +204,18 @@ export const nearbyUtils = {
         name: pending.name,
         slug: generateSlug(pending.name),
         address: pending.address,
+        city: pending.city,
+        country: pending.country,
         latitude: pending.latitude,
         longitude: pending.longitude,
         rating: pending.rating,
         category: pending.category,
+        phone_number: pending.phone_number,
+        website: pending.website,
         source: 'community',
         raw: { ...pending.raw, pendingId: pendingListingId }
       }])
-    
+
     if (insertError) throw insertError
 
     // Update pending status
@@ -192,7 +223,7 @@ export const nearbyUtils = {
       .from('pending_listings')
       .update({ status: 'approved', updated_at: new Date() })
       .eq('id', pendingListingId)
-    
+
     if (updateError) throw updateError
   },
 

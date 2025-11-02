@@ -4,6 +4,7 @@ import ListingCard from './ListingCard'
 import { imageManager } from '../lib/imageManager'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
+import AddBusinessModal from './AddBusinessModal'
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
 
@@ -95,6 +96,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
   const [communityError, setCommunityError] = useState('')
   const [voteCounts, setVoteCounts] = useState({})
   const [userVotes, setUserVotes] = useState({})
+  const [showAddBusiness, setShowAddBusiness] = useState(false)
 
   const itemsPerPage = 12
 
@@ -822,7 +824,15 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           <p className="text-blue-100 text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
 
           <div className="mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">📍 Browse by City</h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-2xl font-bold text-white">📍 Browse by City</h3>
+              <button
+                onClick={() => setShowAddBusiness(true)}
+                className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium"
+              >
+                + Add your business
+              </button>
+            </div>
             <p className="text-blue-100 mb-4">Select a letter to see all cities starting with that letter</p>
 
             {/* Prominent A-Z Alphabet Selector */}
@@ -908,6 +918,14 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
 
         </div>
       </div>
+
+      {showAddBusiness && (
+        <AddBusinessModal
+          userId={userId}
+          onClose={() => setShowAddBusiness(false)}
+          onSubmitted={() => setViewMode('community')}
+        />
+      )}
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-6 py-10">
@@ -1251,6 +1269,11 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                   </div>
 
                   <div className="border-t pt-4 flex items-center justify-between">
+                    {listing.approval_fee_status !== 'paid' && (
+                      <div className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mr-3">
+                        Approval fee unpaid. Final approval requires ₱1,000.
+                      </div>
+                    )}
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleApprovalVote(listing.id, 'approve')}
