@@ -70,7 +70,7 @@ currency-ph/
 
 ---
 
-## 🔧 Configuration
+## �� Configuration
 
 ### Environment Variables
 Create `.env.local` from `.env.example` and fill in:
@@ -368,5 +368,39 @@ Currency.ph is building a transparent, community-driven investment platform for 
 ## What's Next?
 
 Start with the **[Architecture Guide](./docs/ARCHITECTURE.md)** to understand the system design, then follow the **[Supabase Setup](./docs/SUPABASE_SCHEMA.md)** to initialize your database.
+
+Happy building! 🚀
+
+---
+
+## 🗺️ Real-world mapping & Google APIs
+
+This project supports building a playable real-world map of the Philippines using MapTiler (satellite tiles) and Google Maps / Street View panoramas. Add the following keys to your environment file (use `.env.template` as a starter):
+
+Required env variables (add to `.env.local` or your host environment):
+
+- VITE_MAPTILER_KEY — MapTiler API key (satellite tiles)
+- VITE_GOOGLE_API_KEY — Google Maps / Street View API key
+- VITE_SUPABASE_URL — Supabase project URL (for POIs and metadata)
+- VITE_SUPABASE_ANON_KEY — Supabase anon key
+- VITE_SUPABASE_SERVICE_ROLE_KEY — (optional) Supabase service role key for server-side tasks
+
+Notes:
+- Do NOT commit real API keys to the repository. Use `.env.local` or your CI/secrets manager.
+- Street View coverage varies by location; the app falls back to satellite tiles when no panorama is available.
+
+Quick setup:
+
+1. Copy `.env.template` to `.env.local` and fill keys.
+
+   cp .env.template .env.local
+
+2. Start dev server:
+
+   yarn dev
+
+3. Open the Play view and use the "Street View" button (top-right) when zoomed in to preview available panoramas.
+
+If you want, I can also add a small section to docs/ describing each Google API and which gameplay features it enables.
 
 Happy building! 🚀
