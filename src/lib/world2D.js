@@ -1,18 +1,21 @@
 import { supabase } from './supabaseClient'
+import { PHILIPPINES_CITIES } from '../data/philippinesCities'
 
-// Philippines city coordinates (real world latitude/longitude)
-export const CITY_COORDS = {
-  'Manila': { lat: 14.5994, lng: 120.9842, mapX: 1000, mapY: 1000 },
-  'Quezon City': { lat: 14.6349, lng: 121.0388, mapX: 1050, mapY: 950 },
-  'Cebu': { lat: 10.3157, lng: 123.8854, mapX: 1500, mapY: 1800 },
-  'Davao': { lat: 7.1315, lng: 125.6521, mapX: 1800, mapY: 2500 },
-  'Cagayan de Oro': { lat: 8.4865, lng: 124.6467, mapX: 1700, mapY: 2200 },
-  'Makati': { lat: 14.5547, lng: 121.0244, mapX: 1020, mapY: 1030 },
-  'Iloilo': { lat: 10.6918, lng: 122.5637, mapX: 1300, mapY: 1900 },
-  'Baguio': { lat: 16.4023, lng: 120.5960, mapX: 850, mapY: 500 },
-  'Bacolod': { lat: 10.3906, lng: 122.9806, mapX: 1450, mapY: 1950 },
-  'Cagayan': { lat: 17.6396, lng: 121.7796, mapX: 950, mapY: 200 }
-}
+// Convert all cities to map coordinates
+export const CITY_COORDS = Object.fromEntries(
+  PHILIPPINES_CITIES.map(city => [
+    city.name,
+    {
+      lat: city.lat,
+      lng: city.lng,
+      mapX: ((city.lng - 116) * 200), // Scale to map
+      mapY: ((city.lat - 5) * 200),
+      region: city.region,
+      population: city.population,
+      type: city.type
+    }
+  ])
+)
 
 // NPC templates for conversations
 const NPC_TEMPLATES = [
