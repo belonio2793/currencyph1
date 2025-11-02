@@ -253,6 +253,11 @@ export async function saveCityToDatabase(userId, city) {
     if (error) throw error
     return data
   } catch (err) {
+    const msg = err?.message || String(err)
+    if (msg.includes("Could not find the table 'public.cities'") || msg.includes('schema cache')) {
+      console.warn('Cities table missing in Supabase; save operation skipped.')
+      return null
+    }
     console.error('Failed to save city:', err)
     throw err
   }
@@ -268,7 +273,12 @@ export async function loadCitiesForUser(userId) {
     if (error) throw error
     return data || []
   } catch (err) {
-    console.error('Failed to load cities:', err?.message || String(err))
+    const msg = err?.message || String(err)
+    if (msg.includes("Could not find the table 'public.cities'") || msg.includes('schema cache')) {
+      console.warn('Cities table missing in Supabase; returning empty list instead of failing.')
+      return []
+    }
+    console.error('Failed to load cities:', msg)
     return []
   }
 }
@@ -282,6 +292,11 @@ export async function deleteCity(cityId) {
 
     if (error) throw error
   } catch (err) {
+    const msg = err?.message || String(err)
+    if (msg.includes("Could not find the table 'public.cities'") || msg.includes('schema cache')) {
+      console.warn('Cities table missing in Supabase; delete operation skipped.')
+      return
+    }
     console.error('Failed to delete city:', err)
     throw err
   }
