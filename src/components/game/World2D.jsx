@@ -17,6 +17,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const conversationRef = useRef(null)
   const cameraRef = useRef({ x: 0, y: 0, zoom: 1 })
   const [panMode, setPanMode] = useState(false)
+  const [showNPCs, setShowNPCs] = useState(false) // hide NPCs by default for clean satellite view
   const draggingRef = useRef(false)
   const lastMouseRef = useRef({ x: 0, y: 0 })
 
