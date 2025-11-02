@@ -20,6 +20,7 @@ export default function PlayCurrency({ userId }) {
   const [showCharacterCustomizer, setShowCharacterCustomizer] = useState(false)
   const [combatActive, setCombatActive] = useState(false)
   const [combatData, setCombatData] = useState(null)
+  const [claimingReward, setClaimingReward] = useState(false)
 
   useEffect(() => {
     initializeGame()
@@ -89,6 +90,21 @@ export default function PlayCurrency({ userId }) {
     }
   }
 
+  const handleDailyReward = async () => {
+    if (!character) return
+    try {
+      setClaimingReward(true)
+      await gameAPI.getOrCreateDailyReward(character.id)
+      const updated = await gameAPI.getCharacter(userId)
+      setCharacter(updated)
+      setError('')
+    } catch (err) {
+      setError('Daily reward: ' + err.message)
+    } finally {
+      setClaimingReward(false)
+    }
+  }
+
   const handleCombat = async (enemyType, enemyLevel = 1) => {
     try {
       setCombatActive(true)
@@ -131,6 +147,13 @@ export default function PlayCurrency({ userId }) {
               <p className="text-slate-400 text-sm">Level {character.level} • Location: {character.current_location}</p>
             </div>
             <div className="flex items-center gap-8">
+              <button
+                onClick={handleDailyReward}
+                disabled={claimingReward}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded text-white font-medium"
+              >
+                {claimingReward ? 'Claiming…' : 'Claim Daily Reward'}
+              </button>
               <div className="text-right">
                 <p className="text-slate-400 text-xs">Total Wealth</p>
                 <p className="text-2xl font-bold text-yellow-400">₱{character.money?.toLocaleString() || 0}</p>
