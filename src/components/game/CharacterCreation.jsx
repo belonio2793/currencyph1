@@ -29,6 +29,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [photoMode, setPhotoMode] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
   const [generating, setGenerating] = useState(false)
+  const [promptText, setPromptText] = useState('')
 
   const hairstyles = useMemo(() => (appearance.gender === 'male' ? MALE_HAIRSTYLES : FEMALE_HAIRSTYLES), [appearance.gender])
 
