@@ -63,6 +63,28 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           mapData.npcSpawns.push({ x: bx + 10 + i*12, y: by + 10 + (i%2)*8, templateIdx: i % 6 })
         }
       })
+
+      // Load POIs from Supabase (nearby_listings) and add as small markers
+      (async () => {
+        try {
+          const { data: pois, error } = await supabase
+            .from('nearby_listings')
+            .select('id, name, latitude, longitude')
+            .limit(800)
+          if (!error && Array.isArray(pois)) {
+            pois.forEach(p => {
+              if (!p.latitude || !p.longitude) return
+              const pos = latLngToWorldCoords(worldW, worldH, parseFloat(p.latitude), parseFloat(p.longitude))
+              const bx = Math.max(0, Math.min(worldW - 10, Math.round(pos.x)))
+              const by = Math.max(0, Math.min(worldH - 10, Math.round(pos.y)))
+              mapData.buildings.push({ x: bx, y: by, width: 12, height: 12, name: p.name || 'POI', type: 'poi' })
+            })
+          }
+        } catch (err) {
+          console.warn('Failed to load POIs:', err)
+        }
+      })()
+
     } catch (e) {
       // ignore mapping errors
       console.warn('City mapping failed', e)
