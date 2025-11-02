@@ -660,12 +660,24 @@ function getCameraPos() {
   }
 }
 
+import { renderModelThumbnail } from '../../lib/avatarRenderer'
+
 const avatarImageCache = new Map()
 
 function getAvatarImage(url) {
   if (!url) return null
   try {
     if (avatarImageCache.has(url)) return avatarImageCache.get(url)
+    // if glb/gltf model, render to thumbnail
+    if (/\.glb$|\.gltf$|\.vrm$|model=/.test(url)) {
+      // async render into cache (will return null until ready)
+      renderModelThumbnail(url, { width: 128, height: 128 }).then(img => {
+        avatarImageCache.set(url, img)
+      }).catch(e => {
+        console.warn('model render failed', url, e)
+      })
+      return null
+    }
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.src = url
