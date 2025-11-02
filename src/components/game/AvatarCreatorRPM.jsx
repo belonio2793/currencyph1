@@ -176,22 +176,24 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
   if (!open) return null
 
   return (
-    <div className="w-full h-full">
-      <div className="absolute top-2 left-3 text-xs text-slate-300 bg-black/40 px-2 py-1 rounded z-30">
-        {saving ? 'Saving…' : status}
-        {error ? <span className="text-red-400 ml-2">{error}</span> : null}
+    <div className="fixed inset-0 bg-black/50 z-[9999] flex items-center justify-center p-4">
+      <div className="relative w-full h-full max-w-6xl max-h-[90vh] bg-slate-900 rounded-lg overflow-hidden">
+        <div className="absolute top-2 left-3 text-xs text-slate-300 bg-black/40 px-2 py-1 rounded z-40">
+          {saving ? 'Saving…' : status}
+          {error ? <span className="text-red-400 ml-2">{error}</span> : null}
+        </div>
+        {showCloseButton ? (
+          <button onClick={onClose} className="absolute top-2 right-2 z-40 bg-slate-700 hover:bg-slate-600 text-white rounded px-3 py-1 text-xs">Close</button>
+        ) : null}
+        <iframe
+          ref={iframeRef}
+          title="Ready Player Me"
+          src={getAvatarEditorUrl(savedAvatarUrl)}
+          allow="camera *; clipboard-write"
+          className="w-full h-full border-0"
+          key={savedAvatarUrl ? `rpm-${savedAvatarUrl}` : 'rpm-new'}
+        />
       </div>
-      {showCloseButton ? (
-        <button onClick={onClose} className="absolute top-2 right-2 z-30 bg-slate-700 hover:bg-slate-600 text-white rounded px-3 py-1 text-xs">Close</button>
-      ) : null}
-      <iframe
-        ref={iframeRef}
-        title="Ready Player Me"
-        src={getAvatarEditorUrl(savedAvatarUrl)}
-        allow="camera *; clipboard-write"
-        className="w-full h-full border-0"
-        key={savedAvatarUrl ? `rpm-${savedAvatarUrl}` : 'rpm-new'}
-      />
     </div>
   )
 }
