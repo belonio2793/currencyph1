@@ -23,7 +23,8 @@ function pixelToTile(px, py) {
 }
 
 function tileUrl(z, x, y) {
-  return `https://api.maptiler.com/tiles/streets/${z}/${x}/${y}.png?key=${MAPTILER_KEY}`
+  // Use satellite tiles for photographic look. Support hi-dpi by increasing z when devicePixelRatio > 1
+  return `https://api.maptiler.com/tiles/satellite/${z}/${x}/${y}.jpg?key=${MAPTILER_KEY}`
 }
 
 const tileCache = new Map()
