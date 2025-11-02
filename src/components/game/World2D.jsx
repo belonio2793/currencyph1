@@ -174,8 +174,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // Update world state
       world.update()
 
-      // Get nearby NPCs
-      const nearby = world.getNearbyNPCs(150)
+      // Get nearby NPCs (respect toggle to hide NPCs)
+      const nearby = showNPCs ? world.getNearbyNPCs(150) : []
       setNearbyNPCs(nearby)
 
       // Sync position
@@ -235,7 +235,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       try { cleanupResize() } catch(e){}
       try { if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null } } catch(e){}
     }
-  }, [otherPlayers])
+  }, [otherPlayers, showNPCs])
 
   // Handle keyboard input
   useEffect(() => {
@@ -536,8 +536,9 @@ function getCameraPos() {
   }
 }
 
-function renderWorld(ctx, canvas, world, otherPlayers, camera) {
+function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   const tileSize = 32
+  const showNPCsOpt = options && options.showNPCs !== undefined ? options.showNPCs : true
 
   // Clear canvas (screen-space)
   ctx.save()
@@ -590,20 +591,22 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera) {
     ctx.fillText(building.name, building.x + 5, building.y + 15)
   })
 
-  // Draw NPCs with depth scale (closer to bottom appear larger)
-  world.npcs.forEach(npc => {
-    const depthFactor = 1 + ((npc.y - world.player.y) / Math.max(100, world.mapData.height)) * 0.5
-    const r = Math.max(4, 8 * depthFactor)
-    ctx.fillStyle = '#3b82f6'
-    ctx.beginPath()
-    ctx.arc(npc.x, npc.y, r, 0, Math.PI * 2)
-    ctx.fill()
+  // Draw NPCs with depth scale (closer to bottom appear larger) if enabled
+  if (showNPCsOpt) {
+    world.npcs.forEach(npc => {
+      const depthFactor = 1 + ((npc.y - world.player.y) / Math.max(100, world.mapData.height)) * 0.5
+      const r = Math.max(4, 8 * depthFactor)
+      ctx.fillStyle = '#3b82f6'
+      ctx.beginPath()
+      ctx.arc(npc.x, npc.y, r, 0, Math.PI * 2)
+      ctx.fill()
 
-    ctx.fillStyle = '#fff'
-    ctx.font = `${12 / cam.zoom}px Arial`
-    ctx.textAlign = 'center'
-    ctx.fillText(npc.emoji, npc.x, npc.y + 2)
-  })
+      ctx.fillStyle = '#fff'
+      ctx.font = `${12 / cam.zoom}px Arial`
+      ctx.textAlign = 'center'
+      ctx.fillText(npc.emoji, npc.x, npc.y + 2)
+    })
+  }
 
   // Draw other players
   otherPlayers.forEach(player => {
