@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { CitySimulation, saveCityToDatabase } from '../../lib/citySimulation'
+import CityStreetView from './CityStreetView'
 
 export default function CityManager({ city, onUpdate, onClose }) {
   const [cityState, setCityState] = useState(city)
