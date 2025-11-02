@@ -82,21 +82,38 @@ export class World3D {
   }
   
   setupLighting() {
-    // Ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+    // Ambient light for overall illumination
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
     this.scene.add(ambientLight)
-    
+
     // Directional light (sun)
-    const sunLight = new THREE.DirectionalLight(0xffffff, 0.8)
-    sunLight.position.set(500, 800, 500)
-    sunLight.castShadow = true
-    sunLight.shadow.mapSize.width = 2048
-    sunLight.shadow.mapSize.height = 2048
-    sunLight.shadow.camera.left = -2000
-    sunLight.shadow.camera.right = 2000
-    sunLight.shadow.camera.top = 2000
-    sunLight.shadow.camera.bottom = -2000
-    this.scene.add(sunLight)
+    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.2)
+    this.sunLight.position.set(1000, 1200, 800)
+    this.sunLight.castShadow = true
+    this.sunLight.shadow.mapSize.width = 4096
+    this.sunLight.shadow.mapSize.height = 4096
+    this.sunLight.shadow.camera.left = -3000
+    this.sunLight.shadow.camera.right = 3000
+    this.sunLight.shadow.camera.top = 3000
+    this.sunLight.shadow.camera.bottom = -3000
+    this.sunLight.shadow.camera.far = 5000
+    this.sunLight.shadow.bias = -0.0001
+    this.scene.add(this.sunLight)
+
+    // Hemisphere light for better ambient
+    const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x1a1a2e, 0.4)
+    this.scene.add(hemiLight)
+  }
+
+  setupEnvironment() {
+    // Add some atmospheric elements
+    const skyGeometry = new THREE.SphereGeometry(5000, 32, 32)
+    const skyMaterial = new THREE.MeshBasicMaterial({
+      color: 0x87CEEB,
+      side: THREE.BackSide
+    })
+    const sky = new THREE.Mesh(skyGeometry, skyMaterial)
+    this.scene.add(sky)
   }
   
   setupGround() {
