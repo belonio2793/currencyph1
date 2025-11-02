@@ -49,13 +49,13 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     syncRef.current.connect().then(() => {
       // include avatar thumbnail in presence
       try {
-        const avatarUrl = character?.appearance?.rpm_meta?.imageUrl || character?.appearance?.rpm_meta?.avatarUrl || character?.appearance?.rpm_model_url || null
+        const avatarUrl = character?.appearance?.rpm?.thumbnail || character?.appearance?.rpm?.meta?.imageUrl || character?.appearance?.rpm?.meta?.avatarUrl || character?.appearance?.rpm?.model_url || null
         syncRef.current.updatePresence({ name: character.name, x: worldRef.current.player.x, y: worldRef.current.player.y, direction: worldRef.current.player.direction, rpm_avatar: avatarUrl })
       } catch(e) {}
       syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
     })
     // set local player's avatar on world object so renderer can draw it
-    worldRef.current.player.avatarUrl = character?.appearance?.rpm_meta?.imageUrl || character?.appearance?.rpm_meta?.avatarUrl || character?.appearance?.rpm_model_url || null
+    worldRef.current.player.avatarUrl = character?.appearance?.rpm?.thumbnail || character?.appearance?.rpm?.meta?.imageUrl || character?.appearance?.rpm?.meta?.avatarUrl || character?.appearance?.rpm?.model_url || null
 
     // Map real-world city coordinates into the world map as buildings/markers
     try {
