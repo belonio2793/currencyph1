@@ -14,8 +14,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     gender: 'male',
     skin_tone: 'medium',
     skin_color: '#d4a574',
-    hair_style: 'buzz_cut',
-    hair_color: '#4b2e2e',
     height: 175,
     build: 'average'
   })
@@ -24,7 +22,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [showConfirm, setShowConfirm] = useState(false)
   const [showGallery, setShowGallery] = useState(false)
   const [search, setSearch] = useState('')
-  const [rgb, setRgb] = useState(() => hexToRgb(appearance.hair_color))
   const [rgbSkin, setRgbSkin] = useState(() => hexToRgb(appearance.skin_color))
   const [photoMode, setPhotoMode] = useState(false)
   const [photoUrl, setPhotoUrl] = useState('')
