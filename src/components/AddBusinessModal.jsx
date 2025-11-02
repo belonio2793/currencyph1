@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
+import { useGeolocation } from '../lib/useGeolocation'
 
 export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [form, setForm] = useState({
@@ -14,11 +15,23 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     website: '',
     description: ''
   })
+  const { location, city: detectedCity } = useGeolocation()
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
   const [paying, setPaying] = useState(false)
   const APPROVAL_FEE = 1000
+
+  useEffect(() => {
+    if (location) {
+      setForm(prev => ({
+        ...prev,
+        latitude: prev.latitude || String(location.latitude),
+        longitude: prev.longitude || String(location.longitude),
+        city: prev.city || detectedCity || prev.city
+      }))
+    }
+  }, [location, detectedCity])
 
   const handleChange = (e) => {
     const { name, value } = e.target
