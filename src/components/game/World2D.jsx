@@ -470,10 +470,17 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
 
       {/* HUD Overlay */}
       <div className="absolute top-4 left-4 text-white pointer-events-none">
-        <div className="bg-black/50 p-3 rounded border border-slate-600">
-          <p className="text-sm font-bold">{character.name}</p>
-          <p className="text-xs text-slate-400">📍 {city}</p>
-          <p className="text-xs text-slate-400">Position: {Math.round(worldRef.current?.player.x || 0)}, {Math.round(worldRef.current?.player.y || 0)}</p>
+        <div className="bg-black/50 p-3 rounded border border-slate-600 flex items-center gap-3">
+          {character?.appearance && (character.appearance.rpm_meta?.imageUrl || character.appearance.rpm_meta?.avatarUrl || character.appearance.rpm_model_url) ? (
+            <img src={character.appearance.rpm_meta?.imageUrl || character.appearance.rpm_meta?.avatarUrl || character.appearance.rpm_model_url} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
+          ) : (
+            <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-400">No<br/>Avatar</div>
+          )}
+          <div>
+            <p className="text-sm font-bold">{character.name}</p>
+            <p className="text-xs text-slate-400">📍 {city}</p>
+            <p className="text-xs text-slate-400">Position: {Math.round(worldRef.current?.player.x || 0)}, {Math.round(worldRef.current?.player.y || 0)}</p>
+          </div>
         </div>
       </div>
 
