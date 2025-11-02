@@ -214,6 +214,10 @@ export class NPC {
 }
 
 // World manager
+export const CITY_MAPS = Object.fromEntries(
+  PHILIPPINES_CITIES.map(city => [city.name, generateCityMap(city)])
+)
+
 export class World2D {
   constructor(cityName, userId, characterName) {
     this.cityName = cityName
