@@ -170,15 +170,24 @@ export default function PlayCurrency({ userId }) {
       <div className="bg-slate-800/50 border-b border-slate-700">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1
-                onClick={() => setShowCharactersPanel(true)}
-                className="text-3xl font-bold text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
-                title="Click to open characters panel"
+            <div className="flex items-center gap-4">
+              <div>
+                <h1
+                  onClick={() => setShowCharactersPanel(true)}
+                  className="text-3xl font-bold text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
+                  title="Click to open characters panel"
+                >
+                  {character.name}
+                </h1>
+                <p className="text-slate-400 text-sm">Level {character.level} • 📍 {character.current_location} {character.home_city && character.home_city !== character.current_location ? `(Home: ${character.home_city})` : ''}</p>
+              </div>
+              <button
+                onClick={() => setShowRPM(true)}
+                className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                title="Edit your character avatar"
               >
-                {character.name}
-              </h1>
-              <p className="text-slate-400 text-sm">Level {character.level} • 📍 {character.current_location} {character.home_city && character.home_city !== character.current_location ? `(Home: ${character.home_city})` : ''}</p>
+                ✏️ Edit Avatar
+              </button>
             </div>
             <div className="flex items-center gap-8">
               <button
@@ -240,7 +249,7 @@ export default function PlayCurrency({ userId }) {
             { id: 'equipment', label: '👕 Equipment', icon: '👗' },
             { id: 'marketplace', label: '🏪 Marketplace', icon: '💰' },
             { id: 'properties', label: '🏠 Properties', icon: '🏢' },
-            { id: 'banking', label: '🏦 Banking', icon: '💳' }
+            { id: 'banking', label: '��� Banking', icon: '💳' }
           ].map(tab => (
             <button
               key={tab.id}
