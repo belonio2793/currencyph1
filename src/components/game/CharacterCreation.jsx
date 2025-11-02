@@ -223,6 +223,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
 function AvatarPreview({ appearance, name = '', large = false }) {
   const size = large ? 260 : 160
+  const headRadius = Math.round(size * 0.26)
   const isMale = appearance.gender === 'male'
   const faceColor = appearance.skin_color || { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }[appearance.skin_tone] || '#d4a574'
 
