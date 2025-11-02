@@ -17,10 +17,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [showGallery, setShowGallery] = useState(false)
   const [search, setSearch] = useState('')
   const [rgbSkin, setRgbSkin] = useState(() => hexToRgb(appearance.skin_color))
-  const [photoMode, setPhotoMode] = useState(false)
-  const [photoUrl, setPhotoUrl] = useState('')
-  const [generating, setGenerating] = useState(false)
-  const [promptText, setPromptText] = useState('')
 
   function handlePrepareCreate(e) {
     e.preventDefault()
@@ -182,46 +178,8 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                 </div>
 
                 <div className="w-full flex items-center justify-center mb-3">
-                  {photoMode ? (
-                    <div className="w-full flex flex-col items-center">
-                      {photoUrl ? (
-                        <img src={photoUrl} alt="avatar" className="w-full rounded-lg border border-slate-700 object-cover max-h-72" />
-                      ) : (
-                        <div className="w-full h-48 bg-slate-800 rounded border border-dashed border-slate-700 flex items-center justify-center text-slate-400">No photoreal image yet</div>
-                      )}
-                    </div>
-                  ) : (
-                    <AvatarPreview appearance={appearance} name={name} />
-                  )}
+                  <AvatarPreview appearance={appearance} name={name} />
                 </div>
-
-                <div className="w-full">
-                  <label className="block text-xs text-slate-400 mb-2">Prompt (optional) — describe photoreal look, style, lighting, clothing, expression</label>
-                  <textarea value={promptText} onChange={(e)=>setPromptText(e.target.value)} placeholder="e.g. studio portrait, soft window light, smiling, wearing a navy jacket" className="w-full h-20 p-2 rounded bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 mb-3" />
-                </div>
-
-                <div className="w-full flex gap-2">
-                  <button onClick={async ()=>{
-                    if (!photoMode) return
-                    setGenerating(true)
-                    setError('')
-                    try {
-                      const { generatePhotorealAvatar } = await import('../../lib/imageGen.js')
-                      const url = await generatePhotorealAvatar(appearance, userId || 'guest', promptText)
-                      setPhotoUrl(url)
-                    } catch (err) {
-                      console.error(err)
-                      setError('Photo generation failed: ' + (err.message || err))
-                    } finally {
-                      setGenerating(false)
-                    }
-                  }} className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded disabled:opacity-50" disabled={!photoMode || generating}>
-                    {generating ? 'Generating…' : 'Generate Photo'}
-                  </button>
-                  <button onClick={()=>{ setPhotoUrl(''); setPhotoMode(false); setPromptText('') }} className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded">Reset</button>
-                </div>
-
-                <p className="text-slate-400 text-sm mt-3 text-center px-3">Toggle between SVG preview and photorealistic composite. Use Generate Photo to create and store an image.</p>
               </div>
             </div>
           </div>
@@ -256,7 +214,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
             <div className="max-w-7xl mx-auto px-2 py-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
               <div>
                 <strong className="block text-yellow-200">Note:</strong>
-                <p className="text-xs text-yellow-100 mt-1">You can always reset or change your character's style, outfit, hairstyle, or appearance later. If a hairstyle or placement doesn't look right, use the Reset button or revisit the character editor — your character can be updated anytime.</p>
+                <p className="text-xs text-yellow-100 mt-1">You can always reset or change your character's style or appearance later. Use the Reset button or revisit the character editor — your character can be updated anytime.</p>
               </div>
               <div className="flex-shrink-0">
                 <button onClick={cancelPending} className="px-3 py-1 bg-yellow-600 text-slate-900 rounded font-semibold">Reset Now</button>
@@ -273,31 +231,35 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
 function AvatarPreview({ appearance, name = '', large = false }) {
   const size = large ? 260 : 160
-  const headRadius = Math.round(size * 0.26)
+  const isMale = appearance.gender === 'male'
   const faceColor = appearance.skin_color || { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }[appearance.skin_tone] || '#d4a574'
 
-  // Build mapping influences body width and belly
+  // Build mapping with gender-specific differences
   const buildMap = {
-    very_slim: { bodyScale: 0.8, waist: 0.55, limb: 0.6 },
-    slim: { bodyScale: 0.9, waist: 0.7, limb: 0.75 },
-    average: { bodyScale: 1, waist: 0.9, limb: 0.9 },
-    athletic: { bodyScale: 1.02, waist: 0.85, limb: 1.0 },
-    heavy: { bodyScale: 1.18, waist: 1.2, limb: 1.2 },
-    obese: { bodyScale: 1.35, waist: 1.45, limb: 1.35 }
+    very_slim: { bodyScale: 0.8, waist: 0.55, limb: 0.6, shoulder: isMale ? 1.1 : 0.95 },
+    slim: { bodyScale: 0.9, waist: 0.7, limb: 0.75, shoulder: isMale ? 1.2 : 1.0 },
+    average: { bodyScale: 1, waist: 0.9, limb: 0.9, shoulder: isMale ? 1.3 : 1.1 },
+    athletic: { bodyScale: 1.02, waist: 0.85, limb: 1.0, shoulder: isMale ? 1.4 : 1.15 },
+    heavy: { bodyScale: 1.18, waist: 1.2, limb: 1.2, shoulder: isMale ? 1.35 : 1.25 },
+    obese: { bodyScale: 1.35, waist: 1.45, limb: 1.35, shoulder: isMale ? 1.4 : 1.35 }
   }
 
   const b = buildMap[appearance.build] || buildMap['average']
-  const heightScale = (appearance.height - 140) / 90 // 140..230
+  const heightScale = (appearance.height - 140) / 90
   const avatarHeight = Math.round(size * (1 + heightScale * 0.25))
   const avatarStyle = { width: size, height: avatarHeight }
 
-  // torso dims
-  const torsoW = avatarStyle.width * 0.36 * b.bodyScale
+  // Torso with gender-specific shaping
+  const baseTorsoW = avatarStyle.width * 0.36 * b.bodyScale
+  const torsoW = isMale ? baseTorsoW * 1.08 : baseTorsoW * 0.95
   const torsoH = avatarStyle.height * 0.34 * b.bodyScale
+  const shoulderW = torsoW * b.shoulder
 
-  // limb widths influenced by build
   const armW = Math.max(6, Math.round(avatarStyle.width * 0.06 * b.limb))
   const legW = Math.max(8, Math.round(avatarStyle.width * 0.08 * b.limb))
+
+  // Female chest/curve
+  const chestHeight = isMale ? 0 : torsoH * 0.15
 
   return (
     <div className="flex flex-col items-center text-center px-2">
@@ -308,32 +270,60 @@ function AvatarPreview({ appearance, name = '', large = false }) {
           <rect x={torsoW*0.45} y={-0} width={legW} height={avatarStyle.height*0.4} rx={legW/2} fill="#24303b" />
         </g>
 
-        {/* torso */}
+        {/* torso with gender-specific shape */}
         <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.62})`}>
-          <rect x={-torsoW/2} y={-torsoH/2} width={torsoW} height={torsoH} rx="14" fill="#293241" />
+          {isMale ? (
+            /* Male: broader shoulders, straighter sides, muscular */
+            <path d={`M ${-shoulderW/2} ${-torsoH*0.5} L ${-torsoW/2} ${-torsoH*0.2} L ${-torsoW/2} ${torsoH*0.5} L ${torsoW/2} ${torsoH*0.5} L ${torsoW/2} ${-torsoH*0.2} L ${shoulderW/2} ${-torsoH*0.5} Q 0 ${-torsoH*0.55} ${-shoulderW/2} ${-torsoH*0.5}`} fill="#293241" />
+          ) : (
+            /* Female: curved waist, defined chest, hourglass shape */
+            <path d={`M ${-shoulderW/2} ${-torsoH*0.5} Q ${-shoulderW*0.35} ${-torsoH*0.35} ${-torsoW*0.4} ${-torsoH*0.1} L ${-torsoW*0.55} ${torsoH*0.5} Q 0 ${torsoH*0.58} ${torsoW*0.55} ${torsoH*0.5} L ${torsoW*0.4} ${-torsoH*0.1} Q ${shoulderW*0.35} ${-torsoH*0.35} ${shoulderW/2} ${-torsoH*0.5} Q 0 ${-torsoH*0.55} ${-shoulderW/2} ${-torsoH*0.5}`} fill="#293241" />
+          )}
 
-          {/* belly overlay for heavy/obese */}
+          {/* Female chest curves */}
+          {!isMale && (
+            <>
+              <ellipse cx={-torsoW*0.25} cy={-torsoH*0.15} rx={torsoW*0.18} ry={torsoH*0.22} fill="#2f3337" opacity="0.6" />
+              <ellipse cx={torsoW*0.25} cy={-torsoH*0.15} rx={torsoW*0.18} ry={torsoH*0.22} fill="#2f3337" opacity="0.6" />
+            </>
+          )}
+
+          {/* Belly overlay for heavy/obese */}
           {appearance.build === 'heavy' && <ellipse cx={0} cy={torsoH*0.12} rx={torsoW*0.55} ry={torsoH*0.25} fill="#2f3337" />}
           {appearance.build === 'obese' && <ellipse cx={0} cy={torsoH*0.2} rx={torsoW*0.68} ry={torsoH*0.33} fill="#2f3337" />}
 
           {/* arms */}
-          <rect x={-torsoW/2 - armW - 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
-          <rect x={torsoW/2 + 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
+          <rect x={-shoulderW/2 - armW - 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
+          <rect x={shoulderW/2 + 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
         </g>
 
-        {/* head group */}
+        {/* head group with gender-specific features */}
         <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.24})`}>
           <circle r={headRadius} fill={faceColor} />
 
-          <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
-          <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
+          {/* Eyes */}
+          {isMale ? (
+            /* Male: larger, more angular eyes */
+            <>
+              <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.14))} fill="#0b1220" />
+              <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.14))} fill="#0b1220" />
+            </>
+          ) : (
+            /* Female: larger, rounder eyes */
+            <>
+              <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.16))} fill="#0b1220" />
+              <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.16))} fill="#0b1220" />
+            </>
+          )}
+
+          {/* Mouth */}
           <path d={`M ${-headRadius * 0.28} ${Math.round(headRadius * 0.45)} q ${headRadius * 0.28} ${headRadius * 0.18} ${headRadius * 0.56} 0`} stroke="#7f1d1d" strokeWidth={Math.max(1, Math.round(headRadius * 0.05))} fill="none" strokeLinecap="round" />
         </g>
       </svg>
 
       <div className="mt-3">
         <p className="text-sm md:text-base font-semibold text-slate-100 truncate max-w-[220px]">{name || 'Unnamed'}</p>
-        <p className="text-xs text-slate-400">{appearance.gender === 'male' ? 'Male' : 'Female'}</p>
+        <p className="text-xs text-slate-400">{isMale ? '♂ Male' : '♀ Female'}</p>
       </div>
     </div>
   )
