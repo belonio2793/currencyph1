@@ -17,10 +17,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     hair_style: 'buzz_cut',
     hair_color: '#4b2e2e',
     height: 175,
-    build: 'average',
-    hair_offset_x: 0,
-    hair_offset_y: 0,
-    hair_scale: 1
+    build: 'average'
   })
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
