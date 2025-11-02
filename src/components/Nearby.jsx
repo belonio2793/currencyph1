@@ -1298,6 +1298,22 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                     </div>
 
                     <div className="flex gap-2">
+                      {listing.approval_fee_status !== 'paid' && listing.submitted_by_user_id === userId && (
+                        <button
+                          onClick={async () => {
+                            try {
+                              await nearbyUtils.payApprovalFee(listing.id, userId, 'PHP', 1000)
+                              await loadPendingListings()
+                              alert('Fee paid')
+                            } catch (e) {
+                              alert(e.message || 'Payment failed')
+                            }
+                          }}
+                          className="px-4 py-2 bg-amber-500 text-white rounded text-sm font-medium hover:bg-amber-600"
+                        >
+                          Pay ₱1,000 fee
+                        </button>
+                      )}
                       <button
                         onClick={() => handleApprove(listing.id)}
                         className="px-4 py-2 bg-blue-600 text-white rounded text-sm font-medium hover:bg-blue-700"
