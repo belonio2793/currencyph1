@@ -1,23 +1,13 @@
-// Extensive hairstyle definitions (real-world names)
-
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState } from 'react'
+import AvatarCreatorRPM from './AvatarCreatorRPM'
 
 export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [name, setName] = useState('')
-  const [appearance, setAppearance] = useState({
-    gender: 'male',
-    skin_tone: 'medium',
-    skin_color: '#d4a574',
-    height: 175,
-    build: 'average'
-  })
+  const [homeCity, setHomeCity] = useState('Manila')
+  const [avatarAppearance, setAvatarAppearance] = useState(null)
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
-  const [showConfirm, setShowConfirm] = useState(false)
-  const [showGallery, setShowGallery] = useState(false)
-  const [search, setSearch] = useState('')
-  const [rgbSkin, setRgbSkin] = useState(() => hexToRgb(appearance.skin_color))
-  const [homeCity, setHomeCity] = useState('Manila')
+  const [showAvatarCreator, setShowAvatarCreator] = useState(false)
 
   const PHILIPPINES_CITIES = [
     { name: 'Manila', region: 'NCR', description: 'Capital city - Economic hub' },
@@ -38,397 +28,134 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       setError('Please enter a character name')
       return
     }
+    if (!avatarAppearance) {
+      setError('Please create an avatar first')
+      return
+    }
     setError('')
-    setShowConfirm(true)
+    doCreate()
   }
 
   async function doCreate() {
     try {
       setCreating(true)
-      await onCharacterCreated(name, appearance, homeCity)
+      setError('')
+      await onCharacterCreated(name, avatarAppearance, homeCity)
     } catch (err) {
       setError(err.message || String(err))
     } finally {
       setCreating(false)
-      setShowConfirm(false)
     }
   }
 
-  function cancelPending() {
-    setShowConfirm(false)
-    setName('')
-    const defaultAppearance = {
-      gender: 'male',
-      skin_tone: 'medium',
-      skin_color: '#d4a574',
-      height: 175,
-      build: 'average'
-    }
-    setAppearance(defaultAppearance)
-    setRgbSkin(hexToRgb(defaultAppearance.skin_color))
-    setError('')
+  function handleAvatarExport(appearance) {
+    setAvatarAppearance(appearance)
+    setShowAvatarCreator(false)
   }
-
-  function handleAppearanceChange(key, value) {
-    if (key === 'gender' && value !== 'male' && value !== 'female') return
-    // handle skin tone presets
-    if (key === 'skin_tone') {
-      const mapping = { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }
-      const color = mapping[value] || '#d4a574'
-      setAppearance(prev => ({ ...prev, skin_tone: value, skin_color: color }))
-      setRgbSkin(hexToRgb(color))
-      return
-    }
-    if (key === 'skin_color') {
-      setAppearance(prev => ({ ...prev, skin_color: value }))
-      setRgbSkin(hexToRgb(value))
-      return
-    }
-    setAppearance(prev => ({ ...prev, [key]: value }))
-  }
-
-  // gallery removed
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-start justify-center p-3">
-      <div className="w-full max-w-6xl mt-6">
-        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:p-6 lg:p-8">
+      <div className="w-full max-w-4xl mt-6">
+        <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:p-8">
           <h1 className="text-3xl md:text-4xl font-bold text-center text-blue-400 mb-2">⚔️ Play Currency</h1>
-          <p className="text-center text-slate-400 mb-4 md:mb-6">Create Your Adventure — pro customization</p>
+          <p className="text-center text-slate-400 mb-8">Create Your Adventure — with ReadyPlayer.me</p>
 
-
-          {error && (<div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">{error}</div>)}
-
-          <div className="flex flex-col lg:flex-row gap-6">
-            <div className="flex-1">
-              <form onSubmit={handlePrepareCreate} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-2">Character Name</label>
-                  <input type="text" value={name} onChange={(e)=>setName(e.target.value)} placeholder="Enter your character name..." className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500" disabled={creating} />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Gender</label>
-                    <div className="flex gap-2">
-                      {['male','female'].map(g => (
-                        <button key={g} type="button" onClick={()=>handleAppearanceChange('gender', g)} className={`flex-1 px-3 py-2 rounded-lg border-2 text-sm ${appearance.gender===g ? 'border-blue-500 bg-blue-500/10 text-blue-300' : 'border-slate-600 text-slate-300'}`}>{g.charAt(0).toUpperCase()+g.slice(1)}</button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Skin Tone</label>
-                    <div className="flex gap-2 items-center mb-2">
-                      {[{n:'light',c:'#fdbcb4'},{n:'medium',c:'#d4a574'},{n:'dark',c:'#8b5a3c'},{n:'olive',c:'#9a7c5c'}].map(t=> (
-                        <button key={t.n} type="button" onClick={()=>handleAppearanceChange('skin_tone', t.n)} className={`w-10 h-10 rounded border-2 ${appearance.skin_tone===t.n ? 'ring-2 ring-blue-500 border-blue-500' : 'border-slate-600'}`} style={{backgroundColor:t.c}} title={t.n} />
-                      ))}
-
-                      <div className="flex items-center gap-2 ml-3">
-                        <input type="color" value={appearance.skin_color || '#d4a574'} onChange={(e)=>handleAppearanceChange('skin_color', e.target.value)} className="w-10 h-8 p-0 border-2 border-slate-600 rounded-md" />
-                        <div className="text-xs text-slate-400">Custom</div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2">
-                      <div>
-                        <label className="text-xs text-slate-400">R</label>
-                        <input type="number" min="0" max="255" value={rgbSkin.r} onChange={(e)=>{ const v = clamp(parseInt(e.target.value||0),0,255); setRgbSkin(prev=>({ ...prev, r: v })); handleAppearanceChange('skin_color', rgbToHex({ ...rgbSkin, r: v })) }} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-                      </div>
-                      <div>
-                        <label className="text-xs text-slate-400">G</label>
-                        <input type="number" min="0" max="255" value={rgbSkin.g} onChange={(e)=>{ const v = clamp(parseInt(e.target.value||0),0,255); setRgbSkin(prev=>({ ...prev, g: v })); handleAppearanceChange('skin_color', rgbToHex({ ...rgbSkin, g: v })) }} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-                      </div>
-                      <div>
-                        <label className="text-xs text-slate-400">B</label>
-                        <input type="number" min="0" max="255" value={rgbSkin.b} onChange={(e)=>{ const v = clamp(parseInt(e.target.value||0),0,255); setRgbSkin(prev=>({ ...prev, b: v })); handleAppearanceChange('skin_color', rgbToHex({ ...rgbSkin, b: v })) }} className="w-full px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Height: {appearance.height}cm</label>
-                    <input type="range" min="140" max="230" value={appearance.height} onChange={(e)=>handleAppearanceChange('height', parseInt(e.target.value))} className="w-full" />
-                    <div className="flex items-center gap-2 mt-2">
-                      <FeetInchesDisplay cm={appearance.height} onChange={(ft, inch) => {
-                        const cm = feetInchesToCm(ft, inch)
-                        handleAppearanceChange('height', cm)
-                      }} />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-2">Build</label>
-                    <select value={appearance.build} onChange={(e)=>handleAppearanceChange('build', e.target.value)} className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100">
-                      <option value="very_slim">Very Slim</option>
-                      <option value="slim">Slim</option>
-                      <option value="average">Average</option>
-                      <option value="athletic">Athletic</option>
-                      <option value="heavy">Heavy</option>
-                      <option value="obese">Obese</option>
-                    </select>
-                    <p className="text-xs text-slate-400 mt-2">Body proportions update live in preview (waist, limbs, torso).</p>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-3">🏠 Home City</label>
-                  <p className="text-xs text-slate-400 mb-3">Choose your home city to start your economic adventure</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {PHILIPPINES_CITIES.map(city => (
-                      <button
-                        key={city.name}
-                        type="button"
-                        onClick={() => setHomeCity(city.name)}
-                        className={`text-left p-3 rounded-lg border-2 transition-colors ${
-                          homeCity === city.name
-                            ? 'border-blue-500 bg-blue-500/10'
-                            : 'border-slate-600 bg-slate-700 hover:bg-slate-600'
-                        }`}
-                      >
-                        <p className="font-semibold text-slate-100">{city.name}</p>
-                        <p className="text-xs text-slate-400">{city.region}</p>
-                        <p className="text-xs text-slate-500">{city.description}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <button type="submit" disabled={creating} className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50">{creating ? '⏳ Creating Adventure...' : '🎮 Begin Adventure'}</button>
-                </div>
-              </form>
-            </div>
-
-            <div className="w-full lg:w-96 flex-shrink-0">
-              <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-col items-center w-full">
-
-                <div className="w-full flex items-center justify-center mb-3">
-                  <AvatarPreview appearance={appearance} name={name} />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Confirm modal */}
-          {showConfirm && (
-            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-              <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-xl w-full p-4 md:p-6">
-                <h3 className="text-xl font-bold text-slate-100 mb-3">Confirm Your Character</h3>
-                <div className="flex flex-col md:flex-row gap-3">
-                  <div className="flex-1">
-                    <div className="bg-slate-900 p-3 rounded border border-slate-700 flex items-center justify-center"><AvatarPreview appearance={appearance} name={name} large /></div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-slate-300 mb-1"><span className="font-semibold">Name:</span> {name}</p>
-                    <p className="text-slate-300 mb-1"><span className="font-semibold">Gender:</span> {appearance.gender}</p>
-                    <p className="text-slate-300 mb-1"><span className="font-semibold">Height:</span> {appearance.height}cm</p>
-                    <p className="text-slate-300 mb-1"><span className="font-semibold">Build:</span> {appearance.build}</p>
-                    <p className="text-slate-300 mb-1"><span className="font-semibold">🏠 Home City:</span> {homeCity}</p>
-                    <div className="mt-3 flex gap-2">
-                      <button onClick={doCreate} disabled={creating} className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">{creating ? 'Creating…' : 'Confirm & Create'}</button>
-                      <button onClick={cancelPending} className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">Delete</button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          {error && (
+            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
+              {error}
             </div>
           )}
 
+          <form onSubmit={handlePrepareCreate} className="space-y-6">
+            {/* Character Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Character Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your character name..."
+                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                disabled={creating}
+              />
+            </div>
 
-          {/* Disclaimer: users can always reset or change appearance later (moved to bottom) */}
-          <div className="mt-6 p-3 bg-yellow-600/8 border-t border-yellow-600/20 rounded text-yellow-100 text-sm">
-            <div className="max-w-7xl mx-auto px-2 py-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-              <div>
-                <strong className="block text-yellow-200">Note:</strong>
-                <p className="text-xs text-yellow-100 mt-1">You can always reset or change your character's style or appearance later. Use the Reset button or revisit the character editor — your character can be updated anytime.</p>
-              </div>
-              <div className="flex-shrink-0">
-                <button onClick={cancelPending} className="px-3 py-1 bg-yellow-600 text-slate-900 rounded font-semibold">Reset Now</button>
+            {/* Home City Selection */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-3">🏠 Home City</label>
+              <p className="text-xs text-slate-400 mb-4">Choose your home city to start your economic adventure</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-96 overflow-y-auto">
+                {PHILIPPINES_CITIES.map(city => (
+                  <button
+                    key={city.name}
+                    type="button"
+                    onClick={() => setHomeCity(city.name)}
+                    className={`text-left p-3 rounded-lg border-2 transition-colors ${
+                      homeCity === city.name
+                        ? 'border-blue-500 bg-blue-500/10'
+                        : 'border-slate-600 bg-slate-700 hover:bg-slate-600'
+                    }`}
+                  >
+                    <p className="font-semibold text-slate-100">{city.name}</p>
+                    <p className="text-xs text-slate-400">{city.region}</p>
+                    <p className="text-xs text-slate-500">{city.description}</p>
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
 
+            {/* Avatar Creation */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">👤 Your Avatar</label>
+              <p className="text-xs text-slate-400 mb-3">
+                {avatarAppearance
+                  ? '✓ Avatar created. Click below to modify.'
+                  : 'Create or customize your 3D avatar using ReadyPlayer.me'}
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowAvatarCreator(true)}
+                disabled={creating}
+                className={`w-full px-6 py-4 rounded-lg border-2 transition-colors ${
+                  avatarAppearance
+                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+                    : 'border-blue-500 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'
+                } disabled:opacity-50 font-medium`}
+              >
+                {avatarAppearance ? '✓ Avatar Ready — Click to Modify' : '+ Design Your Avatar'}
+              </button>
+            </div>
+
+            {/* Create Button */}
+            <div className="pt-4">
+              <button
+                type="submit"
+                disabled={creating || !avatarAppearance}
+                className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 transition-all"
+              >
+                {creating ? '⏳ Creating Adventure...' : '🎮 Begin Adventure'}
+              </button>
+            </div>
+          </form>
+
+          {/* Info Note */}
+          <div className="mt-8 p-4 bg-yellow-600/8 border border-yellow-600/20 rounded text-yellow-100 text-sm">
+            <strong className="block text-yellow-200 mb-1">Welcome to Play Currency</strong>
+            <p className="text-xs text-yellow-100">
+              Design your unique 3D avatar, choose your home city, and begin your economic adventure. You can always customize your appearance later!
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Avatar Creator Modal */}
+      <AvatarCreatorRPM
+        open={showAvatarCreator}
+        onClose={() => setShowAvatarCreator(false)}
+        onExport={handleAvatarExport}
+        userId={userId}
+        showCloseButton={true}
+      />
     </div>
   )
 }
-
-
-function AvatarPreview({ appearance, name = '', large = false }) {
-  const size = large ? 260 : 160
-  const headRadius = Math.round(size * 0.26)
-  const isMale = appearance.gender === 'male'
-  const faceColor = appearance.skin_color || { light: '#fdbcb4', medium: '#d4a574', dark: '#8b5a3c', olive: '#9a7c5c' }[appearance.skin_tone] || '#d4a574'
-
-  // Build mapping with gender-specific differences
-  const buildMap = {
-    very_slim: { bodyScale: 0.8, waist: 0.55, limb: 0.6, shoulder: isMale ? 1.1 : 0.95 },
-    slim: { bodyScale: 0.9, waist: 0.7, limb: 0.75, shoulder: isMale ? 1.2 : 1.0 },
-    average: { bodyScale: 1, waist: 0.9, limb: 0.9, shoulder: isMale ? 1.3 : 1.1 },
-    athletic: { bodyScale: 1.02, waist: 0.85, limb: 1.0, shoulder: isMale ? 1.4 : 1.15 },
-    heavy: { bodyScale: 1.18, waist: 1.2, limb: 1.2, shoulder: isMale ? 1.35 : 1.25 },
-    obese: { bodyScale: 1.35, waist: 1.45, limb: 1.35, shoulder: isMale ? 1.4 : 1.35 }
-  }
-
-  const b = buildMap[appearance.build] || buildMap['average']
-  const heightScale = (appearance.height - 140) / 90
-  const avatarHeight = Math.round(size * (1 + heightScale * 0.25))
-  const avatarStyle = { width: size, height: avatarHeight }
-
-  // Torso with gender-specific shaping
-  const baseTorsoW = avatarStyle.width * 0.36 * b.bodyScale
-  const torsoW = isMale ? baseTorsoW * 1.08 : baseTorsoW * 0.95
-  const torsoH = avatarStyle.height * 0.34 * b.bodyScale
-  const shoulderW = torsoW * b.shoulder
-
-  const armW = Math.max(6, Math.round(avatarStyle.width * 0.06 * b.limb))
-  const legW = Math.max(8, Math.round(avatarStyle.width * 0.08 * b.limb))
-
-  // Female chest/curve
-  const chestHeight = isMale ? 0 : torsoH * 0.15
-
-  return (
-    <div className="flex flex-col items-center text-center px-2">
-      <svg width={avatarStyle.width} height={avatarStyle.height} viewBox={`0 0 ${avatarStyle.width} ${avatarStyle.height}`}>
-        {/* legs */}
-        <g transform={`translate(${avatarStyle.width/2}, ${avatarStyle.height*0.9})`}>
-          <rect x={-torsoW*0.45 - legW} y={-0} width={legW} height={avatarStyle.height*0.4} rx={legW/2} fill="#24303b" />
-          <rect x={torsoW*0.45} y={-0} width={legW} height={avatarStyle.height*0.4} rx={legW/2} fill="#24303b" />
-        </g>
-
-        {/* torso with gender-specific shape */}
-        <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.62})`}>
-          {isMale ? (
-            /* Male: broader shoulders, straighter sides, muscular */
-            <path d={`M ${-shoulderW/2} ${-torsoH*0.5} L ${-torsoW/2} ${-torsoH*0.2} L ${-torsoW/2} ${torsoH*0.5} L ${torsoW/2} ${torsoH*0.5} L ${torsoW/2} ${-torsoH*0.2} L ${shoulderW/2} ${-torsoH*0.5} Q 0 ${-torsoH*0.55} ${-shoulderW/2} ${-torsoH*0.5}`} fill="#293241" />
-          ) : (
-            /* Female: curved waist, defined chest, hourglass shape */
-            <path d={`M ${-shoulderW/2} ${-torsoH*0.5} Q ${-shoulderW*0.35} ${-torsoH*0.35} ${-torsoW*0.4} ${-torsoH*0.1} L ${-torsoW*0.55} ${torsoH*0.5} Q 0 ${torsoH*0.58} ${torsoW*0.55} ${torsoH*0.5} L ${torsoW*0.4} ${-torsoH*0.1} Q ${shoulderW*0.35} ${-torsoH*0.35} ${shoulderW/2} ${-torsoH*0.5} Q 0 ${-torsoH*0.55} ${-shoulderW/2} ${-torsoH*0.5}`} fill="#293241" />
-          )}
-
-          {/* Female chest curves */}
-          {!isMale && (
-            <>
-              <ellipse cx={-torsoW*0.25} cy={-torsoH*0.15} rx={torsoW*0.18} ry={torsoH*0.22} fill="#2f3337" opacity="0.6" />
-              <ellipse cx={torsoW*0.25} cy={-torsoH*0.15} rx={torsoW*0.18} ry={torsoH*0.22} fill="#2f3337" opacity="0.6" />
-            </>
-          )}
-
-          {/* Belly overlay for heavy/obese */}
-          {appearance.build === 'heavy' && <ellipse cx={0} cy={torsoH*0.12} rx={torsoW*0.55} ry={torsoH*0.25} fill="#2f3337" />}
-          {appearance.build === 'obese' && <ellipse cx={0} cy={torsoH*0.2} rx={torsoW*0.68} ry={torsoH*0.33} fill="#2f3337" />}
-
-          {/* arms */}
-          <rect x={-shoulderW/2 - armW - 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
-          <rect x={shoulderW/2 + 6} y={-torsoH*0.35} width={armW} height={torsoH*0.9} rx={armW/2} fill="#293241" />
-        </g>
-
-        {/* head group with gender-specific features */}
-        <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.24})`}>
-          <circle r={headRadius} fill={faceColor} />
-
-          {/* Eyes */}
-          {isMale ? (
-            /* Male: larger, more angular eyes */
-            <>
-              <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.14))} fill="#0b1220" />
-              <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.14))} fill="#0b1220" />
-            </>
-          ) : (
-            /* Female: larger, rounder eyes */
-            <>
-              <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.16))} fill="#0b1220" />
-              <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.16))} fill="#0b1220" />
-            </>
-          )}
-
-          {/* Mouth */}
-          <path d={`M ${-headRadius * 0.28} ${Math.round(headRadius * 0.45)} q ${headRadius * 0.28} ${headRadius * 0.18} ${headRadius * 0.56} 0`} stroke="#7f1d1d" strokeWidth={Math.max(1, Math.round(headRadius * 0.05))} fill="none" strokeLinecap="round" />
-        </g>
-      </svg>
-
-      <div className="mt-3">
-        <p className="text-sm md:text-base font-semibold text-slate-100 truncate max-w-[220px]">{name || 'Unnamed'}</p>
-        <p className="text-xs text-slate-400">{isMale ? '♂ Male' : '♀ Female'}</p>
-      </div>
-    </div>
-  )
-}
-
-// shading helper
-function shade(hex, percent) {
-  const h = hex.replace('#','')
-  const num = parseInt(h,16)
-  let r = (num >> 16) + percent
-  let g = ((num >> 8) & 0x00FF) + percent
-  let b = (num & 0x0000FF) + percent
-  r = Math.max(0, Math.min(255, r))
-  g = Math.max(0, Math.min(255, g))
-  b = Math.max(0, Math.min(255, b))
-  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
-}
-
-// Helpers
-function cmToFeetInches(cm) {
-  const totalInches = Math.round(cm / 2.54)
-  const feet = Math.floor(totalInches / 12)
-  const inches = totalInches % 12
-  return { feet, inches }
-}
-function feetInchesToCm(feet, inches) {
-  const totalInches = (Number(feet) || 0) * 12 + (Number(inches) || 0)
-  return Math.round(totalInches * 2.54)
-}
-
-function FeetInchesDisplay({ cm, onChange }) {
-  const fi = cmToFeetInches(cm)
-  const [feet, setFeet] = useState(fi.feet)
-  const [inches, setInches] = useState(fi.inches)
-
-  // Keep local feet/inches in sync when cm prop changes (e.g., slider updates)
-  React.useEffect(() => {
-    const updated = cmToFeetInches(cm)
-    setFeet(updated.feet)
-    setInches(updated.inches)
-  }, [cm])
-
-  function updateFeet(f) {
-    const fv = Number.isNaN(Number(f)) ? 0 : Number(f)
-    setFeet(fv)
-    const cmVal = feetInchesToCm(fv, inches)
-    onChange(fv, inches)
-  }
-  function updateInches(i) {
-    let iv = Number(i)
-    if (isNaN(iv) || iv < 0) iv = 0
-    if (iv > 11) iv = 11
-    setInches(iv)
-    onChange(feet, iv)
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <div className="flex items-center gap-1">
-        <input value={feet} onChange={(e)=>{ const v = parseInt(e.target.value||0); setFeet(isNaN(v)?0:v)}} onBlur={(e)=>updateFeet(parseInt(e.target.value||0))} className="w-12 px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-        <span className="text-xs text-slate-400">ft</span>
-      </div>
-      <div className="flex items-center gap-1">
-        <input value={inches} onChange={(e)=>{ const v = parseInt(e.target.value||0); setInches(isNaN(v)?0:v)}} onBlur={(e)=>updateInches(parseInt(e.target.value||0))} className="w-12 px-2 py-1 rounded bg-slate-700 border border-slate-600 text-slate-100" />
-        <span className="text-xs text-slate-400">in</span>
-      </div>
-    </div>
-  )
-}
-
-function hexToRgb(hex) {
-  const h = hex.replace('#','')
-  const bigint = parseInt(h,16)
-  return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 }
-}
-function rgbToHex({r,g,b}){ return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('') }
-function clamp(v,a,b){ return Math.max(a, Math.min(b, v)) }
