@@ -184,7 +184,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       } catch (e) {
         console.warn('Google Map init exception', e)
       }
-    }, 50)
+    }, 100)
 
     return () => {
       if (syncRef.current) syncRef.current.disconnect()
