@@ -247,7 +247,7 @@ export default function PlayCurrency({ userId }) {
               <h2 className="text-xl font-bold text-slate-100">Immersive World</h2>
               <p className="text-xs text-slate-400 mt-1">Walk around, find NPCs, and trade. Use WASD/Arrows or click to move.</p>
             </div>
-            <div style={{ height: '600px' }}>
+            <div style={{ height: '700px' }}>
               <World2DRenderer
                 character={character}
                 userId={userId}
