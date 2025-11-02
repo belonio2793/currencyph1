@@ -315,59 +315,117 @@ function HairIcon({ styleId, color = '#333', gender, largeIcon = false }) {
 
 function renderHairSVG(style, color, r) {
   const h = r
-  const common = { fill: color }
-  // Many simple illustrative shapes to represent styles
+  let yOffset = 0
+  // choose offsets per style to fit head better
+  const up = -h * 0.18
+  const mid = -h * 0.12
+  const down = -h * 0.0
+
   switch (style) {
     case 'buzz_cut':
     case 'crew_cut':
     case 'fade':
-      return <rect x={-h} y={-h*0.6} width={h*2} height={h*1.05} rx={h*0.2} fill={color} />
+      yOffset = mid
+      break
     case 'undercut':
     case 'comb_over':
-      return <g><rect x={-h} y={-h*0.5} width={h*2} height={h*0.6} rx={h*0.22} fill={color} /><path d={`M ${-h} ${-h*0.02} q ${h*1.0} ${-h*0.6} ${h*2.0} ${0}`} fill={color} /></g>
+      yOffset = up
+      break
     case 'quiff':
     case 'pompadour':
-      return <path d={`M ${-h} ${-h*0.35} q ${h*0.6} ${-h*0.9} ${h*1.6} ${-h*0.25} q ${-h*0.2} ${h*0.6} ${-h*1.6} ${h*0.4}`} fill={color} />
+      yOffset = up - h*0.02
+      break
     case 'slick_back':
-      return <path d={`M ${-h} ${-h*0.6} q ${h*0.9} ${-h*0.6} ${h*1.6} ${-h*0.2} v ${h*0.6} h ${-h*1.6} z`} fill={color} />
+      yOffset = up
+      break
     case 'man_bun':
     case 'top_knot':
-      return <g><circle cx={h*0.35} cy={-h*1.05} r={h*0.35} fill={color} /><path d={`M ${-h} ${-h*0.05} q ${h*0.8} ${-h*0.6} ${h*1.8} ${-h*0.1} v ${h*0.8} h ${-h*1.8} z`} fill={color} /></g>
+      yOffset = up - h*0.25
+      break
     case 'mullet':
-      return <path d={`M ${-h*1.2} ${-h*0.35} q ${h*1.6} ${-h*0.6} ${h*2.4} ${0} v ${h*1.6} q ${-h*0.3} ${h*0.4} ${-h*2.4} ${0} z`} fill={color} />
     case 'long_layers':
     case 'long_flow':
     case 'layered_long':
-      return <path d={`M ${-h*1.2} ${-h*0.6} q ${h*1.8} ${-h*0.8} ${h*2.8} ${0} v ${h*1.8} q ${-h*0.3} ${h*0.4} ${-h*2.8} ${0} z`} fill={color} />
+      yOffset = down + h*0.05
+      break
     case 'curly_male':
     case 'curly_female':
-      return <g>{[-0.6,-0.2,0.2,0.6].map((cx,i)=><circle key={i} cx={h*cx} cy={-h*0.7 + (i%2)*6} r={h*0.28} fill={color} />)}</g>
-    case 'shag_male':
-    case 'shaggy':
-      return <path d={`M ${-h*1.1} ${-h*0.2} q ${h*1.2} ${-h*0.7} ${h*2.2} ${-h*0.2} v ${h*1.0} q ${-h*0.3} ${h*0.4} ${-h*2.2} ${0} z`} fill={color} />
+      yOffset = mid
+      break
     case 'pixie':
-      return <path d={`M ${-h} ${-h*0.35} q ${h*0.7} ${-h*0.6} ${h*1.6} ${-h*0.1} v ${h*0.5} h ${-h*1.6} z`} fill={color} />
     case 'bob':
-    case 'blunt_bob':
-    case 'asym_bob':
-      return <path d={`M ${-h*1.2} ${-h*0.1} q ${h*1.2} ${-h*0.8} ${h*2.4} ${-h*0.1} v ${h*0.9} q ${-h*0.3} ${h*0.4} ${-h*2.4} ${0} z`} fill={color} />
     case 'lob':
-      return <path d={`M ${-h*1.3} ${-h*0.35} q ${h*1.6} ${-h*0.6} ${h*2.6} ${0} v ${h*1.2} q ${-h*0.3} ${h*0.4} ${-h*2.6} ${0} z`} fill={color} />
+      yOffset = mid
+      break
     case 'ponytail':
     case 'high_ponytail':
     case 'low_bun':
-      return <g><path d={`M ${-h} ${-h*0.1} q ${h*0.8} ${-h*0.6} ${h*1.6} ${-h*0.1} v ${h*0.6} h ${-h*1.6} z`} fill={color} /><path d={`M ${h*0.9} ${-h*0.1} q ${h*0.8} ${h*0.6} ${h*1.0} ${h*1.6}`} stroke={color} strokeWidth={Math.max(2, h*0.08)} fill="none" strokeLinecap="round" /></g>
-    case 'braid':
-    case 'french_braid':
-    case 'fishtail':
-      return <g>{[0,1,2,3].map(i=> <ellipse key={i} cx={h*0.8 + i* -h*0.18} cy={-h*0.0 + i*8} rx={h*0.22} ry={h*0.12} fill={color} />)}</g>
+      yOffset = up - h*0.05
+      break
     case 'afro':
-      return <g>{Array.from({length:8}).map((_,i)=><circle key={i} cx={Math.cos(i/8*Math.PI*2)*h*0.5} cy={Math.sin(i/8*Math.PI*2)*h*0.25 - h*0.4} r={h*0.28} fill={color} />)}</g>
     case 'twists':
-      return <g>{[ -0.6,-0.2,0.2,0.6 ].map((cx,i)=><path key={i} d={`M ${h*cx} ${-h*0.6} q ${h*0.05} ${h*0.25} ${h*0.2} ${h*0.5}`} stroke={color} strokeWidth={Math.max(2,h*0.06)} fill="none" strokeLinecap="round" />)}</g>
+      yOffset = mid
+      break
     default:
-      return <rect x={-h} y={-h*0.6} width={h*2} height={h*1.05} rx={h*0.2} fill={color} />
+      yOffset = mid
   }
+
+  // Now render content relative to head; use a group with vertical offset
+  const content = (() => {
+    switch (style) {
+      case 'buzz_cut':
+      case 'crew_cut':
+      case 'fade':
+        return <rect x={-h} y={-h*0.6} width={h*2} height={h*1.05} rx={h*0.2} fill={color} />
+      case 'undercut':
+      case 'comb_over':
+        return <g><rect x={-h} y={-h*0.5} width={h*2} height={h*0.6} rx={h*0.22} fill={color} /><path d={`M ${-h} ${-h*0.02} q ${h*1.0} ${-h*0.6} ${h*2.0} ${0}`} fill={color} /></g>
+      case 'quiff':
+      case 'pompadour':
+        return <path d={`M ${-h} ${-h*0.35} q ${h*0.6} ${-h*0.9} ${h*1.6} ${-h*0.25} q ${-h*0.2} ${h*0.6} ${-h*1.6} ${h*0.4}`} fill={color} />
+      case 'slick_back':
+        return <path d={`M ${-h} ${-h*0.6} q ${h*0.9} ${-h*0.6} ${h*1.6} ${-h*0.2} v ${h*0.6} h ${-h*1.6} z`} fill={color} />
+      case 'man_bun':
+      case 'top_knot':
+        return <g><circle cx={h*0.35} cy={-h*1.05} r={h*0.35} fill={color} /><path d={`M ${-h} ${-h*0.05} q ${h*0.8} ${-h*0.6} ${h*1.8} ${-h*0.1} v ${h*0.8} h ${-h*1.8} z`} fill={color} /></g>
+      case 'mullet':
+        return <path d={`M ${-h*1.2} ${-h*0.35} q ${h*1.6} ${-h*0.6} ${h*2.4} ${0} v ${h*1.6} q ${-h*0.3} ${h*0.4} ${-h*2.4} ${0} z`} fill={color} />
+      case 'long_layers':
+      case 'long_flow':
+      case 'layered_long':
+        return <path d={`M ${-h*1.2} ${-h*0.6} q ${h*1.8} ${-h*0.8} ${h*2.8} ${0} v ${h*1.8} q ${-h*0.3} ${h*0.4} ${-h*2.8} ${0} z`} fill={color} />
+      case 'curly_male':
+      case 'curly_female':
+        return <g>{[-0.6,-0.2,0.2,0.6].map((cx,i)=><circle key={i} cx={h*cx} cy={-h*0.7 + (i%2)*6} r={h*0.28} fill={color} />)}</g>
+      case 'shag_male':
+      case 'shaggy':
+        return <path d={`M ${-h*1.1} ${-h*0.2} q ${h*1.2} ${-h*0.7} ${h*2.2} ${-h*0.2} v ${h*1.0} q ${-h*0.3} ${h*0.4} ${-h*2.2} ${0} z`} fill={color} />
+      case 'pixie':
+        return <path d={`M ${-h} ${-h*0.35} q ${h*0.7} ${-h*0.6} ${h*1.6} ${-h*0.1} v ${h*0.5} h ${-h*1.6} z`} fill={color} />
+      case 'bob':
+      case 'blunt_bob':
+      case 'asym_bob':
+        return <path d={`M ${-h*1.2} ${-h*0.1} q ${h*1.2} ${-h*0.8} ${h*2.4} ${-h*0.1} v ${h*0.9} q ${-h*0.3} ${h*0.4} ${-h*2.4} ${0} z`} fill={color} />
+      case 'lob':
+        return <path d={`M ${-h*1.3} ${-h*0.35} q ${h*1.6} ${-h*0.6} ${h*2.6} ${0} v ${h*1.2} q ${-h*0.3} ${h*0.4} ${-h*2.6} ${0} z`} fill={color} />
+      case 'ponytail':
+      case 'high_ponytail':
+      case 'low_bun':
+        return <g><path d={`M ${-h} ${-h*0.1} q ${h*0.8} ${-h*0.6} ${h*1.6} ${-h*0.1} v ${h*0.6} h ${-h*1.6} z`} fill={color} /><path d={`M ${h*0.9} ${-h*0.1} q ${h*0.8} ${h*0.6} ${h*1.0} ${h*1.6}`} stroke={color} strokeWidth={Math.max(2, h*0.08)} fill="none" strokeLinecap="round" /></g>
+      case 'braid':
+      case 'french_braid':
+      case 'fishtail':
+        return <g>{[0,1,2,3].map(i=> <ellipse key={i} cx={h*0.8 + i* -h*0.18} cy={-h*0.0 + i*8} rx={h*0.22} ry={h*0.12} fill={color} />)}</g>
+      case 'afro':
+        return <g>{Array.from({length:8}).map((_,i)=><circle key={i} cx={Math.cos(i/8*Math.PI*2)*h*0.5} cy={Math.sin(i/8*Math.PI*2)*h*0.25 - h*0.4} r={h*0.28} fill={color} />)}</g>
+      case 'twists':
+        return <g>{[ -0.6,-0.2,0.2,0.6 ].map((cx,i)=><path key={i} d={`M ${h*cx} ${-h*0.6} q ${h*0.05} ${h*0.25} ${h*0.2} ${h*0.5}`} stroke={color} strokeWidth={Math.max(2,h*0.06)} fill="none" strokeLinecap="round" />)}</g>
+      default:
+        return <rect x={-h} y={-h*0.6} width={h*2} height={h*1.05} rx={h*0.2} fill={color} />
+    }
+  })()
+
+  return <g transform={`translate(0, ${yOffset})`}>{content}</g>
 }
 
 function AvatarPreview({ appearance, name = '', large = false }) {
