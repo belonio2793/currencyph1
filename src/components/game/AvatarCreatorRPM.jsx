@@ -29,11 +29,49 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
             // Merge into appearance JSON to avoid schema changes
             const { data: existing, error: fetchErr } = await supabase
               .from('game_characters')
-              .select('appearance')
+              .select('appearance,user_id')
               .eq('id', characterId)
               .single()
             if (fetchErr) throw fetchErr
-            const nextAppearance = { ...(existing?.appearance || {}), rpm_model_url: modelUrl, rpm_meta: meta }
+            const existingAppearance = existing?.appearance || {}
+
+            // upload thumbnail to storage if present
+            let thumbnailUrl = existingAppearance.rpm?.thumbnail || existingAppearance.rpm_meta?.imageUrl || meta?.imageUrl || null
+            try {
+              if (meta?.imageUrl) {
+                const res = await fetch(meta.imageUrl)
+                if (res.ok) {
+                  const blob = await res.blob()
+                  const ext = blob.type?.split('/')?.[1] || 'png'
+                  const path = `${existing.user_id || 'user'}/${characterId}-${Date.now()}.${ext}`
+                  const { error: upErr } = await supabase.storage.from('avatars').upload(path, blob)
+                  if (!upErr) {
+                    const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(path)
+                    thumbnailUrl = publicData.publicUrl
+                  } else {
+                    console.warn('Thumbnail upload failed', upErr.message)
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn('Thumbnail save failed', e.message)
+            }
+
+            const nextAppearance = {
+              ...(existingAppearance || {}),
+              rpm: {
+                model_url: modelUrl || existingAppearance.rpm?.model_url || null,
+                thumbnail: thumbnailUrl || existingAppearance.rpm?.thumbnail || null,
+                meta: meta || existingAppearance.rpm?.meta || null
+              }
+            }
+
+            // extract common fields
+            nextAppearance.hair_color = nextAppearance.hair_color || meta?.hairColor || nextAppearance.hair_color || null
+            nextAppearance.skin_color = nextAppearance.skin_color || meta?.skinColor || nextAppearance.skin_color || null
+            nextAppearance.height = nextAppearance.height || nextAppearance.height || 175
+            nextAppearance.build = nextAppearance.build || 'average'
+
             const { error: upErr } = await supabase
               .from('game_characters')
               .update({ appearance: nextAppearance, updated_at: new Date() })
