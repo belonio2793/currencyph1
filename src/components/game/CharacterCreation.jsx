@@ -227,6 +227,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                     <p className="text-slate-300 mb-1"><span className="font-semibold">Gender:</span> {appearance.gender}</p>
                     <p className="text-slate-300 mb-1"><span className="font-semibold">Height:</span> {appearance.height}cm</p>
                     <p className="text-slate-300 mb-1"><span className="font-semibold">Build:</span> {appearance.build}</p>
+                    <p className="text-slate-300 mb-1"><span className="font-semibold">🏠 Home City:</span> {homeCity}</p>
                     <div className="mt-3 flex gap-2">
                       <button onClick={doCreate} disabled={creating} className="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded">{creating ? 'Creating…' : 'Confirm & Create'}</button>
                       <button onClick={cancelPending} className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded">Delete</button>
