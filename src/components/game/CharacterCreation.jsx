@@ -391,7 +391,9 @@ function HairIcon({ styleId, color = '#333', gender, largeIcon = false, offsetX 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
       <g transform={`translate(${size/2}, ${size/2})`}>
-        {renderHairSVG(styleId, color, size/2, offsetX, offsetY, scale)}
+        <g transform={`translate(${offsetX}, ${offsetY}) scale(${scale})`}>
+          {renderHairSVG(styleId, color, size/2)}
+        </g>
       </g>
     </svg>
   )
