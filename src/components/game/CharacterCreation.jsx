@@ -266,6 +266,11 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                   )}
                 </div>
 
+                <div className="w-full">
+                  <label className="block text-xs text-slate-400 mb-2">Prompt (optional) — describe photoreal look, style, lighting, clothing, expression</label>
+                  <textarea value={promptText} onChange={(e)=>setPromptText(e.target.value)} placeholder="e.g. studio portrait, soft window light, smiling, wearing a navy jacket" className="w-full h-20 p-2 rounded bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 mb-3" />
+                </div>
+
                 <div className="w-full flex gap-2">
                   <button onClick={async ()=>{
                     if (!photoMode) return
@@ -273,7 +278,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                     setError('')
                     try {
                       const { generatePhotorealAvatar } = await import('../../lib/imageGen.js')
-                      const url = await generatePhotorealAvatar(appearance, userId || 'guest')
+                      const url = await generatePhotorealAvatar(appearance, userId || 'guest', promptText)
                       setPhotoUrl(url)
                     } catch (err) {
                       console.error(err)
@@ -284,7 +289,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                   }} className="flex-1 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded disabled:opacity-50" disabled={!photoMode || generating}>
                     {generating ? 'Generating…' : 'Generate Photo'}
                   </button>
-                  <button onClick={()=>{ setPhotoUrl(''); setPhotoMode(false) }} className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded">Reset</button>
+                  <button onClick={()=>{ setPhotoUrl(''); setPhotoMode(false); setPromptText('') }} className="flex-1 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded">Reset</button>
                 </div>
 
                 <p className="text-slate-400 text-sm mt-3 text-center px-3">Toggle between SVG preview and photorealistic composite. Use Generate Photo to create and store an image.</p>
