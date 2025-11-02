@@ -172,9 +172,9 @@ export default function PlayCurrency({ userId }) {
           <div className="flex items-center justify-between">
             <div>
               <h1
-                onClick={() => setShowRPM(true)}
+                onClick={() => setShowCharactersPanel(true)}
                 className="text-3xl font-bold text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
-                title="Click to customize"
+                title="Click to open characters panel"
               >
                 {character.name}
               </h1>
