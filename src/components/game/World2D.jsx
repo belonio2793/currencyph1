@@ -538,13 +538,55 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         </div>
       </div>
 
-      {/* NPC toggle */}
-      <div className="absolute top-6 right-6 z-40 pointer-events-auto">
+      {/* NPC toggle + Street View */}
+      <div className="absolute top-6 right-6 z-40 pointer-events-auto flex items-center gap-3">
         <div className="bg-black/60 rounded border border-slate-700 p-2 flex items-center gap-2 text-xs text-slate-200">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={showNPCs} onChange={(e)=>setShowNPCs(e.target.checked)} className="accent-blue-500" />
             Show NPCs
           </label>
+        </div>
+        <div className="bg-black/60 rounded border border-slate-700 p-2 text-xs text-slate-200">
+          <button
+            onClick={async () => {
+              // compute center lat/lng from camera
+              try {
+                const canvas = canvasRef.current
+                const cam = cameraRef.current
+                const worldW = worldRef.current.mapData.width
+                const worldH = worldRef.current.mapData.height
+                const centerWx = cam.x + (canvas.width/(2*cam.zoom))
+                const centerWy = cam.y + (canvas.height*(0.65)/cam.zoom)
+                const ll = worldToLatLng(worldW, worldH, centerWx, centerWy)
+                const key = import.meta.env?.VITE_GOOGLE_API_KEY || import.meta.env?.GOOGLE_API_KEY || ''
+                if (!key) {
+                  alert('Google API key not configured (VITE_GOOGLE_API_KEY)')
+                  return
+                }
+
+                const metaUrl = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${ll.lat},${ll.lng}&key=${key}`
+                try {
+                  const res = await fetch(metaUrl)
+                  const data = await res.json()
+                  if (data && data.status === 'OK') {
+                    const img = `https://maps.googleapis.com/maps/api/streetview?size=1280x720&location=${ll.lat},${ll.lng}&fov=90&heading=0&pitch=0&key=${key}`
+                    setStreetViewImage(img)
+                    setStreetViewOpen(true)
+                  } else {
+                    alert('No Street View imagery available at this location')
+                  }
+                } catch (err) {
+                  console.warn('Street View metadata fetch failed', err)
+                  alert('Street View API error')
+                }
+              } catch (e) {
+                console.warn('Street View open failed', e)
+              }
+            }}
+            className="px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded text-xs"
+          >
+            Street View
+          </button>
         </div>
       </div>
     </div>
