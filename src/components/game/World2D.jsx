@@ -478,8 +478,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       {/* HUD Overlay */}
       <div className="absolute top-4 left-4 text-white pointer-events-none">
         <div className="bg-black/50 p-3 rounded border border-slate-600 flex items-center gap-3">
-          {character?.appearance && (character.appearance.rpm_meta?.imageUrl || character.appearance.rpm_meta?.avatarUrl || character.appearance.rpm_model_url) ? (
-            <img src={character.appearance.rpm_meta?.imageUrl || character.appearance.rpm_meta?.avatarUrl || character.appearance.rpm_model_url} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
+          {character?.appearance && (character.appearance.rpm?.thumbnail || character.appearance.rpm?.meta?.imageUrl || character.appearance.rpm?.meta?.avatarUrl || character.appearance.rpm?.model_url) ? (
+            <img src={character.appearance.rpm?.thumbnail || character.appearance.rpm?.meta?.imageUrl || character.appearance.rpm?.meta?.avatarUrl || character.appearance.rpm?.model_url} alt="avatar" className="w-12 h-12 rounded-full object-cover" />
           ) : (
             <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-400">No<br/>Avatar</div>
           )}
