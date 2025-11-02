@@ -51,13 +51,11 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       gender: 'male',
       skin_tone: 'medium',
       skin_color: '#d4a574',
-      hair_style: 'buzz_cut',
-      hair_color: '#4b2e2e',
       height: 175,
       build: 'average'
     }
     setAppearance(defaultAppearance)
-    setRgb(hexToRgb(defaultAppearance.hair_color))
+    setRgbSkin(hexToRgb(defaultAppearance.skin_color))
     setError('')
   }
 
