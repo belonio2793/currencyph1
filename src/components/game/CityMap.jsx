@@ -42,11 +42,27 @@ export default function CityMap({ userId, onCitySelect }) {
     // Create map
     map.current = L.map(mapContainer.current).setView(PHILIPPINES_CENTER, 6)
 
-    // Add tiles
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map.current)
+    // Add tiles (MapTiler with OSM fallback)
+    const MAPTILER_KEY = 'Epg2ZBCTb2mrWoiUKQRL'
+    const mtUrl = `https://api.maptiler.com/tiles/streets/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`
+    let tileLayer = L.tileLayer(mtUrl, { maxZoom: 19, attribution: '© MapTiler © OpenStreetMap contributors' })
+
+    tileLayer.addTo(map.current)
+
+    // Fallback to OSM if tiles fail
+    tileLayer.on('tileerror', () => {
+      try {
+        map.current.removeLayer(tileLayer)
+      } catch (e) {}
+      tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors'
+      })
+      tileLayer.addTo(map.current)
+    })
+
+    // When tiles load, mark loading false
+    tileLayer.on('load', () => setLoading(false))
 
     // Set max bounds
     map.current.setMaxBounds(PHILIPPINES_BOUNDS)
