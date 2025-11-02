@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { gameAPI } from '../lib/gameAPI'
 import CharacterCreation from './game/CharacterCreation'
