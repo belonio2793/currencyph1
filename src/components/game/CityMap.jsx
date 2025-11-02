@@ -43,7 +43,7 @@ export default function CityMap({ userId, onCitySelect }) {
     map.current = L.map(mapContainer.current).setView(PHILIPPINES_CENTER, 6)
 
     // Add tiles (MapTiler with OSM fallback)
-    const MAPTILER_KEY = 'Epg2ZBCTb2mrWoiUKQRL'
+    const MAPTILER_KEY = import.meta.env?.VITE_MAPTILER_KEY || ''
     const mtUrl = `https://api.maptiler.com/tiles/streets/{z}/{x}/{y}.png?key=${MAPTILER_KEY}`
     let tileLayer = L.tileLayer(mtUrl, { maxZoom: 19, attribution: '© MapTiler © OpenStreetMap contributors' })
 
