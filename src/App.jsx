@@ -412,13 +412,15 @@ export default function App() {
       <main>
         {(activeTab === 'home' || showAuth) && (
           <>
-            {!showAuth && <LandingPage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />}
+            {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} />}
           </>
         )}
         {showAuth ? (
           <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
         ) : (
           <>
+            {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
+            {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
             {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
             {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} />}
             {activeTab === 'send' && <SendMoney userId={userId} />}
