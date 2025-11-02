@@ -109,3 +109,25 @@ export async function drawTiles(ctx, canvas, cam, worldWidth, worldHeight) {
   // return a promise that resolves when requested tiles loaded
   return Promise.allSettled(drawPromises)
 }
+
+// Convert lat/lng to world coordinates given world dimensions
+export function latLngToWorldCoords(worldWidth, worldHeight, lat, lng, z = 6) {
+  // mercator pixels for bounds
+  const westPx = latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.west, z).x
+  const eastPx = latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.east, z).x
+  const northPx = latLngToPixels(PHILIPPINES_BOUNDS.north, PHILIPPINES_BOUNDS.west, z).y
+
+  const philWidthPx = Math.abs(eastPx - westPx)
+  const philHeightPx = Math.abs(latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.west, z).y - northPx)
+  const scaleX = philWidthPx / Math.max(1, worldWidth)
+  const scaleY = philHeightPx / Math.max(1, worldHeight)
+  const scale = Math.max(0.0001, (scaleX + scaleY) / 2)
+
+  const px = westPx + (lng - PHILIPPINES_BOUNDS.west) / (PHILIPPINES_BOUNDS.east - PHILIPPINES_BOUNDS.west) * philWidthPx
+  const py = northPx + (PHILIPPINES_BOUNDS.north - lat) / (PHILIPPINES_BOUNDS.north - PHILIPPINES_BOUNDS.south) * philHeightPx
+
+  // Convert back to world coordinates
+  const wx = (px - westPx) / scale
+  const wy = (py - northPx) / scale
+  return { x: wx, y: wy }
+}
