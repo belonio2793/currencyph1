@@ -5,6 +5,7 @@ import { citySimulationTicker } from '../lib/citySimulationTicker'
 import CharacterCreation from './game/CharacterCreation'
 import GameWorld from './game/GameWorld'
 import World2DRenderer from './game/World2D'
+import AvatarCreatorRPM from './game/AvatarCreatorRPM'
 import GameInventory from './game/GameInventory'
 import GameMarketplace from './game/GameMarketplace'
 import GameProperties from './game/GameProperties'
@@ -26,6 +27,7 @@ export default function PlayCurrency({ userId }) {
   const [combatData, setCombatData] = useState(null)
   const [claimingReward, setClaimingReward] = useState(false)
   const [selectedCity, setSelectedCity] = useState(null)
+  const [showRPM, setShowRPM] = useState(false)
   const [showCityManager, setShowCityManager] = useState(false)
   // Modal state: which tab opens as modal
   const [openModal, setOpenModal] = useState(null)
@@ -490,21 +492,25 @@ export default function PlayCurrency({ userId }) {
                 </button>
               </div>
               <div className="p-6">
-                <CharacterCustomizer 
+                <CharacterCustomizer
                   character={character}
                   onUpdate={handleCharacterCustomization}
                   onClose={() => setShowCharacterCustomizer(false)}
+                  onOpenRPM={() => setShowRPM(true)}
                 />
               </div>
             </div>
           </div>
         )}
       </div>
+    {showRPM && (
+      <AvatarCreatorRPM open={true} onClose={()=>setShowRPM(false)} characterId={character.id} userId={userId} />
+    )}
     </div>
   )
 }
 
-function CharacterCustomizer({ character, onUpdate, onClose }) {
+function CharacterCustomizer({ character, onUpdate, onClose, onOpenRPM }) {
   const [appearance, setAppearance] = useState(character.appearance || {})
 
   const handleChange = (key, value) => {
@@ -605,18 +611,24 @@ function CharacterCustomizer({ character, onUpdate, onClose }) {
       </div>
 
       </div>
-      <div className="flex gap-2 mt-6">
+      <div className="flex gap-2 mt-6 items-center">
         <button 
           onClick={onClose}
           className="flex-1 px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600"
         >
           Cancel
         </button>
-        <button 
+        <button
           onClick={handleSave}
           className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
           Save
+        </button>
+        <button
+          onClick={onOpenRPM}
+          className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+        >
+          3D Avatar (Ready Player Me)
         </button>
       </div>
     </div>
