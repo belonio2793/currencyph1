@@ -537,6 +537,32 @@ export default function Profile({ userId, onSignOut }) {
                 </div>
                 <button className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors font-medium text-sm">Change</button>
               </div>
+
+              {deviceInfo && (
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                  <div>
+                    <p className="font-medium text-slate-900 text-sm">Device Fingerprint</p>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Logged in: {deviceInfo.timestamp} • Expires: {deviceInfo.expiresAt}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-2 font-mono break-all">{deviceInfo.fingerprint?.substring(0, 16)}...</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+                <div>
+                  <p className="font-medium text-slate-900 text-sm">Sign Out</p>
+                  <p className="text-xs text-slate-500 mt-1">Sign out from this device</p>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  disabled={signingOut}
+                  className="px-4 py-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {signingOut ? 'Signing out...' : 'Sign Out'}
+                </button>
+              </div>
             </div>
           </div>
         </div>
