@@ -51,8 +51,10 @@ serve(async (req) => {
 
     const { appearance, userId } = body
 
-    // Build prompt from appearance
-    const prompt = `A photorealistic full-body portrait of a ${appearance.gender} character, front-facing, neutral pose. Skin tone: ${appearance.skin_tone}. Height: ${appearance.height} cm. Build: ${appearance.build}. Hair style: ${appearance.hair_style}. Hair color: ${appearance.hair_color}. Clothing: simple neutral outfit. High-resolution, studio lighting, realistic skin texture, natural hair, professional photograph.`
+    // Use custom prompt if provided, otherwise build from appearance
+    const prompt = body.prompt && typeof body.prompt === 'string' && body.prompt.trim().length > 0
+      ? body.prompt.trim()
+      : `A photorealistic full-body portrait of a ${appearance.gender} character, front-facing, neutral pose. Skin tone: ${appearance.skin_tone}. Height: ${appearance.height} cm. Build: ${appearance.build}. Hair style: ${appearance.hair_style}. Hair color: ${appearance.hair_color}. Clothing: simple neutral outfit. High-resolution, studio lighting, realistic skin texture, natural hair, professional photograph.`
 
     // Generate image
     const imageBytes = await callOpenAIImage(prompt)
