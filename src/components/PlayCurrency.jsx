@@ -14,7 +14,73 @@ import GameCombat from './game/GameCombat'
 import CityMap from './game/CityMap'
 import CityManager from './game/CityManager'
 
-export default function PlayCurrency({ userId, userEmail }) {
+export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
+  // Check if user is logged in
+  if (!userId) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
+        <div className="w-full max-w-2xl">
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 md:p-12 text-center">
+            <h1 className="text-4xl md:text-5xl font-bold text-blue-400 mb-4">⚔️ Play Currency</h1>
+            <p className="text-slate-300 text-lg mb-8">Create Your Adventure in the Philippines Economy Game</p>
+
+            <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-6 mb-8">
+              <p className="text-slate-300 mb-6">
+                Experience an immersive 3D world where you can customize your character, trade, build businesses, and compete in the economy.
+                Login or register to begin your journey.
+              </p>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    if (typeof onShowAuth === 'function') {
+                      onShowAuth('login')
+                    }
+                  }}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
+                >
+                  🔐 Login
+                </button>
+                <button
+                  onClick={() => {
+                    if (typeof onShowAuth === 'function') {
+                      onShowAuth('register')
+                    }
+                  }}
+                  className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all"
+                >
+                  ✨ Register
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-400 mb-8">
+              <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
+                <div className="text-2xl mb-2">👤</div>
+                <div className="font-semibold text-slate-300">Create Avatar</div>
+                <div className="text-xs mt-1">Design your 3D character with ReadyPlayer.me</div>
+              </div>
+              <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
+                <div className="text-2xl mb-2">🌍</div>
+                <div className="font-semibold text-slate-300">Explore World</div>
+                <div className="text-xs mt-1">Walk around Philippine cities and meet NPCs</div>
+              </div>
+              <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
+                <div className="text-2xl mb-2">💰</div>
+                <div className="font-semibold text-slate-300">Build Wealth</div>
+                <div className="text-xs mt-1">Trade, invest, and manage your empire</div>
+              </div>
+            </div>
+
+            <p className="text-xs text-slate-500">
+              By logging in, you agree to our terms of service. Your data is secure and private.
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const [character, setCharacter] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
