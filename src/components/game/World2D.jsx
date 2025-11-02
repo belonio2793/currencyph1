@@ -79,6 +79,26 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // Sync position
       syncRef.current?.broadcastMove(world.player.x, world.player.y, world.player.direction)
 
+      // Keep camera centered on player with smoothing
+      try {
+        const cam = cameraRef.current || { x: 0, y: 0, zoom: 1 }
+        const zoom = cam.zoom || 1
+        const targetX = world.player.x - canvas.width / (2 * zoom)
+        const targetY = world.player.y - canvas.height / (2 * zoom)
+        // smoothing factor (0 = snap, 1 = instant follow)
+        const smoothing = 0.18
+        cam.x = cam.x + (targetX - cam.x) * smoothing
+        cam.y = cam.y + (targetY - cam.y) * smoothing
+
+        // Clamp to map bounds so we don't show beyond map edges
+        const maxX = Math.max(0, world.mapData.width - canvas.width / zoom)
+        const maxY = Math.max(0, world.mapData.height - canvas.height / zoom)
+        cam.x = Math.max(0, Math.min(cam.x, maxX))
+        cam.y = Math.max(0, Math.min(cam.y, maxY))
+      } catch (e) {
+        // ignore camera errors
+      }
+
       // Render (pass current camera)
       renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current)
 
