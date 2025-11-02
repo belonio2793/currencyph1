@@ -208,22 +208,40 @@ export class WorldSync {
 export const WorldDB = {
   async saveWorldEvent(userId, characterId, city, eventType, data) {
     try {
-      const { error } = await supabase
-        .from('world_events')
-        .insert([{
-          user_id: userId,
-          character_id: characterId,
+      // Use edge function for event persistence
+      const response = await supabase.functions.invoke('world-events', {
+        body: {
+          action: 'save_event',
+          userId,
+          characterId,
           city,
-          event_type: eventType,
-          event_data: data,
-          created_at: new Date()
-        }])
+          data: { type: eventType, ...data }
+        }
+      })
 
-      if (error) throw error
+      if (response.error) throw response.error
       return true
     } catch (error) {
       console.error('World event save error:', error)
       return false
+    }
+  },
+
+  async getNearbyPlayers(characterId, city) {
+    try {
+      const response = await supabase.functions.invoke('world-events', {
+        body: {
+          action: 'get_nearby_players',
+          characterId,
+          city
+        }
+      })
+
+      if (response.error) throw response.error
+      return response.data?.players || []
+    } catch (error) {
+      console.error('Nearby players fetch error:', error)
+      return []
     }
   },
 
