@@ -50,6 +50,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       cameraRef.current.zoom = zoom
       cameraRef.current.x = Math.max(0, world.player.x - canvas.width / (2 * zoom))
       cameraRef.current.y = Math.max(0, world.player.y - canvas.height / (2 * zoom))
+      // expose for legacy helpers/debugging
+      try { window.__cameraRef = cameraRef } catch (e) { /* ignore */ }
     }, 50)
 
     return () => {
