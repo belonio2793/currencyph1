@@ -45,7 +45,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   async function doCreate() {
     try {
       setCreating(true)
-      await onCharacterCreated(name, appearance)
+      await onCharacterCreated(name, appearance, homeCity)
     } catch (err) {
       setError(err.message || String(err))
     } finally {
