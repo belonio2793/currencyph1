@@ -168,14 +168,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
             <div className="w-full lg:w-96 flex-shrink-0">
               <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 flex flex-col items-center w-full">
-                <div className="w-full flex items-center justify-between mb-3">
-                  <div className="text-sm text-slate-200">Preview</div>
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-slate-400">SVG</label>
-                    <input type="checkbox" checked={photoMode} onChange={(e)=>setPhotoMode(e.target.checked)} className="accent-blue-500" />
-                    <label className="text-xs text-slate-400">Photo</label>
-                  </div>
-                </div>
 
                 <div className="w-full flex items-center justify-center mb-3">
                   <AvatarPreview appearance={appearance} name={name} />
