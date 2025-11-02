@@ -233,8 +233,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       const nearby = showNPCs ? world.getNearbyNPCs(150) : []
       setNearbyNPCs(nearby)
 
-      // Sync position
-      syncRef.current?.broadcastMove(world.player.x, world.player.y, world.player.direction)
+      // Sync position (include avatar thumbnail so others see our avatar)
+      syncRef.current?.broadcastMove(world.player.x, world.player.y, world.player.direction, world.player.avatarUrl)
 
       // Keep camera centered on player with smoothing (unless panMode active)
       try {
