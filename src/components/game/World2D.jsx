@@ -146,9 +146,10 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
             const gm = new window.google.maps.Map(mapDivRef.current, {
               center: { lat: ll.lat, lng: ll.lng },
               zoom: TARGET_TILE_ZOOM,
-              disableDefaultUI: true,
-              clickableIcons: false,
-              gestureHandling: 'none',
+              mapTypeId: 'roadmap',
+              disableDefaultUI: false,
+              clickableIcons: true,
+              gestureHandling: 'greedy',
               mapId: mapId || undefined
             })
             googleMapRef.current = gm
@@ -454,7 +455,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   return (
     <div className="w-full h-full bg-slate-900 rounded-lg overflow-hidden relative">
       {/* Google Map behind the canvas */}
-      <div ref={mapDivRef} className="absolute inset-0 z-0" style={{ filter: 'brightness(0.9) contrast(1.05)' }} />
+      <div ref={mapDivRef} className="absolute inset-0 z-0" />
 
       {/* Game Canvas */}
       <canvas
@@ -471,7 +472,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       <div className="absolute top-4 left-4 text-white pointer-events-none">
         <div className="bg-black/50 p-3 rounded border border-slate-600">
           <p className="text-sm font-bold">{character.name}</p>
-          <p className="text-xs text-slate-400">📍 {city}</p>
+          <p className="text-xs text-slate-400">��� {city}</p>
           <p className="text-xs text-slate-400">Position: {Math.round(worldRef.current?.player.x || 0)}, {Math.round(worldRef.current?.player.y || 0)}</p>
         </div>
       </div>
@@ -662,40 +663,7 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   ctx.scale(cam.zoom, cam.zoom)
   ctx.translate(-cam.x, -cam.y)
 
-  // Draw grid in world-space (subtle)
-  ctx.strokeStyle = '#1e293b'
-  ctx.lineWidth = 1 / Math.max(0.0001, cam.zoom)
-  const worldViewWidth = canvas.width / cam.zoom
-  const worldViewHeight = canvas.height / cam.zoom
-  const cols = Math.ceil(worldViewWidth / tileSize) + 2
-  const rows = Math.ceil(worldViewHeight / tileSize) + 2
-
-  for (let i = 0; i <= cols; i++) {
-    ctx.beginPath()
-    ctx.moveTo(i * tileSize, 0)
-    ctx.lineTo(i * tileSize, worldViewHeight)
-    ctx.stroke()
-  }
-  for (let j = 0; j <= rows; j++) {
-    ctx.beginPath()
-    ctx.moveTo(0, j * tileSize)
-    ctx.lineTo(worldViewWidth, j * tileSize)
-    ctx.stroke()
-  }
-
-  // Draw buildings with slight shadow for depth
-  world.mapData.buildings.forEach(building => {
-    // shadow
-    ctx.fillStyle = 'rgba(0,0,0,0.25)'
-    ctx.fillRect(building.x + 6, building.y + 6, building.width, building.height)
-
-    ctx.fillStyle = '#475569'
-    ctx.fillRect(building.x, building.y, building.width, building.height)
-
-    ctx.fillStyle = '#94a3b8'
-    ctx.font = `${10 / cam.zoom}px Arial`
-    ctx.fillText(building.name, building.x + 5, building.y + 15)
-  })
+  // Skip old grid and blocky buildings; Google Map renders real streets/labels underneath.
 
   // Draw NPCs with depth scale (closer to bottom appear larger) if enabled
   if (showNPCsOpt) {
