@@ -8,6 +8,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
     { id: 'nearby', label: 'Nearby', public: true },
+    { id: 'play-currency', label: 'Play Currency', auth: true },
     { id: 'online-users', label: 'Online Users', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
     { id: 'rates', label: 'Rates', public: true }
