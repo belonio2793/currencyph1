@@ -514,7 +514,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       </div>
 
       {/* NPC toggle */}
-      <div className="absolute bottom-6 left-20 z-40">
+      <div className="absolute top-6 right-6 z-40 pointer-events-auto">
         <div className="bg-black/60 rounded border border-slate-700 p-2 flex items-center gap-2 text-xs text-slate-200">
           <label className="flex items-center gap-2 cursor-pointer">
             <input type="checkbox" checked={showNPCs} onChange={(e)=>setShowNPCs(e.target.checked)} className="accent-blue-500" />
