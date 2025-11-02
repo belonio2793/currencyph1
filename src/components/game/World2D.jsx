@@ -178,6 +178,22 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     cam.y = worldY - my / newZoom
   }
 
+  // Programmatic zoom (used by buttons). factor >1 zooms in, <1 zooms out
+  const handleZoomButton = (factor) => {
+    const canvas = canvasRef.current
+    const cam = cameraRef.current
+    if (!canvas || !cam) return
+    const prev = cam.zoom || 1
+    const centerX = canvas.width / 2
+    const centerY = canvas.height / 2
+    const worldCenterX = centerX / prev + cam.x
+    const worldCenterY = centerY / prev + cam.y
+    const newZoom = Math.max(0.2, Math.min(3, prev * factor))
+    cam.zoom = newZoom
+    cam.x = worldCenterX - centerX / newZoom
+    cam.y = worldCenterY - centerY / newZoom
+  }
+
   // Handle chat send
   const handleSendMessage = async () => {
     if (!playerInput.trim() || !chatUI.npc) return
@@ -312,6 +328,14 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           <p>WASD/Arrows to move</p>
           <p>Click to walk</p>
           <p>Click NPC to talk</p>
+        </div>
+      </div>
+
+      {/* Zoom controls */}
+      <div className="absolute bottom-6 left-6 z-40">
+        <div className="bg-black/60 rounded border border-slate-700 p-2 flex flex-col gap-2">
+          <button aria-label="Zoom in" onClick={() => handleZoomButton(1.2)} className="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded">+</button>
+          <button aria-label="Zoom out" onClick={() => handleZoomButton(0.8)} className="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded">−</button>
         </div>
       </div>
     </div>
