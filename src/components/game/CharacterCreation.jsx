@@ -277,32 +277,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
             </div>
           )}
 
-          {/* Gallery modal */}
-          {showGallery && (
-            <div className="fixed inset-0 z-60 bg-black/60 flex items-start md:items-center justify-center p-4 overflow-auto">
-              <div className="bg-slate-900 border border-slate-700 rounded-lg max-w-4xl w-full p-4 md:p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h4 className="text-lg font-semibold text-slate-100">Hairstyle Gallery</h4>
-                  <div className="flex items-center gap-2">
-                    <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search styles (e.g. bob, afro, mullet)" className="px-3 py-2 bg-slate-800 border border-slate-700 rounded text-slate-200" />
-                    <button onClick={()=>setShowGallery(false)} className="px-3 py-2 bg-rose-600 text-white rounded">Close</button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-                  {galleryList.map(styleId => (
-                    <button key={styleId} onClick={()=>{ handleAppearanceChange('hair_style', styleId); setShowGallery(false) }} className={`p-3 rounded-lg border ${appearance.hair_style===styleId ? 'border-blue-500 bg-slate-800' : 'border-slate-700 bg-slate-900'}`}>
-                      <div className="flex items-center justify-center mb-2 h-20 w-full">
-                        <HairIcon styleId={styleId} color={appearance.hair_color} gender={appearance.gender} />
-                      </div>
-                      <div className="text-xs text-slate-300 text-center truncate">{styleId.replace('_',' ')}</div>
-                    </button>
-                  ))}
-                </div>
-
-              </div>
-            </div>
-          )}
 
           {/* Disclaimer: users can always reset or change appearance later (moved to bottom) */}
           <div className="mt-6 p-3 bg-yellow-600/8 border-t border-yellow-600/20 rounded text-yellow-100 text-sm">
