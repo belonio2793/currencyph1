@@ -27,40 +27,69 @@ const NPC_TEMPLATES = [
   { name: 'Pedro', role: 'Guide', emoji: '👨‍🎓' }
 ]
 
-// City map data with buildings and spawn points
-export const CITY_MAPS = {
-  'Manila': {
-    width: 800,
-    height: 800,
-    tiles: 'urban',
-    buildings: [
-      { x: 100, y: 100, width: 60, height: 60, name: 'Central Market', type: 'shop' },
-      { x: 200, y: 150, width: 80, height: 80, name: 'Government Office', type: 'government' },
-      { x: 400, y: 300, width: 100, height: 100, name: 'Bank of Manila', type: 'bank' },
-      { x: 600, y: 200, width: 70, height: 70, name: 'Trading Post', type: 'trade' }
-    ],
-    npcSpawns: [
-      { x: 150, y: 150, templateIdx: 0 },
-      { x: 250, y: 200, templateIdx: 1 },
-      { x: 450, y: 350, templateIdx: 2 },
-      { x: 650, y: 250, templateIdx: 3 }
-    ]
-  },
-  'Cebu': {
-    width: 800,
-    height: 800,
-    tiles: 'tropical',
-    buildings: [
-      { x: 100, y: 100, width: 60, height: 60, name: 'Cebu Market', type: 'shop' },
-      { x: 300, y: 200, width: 80, height: 80, name: 'Port Authority', type: 'trade' },
-      { x: 500, y: 400, width: 100, height: 100, name: 'Cebu Exchange', type: 'bank' }
-    ],
-    npcSpawns: [
-      { x: 150, y: 150, templateIdx: 0 },
-      { x: 350, y: 250, templateIdx: 1 },
-      { x: 550, y: 450, templateIdx: 2 }
-    ]
+// Dynamic city map generation based on city data
+export function generateCityMap(city) {
+  const density = city.type === 'metropolis' ? 3 : city.type === 'city' ? 2 : 1
+  const width = 800 + (density * 200)
+  const height = 800 + (density * 200)
+
+  const buildings = generateBuildings(city, density)
+  const npcSpawns = generateNPCSpawns(buildings, 5 + density * 3)
+
+  return {
+    width,
+    height,
+    tiles: city.region.includes('Visayas') || city.region === 'Mimaropa' ? 'tropical' : 'urban',
+    buildings,
+    npcSpawns,
+    cityName: city.name,
+    region: city.region
   }
+}
+
+function generateBuildings(city, density) {
+  const buildings = []
+  const buildingTypes = [
+    { name: 'Market', type: 'shop', count: 2 + density },
+    { name: 'Bank', type: 'bank', count: 1 + density },
+    { name: 'Trading Post', type: 'trade', count: 1 + density },
+    { name: 'Restaurant', type: 'restaurant', count: 2 + density },
+    { name: 'Government Office', type: 'government', count: 1 },
+    { name: 'Hospital', type: 'hospital', count: 1 },
+    { name: 'School', type: 'school', count: 1 + Math.floor(density / 2) },
+    { name: 'Port', type: 'port', count: city.name.includes('Cebu') || city.name.includes('Manila') ? 1 : 0 }
+  ]
+
+  let xPos = 100
+  let yPos = 100
+
+  buildingTypes.forEach(buildingType => {
+    for (let i = 0; i < buildingType.count; i++) {
+      buildings.push({
+        x: xPos + Math.random() * 400,
+        y: yPos + Math.random() * 400,
+        width: 50 + Math.random() * 50,
+        height: 50 + Math.random() * 50,
+        name: `${buildingType.name} #${i + 1}`,
+        type: buildingType.type
+      })
+    }
+  })
+
+  return buildings
+}
+
+function generateNPCSpawns(buildings, count) {
+  const spawns = []
+  for (let i = 0; i < count; i++) {
+    const building = buildings[Math.floor(Math.random() * buildings.length)]
+    spawns.push({
+      x: building.x + building.width / 2,
+      y: building.y + building.height / 2,
+      templateIdx: i % NPC_TEMPLATES.length
+    })
+  }
+  return spawns
 }
 
 // World player tracking
