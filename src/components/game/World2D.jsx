@@ -465,14 +465,14 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         onClick={handleCanvasClick}
         onWheel={handleWheel}
         className="absolute inset-0 w-full h-full z-10 cursor-crosshair block"
-        style={{ imageRendering: 'pixelated' }}
+        style={{ imageRendering: 'auto' }}
       />
 
       {/* HUD Overlay */}
       <div className="absolute top-4 left-4 text-white pointer-events-none">
         <div className="bg-black/50 p-3 rounded border border-slate-600">
           <p className="text-sm font-bold">{character.name}</p>
-          <p className="text-xs text-slate-400">��� {city}</p>
+          <p className="text-xs text-slate-400">📍 {city}</p>
           <p className="text-xs text-slate-400">Position: {Math.round(worldRef.current?.player.x || 0)}, {Math.round(worldRef.current?.player.y || 0)}</p>
         </div>
       </div>
@@ -665,20 +665,26 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
 
   // Skip old grid and blocky buildings; Google Map renders real streets/labels underneath.
 
-  // Draw NPCs with depth scale (closer to bottom appear larger) if enabled
+  // Draw NPCs as modern glowing beacons
   if (showNPCsOpt) {
     world.npcs.forEach(npc => {
-      const depthFactor = 1 + ((npc.y - world.player.y) / Math.max(100, world.mapData.height)) * 0.5
-      const r = Math.max(4, 8 * depthFactor)
-      ctx.fillStyle = '#3b82f6'
+      const r = Math.max(3, 6)
+      // glow
+      const g = ctx.createRadialGradient(npc.x, npc.y, 0, npc.x, npc.y, 16)
+      g.addColorStop(0, 'rgba(59,130,246,0.85)')
+      g.addColorStop(1, 'rgba(59,130,246,0)')
+      ctx.fillStyle = g
+      ctx.beginPath()
+      ctx.arc(npc.x, npc.y, 16, 0, Math.PI * 2)
+      ctx.fill()
+      // core
+      ctx.fillStyle = '#1d4ed8'
+      ctx.strokeStyle = '#e2e8f0'
+      ctx.lineWidth = 2 / cam.zoom
       ctx.beginPath()
       ctx.arc(npc.x, npc.y, r, 0, Math.PI * 2)
       ctx.fill()
-
-      ctx.fillStyle = '#fff'
-      ctx.font = `${12 / cam.zoom}px Arial`
-      ctx.textAlign = 'center'
-      ctx.fillText(npc.emoji, npc.x, npc.y + 2)
+      ctx.stroke()
     })
   }
 
@@ -695,16 +701,47 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
     ctx.fillText(player.character_name, player.x, player.y - 12)
   })
 
-  // Draw player (centered lower for FP feel)
-  ctx.fillStyle = '#10b981'
+  // Draw player as modern GPS avatar with pulse and heading
+  const px = world.player.x
+  const py = world.player.y
+  const baseR = 10
+  const pulseT = ((Date.now() % 1500) / 1500)
+  const pulseR = baseR + 8 + pulseT * 16
+  const pulseA = 1 - pulseT
+  // pulsing ring
+  ctx.strokeStyle = `rgba(16,185,129,${0.35 * pulseA})`
+  ctx.lineWidth = 3 / cam.zoom
   ctx.beginPath()
-  ctx.arc(world.player.x, world.player.y, 12, 0, Math.PI * 2)
+  ctx.arc(px, py, pulseR, 0, Math.PI * 2)
+  ctx.stroke()
+  // glow
+  const grad = ctx.createRadialGradient(px, py, 0, px, py, 24)
+  grad.addColorStop(0, 'rgba(16,185,129,0.9)')
+  grad.addColorStop(1, 'rgba(16,185,129,0)')
+  ctx.fillStyle = grad
+  ctx.beginPath()
+  ctx.arc(px, py, 24, 0, Math.PI * 2)
   ctx.fill()
-
-  ctx.fillStyle = '#fff'
-  ctx.font = `${14 / cam.zoom}px Arial`
-  ctx.textAlign = 'center'
-  ctx.fillText('👤', world.player.x, world.player.y + 1)
+  // core avatar
+  ctx.fillStyle = '#0ea5a5'
+  ctx.strokeStyle = '#ecfeff'
+  ctx.lineWidth = 2.5 / cam.zoom
+  ctx.beginPath()
+  ctx.arc(px, py, baseR, 0, Math.PI * 2)
+  ctx.fill()
+  ctx.stroke()
+  // heading wedge
+  const dir = world.player.direction || 0
+  const angle = (dir * Math.PI) / 180
+  const tipX = px + Math.cos(angle) * (baseR + 8)
+  const tipY = py + Math.sin(angle) * (baseR + 8)
+  ctx.fillStyle = '#e2e8f0'
+  ctx.beginPath()
+  ctx.moveTo(tipX, tipY)
+  ctx.lineTo(px + Math.cos(angle + 0.7) * baseR, py + Math.sin(angle + 0.7) * baseR)
+  ctx.lineTo(px + Math.cos(angle - 0.7) * baseR, py + Math.sin(angle - 0.7) * baseR)
+  ctx.closePath()
+  ctx.fill()
 
   ctx.restore()
 
