@@ -60,6 +60,19 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, u
         // subscribe to exported event
         iframeRef.current?.contentWindow?.postMessage({ target: 'readyplayerme', type: 'subscribe', eventName: 'v1.avatar.exported' }, '*')
 
+        // Pre-fill email if available
+        if (userEmail && iframeRef.current) {
+          try {
+            iframeRef.current.contentWindow.postMessage({
+              target: 'readyplayerme',
+              type: 'setUserEmail',
+              email: userEmail
+            }, '*')
+          } catch (e) {
+            console.warn('Could not set user email:', e.message)
+          }
+        }
+
         // If we have a saved avatar, load it in the editor
         if (savedAvatarUrl && iframeRef.current) {
           try {
