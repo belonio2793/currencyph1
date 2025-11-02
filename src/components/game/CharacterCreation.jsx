@@ -8,6 +8,8 @@ const FEMALE_HAIRSTYLES = [
   'pixie','bob','lob','blunt_bob','asym_bob','long_flow','layered_long','curly_female','beach_waves','ponytail','high_ponytail','low_bun','braid','french_braid','fishtail','afro','twists'
 ]
 
+import React, { useState, useMemo, useEffect } from 'react'
+
 export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [name, setName] = useState('')
   const [appearance, setAppearance] = useState({
@@ -545,6 +547,19 @@ function AvatarPreview({ appearance, name = '', large = false }) {
       </div>
     </div>
   )
+}
+
+// shading helper
+function shade(hex, percent) {
+  const h = hex.replace('#','')
+  const num = parseInt(h,16)
+  let r = (num >> 16) + percent
+  let g = ((num >> 8) & 0x00FF) + percent
+  let b = (num & 0x0000FF) + percent
+  r = Math.max(0, Math.min(255, r))
+  g = Math.max(0, Math.min(255, g))
+  b = Math.max(0, Math.min(255, b))
+  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
 }
 
 // Helpers
