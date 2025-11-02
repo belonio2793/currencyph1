@@ -127,12 +127,12 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
 
     setResendLoading(true)
     try {
-      const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || process.env.PROJECT_URL
+      const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || import.meta.env.PROJECT_URL || window?.PROJECT_URL
       if (!PROJECT_URL) throw new Error('Project URL not configured')
       const controller = new AbortController()
       const timeout = setTimeout(() => controller.abort(), 10000)
       try {
-        const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY
+        const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY || window?.SUPABASE_ANON_KEY
         const headers = { 'Content-Type': 'application/json' }
         if (ANON_KEY) {
           // Send only Authorization header to avoid triggering preflight for custom 'apikey' header
@@ -218,7 +218,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
         if (identifier === 'guest') {
           try {
             // Try to create the guest user via serverless Edge Function (preferred)
-            const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || process.env.PROJECT_URL
+            const PROJECT_URL = import.meta.env.VITE_PROJECT_URL || import.meta.env.PROJECT_URL || window?.PROJECT_URL
             try {
               if (PROJECT_URL) {
                 const controller = new AbortController()
@@ -249,7 +249,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
             } catch (err) {
               console.warn('create-guest function error', err)
               // fallback to admin direct (if service role key is present on client)
-              const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY
+              const ADMIN_KEY = import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY || import.meta.env.SUPABASE_SERVICE_ROLE_KEY || window?.SUPABASE_SERVICE_ROLE_KEY
               if (ADMIN_KEY && PROJECT_URL) {
                 const controller = new AbortController()
                 const timeout = setTimeout(() => controller.abort(), 5000)
