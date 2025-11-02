@@ -146,9 +146,43 @@ export class WorldSync {
   // Handle presence sync
   handlePresenceSync(payload) {
     this.otherPlayers.clear()
-    payload.forEach(presence => {
-      if (presence.user_id !== this.userId) {
-        this.otherPlayers.set(presence.user_id, presence)
+
+    // Normalize payload to array of presence metas
+    let presArray = []
+    try {
+      if (Array.isArray(payload)) {
+        presArray = payload
+      } else if (payload && payload.presence_state) {
+        // payload.presence_state is an object mapping keys -> { metas: [...] }
+        Object.values(payload.presence_state).forEach(v => {
+          if (v && v.metas) presArray.push(...v.metas)
+          else if (Array.isArray(v)) presArray.push(...v)
+          else presArray.push(v)
+        })
+      } else if (payload && payload.state) {
+        // some versions use state
+        Object.values(payload.state).forEach(v => {
+          if (v && v.metas) presArray.push(...v.metas)
+          else if (Array.isArray(v)) presArray.push(...v)
+          else presArray.push(v)
+        })
+      } else if (payload && typeof payload === 'object') {
+        // fallback: object of presences
+        Object.values(payload).forEach(v => {
+          if (v && v.metas) presArray.push(...v.metas)
+          else if (Array.isArray(v)) presArray.push(...v)
+          else if (v && v.user_id) presArray.push(v)
+        })
+      }
+    } catch (e) {
+      console.warn('Error normalizing presence payload', e, payload)
+    }
+
+    presArray.forEach(presence => {
+      const uid = presence?.user_id || presence?.user?.id || presence?.user?.uid || presence?.id
+      if (!uid) return
+      if (uid !== this.userId) {
+        this.otherPlayers.set(uid, presence)
       }
     })
 
