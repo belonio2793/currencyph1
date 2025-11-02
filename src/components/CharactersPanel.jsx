@@ -101,7 +101,7 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
 
             <div className="mt-3">
               {!exportedData ? (
-                <div className="text-sm text-slate-400">Use the Ready Player Me editor above. After exporting your avatar, fill the name and create your character below.</div>
+                <div className="text-sm text-slate-400">Use the avatar editor above. After exporting your avatar, fill the name and create your character below.</div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
                   <div className="col-span-2">
