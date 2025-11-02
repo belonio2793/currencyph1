@@ -27,6 +27,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const [chatUI, setChatUI] = useState({ isOpen: false, npc: null, messages: [] })
   const [playerInput, setPlayerInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+  const [streetViewOpen, setStreetViewOpen] = useState(false)
+  const [streetViewImage, setStreetViewImage] = useState(null)
 
   const keysPressed = useRef({})
   const gameLoopRef = useRef(null)
