@@ -406,9 +406,14 @@ export const gameAPI = {
         .update({ money: (buyer.data?.money || 0) - listing.total_price })
         .eq('id', buyerId)
       
+      const { data: sellerChar } = await supabase
+        .from('game_characters')
+        .select('money')
+        .eq('id', listing.seller_id)
+        .single()
       await supabase
         .from('game_characters')
-        .update({ money: supabase.rpc('add_to_money', { character_id: listing.seller_id, amount: listing.total_price }) })
+        .update({ money: (sellerChar?.money || 0) + listing.total_price })
         .eq('id', listing.seller_id)
       
       // Mark listing as sold
@@ -613,9 +618,14 @@ export const gameAPI = {
       
       await this.addExperience(characterId, quest?.xp_reward || 0, 'quest', questId)
       
+      const { data: charMoney } = await supabase
+        .from('game_characters')
+        .select('money')
+        .eq('id', characterId)
+        .single()
       await supabase
         .from('game_characters')
-        .update({ money: supabase.rpc('add_to_money', { character_id: characterId, amount: quest?.money_reward || 0 }) })
+        .update({ money: (charMoney?.money || 0) + (quest?.money_reward || 0) })
         .eq('id', characterId)
       
       const { data, error } = await supabase
@@ -680,9 +690,14 @@ export const gameAPI = {
       
       // Apply rewards
       await this.addExperience(characterId, xpReward, 'daily_login')
+      const { data: charMoney2 } = await supabase
+        .from('game_characters')
+        .select('money')
+        .eq('id', characterId)
+        .single()
       await supabase
         .from('game_characters')
-        .update({ money: supabase.rpc('add_to_money', { character_id: characterId, amount: moneyReward }) })
+        .update({ money: (charMoney2?.money || 0) + moneyReward })
         .eq('id', characterId)
       
       return data
