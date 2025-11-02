@@ -131,3 +131,25 @@ export function latLngToWorldCoords(worldWidth, worldHeight, lat, lng, z = 6) {
   const wy = (py - northPx) / scale
   return { x: wx, y: wy }
 }
+
+// Convert world coordinates back to lat/lng
+export function worldToLatLng(worldWidth, worldHeight, wx, wy, z = 6) {
+  const westPx = latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.west, z).x
+  const eastPx = latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.east, z).x
+  const northPx = latLngToPixels(PHILIPPINES_BOUNDS.north, PHILIPPINES_BOUNDS.west, z).y
+
+  const philWidthPx = Math.abs(eastPx - westPx)
+  const philHeightPx = Math.abs(latLngToPixels(PHILIPPINES_BOUNDS.south, PHILIPPINES_BOUNDS.west, z).y - northPx)
+  const scaleX = philWidthPx / Math.max(1, worldWidth)
+  const scaleY = philHeightPx / Math.max(1, worldHeight)
+  const scale = Math.max(0.0001, (scaleX + scaleY) / 2)
+
+  const px = westPx + wx * scale
+  const py = northPx + wy * scale
+
+  const z2 = Math.pow(2, z)
+  const lon = (px / (TILE_SIZE * z2)) * 360 - 180
+  const n = Math.PI - (2 * Math.PI * py) / (TILE_SIZE * z2)
+  const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
+  return { lat, lng: lon }
+}
