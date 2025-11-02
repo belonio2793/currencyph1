@@ -242,7 +242,7 @@ export default function OnlineUsers({ userId, userEmail }) {
       {/* Main Content */}
       <div className="flex-1 overflow-hidden flex gap-4 p-4">
         {/* Map */}
-        <div className="flex-1 bg-white rounded-lg shadow overflow-hidden relative">
+        <div className="flex-1 min-h-[500px] bg-white rounded-lg shadow overflow-hidden relative">
           {loading ? (
             <div className="h-full flex items-center justify-center bg-slate-100">
               <div className="text-center">
@@ -316,7 +316,7 @@ export default function OnlineUsers({ userId, userEmail }) {
         </div>
 
         {/* Users List */}
-        <div className="w-80 bg-white rounded-lg shadow overflow-y-auto flex flex-col">
+        <div className="w-80 min-h-[500px] bg-white rounded-lg shadow overflow-y-auto flex flex-col">
           {loading ? (
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center">
@@ -332,7 +332,7 @@ export default function OnlineUsers({ userId, userEmail }) {
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center">
                 <p className="text-slate-600 font-medium text-sm">
-                  {filter === 'friends' ? 'No friends online' : 'No users online'}
+                  {filter === 'friends' ? 'No friends online' : 'No users online.'}
                 </p>
               </div>
             </div>
