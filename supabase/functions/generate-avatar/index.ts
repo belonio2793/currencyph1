@@ -57,6 +57,13 @@ serve(async (req) => {
     // Generate image
     const imageBytes = await callOpenAIImage(prompt)
 
+    // Ensure 'avatars' bucket exists (service role)
+    try {
+      await supabase.storage.createBucket('avatars', { public: true })
+    } catch (e) {
+      // ignore if already exists
+    }
+
     // Create path and upload to storage bucket 'avatars'
     const fileName = `avatar-${userId || 'guest'}-${Date.now()}.png`
     const path = `avatars/${fileName}`
