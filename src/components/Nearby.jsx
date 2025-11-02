@@ -650,12 +650,13 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
     try {
       setCommunityLoading(true)
       setCommunityError('')
-      const listings = await nearbyUtils.getPendingListings('pending', 100)
-      setPendingListings(listings)
+      const { rows, total } = await nearbyUtils.getPendingListings('pending', communityPerPage, communityPage)
+      setPendingListings(rows)
+      setCommunityTotal(total)
 
       const counts = {}
       const votes = {}
-      for (const listing of listings) {
+      for (const listing of rows) {
         const voteData = await nearbyUtils.getApprovalVotes(listing.id)
         counts[listing.id] = voteData
 
