@@ -90,6 +90,21 @@ export default function HeaderMap({ userId: headerUserId }) {
     }
   }, [headerUserId])
 
+  // Update presence location when user location changes
+  useEffect(() => {
+    if (location && shareEnabled && headerUserId) {
+      try {
+        updatePresenceLocation({
+          latitude: location.latitude,
+          longitude: location.longitude,
+          city: city
+        })
+      } catch (e) {
+        console.warn('Failed to update presence location:', e)
+      }
+    }
+  }, [location, shareEnabled, headerUserId, city])
+
   const toggleShare = () => {
     const next = !shareEnabled
     setShareEnabled(next)
