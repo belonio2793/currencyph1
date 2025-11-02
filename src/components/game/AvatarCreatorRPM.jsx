@@ -6,6 +6,37 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
   const [status, setStatus] = useState('Initializing…')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [savedAvatarUrl, setSavedAvatarUrl] = useState(null)
+  const [iframeReady, setIframeReady] = useState(false)
+
+  // Load saved avatar URL when editing an existing character
+  useEffect(() => {
+    if (!open || !characterId) return
+
+    const loadSavedAvatar = async () => {
+      try {
+        const { data, error: fetchErr } = await supabase
+          .from('game_characters')
+          .select('appearance')
+          .eq('id', characterId)
+          .single()
+
+        if (fetchErr) throw fetchErr
+
+        if (data?.appearance?.rpm?.model_url) {
+          setSavedAvatarUrl(data.appearance.rpm.model_url)
+          setStatus('Loading saved avatar…')
+        } else {
+          setStatus('No previous avatar found')
+        }
+      } catch (e) {
+        console.warn('Failed to load saved avatar:', e.message)
+        setStatus('Ready to create new avatar')
+      }
+    }
+
+    loadSavedAvatar()
+  }, [open, characterId])
 
   useEffect(() => {
     if (!open) return
@@ -14,9 +45,23 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
       if (!event.data || event.data.source !== 'readyplayerme') return
       const { eventName, data } = event.data
       if (eventName === 'v1.frame.ready') {
-        setStatus('Creator ready')
+        setStatus(savedAvatarUrl ? 'Avatar loaded' : 'Creator ready')
+        setIframeReady(true)
         // subscribe to exported event
         iframeRef.current?.contentWindow?.postMessage({ target: 'readyplayerme', type: 'subscribe', eventName: 'v1.avatar.exported' }, '*')
+
+        // If we have a saved avatar, load it in the editor
+        if (savedAvatarUrl && iframeRef.current) {
+          try {
+            iframeRef.current.contentWindow.postMessage({
+              target: 'readyplayerme',
+              type: 'loadAvatar',
+              url: savedAvatarUrl
+            }, '*')
+          } catch (e) {
+            console.warn('Could not pre-load saved avatar:', e.message)
+          }
+        }
       }
       if (eventName === 'v1.avatar.exported') {
         try {
