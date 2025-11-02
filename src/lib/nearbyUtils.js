@@ -72,16 +72,36 @@ export const nearbyUtils = {
   },
 
   // Get all pending listings
-  async getPendingListings(status = 'pending', limit = 50) {
-    const { data, error } = await supabase
+  async getPendingListings(status = 'pending', limit = 50, page = 1) {
+    const from = (page - 1) * limit
+    const to = from + limit - 1
+    const { data, error, count } = await supabase
       .from('pending_listings')
-      .select('*')
+      .select('*', { count: 'exact' })
       .eq('status', status)
       .order('created_at', { ascending: false })
-      .limit(limit)
-    
+      .range(from, to)
+
     if (error) throw error
-    return data || []
+    return { rows: data || [], total: typeof count === 'number' ? count : (data?.length || 0) }
+  },
+
+  async countPendingListings(status = 'pending') {
+    const { count, error } = await supabase
+      .from('pending_listings')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', status)
+    if (error) {
+      // Fallback approach when head is not supported
+      const { data, error: e2 } = await supabase
+        .from('pending_listings')
+        .select('id', { count: 'exact' })
+        .eq('status', status)
+        .limit(0)
+      if (e2) throw e2
+      return data?.length || 0
+    }
+    return count || 0
   },
 
   // Submit a pending listing (new business)
@@ -101,6 +121,8 @@ export const nearbyUtils = {
       phone_number: listing.phone_number || null,
       website: listing.website || null,
       description: listing.description || null,
+      primary_image_url: listing.primary_image_url || null,
+      image_urls: listing.image_urls || [],
       approval_fee_amount: 1000,
       approval_fee_currency: 'PHP',
       approval_fee_status: 'unpaid',
