@@ -220,8 +220,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         }
       } catch (e) {}
 
-      // Render (pass current camera)
-      renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current)
+      // Render (pass current camera and options)
+      renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current, { showNPCs })
 
       gameLoopRef.current = requestAnimationFrame(gameLoop)
     }
