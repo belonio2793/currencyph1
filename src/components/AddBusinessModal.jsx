@@ -61,11 +61,32 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
         phone_number: form.phone_number || null,
         website: form.website || null,
         description: form.description || null,
+        primary_image_url: form.primary_image_url || null,
         raw: { source: 'community_submission' }
       }
       const created = await nearbyUtils.submitPendingListing(userId, payload)
-      setPending(created)
-      onSubmitted && onSubmitted(created)
+      // Upload files if any
+      if (selectedFiles && selectedFiles.length > 0) {
+        const uploadedUrls = []
+        for (const file of selectedFiles) {
+          const path = `pending/${created.id}/${Date.now()}-${file.name}`
+          const { error: upErr } = await supabase.storage.from('nearby_listings').upload(path, file, { upsert: true })
+          if (!upErr) {
+            const { data: pub } = supabase.storage.from('nearby_listings').getPublicUrl(path)
+            if (pub?.publicUrl) uploadedUrls.push(pub.publicUrl)
+          }
+        }
+        if (uploadedUrls.length > 0) {
+          const primary = created.primary_image_url || uploadedUrls[0]
+          await supabase
+            .from('pending_listings')
+            .update({ image_urls: uploadedUrls, primary_image_url: primary, updated_at: new Date() })
+            .eq('id', created.id)
+        }
+      }
+      const refreshed = created
+      setPending(refreshed)
+      onSubmitted && onSubmitted(refreshed)
     } catch (err) {
       setError(err.message || 'Failed to submit')
     } finally {
@@ -142,6 +163,14 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
               <div>
                 <label className="block text-sm font-medium mb-1">Website</label>
                 <input name="website" value={form.website} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="https://..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Primary Photo URL</label>
+                <input name="primary_image_url" value={form.primary_image_url} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="https://..." />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Upload Images</label>
+                <input type="file" accept="image/*" multiple onChange={(e) => setSelectedFiles(Array.from(e.target.files || []))} className="w-full border rounded px-3 py-2" />
               </div>
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium mb-1">Description</label>
