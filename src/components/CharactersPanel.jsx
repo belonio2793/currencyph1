@@ -96,7 +96,7 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
         {showCreate ? (
           <div className="mb-3 h-[70vh] flex flex-col">
             <div className="flex-1 bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
-              <AvatarCreatorRPM open={true} onClose={() => setShowCreate(false)} onExport={(data) => { setExportedData(data) }} userId={userId} />
+              <AvatarCreatorRPM open={true} onClose={() => setShowCreate(false)} onExport={(data) => { setExportedData(data) }} userId={userId} showCloseButton={false} />
             </div>
 
             <div className="mt-3">
