@@ -349,6 +349,19 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
             </div>
           )}
 
+          {/* Disclaimer: users can always reset or change appearance later (moved to bottom) */}
+          <div className="mt-6 p-3 bg-yellow-600/8 border-t border-yellow-600/20 rounded text-yellow-100 text-sm">
+            <div className="max-w-7xl mx-auto px-2 py-2 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div>
+                <strong className="block text-yellow-200">Note:</strong>
+                <p className="text-xs text-yellow-100 mt-1">You can always reset or change your character's style, outfit, hairstyle, or appearance later. If a hairstyle or placement doesn't look right, use the Reset button or revisit the character editor — your character can be updated anytime.</p>
+              </div>
+              <div className="flex-shrink-0">
+                <button onClick={cancelPending} className="px-3 py-1 bg-yellow-600 text-slate-900 rounded font-semibold">Reset Now</button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
