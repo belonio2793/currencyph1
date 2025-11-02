@@ -240,7 +240,24 @@ export default function PlayCurrency({ userId }) {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* Navigation Tabs */}
+        {/* World View - Default Main Display */}
+        {character && (
+          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
+            <div className="p-4 border-b border-slate-700">
+              <h2 className="text-xl font-bold text-slate-100">Immersive World</h2>
+              <p className="text-xs text-slate-400 mt-1">Walk around, find NPCs, and trade. Use WASD/Arrows or click to move.</p>
+            </div>
+            <div style={{ height: '600px' }}>
+              <World2DRenderer
+                character={character}
+                userId={userId}
+                city={character.current_location || character.home_city || 'Manila'}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Tabs for Modals */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
             { id: 'cities', label: 'Cities' },
