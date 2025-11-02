@@ -254,12 +254,6 @@ export default function PlayCurrency({ userId }) {
               {tab.label}
             </button>
           ))}
-          <button
-            onClick={() => setShowRPM(true)}
-            className="px-4 py-2 rounded-lg bg-slate-700 text-slate-300 hover:bg-slate-600 whitespace-nowrap transition-colors"
-          >
-            👤 Customize
-          </button>
         </div>
 
         {/* Tab Content */}
