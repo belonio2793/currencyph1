@@ -82,7 +82,8 @@
     "node-fetch": "^2.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-leaflet": "^4.2.1"
+    "react-leaflet": "^4.2.1",
+    "three": "^0.156.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
