@@ -58,7 +58,7 @@ currency-ph/
 ├── docs/
 │   ├── ARCHITECTURE.md       # System architecture + tech stack
 │   ├── SUPABASE_SCHEMA.md    # Database schema + setup
-│   ├── API_INTEGRATION.md    # Payment + crypto API setup
+│   ├─�� API_INTEGRATION.md    # Payment + crypto API setup
 │   ├── POLYGON_SETUP.md      # Smart contract deployment
 │   └── STAGING_SETUP.md      # Step-by-step staging guide
 ├── index.html                # HTML entry point
@@ -401,6 +401,6 @@ Quick setup:
 
 3. Open the Play view and use the "Street View" button (top-right) when zoomed in to preview available panoramas.
 
-If you want, I can also add a small section to docs/ describing each Google API and which gameplay features it enables.
+See docs/PLAY_CURRENCY_GOOGLE_APIS.md for the detailed API plan and phased rollout.
 
 Happy building! 🚀
