@@ -117,55 +117,91 @@ export class World3D {
   }
   
   setupGround() {
-    const groundGeometry = new THREE.PlaneGeometry(5000, 5000)
+    // Create a more interesting ground with texture
+    const groundGeometry = new THREE.PlaneGeometry(6000, 6000)
+
+    // Create a canvas texture for ground
+    const canvas = document.createElement('canvas')
+    canvas.width = 256
+    canvas.height = 256
+    const ctx = canvas.getContext('2d')
+
+    // Draw a grid pattern
+    ctx.fillStyle = '#2a4a3a'
+    ctx.fillRect(0, 0, 256, 256)
+    ctx.strokeStyle = '#1a3a2a'
+    ctx.lineWidth = 1
+    for (let i = 0; i <= 16; i++) {
+      ctx.beginPath()
+      ctx.moveTo(i * 16, 0)
+      ctx.lineTo(i * 16, 256)
+      ctx.stroke()
+      ctx.beginPath()
+      ctx.moveTo(0, i * 16)
+      ctx.lineTo(256, i * 16)
+      ctx.stroke()
+    }
+
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.repeat.set(16, 16)
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+
     const groundMaterial = new THREE.MeshStandardMaterial({
-      color: 0x2a4a3a,
+      map: texture,
       roughness: 0.8,
-      metalness: 0.2
+      metalness: 0.0
     })
+
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
     ground.rotation.x = -Math.PI / 2
     ground.receiveShadow = true
+    ground.position.y = -0.5
     this.scene.add(ground)
-    
-    // Grid helper for reference
+
+    // Add a subtle grid helper
     const gridHelper = new THREE.GridHelper(5000, 50, 0x444444, 0x222222)
-    gridHelper.position.y = 0.01
+    gridHelper.position.y = 0.1
     this.scene.add(gridHelper)
   }
-  
+
   updateCameraPosition(playerPos = { x: 0, z: 0 }) {
     const config = this.cameraConfig
-    
+    const target = new THREE.Vector3(playerPos.x, 0, playerPos.z)
+
     switch (config.mode) {
       case 'topdown':
-        this.camera.position.set(playerPos.x, config.height, playerPos.z)
+        this.camera.position.set(
+          playerPos.x,
+          config.height * config.zoom,
+          playerPos.z
+        )
         this.camera.lookAt(playerPos.x, 0, playerPos.z)
         break
-        
+
       case 'isometric':
         const distance = config.distance / config.zoom
         const angle = (config.angle * Math.PI) / 180
         this.camera.position.set(
           playerPos.x + distance * Math.cos(angle),
-          config.height / config.zoom,
+          (config.height * config.zoom) / 1.5,
           playerPos.z + distance * Math.sin(angle)
         )
-        this.camera.lookAt(playerPos.x, 50, playerPos.z)
+        this.camera.lookAt(playerPos.x, 40, playerPos.z)
         break
-        
+
       case 'thirdperson':
-        const tpDistance = 300 / config.zoom
+        const tpDistance = 250 / config.zoom
         this.camera.position.set(
           playerPos.x,
-          200 / config.zoom,
+          (150 * config.zoom),
           playerPos.z + tpDistance
         )
-        this.camera.lookAt(playerPos.x, 100, playerPos.z)
+        this.camera.lookAt(playerPos.x, 60, playerPos.z)
         break
-        
+
       case 'freecam':
-        // Freecam position is controlled separately
+        // Freecam position is not automatically updated
         break
     }
   }
