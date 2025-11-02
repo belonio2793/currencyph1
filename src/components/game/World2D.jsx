@@ -27,7 +27,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     worldRef.current = new World2D(city, userId, character.name)
 
     // Initialize AI engine
-    aiRef.current = new NPCAIEngine(process.env.VITE_X_API_KEY || process.env.X_API_KEY)
+    aiRef.current = new NPCAIEngine(import.meta?.env?.VITE_X_API_KEY || import.meta?.env?.X_API_KEY || window?.X_API_KEY)
 
     // Initialize conversation UI
     conversationRef.current = new ConversationUI()
