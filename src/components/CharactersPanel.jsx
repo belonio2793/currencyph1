@@ -118,8 +118,18 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
 
                     <div className="flex gap-2 mt-3">
                       <button onClick={async () => {
-                        const appearance = { ...(exportedData || {}) }
-                        await handleCreate(newName || 'Unnamed', appearance, newHomeCity)
+                        if (!newName.trim()) {
+                          alert('Please enter a character name')
+                          return
+                        }
+                        const appearance = {
+                          ...(exportedData || {}),
+                          gender: 'male',
+                          skin_tone: 'medium',
+                          height: 175,
+                          build: 'average'
+                        }
+                        await handleCreate(newName, appearance, newHomeCity)
                         setExportedData(null)
                         setNewName('')
                         setNewHomeCity('Manila')
