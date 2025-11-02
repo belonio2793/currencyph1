@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 
-const GOOGLE_MAPS_API_KEY = 'AIzaSyC1hNFq1m4sL2WevJSfP4sAVQ5dJ_jRCHc'
+const GOOGLE_MAPS_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GOOGLE_API_KEY) || (typeof process !== 'undefined' && process.env?.VITE_GOOGLE_API_KEY) || (typeof process !== 'undefined' && process.env?.GOOGLE_API_KEY) || ''
 
 export default function CityStreetView({ city, mode = 'map' }) {
   const [mapElement, setMapElement] = useState(null)
@@ -18,8 +18,14 @@ export default function CityStreetView({ city, mode = 'map' }) {
       return
     }
 
+    if (!GOOGLE_MAPS_API_KEY) {
+      console.error('Google Maps API key not configured (VITE_GOOGLE_API_KEY)')
+      setIsLoading(false)
+      return
+    }
     const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}`
+    const libraries = 'places,geometry'
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(GOOGLE_MAPS_API_KEY)}&libraries=${libraries}`
     script.async = true
     script.defer = true
 
