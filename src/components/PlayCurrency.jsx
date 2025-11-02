@@ -265,11 +265,46 @@ export default function PlayCurrency({ userId }) {
           )}
 
           {activeTab === 'inventory' && (
-            <GameInventory 
+            <GameInventory
               character={character}
               inventory={inventory}
               onInventoryUpdate={handleInventoryUpdate}
             />
+          )}
+
+          {activeTab === 'cities' && character && (
+            <div className="space-y-6">
+              <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">🌍 Philippines World Map</h2>
+                <p className="text-slate-400 mb-4">Explore major cities across the Philippines. Click on cities to manage them or build new ones.</p>
+                <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700" style={{ height: '600px' }}>
+                  <CityMap userId={userId} onCitySelect={setSelectedCity} />
+                </div>
+              </div>
+              {selectedCity && (
+                <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                  <h3 className="text-xl font-bold mb-2">{selectedCity.name}</h3>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-slate-400 text-sm">Population</p>
+                      <p className="text-2xl font-bold text-blue-400">{(selectedCity.population || 0).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-sm">Budget</p>
+                      <p className="text-2xl font-bold text-emerald-400">₱{(selectedCity.budget || 0).toLocaleString()}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-sm">Happiness</p>
+                      <p className="text-2xl font-bold text-yellow-400">{Math.floor(selectedCity.happiness || 0)}%</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400 text-sm">Region</p>
+                      <p className="text-2xl font-bold text-purple-400">{selectedCity.region || 'N/A'}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           )}
 
           {activeTab === 'equipment' && character && (
