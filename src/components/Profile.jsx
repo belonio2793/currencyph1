@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
+import { deviceFingerprint } from '../lib/deviceFingerprint'
 
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
