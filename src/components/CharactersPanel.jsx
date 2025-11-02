@@ -9,6 +9,9 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
   const [characters, setCharacters] = useState([])
   const [showCreate, setShowCreate] = useState(false)
   const [error, setError] = useState('')
+  const [exportedData, setExportedData] = useState(null)
+  const [newName, setNewName] = useState('')
+  const [newHomeCity, setNewHomeCity] = useState('Manila')
 
   useEffect(() => {
     if (!userId) return
@@ -89,8 +92,51 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
         {error && <div className="mb-2 p-2 bg-red-600/10 border border-red-600/20 text-red-300 text-sm rounded">{error}</div>}
 
         {showCreate ? (
-          <div className="mb-3">
-            <CharacterCreation onCharacterCreated={handleCreate} userId={userId} />
+          <div className="mb-3 h-[70vh] flex flex-col">
+            <div className="flex-1 bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+              <AvatarCreatorRPM open={true} onClose={() => setShowCreate(false)} onExport={(data) => { setExportedData(data) }} userId={userId} />
+            </div>
+
+            <div className="mt-3">
+              {!exportedData ? (
+                <div className="text-sm text-slate-400">Use the Ready Player Me editor above. After exporting your avatar, fill the name and create your character below.</div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                  <div className="col-span-2">
+                    <label className="block text-sm text-slate-300 mb-1">Character Name</label>
+                    <input value={newName} onChange={(e)=>setNewName(e.target.value)} placeholder="Enter character name" className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100" />
+
+                    <label className="block text-sm text-slate-300 mt-3 mb-1">Home City</label>
+                    <select value={newHomeCity} onChange={(e)=>setNewHomeCity(e.target.value)} className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100">
+                      <option>Manila</option>
+                      <option>Quezon City</option>
+                      <option>Cebu</option>
+                      <option>Davao</option>
+                    </select>
+
+                    <div className="flex gap-2 mt-3">
+                      <button onClick={async () => {
+                        const appearance = { ...(exportedData || {}) }
+                        await handleCreate(newName || 'Unnamed', appearance, newHomeCity)
+                        setExportedData(null)
+                        setNewName('')
+                        setNewHomeCity('Manila')
+                      }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Create Character</button>
+                      <button onClick={() => { setExportedData(null) }} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-100">Reset</button>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <div className="w-28 h-28 bg-slate-700 rounded overflow-hidden flex items-center justify-center">
+                      {exportedData?.rpm_meta?.imageUrl ? (
+                        <img src={exportedData.rpm_meta.imageUrl} className="w-full h-full object-cover" alt="preview" />
+                      ) : (
+                        <div className="text-xs text-slate-400">No preview</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
