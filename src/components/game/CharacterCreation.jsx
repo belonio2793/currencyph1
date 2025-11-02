@@ -547,7 +547,7 @@ function AvatarPreview({ appearance, name = '', large = false }) {
         {/* head group */}
         <g transform={`translate(${avatarStyle.width / 2}, ${avatarStyle.height * 0.24})`}>
           <circle r={headRadius} fill={faceColor} />
-          <g transform={`translate(${appearance.hair_offset_x}, ${appearance.hair_offset_y}) scale(${appearance.hair_scale})`}>{renderHairSVG(appearance.hair_style, appearance.hair_color, headRadius)}</g>
+          <g>{renderHairSVG(appearance.hair_style, appearance.hair_color, headRadius)}</g>
 
           <circle cx={-Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
           <circle cx={Math.round(headRadius * 0.35)} cy={-Math.round(headRadius * 0.12)} r={Math.max(1, Math.round(headRadius * 0.12))} fill="#0b1220" />
