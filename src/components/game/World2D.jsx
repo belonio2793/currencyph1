@@ -9,6 +9,8 @@ import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 
 export default function World2DRenderer({ character, userId, city = 'Manila' }) {
   const canvasRef = useRef(null)
+  const mapDivRef = useRef(null)
+  const leafletRef = useRef(null)
   const worldRef = useRef(null)
   const syncRef = useRef(null)
   const aiRef = useRef(null)
@@ -107,6 +109,24 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       cameraRef.current.y = Math.max(0, world.player.y - (canvas.height * 0.65) / zoom)
       // expose for legacy helpers/debugging
       try { window.__cameraRef = cameraRef } catch (e) { /* ignore */ }
+
+      // initialize Leaflet map under the canvas
+      try {
+        if (mapDivRef.current && !leafletRef.current) {
+          const map = L.map(mapDivRef.current, { zoomControl: false, attributionControl: false, interactive: false })
+          const key = 'Epg2ZBCTb2mrWoiUKQRL'
+          const satUrl = `https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=${key}`
+          const sat = L.tileLayer(satUrl, { maxZoom: 19 })
+          sat.addTo(map)
+          leafletRef.current = map
+          // set initial view to player
+          const { x: wx, y: wy } = world.player
+          const ll = worldToLatLng(map.mapData?.width || world.mapData.width, map.mapData?.height || world.mapData.height, wx, wy)
+          map.setView([ll.lat, ll.lng], 6)
+        }
+      } catch (e) {
+        console.warn('Leaflet init failed', e)
+      }
     }, 50)
 
     return () => {
@@ -134,6 +154,20 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
     }
+
+    // Attach resize observer to adjust leaflet map size
+    let ro
+    try {
+      if (mapDivRef.current && leafletRef.current) {
+        leafletRef.current.invalidateSize()
+      }
+      ro = new ResizeObserver(() => {
+        if (leafletRef.current) leafletRef.current.invalidateSize()
+      })
+      if (mapDivRef.current) ro.observe(mapDivRef.current)
+    } catch (e) {}
+
+    const cleanupResize = () => { try { if (ro && mapDivRef.current) ro.unobserve(mapDivRef.current) } catch(e){} }
 
     const gameLoop = () => {
       // Update world state
@@ -168,6 +202,23 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         // ignore camera errors
       }
 
+      // Update Leaflet view to follow camera/player when present
+      try {
+        const map = leafletRef.current
+        if (map && world) {
+          const cam = cameraRef.current || { x:0,y:0,zoom:1 }
+          const worldW = world.mapData.width
+          const worldH = world.mapData.height
+          const centerWx = cam.x + (canvas.width/(2*cam.zoom))
+          const centerWy = cam.y + (canvas.height*(0.65)/cam.zoom)
+          const ll = worldToLatLng(worldW, worldH, centerWx, centerWy)
+          // estimate tile zoom
+          const baseZ = 6
+          const tileZoom = Math.max(2, Math.min(19, Math.round(baseZ + Math.log2(cam.zoom))))
+          map.setView([ll.lat, ll.lng], tileZoom, { animate: false })
+        }
+      } catch (e) {}
+
       // Render (pass current camera)
       renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current)
 
@@ -180,6 +231,8 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       cancelAnimationFrame(gameLoopRef.current)
       // remove attached listeners
       try { cleanupMouse() } catch(e){}
+      try { cleanupResize() } catch(e){}
+      try { if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null } } catch(e){}
     }
   }, [otherPlayers])
 
@@ -347,6 +400,9 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
 
   return (
     <div className="w-full h-full bg-slate-900 rounded-lg overflow-hidden relative">
+      {/* Leaflet Map (satellite) behind the canvas */}
+      <div ref={mapDivRef} className="absolute inset-0 z-0" style={{ filter: 'brightness(0.9) contrast(1.05)' }} />
+
       {/* Game Canvas */}
       <canvas
         ref={canvasRef}
@@ -354,7 +410,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         height={600}
         onClick={handleCanvasClick}
         onWheel={handleWheel}
-        className="w-full h-full bg-slate-800 cursor-crosshair block"
+        className="absolute inset-0 w-full h-full z-10 cursor-crosshair block"
         style={{ imageRendering: 'pixelated' }}
       />
 
