@@ -1,6 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 
+function getAvatarEditorUrl(avatarUrl = null) {
+  const subdomain = import.meta.env.VITE_READYPLAYER_SUBDOMAIN || 'readyplayer.me'
+  const baseUrl = `https://${subdomain}/avatar?frameApi=1&bodyType=fullbody`
+
+  if (avatarUrl) {
+    return `${baseUrl}&avatarUrl=${encodeURIComponent(avatarUrl)}`
+  }
+  return `${baseUrl}&clearCache=1`
+}
+
 export default function AvatarCreatorRPM({ open, onClose, characterId, userId, onExport, onSaved, showCloseButton = true }) {
   const iframeRef = useRef(null)
   const [status, setStatus] = useState('Initializing…')
