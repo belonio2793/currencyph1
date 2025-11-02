@@ -2,15 +2,13 @@ import React, { useState, useEffect, useRef } from 'react'
 import { World2D, CITY_COORDS, CITY_MAPS } from '../../lib/world2D'
 import { drawTiles, latLngToWorldCoords, worldToLatLng } from '../../lib/mapUtils'
 import { supabase } from '../../lib/supabaseClient'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { WorldSync } from '../../lib/worldSync'
 import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 
 export default function World2DRenderer({ character, userId, city = 'Manila' }) {
   const canvasRef = useRef(null)
   const mapDivRef = useRef(null)
-  const leafletRef = useRef(null)
+  const googleMapRef = useRef(null)
   const worldRef = useRef(null)
   const syncRef = useRef(null)
   const aiRef = useRef(null)
@@ -123,23 +121,41 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // expose for legacy helpers/debugging
       try { window.__cameraRef = cameraRef } catch (e) { /* ignore */ }
 
-      // initialize Leaflet map under the canvas and match zoom
+      // initialize Google Map under the canvas and match zoom
       try {
-        if (mapDivRef.current && !leafletRef.current) {
-          const map = L.map(mapDivRef.current, { zoomControl: false, attributionControl: false, interactive: false })
-          const key = import.meta.env?.VITE_MAPTILER_KEY || ''
-          const satUrl = `https://api.maptiler.com/tiles/satellite/{z}/{x}/{y}.jpg?key=${key}`
-          const sat = L.tileLayer(satUrl, { maxZoom: 19 })
-          sat.addTo(map)
-          leafletRef.current = map
-          // set initial view to player
-          const { x: wx, y: wy } = world.player
-          const ll = worldToLatLng(map.mapData?.width || world.mapData.width, map.mapData?.height || world.mapData.height, wx, wy)
-          // use the target tile zoom for Leaflet as well
-          map.setView([ll.lat, ll.lng], TARGET_TILE_ZOOM)
+        const loadGoogleMaps = () => new Promise((resolve, reject) => {
+          if (window.google && window.google.maps) return resolve()
+          if (window.__googleMapsLoading) return window.__googleMapsLoading.then(resolve).catch(reject)
+          const key = (import.meta.env?.VITE_GOOGLE_API_KEY || import.meta.env?.GOOGLE_API_KEY || '')
+          if (!key) { console.warn('Missing VITE_GOOGLE_API_KEY'); return reject(new Error('no-key')) }
+          const s = document.createElement('script')
+          const libs = 'places,geometry'
+          s.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&libraries=${libs}`
+          s.async = true; s.defer = true
+          s.onload = () => resolve()
+          s.onerror = () => reject(new Error('gmaps-load-failed'))
+          window.__googleMapsLoading = new Promise((res, rej)=>{ s.onload = ()=>{ res(); resolve() }; s.onerror = ()=>{ rej(); reject(new Error('gmaps-load-failed')) } })
+          document.head.appendChild(s)
+        })
+
+        if (mapDivRef.current && !googleMapRef.current) {
+          loadGoogleMaps().then(() => {
+            const { x: wx, y: wy } = world.player
+            const ll = worldToLatLng(world.mapData.width, world.mapData.height, wx, wy)
+            const mapId = import.meta.env?.VITE_GOOGLE_MAP_ID
+            const gm = new window.google.maps.Map(mapDivRef.current, {
+              center: { lat: ll.lat, lng: ll.lng },
+              zoom: TARGET_TILE_ZOOM,
+              disableDefaultUI: true,
+              clickableIcons: false,
+              gestureHandling: 'none',
+              mapId: mapId || undefined
+            })
+            googleMapRef.current = gm
+          }).catch((err) => console.warn('Google Map init failed', err))
         }
       } catch (e) {
-        console.warn('Leaflet init failed', e)
+        console.warn('Google Map init exception', e)
       }
     }, 50)
 
@@ -183,14 +199,18 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       window.removeEventListener('mouseup', handleMouseUp)
     }
 
-    // Attach resize observer to adjust leaflet map size
+    // Attach resize observer to nudge Google Map on size changes
     let ro
     try {
-      if (mapDivRef.current && leafletRef.current) {
-        leafletRef.current.invalidateSize()
-      }
       ro = new ResizeObserver(() => {
-        if (leafletRef.current) leafletRef.current.invalidateSize()
+        try {
+          const gm = googleMapRef.current
+          if (gm) {
+            const c = gm.getCenter()
+            window.google && window.google.maps && window.google.maps.event.trigger(gm, 'resize')
+            if (c) gm.setCenter(c)
+          }
+        } catch (e) {}
       })
       if (mapDivRef.current) ro.observe(mapDivRef.current)
     } catch (e) {}
@@ -230,22 +250,27 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
         // ignore camera errors
       }
 
-      // Update Leaflet view to follow camera/player when present
-      try {
-        const map = leafletRef.current
-        if (map && world) {
-          const cam = cameraRef.current || { x:0,y:0,zoom:1 }
-          const worldW = world.mapData.width
-          const worldH = world.mapData.height
-          const centerWx = cam.x + (canvas.width/(2*cam.zoom))
-          const centerWy = cam.y + (canvas.height*(0.65)/cam.zoom)
-          const ll = worldToLatLng(worldW, worldH, centerWx, centerWy)
-          // estimate tile zoom
-          const baseZ = 6
-          const tileZoom = Math.max(2, Math.min(19, Math.round(baseZ + Math.log2(cam.zoom))))
-          map.setView([ll.lat, ll.lng], tileZoom, { animate: false })
+      // Update Google Map view to follow camera/player when present
+    try {
+      const gm = googleMapRef.current
+      if (gm && world && window.google && window.google.maps) {
+        const cam = cameraRef.current || { x:0,y:0,zoom:1 }
+        const worldW = world.mapData.width
+        const worldH = world.mapData.height
+        const centerWx = cam.x + (canvas.width/(2*cam.zoom))
+        const centerWy = cam.y + (canvas.height*(0.65)/cam.zoom)
+        const ll = worldToLatLng(worldW, worldH, centerWx, centerWy)
+        const baseZ = 6
+        const tileZoom = Math.max(2, Math.min(21, Math.round(baseZ + Math.log2(cam.zoom))))
+        const current = gm.getCenter()
+        if (!current || Math.abs(current.lat() - ll.lat) > 1e-6 || Math.abs(current.lng() - ll.lng) > 1e-6) {
+          gm.setCenter({ lat: ll.lat, lng: ll.lng })
         }
-      } catch (e) {}
+        if (Math.abs((gm.getZoom()||0) - tileZoom) > 0) {
+          gm.setZoom(tileZoom)
+        }
+      }
+    } catch (e) {}
 
       // Render (pass current camera and options)
       renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current, { showNPCs })
@@ -260,7 +285,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // remove attached listeners
       try { cleanupMouse() } catch(e){}
       try { cleanupResize() } catch(e){}
-      try { if (leafletRef.current) { leafletRef.current.remove(); leafletRef.current = null } } catch(e){}
+      try { if (googleMapRef.current) { googleMapRef.current = null } } catch(e){}
     }
   }, [otherPlayers, showNPCs])
 
@@ -428,7 +453,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
 
   return (
     <div className="w-full h-full bg-slate-900 rounded-lg overflow-hidden relative">
-      {/* Leaflet Map (satellite) behind the canvas */}
+      {/* Google Map behind the canvas */}
       <div ref={mapDivRef} className="absolute inset-0 z-0" style={{ filter: 'brightness(0.9) contrast(1.05)' }} />
 
       {/* Game Canvas */}
@@ -630,10 +655,7 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   ctx.fillStyle = '#0f172a'
   ctx.fillRect(0, 0, canvas.width, canvas.height)
 
-  // Draw map tiles underneath (async-safe - may draw on top later)
-  try {
-    drawTiles(ctx, canvas, camera || { x: 0, y: 0, zoom: 1 }, world.mapData.width, world.mapData.height)
-  } catch (e) {}
+  // Base map is rendered by Google Maps underneath; skip tile drawing here.
 
   // Apply camera transform: scale then translate
   const cam = camera || { x: 0, y: 0, zoom: 1 }
