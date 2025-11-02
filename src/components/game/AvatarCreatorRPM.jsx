@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 
-export default function AvatarCreatorRPM({ open, onClose, characterId, userId, onExport }) {
+export default function AvatarCreatorRPM({ open, onClose, characterId, userId, onExport, onSaved }) {
   const iframeRef = useRef(null)
   const [status, setStatus] = useState('Initializing…')
   const [saving, setSaving] = useState(false)
