@@ -444,6 +444,7 @@ export default function App() {
             {activeTab === 'borrow-business' && <BorrowMoney userId={userId} loanType="business" />}
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
+            {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
           </>
         )}
       </main>
