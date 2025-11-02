@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { gameAPI } from '../lib/gameAPI'
+import { citySimulationTicker } from '../lib/citySimulationTicker'
 import CharacterCreation from './game/CharacterCreation'
 import GameWorld from './game/GameWorld'
 import GameInventory from './game/GameInventory'
@@ -230,35 +231,13 @@ export default function PlayCurrency({ userId }) {
         {/* Tab Content */}
         <div className="space-y-6">
           {activeTab === 'world' && (
-            <GameWorld
-              character={character}
+            <GameWorld 
+              character={character} 
               onCombat={handleCombat}
               combatActive={combatActive}
               onPositionUpdate={(x, y, location) => {
                 setCharacter(prev => ({ ...prev, position_x: x, position_y: y, current_location: location }))
               }}
-            />
-          )}
-
-          {activeTab === 'cities' && (
-            <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-              <CityMap
-                userId={userId}
-                onCitySelect={(city) => {
-                  setSelectedCity(city)
-                  setShowCityManager(true)
-                }}
-              />
-            </div>
-          )}
-
-          {showCityManager && selectedCity && (
-            <CityManager
-              city={selectedCity}
-              onUpdate={(updatedCity) => {
-                setSelectedCity(updatedCity)
-              }}
-              onClose={() => setShowCityManager(false)}
             />
           )}
 
