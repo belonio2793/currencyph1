@@ -125,6 +125,13 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                 <label className="block text-sm font-medium mb-1">Longitude</label>
                 <input name="longitude" value={form.longitude} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="120.9842" />
               </div>
+              <div className="md:col-span-2 -mt-1">
+                <button type="button" onClick={() => {
+                  if (location) setForm(prev => ({ ...prev, latitude: String(location.latitude), longitude: String(location.longitude), city: prev.city || detectedCity || prev.city }))
+                }} className="text-sm text-blue-600 hover:text-blue-700">
+                  Use my current location
+                </button>
+              </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Phone</label>
                 <input name="phone_number" value={form.phone_number} onChange={handleChange} className="w-full border rounded px-3 py-2" placeholder="09xx xxx xxxx" />
