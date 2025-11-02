@@ -394,6 +394,7 @@ export default function PlayCurrency({ userId, userEmail }) {
         onClose={()=>setShowRPM(false)}
         characterId={character.id}
         userId={userId}
+        userEmail={userEmail}
         onSaved={async (updatedChar) => {
           try {
             setCharacter(updatedChar)
