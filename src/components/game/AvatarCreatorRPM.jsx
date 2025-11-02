@@ -39,12 +39,24 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, o
               .update({ appearance: nextAppearance, updated_at: new Date() })
               .eq('id', characterId)
             if (upErr) throw upErr
+            // fetch updated character
+            const { data: updatedChar } = await supabase
+              .from('game_characters')
+              .select('*')
+              .eq('id', characterId)
+              .single()
             setStatus('Saved. You can close this window.')
             setSaving(false)
+            if (typeof onSaved === 'function') {
+              try { onSaved(updatedChar) } catch(e) { console.warn('onSaved handler error', e) }
+            }
           } else if (typeof onExport === 'function') {
             // If no characterId provided, call onExport with exported data
             setStatus('Avatar exported — ready to create character')
             try { onExport({ rpm_model_url: modelUrl, rpm_meta: meta }) } catch(e) { console.warn('onExport handler error', e) }
+            if (typeof onSaved === 'function') {
+              try { onSaved({ rpm_model_url: modelUrl, rpm_meta: meta }) } catch(e) { console.warn('onSaved handler error', e) }
+            }
           } else {
             setStatus('Avatar exported — no handler to receive it')
           }
