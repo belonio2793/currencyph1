@@ -148,8 +148,8 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
               <div key={c.id} className={`p-2 rounded border ${currentCharacter && currentCharacter.id === c.id ? 'border-blue-500 bg-blue-500/6' : 'border-slate-700 bg-slate-800'}`}>
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-slate-700 rounded overflow-hidden flex items-center justify-center">
-                    {c.appearance && (c.appearance.rpm_meta?.imageUrl || c.appearance.rpm_meta?.avatarUrl || c.appearance.rpm_model_url) ? (
-                      <img src={c.appearance.rpm_meta?.imageUrl || c.appearance.rpm_meta?.avatarUrl || c.appearance.rpm_model_url} alt={c.name} className="w-full h-full object-cover" />
+                    {c.appearance && (c.appearance.rpm?.thumbnail || c.appearance.rpm?.meta?.imageUrl || c.appearance.rpm?.meta?.avatarUrl || c.appearance.rpm?.model_url) ? (
+                      <img src={c.appearance.rpm?.thumbnail || c.appearance.rpm?.meta?.imageUrl || c.appearance.rpm?.meta?.avatarUrl || c.appearance.rpm?.model_url} alt={c.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="text-xs text-slate-400">No avatar</div>
                     )}
