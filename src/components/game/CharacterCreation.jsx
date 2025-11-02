@@ -74,11 +74,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       setRgbSkin(hexToRgb(value))
       return
     }
-    if (key === 'hair_color') {
-      setAppearance(prev => ({ ...prev, hair_color: value }))
-      setRgb(hexToRgb(value))
-      return
-    }
     setAppearance(prev => ({ ...prev, [key]: value }))
   }
 
