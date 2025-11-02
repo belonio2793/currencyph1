@@ -254,15 +254,20 @@ export default function PlayCurrency({ userId }) {
 
         {/* Tab Content */}
         <div className="space-y-6">
-          {activeTab === 'world' && (
-            <GameWorld 
-              character={character} 
-              onCombat={handleCombat}
-              combatActive={combatActive}
-              onPositionUpdate={(x, y, location) => {
-                setCharacter(prev => ({ ...prev, position_x: x, position_y: y, current_location: location }))
-              }}
-            />
+          {activeTab === 'world' && character && (
+            <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+              <div className="p-4 border-b border-slate-700">
+                <h2 className="text-xl font-bold text-slate-100">🌍 Immersive World</h2>
+                <p className="text-xs text-slate-400 mt-1">Walk around, find NPCs, and trade. Use WASD/Arrows or click to move.</p>
+              </div>
+              <div style={{ height: '600px' }}>
+                <World2DRenderer
+                  character={character}
+                  userId={userId}
+                  city={character.current_location || character.home_city || 'Manila'}
+                />
+              </div>
+            </div>
           )}
 
           {activeTab === 'inventory' && (
