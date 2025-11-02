@@ -191,23 +191,42 @@ export class WorldSync {
     }
   }
 
+  // Helper to normalize presence event payloads
+  normalizePresenceEvent(payload) {
+    if (!payload) return null
+    if (payload.presence_event) return payload.presence_event
+    if (payload.event && payload.event.presence_event) return payload.event.presence_event
+    if (payload.new_presences) return payload.new_presences[0] || null
+    if (payload.new_presence) return payload.new_presence
+    if (payload.user_id) return payload
+    if (Array.isArray(payload) && payload.length > 0) return payload[0]
+    return null
+  }
+
   // Handle player joined
   handlePlayerJoined(payload) {
-    if (payload.presence_event.user_id !== this.userId) {
-      this.otherPlayers.set(payload.presence_event.user_id, payload.presence_event)
+    const ev = this.normalizePresenceEvent(payload)
+    if (!ev) return
+    const uid = ev.user_id || ev.user?.id || ev.user?.uid || ev.id
+    if (!uid || uid === this.userId) return
 
-      if (this.callbacks.onPlayerJoined) {
-        this.callbacks.onPlayerJoined(payload.presence_event)
-      }
+    this.otherPlayers.set(uid, ev)
+
+    if (this.callbacks.onPlayerJoined) {
+      this.callbacks.onPlayerJoined(ev)
     }
   }
 
   // Handle player left
   handlePlayerLeft(payload) {
-    this.otherPlayers.delete(payload.presence_event.user_id)
+    const ev = this.normalizePresenceEvent(payload)
+    const uid = ev?.user_id || ev?.user?.id || ev?.user?.uid || ev?.id
+    if (!uid) return
+
+    this.otherPlayers.delete(uid)
 
     if (this.callbacks.onPlayerLeft) {
-      this.callbacks.onPlayerLeft(payload.presence_event.user_id)
+      this.callbacks.onPlayerLeft(uid)
     }
   }
 
