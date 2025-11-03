@@ -1,13 +1,32 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 export default function GameSettings({ world3D, onClose }) {
-  const [cameraMode, setCameraMode] = useState(world3D?.cameraConfig?.mode || 'topdown')
-  const [height, setHeight] = useState(world3D?.cameraConfig?.height || 800)
-  const [distance, setDistance] = useState(world3D?.cameraConfig?.distance || 500)
+  const [cameraMode, setCameraMode] = useState(world3D?.cameraConfig?.mode || 'isometric')
+  const [height, setHeight] = useState(world3D?.cameraConfig?.height || 600)
+  const [distance, setDistance] = useState(world3D?.cameraConfig?.distance || 400)
   const [angle, setAngle] = useState(world3D?.cameraConfig?.angle || 45)
-  const [zoom, setZoom] = useState(world3D?.cameraConfig?.zoom || 1)
+  const [zoom, setZoom] = useState(world3D?.cameraConfig?.zoom || 1.2)
   const [fov, setFov] = useState(world3D?.cameraConfig?.fov || 75)
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [enableShadows, setEnableShadows] = useState(world3D?.cameraConfig?.enableShadows ?? true)
+  const [enableFog, setEnableFog] = useState(world3D?.cameraConfig?.enableFog ?? true)
+  const [showNameplates, setShowNameplates] = useState(world3D?.cameraConfig?.showNameplates ?? true)
+
+  useEffect(() => {
+    // Sync settings with 3D world if it changes
+    if (!world3D) return
+
+    world3D.setCameraMode(cameraMode, {
+      height,
+      distance,
+      angle,
+      fov,
+      zoom,
+      enableShadows,
+      enableFog,
+      showNameplates
+    })
+  }, [cameraMode, height, distance, angle, fov, zoom, enableShadows, enableFog, showNameplates, world3D])
 
   const handleCameraModeChange = (mode) => {
     setCameraMode(mode)
@@ -80,7 +99,7 @@ export default function GameSettings({ world3D, onClose }) {
                 { mode: 'topdown', label: '⬇️ Top-Down', desc: 'Bird\'s eye view from above' },
                 { mode: 'isometric', label: '↗️ Isometric', desc: 'Angled 3D perspective' },
                 { mode: 'thirdperson', label: '👤 Third-Person', desc: 'Follow camera behind player' },
-                { mode: 'freecam', label: '🎬 Free Cam', desc: 'Unrestricted camera movement' }
+                { mode: 'freecam', label: '���� Free Cam', desc: 'Unrestricted camera movement' }
               ].map(({ mode, label, desc }) => (
                 <button
                   key={mode}
