@@ -401,25 +401,28 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
 
       {/* Controls */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-3">Controls</h3>
+        <h3 className="text-lg font-bold mb-3">Flight Controls</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">Movement</p>
+            <p className="text-slate-400">🕹️ Fly</p>
             <p className="font-bold">↑ ↓ ← → or WASD</p>
           </div>
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">Combat</p>
-            <p className="font-bold">Click/Button</p>
+            <p className="text-slate-400">🖱️ Pan</p>
+            <p className="font-bold">Drag the map</p>
           </div>
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">Enemies</p>
-            <p className="font-bold">Random</p>
+            <p className="text-slate-400">📍 Navigate</p>
+            <p className="font-bold">Click a city</p>
           </div>
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">Speed</p>
-            <p className="font-bold">{character.base_speed} tiles/s</p>
+            <p className="text-slate-400">⚡ Speed</p>
+            <p className="font-bold">{Math.round(Math.hypot(velocity.x, velocity.y) * 10) / 10} units/frame</p>
           </div>
         </div>
+        <p className="text-slate-400 text-xs mt-4">
+          💡 Tip: Hold movement keys for acceleration! Movement has inertia - release to drift and decelerate naturally.
+        </p>
       </div>
     </div>
   )
