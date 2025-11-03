@@ -41,7 +41,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {/* Row 1: Logo and HeaderMap */}
         <div className="py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
+            <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 dark:text-slate-100 tracking-wide">currency.ph</h1>
             {userEmail && (
               <div className="ml-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex items-center">
                 <span className="text-slate-400 mr-2 text-xs">Total</span>
