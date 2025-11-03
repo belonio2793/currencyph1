@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { World3D } from '../../lib/world3D'
 import { supabase } from '../../lib/supabaseClient'
+import { gameAPI } from '../../lib/gameAPI'
 import { WorldSync } from '../../lib/worldSync'
 import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 import GameSettings from './GameSettings'
