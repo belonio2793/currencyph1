@@ -31,6 +31,17 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
     })
   }, [cameraMode, height, distance, angle, fov, zoom, enableShadows, enableFog, showNameplates, world3D])
 
+  useEffect(() => {
+    // Sync map settings
+    if (onMapSettingsChange) {
+      onMapSettingsChange({
+        avatarSpeed,
+        cameraSpeed,
+        showAvatarTrail
+      })
+    }
+  }, [avatarSpeed, cameraSpeed, showAvatarTrail, onMapSettingsChange])
+
   const applyPreset = (preset) => {
     switch (preset) {
       case 'wide':
