@@ -21,6 +21,28 @@ import CurrencyMarketplace from './game/CurrencyMarketplace'
 import GameWork from './game/GameWork'
 import PropertyInteractionModal from './game/PropertyInteractionModal'
 
+function ThemeToggleButton() {
+  const { isDark, toggleTheme } = useTheme()
+
+  return (
+    <button
+      onClick={toggleTheme}
+      className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
+      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+    >
+      {isDark ? (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.293 2.293a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zm2.828 2.828a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zM10 7a3 3 0 100 6 3 3 0 000-6zm-7 8a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm.293-2.293a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414L3.414 12.5a1 1 0 010-1.414zM3 10a1 1 0 01-1-1V8a1 1 0 012 0v1a1 1 0 01-1 1zm10.657-5.657a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 15a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" clipRule="evenodd" />
+        </svg>
+      ) : (
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
+        </svg>
+      )}
+    </button>
+  )
+}
+
 export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   // Check if user is logged in
   if (!userId) {
