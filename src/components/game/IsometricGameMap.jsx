@@ -288,8 +288,7 @@ export default function IsometricGameMap({
     drawAvatar(ctx, avatarScreenPos.x - AVATAR_SIZE / 2, avatarScreenPos.y - AVATAR_SIZE)
 
     ctx.restore()
-    drawLegend(ctx, width, height)
-  }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, drawLegend, avatarPos, selectedCity])
+  }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos])
 
   const moveAvatar = useCallback((direction) => {
     const speed = mapSettings.avatarSpeed || 2
