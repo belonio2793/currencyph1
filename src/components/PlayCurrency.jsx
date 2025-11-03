@@ -102,6 +102,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [openModal, setOpenModal] = useState(null)
   const [use3DWorld, setUse3DWorld] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const world3DRef = useRef(null)
 
   useEffect(() => {
     initializeGame()
