@@ -264,3 +264,89 @@ button {
 button:active {
   transform: scale(0.98);
 }
+
+/* Comprehensive text color contrast for light/dark modes */
+
+/* Primary text - should be dark on light, light on dark */
+.text-black,
+.text-slate-900 {
+  color: #000000;
+}
+
+html.dark .text-black,
+html.dark .text-slate-900 {
+  color: #f8fafc;
+}
+
+/* Secondary text - should be dark-ish on light, light-ish on dark */
+.text-slate-700,
+.text-slate-600,
+.text-gray-700,
+.text-gray-600 {
+  color: #334155;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html.dark .text-gray-700,
+html.dark .text-gray-600 {
+  color: #cbd5e1;
+}
+
+/* Muted text - gray on light, lighter gray on dark */
+.text-slate-500,
+.text-gray-500 {
+  color: #64748b;
+}
+
+html.dark .text-slate-500,
+html.dark .text-gray-500 {
+  color: #94a3b8;
+}
+
+/* Light gray text - already light, make lighter on dark */
+.text-slate-400,
+.text-gray-400 {
+  color: #94a3b8;
+}
+
+html.dark .text-slate-400,
+html.dark .text-gray-400 {
+  color: #cbd5e1;
+}
+
+/* Link colors with dark mode variants */
+.text-blue-600 {
+  color: #2563eb;
+}
+
+html.dark .text-blue-600 {
+  color: #60a5fa;
+}
+
+/* Red text for errors/alerts */
+.text-red-600 {
+  color: #dc2626;
+}
+
+html.dark .text-red-600 {
+  color: #f87171;
+}
+
+/* Green text for success */
+.text-green-600 {
+  color: #16a34a;
+}
+
+html.dark .text-green-600 {
+  color: #86efac;
+}
+
+/* Amber text for warnings */
+.text-amber-600 {
+  color: #d97706;
+}
+
+html.dark .text-amber-600 {
+  color: #fbbf24;
+}
