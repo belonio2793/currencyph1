@@ -363,12 +363,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         {/* Navigation Tabs for Modals */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
-            { id: 'cities', label: 'Cities' },
-            { id: 'inventory', label: 'Inventory' },
-            { id: 'equipment', label: 'Equipment' },
-            { id: 'marketplace', label: 'Marketplace' },
-            { id: 'properties', label: 'Properties' },
-            { id: 'banking', label: 'Banking' }
+            { id: 'cities', label: '🏙️ Cities' },
+            { id: 'inventory', label: '🎒 Inventory' },
+            { id: 'equipment', label: '👕 Equipment' },
+            { id: 'marketplace', label: '🏪 Marketplace' },
+            { id: 'properties', label: '🏠 Properties' },
+            { id: 'banking', label: '🏦 Banking' }
           ].map(tab => (
             <button
               key={tab.id}
