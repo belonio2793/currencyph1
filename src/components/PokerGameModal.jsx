@@ -449,10 +449,10 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                   <div className="text-slate-600 dark:text-slate-400 text-sm font-semibold mr-4">Community:</div>
                   <div className="flex gap-2">
                     {communityCards.length === 0 ? (
-                      <div className="text-slate-500 text-sm italic">Waiting for cards...</div>
+                      <div className="text-slate-600 dark:text-slate-500 text-sm italic">Waiting for cards...</div>
                     ) : (
                       communityCards.map((card, i) => (
-                        <div key={i} className="w-12 h-16 bg-white rounded border-2 border-slate-600 flex items-center justify-center font-bold text-sm">
+                        <div key={i} className="w-12 h-16 bg-white dark:bg-slate-700 rounded border-2 border-slate-300 dark:border-slate-600 flex items-center justify-center font-bold text-sm text-slate-900 dark:text-white">
                           {card}
                         </div>
                       ))
