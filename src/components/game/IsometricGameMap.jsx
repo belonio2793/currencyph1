@@ -536,39 +536,6 @@ export default function IsometricGameMap({
           className="block w-full h-full cursor-grab active:cursor-grabbing"
           style={{ display: 'block' }}
         />
-
-        <div className="absolute top-4 left-4 bg-slate-800/80 text-slate-300 px-4 py-3 rounded-lg border border-slate-600 text-xs pointer-events-auto z-20">
-          <p className="font-bold text-white mb-2">City Selection</p>
-          <div className="space-y-1">
-            {PHILIPPINES_CITIES.slice(0, 3).map(c => (
-              <button
-                key={c.id}
-                onClick={() => handleCityChange(c.name)}
-                className={`block w-full text-left px-2 py-1 rounded transition-colors ${
-                  selectedCity === c.name
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-700 hover:bg-slate-600'
-                }`}
-              >
-                {c.name}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="absolute top-4 right-4 bg-slate-800/80 text-slate-300 px-4 py-2 rounded-lg border border-slate-600 text-xs pointer-events-none">
-          <p>📍 Pos: ({Math.round(avatarPos.x)}, {Math.round(avatarPos.y)})</p>
-          <p>🔍 Zoom: {(zoom * 100).toFixed(0)}%</p>
-        </div>
-      </div>
-
-      <div className="bg-slate-800 border-t border-slate-700 text-slate-300 px-4 py-3 text-xs">
-        <p className="font-bold text-white mb-2">Controls</p>
-        <div className="grid grid-cols-3 gap-4">
-          <p>🖱️ Drag to pan • Scroll to zoom</p>
-          <p>⌨️ WASD or Arrows to move avatar</p>
-          <p>🖱️ Click property to manage</p>
-        </div>
       </div>
     </div>
   )
