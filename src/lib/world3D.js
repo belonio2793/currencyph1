@@ -58,6 +58,9 @@ export class World3D {
     this.setupEnvironment()
     this.setupGround()
 
+    // Initialize map tile manager for dynamic Philippines regions
+    this.mapTileManager = new MapTileManager(this.scene)
+
     // Players and NPCs
     this.players = new Map()
     this.npcs = new Map()
