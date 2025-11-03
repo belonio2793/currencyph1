@@ -198,7 +198,7 @@ export default function IsometricGameMap({
         if (isRoad) {
           ctx.fillStyle = STREET_COLOR
           ctx.globalAlpha = 0.6
-          drawIsometricTile(ctx, isoPos.x, isoPos.y, STREET_COLOR)
+          drawIsometricTile(ctx, isoPos.x, isoPos.y, STREET_COLOR, 0, false)
           ctx.globalAlpha = 1
         } else {
           const prop = getPropertyAtGridPos(gridX, gridY)
@@ -213,7 +213,8 @@ export default function IsometricGameMap({
               isoPos.x,
               isoPos.y,
               isHovered ? adjustBrightness(color, 30) : color,
-              isOwned ? height : 0
+              isOwned ? height : 0,
+              isHovered
             )
 
             if (isHovered || prop.owner_id) {
@@ -227,7 +228,7 @@ export default function IsometricGameMap({
               )
             }
           } else {
-            drawIsometricTile(ctx, isoPos.x, isoPos.y, adjustBrightness(GRASS_COLOR, -10))
+            drawIsometricTile(ctx, isoPos.x, isoPos.y, adjustBrightness(GRASS_COLOR, -10), 0, false)
           }
         }
       }
