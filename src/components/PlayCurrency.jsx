@@ -20,25 +20,6 @@ import CurrencyMarketplace from './game/CurrencyMarketplace'
 import GameWork from './game/GameWork'
 import PropertyInteractionModal from './game/PropertyInteractionModal'
 
-function ThemeToggleButton({ isDark, onToggle }) {
-  return (
-    <button
-      onClick={onToggle}
-      className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
-      title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-    >
-      {isDark ? (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4.293 2.293a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zm2.828 2.828a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414l-.707-.707a1 1 0 010-1.414zM10 7a3 3 0 100 6 3 3 0 000-6zm-7 8a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zm.293-2.293a1 1 0 011.414 0l.707.707a1 1 0 11-1.414 1.414L3.414 12.5a1 1 0 010-1.414zM3 10a1 1 0 01-1-1V8a1 1 0 012 0v1a1 1 0 01-1 1zm10.657-5.657a1 1 0 010 1.414l-.707.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM10 15a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1z" clipRule="evenodd" />
-        </svg>
-      ) : (
-        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-          <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" />
-        </svg>
-      )}
-    </button>
-  )
-}
 
 export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   // Check if user is logged in
@@ -128,7 +109,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [selectedPropertyForModal, setSelectedPropertyForModal] = useState(null)
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
   const [characterPosition, setCharacterPosition] = useState({ x: 150, y: 175, city: 'Manila' })
-  const [gameThemeIsDark, setGameThemeIsDark] = useState(true)
   const world3DRef = useRef(null)
 
   useEffect(() => {
@@ -299,10 +279,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${gameThemeIsDark ? 'bg-gradient-to-br from-slate-900 to-slate-800' : 'bg-gradient-to-br from-slate-100 to-slate-50'} flex items-center justify-center`}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className={`text-4xl font-bold ${gameThemeIsDark ? 'text-blue-400' : 'text-blue-600'} mb-4`}>Play Currency</div>
-          <p className={gameThemeIsDark ? 'text-slate-400' : 'text-slate-600'}>Loading your adventure...</p>
+          <div className="text-4xl font-bold text-blue-600 mb-4">Play Currency</div>
+          <p className="text-slate-600">Loading your adventure...</p>
         </div>
       </div>
     )
@@ -313,9 +293,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   }
 
   return (
-    <div className={`min-h-screen ${gameThemeIsDark ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100' : 'bg-gradient-to-br from-slate-100 to-slate-50 text-slate-900'}`}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-50 text-slate-900">
       {/* Header */}
-      <div className={`${gameThemeIsDark ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-200/30 border-slate-300'} border-b`}>
+      <div className="bg-slate-200/30 border-slate-300 border-b">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -387,15 +367,15 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       )}
 
       {/* Main Content */}
-      <div className={`${gameThemeIsDark ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-900'}`}>
+      <div className="bg-white text-slate-900">
         <div className="max-w-7xl mx-auto px-6 py-6">
         {/* World View - Default Main Display */}
         {character && (
-          <div className={`${gameThemeIsDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-lg overflow-hidden mb-6`}>
-            <div className={`p-4 ${gameThemeIsDark ? 'border-b border-slate-700' : 'border-b border-slate-200'} flex items-center justify-between`}>
+          <div className="bg-slate-50 border-slate-200 border rounded-lg overflow-hidden mb-6">
+            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
               <div className="flex-1">
-                <h2 className={`text-xl font-bold ${gameThemeIsDark ? 'text-slate-100' : 'text-slate-900'}`}>Game World</h2>
-                <p className={`text-xs ${gameThemeIsDark ? 'text-slate-400' : 'text-slate-500'} mt-1`}>Interactive isometric map view. Click on properties to manage your investments.</p>
+                <h2 className="text-xl font-bold text-slate-900">Game World</h2>
+                <p className="text-xs text-slate-500 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
               </div>
               <div className="flex gap-2">
                 <button
@@ -412,7 +392,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 >
                   Settings
                 </button>
-                <ThemeToggleButton isDark={gameThemeIsDark} onToggle={() => setGameThemeIsDark(!gameThemeIsDark)} />
               </div>
             </div>
             <div style={{ height: '600px' }}>
@@ -438,7 +417,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors font-bold ${
               showCurrencyGame
                 ? 'bg-green-600 text-white'
-                : gameThemeIsDark ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
             }`}
           >
             Currency Game
@@ -457,7 +436,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                 openModal === tab.id
                   ? 'bg-blue-600 text-white'
-                  : gameThemeIsDark ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
               }`}
             >
               {tab.label}
@@ -467,19 +446,19 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         {/* Currency Game Panel */}
         {showCurrencyGame && (
-          <div className={`${gameThemeIsDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto`}>
+          <div className="bg-slate-50 border-slate-200 border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
             <CurrencyGameUI
               character={character}
               world3D={world3DRef.current}
               onCharacterUpdate={(updated) => setCharacter(updated)}
-              isDark={gameThemeIsDark}
+              isDark={false}
             />
           </div>
         )}
 
         {/* Property Detail Modal from Map */}
         {openModal === 'property-detail' && selectedPropertyForModal && (
-          <PropertyInteractionModal isDark={gameThemeIsDark}
+          <PropertyInteractionModal isDark={false}
             property={selectedPropertyForModal}
             character={character}
             isOpen={true}
@@ -496,9 +475,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         {/* Modal for tabs */}
         {openModal && openModal !== 'property-detail' && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className={`${gameThemeIsDark ? 'bg-slate-800' : 'bg-white'} rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto`}>
-              <div className={`p-6 ${gameThemeIsDark ? 'border-b border-slate-700' : 'border-b border-slate-200'} flex items-center justify-between`}>
-                <h3 className={`text-2xl font-bold ${gameThemeIsDark ? 'text-slate-100' : 'text-slate-900'}`}>
+            <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-slate-900">
                   {openModal === 'cities' && 'Cities'}
                   {openModal === 'inventory' && 'Inventory'}
                   {openModal === 'equipment' && 'Equipment'}
@@ -508,18 +487,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 </h3>
                 <button onClick={() => setOpenModal(null)} className="text-slate-400 hover:text-slate-200">X</button>
               </div>
-              <div className={`p-6 ${gameThemeIsDark ? 'text-slate-100' : 'text-slate-900'}`}>
+              <div className="p-6 text-slate-900">
                 {openModal === 'inventory' && (
                   <GameInventory character={character} inventory={inventory} onInventoryUpdate={handleInventoryUpdate} />
                 )}
 
                 {openModal === 'cities' && (
                   <div className="space-y-6">
-                    <div className={`${gameThemeIsDark ? 'bg-slate-900 border border-slate-700' : 'bg-slate-100 border border-slate-300'} rounded-lg overflow-hidden`} style={{ height: '600px' }}>
+                    <div className="bg-slate-100 border border-slate-300 rounded-lg overflow-hidden" style={{ height: '600px' }}>
                       <CityMap userId={userId} onCitySelect={setSelectedCity} />
                     </div>
                     {selectedCity && (
-                      <div className={`${gameThemeIsDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg p-6`}>
+                      <div className="bg-white border border-slate-200 rounded-lg p-6">
                         <h3 className="text-xl font-bold mb-2">{selectedCity.name}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
@@ -545,13 +524,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'equipment' && (
-                  <div className={`${gameThemeIsDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg p-6`}>
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
                     <h2 className="text-2xl font-bold mb-6">Equipment</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
                         const equipped = equipment.find(e => e.equipment_slot === slot)
                         return (
-                          <div key={slot} className={`${gameThemeIsDark ? 'bg-slate-700 border border-slate-600' : 'bg-slate-100 border border-slate-300'} rounded-lg p-4`}>
+                          <div key={slot} className="bg-slate-100 border border-slate-300 rounded-lg p-4">
                             <p className="text-xs text-slate-400 uppercase mb-2">{slot.replace('_', ' ')}</p>
                             {equipped ? (
                               <div>
@@ -582,11 +561,11 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'banking' && (
-                  <div className={`${gameThemeIsDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg p-6`}>
+                  <div className="bg-white border border-slate-200 rounded-lg p-6">
                     <h2 className="text-2xl font-bold mb-6">Banking System</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {bankAccounts.map(account => (
-                        <div key={account.id} className={`${gameThemeIsDark ? 'bg-slate-700 border border-slate-600' : 'bg-slate-100 border border-slate-300'} rounded-lg p-4`}>
+                        <div key={account.id} className="bg-slate-100 border border-slate-300 rounded-lg p-4">
                           <p className="text-slate-400 text-sm uppercase">{account.account_type} Account</p>
                           <p className="text-2xl font-bold mt-2">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
                           <p className="text-xs text-slate-500 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
@@ -640,7 +619,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         onClose={() => setShowSettings(false)}
         mapSettings={mapSettings}
         onMapSettingsChange={setMapSettings}
-        isDark={gameThemeIsDark}
+        isDark={false}
       />
     )}
     </div>
