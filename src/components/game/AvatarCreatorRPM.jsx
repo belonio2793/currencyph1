@@ -170,7 +170,7 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, u
 
             if (upErr) throw upErr
 
-            setStatus('✓ Avatar saved successfully!')
+            setStatus('Avatar saved successfully!')
             setSaving(false)
             setSavedAvatarUrl(modelUrl || existingAppearance?.rpm?.model_url)
 
