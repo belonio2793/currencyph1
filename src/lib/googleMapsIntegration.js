@@ -330,44 +330,6 @@ export function clearTextureCache() {
 }
 
 
-/**
- * Generate terrain tiles for the 3D world based on Philippines regions
- * @returns {Promise<Array>} Array of tile objects with position and metadata
- */
-export async function generatePhilippinesTerrain() {
-  const tiles = []
-  
-  // Major Philippine cities and regions with their coordinates
-  const regions = [
-    { name: 'Manila', lat: 14.5995, lng: 120.9842, zoom: 16 },
-    { name: 'Cebu', lat: 10.3157, lng: 123.8854, zoom: 15 },
-    { name: 'Davao', lat: 7.1108, lng: 125.6423, zoom: 15 },
-    { name: 'Cagayan de Oro', lat: 8.4874, lng: 124.6487, zoom: 15 },
-    { name: 'Iloilo', lat: 10.6918, lng: 122.5635, zoom: 15 },
-    { name: 'Bacolod', lat: 10.3932, lng: 122.9749, zoom: 15 },
-    { name: 'Zamboanga', lat: 6.9271, lng: 122.0724, zoom: 15 },
-    { name: 'Quezon City', lat: 14.6760, lng: 121.0437, zoom: 15 },
-    { name: 'Makati', lat: 14.5560, lng: 121.0227, zoom: 16 },
-    { name: 'Pasig', lat: 14.5794, lng: 121.5734, zoom: 15 }
-  ]
-
-  for (const region of regions) {
-    try {
-      const texture = await getMapTexture(region.lat, region.lng, region.zoom, 512)
-      tiles.push({
-        name: region.name,
-        lat: region.lat,
-        lng: region.lng,
-        texture: texture,
-        zoom: region.zoom
-      })
-    } catch (err) {
-      console.warn(`Failed to load terrain for ${region.name}:`, err)
-    }
-  }
-
-  return tiles
-}
 
 /**
  * Create a ground plane with Google Maps satellite imagery
