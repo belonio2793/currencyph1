@@ -232,25 +232,7 @@ button {
   background: transparent !important;
 }
 
-/* EXCEPTION: Restore specific ChatBar button backgrounds that should be colored */
-.light-mode-widget button[className*="bg-blue-600"],
-.light-mode-widget button[className*="bg-red-500"] {
-  background: inherit !important;
-}
-
-/* Explicitly set ChatBar button colors */
-.light-mode-widget .bg-blue-600 {
-  background-color: #2563eb !important;
-}
-
-.light-mode-widget .bg-blue-700 {
-  background-color: #1d4ed8 !important;
-}
-
-.light-mode-widget .bg-red-500 {
-  background-color: #ef4444 !important;
-}
-
+/* EXCEPTION: ChatBar buttons keep their backgrounds */
 .light-mode-widget button.bg-blue-600 {
   background-color: #2563eb !important;
 }
@@ -259,8 +241,24 @@ button {
   background-color: #1d4ed8 !important;
 }
 
+.light-mode-widget button.bg-blue-800 {
+  background-color: #1e40af !important;
+}
+
 .light-mode-widget button.bg-red-500 {
   background-color: #ef4444 !important;
+}
+
+.light-mode-widget button.hover\:bg-blue-700:hover {
+  background-color: #1d4ed8 !important;
+}
+
+.light-mode-widget button.hover\:bg-blue-800:hover {
+  background-color: #1e40af !important;
+}
+
+.light-mode-widget button.disabled\:bg-slate-300:disabled {
+  background-color: #cbd5e1 !important;
 }
 
 button:active {
