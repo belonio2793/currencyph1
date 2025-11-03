@@ -255,40 +255,40 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
           </div>
 
           {/* Display Settings Section */}
-          <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">Display & Graphics</h3>
+          <div className="border-t border-slate-300 pt-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Display & Graphics</h3>
 
             <div className="space-y-2">
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={showNameplates}
                   onChange={(e) => setShowNameplates(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-300">Show Nameplates</span>
+                <span className="text-sm text-slate-700">Show Nameplates</span>
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={enableShadows}
                   onChange={(e) => setEnableShadows(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-300">Enable Shadows</span>
-                <span className="text-xs text-slate-500 ml-auto">(Better graphics, more performance impact)</span>
+                <span className="text-sm text-slate-700">Enable Shadows</span>
+                <span className="text-xs text-slate-600 ml-auto">(Better graphics, more performance impact)</span>
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={enableFog}
                   onChange={(e) => setEnableFog(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-300">Enable Fog</span>
-                <span className="text-xs text-slate-500 ml-auto">(Atmospheric effect)</span>
+                <span className="text-sm text-slate-700">Enable Fog</span>
+                <span className="text-xs text-slate-600 ml-auto">(Atmospheric effect)</span>
               </label>
             </div>
           </div>
