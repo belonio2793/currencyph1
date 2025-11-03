@@ -681,16 +681,25 @@ export class World3D {
 
     this.raycaster.setFromCamera(this.mouse, this.camera)
 
-    // Check for player/NPC intersections
     const playersArray = Array.from(this.players.values()).map(p => p.group)
     const npcsArray = Array.from(this.npcs.values()).map(n => n.group)
-    const allObjects = [...playersArray, ...npcsArray]
+    const propertiesArray = Array.from(this.propertyMarkers.values()).map(p => p.marker)
+    const allObjects = [...playersArray, ...npcsArray, ...propertiesArray]
 
     const intersects = this.raycaster.intersectObjects(allObjects, true)
 
     if (intersects.length > 0) {
-      // Emit click event or handle selection
       const clicked = intersects[0].object
+
+      for (const [id, entry] of this.propertyMarkers) {
+        if (entry.marker.children.includes(clicked) || entry.marker === clicked || this._isDescendant(entry.marker, clicked)) {
+          if (this.onPropertyClicked) {
+            this.onPropertyClicked(entry.prop)
+          }
+          return
+        }
+      }
+
       for (const [userId, player] of this.players) {
         if (player.group.children.includes(clicked) || player.group === clicked || player.group.getObjectById(clicked.id)) {
           this.selectedPlayer = userId
@@ -698,6 +707,20 @@ export class World3D {
         }
       }
     }
+  }
+
+  _isDescendant(parent, child) {
+    if (!parent || !child) return false
+    let node = child.parent
+    while (node) {
+      if (node === parent) return true
+      node = node.parent
+    }
+    return false
+  }
+
+  setPropertyClickHandler(callback) {
+    this.onPropertyClicked = callback
   }
 
   render() {
