@@ -546,7 +546,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           )}
           <div>
             <p className="text-sm font-bold">{character.name}</p>
-            <p className="text-xs text-slate-400">📍 {city}</p>
+            <p className="text-xs text-slate-400">Location: {city}</p>
             <p className="text-xs text-slate-400">Position: {Math.round(worldRef.current?.player.x || 0)}, {Math.round(worldRef.current?.player.y || 0)}</p>
           </div>
         </div>
