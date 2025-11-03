@@ -142,15 +142,15 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
           </div>
 
           {/* Camera Settings Section */}
-          <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">Camera Settings</h3>
+          <div className="border-t border-slate-300 pt-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Camera Settings</h3>
 
             <div className="space-y-4">
               {/* Zoom Slider */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-300">Zoom Level</label>
-                  <span className="text-sm font-bold text-blue-400">{zoom.toFixed(2)}x</span>
+                  <label className="text-sm font-medium text-slate-700">Zoom Level</label>
+                  <span className="text-sm font-bold text-blue-600">{zoom.toFixed(2)}x</span>
                 </div>
                 <input
                   type="range"
@@ -159,16 +159,16 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="0.1"
                   value={zoom}
                   onChange={(e) => setZoom(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
-                <p className="text-xs text-slate-400 mt-1">Adjust overall scale of the view (1.0 = normal)</p>
+                <p className="text-xs text-slate-600 mt-1">Adjust overall scale of the view (1.0 = normal)</p>
               </div>
 
               {/* Field of View */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-300">Field of View</label>
-                  <span className="text-sm font-bold text-blue-400">{fov}°</span>
+                  <label className="text-sm font-medium text-slate-700">Field of View</label>
+                  <span className="text-sm font-bold text-blue-600">{fov}°</span>
                 </div>
                 <input
                   type="range"
@@ -177,15 +177,15 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="5"
                   value={fov}
                   onChange={(e) => setFov(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
-                <p className="text-xs text-slate-400 mt-1">Lower = zoomed in, higher = wider view</p>
+                <p className="text-xs text-slate-600 mt-1">Lower = zoomed in, higher = wider view</p>
               </div>
 
               {/* Advanced Settings Toggle */}
               <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="w-full text-left px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:bg-slate-700 transition-colors text-sm text-blue-400 hover:text-blue-300 font-medium flex items-center justify-between"
+                className="w-full text-left px-3 py-2 rounded-lg bg-slate-100 border border-slate-300 hover:bg-slate-50 transition-colors text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-between"
               >
                 <span>{showAdvanced ? '▼' : '▶'} Advanced Camera Settings</span>
               </button>
