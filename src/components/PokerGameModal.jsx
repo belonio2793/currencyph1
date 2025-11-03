@@ -480,11 +480,11 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                   )}
                   
                   {(!isSigned || !isSeated) && (
-                    <div className="bg-blue-900 border border-blue-700 rounded-lg p-4 text-blue-100 text-center">
+                    <div className="bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-4 text-blue-900 dark:text-blue-100 text-center">
                       {!isSigned ? (
                         <button
                           onClick={() => onShowAuth?.('login')}
-                          className="text-blue-300 underline hover:text-blue-200"
+                          className="text-blue-600 dark:text-blue-300 underline hover:text-blue-700 dark:hover:text-blue-200"
                         >
                           Sign in to play
                         </button>
