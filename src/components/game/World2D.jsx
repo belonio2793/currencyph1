@@ -376,6 +376,16 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           worldRef.current.movePlayer(worldRef.current.player.x + 10, worldRef.current.player.y)
           e.preventDefault()
           break
+        case '+':
+        case '=': // some keyboards require shift+'='
+          handleZoomButton(1.2)
+          e.preventDefault()
+          break
+        case '-':
+        case '_':
+          handleZoomButton(0.8)
+          e.preventDefault()
+          break
         default:
           break
       }
