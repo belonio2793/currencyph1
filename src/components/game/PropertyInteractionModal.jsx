@@ -323,7 +323,7 @@ export default function PropertyInteractionModal({
                   type="number"
                   value={upgradeAmount}
                   onChange={(e) => setUpgradeAmount(Math.max(0, parseInt(e.target.value) || 0))}
-                  className="w-full bg-slate-600 text-white rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark ? 'bg-slate-600 text-white' : 'bg-white text-slate-900 border border-slate-300'}`}
                   placeholder="Enter upgrade cost"
                   min="0"
                 />
