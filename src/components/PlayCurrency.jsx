@@ -324,13 +324,15 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 </p>
               </div>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                  title="Open camera and game settings"
-                >
-                  ⚙️ Settings
-                </button>
+                {use3DWorld && (
+                  <button
+                    onClick={() => setShowSettings(true)}
+                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                    title="Open camera and game settings"
+                  >
+                    ⚙️ Settings
+                  </button>
+                )}
                 <button
                   onClick={() => setUse3DWorld(!use3DWorld)}
                   className={`px-3 py-2 rounded text-white text-sm font-medium whitespace-nowrap ${
