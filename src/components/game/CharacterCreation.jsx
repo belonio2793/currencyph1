@@ -57,7 +57,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-start justify-center p-3">
       <div className="w-full max-w-4xl mt-6">
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:p-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-center text-blue-400 mb-2">⚔️ Play Currency</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-center text-blue-400 mb-2">Play Currency</h1>
           <p className="text-center text-slate-400 mb-8">Create Your Adventure — with ReadyPlayer.me</p>
 
           {error && (
@@ -82,7 +82,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
             {/* Home City Selection */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-3">🏠 Home City</label>
+              <label className="block text-sm font-medium text-slate-300 mb-3">Home City</label>
               <p className="text-xs text-slate-400 mb-4">Choose your home city to start your economic adventure</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-96 overflow-y-auto">
                 {PHILIPPINES_CITIES.map(city => (
@@ -106,10 +106,10 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
             {/* Avatar Creation */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">👤 Your Avatar</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Your Avatar</label>
               <p className="text-xs text-slate-400 mb-3">
                 {avatarAppearance
-                  ? '✓ Avatar created. Click below to modify.'
+                  ? 'Avatar created. Click below to modify.'
                   : 'Create or customize your 3D avatar using ReadyPlayer.me'}
               </p>
               <button
@@ -122,7 +122,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                     : 'border-blue-500 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'
                 } disabled:opacity-50 font-medium`}
               >
-                {avatarAppearance ? '✓ Avatar Ready — Click to Modify' : '+ Design Your Avatar'}
+                {avatarAppearance ? 'Avatar Ready — Click to Modify' : 'Design Your Avatar'}
               </button>
             </div>
 
@@ -133,7 +133,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
                 disabled={creating || !avatarAppearance}
                 className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 transition-all"
               >
-                {creating ? '⏳ Creating Adventure...' : '🎮 Begin Adventure'}
+                {creating ? 'Creating Adventure...' : 'Begin Adventure'}
               </button>
             </div>
           </form>
