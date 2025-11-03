@@ -293,13 +293,13 @@ export default function PropertyInteractionModal({
 
           {action === 'buy' && !isOwner && (
             <div className="space-y-4">
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded p-4">
-                <p className="text-amber-400 font-bold text-lg">₱{(property.current_value || 0).toLocaleString()}</p>
-                <p className="text-amber-200 text-sm mt-2">Purchase price for this property</p>
+              <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 rounded p-4">
+                <p className="text-amber-600 dark:text-amber-400 font-bold text-lg">₱{(property.current_value || 0).toLocaleString()}</p>
+                <p className="text-amber-700 dark:text-amber-200 text-sm mt-2">Purchase price for this property</p>
               </div>
-              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
-                <p className="text-slate-400 text-sm mb-2">Your Balance</p>
-                <p className="text-2xl font-bold text-yellow-400">₱{(character?.money || 0).toLocaleString()}</p>
+              <div className="bg-slate-100 dark:bg-slate-700 rounded p-4">
+                <p className="text-slate-600 dark:text-slate-400 text-sm mb-2">Your Balance</p>
+                <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">₱{(character?.money || 0).toLocaleString()}</p>
               </div>
               <button
                 onClick={handleBuy}
