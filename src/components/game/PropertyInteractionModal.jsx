@@ -219,7 +219,7 @@ export default function PropertyInteractionModal({
           )}
 
           {/* Action Tabs */}
-          <div className={`flex gap-2 border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+          <div className="flex gap-2 border-b border-slate-200 dark:border-slate-700">
             <button
               onClick={() => setAction('view')}
               className={`px-4 py-2 text-sm font-medium transition-colors ${
