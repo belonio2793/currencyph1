@@ -639,5 +639,10 @@ export class World3D {
     this.players.clear()
     this.npcs.clear()
     modelCache.clear()
+
+    // Clean up map tile manager
+    if (this.mapTileManager) {
+      this.mapTileManager.clearAllTiles()
+    }
   }
 }
