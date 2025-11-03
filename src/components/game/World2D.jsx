@@ -335,6 +335,13 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     gameLoopRef.current = requestAnimationFrame(gameLoop)
 
     return () => {
+      // Save final position
+      try {
+        const w = worldRef.current
+        if (w && character?.id) {
+          localStorage.setItem(`character_position_2d_${character.id}`,(JSON.stringify({ x: Math.round(w.player.x), y: Math.round(w.player.y), t: Date.now() })))
+        }
+      } catch(e) {}
       cancelAnimationFrame(gameLoopRef.current)
       // remove attached listeners
       try { cleanupMouse() } catch(e){}
