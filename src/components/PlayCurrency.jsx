@@ -194,6 +194,41 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  const handleBuyProperty = async (propertyId, price) => {
+    try {
+      await gameAPI.buyProperty(character.id, propertyId, price)
+      await loadGameData(character.id)
+      const updated = await gameAPI.getCharacter(character.id)
+      setCharacter(updated)
+      setOpenModal(null)
+    } catch (err) {
+      setError('Failed to buy property: ' + err.message)
+    }
+  }
+
+  const handleSellProperty = async (propertyId, salePrice) => {
+    try {
+      await gameAPI.sellProperty(character.id, propertyId, salePrice)
+      await loadGameData(character.id)
+      const updated = await gameAPI.getCharacter(character.id)
+      setCharacter(updated)
+      setOpenModal(null)
+    } catch (err) {
+      setError('Failed to sell property: ' + err.message)
+    }
+  }
+
+  const handleUpgradeProperty = async (propertyId, upgradeCost) => {
+    try {
+      await gameAPI.upgradeProperty(propertyId, upgradeCost)
+      await loadGameData(character.id)
+      const updated = await gameAPI.getCharacter(character.id)
+      setCharacter(updated)
+    } catch (err) {
+      setError('Failed to upgrade property: ' + err.message)
+    }
+  }
+
   const handleInventoryUpdate = async () => {
     if (character) {
       const inv = await gameAPI.getInventory(character.id)
