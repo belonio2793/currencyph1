@@ -99,6 +99,38 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
 
       // Start rendering
       world3D.start()
+
+      // Load properties for this city and render markers
+      try {
+        (async () => {
+          try {
+            const props = await listPropertiesByCity(city)
+            if (props && props.length > 0) {
+              world3D.renderProperties(props, 6000, 6000)
+            }
+          } catch (e) {
+            console.warn('Could not load properties for city:', city, e)
+          }
+        })()
+
+        // Subscribe to realtime property changes and update markers
+        const propChannel = subscribeToProperties(city, (payload) => {
+          try {
+            // payload.record contains new/updated row depending on event
+            if (!payload || !payload.record) return
+            // Re-fetch full list for simplicity on changes
+            listPropertiesByCity(city).then(updated => {
+              try { world3D.renderProperties(updated, 6000, 6000) } catch(e){}
+            }).catch(()=>{})
+          } catch (e) { console.warn('Property subscription handler error', e) }
+        })
+
+        // Attach to world3D for cleanup
+        world3D._propertyChannel = propChannel
+      } catch (e) {
+        console.warn('Failed to initialize property subscription:', e)
+      }
+
     } catch (error) {
       console.error('Failed to initialize 3D world:', error)
     }
