@@ -209,13 +209,13 @@ export default function CurrencyMarketplace({ character, onListingCreated, onPur
   }
 
   const getListingIcon = (type) => {
-    const icons = {
-      item: '📦',
-      property: '🏠',
-      service: '🔧',
-      equipment: '⚔️'
+    const labels = {
+      item: 'Item',
+      property: 'Property',
+      service: 'Service',
+      equipment: 'Equipment'
     }
-    return icons[type] || '📦'
+    return labels[type] || 'Item'
   }
 
   return (
@@ -223,7 +223,7 @@ export default function CurrencyMarketplace({ character, onListingCreated, onPur
       {/* Header */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-bold text-white">🏪 Marketplace</h2>
+          <h2 className="text-2xl font-bold text-white">Marketplace</h2>
           <button
             onClick={() => setShowCreateListing(!showCreateListing)}
             className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-bold transition-colors"
