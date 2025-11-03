@@ -19,13 +19,18 @@ body {
   color: #000000;
 }
 
-/* Prevent dark mode from affecting ChatBar */
-div.fixed.bottom-0.right-0.z-50.flex.flex-col {
+/* Prevent dark mode from affecting ChatBar widget */
+:root.dark div.fixed.bottom-0.right-0.z-50.flex.flex-col {
   color-scheme: light !important;
 }
 
-div.fixed.bottom-0.right-0.z-50.flex.flex-col * {
-  color-scheme: light !important;
+:root.dark div.fixed.bottom-0.right-0.z-50.flex.flex-col,
+:root.dark div.fixed.bottom-0.right-0.z-50.flex.flex-col * {
+  background-color: revert !important;
+  color: revert !important;
+  border-color: revert !important;
+  --tw-bg-opacity: 1 !important;
+  --tw-text-opacity: 1 !important;
 }
 
 input, button {
