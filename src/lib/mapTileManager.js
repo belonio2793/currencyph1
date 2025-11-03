@@ -124,10 +124,46 @@ export class MapTileManager {
       mesh.position.set(tx * this.tileSize, -0.5, tz * this.tileSize)
 
       this.scene.add(mesh)
-      this.activeTiles.set(key, { lat, lng, texture })
-      this.tileMeshes.set(key, mesh)
 
-      console.log(`Loaded tile ${key} for ${nearestCity.name}`)
+      // Create low-poly instanced buildings to give a game-like city look
+      const buildingsGroup = new THREE.Group()
+      const buildingCount = 60
+      const boxGeom = new THREE.BoxGeometry(20, 1, 20)
+      const boxMat = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.6, metalness: 0.1 })
+      const instanced = new THREE.InstancedMesh(boxGeom, boxMat, buildingCount)
+      instanced.instanceMatrix.setUsage(THREE.DynamicDrawUsage)
+
+      // Determine density factor based on distance to city center (closer -> denser/taller)
+      const cityCenterX = nearestCity.x || 0
+      const cityCenterZ = nearestCity.z || 0
+      const tileCenterX = tx * this.tileSize
+      const tileCenterZ = tz * this.tileSize
+      const distToCity = Math.hypot(tileCenterX - cityCenterX, tileCenterZ - cityCenterZ)
+      const density = Math.max(0.2, 1 - distToCity / 4000)
+
+      const dummy = new THREE.Object3D()
+      let placed = 0
+      for (let i = 0; i < buildingCount; i++) {
+        const px = tileCenterX + (Math.random() - 0.5) * this.tileSize * 0.9
+        const pz = tileCenterZ + (Math.random() - 0.5) * this.tileSize * 0.9
+        // Simple exclusion radius near water could be implemented later
+        const baseHeight = 20 + Math.random() * 120
+        const height = baseHeight * (0.5 + Math.random() * 1.5) * density
+        dummy.position.set(px, height / 2 - 0.5, pz)
+        dummy.scale.set(1, height / 20, 1)
+        dummy.updateMatrix()
+        instanced.setMatrixAt(i, dummy.matrix)
+        placed++
+      }
+      instanced.castShadow = true
+      instanced.receiveShadow = true
+      buildingsGroup.add(instanced)
+      this.scene.add(buildingsGroup)
+
+      this.activeTiles.set(key, { lat, lng, texture })
+      this.tileMeshes.set(key, { mesh, buildings: buildingsGroup })
+
+      console.log(`Loaded tile ${key} for ${nearestCity.name} (buildings: ${placed})`)
     } catch (err) {
       console.warn(`Failed to load tile ${key}:`, err)
     }
