@@ -448,54 +448,84 @@ export class World3D {
     if (player) {
       this.scene.remove(player.group)
       this.players.delete(userId)
+      if (this.selectedPlayer === userId) {
+        this.selectedPlayer = this.players.keys().next().value || null
+      }
     }
   }
-  
-  addNPC(id, name, x, z) {
-    const geometry = new THREE.ConeGeometry(20, 60, 8)
-    const material = new THREE.MeshStandardMaterial({ color: 0xff6b6b })
-    const mesh = new THREE.Mesh(geometry, material)
-    mesh.castShadow = true
-    mesh.receiveShadow = true
-    
+
+  addNPC(id, name, x = 0, z = 0, color = 0xff8844) {
+    // Create a simple NPC avatar
+    const npcModel = this.createSimpleAvatar(name, color)
+
     const group = new THREE.Group()
     group.position.set(x, 0, z)
-    group.add(mesh)
-    
-    // Nameplate
-    const canvas = document.createElement('canvas')
-    canvas.width = 256
-    canvas.height = 64
-    const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#ffaa00'
-    ctx.font = 'bold 32px Arial'
-    ctx.textAlign = 'center'
-    ctx.fillText(name, 128, 40)
-    
-    const texture = new THREE.CanvasTexture(canvas)
-    const spriteMaterial = new THREE.SpriteMaterial({ map: texture })
-    const sprite = new THREE.Sprite(spriteMaterial)
-    sprite.scale.set(100, 25, 1)
-    sprite.position.y = 80
-    group.add(sprite)
-    
+    group.add(npcModel)
+
+    // Nameplate (only if enabled)
+    if (this.cameraConfig.showNameplates) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 256
+      canvas.height = 64
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#ffaa00'
+      ctx.shadowColor = '#000000'
+      ctx.shadowBlur = 4
+      ctx.font = 'bold 32px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText(name, 128, 40)
+
+      const texture = new THREE.CanvasTexture(canvas)
+      const spriteMaterial = new THREE.SpriteMaterial({ map: texture })
+      const sprite = new THREE.Sprite(spriteMaterial)
+      sprite.scale.set(100, 25, 1)
+      sprite.position.y = 80
+      group.add(sprite)
+    }
+
     this.scene.add(group)
-    this.npcs.set(id, { group, targetPos: { x, z } })
+    this.npcs.set(id, {
+      group,
+      model: npcModel,
+      targetPos: { x, z },
+      direction: 0,
+      isMoving: false
+    })
   }
-  
-  moveNPC(id, speed = 2) {
+
+  moveNPC(id, speed = 3) {
     const npc = this.npcs.get(id)
     if (!npc) return
-    
+
     const { group, targetPos } = npc
     const dx = targetPos.x - group.position.x
     const dz = targetPos.z - group.position.z
     const dist = Math.hypot(dx, dz)
-    
-    if (dist > speed) {
+
+    if (dist > speed * 0.1) {
       group.position.x += (dx / dist) * speed
       group.position.z += (dz / dist) * speed
-      group.rotation.y = Math.atan2(dx, dz)
+
+      // Smooth rotation
+      const targetRotation = Math.atan2(dx, dz)
+      const angleDiff = targetRotation - group.rotation.y
+
+      let normalizedDiff = angleDiff
+      while (normalizedDiff > Math.PI) normalizedDiff -= 2 * Math.PI
+      while (normalizedDiff < -Math.PI) normalizedDiff += 2 * Math.PI
+
+      group.rotation.y += normalizedDiff * 0.1
+      npc.direction = group.rotation.y
+      npc.isMoving = true
+    } else {
+      npc.isMoving = false
+    }
+  }
+
+  setNPCTarget(id, x, z) {
+    const npc = this.npcs.get(id)
+    if (npc) {
+      npc.targetPos = { x, z }
     }
   }
   
