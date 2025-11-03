@@ -605,7 +605,7 @@ export default function ChatBar({ userId, userEmail }) {
   }
 
   return (
-    <div className="fixed bottom-0 right-0 z-50 flex flex-col">
+    <div className="fixed bottom-0 right-0 z-50 flex flex-col light-mode-widget">
       {minimized && (
         <button onClick={() => setMinimized(false)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-t-lg shadow-lg flex items-center gap-2 border-t border-l border-r border-blue-700">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5z" /></svg>
