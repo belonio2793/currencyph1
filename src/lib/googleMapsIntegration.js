@@ -337,32 +337,6 @@ export function clearTextureCache() {
  * @param {THREE.Scene} scene - Three.js scene
  * @param {number} size - Sky dome size
  */
-export function createMapSky(scene, size = 5000) {
-  // Create a gradient sky for Philippines tropical climate
-  const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 256
-  const ctx = canvas.getContext('2d')
-
-  // Sky gradient (bright tropical sky)
-  const gradient = ctx.createLinearGradient(0, 0, 0, 256)
-  gradient.addColorStop(0, '#87CEEB') // Light blue at top
-  gradient.addColorStop(0.5, '#B0E0E6') // Sky blue in middle
-  gradient.addColorStop(1, '#FFE4B5') // Warm horizon
-
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, 512, 256)
-
-  const texture = new THREE.CanvasTexture(canvas)
-  const geometry = new THREE.SphereGeometry(size, 32, 32)
-  const material = new THREE.MeshBasicMaterial({
-    map: texture,
-    side: THREE.BackSide
-  })
-  const mesh = new THREE.Mesh(geometry, material)
-  scene.add(mesh)
-  return mesh
-}
 
 /**
  * Get elevation data for Philippines region (procedural approximation)
