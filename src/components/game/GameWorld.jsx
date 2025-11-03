@@ -265,7 +265,7 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
       {/* Map */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <div className="mb-4">
-          <h3 className="text-lg font-bold mb-3">🗺️ Philippines World Map</h3>
+          <h3 className="text-lg font-bold mb-3">Philippines World Map</h3>
           <p className="text-slate-400 text-sm">Use arrow keys or WASD to move • Click to navigate</p>
         </div>
         
