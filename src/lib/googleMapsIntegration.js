@@ -337,35 +337,3 @@ export function clearTextureCache() {
  * @param {THREE.Scene} scene - Three.js scene
  * @param {number} size - Sky dome size
  */
-
-
-/**
- * Load POIs (Points of Interest) for Philippines
- * This is a static list but could be extended with real data
- */
-export function getPhilippinesPOIs() {
-  return [
-    // Major cities
-    { name: 'Manila', type: 'city', lat: 14.5995, lng: 120.9842, population: 1846513 },
-    { name: 'Cebu City', type: 'city', lat: 10.3157, lng: 123.8854, population: 798634 },
-    { name: 'Davao City', type: 'city', lat: 7.1108, lng: 125.6423, population: 1428606 },
-    
-    // Tourist attractions
-    { name: 'Boracay Island', type: 'beach', lat: 11.9676, lng: 121.9254 },
-    { name: 'Palawan', type: 'region', lat: 9.7489, lng: 118.7383 },
-    { name: 'Banaue Rice Terraces', type: 'landmark', lat: 16.8103, lng: 121.1744 },
-    { name: 'Intramuros', type: 'landmark', lat: 14.5963, lng: 120.9749 },
-    
-    // Provinces
-    { name: 'Laguna', type: 'province', lat: 14.3500, lng: 121.2833 },
-    { name: 'Cavite', type: 'province', lat: 14.3566, lng: 120.8939 },
-    { name: 'Bulacan', type: 'province', lat: 14.7500, lng: 121.1667 }
-  ]
-}
-
-/**
- * Clear texture cache to free memory
- */
-export function clearTextureCache() {
-  textureCache.clear()
-}
