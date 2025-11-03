@@ -244,7 +244,7 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">📍 {visibleArea}</h2>
+            <h2 className="text-2xl font-bold">Location: {visibleArea}</h2>
             <p className="text-slate-400 text-sm">
               Position: ({Math.floor(worldPos.x)}, {Math.floor(worldPos.y)})
             </p>
