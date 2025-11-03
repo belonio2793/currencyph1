@@ -495,7 +495,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                   )}
                 </div>
               ) : (
-                <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 text-center space-y-4">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 text-center space-y-4 text-slate-900 dark:text-white">
                   {!isSigned ? (
                     <div className="space-y-3">
                       <p className="text-slate-300">Sign in to play poker</p>
