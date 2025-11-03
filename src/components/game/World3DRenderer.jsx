@@ -305,6 +305,66 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
     setChatLoading(false)
   }
 
+  useEffect(() => {
+    if (!streetViewOpen || !streetViewCoords || !panoramaDivRef.current) return
+
+    const key = import.meta.env?.VITE_GOOGLE_API_KEY || import.meta.env?.GOOGLE_API_KEY || ''
+    if (!key) {
+      console.warn('Google API key missing for Street View')
+      return
+    }
+
+    let cancelled = false
+    const loadGoogleMaps = () => new Promise((resolve, reject) => {
+      if (window.google && window.google.maps && window.google.maps.StreetViewPanorama) return resolve(window.google.maps)
+      const existing = document.querySelector('script[data-google-maps]')
+      if (existing) {
+        existing.addEventListener('load', () => resolve(window.google.maps))
+        existing.addEventListener('error', (e) => reject(e))
+        return
+      }
+      const s = document.createElement('script')
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${key}`
+      s.defer = true
+      s.async = true
+      s.setAttribute('data-google-maps', '1')
+      s.onload = () => resolve(window.google.maps)
+      s.onerror = (e) => reject(e)
+      document.head.appendChild(s)
+    })
+
+    loadGoogleMaps().then(() => {
+      if (cancelled) return
+      try {
+        const panorama = new window.google.maps.StreetViewPanorama(panoramaDivRef.current, {
+          position: { lat: streetViewCoords.lat, lng: streetViewCoords.lng },
+          pov: { heading: 0, pitch: 0 },
+          visible: true,
+          motionTracking: true,
+          linksControl: true,
+          panControl: true,
+          addressControl: false,
+          fullscreenControl: true
+        })
+        panoramaRef.current = panorama
+      } catch (e) {
+        console.warn('Failed to create Street View Panorama:', e)
+      }
+    }).catch((err) => {
+      console.warn('Google Maps JS API failed to load for Street View:', err)
+    })
+
+    return () => {
+      cancelled = true
+      try {
+        if (panoramaRef.current) {
+          try { panoramaRef.current.setVisible(false) } catch(e){}
+          panoramaRef.current = null
+        }
+      } catch (e) {}
+    }
+  }, [streetViewOpen, streetViewCoords])
+
   return (
     <div className="w-full h-full bg-slate-900 rounded-lg overflow-hidden relative">
       {/* 3D Canvas Container */}
