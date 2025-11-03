@@ -13,6 +13,7 @@ export default function PropertyInteractionModal({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [upgradeAmount, setUpgradeAmount] = useState(0)
+  const [isCollapsed, setIsCollapsed] = useState(false)
 
   if (!isOpen || !property) return null
 
