@@ -235,7 +235,7 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
     ctx.fillStyle = '#ffffff'
     ctx.font = 'bold 10px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('👤', playerScreenX, playerScreenY + 3)
+    ctx.fillText('You', playerScreenX, playerScreenY + 3)
   }
 
   return (
