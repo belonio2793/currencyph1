@@ -288,9 +288,29 @@ export class WorldSync {
   }
 
   // Disconnect
-  disconnect() {
+  async disconnect() {
+    // persist last known presence into world_positions if available
+    try {
+      if (this.lastPresence && this.characterId) {
+        const p = this.lastPresence
+        await supabase.from('world_positions').insert([{
+          character_id: this.characterId,
+          x: p.x || 0,
+          z: p.y || 0,
+          lat: p.lat || null,
+          lng: p.lng || null,
+          street: p.street || p.display_name || null,
+          city: p.locality || p.city || this.cityName || null,
+          recorded_at: new Date()
+        }])
+        console.log('Persisted last presence for', this.characterId)
+      }
+    } catch (err) {
+      console.warn('Failed to persist last presence on disconnect:', err)
+    }
+
     if (this.subscription) {
-      this.subscription.unsubscribe()
+      try { this.subscription.unsubscribe() } catch(e){}
       this.subscription = null
     }
     this.otherPlayers.clear()
