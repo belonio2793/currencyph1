@@ -28,10 +28,15 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
     const world3D = new World3D(containerRef.current, mapCenter)
     world3DRef.current = world3D
 
+    // Notify parent component that world is ready
+    if (onWorldReady) {
+      onWorldReady(world3D)
+    }
+
     // Get avatar URL
-    const avatarUrl = character?.appearance?.rpm?.thumbnail || 
-                      character?.appearance?.rpm?.meta?.imageUrl || 
-                      character?.appearance?.rpm?.meta?.avatarUrl || 
+    const avatarUrl = character?.appearance?.rpm?.thumbnail ||
+                      character?.appearance?.rpm?.meta?.imageUrl ||
+                      character?.appearance?.rpm?.meta?.avatarUrl ||
                       character?.appearance?.rpm?.model_url
 
     // Add player to 3D world
