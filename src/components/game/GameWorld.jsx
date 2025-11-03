@@ -141,32 +141,35 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
     drawMap()
   }, [worldPos, nearbyEnemies])
 
-  const moveToPosition = (x, y) => {
-    setWorldPos({ x, y })
-    
-    // Find closest location
-    let closest = null
-    let closestDist = Infinity
-
-    Object.entries(PHILIPPINES_LOCATIONS).forEach(([name, pos]) => {
-      const dist = Math.hypot(pos.x - x, pos.y - y)
-      if (dist < closestDist) {
-        closestDist = dist
-        closest = name
-      }
-    })
-
-    if (closest && closestDist < 15) {
-      setVisibleArea(closest)
-      if (onPositionUpdate) {
-        onPositionUpdate(x, y, closest)
-      }
+  const handleMouseDown = (e) => {
+    const rect = canvasRef.current.getBoundingClientRect()
+    dragStart.current = {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      worldX: worldPos.x,
+      worldY: worldPos.y
     }
+  }
 
-    // Check for random encounters
-    if (Math.random() > 0.95) {
-      generateNearbyEnemies()
-    }
+  const handleMouseMove = (e) => {
+    if (!dragStart.current) return
+
+    const rect = canvasRef.current.getBoundingClientRect()
+    const currentX = e.clientX - rect.left
+    const currentY = e.clientY - rect.top
+
+    const deltaX = (dragStart.current.x - currentX) / TILE_SIZE
+    const deltaY = (dragStart.current.y - currentY) / TILE_SIZE
+
+    const newX = Math.max(0, Math.min(MAP_WIDTH - 1, dragStart.current.worldX + deltaX))
+    const newY = Math.max(0, Math.min(MAP_HEIGHT - 1, dragStart.current.worldY + deltaY))
+
+    setWorldPos({ x: newX, y: newY })
+    setVelocity({ x: 0, y: 0 })
+  }
+
+  const handleMouseUp = () => {
+    dragStart.current = null
   }
 
   const generateNearbyEnemies = () => {
