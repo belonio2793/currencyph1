@@ -101,9 +101,10 @@ async function runIteration() {
       }
 
       // Insert valuations history into existing price_history table
-      const priceHistoryInserts = valuationInserts.map(v => ({ property_id: v.property_id, price: v.valuation, source: 'algorithmic' }))
-      await supabase.from('price_history').insert(priceHistoryInserts)
-      console.log(`Updated ${updates.length} properties and recorded price_history entries`)
+      const valuationRows = valuationInserts.map(v => ({ property_id: v.property_id, valuation: v.valuation, source: 'algorithmic' }))
+      // Persist into property_valuations table (user ran migration)
+      await supabase.from('property_valuations').insert(valuationRows)
+      console.log(`Updated ${updates.length} properties and recorded property_valuations entries`)
     } else {
       console.log('No price changes computed this iteration')
     }
