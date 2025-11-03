@@ -15,6 +15,17 @@ export default function GameProperties({ character, properties }) {
   const [propertyName, setPropertyName] = useState('')
   const [buying, setBuying] = useState(false)
   const [error, setError] = useState('')
+  const [expandedProperties, setExpandedProperties] = useState(new Set())
+
+  const togglePropertyExpanded = (idx) => {
+    const newExpanded = new Set(expandedProperties)
+    if (newExpanded.has(idx)) {
+      newExpanded.delete(idx)
+    } else {
+      newExpanded.add(idx)
+    }
+    setExpandedProperties(newExpanded)
+  }
 
   const handlePurchaseProperty = async () => {
     if (!selectedType || !propertyName.trim()) {
