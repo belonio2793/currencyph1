@@ -63,13 +63,16 @@ export default function GameSettings({ world3D, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-slate-800 border-b border-slate-700 p-4 md:p-6 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-100">⚙️ Game Settings</h2>
+        <div className="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-700 p-4 md:p-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-100">⚙️ Game Settings</h2>
+            <p className="text-xs text-slate-400 mt-1">Customize your view and gameplay experience</p>
+          </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 text-2xl"
+            className="text-slate-400 hover:text-slate-200 text-2xl transition-colors"
           >
             ✕
           </button>
@@ -77,27 +80,48 @@ export default function GameSettings({ world3D, onClose }) {
 
         {/* Content */}
         <div className="p-4 md:p-6 space-y-6">
+          {/* Quick Presets */}
+          <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600">
+            <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase">⚡ Quick Presets</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {[
+                { id: 'wide', label: '📐 Wide View', emoji: '📐' },
+                { id: 'cinematic', label: '🎬 Cinematic', emoji: '🎬' },
+                { id: 'closeup', label: '🔍 Close-up', emoji: '🔍' },
+                { id: 'tactical', label: '🎯 Tactical', emoji: '🎯' }
+              ].map(({ id, label, emoji }) => (
+                <button
+                  key={id}
+                  onClick={() => applyPreset(id)}
+                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium text-slate-200 transition-colors border border-slate-600 hover:border-slate-500"
+                >
+                  {emoji} {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Camera Mode Section */}
           <div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">📷 Camera View</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-4">📷 Camera View Modes</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
                 { mode: 'topdown', label: '⬇️ Top-Down', desc: 'Bird\'s eye view from above' },
-                { mode: 'isometric', label: '↗️ Isometric', desc: 'Angled 3D perspective' },
+                { mode: 'isometric', label: '↗️ Isometric', desc: 'Angled 3D perspective (Recommended)' },
                 { mode: 'thirdperson', label: '👤 Third-Person', desc: 'Follow camera behind player' },
                 { mode: 'freecam', label: '🎬 Free Cam', desc: 'Unrestricted camera movement' }
               ].map(({ mode, label, desc }) => (
                 <button
                   key={mode}
-                  onClick={() => handleCameraModeChange(mode)}
+                  onClick={() => setCameraMode(mode)}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     cameraMode === mode
-                      ? 'border-blue-500 bg-blue-500/10'
+                      ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/50'
                       : 'border-slate-600 bg-slate-700 hover:bg-slate-600'
                   }`}
                 >
                   <p className="font-semibold text-slate-100">{label}</p>
-                  <p className="text-xs text-slate-400">{desc}</p>
+                  <p className="text-xs text-slate-400 mt-1">{desc}</p>
                 </button>
               ))}
             </div>
