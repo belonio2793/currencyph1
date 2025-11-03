@@ -2,6 +2,7 @@ import { supabase } from './supabaseClient'
 
 import { reverseGeocode } from './geocode'
 import { worldToLatLng } from './mapUtils'
+import { supabase } from './supabaseClient'
 
 // Manage real-time player position sync
 export class WorldSync {
