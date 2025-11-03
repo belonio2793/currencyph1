@@ -57,11 +57,15 @@ export default function IsometricGameMap({
   }, [])
 
   const getPropertyAtGridPos = useCallback((gridX, gridY) => {
+    if (gridX < 0 || gridX >= GRID_WIDTH || gridY < 0 || gridY >= GRID_HEIGHT) return null
     return properties.find(p => {
       if (!p.location_x || !p.location_y) return false
-      const px = Math.floor((p.location_x / (300 / GRID_WIDTH)))
-      const py = Math.floor((p.location_y / (350 / GRID_HEIGHT)))
-      return px === gridX && py === gridY
+      const px = Math.floor((p.location_x % 300) / (300 / GRID_WIDTH))
+      const py = Math.floor((p.location_y % 350) / (350 / GRID_HEIGHT))
+      const px2 = Math.round(px)
+      const py2 = Math.round(py)
+      return (px2 === gridX || px2 === gridX - 1 || px2 === gridX + 1) &&
+             (py2 === gridY || py2 === gridY - 1 || py2 === gridY + 1)
     })
   }, [properties])
 
