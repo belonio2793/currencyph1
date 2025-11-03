@@ -275,7 +275,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
 
         {activeTab === 'properties' && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-white">🏠 Your Properties</h2>
+            <h2 className="text-2xl font-bold text-white">Your Properties</h2>
             {properties.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {properties.map(prop => (
@@ -287,7 +287,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
                       setActiveTab('property')
                     }}
                   >
-                    <p className="text-3xl mb-2">🏘️</p>
+                    <p className="text-sm font-semibold text-slate-300 mb-2">Property</p>
                     <h3 className="font-bold text-white mb-2">{prop.name}</h3>
                     <p className="text-slate-400 text-sm mb-3">{prop.city}, {prop.province}</p>
                     <div className="space-y-1 text-sm">
