@@ -196,6 +196,26 @@ export class World3D {
         this.camera.lookAt(playerPos.x, 60, playerPos.z)
         break
 
+      case 'firstperson':
+        try {
+          const player = this.players.get(this.selectedPlayer)
+          if (player) {
+            const p = player.group.position
+            const rot = player.group.rotation.y || 0
+            const headY = 60 // approximate head height
+            // Place camera at player's head
+            this.camera.position.set(p.x, headY, p.z)
+            // Compute forward vector and look slightly ahead
+            const lookAtX = p.x + Math.sin(rot) * 10
+            const lookAtY = p.y + headY - 2
+            const lookAtZ = p.z + Math.cos(rot) * 10
+            this.camera.lookAt(lookAtX, lookAtY, lookAtZ)
+          }
+        } catch (e) {
+          // ignore
+        }
+        break
+
       case 'freecam':
         // Freecam position is not automatically updated
         break
