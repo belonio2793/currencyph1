@@ -245,7 +245,15 @@ export class World3D {
   }
 
   setZoom(zoomLevel) {
-    this.cameraConfig.zoom = Math.max(0.3, Math.min(3, zoomLevel))
+    const z = Math.max(0.3, Math.min(3, zoomLevel))
+    this.cameraConfig.zoom = z
+    try {
+      // adjust camera FOV to simulate zoom for firstperson/thirdperson
+      const base = this.cameraConfig.baseFov || this.cameraConfig.fov || 75
+      const newFov = Math.max(20, Math.min(100, base / z))
+      this.camera.fov = newFov
+      this.camera.updateProjectionMatrix()
+    } catch(e) {}
   }
 
   async loadAvatarModel(url) {
