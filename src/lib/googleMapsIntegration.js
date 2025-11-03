@@ -329,36 +329,6 @@ export function clearTextureCache() {
   textureCache.clear()
 }
 
-/**
- * Create a fallback procedural texture when Google Maps fails
- */
-function createFallbackTexture() {
-  const canvas = document.createElement('canvas')
-  canvas.width = 512
-  canvas.height = 512
-  const ctx = canvas.getContext('2d')
-
-  // Green base for terrain
-  ctx.fillStyle = '#2a8c4a'
-  ctx.fillRect(0, 0, 512, 512)
-
-  // Add some procedural noise for realism
-  const imageData = ctx.getImageData(0, 0, 512, 512)
-  const data = imageData.data
-  for (let i = 0; i < data.length; i += 4) {
-    const noise = Math.random() * 30
-    data[i] += noise // R
-    data[i + 1] += noise // G
-    data[i + 2] += noise * 0.5 // B
-  }
-  ctx.putImageData(imageData, 0, 0)
-
-  const texture = new THREE.CanvasTexture(canvas)
-  texture.magFilter = THREE.LinearFilter
-  texture.minFilter = THREE.LinearMipmapLinearFilter
-  texture.generateMipmaps = true
-  return texture
-}
 
 /**
  * Generate terrain tiles for the 3D world based on Philippines regions
