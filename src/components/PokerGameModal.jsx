@@ -519,7 +519,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <p className="text-slate-300">Ready to play?</p>
+                      <p className="text-slate-600 dark:text-slate-300">Ready to play?</p>
                       <button
                         onClick={startHand}
                         disabled={loading || waitingForPlayers}
