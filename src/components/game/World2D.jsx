@@ -578,7 +578,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
           <div className="bg-slate-800 border border-slate-600 rounded-t-lg w-full max-w-md p-4 max-h-96 flex flex-col">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="font-bold text-slate-100">{chatUI.npc.emoji} {chatUI.npc.name}</h3>
+                <h3 className="font-bold text-slate-100">{chatUI.npc.name}</h3>
                 <p className="text-xs text-slate-400">{chatUI.npc.role}</p>
               </div>
               <button
