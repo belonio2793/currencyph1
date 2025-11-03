@@ -58,6 +58,21 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
     // Create world instance
     worldRef.current = new World2D(city, userId, character.name)
 
+    // Load saved 2D position from localStorage (if available)
+    try {
+      const saved = localStorage.getItem(`character_position_2d_${character.id}`)
+      if (saved) {
+        const pos = JSON.parse(saved)
+        const sx = Number(pos?.x)
+        const sy = Number(pos?.y)
+        if (Number.isFinite(sx) && Number.isFinite(sy)) {
+          worldRef.current.player.teleport(sx, sy)
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to load saved 2D position', e)
+    }
+
     // Initialize AI engine
     aiRef.current = new NPCAIEngine(import.meta?.env?.VITE_X_API_KEY || import.meta?.env?.X_API_KEY || window?.X_API_KEY)
 
