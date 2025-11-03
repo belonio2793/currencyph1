@@ -404,6 +404,14 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         </button>
       </div>
 
+      {/* Zoom controls (Bottom Left) */}
+      <div className="absolute bottom-6 left-6 z-40">
+        <div className="bg-black/60 rounded border border-slate-700 p-2 flex flex-col gap-2">
+          <button aria-label="Zoom in" onClick={() => { try { world3DRef.current?.setZoom((world3DRef.current.cameraConfig.zoom || 1) * 1.2) } catch(e){} }} className="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded">+</button>
+          <button aria-label="Zoom out" onClick={() => { try { world3DRef.current?.setZoom((world3DRef.current.cameraConfig.zoom || 1) * 0.8) } catch(e){} }} className="w-10 h-10 flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-white rounded">−</button>
+        </div>
+      </div>
+
       {/* Street View modal */}
       {streetViewOpen && (
         <div className="absolute inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
