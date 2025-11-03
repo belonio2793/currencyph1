@@ -317,22 +317,22 @@ export default function PropertyInteractionModal({
 
           {action === 'upgrade' && isOwner && (
             <div className="space-y-4">
-              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
-                <label className="text-slate-300 text-sm block mb-2">Upgrade Cost (₱)</label>
+              <div className="bg-slate-100 dark:bg-slate-700 rounded p-4">
+                <label className="text-slate-700 dark:text-slate-300 text-sm block mb-2">Upgrade Cost (₱)</label>
                 <input
                   type="number"
                   value={upgradeAmount}
                   onChange={(e) => setUpgradeAmount(Math.max(0, parseInt(e.target.value) || 0))}
-                  className={`w-full rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDark ? 'bg-slate-600 text-white' : 'bg-white text-slate-900 border border-slate-300'}`}
+                  className="w-full rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-600 text-slate-900 dark:text-white border border-slate-300 dark:border-slate-500"
                   placeholder="Enter upgrade cost"
                   min="0"
                 />
               </div>
               {upgradeAmount > 0 && (
-                <div className="bg-blue-500/10 border border-blue-500/30 rounded p-4">
-                  <p className="text-blue-400 text-sm mb-2">Expected Benefits:</p>
-                  <p className="text-white font-bold">New Daily Revenue: ₱{Math.round((property.revenue_per_day || 0) * 1.25).toLocaleString()}</p>
-                  <p className="text-blue-200 text-sm mt-2">Property value increases by upgrade cost</p>
+                <div className="bg-blue-50 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/30 rounded p-4">
+                  <p className="text-blue-600 dark:text-blue-400 text-sm mb-2">Expected Benefits:</p>
+                  <p className="text-slate-900 dark:text-white font-bold">New Daily Revenue: ₱{Math.round((property.revenue_per_day || 0) * 1.25).toLocaleString()}</p>
+                  <p className="text-blue-700 dark:text-blue-200 text-sm mt-2">Property value increases by upgrade cost</p>
                 </div>
               )}
               <button
