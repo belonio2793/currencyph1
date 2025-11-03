@@ -98,6 +98,10 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, u
           const modelUrl = data?.url || data?.avatarUrl || ''
           const meta = data || {}
 
+          if (!modelUrl) {
+            throw new Error('No avatar URL returned from editor')
+          }
+
           if (characterId) {
             setStatus('Avatar exported, saving…')
             setSaving(true)
