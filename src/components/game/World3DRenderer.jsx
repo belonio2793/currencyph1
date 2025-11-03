@@ -40,15 +40,24 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
                         gameAPI.getAvatarThumbnail(character?.appearance)
 
       // Log for debugging
+      console.log('Loading 3D World for character:', {
+        charId: character.id,
+        charName: character.name,
+        hasAppearance: !!character?.appearance,
+        hasAvatarUrl: !!avatarUrl,
+        avatarUrlPreview: avatarUrl ? avatarUrl.substring(0, 80) + '...' : 'None'
+      })
+
       if (!avatarUrl) {
-        console.warn('No avatar URL found for character', {
+        console.warn('⚠️ No avatar URL found - will use fallback avatar', {
           charId: character.id,
           appearance: character?.appearance
         })
       }
 
-      // Add player to 3D world with avatar URL
+      // Add player to 3D world with avatar URL (fallback creates simple avatar if null)
       world3D.addPlayer(userId, character.name, avatarUrl, 0, 0)
+        .then(() => console.log('✓ Player added to 3D world successfully'))
         .catch(err => {
           console.warn('Failed to load avatar, using fallback:', err.message)
           // Fallback is handled inside addPlayer with simple avatar creation
