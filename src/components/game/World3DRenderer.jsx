@@ -344,7 +344,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         </div>
 
         <div className="bg-black/70 backdrop-blur-sm p-3 rounded-lg border border-slate-600/50">
-          <p className="text-xs font-bold text-slate-200 mb-1">📷 CAMERA</p>
+          <p className="text-xs font-bold text-slate-200 mb-1">CAMERA</p>
           <p className="text-xs text-cyan-400">{world3DRef.current?.cameraConfig?.mode?.toUpperCase() || 'ISOMETRIC'}</p>
         </div>
       </div>
