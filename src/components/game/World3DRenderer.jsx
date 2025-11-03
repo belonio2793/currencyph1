@@ -337,7 +337,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       {/* Controls & Camera Info (Top Right) */}
       <div className="absolute top-4 right-4 text-white pointer-events-none z-30 space-y-2">
         <div className="bg-black/70 backdrop-blur-sm p-3 rounded-lg border border-slate-600/50">
-          <p className="text-xs font-bold text-slate-200 mb-2">⌨️ CONTROLS</p>
+          <p className="text-xs font-bold text-slate-200 mb-2">CONTROLS</p>
           <p className="text-xs text-slate-400"><span className="text-slate-200">WASD</span> / Arrows to move</p>
           <p className="text-xs text-slate-400"><span className="text-slate-200">Click</span> to interact</p>
           <p className="text-xs text-slate-400"><span className="text-slate-200">ESC</span> for settings</p>
