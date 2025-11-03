@@ -36,17 +36,17 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
     }
   }
 
-  const getItemIcon = (itemType) => {
-    const icons = {
-      clothing: '',
-      equipment: '',
-      tool: '',
-      consumable: '',
-      weapon: '',
-      armor: '',
-      accessory: ''
+  const getItemLabel = (itemType) => {
+    const labels = {
+      clothing: 'Clothing',
+      equipment: 'Equipment',
+      tool: 'Tool',
+      consumable: 'Consumable',
+      weapon: 'Weapon',
+      armor: 'Armor',
+      accessory: 'Accessory'
     }
-    return icons[itemType] || '📦'
+    return labels[itemType] || 'Item'
   }
 
   return (

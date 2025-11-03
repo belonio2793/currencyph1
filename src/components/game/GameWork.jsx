@@ -7,7 +7,7 @@ export default function GameWork({ character, onEarnings }) {
       id: 'merchant',
       name: 'Street Merchant',
       description: 'Sell goods on the street',
-      icon: '🛒',
+      label: 'Merchant',
       baseWage: 50,
       duration: 30,
       energy: 20,
@@ -17,7 +17,7 @@ export default function GameWork({ character, onEarnings }) {
       id: 'courier',
       name: 'Courier',
       description: 'Deliver packages around the city',
-      icon: '📦',
+      label: 'Courier',
       baseWage: 75,
       duration: 45,
       energy: 30,
@@ -27,7 +27,7 @@ export default function GameWork({ character, onEarnings }) {
       id: 'construction',
       name: 'Construction Worker',
       description: 'Work on construction projects',
-      icon: '🏗️',
+      label: 'Construction',
       baseWage: 100,
       duration: 60,
       energy: 40,
@@ -37,7 +37,7 @@ export default function GameWork({ character, onEarnings }) {
       id: 'security',
       name: 'Security Guard',
       description: 'Provide security services',
-      icon: '👮',
+      label: 'Security',
       baseWage: 80,
       duration: 120,
       energy: 25,
@@ -47,7 +47,7 @@ export default function GameWork({ character, onEarnings }) {
       id: 'vendor',
       name: 'Market Vendor',
       description: 'Manage a market stall',
-      icon: '🏪',
+      label: 'Vendor',
       baseWage: 120,
       duration: 90,
       energy: 35,
@@ -57,7 +57,7 @@ export default function GameWork({ character, onEarnings }) {
       id: 'tutor',
       name: 'Tutor',
       description: 'Provide tutoring services',
-      icon: '📚',
+      label: 'Tutor',
       baseWage: 150,
       duration: 60,
       energy: 15,
@@ -183,7 +183,7 @@ export default function GameWork({ character, onEarnings }) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-slate-800 border border-slate-700 rounded-lg w-full max-w-md p-8 text-center">
-          <p className="text-6xl mb-4">{activeJob.icon}</p>
+          <p className="text-2xl font-bold text-blue-400 mb-4">{activeJob.label}</p>
           <h2 className="text-2xl font-bold text-white mb-2">{activeJob.name}</h2>
           <p className="text-slate-400 mb-6">{activeJob.description}</p>
 
@@ -260,7 +260,9 @@ export default function GameWork({ character, onEarnings }) {
             className="bg-slate-800 border border-slate-700 rounded-lg p-4 hover:border-blue-500 transition-colors"
           >
             <div className="flex items-start justify-between mb-3">
-              <p className="text-4xl">{job.icon}</p>
+              <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded font-semibold">
+                {job.label}
+              </span>
               <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">
                 {job.duration}s
               </span>
