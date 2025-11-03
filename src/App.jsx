@@ -368,8 +368,7 @@ export default function App() {
 
 
   return (
-    <ThemeProvider>
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 dark:text-slate-100">
+    <div className="min-h-screen bg-slate-50">
       <HeaderMap userId={userId} />
       <Navbar
         activeTab={activeTab}
@@ -518,6 +517,5 @@ export default function App() {
         </div>
       </footer>
     </div>
-    </ThemeProvider>
   )
 }
