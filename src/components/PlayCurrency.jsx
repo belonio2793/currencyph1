@@ -439,7 +439,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors font-bold ${
               showCurrencyGame
                 ? 'bg-green-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                : gameThemeIsDark ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
             }`}
           >
             Currency Game
@@ -458,7 +458,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                 openModal === tab.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  : gameThemeIsDark ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
               }`}
             >
               {tab.label}
