@@ -46,24 +46,24 @@ export default function GameMarketplace({ character, onInventoryUpdate }) {
   }
 
   const getItemIcon = (itemType) => {
-    const icons = {
-      clothing: '👕',
-      equipment: '💼',
-      tool: '🛠️',
-      consumable: '🍎',
-      weapon: '💼',
-      armor: '🧥',
-      accessory: '💍',
-      property: '🏠'
+    const labels = {
+      clothing: 'Clothing',
+      equipment: 'Equipment',
+      tool: 'Tool',
+      consumable: 'Consumable',
+      weapon: 'Weapon',
+      armor: 'Armor',
+      accessory: 'Accessory',
+      property: 'Property'
     }
-    return icons[itemType] || '📦'
+    return labels[itemType] || 'Item'
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">🏪 Marketplace</h2>
+        <h2 className="text-2xl font-bold mb-4">Marketplace</h2>
         <div className="flex items-center justify-between">
           <p className="text-slate-400">Your Balance: <span className="text-yellow-400 font-bold">₱{(character.money || 0).toLocaleString()}</span></p>
           <p className="text-slate-400">Total Listings: <span className="font-bold">{listings.length}</span></p>

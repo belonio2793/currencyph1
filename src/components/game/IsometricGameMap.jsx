@@ -175,7 +175,7 @@ export default function IsometricGameMap({
       ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
       ctx.font = 'bold 10px Arial'
       ctx.textAlign = 'center'
-      ctx.fillText('🏃', screenX + size / 2 - (avatarFacing === -1 ? -size : 0), screenY - 20)
+      ctx.fillText('Moving', screenX + size / 2 - (avatarFacing === -1 ? -size : 0), screenY - 20)
     }
   }, [avatarFacing, avatarMoving])
 
