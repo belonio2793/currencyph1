@@ -104,6 +104,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [openModal, setOpenModal] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
   const [showCurrencyGame, setShowCurrencyGame] = useState(false)
+  const [selectedPropertyForModal, setSelectedPropertyForModal] = useState(null)
   const world3DRef = useRef(null)
 
   useEffect(() => {
@@ -405,8 +406,24 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           </div>
         )}
 
+        {/* Property Detail Modal from Map */}
+        {openModal === 'property-detail' && selectedPropertyForModal && (
+          <PropertyInteractionModal
+            property={selectedPropertyForModal}
+            character={character}
+            isOpen={true}
+            onClose={() => {
+              setOpenModal(null)
+              setSelectedPropertyForModal(null)
+            }}
+            onBuy={handleBuyProperty}
+            onSell={handleSellProperty}
+            onUpgrade={handleUpgradeProperty}
+          />
+        )}
+
         {/* Modal for tabs */}
-        {openModal && (
+        {openModal && openModal !== 'property-detail' && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6 border-b border-slate-700 flex items-center justify-between">
