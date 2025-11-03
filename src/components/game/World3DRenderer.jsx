@@ -20,6 +20,9 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
   const [chatLoading, setChatLoading] = useState(false)
   const [streetViewOpen, setStreetViewOpen] = useState(false)
   const [streetViewImage, setStreetViewImage] = useState(null)
+  const [streetViewCoords, setStreetViewCoords] = useState(null)
+  const panoramaDivRef = useRef(null)
+  const panoramaRef = useRef(null)
 
   const keysPressed = useRef({})
   const lastSaveTimeRef = useRef(0)
