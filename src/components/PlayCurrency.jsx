@@ -473,6 +473,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               character={character}
               world3D={world3DRef.current}
               onCharacterUpdate={(updated) => setCharacter(updated)}
+              isDark={gameThemeIsDark}
             />
           </div>
         )}
