@@ -160,7 +160,7 @@ export default function PropertyInteractionModal({
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-bold mb-2 text-blue-200">{getPropertyTypeLabel(property.property_type)}</p>
-              <h2 className="text-2xl font-bold text-white">{property.name}</h2>
+              <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{property.name}</h2>
               <p className="text-blue-100 text-sm mt-1">{property.city}, {property.province}</p>
             </div>
             <div className="flex gap-2">
