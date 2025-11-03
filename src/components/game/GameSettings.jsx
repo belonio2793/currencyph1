@@ -280,20 +280,20 @@ export default function GameSettings({ world3D, onClose }) {
           </div>
 
           {/* Info Section */}
-          <div className="border-t border-slate-700 pt-6 bg-slate-700/30 rounded p-4">
-            <p className="text-xs text-slate-400">
-              <strong>💡 Tip:</strong> Adjust camera settings to your preference. All settings are saved locally and applied immediately.
+          <div className="border-t border-slate-700 pt-6 bg-slate-700/30 rounded-lg p-4">
+            <p className="text-xs text-slate-400 leading-relaxed">
+              <strong className="text-slate-300">💡 Tip:</strong> Camera settings are applied immediately. Try different camera modes and presets to find your preferred view! Zoom and FOV adjustments work across all modes.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-700 p-4 md:p-6 flex justify-end gap-2">
+        <div className="border-t border-slate-700 p-4 md:p-6 flex justify-end gap-2 bg-slate-700/20">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
+            className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium transition-all shadow-lg"
           >
-            Done
+            ✓ Done
           </button>
         </div>
       </div>
