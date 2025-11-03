@@ -1,5 +1,3 @@
-import { supabase } from './supabaseClient'
-
 import { reverseGeocode } from './geocode'
 import { worldToLatLng } from './mapUtils'
 import { supabase } from './supabaseClient'
