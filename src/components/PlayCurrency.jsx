@@ -496,9 +496,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         {/* Modal for tabs */}
         {openModal && openModal !== 'property-detail' && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-slate-700 flex items-center justify-between">
-                <h3 className="text-2xl font-bold">
+            <div className={`${gameThemeIsDark ? 'bg-slate-800' : 'bg-white'} rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto`}>
+              <div className={`p-6 ${gameThemeIsDark ? 'border-b border-slate-700' : 'border-b border-slate-200'} flex items-center justify-between`}>
+                <h3 className={`text-2xl font-bold ${gameThemeIsDark ? 'text-slate-100' : 'text-slate-900'}`}>
                   {openModal === 'cities' && 'Cities'}
                   {openModal === 'inventory' && 'Inventory'}
                   {openModal === 'equipment' && 'Equipment'}
