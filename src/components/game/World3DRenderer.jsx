@@ -137,6 +137,28 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           console.warn('Could not update presence:', e)
         }
         syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
+
+        // Poll for our lastPresence to update HUD
+        try {
+          const poll = setInterval(() => {
+            try {
+              const pres = syncRef.current?.lastPresence || null
+              if (pres) {
+                setPositionInfo({
+                  lat: pres.lat || null,
+                  lng: pres.lng || null,
+                  street: pres.street || pres.display_name || null,
+                  city: pres.locality || pres.city || null,
+                  x: pres.x || 0,
+                  z: pres.y || 0
+                })
+              }
+            } catch(e){}
+          }, 500)
+          // store poll ref so cleanup can clear it
+          syncRef.current._pollInterval = poll
+        } catch(e) { console.warn('Failed to start presence poll:', e) }
+
       }).catch(err => {
         console.warn('Failed to connect world sync:', err)
       })
