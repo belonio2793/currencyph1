@@ -23,56 +23,119 @@ const ENEMIES = [
 export default function GameWorld({ character, onCombat, combatActive, onPositionUpdate }) {
   const [visibleArea, setVisibleArea] = useState('Manila')
   const [worldPos, setWorldPos] = useState({ x: 100, y: 100 })
+  const [velocity, setVelocity] = useState({ x: 0, y: 0 })
   const [showEnemies, setShowEnemies] = useState(false)
   const [nearbyEnemies, setNearbyEnemies] = useState([])
   const canvasRef = useRef(null)
+  const keysPressed = useRef({})
+  const dragStart = useRef(null)
+  const lastPositionUpdate = useRef(0)
 
   const TILE_SIZE = 40
   const MAP_WIDTH = 300
   const MAP_HEIGHT = 350
-  const VIEW_SIZE = 8 // 8x8 tiles visible
+  const VIEW_SIZE = 8
+  const BASE_SPEED = 2
+  const ACCELERATION = 0.8
+  const FRICTION = 0.92
+  const MAX_VELOCITY = 6
 
+  // Set up continuous movement loop
   useEffect(() => {
-    const handleKeyPress = (e) => {
-      const speed = 5
-      let newX = worldPos.x
-      let newY = worldPos.y
+    const updatePosition = () => {
+      setWorldPos(prevPos => {
+        setVelocity(prevVel => {
+          let newVelX = prevVel.x * FRICTION
+          let newVelY = prevVel.y * FRICTION
 
-      switch(e.key) {
-        case 'ArrowUp':
-        case 'w':
-        case 'W':
-          newY = Math.max(0, worldPos.y - speed)
-          e.preventDefault()
-          break
-        case 'ArrowDown':
-        case 's':
-        case 'S':
-          newY = Math.min(MAP_HEIGHT - 1, worldPos.y + speed)
-          e.preventDefault()
-          break
-        case 'ArrowLeft':
-        case 'a':
-        case 'A':
-          newX = Math.max(0, worldPos.x - speed)
-          e.preventDefault()
-          break
-        case 'ArrowRight':
-        case 'd':
-        case 'D':
-          newX = Math.min(MAP_WIDTH - 1, worldPos.x + speed)
-          e.preventDefault()
-          break
-        default:
-          return
-      }
+          // Apply acceleration based on pressed keys
+          if (keysPressed.current['ArrowUp'] || keysPressed.current['w'] || keysPressed.current['W']) {
+            newVelY = Math.max(newVelY - ACCELERATION, -MAX_VELOCITY)
+          }
+          if (keysPressed.current['ArrowDown'] || keysPressed.current['s'] || keysPressed.current['S']) {
+            newVelY = Math.min(newVelY + ACCELERATION, MAX_VELOCITY)
+          }
+          if (keysPressed.current['ArrowLeft'] || keysPressed.current['a'] || keysPressed.current['A']) {
+            newVelX = Math.max(newVelX - ACCELERATION, -MAX_VELOCITY)
+          }
+          if (keysPressed.current['ArrowRight'] || keysPressed.current['d'] || keysPressed.current['D']) {
+            newVelX = Math.min(newVelX + ACCELERATION, MAX_VELOCITY)
+          }
 
-      moveToPosition(newX, newY)
+          // Apply velocity to position
+          let newX = Math.max(0, Math.min(MAP_WIDTH - 1, prevPos.x + newVelX))
+          let newY = Math.max(0, Math.min(MAP_HEIGHT - 1, prevPos.y + newVelY))
+
+          // Update position
+          setWorldPos(pos => ({
+            x: newX,
+            y: newY
+          }))
+
+          // Update visible area
+          const now = Date.now()
+          if (now - lastPositionUpdate.current > 100) {
+            lastPositionUpdate.current = now
+
+            let closest = null
+            let closestDist = Infinity
+
+            Object.entries(PHILIPPINES_LOCATIONS).forEach(([name, pos]) => {
+              const dist = Math.hypot(pos.x - newX, pos.y - newY)
+              if (dist < closestDist) {
+                closestDist = dist
+                closest = name
+              }
+            })
+
+            if (closest && closestDist < 15) {
+              setVisibleArea(closest)
+              if (onPositionUpdate) {
+                onPositionUpdate(newX, newY, closest)
+              }
+            }
+
+            // Random encounters
+            if (Math.random() > 0.98) {
+              generateNearbyEnemies()
+            }
+          }
+
+          return { x: newVelX, y: newVelY }
+        })
+
+        return prevPos
+      })
     }
 
-    window.addEventListener('keydown', handleKeyPress)
-    return () => window.removeEventListener('keydown', handleKeyPress)
-  }, [worldPos])
+    const animationInterval = setInterval(updatePosition, 16) // ~60fps
+    return () => clearInterval(animationInterval)
+  }, [])
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const key = e.key
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(key)) {
+        keysPressed.current[key] = true
+        e.preventDefault()
+      }
+    }
+
+    const handleKeyUp = (e) => {
+      const key = e.key
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].includes(key)) {
+        keysPressed.current[key] = false
+        e.preventDefault()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keyup', handleKeyUp)
+    }
+  }, [])
 
   useEffect(() => {
     drawMap()
