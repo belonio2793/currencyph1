@@ -208,25 +208,6 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
     }
   }
 
-  const generateNearbyEnemies = () => {
-    const enemies = []
-    const count = Math.floor(Math.random() * 3) + 1
-
-    for (let i = 0; i < count; i++) {
-      const enemy = ENEMIES[Math.floor(Math.random() * ENEMIES.length)]
-      enemies.push({
-        id: Math.random(),
-        type: enemy.type,
-        level: enemy.level + Math.floor(character.level / 5),
-        x: worldPos.x + (Math.random() - 0.5) * 20,
-        y: worldPos.y + (Math.random() - 0.5) * 20
-      })
-    }
-
-    setNearbyEnemies(enemies)
-    setShowEnemies(true)
-  }
-
   const handleCombat = async (enemy) => {
     try {
       await onCombat(enemy.type, enemy.level)
