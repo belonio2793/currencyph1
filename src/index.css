@@ -266,8 +266,9 @@ button:active {
 }
 
 /* Comprehensive text color contrast for light/dark modes */
+/* This ensures text is dark on light backgrounds and light on dark backgrounds */
 
-/* Primary text - should be dark on light, light on dark */
+/* Primary heading/body text */
 .text-black,
 .text-slate-900 {
   color: #000000;
@@ -275,10 +276,21 @@ button:active {
 
 html.dark .text-black,
 html.dark .text-slate-900 {
-  color: #f8fafc;
+  color: #f1f5f9;
 }
 
-/* Secondary text - should be dark-ish on light, light-ish on dark */
+/* Secondary text */
+.text-slate-800,
+.text-gray-800 {
+  color: #1e293b;
+}
+
+html.dark .text-slate-800,
+html.dark .text-gray-800 {
+  color: #e2e8f0;
+}
+
+/* Body text */
 .text-slate-700,
 .text-slate-600,
 .text-gray-700,
@@ -293,7 +305,7 @@ html.dark .text-gray-600 {
   color: #cbd5e1;
 }
 
-/* Muted text - gray on light, lighter gray on dark */
+/* Muted/secondary text */
 .text-slate-500,
 .text-gray-500 {
   color: #64748b;
@@ -304,7 +316,7 @@ html.dark .text-gray-500 {
   color: #94a3b8;
 }
 
-/* Light gray text - already light, make lighter on dark */
+/* Light gray text on light backgrounds, lighter on dark */
 .text-slate-400,
 .text-gray-400 {
   color: #94a3b8;
@@ -315,22 +327,49 @@ html.dark .text-gray-400 {
   color: #cbd5e1;
 }
 
-/* Link colors with dark mode variants */
-.text-blue-600 {
+/* Very light text - only used on dark backgrounds, invert in light mode */
+.text-slate-300 {
+  color: #cbd5e1;
+}
+
+html.dark .text-slate-300 {
+  color: #e2e8f0;
+}
+
+/* Link colors */
+.text-blue-600,
+.text-blue-700 {
   color: #2563eb;
 }
 
-html.dark .text-blue-600 {
+html.dark .text-blue-600,
+html.dark .text-blue-700 {
   color: #60a5fa;
 }
 
-/* Red text for errors/alerts */
+.text-blue-500 {
+  color: #3b82f6;
+}
+
+html.dark .text-blue-500 {
+  color: #93c5fd;
+}
+
+/* Red text for errors/critical */
 .text-red-600 {
   color: #dc2626;
 }
 
 html.dark .text-red-600 {
   color: #f87171;
+}
+
+.text-red-500 {
+  color: #ef4444;
+}
+
+html.dark .text-red-500 {
+  color: #fca5a5;
 }
 
 /* Green text for success */
@@ -342,11 +381,31 @@ html.dark .text-green-600 {
   color: #86efac;
 }
 
-/* Amber text for warnings */
-.text-amber-600 {
+.text-green-500 {
+  color: #22c55e;
+}
+
+html.dark .text-green-500 {
+  color: #86efac;
+}
+
+/* Amber/yellow text for warnings */
+.text-amber-600,
+.text-yellow-600 {
   color: #d97706;
 }
 
-html.dark .text-amber-600 {
+html.dark .text-amber-600,
+html.dark .text-yellow-600 {
   color: #fbbf24;
+}
+
+.text-amber-500,
+.text-yellow-500 {
+  color: #f59e0b;
+}
+
+html.dark .text-amber-500,
+html.dark .text-yellow-500 {
+  color: #fcd34d;
 }
