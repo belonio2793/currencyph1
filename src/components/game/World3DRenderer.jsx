@@ -89,7 +89,13 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
 
     // Keyboard input
     const handleKeyDown = (e) => {
-      keysPressed.current[e.key.toLowerCase()] = true
+      const key = e.key.toLowerCase()
+      keysPressed.current[key] = true
+
+      // Handle special keys
+      if (key === 'escape') {
+        setShowSettings(true)
+      }
     }
     const handleKeyUp = (e) => {
       keysPressed.current[e.key.toLowerCase()] = false
@@ -98,13 +104,13 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
 
-    // Game loop for movement
+    // Game loop for movement and updates
     const gameLoop = setInterval(() => {
       const player = world3D.players.get(userId)
       if (!player) return
 
       let dx = 0, dz = 0
-      const moveSpeed = 10
+      const moveSpeed = 15 // Faster movement
 
       if (keysPressed.current['w'] || keysPressed.current['arrowup']) dz -= moveSpeed
       if (keysPressed.current['s'] || keysPressed.current['arrowdown']) dz += moveSpeed
@@ -112,14 +118,13 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       if (keysPressed.current['d'] || keysPressed.current['arrowright']) dx += moveSpeed
 
       if (dx !== 0 || dz !== 0) {
-        world3D.updatePlayerPosition(userId, 
-          player.group.position.x + dx, 
-          player.group.position.z + dz
-        )
+        const newX = player.group.position.x + dx
+        const newZ = player.group.position.z + dz
+        world3D.updatePlayerPosition(userId, newX, newZ)
         syncRef.current?.updatePresence({
           name: character.name,
-          x: player.group.position.x + dx,
-          y: player.group.position.z + dz,
+          x: newX,
+          y: newZ,
           direction: Math.atan2(dx, dz) * (180 / Math.PI),
           rpm_avatar: avatarUrl
         })
