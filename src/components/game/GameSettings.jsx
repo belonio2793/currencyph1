@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-export default function GameSettings({ world3D, onClose }) {
+export default function GameSettings({ world3D, onClose, mapSettings = {}, onMapSettingsChange = null }) {
   const [cameraMode, setCameraMode] = useState(world3D?.cameraConfig?.mode || 'isometric')
   const [height, setHeight] = useState(world3D?.cameraConfig?.height || 600)
   const [distance, setDistance] = useState(world3D?.cameraConfig?.distance || 400)
@@ -11,6 +11,9 @@ export default function GameSettings({ world3D, onClose }) {
   const [enableShadows, setEnableShadows] = useState(world3D?.cameraConfig?.enableShadows ?? true)
   const [enableFog, setEnableFog] = useState(world3D?.cameraConfig?.enableFog ?? true)
   const [showNameplates, setShowNameplates] = useState(world3D?.cameraConfig?.showNameplates ?? true)
+  const [avatarSpeed, setAvatarSpeed] = useState(mapSettings?.avatarSpeed || 2)
+  const [cameraSpeed, setCameraSpeed] = useState(mapSettings?.cameraSpeed || 1)
+  const [showAvatarTrail, setShowAvatarTrail] = useState(mapSettings?.showAvatarTrail ?? true)
 
   useEffect(() => {
     // Sync settings with 3D world if it changes
