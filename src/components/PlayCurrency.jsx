@@ -468,7 +468,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         {/* Currency Game Panel */}
         {showCurrencyGame && (
-          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
+          <div className={`${gameThemeIsDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto`}>
             <CurrencyGameUI
               character={character}
               world3D={world3DRef.current}
@@ -508,7 +508,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 </h3>
                 <button onClick={() => setOpenModal(null)} className="text-slate-400 hover:text-slate-200">X</button>
               </div>
-              <div className="p-6">
+              <div className={`p-6 ${gameThemeIsDark ? 'text-slate-100' : 'text-slate-900'}`}>
                 {openModal === 'inventory' && (
                   <GameInventory character={character} inventory={inventory} onInventoryUpdate={handleInventoryUpdate} />
                 )}
