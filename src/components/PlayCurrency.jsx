@@ -323,11 +323,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <div className="flex-1">
                 <h2 className="text-xl font-bold text-slate-100">{use3DWorld ? '🎮 3D Immersive World' : '🗺️ 2D World'}</h2>
-                <p className="text-xs text-slate-400 mt-1">
-                  {use3DWorld
-                    ? 'Full 3D experience with customizable camera views. Use WASD/Arrows to move.'
-                    : 'Walk around, find NPCs, and trade. Use WASD/Arrows or click to move.'}
-                </p>
+                <p className="text-xs text-slate-400 mt-1">Full 3D experience with customizable camera views. Use WASD/Arrows to move.</p>
               </div>
               <div className="flex gap-2">
                 <button
