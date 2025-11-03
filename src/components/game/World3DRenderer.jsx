@@ -25,6 +25,10 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
   useEffect(() => {
     if (!containerRef.current || !character) return
 
+    // Get avatar URL once for use throughout this effect
+    const avatarUrl = gameAPI.getAvatarUrl(character?.appearance) ||
+                      gameAPI.getAvatarThumbnail(character?.appearance)
+
     try {
       const mapCenter = { lat: 14.5995, lng: 120.9842 } // Manila default
       const world3D = new World3D(containerRef.current, mapCenter)
@@ -34,10 +38,6 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       if (onWorldReady) {
         onWorldReady(world3D)
       }
-
-      // Get avatar URL using safe helper
-      const avatarUrl = gameAPI.getAvatarUrl(character?.appearance) ||
-                        gameAPI.getAvatarThumbnail(character?.appearance)
 
       // Log for debugging
       console.log('Loading 3D World for character:', {
