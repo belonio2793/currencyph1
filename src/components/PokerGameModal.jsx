@@ -498,7 +498,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                 <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 text-center space-y-4 text-slate-900 dark:text-white">
                   {!isSigned ? (
                     <div className="space-y-3">
-                      <p className="text-slate-300">Sign in to play poker</p>
+                      <p className="text-slate-600 dark:text-slate-300">Sign in to play poker</p>
                       <button
                         onClick={() => onShowAuth?.('login')}
                         className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
