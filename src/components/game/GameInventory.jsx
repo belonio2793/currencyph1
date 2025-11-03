@@ -38,13 +38,13 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
 
   const getItemIcon = (itemType) => {
     const icons = {
-      clothing: '��',
-      equipment: '💼',
-      tool: '🛠️',
-      consumable: '🍎',
-      weapon: '💼',
-      armor: '🧥',
-      accessory: '💍'
+      clothing: '',
+      equipment: '',
+      tool: '',
+      consumable: '',
+      weapon: '',
+      armor: '',
+      accessory: ''
     }
     return icons[itemType] || '📦'
   }
@@ -59,7 +59,7 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
 
       {/* Inventory Summary */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <h2 className="text-2xl font-bold mb-4">🎒 Inventory</h2>
+        <h2 className="text-2xl font-bold mb-4">Inventory</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-slate-700 rounded p-4">
             <p className="text-slate-400 text-sm">Total Items</p>
@@ -124,7 +124,7 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
                       }}
                       className="w-full px-3 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
                     >
-                      💰 Sell Item
+                      Sell Item
                     </button>
                   </div>
                 )}
@@ -142,7 +142,7 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
       {sellMode && selectedItem && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 rounded-lg max-w-md w-full p-6 border border-slate-700">
-            <h3 className="text-xl font-bold mb-4">💰 Sell {selectedItem.game_items?.name}</h3>
+            <h3 className="text-xl font-bold mb-4">Sell {selectedItem.game_items?.name}</h3>
 
             <div className="space-y-4">
               <div className="bg-slate-700 rounded p-4">
@@ -183,7 +183,7 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
                   disabled={listing || !sellPrice}
                   className="flex-1 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors"
                 >
-                  {listing ? '⏳ Listing...' : '📤 List Item'}
+                  {listing ? 'Listing...' : 'List Item'}
                 </button>
               </div>
             </div>
