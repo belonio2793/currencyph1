@@ -105,14 +105,8 @@ export class World3D {
   }
 
   setupEnvironment() {
-    // Add some atmospheric elements
-    const skyGeometry = new THREE.SphereGeometry(5000, 32, 32)
-    const skyMaterial = new THREE.MeshBasicMaterial({
-      color: 0x87CEEB,
-      side: THREE.BackSide
-    })
-    const sky = new THREE.Mesh(skyGeometry, skyMaterial)
-    this.scene.add(sky)
+    // Create Philippines tropical sky
+    createMapSky(this.scene, 5000)
   }
   
   setupGround() {
