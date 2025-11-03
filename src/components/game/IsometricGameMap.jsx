@@ -268,28 +268,52 @@ export default function IsometricGameMap({
 
           if (prop) {
             const color = PROPERTY_COLORS[prop.property_type] || PROPERTY_COLORS.default
-            const height = Math.min(20, 5 + Math.log(prop.current_value || 100000) / 10)
+            const upgradeLevel = prop.upgrade_level || 0
+            // Height increases with upgrade level: base 3px + 2px per upgrade level
+            const baseHeight = 3 + (upgradeLevel * 2)
+            const valueHeight = Math.min(10, Math.log(prop.current_value || 100000) / 10)
+            const height = baseHeight + valueHeight
             const isHovered = prop.id === hoveredPropertyId
             const isOwned = prop.owner_id
+
+            // Brighten color based on upgrade level
+            let displayColor = color
+            if (isHovered) {
+              displayColor = adjustBrightness(color, 30)
+            } else if (upgradeLevel > 0) {
+              displayColor = adjustBrightness(color, Math.min(40, upgradeLevel * 5))
+            }
 
             drawIsometricTile(
               ctx,
               isoPos.x,
               isoPos.y,
-              isHovered ? adjustBrightness(color, 30) : color,
+              displayColor,
               isOwned ? height : 0,
-              isHovered
+              isHovered || upgradeLevel > 0
             )
 
-            if (isHovered || prop.owner_id) {
-              ctx.fillStyle = 'white'
-              ctx.font = 'bold 10px Arial'
+            // Show property name and tier indicator
+            if (isOwned) {
+              ctx.fillStyle = upgradeLevel > 0 ? '#ffd700' : 'white'
+              ctx.font = `bold ${upgradeLevel > 0 ? '11px' : '10px'} Arial`
               ctx.textAlign = 'center'
               ctx.fillText(
                 prop.name ? prop.name.substring(0, 10) : 'Prop',
                 isoPos.x,
-                isoPos.y
+                isoPos.y - 3
               )
+
+              // Draw tier indicator
+              if (upgradeLevel > 0) {
+                ctx.fillStyle = '#ffd700'
+                ctx.font = 'bold 8px Arial'
+                ctx.fillText(
+                  `★${upgradeLevel}`,
+                  isoPos.x,
+                  isoPos.y + 5
+                )
+              }
             }
           } else {
             drawIsometricTile(ctx, isoPos.x, isoPos.y, adjustBrightness('#6ba54a', -10), 0, false)
