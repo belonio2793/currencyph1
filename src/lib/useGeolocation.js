@@ -60,7 +60,8 @@ export function useGeolocation() {
                 } catch (e) {
                   if (timeoutId) clearTimeout(timeoutId)
                   // Silently fail for network/abort errors - not user-facing
-                  if (e.name !== 'AbortError' && e.code !== 'ABORT_ERR' && e.message !== 'Failed to fetch') {
+                  const isNetworkError = e.name === 'AbortError' || e.code === 'ABORT_ERR' || e.message === 'Failed to fetch'
+                  if (!isNetworkError) {
                     console.debug('MapTiler reverse geocoding failed:', e.message)
                   }
                 }
@@ -68,6 +69,7 @@ export function useGeolocation() {
                 if (data && data.features && data.features.length && isMountedRef.current) {
                   const props = data.features[0].properties || {}
                   setCity(props.city || props.town || props.village || props.county || props.state || null)
+                  setLoading(false)
                   return
                 }
               }
@@ -106,26 +108,32 @@ export function useGeolocation() {
                 } catch (err) {
                   if (timeoutId) clearTimeout(timeoutId)
                   // Silently fail for network/abort errors - not user-facing
-                  if (err.name !== 'AbortError' && err.code !== 'ABORT_ERR' && err.message !== 'Failed to fetch') {
+                  const isNetworkError = err.name === 'AbortError' || err.code === 'ABORT_ERR' || err.message === 'Failed to fetch'
+                  if (!isNetworkError) {
                     console.debug('Nominatim reverse geocoding failed:', err.message)
                   }
                 }
               } catch (err) {
                 // Silently ignore outer catch
-              } finally {
-                if (isMountedRef.current) {
-                  setLoading(false)
-                }
+              }
+
+              // Always reset loading state when done
+              if (isMountedRef.current) {
+                setLoading(false)
               }
             } catch (err) {
               // Silently ignore outer error
-            } finally {
-              // Always reset loading state
               if (isMountedRef.current) {
                 setLoading(false)
               }
             }
-          })()
+          })().catch(err => {
+            // Final safety catch to prevent unhandled promise rejections
+            console.debug('Reverse geocoding error:', err?.message)
+            if (isMountedRef.current) {
+              setLoading(false)
+            }
+          })
         },
         (err) => {
           if (isMountedRef.current) {
