@@ -208,7 +208,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {incomeProjection && (
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-            <h3 className="text-lg font-bold mb-4">💰 Income Projection</h3>
+            <h3 className="text-lg font-bold mb-4">Income Projection</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-slate-400">Daily</span>
