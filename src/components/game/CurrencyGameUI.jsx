@@ -157,7 +157,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
       <div className="flex items-center justify-center h-full text-white">
         <div className="text-center">
           <p className="text-xl mb-4">Loading Currency Game...</p>
-          <div className="animate-spin text-4xl">💰</div>
+          <div className="animate-spin text-lg font-bold text-blue-400">Loading...</div>
         </div>
       </div>
     )
@@ -169,7 +169,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 border-b border-slate-700">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">💰 Currency Game</h1>
+            <h1 className="text-2xl font-bold text-white">Currency Game</h1>
             <p className="text-blue-100 text-sm">{characterData?.character_name || 'Player'}</p>
           </div>
           <div className="text-right">
@@ -192,9 +192,9 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
             }`}
           >
             {tab === 'overview' && '📊 Overview'}
-            {tab === 'properties' && '🏠 Properties'}
-            {tab === 'work' && '💼 Work'}
-            {tab === 'property' && '📍 Property Details'}
+            {tab === 'properties' && 'Properties'}
+            {tab === 'work' && 'Work'}
+            {tab === 'property' && 'Property Details'}
           </button>
         ))}
       </div>
