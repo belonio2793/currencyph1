@@ -129,14 +129,22 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     try {
       setLoading(true)
       const char = await gameAPI.getCharacter(userId)
-      
+
       if (!char) {
         setCharacter(null)
       } else {
+        // Ensure appearance data is loaded
+        if (!char.appearance) {
+          const appearance = await gameAPI.getCharacterAppearance(char.id)
+          if (appearance) {
+            char.appearance = appearance
+          }
+        }
         setCharacter(char)
         await loadGameData(char.id)
       }
     } catch (err) {
+      console.error('Game initialization error:', err)
       setError('Failed to load game: ' + err.message)
     } finally {
       setLoading(false)
