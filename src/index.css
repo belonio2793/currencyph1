@@ -19,27 +19,158 @@ body {
   color: #000000;
 }
 
-/* Force ChatBar to always use light mode appearance - override dark mode */
+/* Force ChatBar to always use light mode - comprehensive dark mode override */
 .light-mode-widget {
   color-scheme: light !important;
 }
 
-/* Critical: Override Tailwind dark mode for the messages widget */
-.light-mode-widget * {
-  color-scheme: light !important;
+/* Override dark mode for all Tailwind utilities in the widget */
+html.dark .light-mode-widget,
+html.dark .light-mode-widget * {
+  --tw-bg-opacity: 1 !important;
+  --tw-text-opacity: 1 !important;
+  --tw-border-opacity: 1 !important;
 }
 
-/* Force light appearance when dark mode is active */
-html.dark .light-mode-widget {
-  color-scheme: light !important;
+/* White backgrounds */
+html.dark .light-mode-widget .bg-white {
   background-color: white !important;
+}
+
+/* Gradient backgrounds */
+html.dark .light-mode-widget .bg-gradient-to-r {
+  background-image: linear-gradient(to right, var(--tw-gradient-stops)) !important;
+}
+
+html.dark .light-mode-widget .from-blue-600 {
+  --tw-gradient-from: #2563eb var(--tw-gradient-from-position) !important;
+  --tw-gradient-to: rgba(37, 99, 235, 0) var(--tw-gradient-to-position) !important;
+}
+
+html.dark .light-mode-widget .to-blue-700 {
+  --tw-gradient-to: #1d4ed8 var(--tw-gradient-to-position) !important;
+}
+
+/* Slate backgrounds */
+html.dark .light-mode-widget .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+
+html.dark .light-mode-widget .bg-slate-100 {
+  background-color: #f1f5f9 !important;
+}
+
+/* Blue backgrounds */
+html.dark .light-mode-widget .bg-blue-600 {
+  background-color: #2563eb !important;
+}
+
+html.dark .light-mode-widget .bg-blue-700 {
+  background-color: #1d4ed8 !important;
+}
+
+html.dark .light-mode-widget .bg-blue-800 {
+  background-color: #1e40af !important;
+}
+
+/* Red backgrounds */
+html.dark .light-mode-widget .bg-red-500 {
+  background-color: #ef4444 !important;
+}
+
+/* Green, yellow backgrounds */
+html.dark .light-mode-widget .bg-green-400 {
+  background-color: #4ade80 !important;
+}
+
+html.dark .light-mode-widget .bg-green-500 {
+  background-color: #22c55e !important;
+}
+
+html.dark .light-mode-widget .bg-yellow-400 {
+  background-color: #facc15 !important;
+}
+
+html.dark .light-mode-widget .bg-red-400 {
+  background-color: #f87171 !important;
+}
+
+/* Text colors */
+html.dark .light-mode-widget .text-white {
+  color: white !important;
+}
+
+html.dark .light-mode-widget .text-black {
   color: black !important;
 }
 
-html.dark .light-mode-widget * {
-  background-color: revert !important;
-  color: revert !important;
-  border-color: revert !important;
+html.dark .light-mode-widget .text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .light-mode-widget .text-slate-500 {
+  color: #64748b !important;
+}
+
+html.dark .light-mode-widget .text-slate-600 {
+  color: #475569 !important;
+}
+
+html.dark .light-mode-widget .text-slate-700 {
+  color: #334155 !important;
+}
+
+html.dark .light-mode-widget .text-slate-900 {
+  color: #0f172a !important;
+}
+
+html.dark .light-mode-widget .text-blue-600 {
+  color: #2563eb !important;
+}
+
+html.dark .light-mode-widget .text-red-500 {
+  color: #ef4444 !important;
+}
+
+html.dark .light-mode-widget .text-red-600 {
+  color: #dc2626 !important;
+}
+
+html.dark .light-mode-widget .text-red-700 {
+  color: #b91c1c !important;
+}
+
+html.dark .light-mode-widget .text-emerald-600 {
+  color: #059669 !important;
+}
+
+html.dark .light-mode-widget .text-green-400 {
+  color: #4ade80 !important;
+}
+
+html.dark .light-mode-widget .text-green-500 {
+  color: #22c55e !important;
+}
+
+html.dark .light-mode-widget .text-yellow-400 {
+  color: #facc15 !important;
+}
+
+/* Border colors */
+html.dark .light-mode-widget .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+html.dark .light-mode-widget .border-blue-700 {
+  border-color: #1d4ed8 !important;
+}
+
+html.dark .light-mode-widget .border-slate-300 {
+  border-color: #cbd5e1 !important;
+}
+
+html.dark .light-mode-widget .border-blue-500 {
+  border-color: #3b82f6 !important;
 }
 
 input, button {
