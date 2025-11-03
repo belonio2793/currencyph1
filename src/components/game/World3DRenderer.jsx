@@ -55,8 +55,22 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         })
       }
 
+      // Load saved character position from localStorage
+      let startX = 0, startZ = 0
+      try {
+        const savedPosition = localStorage.getItem(`character_position_${character.id}`)
+        if (savedPosition) {
+          const pos = JSON.parse(savedPosition)
+          startX = pos.x || 0
+          startZ = pos.z || 0
+          console.log('✓ Loaded saved character position:', { x: startX, z: startZ })
+        }
+      } catch (err) {
+        console.warn('Failed to load saved position:', err)
+      }
+
       // Add player to 3D world with avatar URL (fallback creates simple avatar if null)
-      world3D.addPlayer(userId, character.name, avatarUrl, 0, 0)
+      world3D.addPlayer(userId, character.name, avatarUrl, startX, startZ)
         .then(() => console.log('✓ Player added to 3D world successfully'))
         .catch(err => {
           console.warn('Failed to load avatar, using fallback:', err.message)
