@@ -79,7 +79,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className={`${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto`}>
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-700 p-4 md:p-6 flex items-center justify-between">
+        <div className={`sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 border-b ${isDark ? 'border-slate-700' : 'border-slate-200'} p-4 md:p-6 flex items-center justify-between`}>
           <div>
             <h2 className="text-2xl font-bold text-slate-100">Game Settings</h2>
             <p className="text-xs text-slate-400 mt-1">Customize your view and gameplay experience</p>
