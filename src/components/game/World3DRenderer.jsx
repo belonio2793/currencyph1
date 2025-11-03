@@ -62,14 +62,25 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           console.warn('Failed to load avatar, using fallback:', err.message)
           // Fallback is handled inside addPlayer with simple avatar creation
         })
+
+      // Load NPCs
+      const npcCount = 5 + Math.floor(Math.random() * 5)
+      for (let i = 0; i < npcCount; i++) {
+        const x = (Math.random() - 0.5) * 800
+        const z = (Math.random() - 0.5) * 800
+        world3D.addNPC(`npc-${i}`, `NPC ${i + 1}`, x, z)
+      }
+
+      // Start rendering
+      world3D.start()
     } catch (error) {
       console.error('Failed to initialize 3D world:', error)
     }
 
     // Initialize AI engine
     aiRef.current = new NPCAIEngine(
-      import.meta?.env?.VITE_X_API_KEY || 
-      import.meta?.env?.X_API_KEY || 
+      import.meta?.env?.VITE_X_API_KEY ||
+      import.meta?.env?.X_API_KEY ||
       window?.X_API_KEY
     )
 
@@ -81,29 +92,18 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
     syncRef.current.connect().then(() => {
       // Update presence with avatar
       try {
-        syncRef.current.updatePresence({ 
-          name: character.name, 
-          x: 0, 
-          y: 0, 
-          direction: 0, 
-          rpm_avatar: avatarUrl 
+        syncRef.current.updatePresence({
+          name: character.name,
+          x: 0,
+          y: 0,
+          direction: 0,
+          rpm_avatar: avatarUrl
         })
       } catch(e) {
         console.warn('Could not update presence:', e)
       }
       syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
     })
-
-    // Load NPCs
-    const npcCount = 5 + Math.floor(Math.random() * 5)
-    for (let i = 0; i < npcCount; i++) {
-      const x = (Math.random() - 0.5) * 800
-      const z = (Math.random() - 0.5) * 800
-      world3D.addNPC(`npc-${i}`, `NPC ${i + 1}`, x, z)
-    }
-
-    // Start rendering
-    world3D.start()
 
     // Keyboard input
     const handleKeyDown = (e) => {
