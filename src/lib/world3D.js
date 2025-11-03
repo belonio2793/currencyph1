@@ -398,6 +398,13 @@ export class World3D {
 
     player.targetPos = { x, z }
     player.isMoving = true
+
+    // Update map tiles based on player position
+    if (this.mapTileManager) {
+      this.mapTileManager.updatePlayerPosition(x, z).catch(err => {
+        console.warn('Failed to update map tiles:', err)
+      })
+    }
   }
 
   movePlayer(userId, speed = 8) {
