@@ -470,7 +470,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'marketplace' && (
-                  <GameMarketplace character={character} onInventoryUpdate={handleInventoryUpdate} />
+                  <CurrencyMarketplace
+                    character={character}
+                    onInventoryUpdate={handleInventoryUpdate}
+                    onListingCreated={() => loadGameData(character.id)}
+                    onPurchaseComplete={() => setCharacter({...character, money: character.money})}
+                  />
                 )}
 
                 {openModal === 'properties' && (
