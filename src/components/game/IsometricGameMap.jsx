@@ -179,44 +179,6 @@ export default function IsometricGameMap({
     }
   }, [avatarFacing, avatarMoving])
 
-  const drawLegend = useCallback((ctx, width, height) => {
-    const legendX = 20
-    const legendY = 20
-    const itemHeight = 22
-    const boxSize = 14
-    const legendWidth = 230
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'
-    ctx.fillRect(legendX - 10, legendY - 10, legendWidth, 190)
-
-    ctx.strokeStyle = 'rgba(100, 150, 200, 0.4)'
-    ctx.lineWidth = 2
-    ctx.strokeRect(legendX - 10, legendY - 10, legendWidth, 190)
-
-    ctx.fillStyle = '#60a5fa'
-    ctx.font = 'bold 14px Arial'
-    ctx.fillText('Property Types', legendX, legendY + 15)
-
-    let y = legendY + 38
-    const colorEntries = Object.entries(PROPERTY_COLORS).filter(([type]) => type !== 'default')
-    colorEntries.forEach(([type, color]) => {
-      ctx.fillStyle = color
-      ctx.fillRect(legendX, y - 10, boxSize, boxSize)
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)'
-      ctx.lineWidth = 1
-      ctx.strokeRect(legendX, y - 10, boxSize, boxSize)
-
-      ctx.fillStyle = '#e0e7ff'
-      ctx.font = '11px Arial'
-      ctx.fillText(type.charAt(0).toUpperCase() + type.slice(1), legendX + 24, y - 2)
-      y += itemHeight
-    })
-
-    ctx.fillStyle = '#94a3b8'
-    ctx.font = '10px Arial'
-    ctx.fillText('Drag map • Click properties', legendX, height - 40)
-    ctx.fillText(`${selectedCity} • WASD to move avatar`, legendX, height - 25)
-  }, [selectedCity])
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
