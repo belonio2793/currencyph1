@@ -74,15 +74,15 @@ export default function PropertyInteractionModal({
     }
   }
 
-  const getPropertyTypeEmoji = (type) => {
-    const emojis = {
-      house: '🏠',
-      business: '🏢',
-      farm: '🌾',
-      shop: '🏪',
-      factory: '🏭'
+  const getPropertyTypeLabel = (type) => {
+    const labels = {
+      house: 'House',
+      business: 'Business',
+      farm: 'Farm',
+      shop: 'Shop',
+      factory: 'Factory'
     }
-    return emojis[type] || '📍'
+    return labels[type] || 'Property'
   }
 
   const monthlyRevenue = (property.revenue_per_day || 0) * 30
