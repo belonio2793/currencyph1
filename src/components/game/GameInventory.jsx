@@ -96,8 +96,8 @@ export default function GameInventory({ character, inventory, onInventoryUpdate 
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="text-2xl">{getItemIcon(item.game_items?.item_type)}</p>
-                    <p className="font-bold mt-2">{item.game_items?.name}</p>
+                    <p className="text-xs font-semibold text-slate-300 mb-1">{getItemLabel(item.game_items?.item_type)}</p>
+                    <p className="font-bold mt-1">{item.game_items?.name}</p>
                     <p className="text-xs text-slate-400 mt-1">{item.game_items?.brand || 'Unbranded'}</p>
                   </div>
                   <div className="text-right">
