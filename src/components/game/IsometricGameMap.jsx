@@ -49,8 +49,10 @@ export default function IsometricGameMap({
   }, [])
 
   const isometricToGrid = useCallback((isoX, isoY) => {
-    const gridX = ((isoX / (TILE_SIZE / 2)) + (isoY / (TILE_SIZE / 4))) / 2
-    const gridY = ((isoY / (TILE_SIZE / 4)) - (isoX / (TILE_SIZE / 2))) / 2
+    const col = (isoX / (TILE_SIZE / 2))
+    const row = (isoY / (TILE_SIZE / 4))
+    const gridX = (col + row) / 2
+    const gridY = (row - col) / 2
     return { x: Math.round(gridX), y: Math.round(gridY) }
   }, [])
 
