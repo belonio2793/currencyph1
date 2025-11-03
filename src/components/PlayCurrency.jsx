@@ -5,6 +5,7 @@ import { citySimulationTicker } from '../lib/citySimulationTicker'
 import CharacterCreation from './game/CharacterCreation'
 import GameWorld from './game/GameWorld'
 import World3DRenderer from './game/World3DRenderer'
+import IsometricGameMap from './game/IsometricGameMap'
 import GameSettings from './game/GameSettings'
 import AvatarCreatorRPM from './game/AvatarCreatorRPM'
 import CharactersPanel from './CharactersPanel'
@@ -325,25 +326,35 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-100">3D Immersive World</h2>
-                <p className="text-xs text-slate-400 mt-1">Full 3D experience with customizable camera views. Use WASD/Arrows to move.</p>
+                <h2 className="text-xl font-bold text-slate-100">🗺️ Game World</h2>
+                <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
               </div>
               <div className="flex gap-2">
+                <button
+                  onClick={() => setOpenModal('properties')}
+                  className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                  title="View your properties"
+                >
+                  📋 My Properties
+                </button>
                 <button
                   onClick={() => setShowSettings(true)}
                   className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
                   title="Open camera and game settings"
                 >
-                  Settings
+                  ⚙️ Settings
                 </button>
               </div>
             </div>
-            <div style={{ height: '700px' }}>
-              <World3DRenderer
+            <div style={{ height: '600px' }}>
+              <IsometricGameMap
+                properties={properties}
                 character={character}
-                userId={userId}
                 city={character.current_location || character.home_city || 'Manila'}
-                onWorldReady={(world3D) => { world3DRef.current = world3D }}
+                onPropertyClick={(property) => {
+                  setSelectedPropertyForModal(property)
+                  setOpenModal('property-detail')
+                }}
               />
             </div>
           </div>
