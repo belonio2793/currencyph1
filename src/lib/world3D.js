@@ -3,6 +3,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { getMapTexture, createMapSky } from './googleMapsIntegration'
 import { MapTileManager } from './mapTileManager'
 import { latLngToWorldCoords } from './mapUtils'
+import { PropertyBuildingRenderer, StreetGridRenderer, PropertyMarkerEnhanced } from './world3DEnhancements'
 
 const gltfLoader = new GLTFLoader()
 const modelCache = new Map()
@@ -62,6 +63,11 @@ export class World3D {
 
     // Initialize map tile manager for dynamic Philippines regions
     this.mapTileManager = new MapTileManager(this.scene)
+
+    // Initialize rendering enhancers
+    this.buildingRenderer = new PropertyBuildingRenderer(this.scene)
+    this.streetRenderer = new StreetGridRenderer(this.scene)
+    this.streetRenderer.createStreetGrid(6000, 200)
 
     // Players and NPCs
     this.players = new Map()
@@ -169,21 +175,38 @@ export class World3D {
     }
   }
 
-  // Render property markers from properties array (expects lat/lng and price fields)
   renderProperties(properties = [], worldWidth = 6000, worldHeight = 6000) {
     try {
-      // Clear existing markers
       this.clearProperties()
 
       for (const prop of properties) {
         try {
-          const lat = prop.lat || prop.latitude || prop.location_lat
-          const lng = prop.lng || prop.longitude || prop.location_lng
-          if (lat == null || lng == null) continue
+          let x, y
 
-          const { x, y } = latLngToWorldCoords(worldWidth, worldHeight, lat, lng)
-          const marker = this._createPropertyMarker(prop, x, y)
-          this.propertyMarkers.set(prop.id, { prop, marker })
+          if (prop.lat != null && prop.lng != null) {
+            const lat = prop.lat || prop.latitude || prop.location_lat
+            const lng = prop.lng || prop.longitude || prop.location_lng
+            const coords = latLngToWorldCoords(worldWidth, worldHeight, lat, lng)
+            x = coords.x
+            y = coords.y
+          } else if (prop.location_x != null && prop.location_y != null) {
+            x = (prop.location_x / 300) * (worldWidth / 2) - (worldWidth / 2)
+            y = (prop.location_y / 350) * (worldHeight / 2) - (worldHeight / 2)
+          } else {
+            continue
+          }
+
+          const marker = PropertyMarkerEnhanced.createAdvancedMarker(prop, prop.owner_id ? 0x4caf50 : 0xffd166)
+          marker.position.set(x, 0, y)
+
+          const building = this.buildingRenderer.createPropertyBuilding(
+            prop.id,
+            { x, y },
+            prop.property_type || 'shop',
+            prop.current_value || prop.price || 50000
+          )
+
+          this.propertyMarkers.set(prop.id, { prop, marker, building })
           this.propertiesGroup.add(marker)
         } catch (e) {
           console.warn('Failed to create property marker for', prop && prop.id, e)
@@ -197,7 +220,10 @@ export class World3D {
   clearProperties() {
     try {
       for (const [id, entry] of this.propertyMarkers) {
-        if (entry && entry.marker) this.propertiesGroup.remove(entry.marker)
+        if (entry && entry.marker) {
+          this.propertiesGroup.remove(entry.marker)
+          this.buildingRenderer.removeBuilding(id)
+        }
       }
       this.propertyMarkers.clear()
     } catch (err) {
