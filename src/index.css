@@ -20,9 +20,57 @@ body {
 }
 
 /* Force ChatBar to always use light mode appearance */
+.light-mode-widget {
+  color-scheme: light !important;
+}
+
+/* Override all dark mode Tailwind styles for light-mode-widget and descendants */
 .light-mode-widget,
 .light-mode-widget * {
+  /* Reset text colors */
+  --tw-text-opacity: 1;
+}
+
+/* Specific overrides for common dark mode transformations */
+:root.dark .light-mode-widget {
+  background-color: white !important;
+  color: black !important;
+}
+
+:root.dark .light-mode-widget * {
   color-scheme: light !important;
+}
+
+/* Force white backgrounds on elements that might get dark backgrounds */
+:root.dark .light-mode-widget,
+:root.dark .light-mode-widget .bg-white,
+:root.dark .light-mode-widget .bg-slate-50,
+:root.dark .light-mode-widget .bg-gradient-to-r {
+  background-color: white !important;
+}
+
+/* Force text colors to stay light mode */
+:root.dark .light-mode-widget {
+  color: #000000 !important;
+}
+
+:root.dark .light-mode-widget .text-white {
+  color: white !important;
+}
+
+:root.dark .light-mode-widget .text-slate-600,
+:root.dark .light-mode-widget .text-slate-700,
+:root.dark .light-mode-widget .text-slate-900 {
+  color: #475569 !important;
+}
+
+/* Border colors */
+:root.dark .light-mode-widget .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+:root.dark .light-mode-widget .border-blue-700 {
+  border-color: #1d4ed8 !important;
 }
 
 input, button {
