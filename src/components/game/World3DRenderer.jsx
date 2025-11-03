@@ -300,6 +300,14 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
             console.warn('Failed to save final character position:', err)
           }
         }
+        // Unsubscribe property channel and clear markers
+        try {
+          if (world3DRef.current._propertyChannel && typeof world3DRef.current._propertyChannel.unsubscribe === 'function') {
+            try { world3DRef.current._propertyChannel.unsubscribe() } catch(e) {}
+          }
+          try { world3DRef.current.clearProperties() } catch(e) {}
+        } catch(e) {}
+
         world3DRef.current.destroy()
       }
 
