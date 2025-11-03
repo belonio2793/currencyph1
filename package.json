@@ -67,7 +67,9 @@
     "reconcile-balances": "node scripts/reconcile-and-display.js",
     "reconcile-all": "node scripts/reconcile-and-display.js --type=all",
     "reconcile-house": "node scripts/reconcile-and-display.js --type=house",
-    "display-balances": "node scripts/reconcile-and-display.js --no-reconcile"
+    "display-balances": "node scripts/reconcile-and-display.js --no-reconcile",
+    "world-worker": "node scripts/world-worker.js",
+    "run-world-worker": "bash scripts/run-world-worker.sh"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
