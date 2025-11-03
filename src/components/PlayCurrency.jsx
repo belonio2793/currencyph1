@@ -613,6 +613,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       <GameSettings
         world3D={world3DRef.current}
         onClose={() => setShowSettings(false)}
+        mapSettings={mapSettings}
+        onMapSettingsChange={setMapSettings}
       />
     )}
     </div>
