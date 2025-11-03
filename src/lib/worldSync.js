@@ -1,5 +1,8 @@
 import { supabase } from './supabaseClient'
 
+import { reverseGeocode } from './geocode'
+import { worldToLatLng } from './mapUtils'
+
 // Manage real-time player position sync
 export class WorldSync {
   constructor(userId, characterId, cityName) {
@@ -58,19 +61,57 @@ export class WorldSync {
     try {
       if (!this.subscription) return
 
+      const x = playerData.x || 0
+      const y = playerData.y || 0
+
       const presence = {
         user_id: this.userId,
         character_id: this.characterId,
         character_name: playerData.name || 'Player',
         city: this.cityName,
-        x: playerData.x || 0,
-        y: playerData.y || 0,
+        x,
+        y,
         direction: playerData.direction || 'down',
         rpm_avatar: playerData.rpm_avatar || playerData.avatarUrl || null,
         timestamp: Date.now()
       }
 
+      // Compute lat/lng from world coordinates if possible (assume ground plane 6000x6000 for World3D)
+      try {
+        const { lat, lng } = worldToLatLng(6000, 6000, x, y)
+        presence.lat = lat
+        presence.lng = lng
+
+        // Reverse geocode to get street and locality (best-effort)
+        try {
+          const geo = await reverseGeocode(lat, lng)
+          if (geo) {
+            presence.street = geo.street || geo.road || geo.name || null
+            presence.locality = geo.city || geo.town || geo.village || geo.county || null
+            presence.display_name = geo.display_name || null
+          }
+        } catch (gerr) {
+          console.warn('Reverse geocode failed:', gerr)
+        }
+      } catch (coordErr) {
+        // ignore coordinate conversion errors
+      }
+
+      // track presence in realtime channel
       await this.subscription.track(presence)
+
+      // remember last presence for disconnect/save
+      this.lastPresence = presence
+
+      // Persist position server-side via WorldDB edge function (best-effort)
+      try {
+        await WorldDB.saveWorldEvent(this.userId, this.characterId, this.cityName, 'position_update', {
+          x, y, lat: presence.lat || null, lng: presence.lng || null, street: presence.street || null, locality: presence.locality || null
+        })
+      } catch (perr) {
+        console.warn('Failed to persist position:', perr)
+      }
+
     } catch (error) {
       console.error('Presence update error:', error)
     }
