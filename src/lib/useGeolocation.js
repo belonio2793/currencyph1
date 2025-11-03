@@ -155,17 +155,25 @@ export function useGeolocation() {
 
     return () => {
       isMountedRef.current = false
-      navigator.geolocation.clearWatch(watchId)
+      try {
+        navigator.geolocation.clearWatch(watchId)
+      } catch (e) {
+        // ignore clearWatch errors
+      }
       // Abort all pending fetch requests
-      controllersRef.current.forEach(controller => {
-        try {
-          if (!controller.signal.aborted) {
-            controller.abort()
+      try {
+        controllersRef.current.forEach(controller => {
+          try {
+            if (controller && controller.signal && !controller.signal.aborted) {
+              controller.abort()
+            }
+          } catch (e) {
+            // ignore individual abort errors
           }
-        } catch (e) {
-          // ignore abort errors during cleanup
-        }
-      })
+        })
+      } catch (e) {
+        // ignore overall abort errors
+      }
       controllersRef.current = []
     }
   }, [])
