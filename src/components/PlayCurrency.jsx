@@ -50,7 +50,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   }}
                   className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all"
                 >
-                  ✨ Register
+                  Register
                 </button>
               </div>
             </div>
