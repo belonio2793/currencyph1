@@ -822,14 +822,14 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       {viewMode === 'listings' && (
       <>
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-6 px-6">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-slate-900 dark:text-white py-6 px-6">
         <div className="max-w-6xl mx-auto">
           <h1 className="text-2xl font-bold mb-2">Explore Philippines</h1>
-          <p className="text-blue-100 text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
+          <p className="text-blue-900 dark:text-blue-100 text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
 
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-2xl font-bold text-white">Browse by City</h3>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Browse by City</h3>
               <button
                 onClick={() => setShowAddBusiness(true)}
                 className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium"

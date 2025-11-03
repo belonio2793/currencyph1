@@ -282,7 +282,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           </div>
         )}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-4xl font-light text-white">Poker</h2>
+          <h2 className="text-4xl font-light text-slate-900 dark:text-white">Poker</h2>
           {(activeTab === 'my-tables' || activeTab === 'lobby') && (
             <div className="flex items-center gap-2">
               <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>

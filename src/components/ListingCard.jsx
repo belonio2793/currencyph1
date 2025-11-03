@@ -124,9 +124,9 @@ export default function ListingCard({
 
             {/* Centered cost display */}
             <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-4">
-              <div className="text-sm text-white/90">Estimated cost per person</div>
-              <div className="mt-2 text-4xl font-extrabold text-white drop-shadow-lg">₱{Number(listing.avg_cost).toLocaleString()}</div>
-              <div className="text-xs text-white/80 mt-1">Approximate</div>
+              <div className="text-sm text-white/90 dark:text-white/90">Estimated cost per person</div>
+              <div className="mt-2 text-4xl font-extrabold text-white dark:text-white drop-shadow-lg">₱{Number(listing.avg_cost).toLocaleString()}</div>
+              <div className="text-xs text-white/80 dark:text-white/80 mt-1">Approximate</div>
             </div>
 
             {/* Category & location_type badges overlay */}
