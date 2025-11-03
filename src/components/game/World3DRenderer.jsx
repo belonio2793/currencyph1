@@ -20,6 +20,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
   const [chatLoading, setChatLoading] = useState(false)
 
   const keysPressed = useRef({})
+  const lastSaveTimeRef = useRef(0)
 
   // Initialize 3D world
   useEffect(() => {
