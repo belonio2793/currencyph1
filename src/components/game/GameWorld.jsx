@@ -309,7 +309,7 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
 
       {/* Controls */}
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-        <h3 className="text-lg font-bold mb-3">⌨️ Controls</h3>
+        <h3 className="text-lg font-bold mb-3">Controls</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div className="bg-slate-700 rounded p-3">
             <p className="text-slate-400">Movement</p>
