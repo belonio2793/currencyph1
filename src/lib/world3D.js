@@ -529,55 +529,113 @@ export class World3D {
     }
   }
   
-  render() {
-    const deltaTime = this.clock.getDelta()
-    
-    // Update player positions
-    this.players.forEach((_, userId) => this.movePlayer(userId, 5))
-    
-    // Update NPC positions
-    this.npcs.forEach((_, id) => this.moveNPC(id, 2))
-    
-    // Update camera if tracking player
-    const firstPlayer = this.players.values().next().value
-    if (firstPlayer && this.cameraConfig.mode !== 'freecam') {
-      this.updateCameraPosition({
-        x: firstPlayer.group.position.x,
-        z: firstPlayer.group.position.z
-      })
+  handleMouseClick(event) {
+    const rect = this.renderer.domElement.getBoundingClientRect()
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+
+    this.raycaster.setFromCamera(this.mouse, this.camera)
+
+    // Check for player/NPC intersections
+    const playersArray = Array.from(this.players.values()).map(p => p.group)
+    const npcsArray = Array.from(this.npcs.values()).map(n => n.group)
+    const allObjects = [...playersArray, ...npcsArray]
+
+    const intersects = this.raycaster.intersectObjects(allObjects, true)
+
+    if (intersects.length > 0) {
+      // Emit click event or handle selection
+      const clicked = intersects[0].object
+      for (const [userId, player] of this.players) {
+        if (player.group.children.includes(clicked) || player.group === clicked || player.group.getObjectById(clicked.id)) {
+          this.selectedPlayer = userId
+          return
+        }
+      }
     }
-    
+  }
+
+  render() {
+    this.deltaTime = this.clock.getDelta()
+
+    // Update player positions with smooth movement
+    this.players.forEach((_, userId) => this.movePlayer(userId, 12))
+
+    // Update NPC positions with AI-like behavior
+    this.npcs.forEach((npc, id) => {
+      this.moveNPC(id, 4)
+
+      // Randomly change NPC target to simulate AI
+      if (!npc.isMoving || Math.random() < 0.001) {
+        const randomX = (Math.random() - 0.5) * 1000
+        const randomZ = (Math.random() - 0.5) * 1000
+        this.setNPCTarget(id, randomX, randomZ)
+      }
+    })
+
+    // Update camera if tracking player (not in freecam)
+    if (this.cameraConfig.mode !== 'freecam' && this.selectedPlayer) {
+      const player = this.players.get(this.selectedPlayer)
+      if (player) {
+        this.updateCameraPosition({
+          x: player.group.position.x,
+          z: player.group.position.z
+        })
+      }
+    }
+
+    // Render scene
     this.renderer.render(this.scene, this.camera)
   }
-  
+
   animate() {
     this.animationFrameId = requestAnimationFrame(() => this.animate())
     this.render()
   }
-  
+
   start() {
     this.animate()
   }
-  
+
   stop() {
     if (this.animationFrameId) {
       cancelAnimationFrame(this.animationFrameId)
     }
   }
-  
+
   handleResize() {
     const width = this.container.clientWidth
     const height = this.container.clientHeight
+
+    if (width === 0 || height === 0) return
+
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)
   }
-  
+
   destroy() {
     this.stop()
     window.removeEventListener('resize', this.onWindowResize)
+    this.renderer.domElement.removeEventListener('click', this.onMouseClick)
+
+    // Clean up geometries and materials
+    this.scene.traverse((object) => {
+      if (object.geometry) object.geometry.dispose()
+      if (object.material) {
+        if (Array.isArray(object.material)) {
+          object.material.forEach(m => m.dispose())
+        } else {
+          object.material.dispose()
+        }
+      }
+    })
+
     this.renderer.dispose()
-    this.container.removeChild(this.renderer.domElement)
+    if (this.container.contains(this.renderer.domElement)) {
+      this.container.removeChild(this.renderer.domElement)
+    }
+
     this.players.clear()
     this.npcs.clear()
     modelCache.clear()
