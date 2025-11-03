@@ -640,6 +640,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         onClose={() => setShowSettings(false)}
         mapSettings={mapSettings}
         onMapSettingsChange={setMapSettings}
+        isDark={gameThemeIsDark}
       />
     )}
     </div>
