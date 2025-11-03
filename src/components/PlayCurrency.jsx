@@ -21,12 +21,10 @@ import CurrencyMarketplace from './game/CurrencyMarketplace'
 import GameWork from './game/GameWork'
 import PropertyInteractionModal from './game/PropertyInteractionModal'
 
-function ThemeToggleButton() {
-  const { isDark, toggleTheme } = useTheme()
-
+function ThemeToggleButton({ isDark, onToggle }) {
   return (
     <button
-      onClick={toggleTheme}
+      onClick={onToggle}
       className="p-2 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
       title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
     >
