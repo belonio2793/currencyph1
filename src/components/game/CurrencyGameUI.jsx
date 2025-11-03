@@ -4,7 +4,7 @@ import { CurrencyGameEngine } from '../../lib/currencyGameEngine'
 import PropertyInteractionModal from './PropertyInteractionModal'
 import GameWork from './GameWork'
 
-export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }) {
+export default function CurrencyGameUI({ character, world3D, onCharacterUpdate, isDark = true }) {
   const [gameEngine, setGameEngine] = useState(null)
   const [activeTab, setActiveTab] = useState('overview')
   const [selectedProperty, setSelectedProperty] = useState(null)
@@ -164,7 +164,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
   }
 
   return (
-    <div className="h-full flex flex-col bg-slate-900">
+    <div className={`h-full flex flex-col ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
       {/* Header with balance */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 border-b border-slate-700">
         <div className="flex items-center justify-between">
@@ -180,7 +180,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-slate-700 bg-slate-800 overflow-x-auto flex">
+      <div className={`border-b overflow-x-auto flex ${isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-slate-100'}`}>
         {['overview', 'properties', 'work', 'property'].map(tab => (
           <button
             key={tab}
@@ -316,7 +316,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate }
         )}
 
         {activeTab === 'property' && selectedProperty && (
-          <PropertyInteractionModal
+          <PropertyInteractionModal isDark={isDark}
             property={selectedProperty}
             character={characterData}
             isOpen={true}
