@@ -62,7 +62,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 <div className="text-xs mt-1">Design your 3D character with ReadyPlayer.me</div>
               </div>
               <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
-                <div className="text-2xl mb-2">🌍</div>
+                <div className="text-2xl mb-2"></div>
                 <div className="font-semibold text-slate-300">Explore World</div>
                 <div className="text-xs mt-1">Walk around Philippine cities and meet NPCs</div>
               </div>
