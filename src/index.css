@@ -19,6 +19,15 @@ body {
   color: #000000;
 }
 
+/* Prevent dark mode from affecting ChatBar */
+div.fixed.bottom-0.right-0.z-50.flex.flex-col {
+  color-scheme: light !important;
+}
+
+div.fixed.bottom-0.right-0.z-50.flex.flex-col * {
+  color-scheme: light !important;
+}
+
 input, button {
   font-family: inherit;
 }
