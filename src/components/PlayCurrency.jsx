@@ -40,7 +40,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   }}
                   className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
                 >
-                  🔐 Login
+                  Login
                 </button>
                 <button
                   onClick={() => {
