@@ -16,7 +16,7 @@ export class World3D {
 
     // Camera settings with presets
     this.cameraConfig = {
-      mode: 'isometric', // topdown, isometric, thirdperson, freecam
+      mode: 'firstperson', // firstperson, topdown, isometric, thirdperson, freecam
       height: 600,
       distance: 400,
       angle: 45,
