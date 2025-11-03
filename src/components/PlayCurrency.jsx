@@ -401,6 +401,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   setSelectedPropertyForModal(property)
                   setOpenModal('property-detail')
                 }}
+                mapSettings={mapSettings}
+                onCharacterMove={handleCharacterMove}
               />
             </div>
           </div>
