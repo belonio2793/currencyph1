@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { gameAPI } from '../lib/gameAPI'
 import { citySimulationTicker } from '../lib/citySimulationTicker'
+import { useTheme } from '../lib/ThemeContext'
 import CharacterCreation from './game/CharacterCreation'
 import GameWorld from './game/GameWorld'
 import World3DRenderer from './game/World3DRenderer'
@@ -390,6 +391,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 >
                   Settings
                 </button>
+                <ThemeToggleButton />
               </div>
             </div>
             <div style={{ height: '600px' }}>
