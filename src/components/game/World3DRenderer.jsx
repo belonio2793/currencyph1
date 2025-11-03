@@ -327,7 +327,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           })()}
           <div>
             <p className="text-sm font-bold text-slate-100">{character.name}</p>
-            <p className="text-xs text-slate-400">📍 {city}</p>
+            <p className="text-xs text-slate-400">Location: {city}</p>
             <p className="text-xs text-slate-400">Level <span className="text-cyan-400 font-bold">{character.level || 0}</span></p>
             <p className="text-xs text-slate-500 mt-1">💰 {(character.money || 0).toLocaleString()} PHP</p>
           </div>
