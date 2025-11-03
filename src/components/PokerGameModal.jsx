@@ -444,9 +444,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               </div>
               
               {/* Community Cards */}
-              <div className="bg-slate-800 rounded-xl border border-slate-700 p-6 space-y-4">
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 space-y-4">
                 <div className="flex justify-center gap-2">
-                  <div className="text-slate-400 text-sm font-semibold mr-4">Community:</div>
+                  <div className="text-slate-600 dark:text-slate-400 text-sm font-semibold mr-4">Community:</div>
                   <div className="flex gap-2">
                     {communityCards.length === 0 ? (
                       <div className="text-slate-500 text-sm italic">Waiting for cards...</div>
