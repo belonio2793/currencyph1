@@ -185,19 +185,19 @@ export default function PropertyInteractionModal({
         <div className="p-6 space-y-6">
           {/* Property Stats */}
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-700 p-3 rounded">
+            <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} p-3 rounded`}>
               <p className="text-slate-400 text-xs">Current Value</p>
               <p className="text-xl font-bold text-yellow-400">₱{(property.current_value || 0).toLocaleString()}</p>
             </div>
-            <div className="bg-slate-700 p-3 rounded">
+            <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} p-3 rounded`}>
               <p className="text-slate-400 text-xs">Daily Revenue</p>
               <p className="text-xl font-bold text-green-400">₱{(property.revenue_per_day || 0).toLocaleString()}</p>
             </div>
-            <div className="bg-slate-700 p-3 rounded">
+            <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} p-3 rounded`}>
               <p className="text-slate-400 text-xs">Monthly Revenue</p>
               <p className="text-lg font-bold text-green-400">₱{monthlyRevenue.toLocaleString()}</p>
             </div>
-            <div className="bg-slate-700 p-3 rounded">
+            <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} p-3 rounded`}>
               <p className="text-slate-400 text-xs">Annual ROI</p>
               <p className="text-lg font-bold text-blue-400">{roi}%</p>
             </div>
