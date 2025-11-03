@@ -77,7 +77,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-slate-800 border border-slate-700 rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto">
+      <div className={`${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto`}>
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-700 p-4 md:p-6 flex items-center justify-between">
           <div>
