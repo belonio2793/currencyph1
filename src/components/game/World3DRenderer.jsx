@@ -269,6 +269,17 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         }
         world3DRef.current.destroy()
       }
+
+      // Clear presence poll and disconnect world sync (persist last presence)
+      try {
+        if (syncRef.current) {
+          if (syncRef.current._pollInterval) {
+            clearInterval(syncRef.current._pollInterval)
+            syncRef.current._pollInterval = null
+          }
+          try { syncRef.current.disconnect() } catch(e) { console.warn('Failed to disconnect world sync:', e) }
+        }
+      } catch(e) { console.warn('Error during world cleanup:', e) }
     }
   }, [character, userId, city])
 
