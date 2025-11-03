@@ -156,7 +156,9 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       clearInterval(gameLoop)
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
-      world3D.destroy()
+      if (world3DRef.current) {
+        world3DRef.current.destroy()
+      }
     }
   }, [character, userId, city])
 
