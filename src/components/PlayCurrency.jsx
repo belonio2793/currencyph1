@@ -300,10 +300,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
+      <div className={`min-h-screen ${gameThemeIsDark ? 'bg-gradient-to-br from-slate-900 to-slate-800' : 'bg-gradient-to-br from-slate-100 to-slate-50'} flex items-center justify-center`}>
         <div className="text-center">
-          <div className="text-4xl font-bold text-blue-400 mb-4">Play Currency</div>
-          <p className="text-slate-400">Loading your adventure...</p>
+          <div className={`text-4xl font-bold ${gameThemeIsDark ? 'text-blue-400' : 'text-blue-600'} mb-4`}>Play Currency</div>
+          <p className={gameThemeIsDark ? 'text-slate-400' : 'text-slate-600'}>Loading your adventure...</p>
         </div>
       </div>
     )
@@ -314,9 +314,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
+    <div className={`min-h-screen ${gameThemeIsDark ? 'bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100' : 'bg-gradient-to-br from-slate-100 to-slate-50 text-slate-900'}`}>
       {/* Header */}
-      <div className="bg-slate-800/50 border-b border-slate-700">
+      <div className={`${gameThemeIsDark ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-200/30 border-slate-300'} border-b`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
