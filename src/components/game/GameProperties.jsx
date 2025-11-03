@@ -111,51 +111,92 @@ export default function GameProperties({ character, properties }) {
 
       {/* Properties List */}
       {properties.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-3">
           {properties.map((property, idx) => {
             const type = PROPERTY_TYPES[property.property_type]
             const monthlyRevenue = (property.revenue_per_day || 0) * 30
+            const isExpanded = expandedProperties.has(idx)
 
             return (
-              <div key={idx} className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <p className="text-4xl">{type?.emoji}</p>
-                    <h3 className="text-xl font-bold mt-2">{property.name}</h3>
+              <div key={idx} className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden">
+                {/* Property Header - Always Visible */}
+                <div
+                  onClick={() => togglePropertyExpanded(idx)}
+                  className="p-4 cursor-pointer hover:bg-slate-700/50 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4 flex-1">
+                      <p className="text-3xl">{type?.emoji}</p>
+                      <div>
+                        <h3 className="text-lg font-bold">{property.name}</h3>
+                        <p className="text-slate-400 text-sm">
+                          {property.city}, {property.province}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="text-right">
+                        <p className="text-sm text-green-400 font-bold">₱{(property.revenue_per_day || 0).toLocaleString()}/day</p>
+                        <span className="px-2 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded inline-block mt-1">
+                          {property.status}
+                        </span>
+                      </div>
+                      <button
+                        className="p-2 hover:bg-slate-600 rounded transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          togglePropertyExpanded(idx)
+                        }}
+                      >
+                        {isExpanded ? '▼' : '▶'}
+                      </button>
+                    </div>
                   </div>
-                  <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 text-xs rounded">
-                    {property.status}
-                  </span>
                 </div>
 
-                <p className="text-slate-400 text-sm mb-4">
-                  {property.city}, {property.province}
-                </p>
+                {/* Property Details - Expandable */}
+                {isExpanded && (
+                  <div className="px-4 pb-4 pt-2 border-t border-slate-700 space-y-3">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-slate-700 rounded p-3">
+                        <p className="text-slate-400 text-xs mb-1">Property Value</p>
+                        <p className="font-bold text-yellow-400">₱{(property.current_value || 0).toLocaleString()}</p>
+                      </div>
+                      <div className="bg-slate-700 rounded p-3">
+                        <p className="text-slate-400 text-xs mb-1">Daily Revenue</p>
+                        <p className="font-bold text-green-400">₱{(property.revenue_per_day || 0).toLocaleString()}</p>
+                      </div>
+                      <div className="bg-slate-700 rounded p-3 col-span-2">
+                        <p className="text-slate-400 text-xs mb-1">Monthly Revenue</p>
+                        <p className="font-bold text-green-400">₱{monthlyRevenue.toLocaleString()}</p>
+                      </div>
+                    </div>
 
-                <div className="space-y-2 bg-slate-700 rounded p-4 mb-4">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Property Value</span>
-                    <span className="font-bold text-yellow-400">₱{(property.current_value || 0).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Daily Revenue</span>
-                    <span className="font-bold text-green-400">₱{(property.revenue_per_day || 0).toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t border-slate-600">
-                    <span className="text-slate-400">Monthly Revenue</span>
-                    <span className="font-bold text-green-400">₱{monthlyRevenue.toLocaleString()}</span>
-                  </div>
-                </div>
+                    {property.workers_count > 0 && (
+                      <div className="bg-slate-700 rounded p-3">
+                        <p className="text-slate-400 text-xs mb-2">Workers</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm">👥 {property.workers_count} / {property.max_workers}</span>
+                          <div className="flex-1 ml-4 bg-slate-600 rounded-full h-2">
+                            <div
+                              className="bg-blue-500 h-full rounded-full transition-all"
+                              style={{ width: `${(property.workers_count / (property.max_workers || 1)) * 100}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
-                {property.workers_count > 0 && (
-                  <div className="text-sm text-slate-400 mb-4">
-                    👥 {property.workers_count} / {property.max_workers} Workers
+                    <div className="flex gap-2 pt-2">
+                      <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm font-medium">
+                        ⚙️ Manage
+                      </button>
+                      <button className="flex-1 px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600 transition-colors text-sm">
+                        📊 Details
+                      </button>
+                    </div>
                   </div>
                 )}
-
-                <button className="w-full px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600 transition-colors text-sm">
-                  ⚙️ Manage Property
-                </button>
               </div>
             )
           })}
