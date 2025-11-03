@@ -19,23 +19,27 @@ body {
   color: #000000;
 }
 
-/* Force ChatBar to always use light mode appearance */
+/* Force ChatBar to always use light mode appearance - override dark mode */
 .light-mode-widget {
   color-scheme: light !important;
-  filter: none !important;
 }
 
-/* Isolate the widget from parent dark mode */
-:root.dark .light-mode-widget {
-  color-scheme: light;
-  --tw-bg-opacity: 1;
-  --tw-text-opacity: 1;
-  --tw-border-opacity: 1;
-}
-
-/* Remove dark mode overrides for all children */
-:root.dark .light-mode-widget * {
+/* Critical: Override Tailwind dark mode for the messages widget */
+.light-mode-widget * {
   color-scheme: light !important;
+}
+
+/* Force light appearance when dark mode is active */
+html.dark .light-mode-widget {
+  color-scheme: light !important;
+  background-color: white !important;
+  color: black !important;
+}
+
+html.dark .light-mode-widget * {
+  background-color: revert !important;
+  color: revert !important;
+  border-color: revert !important;
 }
 
 input, button {
