@@ -17,8 +17,8 @@ export default function GameCombat({ combatData, onClose }) {
     <div className={`fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 transition-opacity ${animating ? 'opacity-100' : 'opacity-0'}`}>
       <div className="bg-gradient-to-b from-slate-800 to-slate-900 rounded-lg max-w-md w-full p-8 border-2 border-yellow-500">
         <div className="text-center">
-          <div className="text-6xl mb-4 animate-bounce">
-            {won ? '💰' : '📉'}
+          <div className="text-lg font-bold mb-4 text-center">
+            {won ? 'Success!' : 'Failed!'}
           </div>
 
           <h2 className={`text-3xl font-bold mb-4 ${won ? 'text-green-400' : 'text-red-400'}`}>
@@ -46,7 +46,7 @@ export default function GameCombat({ combatData, onClose }) {
                     <p className="text-slate-400 text-sm">Items Dropped</p>
                     <div className="mt-2 space-y-1">
                       {itemsDropped.map((item, idx) => (
-                        <p key={idx} className="text-blue-400">🎁 {item.name}</p>
+                        <p key={idx} className="text-blue-400">{item.name}</p>
                       ))}
                     </div>
                   </div>
