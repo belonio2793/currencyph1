@@ -330,25 +330,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 </p>
               </div>
               <div className="flex gap-2">
-                {use3DWorld && (
-                  <button
-                    onClick={() => setShowSettings(true)}
-                    className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                    title="Open camera and game settings"
-                  >
-                    ⚙️ Settings
-                  </button>
-                )}
                 <button
-                  onClick={() => setUse3DWorld(!use3DWorld)}
-                  className={`px-3 py-2 rounded text-white text-sm font-medium whitespace-nowrap ${
-                    use3DWorld
-                      ? 'bg-purple-600 hover:bg-purple-700'
-                      : 'bg-slate-700 hover:bg-slate-600'
-                  }`}
-                  title={use3DWorld ? 'Switch to 2D view' : 'Switch to 3D view'}
+                  onClick={() => setShowSettings(true)}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                  title="Open camera and game settings"
                 >
-                  {use3DWorld ? '2D View' : '3D View'}
+                  ⚙️ Settings
                 </button>
               </div>
             </div>
