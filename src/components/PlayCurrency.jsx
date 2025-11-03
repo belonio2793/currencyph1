@@ -22,7 +22,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
         <div className="w-full max-w-2xl">
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 md:p-12 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-blue-400 mb-4">⚔️ Play Currency</h1>
+            <h1 className="text-4xl md:text-5xl font-bold text-blue-400 mb-4">Play Currency</h1>
             <p className="text-slate-300 text-lg mb-8">Create Your Adventure in the Philippines Economy Game</p>
 
             <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-6 mb-8">
