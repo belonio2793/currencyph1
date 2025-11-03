@@ -351,6 +351,16 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         {/* Navigation Tabs for Modals */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+          <button
+            onClick={() => setShowCurrencyGame(!showCurrencyGame)}
+            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors font-bold ${
+              showCurrencyGame
+                ? 'bg-green-600 text-white'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            }`}
+          >
+            💰 Currency Game
+          </button>
           {[
             { id: 'cities', label: 'Cities' },
             { id: 'inventory', label: 'Inventory' },
@@ -372,6 +382,17 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             </button>
           ))}
         </div>
+
+        {/* Currency Game Panel */}
+        {showCurrencyGame && (
+          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
+            <CurrencyGameUI
+              character={character}
+              world3D={world3DRef.current}
+              onCharacterUpdate={(updated) => setCharacter(updated)}
+            />
+          </div>
+        )}
 
         {/* Modal for tabs */}
         {openModal && (
