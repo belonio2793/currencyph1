@@ -402,28 +402,44 @@ export class World3D {
   updatePlayerPosition(userId, x, z) {
     const player = this.players.get(userId)
     if (!player) return
-    
+
     player.targetPos = { x, z }
+    player.isMoving = true
   }
-  
-  movePlayer(userId, speed = 5) {
+
+  movePlayer(userId, speed = 8) {
     const player = this.players.get(userId)
     if (!player) return
-    
+
     const { group, targetPos } = player
     const dx = targetPos.x - group.position.x
     const dz = targetPos.z - group.position.z
     const dist = Math.hypot(dx, dz)
-    
-    if (dist > speed) {
-      group.position.x += (dx / dist) * speed
-      group.position.z += (dz / dist) * speed
-      
-      // Rotate to face direction
-      group.rotation.y = Math.atan2(dx, dz)
+
+    if (dist > speed * 0.1) {
+      const moveX = (dx / dist) * speed
+      const moveZ = (dz / dist) * speed
+
+      group.position.x += moveX
+      group.position.z += moveZ
+
+      // Smooth rotation to face direction
+      const targetRotation = Math.atan2(dx, dz)
+      const angleDiff = targetRotation - group.rotation.y
+
+      // Normalize angle difference to [-PI, PI]
+      let normalizedDiff = angleDiff
+      while (normalizedDiff > Math.PI) normalizedDiff -= 2 * Math.PI
+      while (normalizedDiff < -Math.PI) normalizedDiff += 2 * Math.PI
+
+      group.rotation.y += normalizedDiff * 0.1 // Smooth rotation
+      player.direction = group.rotation.y
+
+      player.isMoving = true
     } else {
       group.position.x = targetPos.x
       group.position.z = targetPos.z
+      player.isMoving = false
     }
   }
   
