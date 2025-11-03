@@ -106,6 +106,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [showSettings, setShowSettings] = useState(false)
   const [showCurrencyGame, setShowCurrencyGame] = useState(false)
   const [selectedPropertyForModal, setSelectedPropertyForModal] = useState(null)
+  const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
+  const [characterPosition, setCharacterPosition] = useState({ x: 150, y: 175, city: 'Manila' })
   const world3DRef = useRef(null)
 
   useEffect(() => {
