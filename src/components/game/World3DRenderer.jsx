@@ -389,6 +389,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
                 if (data && data.status === 'OK') {
                   const img = `https://maps.googleapis.com/maps/api/streetview?size=1280x720&location=${latLng.lat},${latLng.lng}&fov=90&heading=0&pitch=0&key=${key}`
                   setStreetViewImage(img)
+                  setStreetViewCoords({ lat: latLng.lat, lng: latLng.lng })
                   setStreetViewOpen(true)
                 } else {
                   alert('No Street View imagery available at this location')
