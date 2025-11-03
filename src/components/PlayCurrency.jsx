@@ -312,16 +312,50 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         {/* World View - Default Main Display */}
         {character && (
           <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
-            <div className="p-4 border-b border-slate-700">
-              <h2 className="text-xl font-bold text-slate-100">Immersive World</h2>
-              <p className="text-xs text-slate-400 mt-1">Walk around, find NPCs, and trade. Use WASD/Arrows or click to move.</p>
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+              <div className="flex-1">
+                <h2 className="text-xl font-bold text-slate-100">{use3DWorld ? '🎮 3D Immersive World' : '🗺️ 2D World'}</h2>
+                <p className="text-xs text-slate-400 mt-1">
+                  {use3DWorld
+                    ? 'Full 3D experience with customizable camera views. Use WASD/Arrows to move.'
+                    : 'Walk around, find NPCs, and trade. Use WASD/Arrows or click to move.'}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setShowSettings(true)}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                  title="Open camera and game settings"
+                >
+                  ⚙️ Settings
+                </button>
+                <button
+                  onClick={() => setUse3DWorld(!use3DWorld)}
+                  className={`px-3 py-2 rounded text-white text-sm font-medium whitespace-nowrap ${
+                    use3DWorld
+                      ? 'bg-purple-600 hover:bg-purple-700'
+                      : 'bg-slate-700 hover:bg-slate-600'
+                  }`}
+                  title={use3DWorld ? 'Switch to 2D view' : 'Switch to 3D view'}
+                >
+                  {use3DWorld ? '2D View' : '3D View'}
+                </button>
+              </div>
             </div>
             <div style={{ height: '700px' }}>
-              <World2DRenderer
-                character={character}
-                userId={userId}
-                city={character.current_location || character.home_city || 'Manila'}
-              />
+              {use3DWorld ? (
+                <World3DRenderer
+                  character={character}
+                  userId={userId}
+                  city={character.current_location || character.home_city || 'Manila'}
+                />
+              ) : (
+                <World2DRenderer
+                  character={character}
+                  userId={userId}
+                  city={character.current_location || character.home_city || 'Manila'}
+                />
+              )}
             </div>
           </div>
         )}
