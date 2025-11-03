@@ -295,19 +295,19 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         <div className="mb-8 flex items-center gap-2 border-b border-slate-700">
           <button
             onClick={() => setActiveTab('lobby')}
-            className={`px-6 py-3 font-semibold transition ${activeTab === 'lobby' ? 'border-b-2 border-purple-400 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300'}`}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'lobby' ? 'border-b-2 border-purple-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
             Lobby
           </button>
           <button
             onClick={() => setActiveTab('my-tables')}
-            className={`px-6 py-3 font-semibold transition ${activeTab === 'my-tables' ? 'border-b-2 border-blue-400 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300'}`}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'my-tables' ? 'border-b-2 border-blue-400 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
             My Tables
           </button>
           <button
             onClick={() => setActiveTab('network-balances')}
-            className={`px-6 py-3 font-semibold transition ${activeTab === 'network-balances' ? 'border-b-2 border-amber-500 text-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-300'}`}
+            className={`px-6 py-3 font-semibold transition ${activeTab === 'network-balances' ? 'border-b-2 border-amber-500 text-white' : 'text-slate-400 hover:text-slate-300'}`}
           >
             Network Balances
           </button>
@@ -325,7 +325,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                   <>
                     {/* My Tables Section */}
                     <div className="mb-6">
-                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">My Tables</h3>
+                      <h3 className="text-xl font-semibold text-white mb-4">My Tables</h3>
                       {getMyCreatedTables().length === 0 ? (
                         <div className="text-center py-16 flex flex-col items-center justify-center">
                           <div className="text-slate-400 mb-3 text-sm font-medium">You have no created tables</div>
@@ -400,7 +400,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
 
                     {/* Player Tables Section */}
                     <div>
-                      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Player Tables</h3>
+                      <h3 className="text-xl font-semibold text-white mb-4">Player Tables</h3>
                       {getPlayerTables().length === 0 ? (
                         <div className="text-slate-400 text-center py-8">No player tables available</div>
                       ) : (
