@@ -7,7 +7,8 @@ export default function PropertyInteractionModal({
   onClose,
   onBuy,
   onSell,
-  onUpgrade
+  onUpgrade,
+  isDark = true
 }) {
   const [action, setAction] = useState('view')
   const [loading, setLoading] = useState(false)
