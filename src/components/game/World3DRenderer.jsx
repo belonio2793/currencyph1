@@ -350,7 +350,65 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         >
           ⚙️ Settings
         </button>
+        <button
+          onClick={async () => {
+            try {
+              const world3D = world3DRef.current
+              if (!world3D) return
+              const player = world3D.players.get(userId)
+              if (!player) return alert('Player not ready')
+
+              // Use mapTileManager to approximate lat/lng
+              const mtm = world3D.mapTileManager
+              const nearest = mtm ? mtm.getNearestCity(player.group.position.x, player.group.position.z) : null
+              const latLng = (function() {
+                if (!nearest || !mtm) return { lat: world3D.mapCenter.lat, lng: world3D.mapCenter.lng }
+                const latOffset = (player.group.position.z) / 111320
+                const lngOffset = (player.group.position.x) / (111320 * Math.cos(nearest.lat * Math.PI / 180))
+                return { lat: nearest.lat - latOffset, lng: nearest.lng + lngOffset }
+              })()
+
+              const key = import.meta.env?.VITE_GOOGLE_API_KEY || import.meta.env?.GOOGLE_API_KEY || ''
+              if (!key) return alert('Google API key not configured (VITE_GOOGLE_API_KEY)')
+
+              const metaUrl = `https://maps.googleapis.com/maps/api/streetview/metadata?location=${latLng.lat},${latLng.lng}&key=${key}`
+              try {
+                const res = await fetch(metaUrl)
+                const data = await res.json()
+                if (data && data.status === 'OK') {
+                  const img = `https://maps.googleapis.com/maps/api/streetview?size=1280x720&location=${latLng.lat},${latLng.lng}&fov=90&heading=0&pitch=0&key=${key}`
+                  setStreetViewImage(img)
+                  setStreetViewOpen(true)
+                } else {
+                  alert('No Street View imagery available at this location')
+                }
+              } catch (err) {
+                console.warn('Street View metadata fetch failed', err)
+                alert('Street View API error')
+              }
+            } catch (e) {
+              console.warn('Street View open failed', e)
+            }
+          }}
+          className="px-4 py-2 bg-transparent hover:bg-white/10 text-white rounded-lg font-medium flex items-center gap-2 transition-all border border-white/30 hover:border-white/50"
+        >
+          🛣️ Street View
+        </button>
       </div>
+
+      {/* Street View modal */}
+      {streetViewOpen && (
+        <div className="absolute inset-0 z-50 bg-black/90 flex items-center justify-center p-4">
+          <div className="relative w-full max-w-4xl h-[70vh] bg-black rounded">
+            <button className="absolute top-2 right-2 z-60 px-3 py-1 bg-slate-700 rounded" onClick={()=>{ setStreetViewOpen(false); setStreetViewImage(null) }}>Close</button>
+            {streetViewImage ? (
+              <img src={streetViewImage} alt="Street View" className="w-full h-full object-cover rounded" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-white">Loading...</div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Chat Modal */}
       {chatUI.isOpen && chatUI.npc && (
