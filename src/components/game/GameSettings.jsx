@@ -294,15 +294,15 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
           </div>
 
           {/* Map & Avatar Settings Section */}
-          <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">⛰️ Map & Avatar Controls</h3>
+          <div className="border-t border-slate-300 pt-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">⛰️ Map & Avatar Controls</h3>
 
             <div className="space-y-4">
               {/* Avatar Speed */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-300">Avatar Movement Speed</label>
-                  <span className="text-sm font-bold text-blue-400">{avatarSpeed.toFixed(1)}x</span>
+                  <label className="text-sm font-medium text-slate-700">Avatar Movement Speed</label>
+                  <span className="text-sm font-bold text-blue-600">{avatarSpeed.toFixed(1)}x</span>
                 </div>
                 <input
                   type="range"
@@ -311,16 +311,16 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="0.5"
                   value={avatarSpeed}
                   onChange={(e) => setAvatarSpeed(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                 />
-                <p className="text-xs text-slate-400 mt-1">How fast your avatar moves with WASD/Arrow keys</p>
+                <p className="text-xs text-slate-600 mt-1">How fast your avatar moves with WASD/Arrow keys</p>
               </div>
 
               {/* Camera Speed */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-300">Camera Pan Speed</label>
-                  <span className="text-sm font-bold text-blue-400">{cameraSpeed.toFixed(1)}x</span>
+                  <label className="text-sm font-medium text-slate-700">Camera Pan Speed</label>
+                  <span className="text-sm font-bold text-blue-600">{cameraSpeed.toFixed(1)}x</span>
                 </div>
                 <input
                   type="range"
@@ -329,35 +329,35 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="0.1"
                   value={cameraSpeed}
                   onChange={(e) => setCameraSpeed(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                 />
-                <p className="text-xs text-slate-400 mt-1">How fast the camera responds when dragging the map</p>
+                <p className="text-xs text-slate-600 mt-1">How fast the camera responds when dragging the map</p>
               </div>
 
               {/* Avatar Trail */}
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
                 <input
                   type="checkbox"
                   checked={showAvatarTrail}
                   onChange={(e) => setShowAvatarTrail(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-300">Show Avatar Trail</span>
-                <span className="text-xs text-slate-500 ml-auto">(Movement history)</span>
+                <span className="text-sm text-slate-700">Show Avatar Trail</span>
+                <span className="text-xs text-slate-600 ml-auto">(Movement history)</span>
               </label>
             </div>
           </div>
 
           {/* Info Section */}
-          <div className="border-t border-slate-700 pt-6 bg-slate-700/30 rounded-lg p-4">
-            <p className="text-xs text-slate-400 leading-relaxed">
-              <strong className="text-slate-300">💡 Tip:</strong> Camera settings are applied immediately. Try different camera modes and presets to find your preferred view! Zoom and FOV adjustments work across all modes. Map controls allow you to customize avatar movement and camera panning sensitivity.
+          <div className="border-t border-slate-300 pt-6 bg-slate-100 rounded-lg p-4">
+            <p className="text-xs text-slate-600 leading-relaxed">
+              <strong className="text-slate-700">💡 Tip:</strong> Camera settings are applied immediately. Try different camera modes and presets to find your preferred view! Zoom and FOV adjustments work across all modes. Map controls allow you to customize avatar movement and camera panning sensitivity.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-700 p-4 md:p-6 flex justify-end gap-2 bg-slate-700/20">
+        <div className="border-t border-slate-300 p-4 md:p-6 flex justify-end gap-2 bg-slate-50">
           <button
             onClick={onClose}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium transition-all shadow-lg"
