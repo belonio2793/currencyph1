@@ -384,16 +384,10 @@ export default function IsometricGameMap({
         const gridPos = isometricToGrid(isoX, isoY)
         const gameX = (gridPos.x / GRID_WIDTH) * MAP_WIDTH
         const gameY = (gridPos.y / GRID_HEIGHT) * MAP_HEIGHT
-        const prop = getPropertyAtGamePos(gameX, gameY)
-
-        if (prop) {
-          setHoveredPropertyId(prop.id)
-          setTooltipPos({ x: e.clientX - rect.left, y: e.clientY - rect.top })
-          setTooltipData(prop)
-        } else {
-          setHoveredPropertyId(null)
-          setTooltipData(null)
-        }
+        // Don't show hover effects or tooltips
+        // Tiles are managed via the Properties tab instead
+        setHoveredPropertyId(null)
+        setTooltipData(null)
       }
     }
 
