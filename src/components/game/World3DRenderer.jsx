@@ -35,6 +35,9 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       const world3D = new World3D(containerRef.current, mapCenter)
       world3DRef.current = world3D
 
+      // Force first-person camera for immersive experience
+      try { world3D.setCameraMode('firstperson', { fov: 75, zoom: 1.0 }) } catch(e) {}
+
       // Notify parent component that world is ready
       if (onWorldReady) {
         onWorldReady(world3D)
