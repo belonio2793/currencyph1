@@ -18,6 +18,7 @@ import CityManager from './game/CityManager'
 import CurrencyGameUI from './game/CurrencyGameUI'
 import CurrencyMarketplace from './game/CurrencyMarketplace'
 import GameWork from './game/GameWork'
+import PropertyInteractionModal from './game/PropertyInteractionModal'
 
 export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   // Check if user is logged in
