@@ -322,7 +322,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-100">{use3DWorld ? '🎮 3D Immersive World' : '🗺️ 2D World'}</h2>
+                <h2 className="text-xl font-bold text-slate-100">3D Immersive World</h2>
                 <p className="text-xs text-slate-400 mt-1">Full 3D experience with customizable camera views. Use WASD/Arrows to move.</p>
               </div>
               <div className="flex gap-2">
@@ -331,7 +331,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
                   title="Open camera and game settings"
                 >
-                  ⚙️ Settings
+                  Settings
                 </button>
               </div>
             </div>
@@ -349,12 +349,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         {/* Navigation Tabs for Modals */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
-            { id: 'cities', label: '🏙️ Cities' },
-            { id: 'inventory', label: '🎒 Inventory' },
-            { id: 'equipment', label: '👕 Equipment' },
-            { id: 'marketplace', label: '🏪 Marketplace' },
-            { id: 'properties', label: '🏠 Properties' },
-            { id: 'banking', label: '🏦 Banking' }
+            { id: 'cities', label: 'Cities' },
+            { id: 'inventory', label: 'Inventory' },
+            { id: 'equipment', label: 'Equipment' },
+            { id: 'marketplace', label: 'Marketplace' },
+            { id: 'properties', label: 'Properties' },
+            { id: 'banking', label: 'Banking' }
           ].map(tab => (
             <button
               key={tab.id}
