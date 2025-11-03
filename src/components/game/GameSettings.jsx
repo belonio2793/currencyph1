@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-export default function GameSettings({ world3D, onClose, mapSettings = {}, onMapSettingsChange = null }) {
+export default function GameSettings({ world3D, onClose, mapSettings = {}, onMapSettingsChange = null, isDark = true }) {
   const [cameraMode, setCameraMode] = useState(world3D?.cameraConfig?.mode || 'isometric')
   const [height, setHeight] = useState(world3D?.cameraConfig?.height || 600)
   const [distance, setDistance] = useState(world3D?.cameraConfig?.distance || 400)
