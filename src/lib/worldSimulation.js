@@ -95,15 +95,15 @@ export class WeatherSystem {
     }
   }
 
-  getWeatherEmoji() {
-    const emojis = {
-      'clear': '☀️',
-      'cloudy': '⛅',
-      'rainy': '🌧️',
-      'hot': '🔥',
-      'stormy': '⛈️'
+  getWeatherConditionLabel() {
+    const labels = {
+      'clear': 'Clear',
+      'cloudy': 'Cloudy',
+      'rainy': 'Rainy',
+      'hot': 'Hot',
+      'stormy': 'Stormy'
     }
-    return emojis[this.condition] || '☀️'
+    return labels[this.condition] || 'Clear'
   }
 }
 
