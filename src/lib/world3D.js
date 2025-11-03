@@ -269,11 +269,8 @@ export class World3D {
         reject(error)
       }
 
-      // Try loading as GLTF first
-      gltfLoader.load(url, (gltf) => onSuccess(gltf.scene), undefined, (err) => {
-        // Fall back to FBX if GLTF fails
-        fbxLoader.load(url, onSuccess, undefined, onError)
-      })
+      // Load as GLTF
+      gltfLoader.load(url, (gltf) => onSuccess(gltf.scene), undefined, onError)
     })
   }
 
