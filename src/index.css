@@ -227,14 +227,40 @@ input:focus {
   outline: none;
 }
 
-/* Make all buttons transparent except in ChatBar */
-:not(.light-mode-widget) button {
+/* Make all buttons transparent globally */
+button {
   background: transparent !important;
 }
 
-/* Preserve ChatBar button styling */
-.light-mode-widget button {
-  background-color: inherit;
+/* EXCEPTION: Restore specific ChatBar button backgrounds that should be colored */
+.light-mode-widget button[className*="bg-blue-600"],
+.light-mode-widget button[className*="bg-red-500"] {
+  background: inherit !important;
+}
+
+/* Explicitly set ChatBar button colors */
+.light-mode-widget .bg-blue-600 {
+  background-color: #2563eb !important;
+}
+
+.light-mode-widget .bg-blue-700 {
+  background-color: #1d4ed8 !important;
+}
+
+.light-mode-widget .bg-red-500 {
+  background-color: #ef4444 !important;
+}
+
+.light-mode-widget button.bg-blue-600 {
+  background-color: #2563eb !important;
+}
+
+.light-mode-widget button.bg-blue-700 {
+  background-color: #1d4ed8 !important;
+}
+
+.light-mode-widget button.bg-red-500 {
+  background-color: #ef4444 !important;
 }
 
 button:active {
