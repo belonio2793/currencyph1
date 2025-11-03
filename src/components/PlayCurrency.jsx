@@ -412,7 +412,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 >
                   Settings
                 </button>
-                <ThemeToggleButton />
+                <ThemeToggleButton isDark={gameThemeIsDark} onToggle={() => setGameThemeIsDark(!gameThemeIsDark)} />
               </div>
             </div>
             <div style={{ height: '600px' }}>
