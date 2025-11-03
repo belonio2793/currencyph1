@@ -515,7 +515,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 {openModal === 'cities' && (
                   <div className="space-y-6">
-                    <div className="bg-slate-900 rounded-lg overflow-hidden border border-slate-700" style={{ height: '600px' }}>
+                    <div className={`${gameThemeIsDark ? 'bg-slate-900 border border-slate-700' : 'bg-slate-100 border border-slate-300'} rounded-lg overflow-hidden`} style={{ height: '600px' }}>
                       <CityMap userId={userId} onCitySelect={setSelectedCity} />
                     </div>
                     {selectedCity && (
