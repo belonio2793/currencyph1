@@ -75,7 +75,7 @@ export function useGeolocation() {
 
                 const timeoutId = setTimeout(() => {
                   try {
-                    controller.abort()
+                    if (controller && controller.signal && !controller.signal.aborted) controller.abort()
                   } catch (e) {
                     // ignore
                   }
