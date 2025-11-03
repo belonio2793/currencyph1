@@ -479,7 +479,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         {/* Property Detail Modal from Map */}
         {openModal === 'property-detail' && selectedPropertyForModal && (
-          <PropertyInteractionModal
+          <PropertyInteractionModal isDark={gameThemeIsDark}
             property={selectedPropertyForModal}
             character={character}
             isOpen={true}
