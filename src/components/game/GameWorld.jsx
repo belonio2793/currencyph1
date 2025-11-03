@@ -389,20 +389,20 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
             <p className="font-bold">↑ ↓ ← → or WASD</p>
           </div>
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">🖱️ Pan</p>
+            <p className="text-slate-400">Pan</p>
             <p className="font-bold">Drag the map</p>
           </div>
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">📍 Navigate</p>
+            <p className="text-slate-400">Navigate</p>
             <p className="font-bold">Click a city</p>
           </div>
           <div className="bg-slate-700 rounded p-3">
-            <p className="text-slate-400">⚡ Speed</p>
+            <p className="text-slate-400">Speed</p>
             <p className="font-bold">{Math.round(Math.hypot(velocity.x, velocity.y) * 10) / 10} units/frame</p>
           </div>
         </div>
         <p className="text-slate-400 text-xs mt-4">
-          💡 Tip: Hold movement keys for acceleration! Movement has inertia - release to drift and decelerate naturally.
+          Tip: Hold movement keys for acceleration! Movement has inertia - release to drift and decelerate naturally.
         </p>
       </div>
     </div>
