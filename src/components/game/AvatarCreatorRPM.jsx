@@ -128,33 +128,48 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, u
             const nextAppearance = {
               ...(existingAppearance || {}),
               rpm: {
-                model_url: modelUrl || existingAppearance.rpm?.model_url || null,
-                thumbnail: thumbnailUrl || existingAppearance.rpm?.thumbnail || null,
-                meta: meta || existingAppearance.rpm?.meta || null
-              }
+                model_url: modelUrl || existingAppearance?.rpm?.model_url || null,
+                thumbnail: thumbnailUrl || existingAppearance?.rpm?.thumbnail || null,
+                meta: {
+                  ...(existingAppearance?.rpm?.meta || {}),
+                  ...meta
+                }
+              },
+              // Store additional properties from meta
+              hair_color: meta?.hairColor || existingAppearance?.hair_color || null,
+              skin_color: meta?.skinColor || existingAppearance?.skin_color || null,
+              height: meta?.height || existingAppearance?.height || 175,
+              build: meta?.bodyType || existingAppearance?.build || 'average'
             }
 
-            // extract common fields
-            nextAppearance.hair_color = nextAppearance.hair_color || meta?.hairColor || nextAppearance.hair_color || null
-            nextAppearance.skin_color = nextAppearance.skin_color || meta?.skinColor || nextAppearance.skin_color || null
-            nextAppearance.height = nextAppearance.height || nextAppearance.height || 175
-            nextAppearance.build = nextAppearance.build || 'average'
+            // Verify appearance has required fields before updating
+            if (!modelUrl && !nextAppearance.rpm?.model_url) {
+              throw new Error('No avatar model URL to save')
+            }
 
-            const { error: upErr } = await supabase
+            const { error: upErr, data: updateData } = await supabase
               .from('game_characters')
-              .update({ appearance: nextAppearance, updated_at: new Date() })
+              .update({
+                appearance: nextAppearance,
+                updated_at: new Date()
+              })
               .eq('id', characterId)
-            if (upErr) throw upErr
-            // fetch updated character
-            const { data: updatedChar } = await supabase
-              .from('game_characters')
               .select('*')
-              .eq('id', characterId)
               .single()
-            setStatus('Saved. You can close this window.')
+
+            if (upErr) throw upErr
+
+            setStatus('✓ Avatar saved successfully!')
             setSaving(false)
+            setSavedAvatarUrl(modelUrl || existingAppearance?.rpm?.model_url)
+
             if (typeof onSaved === 'function') {
-              try { onSaved(updatedChar) } catch(e) { console.warn('onSaved handler error', e) }
+              try {
+                // Return the complete character with appearance
+                onSaved(updateData)
+              } catch(e) {
+                console.warn('onSaved handler error', e)
+              }
             }
           } else if (typeof onExport === 'function') {
             // If no characterId provided, call onExport with exported data
