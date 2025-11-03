@@ -92,7 +92,7 @@ export default function PropertyInteractionModal({
   if (isCollapsed) {
     return (
       <div className="fixed bottom-6 right-6 z-50">
-        <div className={`${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg shadow-lg w-80 overflow-hidden`}>
+        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg w-80 overflow-hidden">
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-colors"
             onClick={() => setIsCollapsed(false)}>
             <div className="flex items-start justify-between">
