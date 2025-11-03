@@ -189,6 +189,17 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           direction: Math.atan2(dx, dz) * (180 / Math.PI),
           rpm_avatar: avatarUrl
         })
+
+        // Save character position to localStorage
+        try {
+          localStorage.setItem(`character_position_${character.id}`, JSON.stringify({
+            x: newX,
+            z: newZ,
+            timestamp: Date.now()
+          }))
+        } catch (err) {
+          console.warn('Failed to save character position:', err)
+        }
       }
     }, 50)
 
