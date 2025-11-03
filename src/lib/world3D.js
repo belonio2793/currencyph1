@@ -68,6 +68,12 @@ export class World3D {
     this.npcs = new Map()
     this.selectedPlayer = null
 
+    // Property markers group
+    this.propertyMarkers = new Map()
+    this.propertiesGroup = new THREE.Group()
+    this.propertiesGroup.name = 'propertiesGroup'
+    this.scene.add(this.propertiesGroup)
+
     // Animation and state
     this.animationFrameId = null
     this.clock = new THREE.Clock()
