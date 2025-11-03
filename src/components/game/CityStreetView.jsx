@@ -140,7 +140,7 @@ export default function CityStreetView({ city, mode = 'map' }) {
     return (
       <div className="w-full h-full bg-slate-900 rounded overflow-hidden flex items-center justify-center">
         <div className="text-center text-slate-400">
-          <p className="text-lg mb-4">🗺️ Street View</p>
+          <p className="text-lg mb-4">Street View</p>
           <p className="text-sm">Real-world imagery for {city.name}</p>
           <p className="text-xs mt-2 text-slate-500">Coming soon - Street-level view integration</p>
         </div>
