@@ -154,13 +154,13 @@ export default function PropertyInteractionModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className={`${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto`}>
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className={`bg-gradient-to-r from-blue-600 to-blue-700 p-6 sticky top-0 border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 sticky top-0 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-bold mb-2 text-blue-200">{getPropertyTypeLabel(property.property_type)}</p>
-              <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>{property.name}</h2>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{property.name}</h2>
               <p className="text-blue-100 text-sm mt-1">{property.city}, {property.province}</p>
             </div>
             <div className="flex gap-2">
