@@ -204,7 +204,7 @@ export default function PropertyInteractionModal({
           </div>
 
           {/* Owner Info */}
-          <div className="bg-slate-700 rounded p-4">
+          <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
             <p className="text-slate-400 text-sm mb-2">Owner</p>
             <p className="text-white font-bold">{isOwner ? 'You own this property' : property.owner_name || 'System'}</p>
             {property.description && (
@@ -271,7 +271,7 @@ export default function PropertyInteractionModal({
           {/* Action Content */}
           {action === 'view' && (
             <div className="space-y-4">
-              <div className="bg-slate-700 rounded p-4">
+              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
                 <h3 className="font-bold text-white mb-3">Property Details</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-slate-300">
@@ -297,7 +297,7 @@ export default function PropertyInteractionModal({
                 <p className="text-amber-400 font-bold text-lg">₱{(property.current_value || 0).toLocaleString()}</p>
                 <p className="text-amber-200 text-sm mt-2">Purchase price for this property</p>
               </div>
-              <div className="bg-slate-700 rounded p-4">
+              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
                 <p className="text-slate-400 text-sm mb-2">Your Balance</p>
                 <p className="text-2xl font-bold text-yellow-400">₱{(character?.money || 0).toLocaleString()}</p>
               </div>
@@ -317,7 +317,7 @@ export default function PropertyInteractionModal({
 
           {action === 'upgrade' && isOwner && (
             <div className="space-y-4">
-              <div className="bg-slate-700 rounded p-4">
+              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
                 <label className="text-slate-300 text-sm block mb-2">Upgrade Cost (₱)</label>
                 <input
                   type="number"
@@ -355,7 +355,7 @@ export default function PropertyInteractionModal({
                 <p className="text-emerald-400 text-sm mb-2">Sale Price</p>
                 <p className="text-2xl font-bold text-emerald-400">₱{(property.current_value || 0).toLocaleString()}</p>
               </div>
-              <div className="bg-slate-700 rounded p-4">
+              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
                 <p className="text-slate-300 text-sm mb-2">This property generates:</p>
                 <p className="text-lg font-bold text-green-400">₱{monthlyRevenue.toLocaleString()}/month</p>
               </div>
