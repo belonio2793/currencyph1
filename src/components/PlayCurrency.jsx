@@ -350,6 +350,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   character={character}
                   userId={userId}
                   city={character.current_location || character.home_city || 'Manila'}
+                  onWorldReady={(world3D) => { world3DRef.current = world3D }}
                 />
               ) : (
                 <World2DRenderer
