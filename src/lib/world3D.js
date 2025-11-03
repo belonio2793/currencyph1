@@ -1,9 +1,7 @@
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader'
 
 const gltfLoader = new GLTFLoader()
-const fbxLoader = new FBXLoader()
 const modelCache = new Map()
 
 export class World3D {
