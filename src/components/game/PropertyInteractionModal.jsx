@@ -88,6 +88,69 @@ export default function PropertyInteractionModal({
   const monthlyRevenue = (property.revenue_per_day || 0) * 30
   const roi = property.current_value ? ((monthlyRevenue * 12) / property.current_value * 100).toFixed(1) : 0
 
+  if (isCollapsed) {
+    return (
+      <div className="fixed bottom-6 right-6 z-50">
+        <div className="bg-slate-800 border border-slate-700 rounded-lg shadow-lg w-80 overflow-hidden">
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-colors"
+            onClick={() => setIsCollapsed(false)}>
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <p className="text-2xl flex-shrink-0">{getPropertyTypeEmoji(property.property_type)}</p>
+                <div className="min-w-0">
+                  <h3 className="font-bold text-white text-sm truncate">{property.name}</h3>
+                  <p className="text-blue-100 text-xs truncate">{property.city}</p>
+                </div>
+              </div>
+              <div className="flex gap-1 flex-shrink-0 ml-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setIsCollapsed(false)
+                  }}
+                  className="text-white hover:text-blue-200 text-lg p-1"
+                  title="Expand"
+                >
+                  ⊡
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onClose()
+                  }}
+                  className="text-white hover:text-blue-200 text-lg p-1"
+                  title="Close"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="p-4 space-y-3 text-sm">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400">Value</span>
+              <span className="font-bold text-yellow-400">₱{(property.current_value || 0).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400">Daily Income</span>
+              <span className="font-bold text-green-400">₱{(property.revenue_per_day || 0).toLocaleString()}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-400">Owner</span>
+              <span className="font-bold text-blue-400">{isOwner ? 'You' : (property.owner_name || 'System')}</span>
+            </div>
+            <button
+              onClick={() => setIsCollapsed(false)}
+              className="w-full mt-2 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors"
+            >
+              Expand Details
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-slate-800 border border-slate-700 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
@@ -99,12 +162,21 @@ export default function PropertyInteractionModal({
               <h2 className="text-2xl font-bold text-white">{property.name}</h2>
               <p className="text-blue-100 text-sm mt-1">{property.city}, {property.province}</p>
             </div>
-            <button
-              onClick={onClose}
-              className="text-white hover:text-blue-200 text-2xl"
-            >
-              ✕
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setIsCollapsed(true)}
+                className="text-white hover:text-blue-200 text-2xl"
+                title="Collapse to side panel"
+              >
+                ⊟
+              </button>
+              <button
+                onClick={onClose}
+                className="text-white hover:text-blue-200 text-2xl"
+              >
+                ✕
+              </button>
+            </div>
           </div>
         </div>
 
