@@ -33,11 +33,18 @@ export default function AvatarCreatorRPM({ open, onClose, characterId, userId, u
 
         if (fetchErr) throw fetchErr
 
-        if (data?.appearance?.rpm?.model_url) {
-          setSavedAvatarUrl(data.appearance.rpm.model_url)
+        // Try multiple paths where avatar URL might be stored
+        const modelUrl = data?.appearance?.rpm?.model_url ||
+                         data?.appearance?.model_url ||
+                         data?.appearance?.avatar_url
+
+        if (modelUrl) {
+          console.log('Found saved avatar URL:', modelUrl)
+          setSavedAvatarUrl(modelUrl)
           setStatus('Loading saved avatar…')
         } else {
-          setStatus('No previous avatar found')
+          console.warn('No avatar URL found in appearance:', data?.appearance)
+          setStatus('No previous avatar found — you can create a new one')
         }
       } catch (e) {
         console.warn('Failed to load saved avatar:', e.message)
