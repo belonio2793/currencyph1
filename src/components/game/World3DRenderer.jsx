@@ -124,6 +124,9 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
 
     // Game loop for movement and updates
     const gameLoop = setInterval(() => {
+      const world3D = world3DRef.current
+      if (!world3D) return
+
       const player = world3D.players.get(userId)
       if (!player) return
 
