@@ -96,7 +96,7 @@ export default function PropertyInteractionModal({
             onClick={() => setIsCollapsed(false)}>
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <p className="text-2xl flex-shrink-0">{getPropertyTypeEmoji(property.property_type)}</p>
+                <p className="text-sm font-bold flex-shrink-0 text-blue-300">{getPropertyTypeLabel(property.property_type)}</p>
                 <div className="min-w-0">
                   <h3 className="font-bold text-white text-sm truncate">{property.name}</h3>
                   <p className="text-blue-100 text-xs truncate">{property.city}</p>
@@ -158,7 +158,7 @@ export default function PropertyInteractionModal({
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 sticky top-0 border-b border-slate-700">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-4xl mb-2">{getPropertyTypeEmoji(property.property_type)}</p>
+              <p className="text-sm font-bold mb-2 text-blue-200">{getPropertyTypeLabel(property.property_type)}</p>
               <h2 className="text-2xl font-bold text-white">{property.name}</h2>
               <p className="text-blue-100 text-sm mt-1">{property.city}, {property.province}</p>
             </div>
