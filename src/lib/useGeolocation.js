@@ -26,78 +26,67 @@ export function useGeolocation() {
           setLocation({ latitude, longitude })
           setError(null)
 
-          // Try reverse geocoding to get city name
-          ;(async () => {
+          // Try reverse geocoding to get city name - with full isolation
+          const reverseGeocode = async () => {
             if (!isMountedRef.current) return
 
             try {
-              const MAPTILER_KEY = import.meta?.env?.VITE_MAPTILER_API_KEY || import.meta?.env?.MAPTILER_API_KEY || null
-              let data = null
+              const MAPTILER_KEY = import.meta?.env?.VITE_MAPTILER_API_KEY || import.meta?.env?.MAPTILER_API_KEY
 
               if (MAPTILER_KEY) {
-                const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
-                const controller = new AbortController()
-                controllersRef.current.push(controller)
-
-                let timeoutId = null
                 try {
-                  timeoutId = setTimeout(() => {
+                  const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
+                  const controller = new AbortController()
+                  controllersRef.current.push(controller)
+
+                  const timeoutId = setTimeout(() => {
                     try {
-                      if (!controller.signal.aborted) {
-                        controller.abort()
-                      }
+                      controller.abort()
                     } catch (e) {
-                      // ignore abort errors
+                      // ignore
                     }
-                  }, 7000)
+                  }, 5000)
 
-                  const resp = await fetch(url, { signal: controller.signal })
-                  if (timeoutId) clearTimeout(timeoutId)
+                  try {
+                    const resp = await fetch(url, { signal: controller.signal })
+                    clearTimeout(timeoutId)
 
-                  if (resp.ok && isMountedRef.current) {
-                    data = await resp.json()
+                    if (resp.ok && isMountedRef.current) {
+                      const data = await resp.json()
+                      if (data?.features?.[0]?.properties) {
+                        const props = data.features[0].properties
+                        setCity(props.city || props.town || props.village || props.county || props.state || null)
+                        return true
+                      }
+                    }
+                  } catch (e) {
+                    clearTimeout(timeoutId)
+                    // Silently fail - network error
                   }
                 } catch (e) {
-                  if (timeoutId) clearTimeout(timeoutId)
-                  // Silently fail for network/abort errors - not user-facing
-                  const isNetworkError = e.name === 'AbortError' || e.code === 'ABORT_ERR' || e.message === 'Failed to fetch'
-                  if (!isNetworkError) {
-                    console.debug('MapTiler reverse geocoding failed:', e.message)
-                  }
-                }
-
-                if (data && data.features && data.features.length && isMountedRef.current) {
-                  const props = data.features[0].properties || {}
-                  setCity(props.city || props.town || props.village || props.county || props.state || null)
-                  setLoading(false)
-                  return
+                  // Silently fail
                 }
               }
 
-              if (!isMountedRef.current) return
-
               // Fallback to Nominatim
               try {
-                const controller2 = new AbortController()
-                controllersRef.current.push(controller2)
+                const controller = new AbortController()
+                controllersRef.current.push(controller)
 
-                let timeoutId = null
+                const timeoutId = setTimeout(() => {
+                  try {
+                    controller.abort()
+                  } catch (e) {
+                    // ignore
+                  }
+                }, 5000)
+
                 try {
-                  timeoutId = setTimeout(() => {
-                    try {
-                      if (!controller2.signal.aborted) {
-                        controller2.abort()
-                      }
-                    } catch (e) {
-                      // ignore abort errors
-                    }
-                  }, 7000)
-
                   const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                    { signal: controller2.signal, headers: { 'Accept-Language': 'en' } }
+                    { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
                   )
-                  if (timeoutId) clearTimeout(timeoutId)
+                  clearTimeout(timeoutId)
 
                   if (response.ok && isMountedRef.current) {
                     const nom = await response.json()
@@ -105,31 +94,23 @@ export function useGeolocation() {
                       nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
                     )
                   }
-                } catch (err) {
-                  if (timeoutId) clearTimeout(timeoutId)
-                  // Silently fail for network/abort errors - not user-facing
-                  const isNetworkError = err.name === 'AbortError' || err.code === 'ABORT_ERR' || err.message === 'Failed to fetch'
-                  if (!isNetworkError) {
-                    console.debug('Nominatim reverse geocoding failed:', err.message)
-                  }
+                } catch (e) {
+                  clearTimeout(timeoutId)
+                  // Silently fail - network error
                 }
-              } catch (err) {
-                // Silently ignore outer catch
+              } catch (e) {
+                // Silently fail
               }
-
-              // Always reset loading state when done
-              if (isMountedRef.current) {
-                setLoading(false)
-              }
-            } catch (err) {
-              // Silently ignore outer error
+            } finally {
               if (isMountedRef.current) {
                 setLoading(false)
               }
             }
-          })().catch(err => {
-            // Final safety catch to prevent unhandled promise rejections
-            console.debug('Reverse geocoding error:', err?.message)
+          }
+
+          // Execute reverse geocoding without letting errors bubble up
+          Promise.resolve().then(reverseGeocode).catch(() => {
+            // Catch any errors that somehow escape
             if (isMountedRef.current) {
               setLoading(false)
             }
