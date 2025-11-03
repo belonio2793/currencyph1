@@ -19,35 +19,52 @@ const getEnv = (name) => {
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || ''
 
-const GLOBAL_SUPABASE_KEY = '__CURRENCY_SUPABASE_CLIENT__'
+// Module-level lazy singleton: initialize Supabase client on first use without relying on globalThis
+let _client = null
 
-// Ensure we only create the client once even if this module is imported multiple times
-if (!globalThis[GLOBAL_SUPABASE_KEY]) {
-  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    globalThis[GLOBAL_SUPABASE_KEY] = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  } else {
-    console.warn('Supabase not fully configured. SUPABASE_URL or SUPABASE_ANON_KEY is missing. Some features will be disabled.')
-    const missingError = (method) => () => { throw new Error(`Supabase not configured. Called ${method} but SUPABASE_URL or SUPABASE_ANON_KEY is missing.`) }
-    globalThis[GLOBAL_SUPABASE_KEY] = {
-      from: () => ({ select: missingError('from().select'), insert: missingError('from().insert'), update: missingError('from().update'), upsert: missingError('from().upsert'), eq: missingError('from().eq'), order: missingError('from().order') }),
-      auth: {
-        signInWithPassword: missingError('auth.signInWithPassword'),
-        signUp: missingError('auth.signUp'),
-        getUser: async () => ({ data: { user: null }, error: null })
-      },
-      channel: (name) => ({
-        // allow .on(...).subscribe() chaining
-        on: () => ({ subscribe: missingError('channel().on().subscribe') }),
-        // allow subscribe() directly
-        subscribe: missingError('channel().subscribe')
-      }),
-      removeChannel: (c) => { /* noop when supabase not configured */ },
-      rpc: missingError('rpc')
-    }
+function createDummyClient() {
+  console.warn('Supabase not fully configured. SUPABASE_URL or SUPABASE_ANON_KEY is missing. Some features will be disabled.')
+  const missingError = (method) => () => { throw new Error(`Supabase not configured. Called ${method} but SUPABASE_URL or SUPABASE_ANON_KEY is missing.`) }
+  return {
+    from: () => ({ select: missingError('from().select'), insert: missingError('from().insert'), update: missingError('from().update'), upsert: missingError('from().upsert'), eq: missingError('from().eq'), order: missingError('from().order') }),
+    auth: {
+      signInWithPassword: missingError('auth.signInWithPassword'),
+      signUp: missingError('auth.signUp'),
+      getUser: async () => ({ data: { user: null }, error: null })
+    },
+    channel: (name) => ({
+      on: () => ({ subscribe: missingError('channel().on().subscribe') }),
+      subscribe: missingError('channel().subscribe')
+    }),
+    removeChannel: (c) => { /* noop when supabase not configured */ },
+    rpc: missingError('rpc')
   }
 }
 
-const supabase = globalThis[GLOBAL_SUPABASE_KEY]
+function initClient() {
+  if (_client) return _client
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  } else {
+    _client = createDummyClient()
+  }
+  return _client
+}
+
+// Export a Proxy that lazily initializes the real client on first access while keeping the same import shape
+const supabase = new Proxy({}, {
+  get(_, prop) {
+    const client = initClient()
+    const value = client[prop]
+    if (typeof value === 'function') return value.bind(client)
+    return value
+  },
+  set(_, prop, val) {
+    const client = initClient()
+    client[prop] = val
+    return true
+  }
+})
 
 export { supabase }
 
