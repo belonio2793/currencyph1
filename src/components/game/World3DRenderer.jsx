@@ -222,21 +222,21 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       {/* HUD - Player Info (Top Left) */}
       <div className="absolute top-4 left-4 text-white pointer-events-none z-30">
         <div className="bg-black/70 backdrop-blur-sm p-4 rounded-lg border border-slate-600/50 flex items-center gap-3">
-          {character?.appearance && (character.appearance.rpm?.thumbnail ||
-            character.appearance.rpm?.meta?.imageUrl ||
-            character.appearance.rpm?.meta?.avatarUrl) ? (
-            <img
-              src={character.appearance.rpm?.thumbnail ||
-                   character.appearance.rpm?.meta?.imageUrl ||
-                   character.appearance.rpm?.meta?.avatarUrl}
-              alt="avatar"
-              className="w-14 h-14 rounded-full object-cover border-2 border-blue-400"
-            />
-          ) : (
-            <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-400 border-2 border-slate-600">
-              No<br/>Avatar
-            </div>
-          )}
+          {(() => {
+            const thumbnailUrl = gameAPI.getAvatarThumbnail(character?.appearance) || gameAPI.getAvatarUrl(character?.appearance)
+            return thumbnailUrl ? (
+              <img
+                src={thumbnailUrl}
+                alt={character.name}
+                className="w-14 h-14 rounded-full object-cover border-2 border-blue-400"
+                onError={() => console.warn('Failed to load avatar thumbnail:', thumbnailUrl)}
+              />
+            ) : (
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-xs text-slate-300 border-2 border-slate-600 font-bold">
+                {character.name?.charAt(0) || '?'}
+              </div>
+            )
+          })()}
           <div>
             <p className="text-sm font-bold text-slate-100">{character.name}</p>
             <p className="text-xs text-slate-400">📍 {city}</p>
