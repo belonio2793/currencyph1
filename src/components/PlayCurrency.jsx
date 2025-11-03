@@ -594,6 +594,178 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           </div>
         )}
 
+        {/* Navigation Tabs for Modals */}
+        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 mt-6">
+          <button
+            onClick={() => setShowCurrencyGame(!showCurrencyGame)}
+            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors font-bold ${
+              showCurrencyGame
+                ? 'bg-green-600 text-white'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+            }`}
+          >
+            Currency Game
+          </button>
+          {[
+            { id: 'cities', label: 'Cities' },
+            { id: 'inventory', label: 'Inventory' },
+            { id: 'equipment', label: 'Equipment' },
+            { id: 'marketplace', label: 'Marketplace' },
+            { id: 'properties', label: 'Properties' },
+            { id: 'banking', label: 'Banking' }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setOpenModal(tab.id)}
+              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
+                openModal === tab.id
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Currency Game Panel */}
+        {showCurrencyGame && (
+          <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
+            <CurrencyGameUI
+              character={character}
+              world3D={world3DRef.current}
+              onCharacterUpdate={(updated) => setCharacter(updated)}
+              isDark={true}
+            />
+          </div>
+        )}
+
+        {/* Property Detail Modal from Map */}
+        {openModal === 'property-detail' && selectedPropertyForModal && (
+          <PropertyInteractionModal isDark={true}
+            property={selectedPropertyForModal}
+            character={character}
+            isOpen={true}
+            onClose={() => {
+              setOpenModal(null)
+              setSelectedPropertyForModal(null)
+            }}
+            onBuy={handleBuyProperty}
+            onSell={handleSellProperty}
+            onUpgrade={handleUpgradeProperty}
+          />
+        )}
+
+        {/* Modal for tabs */}
+        {openModal && openModal !== 'property-detail' && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-slate-100">
+                  {openModal === 'cities' && 'Cities'}
+                  {openModal === 'inventory' && 'Inventory'}
+                  {openModal === 'equipment' && 'Equipment'}
+                  {openModal === 'marketplace' && 'Marketplace'}
+                  {openModal === 'properties' && 'Properties'}
+                  {openModal === 'banking' && 'Banking'}
+                </h3>
+                <button onClick={() => setOpenModal(null)} className="text-slate-400 hover:text-slate-200">X</button>
+              </div>
+              <div className="p-6 text-slate-100">
+                {openModal === 'inventory' && (
+                  <GameInventory character={character} inventory={inventory} onInventoryUpdate={handleInventoryUpdate} />
+                )}
+
+                {openModal === 'cities' && (
+                  <div className="space-y-6">
+                    <div className="bg-slate-700/30 border border-slate-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                      <CityMap userId={userId} onCitySelect={setSelectedCity} />
+                    </div>
+                    {selectedCity && (
+                      <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
+                        <h3 className="text-xl font-bold mb-2 text-slate-100">{selectedCity.name}</h3>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                          <div>
+                            <p className="text-slate-400 text-sm">Population</p>
+                            <p className="text-2xl font-bold text-blue-400">{(selectedCity.population || 0).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-sm">Budget</p>
+                            <p className="text-2xl font-bold text-emerald-400">P{(selectedCity.budget || 0).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-sm">Happiness</p>
+                            <p className="text-2xl font-bold text-yellow-400">{Math.floor(selectedCity.happiness || 0)}%</p>
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-sm">Region</p>
+                            <p className="text-2xl font-bold text-purple-400">{selectedCity.region || 'N/A'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {openModal === 'equipment' && (
+                  <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6 text-slate-100">Equipment</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
+                        const equipped = equipment.find(e => e.equipment_slot === slot)
+                        return (
+                          <div key={slot} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
+                            <p className="text-xs text-slate-400 uppercase mb-2">{slot.replace('_', ' ')}</p>
+                            {equipped ? (
+                              <div>
+                                <p className="font-bold text-sm text-slate-100">{equipped.game_items?.name}</p>
+                                <p className="text-xs text-slate-400">{equipped.game_items?.brand}</p>
+                              </div>
+                            ) : (
+                              <p className="text-slate-400 text-sm">Empty</p>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {openModal === 'marketplace' && (
+                  <CurrencyMarketplace
+                    character={character}
+                    onInventoryUpdate={handleInventoryUpdate}
+                    onListingCreated={() => loadGameData(character.id)}
+                    onPurchaseComplete={() => setCharacter({...character, money: character.money})}
+                  />
+                )}
+
+                {openModal === 'properties' && (
+                  <GameProperties character={character} properties={properties} />
+                )}
+
+                {openModal === 'banking' && (
+                  <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6 text-slate-100">Banking System</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {bankAccounts.map(account => (
+                        <div key={account.id} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
+                          <p className="text-slate-400 text-sm uppercase">{account.account_type} Account</p>
+                          <p className="text-2xl font-bold mt-2 text-slate-100">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
+                          <p className="text-xs text-slate-400 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-6 flex gap-2 justify-end">
+                  <button onClick={() => setOpenModal(null)} className="px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600">Close</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         </div>
       </div>
     {showRPM && (
