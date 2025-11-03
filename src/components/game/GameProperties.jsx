@@ -396,8 +396,8 @@ export default function GameProperties({ character, properties, onPropertiesUpda
 
       {/* Purchase Dialog */}
       {showPurchaseDialog && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700 max-h-96 overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700 my-auto">
             <h3 className="text-xl font-bold mb-4">Purchase Property</h3>
 
             {error && (
@@ -410,7 +410,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
               {/* Property Type Selection */}
               <div>
                 <label className="block text-sm font-medium mb-2">Property Type</label>
-                <div className="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 gap-3">
                   {Object.entries(propertyTypes).map(([key, value]) => (
                     <button
                       key={key}
