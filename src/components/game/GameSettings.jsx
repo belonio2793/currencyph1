@@ -130,12 +130,12 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   onClick={() => setCameraMode(mode)}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     cameraMode === mode
-                      ? 'border-blue-500 bg-blue-500/10 ring-1 ring-blue-500/50'
-                      : 'border-slate-600 bg-slate-700 hover:bg-slate-600'
+                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500/50'
+                      : 'border-slate-300 bg-slate-50 hover:bg-slate-100'
                   }`}
                 >
-                  <p className="font-semibold text-slate-100">{label}</p>
-                  <p className="text-xs text-slate-400 mt-1">{desc}</p>
+                  <p className="font-semibold text-slate-900">{label}</p>
+                  <p className="text-xs text-slate-600 mt-1">{desc}</p>
                 </button>
               ))}
             </div>
