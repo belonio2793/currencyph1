@@ -340,20 +340,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
             </div>
             <div style={{ height: '700px' }}>
-              {use3DWorld ? (
-                <World3DRenderer
-                  character={character}
-                  userId={userId}
-                  city={character.current_location || character.home_city || 'Manila'}
-                  onWorldReady={(world3D) => { world3DRef.current = world3D }}
-                />
-              ) : (
-                <World2DRenderer
-                  character={character}
-                  userId={userId}
-                  city={character.current_location || character.home_city || 'Manila'}
-                />
-              )}
+              <World3DRenderer
+                character={character}
+                userId={userId}
+                city={character.current_location || character.home_city || 'Manila'}
+                onWorldReady={(world3D) => { world3DRef.current = world3D }}
+              />
             </div>
           </div>
         )}
