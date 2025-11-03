@@ -338,35 +338,6 @@ export function clearTextureCache() {
  * @param {number} size - Sky dome size
  */
 
-/**
- * Get elevation data for Philippines region (procedural approximation)
- * Note: Real elevation would require Google Elevation API which has strict quotas
- */
-export function generateTerrainElevation(width, height) {
-  const elevation = []
-  
-  // Simple Perlin-like noise simulation for terrain variation
-  for (let y = 0; y < height; y++) {
-    const row = []
-    for (let x = 0; x < width; x++) {
-      // Mix of sin waves to create terrain features
-      const h1 = Math.sin(x / 50) * 0.3
-      const h2 = Math.sin(y / 50) * 0.2
-      const h3 = Math.sin((x + y) / 100) * 0.1
-      const h4 = Math.sin((x - y) / 80) * 0.15
-      
-      // Higher elevation for mountain regions (western side represents Cordillera)
-      const mountainEffect = Math.sin(x / width * Math.PI) * 0.4
-      
-      // Base elevation with some randomness
-      const value = (h1 + h2 + h3 + h4 + mountainEffect + Math.random() * 0.1) * 100
-      row.push(Math.max(0, value))
-    }
-    elevation.push(row)
-  }
-  
-  return elevation
-}
 
 /**
  * Create a displacement map for terrain from elevation data
