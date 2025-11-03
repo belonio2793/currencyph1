@@ -95,8 +95,8 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
         {/* Content */}
         <div className="p-4 md:p-6 space-y-6">
           {/* Quick Presets */}
-          <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600">
-            <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase">Quick Presets</h3>
+          <div className="bg-slate-100 rounded-lg p-4 border border-slate-300">
+            <h3 className="text-sm font-semibold text-slate-700 mb-3 uppercase">Quick Presets</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {[
                 { id: 'wide', label: 'Wide View' },
@@ -107,7 +107,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                 <button
                   key={id}
                   onClick={() => applyPreset(id)}
-                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium text-slate-200 transition-colors border border-slate-600 hover:border-slate-500"
+                  className="px-3 py-2 bg-white hover:bg-slate-50 rounded text-xs font-medium text-slate-700 transition-colors border border-slate-300 hover:border-slate-400"
                 >
                   {label}
                 </button>
@@ -117,7 +117,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
 
           {/* Camera Mode Section */}
           <div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">Camera View Modes</h3>
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Camera View Modes</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
                 { mode: 'topdown', label: 'Top-Down', desc: 'Bird\'s eye view from above' },
@@ -362,7 +362,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
             onClick={onClose}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium transition-all shadow-lg"
           >
-            ��� Done
+            ✓ Done
           </button>
         </div>
       </div>
