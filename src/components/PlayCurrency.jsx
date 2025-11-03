@@ -545,7 +545,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'equipment' && (
-                  <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                  <div className={`${gameThemeIsDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg p-6`}>
                     <h2 className="text-2xl font-bold mb-6">Equipment</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
