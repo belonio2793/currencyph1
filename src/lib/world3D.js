@@ -116,38 +116,23 @@ export class World3D {
   }
   
   setupGround() {
-    // Create a more interesting ground with texture
+    // Create ground with Google Maps satellite imagery
     const groundGeometry = new THREE.PlaneGeometry(6000, 6000)
 
-    // Create a canvas texture for ground
-    const canvas = document.createElement('canvas')
-    canvas.width = 256
-    canvas.height = 256
-    const ctx = canvas.getContext('2d')
-
-    // Draw a grid pattern
-    ctx.fillStyle = '#2a4a3a'
+    // Create fallback texture while loading Google Maps
+    const fallbackCanvas = document.createElement('canvas')
+    fallbackCanvas.width = 256
+    fallbackCanvas.height = 256
+    const ctx = fallbackCanvas.getContext('2d')
+    ctx.fillStyle = '#2a8c4a'
     ctx.fillRect(0, 0, 256, 256)
-    ctx.strokeStyle = '#1a3a2a'
-    ctx.lineWidth = 1
-    for (let i = 0; i <= 16; i++) {
-      ctx.beginPath()
-      ctx.moveTo(i * 16, 0)
-      ctx.lineTo(i * 16, 256)
-      ctx.stroke()
-      ctx.beginPath()
-      ctx.moveTo(0, i * 16)
-      ctx.lineTo(256, i * 16)
-      ctx.stroke()
-    }
 
-    const texture = new THREE.CanvasTexture(canvas)
-    texture.repeat.set(16, 16)
-    texture.wrapS = THREE.RepeatWrapping
-    texture.wrapT = THREE.RepeatWrapping
+    const fallbackTexture = new THREE.CanvasTexture(fallbackCanvas)
+    fallbackTexture.magFilter = THREE.LinearFilter
+    fallbackTexture.minFilter = THREE.LinearMipmapLinearFilter
 
     const groundMaterial = new THREE.MeshStandardMaterial({
-      map: texture,
+      map: fallbackTexture,
       roughness: 0.8,
       metalness: 0.0
     })
@@ -156,12 +141,26 @@ export class World3D {
     ground.rotation.x = -Math.PI / 2
     ground.receiveShadow = true
     ground.position.y = -0.5
+    ground.name = 'groundPlane'
     this.scene.add(ground)
+
+    // Load Google Maps satellite imagery asynchronously
+    this.loadGoogleMapsTexture(ground, this.mapCenter.lat, this.mapCenter.lng)
 
     // Add a subtle grid helper
     const gridHelper = new THREE.GridHelper(5000, 50, 0x444444, 0x222222)
     gridHelper.position.y = 0.1
     this.scene.add(gridHelper)
+  }
+
+  async loadGoogleMapsTexture(groundMesh, lat, lng) {
+    try {
+      const mapTexture = await getMapTexture(lat, lng, 13, 512)
+      groundMesh.material.map = mapTexture
+      groundMesh.material.needsUpdate = true
+    } catch (err) {
+      console.warn('Failed to load Google Maps texture:', err)
+    }
   }
 
   updateCameraPosition(playerPos = { x: 0, z: 0 }) {
