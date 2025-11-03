@@ -5,6 +5,7 @@ import { gameAPI } from '../../lib/gameAPI'
 import { WorldSync } from '../../lib/worldSync'
 import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 import GameSettings from './GameSettings'
+import { listPropertiesByCity, subscribeToProperties } from '../../lib/propertyAPI'
 
 export default function World3DRenderer({ character, userId, city = 'Manila', onWorldReady = null }) {
   const containerRef = useRef(null)
