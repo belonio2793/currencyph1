@@ -397,10 +397,10 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
       <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden border border-slate-700 shadow-2xl">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 p-6 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-slate-800 to-slate-900 dark:from-slate-900 dark:to-slate-950 border-b border-slate-700 dark:border-slate-600 p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white">{table.name}</h2>
-            <p className="text-sm text-slate-400 mt-1">
+            <h2 className="text-2xl font-bold text-white dark:text-slate-100">{table.name}</h2>
+            <p className="text-sm text-slate-400 dark:text-slate-300 mt-1">
               Stakes: {table.stake_min}/{table.stake_max} {table.currency_code}
               <span className="ml-4">•</span>
               <span className="ml-4 text-emerald-400">{tableStatusText}</span>
