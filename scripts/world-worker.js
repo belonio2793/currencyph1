@@ -100,9 +100,10 @@ async function runIteration() {
         await supabase.from('properties').update({ price: u.price, updated_at: u.updated_at }).eq('id', u.id)
       }
 
-      // Insert valuations history
-      await supabase.from('property_valuations').insert(valuationInserts)
-      console.log(`Updated ${updates.length} properties valuations`)    
+      // Insert valuations history into existing price_history table
+      const priceHistoryInserts = valuationInserts.map(v => ({ property_id: v.property_id, price: v.valuation, source: 'algorithmic' }))
+      await supabase.from('price_history').insert(priceHistoryInserts)
+      console.log(`Updated ${updates.length} properties and recorded price_history entries`)
     } else {
       console.log('No price changes computed this iteration')
     }
