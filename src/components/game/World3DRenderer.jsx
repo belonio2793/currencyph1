@@ -191,15 +191,19 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           rpm_avatar: avatarUrl
         })
 
-        // Save character position to localStorage
-        try {
-          localStorage.setItem(`character_position_${character.id}`, JSON.stringify({
-            x: newX,
-            z: newZ,
-            timestamp: Date.now()
-          }))
-        } catch (err) {
-          console.warn('Failed to save character position:', err)
+        // Save character position to localStorage (debounced - max once per 500ms)
+        const now = Date.now()
+        if (now - lastSaveTimeRef.current > 500) {
+          try {
+            localStorage.setItem(`character_position_${character.id}`, JSON.stringify({
+              x: newX,
+              z: newZ,
+              timestamp: now
+            }))
+            lastSaveTimeRef.current = now
+          } catch (err) {
+            console.warn('Failed to save character position:', err)
+          }
         }
       }
     }, 50)
