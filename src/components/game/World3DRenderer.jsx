@@ -149,6 +149,14 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         e.preventDefault()
       }
 
+      // Zoom keys
+      if (key === '+' || key === '=' ) {
+        try { world3DRef.current?.setZoom((world3DRef.current.cameraConfig.zoom || 1) * 1.2) } catch(e){}
+      }
+      if (key === '-' || key === '_') {
+        try { world3DRef.current?.setZoom((world3DRef.current.cameraConfig.zoom || 1) * 0.8) } catch(e){}
+      }
+
       // Handle special keys
       if (key === 'escape') {
         e.preventDefault()
