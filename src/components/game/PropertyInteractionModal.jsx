@@ -156,7 +156,7 @@ export default function PropertyInteractionModal({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className={`${isDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto`}>
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-6 sticky top-0 border-b border-slate-700">
+        <div className={`bg-gradient-to-r from-blue-600 to-blue-700 p-6 sticky top-0 border-b ${isDark ? 'border-slate-700' : 'border-slate-200'}`}>
           <div className="flex items-start justify-between">
             <div>
               <p className="text-sm font-bold mb-2 text-blue-200">{getPropertyTypeLabel(property.property_type)}</p>
