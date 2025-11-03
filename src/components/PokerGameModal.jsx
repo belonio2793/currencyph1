@@ -549,9 +549,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                   </div>
 
                   {isSeated && (
-                    <div className="pt-2 space-y-2 border-t border-slate-700">
-                      <div className="text-xs text-slate-400 font-semibold">Seat Status</div>
-                      <div className="text-sm text-emerald-300 flex items-center gap-2">
+                    <div className="pt-2 space-y-2 border-t border-slate-200 dark:border-slate-700">
+                      <div className="text-xs text-slate-600 dark:text-slate-400 font-semibold">Seat Status</div>
+                      <div className="text-sm text-emerald-700 dark:text-emerald-300 flex items-center gap-2">
                         <span className="w-2 h-2 bg-emerald-400 rounded-full"></span>
                         Seated at Table
                       </div>
