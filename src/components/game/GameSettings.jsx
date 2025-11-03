@@ -339,35 +339,35 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="0.1"
                   value={cameraSpeed}
                   onChange={(e) => setCameraSpeed(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                 />
-                <p className="text-xs text-slate-600 mt-1">How fast the camera responds when dragging the map</p>
+                <p className={`text-xs ${textSecondaryClass} mt-1`}>How fast the camera responds when dragging the map</p>
               </div>
 
               {/* Avatar Trail */}
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
+              <label className={`flex items-center gap-3 p-3 rounded-lg ${boxBgClass} border ${borderClass} cursor-pointer transition-colors ${isDark ? 'hover:bg-slate-700/60' : 'hover:bg-slate-50'}`}>
                 <input
                   type="checkbox"
                   checked={showAvatarTrail}
                   onChange={(e) => setShowAvatarTrail(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-700">Show Avatar Trail</span>
-                <span className="text-xs text-slate-600 ml-auto">(Movement history)</span>
+                <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Show Avatar Trail</span>
+                <span className={`text-xs ${textSecondaryClass} ml-auto`}>(Movement history)</span>
               </label>
             </div>
           </div>
 
           {/* Info Section */}
-          <div className="border-t border-slate-300 pt-6 bg-slate-100 rounded-lg p-4">
-            <p className="text-xs text-slate-600 leading-relaxed">
-              <strong className="text-slate-700">💡 Tip:</strong> Camera settings are applied immediately. Try different camera modes and presets to find your preferred view! Zoom and FOV adjustments work across all modes. Map controls allow you to customize avatar movement and camera panning sensitivity.
+          <div className={`border-t ${borderClass} pt-6 ${boxBgClass} rounded-lg p-4`}>
+            <p className={`text-xs ${textSecondaryClass} leading-relaxed`}>
+              <strong className={isDark ? 'text-slate-300' : 'text-slate-700'}>💡 Tip:</strong> Camera settings are applied immediately. Try different camera modes and presets to find your preferred view! Zoom and FOV adjustments work across all modes. Map controls allow you to customize avatar movement and camera panning sensitivity.
             </p>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-300 p-4 md:p-6 flex justify-end gap-2 bg-slate-50">
+        <div className={`border-t ${borderClass} p-4 md:p-6 flex justify-end gap-2 ${isDark ? 'bg-slate-700/40' : 'bg-slate-50'}`}>
           <button
             onClick={onClose}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium transition-all shadow-lg"
