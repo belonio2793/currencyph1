@@ -294,67 +294,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
-      {/* Header */}
-      <div className="bg-slate-800/50 border-slate-700 border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div>
-                <h1
-                  onClick={() => setShowCharactersPanel(true)}
-                  className="text-3xl font-bold text-blue-300 cursor-pointer hover:text-blue-200 transition-colors"
-                  title="Click to open characters panel"
-                >
-                  {character.name}
-                </h1>
-                <p className="text-slate-400 text-sm">Level {character.level} • {character.current_location} {character.home_city && character.home_city !== character.current_location ? `(Home: ${character.home_city})` : ''}</p>
-              </div>
-              <button
-                onClick={() => setShowRPM(true)}
-                className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                title="Edit your character avatar"
-              >
-                Edit Avatar
-              </button>
-            </div>
-            <div className="flex items-center gap-8">
-              <button
-                onClick={handleDailyReward}
-                disabled={claimingReward}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded text-white font-medium"
-              >
-                {claimingReward ? 'Claiming...' : 'Claim Daily Reward'}
-              </button>
-              <div className="text-right">
-                <p className="text-slate-400 text-xs">Total Wealth</p>
-                <p className="text-2xl font-bold text-yellow-300">P{character.money?.toLocaleString() || 0}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-slate-400 text-xs">Experience</p>
-                <p className="text-2xl font-bold text-emerald-300">{character.experience?.toLocaleString() || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Experience Bar */}
-          <div className="mt-4">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs text-slate-400">Progress to Next Level</span>
-              <span className="text-xs text-slate-400">{character.experience % 1000} / 1000</span>
-            </div>
-            <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
-              <div 
-                className="bg-gradient-to-r from-green-500 to-emerald-400 h-full transition-all duration-300"
-                style={{ width: `${(character.experience % 1000) / 10}%` }}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Error Message */}
       {error && (
-        <div className="max-w-7xl mx-auto px-6 mt-4">
+        <div className="mx-6 mt-4">
           <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
             {error}
           </div>
@@ -366,46 +308,115 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         <CharactersPanel userId={userId} currentCharacter={character} onSelectCharacter={(c) => { setCharacter(c); setShowCharactersPanel(false); loadGameData(c.id) }} onClose={() => setShowCharactersPanel(false)} />
       )}
 
-      {/* Main Content */}
+      {/* Main Content with Sidebar Layout */}
       <div className="bg-slate-900/50 text-slate-100">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-        {/* World View - Default Main Display */}
+        <div className="mx-6 py-6">
+        {/* World View with Right Sidebar */}
         {character && (
-          <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden mb-6">
-            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-100">Game World</h2>
-                <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setOpenModal('properties')}
-                  className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                  title="View your properties"
-                >
-                  My Properties
-                </button>
-                <button
-                  onClick={() => setShowSettings(true)}
-                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                  title="Open camera and game settings"
-                >
-                  Settings
-                </button>
+          <div className="flex gap-6 max-h-[750px]">
+            {/* Left: Game Map */}
+            <div className="flex-1 min-w-0">
+              <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden h-full flex flex-col">
+                <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                  <div className="flex-1">
+                    <h2 className="text-xl font-bold text-slate-100">Game World</h2>
+                    <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setOpenModal('properties')}
+                      className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                      title="View your properties"
+                    >
+                      My Properties
+                    </button>
+                    <button
+                      onClick={() => setShowSettings(true)}
+                      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
+                      title="Open camera and game settings"
+                    >
+                      Settings
+                    </button>
+                  </div>
+                </div>
+                <div style={{ height: '600px' }} className="flex-1">
+                  <IsometricGameMap
+                    properties={properties}
+                    character={character}
+                    city={character.current_location || character.home_city || 'Manila'}
+                    onPropertyClick={(property) => {
+                      setSelectedPropertyForModal(property)
+                      setOpenModal('property-detail')
+                    }}
+                    mapSettings={mapSettings}
+                    onCharacterMove={handleCharacterMove}
+                  />
+                </div>
               </div>
             </div>
-            <div style={{ height: '600px' }}>
-              <IsometricGameMap
-                properties={properties}
-                character={character}
-                city={character.current_location || character.home_city || 'Manila'}
-                onPropertyClick={(property) => {
-                  setSelectedPropertyForModal(property)
-                  setOpenModal('property-detail')
-                }}
-                mapSettings={mapSettings}
-                onCharacterMove={handleCharacterMove}
-              />
+
+            {/* Right: Character Info Sidebar */}
+            <div className="w-80">
+              <div className="bg-slate-800/40 border-slate-700 border rounded-lg p-6 h-full overflow-y-auto space-y-6">
+                {/* Character Header */}
+                <div className="border-b border-slate-700 pb-6">
+                  <h1
+                    onClick={() => setShowCharactersPanel(true)}
+                    className="text-2xl font-bold text-blue-300 cursor-pointer hover:text-blue-200 transition-colors mb-2"
+                    title="Click to open characters panel"
+                  >
+                    {character.name}
+                  </h1>
+                  <p className="text-slate-400 text-sm mb-4">Level {character.level} • {character.current_location}</p>
+                  {character.home_city && character.home_city !== character.current_location && (
+                    <p className="text-slate-500 text-xs">Home: {character.home_city}</p>
+                  )}
+                </div>
+
+                {/* Character Stats */}
+                <div className="space-y-4">
+                  <div className="bg-slate-700/30 rounded-lg p-4">
+                    <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Wealth</p>
+                    <p className="text-3xl font-bold text-yellow-300">P{character.money?.toLocaleString() || 0}</p>
+                  </div>
+                  <div className="bg-slate-700/30 rounded-lg p-4">
+                    <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Experience</p>
+                    <p className="text-3xl font-bold text-emerald-300">{character.experience?.toLocaleString() || 0}</p>
+                  </div>
+                </div>
+
+                {/* Experience Progress */}
+                <div className="border-t border-slate-700 pt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-slate-400">Progress to Next Level</span>
+                    <span className="text-xs text-slate-400">{character.experience % 1000} / 1000</span>
+                  </div>
+                  <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-green-500 to-emerald-400 h-full transition-all duration-300"
+                      style={{ width: `${(character.experience % 1000) / 10}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-3 border-t border-slate-700 pt-4">
+                  <button
+                    onClick={() => setShowRPM(true)}
+                    className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium transition-colors"
+                    title="Edit your character avatar"
+                  >
+                    Edit Avatar
+                  </button>
+                  <button
+                    onClick={handleDailyReward}
+                    disabled={claimingReward}
+                    className="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded text-white font-medium transition-colors"
+                  >
+                    {claimingReward ? 'Claiming...' : 'Claim Daily Reward'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
