@@ -19,12 +19,12 @@ export const CITY_COORDS = Object.fromEntries(
 
 // NPC templates for conversations
 const NPC_TEMPLATES = [
-  { name: 'Maria', role: 'Merchant', emoji: '👩‍🏪' },
-  { name: 'Juan', role: 'Businessman', emoji: '👨‍💼' },
-  { name: 'Rosa', role: 'Trader', emoji: '👩‍🍳' },
-  { name: 'Carlos', role: 'Vendor', emoji: '👨‍🏭' },
-  { name: 'Luna', role: 'Entrepreneur', emoji: '👩‍💻' },
-  { name: 'Pedro', role: 'Guide', emoji: '👨‍🎓' }
+  { name: 'Maria', role: 'Merchant' },
+  { name: 'Juan', role: 'Businessman' },
+  { name: 'Rosa', role: 'Trader' },
+  { name: 'Carlos', role: 'Vendor' },
+  { name: 'Luna', role: 'Entrepreneur' },
+  { name: 'Pedro', role: 'Guide' }
 ]
 
 // Dynamic city map generation based on city data
@@ -160,7 +160,6 @@ export class NPC {
     this.y = y
     this.name = template.name
     this.role = template.role
-    this.emoji = template.emoji
     this.vx = 0
     this.vy = 0
     this.speed = 1

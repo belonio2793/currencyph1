@@ -330,7 +330,7 @@ export class WorldSimulator {
       },
       weather: {
         condition: this.weather.condition,
-        emoji: this.weather.getWeatherEmoji(),
+        conditionLabel: this.weather.getWeatherConditionLabel(),
         temperature: this.weather.temperature,
         humidity: this.weather.humidity
       },
