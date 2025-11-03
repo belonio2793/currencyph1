@@ -267,7 +267,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
       {/* Messages */}
       {error && (
         <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
-          ❌ {error}
+          {error}
         </div>
       )}
       {success && (
