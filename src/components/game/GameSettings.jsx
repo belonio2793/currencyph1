@@ -28,50 +28,36 @@ export default function GameSettings({ world3D, onClose }) {
     })
   }, [cameraMode, height, distance, angle, fov, zoom, enableShadows, enableFog, showNameplates, world3D])
 
-  const handleCameraModeChange = (mode) => {
-    setCameraMode(mode)
-    if (world3D) {
-      world3D.setCameraMode(mode, { height, distance, angle, fov, zoom })
-    }
-  }
-
-  const handleHeightChange = (value) => {
-    const newHeight = parseInt(value)
-    setHeight(newHeight)
-    if (world3D) {
-      world3D.setCameraMode(cameraMode, { height: newHeight, distance, angle, fov, zoom })
-    }
-  }
-
-  const handleDistanceChange = (value) => {
-    const newDistance = parseInt(value)
-    setDistance(newDistance)
-    if (world3D) {
-      world3D.setCameraMode(cameraMode, { height, distance: newDistance, angle, fov, zoom })
-    }
-  }
-
-  const handleAngleChange = (value) => {
-    const newAngle = parseInt(value)
-    setAngle(newAngle)
-    if (world3D) {
-      world3D.setCameraMode(cameraMode, { height, distance, angle: newAngle, fov, zoom })
-    }
-  }
-
-  const handleZoomChange = (value) => {
-    const newZoom = parseFloat(value)
-    setZoom(newZoom)
-    if (world3D) {
-      world3D.setZoom(newZoom)
-    }
-  }
-
-  const handleFOVChange = (value) => {
-    const newFov = parseInt(value)
-    setFov(newFov)
-    if (world3D) {
-      world3D.setCameraMode(cameraMode, { height, distance, angle, fov: newFov, zoom })
+  const applyPreset = (preset) => {
+    switch (preset) {
+      case 'wide':
+        setCameraMode('topdown')
+        setHeight(1000)
+        setZoom(1.0)
+        break
+      case 'cinematic':
+        setCameraMode('isometric')
+        setHeight(600)
+        setDistance(400)
+        setAngle(45)
+        setZoom(1.2)
+        setFov(75)
+        break
+      case 'closeup':
+        setCameraMode('thirdperson')
+        setHeight(200)
+        setDistance(150)
+        setZoom(1.5)
+        break
+      case 'tactical':
+        setCameraMode('isometric')
+        setHeight(800)
+        setDistance(600)
+        setAngle(35)
+        setZoom(0.8)
+        break
+      default:
+        break
     }
   }
 
@@ -99,7 +85,7 @@ export default function GameSettings({ world3D, onClose }) {
                 { mode: 'topdown', label: '⬇️ Top-Down', desc: 'Bird\'s eye view from above' },
                 { mode: 'isometric', label: '↗️ Isometric', desc: 'Angled 3D perspective' },
                 { mode: 'thirdperson', label: '👤 Third-Person', desc: 'Follow camera behind player' },
-                { mode: 'freecam', label: '���� Free Cam', desc: 'Unrestricted camera movement' }
+                { mode: 'freecam', label: '🎬 Free Cam', desc: 'Unrestricted camera movement' }
               ].map(({ mode, label, desc }) => (
                 <button
                   key={mode}
