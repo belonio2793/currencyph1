@@ -519,7 +519,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       <CityMap userId={userId} onCitySelect={setSelectedCity} />
                     </div>
                     {selectedCity && (
-                      <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                      <div className={`${gameThemeIsDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg p-6`}>
                         <h3 className="text-xl font-bold mb-2">{selectedCity.name}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
