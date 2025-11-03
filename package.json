@@ -76,7 +76,9 @@
     "run-world-worker": "bash scripts/run-world-worker.sh",
     "ml-export": "node scripts/ml/export_data.js",
     "ml-train": "node scripts/ml/train.js",
-    "ml-orchestrator": "node scripts/ml/orchestrator.js"
+    "ml-orchestrator": "node scripts/ml/orchestrator.js",
+    "backup-bucket": "node scripts/backup-bucket-simple.js",
+    "delete-bucket": "node scripts/delete-bucket.js"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
@@ -85,7 +87,6 @@
     "@solana/web3.js": "^1.75.3",
     "@supabase/supabase-js": "^2.38.0",
     "@thirdweb-dev/sdk": "^4.0.99",
-    "archiver": "^7.0.1",
     "bs58": "^6.0.0",
     "cheerio": "^1.0.0-rc.12",
     "leaflet": "^1.9.4",
