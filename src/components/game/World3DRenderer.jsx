@@ -78,32 +78,46 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
     }
 
     // Initialize AI engine
-    aiRef.current = new NPCAIEngine(
-      import.meta?.env?.VITE_X_API_KEY ||
-      import.meta?.env?.X_API_KEY ||
-      window?.X_API_KEY
-    )
+    try {
+      aiRef.current = new NPCAIEngine(
+        import.meta?.env?.VITE_X_API_KEY ||
+        import.meta?.env?.X_API_KEY ||
+        window?.X_API_KEY
+      )
+    } catch (err) {
+      console.warn('Failed to initialize NPC AI engine:', err)
+    }
 
     // Initialize conversation UI
-    conversationRef.current = new ConversationUI()
+    try {
+      conversationRef.current = new ConversationUI()
+    } catch (err) {
+      console.warn('Failed to initialize conversation UI:', err)
+    }
 
     // Initialize real-time sync
-    syncRef.current = new WorldSync(userId, character.id, city)
-    syncRef.current.connect().then(() => {
-      // Update presence with avatar
-      try {
-        syncRef.current.updatePresence({
-          name: character.name,
-          x: 0,
-          y: 0,
-          direction: 0,
-          rpm_avatar: avatarUrl
-        })
-      } catch(e) {
-        console.warn('Could not update presence:', e)
-      }
-      syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
-    })
+    try {
+      syncRef.current = new WorldSync(userId, character.id, city)
+      syncRef.current.connect().then(() => {
+        // Update presence with avatar
+        try {
+          syncRef.current.updatePresence({
+            name: character.name,
+            x: 0,
+            y: 0,
+            direction: 0,
+            rpm_avatar: avatarUrl
+          })
+        } catch(e) {
+          console.warn('Could not update presence:', e)
+        }
+        syncRef.current.on('playerUpdate', (players) => setOtherPlayers(players))
+      }).catch(err => {
+        console.warn('Failed to connect world sync:', err)
+      })
+    } catch (err) {
+      console.warn('Failed to initialize world sync:', err)
+    }
 
     // Keyboard input
     const handleKeyDown = (e) => {
