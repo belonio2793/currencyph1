@@ -331,45 +331,6 @@ export function clearTextureCache() {
 
 
 
-/**
- * Create a ground plane with Google Maps satellite imagery
- * @param {THREE.Scene} scene - Three.js scene
- * @param {number} lat - Center latitude
- * @param {number} lng - Center longitude
- * @param {number} size - Ground plane size in world units
- * @returns {Promise<THREE.Mesh>}
- */
-export async function createMapGroundPlane(scene, lat = 12.8797, lng = 121.7740, size = 6000) {
-  try {
-    const texture = await getMapTexture(lat, lng, 13, 512)
-    
-    const geometry = new THREE.PlaneGeometry(size, size)
-    const material = new THREE.MeshStandardMaterial({
-      map: texture,
-      roughness: 0.8,
-      metalness: 0.1
-    })
-    
-    const mesh = new THREE.Mesh(geometry, material)
-    mesh.rotation.x = -Math.PI / 2
-    mesh.receiveShadow = true
-    scene.add(mesh)
-    
-    return mesh
-  } catch (err) {
-    console.warn('Failed to create map ground plane:', err)
-    // Return default ground plane as fallback
-    const geometry = new THREE.PlaneGeometry(size, size)
-    const material = new THREE.MeshStandardMaterial({
-      color: 0x2a8c4a,
-      roughness: 0.8
-    })
-    const mesh = new THREE.Mesh(geometry, material)
-    mesh.rotation.x = -Math.PI / 2
-    scene.add(mesh)
-    return mesh
-  }
-}
 
 /**
  * Create a sky mesh using Google Maps imagery
