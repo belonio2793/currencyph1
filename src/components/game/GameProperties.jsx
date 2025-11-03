@@ -239,12 +239,12 @@ export default function GameProperties({ character, properties, onPropertiesUpda
 
         {/* Investment Suggestions */}
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4">📊 Investment Suggestions</h3>
+          <h3 className="text-lg font-bold mb-4">Investment Suggestions</h3>
           <div className="space-y-2 text-sm max-h-64 overflow-y-auto">
             {getPropertySuggestions().slice(0, 3).map((prop, idx) => (
               <div key={idx} className="bg-slate-700 rounded p-3">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-bold">{prop.emoji} {prop.name}</span>
+                  <span className="font-bold">{prop.name}</span>
                   <span className="text-xs text-yellow-400">ROI: {prop.estimatedROI}%</span>
                 </div>
                 <div className="flex justify-between text-xs text-slate-400">
@@ -259,7 +259,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
             onClick={() => setShowPurchaseDialog(true)}
             className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-bold"
           >
-            🏗️ Buy Property
+            Buy Property
           </button>
         </div>
       </div>
@@ -272,13 +272,13 @@ export default function GameProperties({ character, properties, onPropertiesUpda
       )}
       {success && (
         <div className="p-3 bg-green-500/10 border border-green-500/30 rounded text-green-400 text-sm">
-          ✅ {success}
+          ✓ {success}
         </div>
       )}
 
       {/* Properties List */}
       <div>
-        <h3 className="text-xl font-bold mb-4">🏠 My Properties ({properties?.length || 0})</h3>
+        <h3 className="text-xl font-bold mb-4">My Properties ({properties?.length || 0})</h3>
         {properties && properties.length > 0 ? (
           <div className="space-y-3">
             {properties.map((property, idx) => {
@@ -295,7 +295,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4 flex-1">
-                        <p className="text-3xl">{typeDef.emoji}</p>
+                        <p className="text-2xl font-bold text-slate-300">{typeDef.name}</p>
                         <div>
                           <h3 className="text-lg font-bold">{property.name}</h3>
                           <p className="text-slate-400 text-sm">
@@ -349,7 +349,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
                         <div className="bg-slate-700 rounded p-3">
                           <p className="text-slate-400 text-xs mb-2">Workers</p>
                           <div className="flex items-center justify-between">
-                            <span className="text-sm">👥 {property.workers_count} / {property.max_workers}</span>
+                            <span className="text-sm">Workers: {property.workers_count} / {property.max_workers}</span>
                             <div className="flex-1 ml-4 bg-slate-600 rounded-full h-2">
                               <div
                                 className="bg-blue-500 h-full rounded-full transition-all"
@@ -368,10 +368,10 @@ export default function GameProperties({ character, properties, onPropertiesUpda
                           }}
                           className="flex-1 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors text-sm font-medium"
                         >
-                          ⬆️ Upgrade
+                          Upgrade
                         </button>
                         <button className="flex-1 px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600 transition-colors text-sm">
-                          👥 Manage
+                          Manage
                         </button>
                       </div>
                     </div>
@@ -388,7 +388,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
               onClick={() => setShowPurchaseDialog(true)}
               className="mt-4 px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors font-bold"
             >
-              🏗️ Buy Your First Property
+              Buy Your First Property
             </button>
           </div>
         )}
@@ -398,7 +398,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
       {showPurchaseDialog && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 rounded-lg max-w-2xl w-full p-6 border border-slate-700 max-h-96 overflow-y-auto">
-            <h3 className="text-xl font-bold mb-4">🏗️ Purchase Property</h3>
+            <h3 className="text-xl font-bold mb-4">Purchase Property</h3>
 
             {error && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
@@ -424,7 +424,6 @@ export default function GameProperties({ character, properties, onPropertiesUpda
                           : 'border-slate-600 hover:border-slate-500'
                       }`}
                     >
-                      <div className="text-2xl mb-1">{value.emoji}</div>
                       <p className="text-sm font-bold">{value.name}</p>
                       <p className="text-xs text-slate-400 mt-1">₱{value.basePrice.toLocaleString()}</p>
                       <p className="text-xs text-green-400 mt-1">{value.baseDailyIncome}/day</p>
@@ -487,7 +486,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
                   disabled={buying || !selectedPropertyType || !propertyName.trim()}
                   className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition-colors font-bold"
                 >
-                  {buying ? '⏳ Purchasing...' : '💳 Purchase'}
+                  {buying ? 'Purchasing...' : 'Purchase'}
                 </button>
               </div>
             </div>
