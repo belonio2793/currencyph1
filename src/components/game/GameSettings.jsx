@@ -372,7 +372,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
             onClick={onClose}
             className="px-6 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium transition-all shadow-lg"
           >
-            ✓ Done
+            Done
           </button>
         </div>
       </div>

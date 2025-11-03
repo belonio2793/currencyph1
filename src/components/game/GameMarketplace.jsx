@@ -163,7 +163,7 @@ export default function GameMarketplace({ character, onInventoryUpdate }) {
                         : 'bg-green-600 text-white hover:bg-green-700'
                     } disabled:opacity-50`}
                   >
-                    {buying === listing.id ? '⏳ Purchasing...' : '💳 Buy Now'}
+                    {buying === listing.id ? 'Purchasing...' : 'Buy Now'}
                   </button>
                 )}
               </div>

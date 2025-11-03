@@ -91,7 +91,7 @@ export default function CurrencyRates() {
       {/* Token Price Card */}
       {tokenPrice && (
         <div className="bg-white dark:bg-black text-slate-900 dark:text-white p-6 mb-6 rounded-lg border border-slate-200 dark:border-slate-700">
-          <h3 className="text-lg font-semibold mb-4">💰 Token Price</h3>
+          <h3 className="text-lg font-semibold mb-4">Token Price</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <p className="text-slate-600 dark:text-gray-300 text-xs mb-1">Price</p>

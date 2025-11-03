@@ -232,7 +232,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
               disabled={collectingIncome}
               className="w-full mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition-colors font-bold"
             >
-              {collectingIncome ? '⏳ Collecting...' : '🎯 Collect Income'}
+              {collectingIncome ? 'Collecting...' : 'Collect Income'}
             </button>
           </div>
         )}
@@ -272,7 +272,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
       )}
       {success && (
         <div className="p-3 bg-green-500/10 border border-green-500/30 rounded text-green-400 text-sm">
-          ✓ {success}
+{success}
         </div>
       )}
 
@@ -498,7 +498,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
       {showUpgradeDialog && selectedPropertyForUpgrade && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-slate-800 rounded-lg max-w-md w-full p-6 border border-slate-700">
-            <h3 className="text-xl font-bold mb-4">⬆️ Upgrade Property</h3>
+            <h3 className="text-xl font-bold mb-4">Upgrade Property</h3>
 
             {error && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
@@ -567,7 +567,7 @@ export default function GameProperties({ character, properties, onPropertiesUpda
                   disabled={upgrading}
                   className="flex-1 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition-colors font-bold"
                 >
-                  {upgrading ? '⏳ Upgrading...' : '⬆️ Upgrade'}
+                  {upgrading ? 'Upgrading...' : 'Upgrade'}
                 </button>
               </div>
             </div>
