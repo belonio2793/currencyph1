@@ -19,6 +19,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
   const draggingRef = useRef(false)
   const lastMouseRef = useRef({ x: 0, y: 0 })
   const offscreenRef = useRef(null) // for post-processing passes
+  const lastSaveRef = useRef(0)
 
   const [otherPlayers, setOtherPlayers] = useState([])
   const [nearbyNPCs, setNearbyNPCs] = useState([])
