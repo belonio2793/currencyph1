@@ -388,7 +388,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className={`${gameThemeIsDark ? 'bg-slate-900 text-slate-100' : 'bg-white text-slate-900'}`}>
+        <div className="max-w-7xl mx-auto px-6 py-6">
         {/* World View - Default Main Display */}
         {character && (
           <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
@@ -603,6 +604,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           </div>
         )}
 
+        </div>
       </div>
     {showRPM && (
       <AvatarCreatorRPM
