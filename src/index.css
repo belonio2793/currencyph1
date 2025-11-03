@@ -26,11 +26,23 @@ body {
 
 :root.dark .light-mode-widget {
   color-scheme: light !important;
+  background: white !important;
+  color: black !important;
 }
 
-:root.dark .light-mode-widget,
 :root.dark .light-mode-widget * {
-  --tw-text-opacity: 1 !important;
+  background-color: var(--light-bg, white) !important;
+  color: var(--light-text, black) !important;
+  border-color: var(--light-border, #e2e8f0) !important;
+}
+
+/* Override specific light colors */
+:root.dark .light-mode-widget {
+  --tw-bg-white: white;
+  --tw-text-slate-900: #0f172a;
+  --tw-bg-blue-600: #2563eb;
+  --tw-bg-slate-50: #f8fafc;
+  --tw-border-slate-200: #e2e8f0;
 }
 
 input, button {
