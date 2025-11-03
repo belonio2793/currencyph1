@@ -264,6 +264,17 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       // Update world state
       world.update()
 
+      // Debounced autosave of player position
+      try {
+        const now = Date.now()
+        if (now - (lastSaveRef.current || 0) > 500) {
+          const px = Math.round(world.player.x)
+          const py = Math.round(world.player.y)
+          localStorage.setItem(`character_position_2d_${character.id}`,(JSON.stringify({ x: px, y: py, t: now })))
+          lastSaveRef.current = now
+        }
+      } catch(e) {}
+
       // Get nearby NPCs (respect toggle to hide NPCs)
       const nearby = showNPCs ? world.getNearbyNPCs(150) : []
       setNearbyNPCs(nearby)
@@ -294,26 +305,26 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
       }
 
       // Update Google Map view to follow camera/player when present
-    try {
-      const gm = googleMapRef.current
-      if (gm && world && window.google && window.google.maps) {
-        const cam = cameraRef.current || { x:0,y:0,zoom:1 }
-        const worldW = world.mapData.width
-        const worldH = world.mapData.height
-        const centerWx = cam.x + (canvas.width/(2*cam.zoom))
-        const centerWy = cam.y + (canvas.height*(0.65)/cam.zoom)
-        const ll = worldToLatLng(worldW, worldH, centerWx, centerWy)
-        const baseZ = 6
-        const tileZoom = Math.max(2, Math.min(21, Math.round(baseZ + Math.log2(cam.zoom))))
-        const current = gm.getCenter()
-        if (!current || Math.abs(current.lat() - ll.lat) > 1e-6 || Math.abs(current.lng() - ll.lng) > 1e-6) {
-          gm.setCenter({ lat: ll.lat, lng: ll.lng })
+      try {
+        const gm = googleMapRef.current
+        if (gm && world && window.google && window.google.maps) {
+          const cam = cameraRef.current || { x:0,y:0,zoom:1 }
+          const worldW = world.mapData.width
+          const worldH = world.mapData.height
+          const centerWx = cam.x + (canvas.width/(2*cam.zoom))
+          const centerWy = cam.y + (canvas.height*(0.65)/cam.zoom)
+          const ll = worldToLatLng(worldW, worldH, centerWx, centerWy)
+          const baseZ = 6
+          const tileZoom = Math.max(2, Math.min(21, Math.round(baseZ + Math.log2(cam.zoom))))
+          const current = gm.getCenter()
+          if (!current || Math.abs(current.lat() - ll.lat) > 1e-6 || Math.abs(current.lng() - ll.lng) > 1e-6) {
+            gm.setCenter({ lat: ll.lat, lng: ll.lng })
+          }
+          if (Math.abs((gm.getZoom()||0) - tileZoom) > 0) {
+            gm.setZoom(tileZoom)
+          }
         }
-        if (Math.abs((gm.getZoom()||0) - tileZoom) > 0) {
-          gm.setZoom(tileZoom)
-        }
-      }
-    } catch (e) {}
+      } catch (e) {}
 
       // Render (pass current camera and options)
       renderWorld(ctx, canvas, world, otherPlayers, cameraRef.current, { showNPCs })
