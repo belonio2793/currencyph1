@@ -227,37 +227,14 @@ input:focus {
   outline: none;
 }
 
-button {
+/* Make all buttons transparent except in ChatBar */
+:not(.light-mode-widget) button {
   background: transparent !important;
 }
 
-/* Exception: Keep ChatBar button backgrounds */
+/* Preserve ChatBar button styling */
 .light-mode-widget button {
-  background: auto !important;
-}
-
-.light-mode-widget button.bg-blue-600 {
-  background-color: #2563eb !important;
-}
-
-.light-mode-widget button.bg-blue-700 {
-  background-color: #1d4ed8 !important;
-}
-
-.light-mode-widget button.bg-red-500 {
-  background-color: #ef4444 !important;
-}
-
-.light-mode-widget button.hover\:bg-blue-700:hover {
-  background-color: #1d4ed8 !important;
-}
-
-.light-mode-widget button.hover\:bg-blue-800:hover {
-  background-color: #1e40af !important;
-}
-
-.light-mode-widget button.disabled\:bg-slate-300:disabled {
-  background-color: #cbd5e1 !important;
+  background-color: inherit;
 }
 
 button:active {
