@@ -20,16 +20,16 @@ body {
 }
 
 /* Prevent dark mode from affecting ChatBar widget */
-:root.dark div.fixed.bottom-0.right-0.z-50.flex.flex-col {
+.light-mode-widget {
   color-scheme: light !important;
 }
 
-:root.dark div.fixed.bottom-0.right-0.z-50.flex.flex-col,
-:root.dark div.fixed.bottom-0.right-0.z-50.flex.flex-col * {
-  background-color: revert !important;
-  color: revert !important;
-  border-color: revert !important;
-  --tw-bg-opacity: 1 !important;
+:root.dark .light-mode-widget {
+  color-scheme: light !important;
+}
+
+:root.dark .light-mode-widget,
+:root.dark .light-mode-widget * {
   --tw-text-opacity: 1 !important;
 }
 
