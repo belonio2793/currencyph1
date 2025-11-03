@@ -400,7 +400,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           }}
           className="px-4 py-2 bg-transparent hover:bg-white/10 text-white rounded-lg font-medium flex items-center gap-2 transition-all border border-white/30 hover:border-white/50"
         >
-          🛣️ Street View
+          Street View
         </button>
       </div>
 
