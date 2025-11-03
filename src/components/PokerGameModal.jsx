@@ -571,10 +571,10 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                 <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Recent Bets</div>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {betHistory.length === 0 ? (
-                    <div className="text-xs text-slate-500 italic">No bets yet</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-500 italic">No bets yet</div>
                   ) : (
                     betHistory.slice(-5).reverse().map((bet, i) => (
-                      <div key={i} className="text-xs text-slate-300 flex justify-between">
+                      <div key={i} className="text-xs text-slate-700 dark:text-slate-300 flex justify-between">
                         <span>{bet.action}</span>
                         <span className="text-amber-400">{bet.amount} {table.currency_code}</span>
                       </div>
