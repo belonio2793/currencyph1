@@ -354,18 +354,22 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
       <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
         <div className="mb-4">
           <h3 className="text-lg font-bold mb-3">Philippines World Map</h3>
-          <p className="text-slate-400 text-sm">Use arrow keys or WASD to move • Click to navigate</p>
+          <p className="text-slate-400 text-sm">⌨️ WASD/Arrows to fly • 🖱️ Drag to pan • Click cities to navigate</p>
         </div>
-        
+
         <canvas
           ref={canvasRef}
           onClick={handleClickMap}
-          className="w-full border border-slate-600 rounded cursor-crosshair bg-slate-900"
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          className="w-full border border-slate-600 rounded bg-slate-900 cursor-grab active:cursor-grabbing"
           style={{ maxWidth: '100%', height: 'auto' }}
         />
 
         <p className="text-slate-400 text-xs mt-3">
-          🟢 You • 🔵 Cities • 🔴 Enemies
+          🟢 You • 🔵 Cities • 🔴 Enemies | Velocity: {Math.round(Math.hypot(velocity.x, velocity.y) * 10) / 10}
         </p>
       </div>
 
