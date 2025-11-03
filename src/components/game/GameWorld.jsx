@@ -192,17 +192,39 @@ export default function GameWorld({ character, onCombat, combatActive, onPositio
   }
 
   const handleClickMap = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect()
-    const clickX = (e.clientX - rect.left) / TILE_SIZE
-    const clickY = (e.clientY - rect.top) / TILE_SIZE
+    // Only navigate if it's a quick click (not a drag)
+    if (!dragStart.current) {
+      const rect = canvasRef.current.getBoundingClientRect()
+      const clickX = (e.clientX - rect.left) / TILE_SIZE
+      const clickY = (e.clientY - rect.top) / TILE_SIZE
 
-    const viewX = Math.floor(worldPos.x) - VIEW_SIZE / 2
-    const viewY = Math.floor(worldPos.y) - VIEW_SIZE / 2
+      const viewX = Math.floor(worldPos.x) - VIEW_SIZE / 2
+      const viewY = Math.floor(worldPos.y) - VIEW_SIZE / 2
 
-    const targetX = Math.max(0, Math.min(MAP_WIDTH - 1, viewX + clickX))
-    const targetY = Math.max(0, Math.min(MAP_HEIGHT - 1, viewY + clickY))
+      const targetX = Math.max(0, Math.min(MAP_WIDTH - 1, viewX + clickX))
+      const targetY = Math.max(0, Math.min(MAP_HEIGHT - 1, viewY + clickY))
 
-    moveToPosition(targetX, targetY)
+      setWorldPos({ x: targetX, y: targetY })
+    }
+  }
+
+  const generateNearbyEnemies = () => {
+    const enemies = []
+    const count = Math.floor(Math.random() * 3) + 1
+
+    for (let i = 0; i < count; i++) {
+      const enemy = ENEMIES[Math.floor(Math.random() * ENEMIES.length)]
+      enemies.push({
+        id: Math.random(),
+        type: enemy.type,
+        level: enemy.level + Math.floor(character.level / 5),
+        x: worldPos.x + (Math.random() - 0.5) * 20,
+        y: worldPos.y + (Math.random() - 0.5) * 20
+      })
+    }
+
+    setNearbyEnemies(enemies)
+    setShowEnemies(true)
   }
 
   const handleCombat = async (enemy) => {
