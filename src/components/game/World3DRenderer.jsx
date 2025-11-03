@@ -428,6 +428,13 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
             <p className="text-xs text-slate-400">Location: {city}</p>
             <p className="text-xs text-slate-400">Level <span className="text-cyan-400 font-bold">{character.level || 0}</span></p>
             <p className="text-xs text-slate-500 mt-1">Balance: P{(character.money || 0).toLocaleString()}</p>
+            {positionInfo ? (
+              <div className="mt-2 text-xs text-slate-300">
+                <div>Lat: {positionInfo.lat ? positionInfo.lat.toFixed(5) : '—'}</div>
+                <div>Lng: {positionInfo.lng ? positionInfo.lng.toFixed(5) : '—'}</div>
+                <div className="truncate">{positionInfo.street || positionInfo.city || ''}</div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
