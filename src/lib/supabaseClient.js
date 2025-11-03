@@ -19,30 +19,35 @@ const getEnv = (name) => {
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || ''
 
-let supabase
+const GLOBAL_SUPABASE_KEY = '__CURRENCY_SUPABASE_CLIENT__'
 
-if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-  supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-} else {
-  console.warn('Supabase not fully configured. SUPABASE_URL or SUPABASE_ANON_KEY is missing. Some features will be disabled.')
-  const missingError = (method) => () => { throw new Error(`Supabase not configured. Called ${method} but SUPABASE_URL or SUPABASE_ANON_KEY is missing.`) }
-  supabase = {
-    from: () => ({ select: missingError('from().select'), insert: missingError('from().insert'), update: missingError('from().update'), upsert: missingError('from().upsert'), eq: missingError('from().eq'), order: missingError('from().order') }),
-    auth: {
-      signInWithPassword: missingError('auth.signInWithPassword'),
-      signUp: missingError('auth.signUp'),
-      getUser: async () => ({ data: { user: null }, error: null })
-    },
-    channel: (name) => ({
-      // allow .on(...).subscribe() chaining
-      on: () => ({ subscribe: missingError('channel().on().subscribe') }),
-      // allow subscribe() directly
-      subscribe: missingError('channel().subscribe')
-    }),
-    removeChannel: (c) => { /* noop when supabase not configured */ },
-    rpc: missingError('rpc')
+// Ensure we only create the client once even if this module is imported multiple times
+if (!globalThis[GLOBAL_SUPABASE_KEY]) {
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    globalThis[GLOBAL_SUPABASE_KEY] = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  } else {
+    console.warn('Supabase not fully configured. SUPABASE_URL or SUPABASE_ANON_KEY is missing. Some features will be disabled.')
+    const missingError = (method) => () => { throw new Error(`Supabase not configured. Called ${method} but SUPABASE_URL or SUPABASE_ANON_KEY is missing.`) }
+    globalThis[GLOBAL_SUPABASE_KEY] = {
+      from: () => ({ select: missingError('from().select'), insert: missingError('from().insert'), update: missingError('from().update'), upsert: missingError('from().upsert'), eq: missingError('from().eq'), order: missingError('from().order') }),
+      auth: {
+        signInWithPassword: missingError('auth.signInWithPassword'),
+        signUp: missingError('auth.signUp'),
+        getUser: async () => ({ data: { user: null }, error: null })
+      },
+      channel: (name) => ({
+        // allow .on(...).subscribe() chaining
+        on: () => ({ subscribe: missingError('channel().on().subscribe') }),
+        // allow subscribe() directly
+        subscribe: missingError('channel().subscribe')
+      }),
+      removeChannel: (c) => { /* noop when supabase not configured */ },
+      rpc: missingError('rpc')
+    }
   }
 }
+
+const supabase = globalThis[GLOBAL_SUPABASE_KEY]
 
 export { supabase }
 
