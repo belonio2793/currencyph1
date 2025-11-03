@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { getMapTexture, createMapSky } from './googleMapsIntegration'
 import { MapTileManager } from './mapTileManager'
+import { latLngToWorldCoords } from './mapUtils'
 
 const gltfLoader = new GLTFLoader()
 const modelCache = new Map()
