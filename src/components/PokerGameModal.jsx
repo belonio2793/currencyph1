@@ -539,9 +539,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               
               {/* Player Info */}
               {isSigned && (
-                <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 space-y-3">
+                <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-300 mb-3">Your Balance</div>
+                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Your Balance</div>
                     <div className="text-3xl font-bold text-emerald-400">
                       {playerBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </div>
