@@ -127,9 +127,9 @@ export default function CityManager({ city, onUpdate, onClose }) {
           {/* View Mode Tabs */}
           <div className="flex gap-2">
             {[
-              { id: 'manager', label: '⚙️ Manager' },
-              { id: 'realworld', label: '🗺️ Real World' },
-              { id: 'streetview', label: '📸 Street View' }
+              { id: 'manager', label: 'Manager' },
+              { id: 'realworld', label: 'Real World' },
+              { id: 'streetview', label: 'Street View' }
             ].map(mode => (
               <button
                 key={mode.id}
