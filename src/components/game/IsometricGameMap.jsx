@@ -69,7 +69,7 @@ export default function IsometricGameMap({
     })
   }, [properties])
 
-  const drawIsometricTile = useCallback((ctx, screenX, screenY, color, height = 0) => {
+  const drawIsometricTile = useCallback((ctx, screenX, screenY, color, height = 0, isHovered = false) => {
     const w = TILE_SIZE / 2
     const h = TILE_SIZE / 4
 
@@ -82,8 +82,8 @@ export default function IsometricGameMap({
     ctx.closePath()
     ctx.fill()
 
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)'
-    ctx.lineWidth = 1
+    ctx.strokeStyle = isHovered ? 'rgba(255, 255, 0, 0.8)' : 'rgba(0, 0, 0, 0.15)'
+    ctx.lineWidth = isHovered ? 2 : 1
     ctx.stroke()
 
     if (height > 0) {
