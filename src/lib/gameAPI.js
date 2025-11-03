@@ -75,9 +75,19 @@ export const gameAPI = {
 
   async updateCharacterAppearance(characterId, appearance) {
     try {
+      // Ensure appearance has proper structure
+      const cleanedAppearance = {
+        ...(appearance || {}),
+        rpm: {
+          model_url: appearance?.rpm?.model_url || appearance?.model_url || null,
+          thumbnail: appearance?.rpm?.thumbnail || appearance?.thumbnail || null,
+          meta: appearance?.rpm?.meta || appearance?.meta || {}
+        }
+      }
+
       const { data, error } = await supabase
         .from('game_characters')
-        .update({ appearance, updated_at: new Date() })
+        .update({ appearance: cleanedAppearance, updated_at: new Date() })
         .eq('id', characterId)
         .select()
         .single()
@@ -87,6 +97,46 @@ export const gameAPI = {
       console.error('Error updating appearance:', err)
       throw err
     }
+  },
+
+  async getCharacterAppearance(characterId) {
+    try {
+      const { data, error } = await supabase
+        .from('game_characters')
+        .select('id, appearance')
+        .eq('id', characterId)
+        .single()
+      if (error) throw error
+      return data?.appearance || null
+    } catch (err) {
+      console.error('Error fetching character appearance:', err)
+      return null
+    }
+  },
+
+  getAvatarUrl(appearance) {
+    if (!appearance) return null
+
+    // Try to get avatar URL from different possible locations
+    return (
+      appearance?.rpm?.model_url ||
+      appearance?.model_url ||
+      appearance?.avatar_url ||
+      appearance?.rpm?.meta?.model_url ||
+      null
+    )
+  },
+
+  getAvatarThumbnail(appearance) {
+    if (!appearance) return null
+
+    return (
+      appearance?.rpm?.thumbnail ||
+      appearance?.thumbnail ||
+      appearance?.rpm?.meta?.imageUrl ||
+      appearance?.rpm?.meta?.thumbnailUrl ||
+      null
+    )
   },
 
   async updateCharacterPosition(characterId, x, y, location) {
