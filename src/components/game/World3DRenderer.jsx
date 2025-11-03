@@ -212,7 +212,21 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       clearInterval(gameLoop)
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+
+      // Save final position before cleanup
       if (world3DRef.current) {
+        const player = world3DRef.current.players.get(userId)
+        if (player) {
+          try {
+            localStorage.setItem(`character_position_${character.id}`, JSON.stringify({
+              x: player.group.position.x,
+              z: player.group.position.z,
+              timestamp: Date.now()
+            }))
+          } catch (err) {
+            console.warn('Failed to save final character position:', err)
+          }
+        }
         world3DRef.current.destroy()
       }
     }
