@@ -201,44 +201,54 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       {/* 3D Canvas Container */}
       <div ref={containerRef} className="w-full h-full" />
 
-      {/* HUD - Player Info */}
-      <div className="absolute top-4 left-4 text-white pointer-events-none">
-        <div className="bg-black/70 p-3 rounded border border-slate-600 flex items-center gap-3">
-          {character?.appearance && (character.appearance.rpm?.thumbnail || 
+      {/* HUD - Player Info (Top Left) */}
+      <div className="absolute top-4 left-4 text-white pointer-events-none z-30">
+        <div className="bg-black/70 backdrop-blur-sm p-4 rounded-lg border border-slate-600/50 flex items-center gap-3">
+          {character?.appearance && (character.appearance.rpm?.thumbnail ||
             character.appearance.rpm?.meta?.imageUrl ||
             character.appearance.rpm?.meta?.avatarUrl) ? (
-            <img 
-              src={character.appearance.rpm?.thumbnail || 
+            <img
+              src={character.appearance.rpm?.thumbnail ||
                    character.appearance.rpm?.meta?.imageUrl ||
                    character.appearance.rpm?.meta?.avatarUrl}
-              alt="avatar" 
-              className="w-12 h-12 rounded-full object-cover" 
+              alt="avatar"
+              className="w-14 h-14 rounded-full object-cover border-2 border-blue-400"
             />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-400">No<br/>Avatar</div>
+            <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center text-xs text-slate-400 border-2 border-slate-600">
+              No<br/>Avatar
+            </div>
           )}
           <div>
-            <p className="text-sm font-bold">{character.name}</p>
+            <p className="text-sm font-bold text-slate-100">{character.name}</p>
             <p className="text-xs text-slate-400">📍 {city}</p>
-            <p className="text-xs text-slate-400">Level {character.level || 0}</p>
+            <p className="text-xs text-slate-400">Level <span className="text-cyan-400 font-bold">{character.level || 0}</span></p>
+            <p className="text-xs text-slate-500 mt-1">💰 {(character.money || 0).toLocaleString()} PHP</p>
           </div>
         </div>
       </div>
 
-      {/* Controls Help */}
-      <div className="absolute top-4 right-4 text-white pointer-events-none">
-        <div className="bg-black/70 p-3 rounded border border-slate-600 text-xs text-slate-400">
-          <p><strong className="text-slate-200">WASD</strong> / Arrows to move</p>
-          <p><strong className="text-slate-200">Click</strong> to interact</p>
-          <p><strong className="text-slate-200">ESC</strong> to open menu</p>
+      {/* Controls & Camera Info (Top Right) */}
+      <div className="absolute top-4 right-4 text-white pointer-events-none z-30 space-y-2">
+        <div className="bg-black/70 backdrop-blur-sm p-3 rounded-lg border border-slate-600/50">
+          <p className="text-xs font-bold text-slate-200 mb-2">⌨️ CONTROLS</p>
+          <p className="text-xs text-slate-400"><span className="text-slate-200">WASD</span> / Arrows to move</p>
+          <p className="text-xs text-slate-400"><span className="text-slate-200">Click</span> to interact</p>
+          <p className="text-xs text-slate-400"><span className="text-slate-200">ESC</span> for settings</p>
+        </div>
+
+        <div className="bg-black/70 backdrop-blur-sm p-3 rounded-lg border border-slate-600/50">
+          <p className="text-xs font-bold text-slate-200 mb-1">📷 CAMERA</p>
+          <p className="text-xs text-cyan-400">{world3DRef.current?.cameraConfig?.mode?.toUpperCase() || 'ISOMETRIC'}</p>
         </div>
       </div>
 
-      {/* Settings Button */}
-      <div className="absolute bottom-6 right-6 z-40">
+      {/* Action Buttons (Bottom Right) */}
+      <div className="absolute bottom-6 right-6 z-40 pointer-events-auto flex flex-col gap-2">
         <button
           onClick={() => setShowSettings(true)}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center gap-2 pointer-events-auto"
+          className="px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white rounded-lg font-medium flex items-center gap-2 transition-all shadow-lg"
+          title="Open game settings (ESC)"
         >
           ⚙️ Settings
         </button>
