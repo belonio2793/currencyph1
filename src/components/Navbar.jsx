@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import HeaderMap from './HeaderMap'
+import { useTheme } from '../lib/ThemeContext'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, userId, totalBalancePHP, onShowAuth, onSignOut }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [borrowDropdownOpen, setBorrowDropdownOpen] = useState(false)
+  const { isDark, toggleTheme } = useTheme()
 
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
