@@ -5,19 +5,19 @@ import { WorldSync } from '../../lib/worldSync'
 import { NPCAIEngine, ConversationUI } from '../../lib/npcAI'
 import GameSettings from './GameSettings'
 
-export default function World3DRenderer({ character, userId, city = 'Manila' }) {
+export default function World3DRenderer({ character, userId, city = 'Manila', onWorldReady = null }) {
   const containerRef = useRef(null)
   const world3DRef = useRef(null)
   const syncRef = useRef(null)
   const aiRef = useRef(null)
   const conversationRef = useRef(null)
-  
+
   const [otherPlayers, setOtherPlayers] = useState([])
   const [showSettings, setShowSettings] = useState(false)
   const [chatUI, setChatUI] = useState({ isOpen: false, npc: null, messages: [] })
   const [playerInput, setPlayerInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
-  
+
   const keysPressed = useRef({})
 
   // Initialize 3D world
