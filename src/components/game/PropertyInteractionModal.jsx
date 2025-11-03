@@ -271,18 +271,18 @@ export default function PropertyInteractionModal({
           {/* Action Content */}
           {action === 'view' && (
             <div className="space-y-4">
-              <div className={`${isDark ? 'bg-slate-700' : 'bg-slate-100'} rounded p-4`}>
-                <h3 className="font-bold text-white mb-3">Property Details</h3>
+              <div className="bg-slate-100 dark:bg-slate-700 rounded p-4">
+                <h3 className="font-bold text-slate-900 dark:text-white mb-3">Property Details</h3>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-slate-300">
+                  <div className="flex justify-between text-slate-700 dark:text-slate-300">
                     <span>Type:</span>
                     <span className="font-bold capitalize">{property.property_type}</span>
                   </div>
-                  <div className="flex justify-between text-slate-300">
+                  <div className="flex justify-between text-slate-700 dark:text-slate-300">
                     <span>Workers:</span>
                     <span className="font-bold">{property.workers_count || 0} / {property.max_workers || 5}</span>
                   </div>
-                  <div className="flex justify-between text-slate-300">
+                  <div className="flex justify-between text-slate-700 dark:text-slate-300">
                     <span>Status:</span>
                     <span className="font-bold capitalize">{property.status || 'Active'}</span>
                   </div>
