@@ -567,8 +567,8 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               )}
               
               {/* Bet History */}
-              <div className="bg-slate-800 rounded-xl border border-slate-700 p-4">
-                <div className="text-sm font-semibold text-slate-300 mb-3">Recent Bets</div>
+              <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4">
+                <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Recent Bets</div>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {betHistory.length === 0 ? (
                     <div className="text-xs text-slate-500 italic">No bets yet</div>
