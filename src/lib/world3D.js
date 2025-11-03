@@ -21,6 +21,7 @@ export class World3D {
       distance: 400,
       angle: 45,
       fov: 75,
+      baseFov: 75,
       zoom: 1.2,
       enableShadows: true,
       enableFog: true,
