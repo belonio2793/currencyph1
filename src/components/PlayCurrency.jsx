@@ -551,7 +551,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
                         const equipped = equipment.find(e => e.equipment_slot === slot)
                         return (
-                          <div key={slot} className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+                          <div key={slot} className={`${gameThemeIsDark ? 'bg-slate-700 border border-slate-600' : 'bg-slate-100 border border-slate-300'} rounded-lg p-4`}>
                             <p className="text-xs text-slate-400 uppercase mb-2">{slot.replace('_', ' ')}</p>
                             {equipped ? (
                               <div>
@@ -586,7 +586,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <h2 className="text-2xl font-bold mb-6">Banking System</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {bankAccounts.map(account => (
-                        <div key={account.id} className="bg-slate-700 rounded-lg p-4 border border-slate-600">
+                        <div key={account.id} className={`${gameThemeIsDark ? 'bg-slate-700 border border-slate-600' : 'bg-slate-100 border border-slate-300'} rounded-lg p-4`}>
                           <p className="text-slate-400 text-sm uppercase">{account.account_type} Account</p>
                           <p className="text-2xl font-bold mt-2">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
                           <p className="text-xs text-slate-500 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
