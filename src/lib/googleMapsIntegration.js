@@ -340,47 +340,6 @@ export function clearTextureCache() {
 
 
 /**
- * Create a displacement map for terrain from elevation data
- */
-export function createDisplacementMap(elevationData) {
-  const width = elevationData[0].length
-  const height = elevationData.length
-  
-  const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const ctx = canvas.getContext('2d')
-  
-  // Find min/max for normalization
-  let min = Infinity, max = -Infinity
-  for (let row of elevationData) {
-    for (let val of row) {
-      min = Math.min(min, val)
-      max = Math.max(max, val)
-    }
-  }
-  
-  const range = max - min || 1
-  const imageData = ctx.createImageData(width, height)
-  const data = imageData.data
-  
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4
-      const normalized = (elevationData[y][x] - min) / range
-      const val = Math.floor(normalized * 255)
-      data[idx] = val
-      data[idx + 1] = val
-      data[idx + 2] = val
-      data[idx + 3] = 255
-    }
-  }
-  
-  ctx.putImageData(imageData, 0, 0)
-  return new THREE.CanvasTexture(canvas)
-}
-
-/**
  * Load POIs (Points of Interest) for Philippines
  * This is a static list but could be extended with real data
  */
