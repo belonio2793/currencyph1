@@ -509,7 +509,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     )}
 
     {/* Game Settings Modal */}
-    {showSettings && use3DWorld && (
+    {showSettings && (
       <GameSettings
         world3D={world3DRef.current}
         onClose={() => setShowSettings(false)}
