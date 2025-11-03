@@ -67,7 +67,7 @@ export default function GameSettings({ world3D, onClose }) {
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-slate-800 to-slate-700 border-b border-slate-700 p-4 md:p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-slate-100">⚙️ Game Settings</h2>
+            <h2 className="text-2xl font-bold text-slate-100">Game Settings</h2>
             <p className="text-xs text-slate-400 mt-1">Customize your view and gameplay experience</p>
           </div>
           <button
@@ -82,20 +82,20 @@ export default function GameSettings({ world3D, onClose }) {
         <div className="p-4 md:p-6 space-y-6">
           {/* Quick Presets */}
           <div className="bg-slate-700/30 rounded-lg p-4 border border-slate-600">
-            <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase">⚡ Quick Presets</h3>
+            <h3 className="text-sm font-semibold text-slate-300 mb-3 uppercase">Quick Presets</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {[
-                { id: 'wide', label: '📐 Wide View', emoji: '📐' },
-                { id: 'cinematic', label: '🎬 Cinematic', emoji: '🎬' },
-                { id: 'closeup', label: '🔍 Close-up', emoji: '🔍' },
-                { id: 'tactical', label: '🎯 Tactical', emoji: '🎯' }
+                { id: 'wide', label: 'Wide View' },
+                { id: 'cinematic', label: 'Cinematic' },
+                { id: 'closeup', label: 'Close-up' },
+                { id: 'tactical', label: 'Tactical' }
               ].map(({ id, label, emoji }) => (
                 <button
                   key={id}
                   onClick={() => applyPreset(id)}
                   className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs font-medium text-slate-200 transition-colors border border-slate-600 hover:border-slate-500"
                 >
-                  {emoji} {label}
+                  {label}
                 </button>
               ))}
             </div>
@@ -103,13 +103,13 @@ export default function GameSettings({ world3D, onClose }) {
 
           {/* Camera Mode Section */}
           <div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">📷 Camera View Modes</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-4">Camera View Modes</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
-                { mode: 'topdown', label: '⬇️ Top-Down', desc: 'Bird\'s eye view from above' },
-                { mode: 'isometric', label: '↗️ Isometric', desc: 'Angled 3D perspective (Recommended)' },
-                { mode: 'thirdperson', label: '👤 Third-Person', desc: 'Follow camera behind player' },
-                { mode: 'freecam', label: '🎬 Free Cam', desc: 'Unrestricted camera movement' }
+                { mode: 'topdown', label: 'Top-Down', desc: 'Bird\'s eye view from above' },
+                { mode: 'isometric', label: 'Isometric', desc: 'Angled 3D perspective (Recommended)' },
+                { mode: 'thirdperson', label: 'Third-Person', desc: 'Follow camera behind player' },
+                { mode: 'freecam', label: 'Free Cam', desc: 'Unrestricted camera movement' }
               ].map(({ mode, label, desc }) => (
                 <button
                   key={mode}
@@ -129,13 +129,13 @@ export default function GameSettings({ world3D, onClose }) {
 
           {/* Camera Settings Section */}
           <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">🎥 Camera Settings</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-4">Camera Settings</h3>
 
             <div className="space-y-4">
               {/* Zoom Slider */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-300">🔍 Zoom Level</label>
+                  <label className="text-sm font-medium text-slate-300">Zoom Level</label>
                   <span className="text-sm font-bold text-blue-400">{zoom.toFixed(2)}x</span>
                 </div>
                 <input
@@ -153,7 +153,7 @@ export default function GameSettings({ world3D, onClose }) {
               {/* Field of View */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-300">📐 Field of View</label>
+                  <label className="text-sm font-medium text-slate-300">Field of View</label>
                   <span className="text-sm font-bold text-blue-400">{fov}°</span>
                 </div>
                 <input
@@ -183,7 +183,7 @@ export default function GameSettings({ world3D, onClose }) {
                   {(cameraMode === 'topdown' || cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-300">⬆️ Camera Height</label>
+                        <label className="text-sm font-medium text-slate-300">Camera Height</label>
                         <span className="text-sm font-bold text-slate-400">{height}px</span>
                       </div>
                       <input
@@ -202,7 +202,7 @@ export default function GameSettings({ world3D, onClose }) {
                   {(cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-300">📏 Camera Distance</label>
+                        <label className="text-sm font-medium text-slate-300">Camera Distance</label>
                         <span className="text-sm font-bold text-slate-400">{distance}px</span>
                       </div>
                       <input
@@ -221,7 +221,7 @@ export default function GameSettings({ world3D, onClose }) {
                   {cameraMode === 'isometric' && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-300">⭐ Isometric Angle</label>
+                        <label className="text-sm font-medium text-slate-300">Isometric Angle</label>
                         <span className="text-sm font-bold text-slate-400">{angle}°</span>
                       </div>
                       <input
@@ -242,7 +242,7 @@ export default function GameSettings({ world3D, onClose }) {
 
           {/* Display Settings Section */}
           <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">🎮 Display & Graphics</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-4">Display & Graphics</h3>
 
             <div className="space-y-2">
               <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
