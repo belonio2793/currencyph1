@@ -5,7 +5,6 @@ import { gameAPI } from './gameAPI'
 const PROPERTY_TYPES = {
   house: {
     name: 'House',
-    emoji: '🏠',
     basePrice: 50000,
     baseDailyIncome: 100,
     maxUpgrades: 5,
@@ -14,7 +13,6 @@ const PROPERTY_TYPES = {
   },
   apartment: {
     name: 'Apartment',
-    emoji: '🏢',
     basePrice: 75000,
     baseDailyIncome: 200,
     maxUpgrades: 5,
@@ -23,7 +21,6 @@ const PROPERTY_TYPES = {
   },
   business: {
     name: 'Business',
-    emoji: '🏪',
     basePrice: 100000,
     baseDailyIncome: 500,
     maxUpgrades: 6,
@@ -32,7 +29,6 @@ const PROPERTY_TYPES = {
   },
   farm: {
     name: 'Farm',
-    emoji: '🌾',
     basePrice: 80000,
     baseDailyIncome: 300,
     maxUpgrades: 5,
@@ -41,7 +37,6 @@ const PROPERTY_TYPES = {
   },
   factory: {
     name: 'Factory',
-    emoji: '🏭',
     basePrice: 200000,
     baseDailyIncome: 1200,
     maxUpgrades: 7,
@@ -50,7 +45,6 @@ const PROPERTY_TYPES = {
   },
   hotel: {
     name: 'Hotel',
-    emoji: '🏨',
     basePrice: 300000,
     baseDailyIncome: 2000,
     maxUpgrades: 8,
