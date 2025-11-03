@@ -279,10 +279,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-4xl font-bold text-blue-600 mb-4">Play Currency</div>
-          <p className="text-slate-600">Loading your adventure...</p>
+          <div className="text-4xl font-bold text-blue-400 mb-4">Play Currency</div>
+          <p className="text-slate-400">Loading your adventure...</p>
         </div>
       </div>
     )
@@ -293,16 +293,16 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-50 text-slate-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
       {/* Header */}
-      <div className="bg-slate-200/30 border-slate-300 border-b">
+      <div className="bg-slate-800/50 border-slate-700 border-b">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div>
                 <h1
                   onClick={() => setShowCharactersPanel(true)}
-                  className="text-3xl font-bold text-blue-400 cursor-pointer hover:text-blue-300 transition-colors"
+                  className="text-3xl font-bold text-blue-300 cursor-pointer hover:text-blue-200 transition-colors"
                   title="Click to open characters panel"
                 >
                   {character.name}
@@ -327,11 +327,11 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </button>
               <div className="text-right">
                 <p className="text-slate-400 text-xs">Total Wealth</p>
-                <p className="text-2xl font-bold text-yellow-400">P{character.money?.toLocaleString() || 0}</p>
+                <p className="text-2xl font-bold text-yellow-300">P{character.money?.toLocaleString() || 0}</p>
               </div>
               <div className="text-right">
                 <p className="text-slate-400 text-xs">Experience</p>
-                <p className="text-2xl font-bold text-green-400">{character.experience?.toLocaleString() || 0}</p>
+                <p className="text-2xl font-bold text-emerald-300">{character.experience?.toLocaleString() || 0}</p>
               </div>
             </div>
           </div>
@@ -342,7 +342,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               <span className="text-xs text-slate-400">Progress to Next Level</span>
               <span className="text-xs text-slate-400">{character.experience % 1000} / 1000</span>
             </div>
-            <div className="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
               <div 
                 className="bg-gradient-to-r from-green-500 to-emerald-400 h-full transition-all duration-300"
                 style={{ width: `${(character.experience % 1000) / 10}%` }}
@@ -367,15 +367,15 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       )}
 
       {/* Main Content */}
-      <div className="bg-white text-slate-900">
+      <div className="bg-slate-900/50 text-slate-100">
         <div className="max-w-7xl mx-auto px-6 py-6">
         {/* World View - Default Main Display */}
         {character && (
-          <div className="bg-slate-50 border-slate-200 border rounded-lg overflow-hidden mb-6">
-            <div className="p-4 border-b border-slate-200 flex items-center justify-between">
+          <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden mb-6">
+            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-900">Game World</h2>
-                <p className="text-xs text-slate-500 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
+                <h2 className="text-xl font-bold text-slate-100">Game World</h2>
+                <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
               </div>
               <div className="flex gap-2">
                 <button
@@ -417,7 +417,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors font-bold ${
               showCurrencyGame
                 ? 'bg-green-600 text-white'
-                : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
             Currency Game
@@ -436,7 +436,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
                 openModal === tab.id
                   ? 'bg-blue-600 text-white'
-                  : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
               {tab.label}
@@ -446,19 +446,19 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         {/* Currency Game Panel */}
         {showCurrencyGame && (
-          <div className="bg-slate-50 border-slate-200 border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
+          <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
             <CurrencyGameUI
               character={character}
               world3D={world3DRef.current}
               onCharacterUpdate={(updated) => setCharacter(updated)}
-              isDark={false}
+              isDark={true}
             />
           </div>
         )}
 
         {/* Property Detail Modal from Map */}
         {openModal === 'property-detail' && selectedPropertyForModal && (
-          <PropertyInteractionModal isDark={false}
+          <PropertyInteractionModal isDark={true}
             property={selectedPropertyForModal}
             character={character}
             isOpen={true}
@@ -475,9 +475,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         {/* Modal for tabs */}
         {openModal && openModal !== 'property-detail' && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-slate-200 flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-slate-900">
+            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6 border-b border-slate-700 flex items-center justify-between">
+                <h3 className="text-2xl font-bold text-slate-100">
                   {openModal === 'cities' && 'Cities'}
                   {openModal === 'inventory' && 'Inventory'}
                   {openModal === 'equipment' && 'Equipment'}
@@ -487,19 +487,19 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 </h3>
                 <button onClick={() => setOpenModal(null)} className="text-slate-400 hover:text-slate-200">X</button>
               </div>
-              <div className="p-6 text-slate-900">
+              <div className="p-6 text-slate-100">
                 {openModal === 'inventory' && (
                   <GameInventory character={character} inventory={inventory} onInventoryUpdate={handleInventoryUpdate} />
                 )}
 
                 {openModal === 'cities' && (
                   <div className="space-y-6">
-                    <div className="bg-slate-100 border border-slate-300 rounded-lg overflow-hidden" style={{ height: '600px' }}>
+                    <div className="bg-slate-700/30 border border-slate-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
                       <CityMap userId={userId} onCitySelect={setSelectedCity} />
                     </div>
                     {selectedCity && (
-                      <div className="bg-white border border-slate-200 rounded-lg p-6">
-                        <h3 className="text-xl font-bold mb-2">{selectedCity.name}</h3>
+                      <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
+                        <h3 className="text-xl font-bold mb-2 text-slate-100">{selectedCity.name}</h3>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                           <div>
                             <p className="text-slate-400 text-sm">Population</p>
@@ -524,21 +524,21 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'equipment' && (
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-6">Equipment</h2>
+                  <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6 text-slate-100">Equipment</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                       {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
                         const equipped = equipment.find(e => e.equipment_slot === slot)
                         return (
-                          <div key={slot} className="bg-slate-100 border border-slate-300 rounded-lg p-4">
+                          <div key={slot} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
                             <p className="text-xs text-slate-400 uppercase mb-2">{slot.replace('_', ' ')}</p>
                             {equipped ? (
                               <div>
-                                <p className="font-bold text-sm">{equipped.game_items?.name}</p>
+                                <p className="font-bold text-sm text-slate-100">{equipped.game_items?.name}</p>
                                 <p className="text-xs text-slate-400">{equipped.game_items?.brand}</p>
                               </div>
                             ) : (
-                              <p className="text-slate-500 text-sm">Empty</p>
+                              <p className="text-slate-400 text-sm">Empty</p>
                             )}
                           </div>
                         )
@@ -561,14 +561,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'banking' && (
-                  <div className="bg-white border border-slate-200 rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-6">Banking System</h2>
+                  <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-6 text-slate-100">Banking System</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {bankAccounts.map(account => (
-                        <div key={account.id} className="bg-slate-100 border border-slate-300 rounded-lg p-4">
+                        <div key={account.id} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
                           <p className="text-slate-400 text-sm uppercase">{account.account_type} Account</p>
-                          <p className="text-2xl font-bold mt-2">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
-                          <p className="text-xs text-slate-500 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
+                          <p className="text-2xl font-bold mt-2 text-slate-100">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
+                          <p className="text-xs text-slate-400 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
                         </div>
                       ))}
                     </div>
@@ -619,7 +619,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         onClose={() => setShowSettings(false)}
         mapSettings={mapSettings}
         onMapSettingsChange={setMapSettings}
-        isDark={false}
+        isDark={true}
       />
     )}
     </div>
