@@ -100,9 +100,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [showRPM, setShowRPM] = useState(false)
   const [showCityManager, setShowCityManager] = useState(false)
   const [showCharactersPanel, setShowCharactersPanel] = useState(false)
-  // Modal state: which tab opens as modal
   const [openModal, setOpenModal] = useState(null)
   const [showSettings, setShowSettings] = useState(false)
+  const [showCurrencyGame, setShowCurrencyGame] = useState(false)
   const world3DRef = useRef(null)
 
   useEffect(() => {
