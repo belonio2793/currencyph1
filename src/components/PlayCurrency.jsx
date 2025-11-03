@@ -582,7 +582,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 {openModal === 'banking' && (
-                  <div className="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                  <div className={`${gameThemeIsDark ? 'bg-slate-800 border border-slate-700' : 'bg-white border border-slate-200'} rounded-lg p-6`}>
                     <h2 className="text-2xl font-bold mb-6">Banking System</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {bankAccounts.map(account => (
