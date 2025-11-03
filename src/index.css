@@ -27,6 +27,10 @@ input:focus {
   outline: none;
 }
 
+button {
+  background: transparent !important;
+}
+
 button:active {
   transform: scale(0.98);
 }
