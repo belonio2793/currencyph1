@@ -173,16 +173,40 @@ export class MapTileManager {
    * Unload a tile
    */
   unloadTile(key) {
-    const mesh = this.tileMeshes.get(key)
-    if (mesh) {
-      this.scene.remove(mesh)
-      mesh.geometry.dispose()
-      if (mesh.material.map) {
-        mesh.material.map.dispose()
+    const entry = this.tileMeshes.get(key)
+    if (entry) {
+      // entry may be an object { mesh, buildings } or a single mesh
+      if (entry.mesh) {
+        const mesh = entry.mesh
+        this.scene.remove(mesh)
+        if (mesh.geometry) mesh.geometry.dispose()
+        if (mesh.material) {
+          if (mesh.material.map) mesh.material.map.dispose()
+          mesh.material.dispose()
+        }
+      } else {
+        const mesh = entry
+        this.scene.remove(mesh)
+        if (mesh.geometry) mesh.geometry.dispose()
+        if (mesh.material) {
+          if (mesh.material.map) mesh.material.map.dispose()
+          mesh.material.dispose()
+        }
       }
-      mesh.material.dispose()
+
+      if (entry.buildings) {
+        // remove instanced meshes
+        entry.buildings.traverse(obj => {
+          if (obj.isInstancedMesh) {
+            this.scene.remove(obj)
+            if (obj.geometry) obj.geometry.dispose()
+            if (obj.material) obj.material.dispose()
+          }
+        })
+        this.scene.remove(entry.buildings)
+      }
     }
-    
+
     this.activeTiles.delete(key)
     this.tileMeshes.delete(key)
     console.log(`Unloaded tile ${key}`)
