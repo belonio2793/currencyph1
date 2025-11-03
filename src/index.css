@@ -227,9 +227,9 @@ input:focus {
   outline: none;
 }
 
-/* Make all buttons transparent globally */
+/* Default button styling - don't force transparency globally */
 button {
-  background: transparent !important;
+  font-family: inherit;
 }
 
 /* EXCEPTION: ChatBar buttons keep their backgrounds */
