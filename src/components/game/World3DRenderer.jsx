@@ -35,16 +35,24 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
         onWorldReady(world3D)
       }
 
-      // Get avatar URL
-      const avatarUrl = character?.appearance?.rpm?.thumbnail ||
-                        character?.appearance?.rpm?.meta?.imageUrl ||
-                        character?.appearance?.rpm?.meta?.avatarUrl ||
-                        character?.appearance?.rpm?.model_url
+      // Get avatar URL using safe helper
+      const avatarUrl = gameAPI.getAvatarUrl(character?.appearance) ||
+                        gameAPI.getAvatarThumbnail(character?.appearance)
 
-      // Add player to 3D world
-      if (avatarUrl) {
-        world3D.addPlayer(userId, character.name, avatarUrl, 0, 0)
+      // Log for debugging
+      if (!avatarUrl) {
+        console.warn('No avatar URL found for character', {
+          charId: character.id,
+          appearance: character?.appearance
+        })
       }
+
+      // Add player to 3D world with avatar URL
+      world3D.addPlayer(userId, character.name, avatarUrl, 0, 0)
+        .catch(err => {
+          console.warn('Failed to load avatar, using fallback:', err.message)
+          // Fallback is handled inside addPlayer with simple avatar creation
+        })
     } catch (error) {
       console.error('Failed to initialize 3D world:', error)
     }
