@@ -75,18 +75,28 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
     }
   }
 
+  const bgClass = isDark ? 'bg-slate-800' : 'bg-white'
+  const headerBgClass = isDark ? 'bg-gradient-to-r from-slate-700 to-slate-800' : 'bg-gradient-to-r from-slate-200 to-slate-100'
+  const borderClass = isDark ? 'border-slate-700' : 'border-slate-200'
+  const textPrimaryClass = isDark ? 'text-slate-100' : 'text-slate-900'
+  const textSecondaryClass = isDark ? 'text-slate-400' : 'text-slate-600'
+  const boxBgClass = isDark ? 'bg-slate-700/40' : 'bg-slate-100'
+  const buttonBgClass = isDark ? 'bg-slate-700 hover:bg-slate-600' : 'bg-white hover:bg-slate-50'
+  const buttonBorderClass = isDark ? 'border-slate-600' : 'border-slate-300'
+  const selectedBgClass = isDark ? 'bg-blue-600/30 ring-blue-500/50' : 'bg-blue-50 ring-blue-500/50'
+
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white border border-slate-200 rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto">
+      <div className={`${bgClass} border ${borderClass} rounded-lg max-w-3xl w-full max-h-[95vh] overflow-y-auto`}>
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-slate-200 to-slate-100 border-b border-slate-200 p-4 md:p-6 flex items-center justify-between">
+        <div className={`sticky top-0 ${headerBgClass} border-b ${borderClass} p-4 md:p-6 flex items-center justify-between`}>
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Game Settings</h2>
-            <p className="text-xs text-slate-600 mt-1">Customize your view and gameplay experience</p>
+            <h2 className={`text-2xl font-bold ${textPrimaryClass}`}>Game Settings</h2>
+            <p className={`text-xs ${textSecondaryClass} mt-1`}>Customize your view and gameplay experience</p>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-600 hover:text-slate-900 text-2xl transition-colors"
+            className={`${textSecondaryClass} hover:${textPrimaryClass} text-2xl transition-colors`}
           >
             ✕
           </button>
@@ -95,8 +105,8 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
         {/* Content */}
         <div className="p-4 md:p-6 space-y-6">
           {/* Quick Presets */}
-          <div className="bg-slate-100 rounded-lg p-4 border border-slate-300">
-            <h3 className="text-sm font-semibold text-slate-700 mb-3 uppercase">Quick Presets</h3>
+          <div className={`${boxBgClass} rounded-lg p-4 border ${borderClass}`}>
+            <h3 className={`text-sm font-semibold ${isDark ? 'text-slate-300' : 'text-slate-700'} mb-3 uppercase`}>Quick Presets</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {[
                 { id: 'wide', label: 'Wide View' },
@@ -107,7 +117,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                 <button
                   key={id}
                   onClick={() => applyPreset(id)}
-                  className="px-3 py-2 bg-white hover:bg-slate-50 rounded text-xs font-medium text-slate-700 transition-colors border border-slate-300 hover:border-slate-400"
+                  className={`px-3 py-2 rounded text-xs font-medium transition-colors border ${buttonBgClass} ${buttonBorderClass} ${isDark ? 'text-slate-300 hover:border-slate-500' : 'text-slate-700 hover:border-slate-400'}`}
                 >
                   {label}
                 </button>
@@ -117,7 +127,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
 
           {/* Camera Mode Section */}
           <div>
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Camera View Modes</h3>
+            <h3 className={`text-lg font-semibold ${textPrimaryClass} mb-4`}>Camera View Modes</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {[
                 { mode: 'topdown', label: 'Top-Down', desc: 'Bird\'s eye view from above' },
@@ -130,27 +140,27 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   onClick={() => setCameraMode(mode)}
                   className={`p-3 rounded-lg border-2 transition-all text-left ${
                     cameraMode === mode
-                      ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-500/50'
-                      : 'border-slate-300 bg-slate-50 hover:bg-slate-100'
+                      ? `border-blue-500 ${selectedBgClass} ring-1`
+                      : isDark ? 'border-slate-600 bg-slate-700/30 hover:bg-slate-700/50' : 'border-slate-300 bg-slate-50 hover:bg-slate-100'
                   }`}
                 >
-                  <p className="font-semibold text-slate-900">{label}</p>
-                  <p className="text-xs text-slate-600 mt-1">{desc}</p>
+                  <p className={`font-semibold ${textPrimaryClass}`}>{label}</p>
+                  <p className={`text-xs ${textSecondaryClass} mt-1`}>{desc}</p>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Camera Settings Section */}
-          <div className="border-t border-slate-300 pt-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Camera Settings</h3>
+          <div className={`border-t ${borderClass} pt-6`}>
+            <h3 className={`text-lg font-semibold ${textPrimaryClass} mb-4`}>Camera Settings</h3>
 
             <div className="space-y-4">
               {/* Zoom Slider */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-700">Zoom Level</label>
-                  <span className="text-sm font-bold text-blue-600">{zoom.toFixed(2)}x</span>
+                  <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Zoom Level</label>
+                  <span className={`text-sm font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{zoom.toFixed(2)}x</span>
                 </div>
                 <input
                   type="range"
@@ -159,16 +169,16 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="0.1"
                   value={zoom}
                   onChange={(e) => setZoom(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-blue-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                 />
-                <p className="text-xs text-slate-600 mt-1">Adjust overall scale of the view (1.0 = normal)</p>
+                <p className={`text-xs ${textSecondaryClass} mt-1`}>Adjust overall scale of the view (1.0 = normal)</p>
               </div>
 
               {/* Field of View */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-700">Field of View</label>
-                  <span className="text-sm font-bold text-blue-600">{fov}°</span>
+                  <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Field of View</label>
+                  <span className={`text-sm font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{fov}°</span>
                 </div>
                 <input
                   type="range"
@@ -177,28 +187,28 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="5"
                   value={fov}
                   onChange={(e) => setFov(parseInt(e.target.value))}
-                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-blue-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-blue-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                 />
-                <p className="text-xs text-slate-600 mt-1">Lower = zoomed in, higher = wider view</p>
+                <p className={`text-xs ${textSecondaryClass} mt-1`}>Lower = zoomed in, higher = wider view</p>
               </div>
 
               {/* Advanced Settings Toggle */}
               <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="w-full text-left px-3 py-2 rounded-lg bg-slate-100 border border-slate-300 hover:bg-slate-50 transition-colors text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center justify-between"
+                className={`w-full text-left px-3 py-2 rounded-lg border transition-colors text-sm font-medium flex items-center justify-between ${boxBgClass} ${borderClass} ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'}`}
               >
                 <span>{showAdvanced ? '▼' : '▶'} Advanced Camera Settings</span>
               </button>
 
               {/* Advanced Settings */}
               {showAdvanced && (
-                <div className="bg-slate-100 rounded-lg p-4 space-y-4 border border-slate-300">
+                <div className={`${boxBgClass} rounded-lg p-4 space-y-4 border ${borderClass}`}>
                   {/* Height */}
                   {(cameraMode === 'topdown' || cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-700">Camera Height</label>
-                        <span className="text-sm font-bold text-slate-600">{height}px</span>
+                        <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Camera Height</label>
+                        <span className={`text-sm font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{height}px</span>
                       </div>
                       <input
                         type="range"
@@ -207,7 +217,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                         step="50"
                         value={height}
                         onChange={(e) => setHeight(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                       />
                     </div>
                   )}
@@ -216,8 +226,8 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   {(cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-700">Camera Distance</label>
-                        <span className="text-sm font-bold text-slate-600">{distance}px</span>
+                        <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Camera Distance</label>
+                        <span className={`text-sm font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{distance}px</span>
                       </div>
                       <input
                         type="range"
@@ -226,7 +236,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                         step="50"
                         value={distance}
                         onChange={(e) => setDistance(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                       />
                     </div>
                   )}
@@ -235,8 +245,8 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   {cameraMode === 'isometric' && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-700">Isometric Angle</label>
-                        <span className="text-sm font-bold text-slate-600">{angle}°</span>
+                        <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Isometric Angle</label>
+                        <span className={`text-sm font-bold ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>{angle}°</span>
                       </div>
                       <input
                         type="range"
@@ -245,7 +255,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                         step="5"
                         value={angle}
                         onChange={(e) => setAngle(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                       />
                     </div>
                   )}
@@ -255,54 +265,54 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
           </div>
 
           {/* Display Settings Section */}
-          <div className="border-t border-slate-300 pt-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">Display & Graphics</h3>
+          <div className={`border-t ${borderClass} pt-6`}>
+            <h3 className={`text-lg font-semibold ${textPrimaryClass} mb-4`}>Display & Graphics</h3>
 
             <div className="space-y-2">
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
+              <label className={`flex items-center gap-3 p-3 rounded-lg ${boxBgClass} border ${borderClass} cursor-pointer transition-colors ${isDark ? 'hover:bg-slate-700/60' : 'hover:bg-slate-50'}`}>
                 <input
                   type="checkbox"
                   checked={showNameplates}
                   onChange={(e) => setShowNameplates(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-700">Show Nameplates</span>
+                <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Show Nameplates</span>
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
+              <label className={`flex items-center gap-3 p-3 rounded-lg ${boxBgClass} border ${borderClass} cursor-pointer transition-colors ${isDark ? 'hover:bg-slate-700/60' : 'hover:bg-slate-50'}`}>
                 <input
                   type="checkbox"
                   checked={enableShadows}
                   onChange={(e) => setEnableShadows(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-700">Enable Shadows</span>
-                <span className="text-xs text-slate-600 ml-auto">(Better graphics, more performance impact)</span>
+                <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Enable Shadows</span>
+                <span className={`text-xs ${textSecondaryClass} ml-auto`}>(Better graphics, more performance impact)</span>
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 border border-slate-300 cursor-pointer hover:bg-slate-50 transition-colors">
+              <label className={`flex items-center gap-3 p-3 rounded-lg ${boxBgClass} border ${borderClass} cursor-pointer transition-colors ${isDark ? 'hover:bg-slate-700/60' : 'hover:bg-slate-50'}`}>
                 <input
                   type="checkbox"
                   checked={enableFog}
                   onChange={(e) => setEnableFog(e.target.checked)}
                   className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-700">Enable Fog</span>
-                <span className="text-xs text-slate-600 ml-auto">(Atmospheric effect)</span>
+                <span className={`text-sm ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Enable Fog</span>
+                <span className={`text-xs ${textSecondaryClass} ml-auto`}>(Atmospheric effect)</span>
               </label>
             </div>
           </div>
 
           {/* Map & Avatar Settings Section */}
-          <div className="border-t border-slate-300 pt-6">
-            <h3 className="text-lg font-semibold text-slate-900 mb-4">⛰️ Map & Avatar Controls</h3>
+          <div className={`border-t ${borderClass} pt-6`}>
+            <h3 className={`text-lg font-semibold ${textPrimaryClass} mb-4`}>⛰️ Map & Avatar Controls</h3>
 
             <div className="space-y-4">
               {/* Avatar Speed */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-700">Avatar Movement Speed</label>
-                  <span className="text-sm font-bold text-blue-600">{avatarSpeed.toFixed(1)}x</span>
+                  <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Avatar Movement Speed</label>
+                  <span className={`text-sm font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{avatarSpeed.toFixed(1)}x</span>
                 </div>
                 <input
                   type="range"
@@ -311,16 +321,16 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   step="0.5"
                   value={avatarSpeed}
                   onChange={(e) => setAvatarSpeed(parseFloat(e.target.value))}
-                  className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                  className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-emerald-500 ${isDark ? 'bg-slate-600' : 'bg-slate-300'}`}
                 />
-                <p className="text-xs text-slate-600 mt-1">How fast your avatar moves with WASD/Arrow keys</p>
+                <p className={`text-xs ${textSecondaryClass} mt-1`}>How fast your avatar moves with WASD/Arrow keys</p>
               </div>
 
               {/* Camera Speed */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-medium text-slate-700">Camera Pan Speed</label>
-                  <span className="text-sm font-bold text-blue-600">{cameraSpeed.toFixed(1)}x</span>
+                  <label className={`text-sm font-medium ${isDark ? 'text-slate-300' : 'text-slate-700'}`}>Camera Pan Speed</label>
+                  <span className={`text-sm font-bold ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>{cameraSpeed.toFixed(1)}x</span>
                 </div>
                 <input
                   type="range"
