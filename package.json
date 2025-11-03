@@ -69,7 +69,10 @@
     "reconcile-house": "node scripts/reconcile-and-display.js --type=house",
     "display-balances": "node scripts/reconcile-and-display.js --no-reconcile",
     "world-worker": "node scripts/world-worker.js",
-    "run-world-worker": "bash scripts/run-world-worker.sh"
+    "run-world-worker": "bash scripts/run-world-worker.sh",
+    "ml-export": "node scripts/ml/export_data.js",
+    "ml-train": "node scripts/ml/train.js",
+    "ml-orchestrator": "node scripts/ml/orchestrator.js"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
