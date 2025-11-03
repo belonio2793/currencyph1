@@ -1,13 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { gameAPI } from '../../lib/gameAPI'
-
-const PROPERTY_TYPES = {
-  house: { name: 'House', emoji: '🏠', basePrice: 50000, dailyRevenue: 100 },
-  business: { name: 'Business', emoji: '🏢', basePrice: 100000, dailyRevenue: 500 },
-  farm: { name: 'Farm', emoji: '🌾', basePrice: 75000, dailyRevenue: 300 },
-  shop: { name: 'Shop', emoji: '🏪', basePrice: 80000, dailyRevenue: 400 },
-  factory: { name: 'Factory', emoji: '🏭', basePrice: 200000, dailyRevenue: 1000 }
-}
+import { propertyTycoonEngine } from '../../lib/propertyTycoonEngine'
+import { propertyIncomeCollector } from '../../lib/propertyIncomeCollector'
+import { gameMarketplace } from '../../lib/gameMarketplace'
 
 export default function GameProperties({ character, properties }) {
   const [showPurchaseDialog, setShowPurchaseDialog] = useState(false)
