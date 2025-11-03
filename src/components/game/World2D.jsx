@@ -564,7 +564,7 @@ export default function World2DRenderer({ character, userId, city = 'Manila' }) 
                   onClick={() => handleNPCClick(npc)}
                   className="block text-left text-xs text-slate-300 hover:text-emerald-400 p-2 bg-slate-800 rounded w-full text-left hover:bg-slate-700 transition-colors"
                 >
-                  {npc.emoji} {npc.name} ({npc.role})
+                  {npc.name} ({npc.role})
                 </button>
               ))}
             </div>
