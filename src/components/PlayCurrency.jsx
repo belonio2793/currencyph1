@@ -258,7 +258,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setCombatActive(true)
       const result = await gameAPI.startCombat(character.id, enemyType, enemyLevel)
       setCombatData(result)
-      
+
       // Update character data
       const updated = await gameAPI.getCharacter(userId)
       setCharacter(updated)
@@ -266,6 +266,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setError('Combat failed: ' + err.message)
     } finally {
       setCombatActive(false)
+    }
+  }
+
+  const handleCharacterMove = (position) => {
+    setCharacterPosition(position)
+    if (character) {
+      character.current_location = position.city
     }
   }
 
