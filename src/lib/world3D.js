@@ -169,6 +169,89 @@ export class World3D {
     }
   }
 
+  // Render property markers from properties array (expects lat/lng and price fields)
+  renderProperties(properties = [], worldWidth = 6000, worldHeight = 6000) {
+    try {
+      // Clear existing markers
+      this.clearProperties()
+
+      for (const prop of properties) {
+        try {
+          const lat = prop.lat || prop.latitude || prop.location_lat
+          const lng = prop.lng || prop.longitude || prop.location_lng
+          if (lat == null || lng == null) continue
+
+          const { x, y } = latLngToWorldCoords(worldWidth, worldHeight, lat, lng)
+          const marker = this._createPropertyMarker(prop, x, y)
+          this.propertyMarkers.set(prop.id, { prop, marker })
+          this.propertiesGroup.add(marker)
+        } catch (e) {
+          console.warn('Failed to create property marker for', prop && prop.id, e)
+        }
+      }
+    } catch (err) {
+      console.warn('renderProperties error:', err)
+    }
+  }
+
+  clearProperties() {
+    try {
+      for (const [id, entry] of this.propertyMarkers) {
+        if (entry && entry.marker) this.propertiesGroup.remove(entry.marker)
+      }
+      this.propertyMarkers.clear()
+    } catch (err) {
+      console.warn('clearProperties error:', err)
+    }
+  }
+
+  _createPropertyMarker(prop, x, y) {
+    // Create a canvas texture with price text
+    const canvas = document.createElement('canvas')
+    canvas.width = 256
+    canvas.height = 128
+    const ctx = canvas.getContext('2d')
+
+    // Background
+    ctx.fillStyle = 'rgba(20,20,30,0.8)'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // Price
+    ctx.fillStyle = '#ffd166'
+    ctx.font = 'bold 28px Arial'
+    ctx.textAlign = 'center'
+    const priceText = prop.price ? `₱${Number(prop.price).toLocaleString()}` : '₱0'
+    ctx.fillText(priceText, canvas.width / 2, 50)
+
+    // Owner or status
+    ctx.fillStyle = '#ffffff'
+    ctx.font = '16px Arial'
+    const ownerText = prop.owner_id ? `Owner: ${prop.owner_name || prop.owner_id.substring(0,6)}` : 'For Sale'
+    ctx.fillText(ownerText, canvas.width / 2, 85)
+
+    const tex = new THREE.CanvasTexture(canvas)
+    tex.encoding = THREE.sRGBEncoding
+    const material = new THREE.SpriteMaterial({ map: tex, transparent: true })
+    const sprite = new THREE.Sprite(material)
+    sprite.scale.set(120, 60, 1)
+    sprite.position.set(x, 10, y)
+    sprite.userData = { propertyId: prop.id }
+
+    // Add subtle billboard base
+    const baseGeom = new THREE.CylinderGeometry(6, 6, 4, 8)
+    const baseMat = new THREE.MeshStandardMaterial({ color: prop.owner_id ? 0x2a9d8f : 0xe76f51 })
+    const base = new THREE.Mesh(baseGeom, baseMat)
+    base.rotation.x = -Math.PI/2
+    base.position.set(x, 2, y)
+
+    const group = new THREE.Group()
+    group.add(base)
+    group.add(sprite)
+    group.userData = { property: prop }
+
+    return group
+  }
+
   updateCameraPosition(playerPos = { x: 0, z: 0 }) {
     const config = this.cameraConfig
     const target = new THREE.Vector3(playerPos.x, 0, playerPos.z)
