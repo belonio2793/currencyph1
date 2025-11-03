@@ -192,13 +192,13 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
 
               {/* Advanced Settings */}
               {showAdvanced && (
-                <div className="bg-slate-700/50 rounded-lg p-4 space-y-4 border border-slate-600">
+                <div className="bg-slate-100 rounded-lg p-4 space-y-4 border border-slate-300">
                   {/* Height */}
                   {(cameraMode === 'topdown' || cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-300">Camera Height</label>
-                        <span className="text-sm font-bold text-slate-400">{height}px</span>
+                        <label className="text-sm font-medium text-slate-700">Camera Height</label>
+                        <span className="text-sm font-bold text-slate-600">{height}px</span>
                       </div>
                       <input
                         type="range"
@@ -207,7 +207,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                         step="50"
                         value={height}
                         onChange={(e) => setHeight(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                       />
                     </div>
                   )}
@@ -216,8 +216,8 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   {(cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-300">Camera Distance</label>
-                        <span className="text-sm font-bold text-slate-400">{distance}px</span>
+                        <label className="text-sm font-medium text-slate-700">Camera Distance</label>
+                        <span className="text-sm font-bold text-slate-600">{distance}px</span>
                       </div>
                       <input
                         type="range"
@@ -226,7 +226,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                         step="50"
                         value={distance}
                         onChange={(e) => setDistance(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                       />
                     </div>
                   )}
@@ -235,8 +235,8 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                   {cameraMode === 'isometric' && (
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <label className="text-sm font-medium text-slate-300">Isometric Angle</label>
-                        <span className="text-sm font-bold text-slate-400">{angle}°</span>
+                        <label className="text-sm font-medium text-slate-700">Isometric Angle</label>
+                        <span className="text-sm font-bold text-slate-600">{angle}°</span>
                       </div>
                       <input
                         type="range"
@@ -245,7 +245,7 @@ export default function GameSettings({ world3D, onClose, mapSettings = {}, onMap
                         step="5"
                         value={angle}
                         onChange={(e) => setAngle(parseInt(e.target.value))}
-                        className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+                        className="w-full h-2 bg-slate-300 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                       />
                     </div>
                   )}
