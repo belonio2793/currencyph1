@@ -119,18 +119,30 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
       console.warn('Failed to initialize world sync:', err)
     }
 
-    // Keyboard input
+    // Keyboard input - prevent default scrolling for game controls
     const handleKeyDown = (e) => {
       const key = e.key.toLowerCase()
       keysPressed.current[key] = true
 
+      // Prevent default scrolling for arrow keys and WASD
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) {
+        e.preventDefault()
+      }
+
       // Handle special keys
       if (key === 'escape') {
+        e.preventDefault()
         setShowSettings(true)
       }
     }
     const handleKeyUp = (e) => {
-      keysPressed.current[e.key.toLowerCase()] = false
+      const key = e.key.toLowerCase()
+      keysPressed.current[key] = false
+
+      // Prevent default scrolling for arrow keys and WASD
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' '].includes(key)) {
+        e.preventDefault()
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
