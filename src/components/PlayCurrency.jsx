@@ -372,7 +372,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
             <div className="p-4 border-b border-slate-700 flex items-center justify-between">
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-100">🗺️ Game World</h2>
+                <h2 className="text-xl font-bold text-slate-100">Game World</h2>
                 <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
               </div>
               <div className="flex gap-2">
@@ -381,14 +381,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
                   title="View your properties"
                 >
-                  📋 My Properties
+                  My Properties
                 </button>
                 <button
                   onClick={() => setShowSettings(true)}
                   className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
                   title="Open camera and game settings"
                 >
-                  ⚙️ Settings
+                  Settings
                 </button>
               </div>
             </div>
@@ -418,7 +418,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
             }`}
           >
-            💰 Currency Game
+            Currency Game
           </button>
           {[
             { id: 'cities', label: 'Cities' },
