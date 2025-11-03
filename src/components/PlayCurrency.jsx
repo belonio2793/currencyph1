@@ -392,11 +392,11 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         <div className="max-w-7xl mx-auto px-6 py-6">
         {/* World View - Default Main Display */}
         {character && (
-          <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden mb-6">
-            <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+          <div className={`${gameThemeIsDark ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-200'} border rounded-lg overflow-hidden mb-6`}>
+            <div className={`p-4 ${gameThemeIsDark ? 'border-b border-slate-700' : 'border-b border-slate-200'} flex items-center justify-between`}>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-slate-100">Game World</h2>
-                <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
+                <h2 className={`text-xl font-bold ${gameThemeIsDark ? 'text-slate-100' : 'text-slate-900'}`}>Game World</h2>
+                <p className={`text-xs ${gameThemeIsDark ? 'text-slate-400' : 'text-slate-500'} mt-1`}>Interactive isometric map view. Click on properties to manage your investments.</p>
               </div>
               <div className="flex gap-2">
                 <button
