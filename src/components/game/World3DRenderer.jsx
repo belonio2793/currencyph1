@@ -18,6 +18,8 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
   const [chatUI, setChatUI] = useState({ isOpen: false, npc: null, messages: [] })
   const [playerInput, setPlayerInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
+  const [streetViewOpen, setStreetViewOpen] = useState(false)
+  const [streetViewImage, setStreetViewImage] = useState(null)
 
   const keysPressed = useRef({})
   const lastSaveTimeRef = useRef(0)
