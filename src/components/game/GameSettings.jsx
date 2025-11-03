@@ -130,38 +130,40 @@ export default function GameSettings({ world3D, onClose }) {
           {/* Camera Settings Section */}
           <div className="border-t border-slate-700 pt-6">
             <h3 className="text-lg font-semibold text-slate-100 mb-4">🎥 Camera Settings</h3>
-            
+
             <div className="space-y-4">
-              {/* Zoom */}
+              {/* Zoom Slider */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  🔍 Zoom Level: {zoom.toFixed(2)}x
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-slate-300">🔍 Zoom Level</label>
+                  <span className="text-sm font-bold text-blue-400">{zoom.toFixed(2)}x</span>
+                </div>
                 <input
                   type="range"
-                  min="0.5"
+                  min="0.3"
                   max="3"
                   step="0.1"
                   value={zoom}
-                  onChange={(e) => handleZoomChange(e.target.value)}
-                  className="w-full"
+                  onChange={(e) => setZoom(parseFloat(e.target.value))}
+                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
-                <p className="text-xs text-slate-400 mt-1">1.0 = Normal, less = zoomed out, more = zoomed in</p>
+                <p className="text-xs text-slate-400 mt-1">Adjust overall scale of the view (1.0 = normal)</p>
               </div>
 
               {/* Field of View */}
               <div>
-                <label className="block text-sm font-medium text-slate-300 mb-2">
-                  📐 Field of View (FOV): {fov}°
-                </label>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-medium text-slate-300">📐 Field of View</label>
+                  <span className="text-sm font-bold text-blue-400">{fov}°</span>
+                </div>
                 <input
                   type="range"
                   min="30"
                   max="120"
                   step="5"
                   value={fov}
-                  onChange={(e) => handleFOVChange(e.target.value)}
-                  className="w-full"
+                  onChange={(e) => setFov(parseInt(e.target.value))}
+                  className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-500"
                 />
                 <p className="text-xs text-slate-400 mt-1">Lower = zoomed in, higher = wider view</p>
               </div>
@@ -169,28 +171,29 @@ export default function GameSettings({ world3D, onClose }) {
               {/* Advanced Settings Toggle */}
               <button
                 onClick={() => setShowAdvanced(!showAdvanced)}
-                className="text-sm text-blue-400 hover:text-blue-300 font-medium"
+                className="w-full text-left px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:bg-slate-700 transition-colors text-sm text-blue-400 hover:text-blue-300 font-medium flex items-center justify-between"
               >
-                {showAdvanced ? '▼' : '▶'} Advanced Camera Settings
+                <span>{showAdvanced ? '▼' : '▶'} Advanced Camera Settings</span>
               </button>
 
               {/* Advanced Settings */}
               {showAdvanced && (
-                <div className="bg-slate-700/50 rounded p-4 space-y-4 border border-slate-600">
+                <div className="bg-slate-700/50 rounded-lg p-4 space-y-4 border border-slate-600">
                   {/* Height */}
                   {(cameraMode === 'topdown' || cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        ⬆️ Camera Height: {height}px
-                      </label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-medium text-slate-300">⬆️ Camera Height</label>
+                        <span className="text-sm font-bold text-slate-400">{height}px</span>
+                      </div>
                       <input
                         type="range"
                         min="200"
                         max="1500"
                         step="50"
                         value={height}
-                        onChange={(e) => handleHeightChange(e.target.value)}
-                        className="w-full"
+                        onChange={(e) => setHeight(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                       />
                     </div>
                   )}
@@ -198,17 +201,18 @@ export default function GameSettings({ world3D, onClose }) {
                   {/* Distance */}
                   {(cameraMode === 'isometric' || cameraMode === 'thirdperson') && (
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        📏 Camera Distance: {distance}px
-                      </label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-medium text-slate-300">📏 Camera Distance</label>
+                        <span className="text-sm font-bold text-slate-400">{distance}px</span>
+                      </div>
                       <input
                         type="range"
                         min="100"
                         max="1000"
                         step="50"
                         value={distance}
-                        onChange={(e) => handleDistanceChange(e.target.value)}
-                        className="w-full"
+                        onChange={(e) => setDistance(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                       />
                     </div>
                   )}
@@ -216,17 +220,18 @@ export default function GameSettings({ world3D, onClose }) {
                   {/* Angle */}
                   {cameraMode === 'isometric' && (
                     <div>
-                      <label className="block text-sm font-medium text-slate-300 mb-2">
-                        ⭐ Isometric Angle: {angle}°
-                      </label>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-sm font-medium text-slate-300">⭐ Isometric Angle</label>
+                        <span className="text-sm font-bold text-slate-400">{angle}°</span>
+                      </div>
                       <input
                         type="range"
                         min="0"
                         max="360"
                         step="5"
                         value={angle}
-                        onChange={(e) => handleAngleChange(e.target.value)}
-                        className="w-full"
+                        onChange={(e) => setAngle(parseInt(e.target.value))}
+                        className="w-full h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-emerald-500"
                       />
                     </div>
                   )}
@@ -237,43 +242,39 @@ export default function GameSettings({ world3D, onClose }) {
 
           {/* Display Settings Section */}
           <div className="border-t border-slate-700 pt-6">
-            <h3 className="text-lg font-semibold text-slate-100 mb-4">🎮 Display Settings</h3>
-            
-            <div className="space-y-3">
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700">
+            <h3 className="text-lg font-semibold text-slate-100 mb-4">🎮 Display & Graphics</h3>
+
+            <div className="space-y-2">
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
                 <input
                   type="checkbox"
-                  defaultChecked
-                  className="w-4 h-4"
+                  checked={showNameplates}
+                  onChange={(e) => setShowNameplates(e.target.checked)}
+                  className="w-4 h-4 accent-blue-500"
                 />
-                <span className="text-sm text-slate-300">Show Player Nameplates</span>
+                <span className="text-sm text-slate-300">Show Nameplates</span>
               </label>
-              
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700">
+
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
                 <input
                   type="checkbox"
-                  defaultChecked
-                  className="w-4 h-4"
-                />
-                <span className="text-sm text-slate-300">Show NPC Nameplates</span>
-              </label>
-              
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="w-4 h-4"
+                  checked={enableShadows}
+                  onChange={(e) => setEnableShadows(e.target.checked)}
+                  className="w-4 h-4 accent-blue-500"
                 />
                 <span className="text-sm text-slate-300">Enable Shadows</span>
+                <span className="text-xs text-slate-500 ml-auto">(Better graphics, more performance impact)</span>
               </label>
-              
-              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700">
+
+              <label className="flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600 cursor-pointer hover:bg-slate-700/70 transition-colors">
                 <input
                   type="checkbox"
-                  defaultChecked
-                  className="w-4 h-4"
+                  checked={enableFog}
+                  onChange={(e) => setEnableFog(e.target.checked)}
+                  className="w-4 h-4 accent-blue-500"
                 />
                 <span className="text-sm text-slate-300">Enable Fog</span>
+                <span className="text-xs text-slate-500 ml-auto">(Atmospheric effect)</span>
               </label>
             </div>
           </div>
