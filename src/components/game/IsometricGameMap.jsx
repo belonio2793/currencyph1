@@ -518,22 +518,6 @@ export default function IsometricGameMap({
         style={{ display: 'block' }}
       />
 
-      {tooltipData && tooltipPos && (
-        <div
-          className="absolute bg-slate-900 text-white px-3 py-2 rounded-lg border border-slate-600 text-xs pointer-events-none shadow-lg z-10"
-          style={{
-            left: `${tooltipPos.x + 10}px`,
-            top: `${tooltipPos.y + 10}px`,
-            maxWidth: '200px'
-          }}
-        >
-          <p className="font-bold text-sm mb-1">{tooltipData.name || 'Property'}</p>
-          <p className="text-slate-300 text-xs">Type: {tooltipData.property_type}</p>
-          <p className="text-yellow-400 text-xs">Value: P{(tooltipData.current_value || 0).toLocaleString()}</p>
-          {tooltipData.owner_id && <p className="text-green-400 text-xs">Owned ✓</p>}
-          {!tooltipData.owner_id && <p className="text-blue-400 text-xs">Available for purchase</p>}
-        </div>
-      )}
 
       <div className="absolute bottom-4 right-4 bg-slate-800/80 text-slate-300 px-4 py-3 rounded-lg border border-slate-600 text-xs pointer-events-auto z-20">
         <p className="font-bold text-white mb-2">Controls</p>
