@@ -154,19 +154,19 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate, 
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full text-white">
+      <div className="flex items-center justify-center h-full text-slate-900">
         <div className="text-center">
           <p className="text-xl mb-4">Loading Currency Game...</p>
-          <div className="animate-spin text-lg font-bold text-blue-400">Loading...</div>
+          <div className="animate-spin text-lg font-bold text-blue-600">Loading...</div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className={`h-full flex flex-col ${isDark ? 'bg-slate-900' : 'bg-white'}`}>
+    <div className="h-full flex flex-col bg-white">
       {/* Header with balance */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 border-b border-slate-700">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 border-b border-slate-300">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-white">Currency Game</h1>
@@ -180,7 +180,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate, 
       </div>
 
       {/* Tabs */}
-      <div className={`border-b overflow-x-auto flex ${isDark ? 'border-slate-700 bg-slate-800' : 'border-slate-200 bg-slate-100'}`}>
+      <div className="border-b overflow-x-auto flex border-slate-200 bg-slate-100">
         {['overview', 'properties', 'work', 'property'].map(tab => (
           <button
             key={tab}
@@ -327,6 +327,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate, 
             onBuy={handleBuyProperty}
             onSell={handleSellProperty}
             onUpgrade={handleUpgradeProperty}
+            isDark={false}
           />
         )}
       </div>
