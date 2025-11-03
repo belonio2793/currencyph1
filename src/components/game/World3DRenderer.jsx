@@ -24,6 +24,8 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
   const panoramaDivRef = useRef(null)
   const panoramaRef = useRef(null)
 
+  const [positionInfo, setPositionInfo] = useState(null) // {lat,lng,street,city,x,z}
+
   const keysPressed = useRef({})
   const lastSaveTimeRef = useRef(0)
 
