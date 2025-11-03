@@ -469,7 +469,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
               </>
             ) : (
               <>
-                <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Available Tables</h3>
+                <h3 className="text-xl font-semibold text-white mb-4">Available Tables</h3>
                 {loading ? (
                   <div className="text-slate-400 text-center py-8">Loading tables...</div>
                 ) : filteredTables.length === 0 ? (
