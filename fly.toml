@@ -1,0 +1,50 @@
+# fly.toml app configuration file generated for currency-ph
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+
+app = "currency-ph"
+primary_region = "sgp"
+
+[build]
+  builder = "paketobuildpacks"
+
+[env]
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+[env.production]
+  ENVIRONMENT = "production"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 3000
+  processes = ["app"]
+
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+    force_https = true
+
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 1000
+    soft_limit = 800
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+[deploy]
+  release_command = "node scripts/deploy.js --skip-git"
+  strategy = "rolling"
