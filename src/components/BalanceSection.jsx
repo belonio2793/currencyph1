@@ -10,7 +10,7 @@ export default function BalanceSection({ balance }) {
       label: 'CPH Tokens',
       value: `${balance.tokens.toLocaleString()} CPH`,
       color: 'bg-green-50 border-green-200',
-      icon: '💰'
+      icon: 'CPH'
     },
     {
       label: 'Bitcoin Equivalent',
