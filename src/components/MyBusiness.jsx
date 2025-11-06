@@ -597,16 +597,20 @@ export default function MyBusiness({ userId }) {
 
                 {/* Registration Date */}
                 <div className="mb-8">
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">Registration Date (Manila Standard Time)</label>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                    Registration Date {formMode === 'existing' && <span className="text-red-500">*</span>}
+                  </label>
                   <input
                     type="date"
                     value={formData.registrationDate}
                     onChange={(e) => setFormData({ ...formData, registrationDate: e.target.value })}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 transition-colors"
                   />
-                  <p className="text-xs text-slate-500 mt-1">
-                    Current: {new Date(formData.registrationDate + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                  </p>
+                  {formData.registrationDate && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      {new Date(formData.registrationDate + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  )}
                 </div>
 
                 {/* Form Actions */}
