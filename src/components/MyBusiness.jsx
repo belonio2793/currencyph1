@@ -338,7 +338,7 @@ export default function MyBusiness({ userId }) {
                     <p className="text-slate-600 max-w-lg">Register your first business to access management tools, employee management, payment integrations, and more.</p>
                   </div>
                   <button
-                    onClick={initializeForm}
+                    onClick={() => initializeForm('create')}
                     className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors whitespace-nowrap ml-4"
                   >
                     Register Business
