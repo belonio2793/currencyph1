@@ -55,6 +55,17 @@ export default function MyBusiness({ userId }) {
     }
   }, [userId])
 
+  // Close city dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('[data-city-dropdown]')) {
+        setShowCityDropdown(false)
+      }
+    }
+    document.addEventListener('click', handleClickOutside)
+    return () => document.removeEventListener('click', handleClickOutside)
+  }, [])
+
   const loadBusinesses = async () => {
     try {
       setLoading(true)
