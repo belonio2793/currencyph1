@@ -149,6 +149,8 @@ export default function MyBusiness({ userId }) {
   const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [businessNameAvailability, setBusinessNameAvailability] = useState(null)
   const [checkingAvailability, setCheckingAvailability] = useState(false)
+  const [mainTab, setMainTab] = useState('businesses')
+  const [formMode, setFormMode] = useState(null) // 'create' or 'existing'
   const [formData, setFormData] = useState({
     businessName: '',
     registrationType: 'sole',
@@ -246,9 +248,18 @@ export default function MyBusiness({ userId }) {
   }
 
   const handleAddBusiness = async () => {
+    // Validate common fields
     if (!formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available) {
       alert('Please fill all required fields and ensure business name is available')
       return
+    }
+
+    // Additional validation for existing business mode
+    if (formMode === 'existing') {
+      if (!formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate) {
+        alert('Please fill all required fields: Business Name, Type, City, TIN, Certificate, and Registration Date')
+        return
+      }
     }
 
     try {
@@ -271,6 +282,7 @@ export default function MyBusiness({ userId }) {
       setBusinesses([...businesses, data[0]])
       setSelectedBusiness(data[0])
       setShowRegistrationForm(false)
+      setFormMode(null)
       setCitySearch('')
       setShowCityDropdown(false)
       setBusinessNameAvailability(null)
@@ -285,18 +297,20 @@ export default function MyBusiness({ userId }) {
     } catch (err) {
       console.error('Failed to add business:', err)
       alert('Failed to register business. Please try again.')
+      setFormMode(null)
     }
   }
 
-  const initializeForm = () => {
+  const initializeForm = (mode) => {
+    setFormMode(mode)
     setShowRegistrationForm(true)
     setFormData({
       businessName: '',
       registrationType: 'sole',
-      tin: generateTIN(),
-      certificateOfIncorporation: generateCertificate(),
+      tin: mode === 'create' ? generateTIN() : '',
+      certificateOfIncorporation: mode === 'create' ? generateCertificate() : '',
       cityOfRegistration: '',
-      registrationDate: getCurrentManillaDate()
+      registrationDate: mode === 'create' ? getCurrentManillaDate() : ''
     })
     setBusinessNameAvailability(null)
     setCitySearch('')
@@ -334,7 +348,7 @@ export default function MyBusiness({ userId }) {
                     <p className="text-slate-600 max-w-lg">Register your first business to access management tools, employee management, payment integrations, and more.</p>
                   </div>
                   <button
-                    onClick={initializeForm}
+                    onClick={() => initializeForm('create')}
                     className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors whitespace-nowrap ml-4"
                   >
                     Register Business
@@ -443,8 +457,14 @@ export default function MyBusiness({ userId }) {
             /* Registration Form */
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
-                <h2 className="text-2xl font-semibold text-white mb-1">Business Registration Form</h2>
-                <p className="text-blue-100 text-sm">Bureau of Internal Revenue (BIR) Registration</p>
+                <h2 className="text-2xl font-semibold text-white mb-1">
+                  {formMode === 'create' ? 'Create New Business' : 'Add Existing Business'}
+                </h2>
+                <p className="text-blue-100 text-sm">
+                  {formMode === 'create'
+                    ? 'Register a new business with Bureau of Internal Revenue (BIR)'
+                    : 'Link an existing business to your account'}
+                </p>
               </div>
 
               <div className="p-8">
@@ -542,54 +562,85 @@ export default function MyBusiness({ userId }) {
                   </div>
                 </div>
 
-                {/* Auto-Generated Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                {/* TIN & Certificate Fields */}
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 rounded-lg border ${
+                  formMode === 'create'
+                    ? 'bg-slate-50 border-slate-200'
+                    : 'bg-white border-slate-300'
+                }`}>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">Tax Identification Number (TIN)</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">
+                      Tax Identification Number (TIN) {formMode === 'existing' && <span className="text-red-500">*</span>}
+                    </label>
                     <input
                       type="text"
+                      placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : ''}
                       value={formData.tin}
-                      readOnly
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white text-slate-900 font-mono text-sm cursor-not-allowed font-semibold"
+                      onChange={(e) => formMode === 'existing' && setFormData({ ...formData, tin: e.target.value })}
+                      readOnly={formMode === 'create'}
+                      className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-sm font-semibold transition-colors ${
+                        formMode === 'create'
+                          ? 'border-slate-200 bg-white text-slate-900 cursor-not-allowed'
+                          : 'border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-blue-600'
+                      }`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">Certificate Number</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">
+                      Certificate of Incorporation {formMode === 'existing' && <span className="text-red-500">*</span>}
+                    </label>
                     <input
                       type="text"
+                      placeholder={formMode === 'existing' ? 'Enter certificate number' : ''}
                       value={formData.certificateOfIncorporation}
-                      readOnly
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white text-slate-900 font-mono text-sm cursor-not-allowed font-semibold"
+                      onChange={(e) => formMode === 'existing' && setFormData({ ...formData, certificateOfIncorporation: e.target.value })}
+                      readOnly={formMode === 'create'}
+                      className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-sm font-semibold transition-colors ${
+                        formMode === 'create'
+                          ? 'border-slate-200 bg-white text-slate-900 cursor-not-allowed'
+                          : 'border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-blue-600'
+                      }`}
                     />
                   </div>
                 </div>
 
                 {/* Registration Date */}
                 <div className="mb-8">
-                  <label className="block text-sm font-semibold text-slate-900 mb-2">Registration Date (Manila Standard Time)</label>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">
+                    Registration Date {formMode === 'existing' && <span className="text-red-500">*</span>}
+                  </label>
                   <input
                     type="date"
                     value={formData.registrationDate}
                     onChange={(e) => setFormData({ ...formData, registrationDate: e.target.value })}
                     className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 transition-colors"
                   />
-                  <p className="text-xs text-slate-500 mt-1">
-                    Current: {new Date(formData.registrationDate + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                  </p>
+                  {formData.registrationDate && (
+                    <p className="text-xs text-slate-500 mt-1">
+                      {new Date(formData.registrationDate + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
+                  )}
                 </div>
 
                 {/* Form Actions */}
                 <div className="flex gap-3 pt-6 border-t border-slate-200">
                   <button
                     onClick={handleAddBusiness}
-                    disabled={!formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available}
+                    disabled={
+                      formMode === 'create'
+                        ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available
+                        : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !businessNameAvailability?.available
+                    }
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors"
                   >
-                    Register Business
+                    {formMode === 'create' ? 'Create Business' : 'Add Business'}
                   </button>
                   <button
-                    onClick={() => setShowRegistrationForm(false)}
+                    onClick={() => {
+                      setShowRegistrationForm(false)
+                      setFormMode(null)
+                    }}
                     className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors"
                   >
                     Cancel
@@ -613,53 +664,183 @@ export default function MyBusiness({ userId }) {
           <p className="text-slate-500">Manage your businesses, employees, and integrations</p>
         </div>
 
-        {/* Business Selector */}
-        <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Your Businesses</h2>
-              <div className="flex flex-wrap gap-3">
-                {businesses.map(business => (
-                  <button
-                    key={business.id}
-                    onClick={() => setSelectedBusiness(selectedBusiness?.id === business.id ? null : business)}
-                    className={`px-4 py-2 rounded-lg border transition-colors ${
-                      selectedBusiness?.id === business.id
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    {business.business_name}
-                  </button>
-                ))}
-              </div>
-            </div>
+        {/* Main Tab Navigation */}
+        <div className="bg-white border-b border-slate-200 mb-8">
+          <div className="flex gap-1">
+            <button
+              onClick={() => setMainTab('businesses')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                mainTab === 'businesses'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-slate-600 border-transparent hover:text-slate-900'
+              }`}
+            >
+              Your Businesses
+            </button>
+            <button
+              onClick={() => setMainTab('management')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                mainTab === 'management'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-slate-600 border-transparent hover:text-slate-900'
+              }`}
+            >
+              Business Management
+            </button>
           </div>
         </div>
 
-        {/* No Business Selected View */}
-        {!selectedBusiness && (
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-12 text-center">
-            <div className="max-w-md mx-auto">
-              <svg className="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <h3 className="text-2xl font-semibold text-slate-900 mb-2">Select a Business</h3>
-              <p className="text-slate-600 mb-6">Choose a business from above to view its overview, documents, settings, and more.</p>
-              <div className="flex gap-3 justify-center">
-                <button
-                  onClick={initializeForm}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-                >
-                  Create New Business
-                </button>
-                <button
-                  onClick={initializeForm}
-                  className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium"
-                >
-                  Add Existing Business
-                </button>
+        {/* Businesses Tab */}
+        {mainTab === 'businesses' && (
+          <div>
+            {/* Business Selector */}
+            <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900 mb-4">Your Businesses</h2>
+                  <div className="flex flex-wrap gap-3">
+                    {businesses.map(business => (
+                      <button
+                        key={business.id}
+                        onClick={() => setSelectedBusiness(selectedBusiness?.id === business.id ? null : business)}
+                        className={`px-4 py-2 rounded-lg border transition-colors ${
+                          selectedBusiness?.id === business.id
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                        }`}
+                      >
+                        {business.business_name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
+            </div>
+
+            {/* No Business Selected View */}
+            {!selectedBusiness && (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-12 text-center">
+                <div className="max-w-md mx-auto">
+                  <svg className="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <h3 className="text-2xl font-semibold text-slate-900 mb-2">Select a Business</h3>
+                  <p className="text-slate-600 mb-6">Choose a business from above to view its overview, documents, settings, and more.</p>
+                  <div className="flex gap-3 justify-center">
+                    <button
+                      onClick={() => initializeForm('create')}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                    >
+                      Create New Business
+                    </button>
+                    <button
+                      onClick={() => initializeForm('existing')}
+                      className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium"
+                    >
+                      Add Existing Business
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Management Tab */}
+        {mainTab === 'management' && (
+          <div>
+            <h3 className="text-lg font-semibold text-slate-900 mb-6">Business Management</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+              {/* BIR Integration */}
+              <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0A5 5 0 017 12z" />
+                    </svg>
+                  </div>
+                  <span className="text-2xl">📋</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">BIR Integration</h3>
+                <p className="text-sm text-slate-600 mb-4">File taxes and access tax documents instantly</p>
+                <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">Access feature →</div>
+              </button>
+
+              {/* Employee Management */}
+              <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
+                    </svg>
+                  </div>
+                  <span className="text-2xl">👨‍💼</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Employees & Payroll</h3>
+                <p className="text-sm text-slate-600 mb-4">Manage employees, payroll, and compensation</p>
+                <div className="text-sm font-medium text-green-600 group-hover:text-green-700">Access feature →</div>
+              </button>
+
+              {/* Merchant Tools */}
+              <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
+                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
+                    </svg>
+                  </div>
+                  <span className="text-2xl">🏪</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Merchant Tools</h3>
+                <p className="text-sm text-slate-600 mb-4">Manage sales, inventory, and transactions</p>
+                <div className="text-sm font-medium text-orange-600 group-hover:text-orange-700">Access feature →</div>
+              </button>
+
+              {/* Digital Receipts */}
+              <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <span className="text-2xl">🧾</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Digital Receipts</h3>
+                <p className="text-sm text-slate-600 mb-4">Track and manage all digital receipts</p>
+                <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Access feature →</div>
+              </button>
+
+              {/* Payment Integrations */}
+              <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-pink-100 group-hover:bg-pink-200 transition-colors">
+                    <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span className="text-2xl">💳</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Integration</h3>
+                <p className="text-sm text-slate-600 mb-4">Connect GCash, PayMaya, and more</p>
+                <div className="text-sm font-medium text-pink-600 group-hover:text-pink-700">Access feature →</div>
+              </button>
+
+              {/* Shareholders */}
+              <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-yellow-100 group-hover:bg-yellow-200 transition-colors">
+                    <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-2xl">🤝</span>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Shareholders</h3>
+                <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
+                <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Access feature →</div>
+              </button>
             </div>
           </div>
         )}
