@@ -634,20 +634,6 @@ export default function MyBusiness({ userId }) {
                 ))}
               </div>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={initializeForm}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium whitespace-nowrap"
-              >
-                + Create New Business
-              </button>
-              <button
-                onClick={initializeForm}
-                className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 text-sm font-medium whitespace-nowrap"
-              >
-                + Add Existing Business
-              </button>
-            </div>
           </div>
         </div>
 
