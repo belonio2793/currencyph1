@@ -129,7 +129,7 @@ export async function populateSlugsForListings(supabaseClient) {
       message: `Successfully updated ${totalUpdated} listings with slugs`,
     }
   } catch (err) {
-    console.error('Error populating slugs:', err)
+    console.error('Error populating slugs:', err?.message || JSON.stringify(err))
     return {
       success: false,
       updated: 0,
