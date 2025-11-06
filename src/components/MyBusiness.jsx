@@ -617,7 +617,7 @@ export default function MyBusiness({ userId }) {
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
               { id: 'overview', label: 'Overview' },
-              { id: 'documents', label: 'Supporting Documents' },
+              { id: 'documents', label: 'Documents' },
               { id: 'bir', label: 'BIR Integration' },
               { id: 'registration', label: 'Business Registration' },
               { id: 'shareholders', label: 'Shareholders' },
@@ -691,12 +691,20 @@ export default function MyBusiness({ userId }) {
                       <p className="text-sm text-slate-600">Official registration certificate for business name and type</p>
                       <p className="text-xs text-slate-500 mt-2">Certificate #: {selectedBusiness.certificate_of_incorporation}</p>
                     </div>
-                    <button
-                      onClick={() => generateAndDownloadPDF('business-name', selectedBusiness)}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
-                    >
-                      📥 Export PDF
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => generateAndDownloadPDF('business-name', selectedBusiness)}
+                        className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium whitespace-nowrap"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => generateAndDownloadPDF('business-name', selectedBusiness)}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+                      >
+                        Export PDF
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -708,12 +716,20 @@ export default function MyBusiness({ userId }) {
                       <p className="text-sm text-slate-600">Official certificate of incorporation and business registration</p>
                       <p className="text-xs text-slate-500 mt-2">TIN: {selectedBusiness.tin}</p>
                     </div>
-                    <button
-                      onClick={() => generateAndDownloadPDF('incorporation', selectedBusiness)}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
-                    >
-                      📥 Export PDF
-                    </button>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => generateAndDownloadPDF('incorporation', selectedBusiness)}
+                        className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium whitespace-nowrap"
+                      >
+                        View
+                      </button>
+                      <button
+                        onClick={() => generateAndDownloadPDF('incorporation', selectedBusiness)}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+                      >
+                        Export PDF
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
