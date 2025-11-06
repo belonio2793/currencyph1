@@ -107,6 +107,8 @@ export default function MyBusiness({ userId }) {
       setBusinesses([...businesses, data[0]])
       setSelectedBusiness(data[0])
       setShowAddBusiness(false)
+      setCitySearch('')
+      setShowCityDropdown(false)
       setFormData({
         businessName: '',
         registrationType: 'sole',
@@ -581,7 +583,7 @@ export default function MyBusiness({ userId }) {
                       </div>
                       <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                         <p className="text-sm text-slate-500 mb-2">Benefits Allocated</p>
-                        <p className="text-3xl font-light text-slate-900">₱0.00</p>
+                        <p className="text-3xl font-light text-slate-900">���0.00</p>
                       </div>
                     </div>
 
