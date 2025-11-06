@@ -302,6 +302,8 @@ export default function MyBusiness({ userId }) {
     setCitySearch('')
   }
 
+  const [mainTab, setMainTab] = useState('businesses')
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -626,7 +628,7 @@ export default function MyBusiness({ userId }) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0A5 5 0 017 12z" />
                   </svg>
                 </div>
-                <span className="text-2xl">📋</span>
+                <span className="text-2xl">����</span>
               </div>
               <h3 className="text-xl font-semibold text-slate-900 mb-2">BIR Integration</h3>
               <p className="text-sm text-slate-600 mb-4">File taxes and access tax documents instantly</p>
