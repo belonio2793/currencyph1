@@ -613,30 +613,6 @@ export default function MyBusiness({ userId }) {
           <p className="text-slate-500">Manage your businesses, employees, and integrations</p>
         </div>
 
-        {/* Business Selector */}
-        <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">Your Businesses</h2>
-              <div className="flex flex-wrap gap-3">
-                {businesses.map(business => (
-                  <button
-                    key={business.id}
-                    onClick={() => setSelectedBusiness(selectedBusiness?.id === business.id ? null : business)}
-                    className={`px-4 py-2 rounded-lg border transition-colors ${
-                      selectedBusiness?.id === business.id
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    {business.business_name}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Business Features Grid - Always Visible */}
         <div className="mb-12">
           <h3 className="text-lg font-semibold text-slate-900 mb-6">Business Management</h3>
@@ -731,6 +707,30 @@ export default function MyBusiness({ userId }) {
               <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
               <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Access feature →</div>
             </button>
+          </div>
+        </div>
+
+        {/* Business Selector */}
+        <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900 mb-4">Your Businesses</h2>
+              <div className="flex flex-wrap gap-3">
+                {businesses.map(business => (
+                  <button
+                    key={business.id}
+                    onClick={() => setSelectedBusiness(selectedBusiness?.id === business.id ? null : business)}
+                    className={`px-4 py-2 rounded-lg border transition-colors ${
+                      selectedBusiness?.id === business.id
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
+                    }`}
+                  >
+                    {business.business_name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
