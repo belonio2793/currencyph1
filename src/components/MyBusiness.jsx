@@ -259,7 +259,7 @@ export default function MyBusiness({ userId }) {
 
                 <div className="md:col-span-2">
                   <label className="block text-sm text-slate-600 font-medium mb-1">City of Registration</label>
-                  <div className="relative">
+                  <div className="relative" data-city-dropdown>
                     <input
                       type="text"
                       placeholder="Search or select a city..."
