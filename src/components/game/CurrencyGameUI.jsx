@@ -316,7 +316,7 @@ export default function CurrencyGameUI({ character, world3D, onCharacterUpdate, 
         )}
 
         {activeTab === 'property' && selectedProperty && (
-          <PropertyInteractionModal isDark={isDark}
+          <PropertyInteractionModal
             property={selectedProperty}
             character={characterData}
             isOpen={true}
