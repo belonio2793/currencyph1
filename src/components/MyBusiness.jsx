@@ -681,13 +681,13 @@ export default function MyBusiness({ userId }) {
                   <p className="text-slate-600 mb-6">Choose a business from above to view its overview, documents, settings, and more.</p>
                   <div className="flex gap-3 justify-center">
                     <button
-                      onClick={initializeForm}
+                      onClick={() => initializeForm('create')}
                       className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                     >
                       Create New Business
                     </button>
                     <button
-                      onClick={initializeForm}
+                      onClick={() => initializeForm('existing')}
                       className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium"
                     >
                       Add Existing Business
