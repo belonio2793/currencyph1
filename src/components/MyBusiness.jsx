@@ -744,7 +744,7 @@ export default function MyBusiness({ userId }) {
                     </div>
                     <div className="flex gap-3">
                       <button
-                        onClick={() => generateAndDownloadPDF('business-name', selectedBusiness)}
+                        onClick={() => generateAndViewPDF('business-name', selectedBusiness)}
                         className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium whitespace-nowrap"
                       >
                         View
