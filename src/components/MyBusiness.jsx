@@ -447,8 +447,14 @@ export default function MyBusiness({ userId }) {
             /* Registration Form */
             <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
               <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
-                <h2 className="text-2xl font-semibold text-white mb-1">Business Registration Form</h2>
-                <p className="text-blue-100 text-sm">Bureau of Internal Revenue (BIR) Registration</p>
+                <h2 className="text-2xl font-semibold text-white mb-1">
+                  {formMode === 'create' ? 'Create New Business' : 'Add Existing Business'}
+                </h2>
+                <p className="text-blue-100 text-sm">
+                  {formMode === 'create'
+                    ? 'Register a new business with Bureau of Internal Revenue (BIR)'
+                    : 'Link an existing business to your account'}
+                </p>
               </div>
 
               <div className="p-8">
