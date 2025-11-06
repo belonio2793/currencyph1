@@ -72,10 +72,11 @@ async function updatePresence(status) {
         // Table doesn't exist, silently skip
         return
       }
-      console.warn('Presence update error:', error)
+      // Silently skip other errors as presence is non-critical
     }
   } catch (err) {
-    // Table might not exist, silently skip
+    // Network errors, table might not exist, or other issues - silently skip
+    // Presence tracking is optional functionality
   }
 }
 
