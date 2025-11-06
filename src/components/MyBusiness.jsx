@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import { useState } from 'react'
 import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
