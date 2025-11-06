@@ -160,15 +160,11 @@ export default function MyBusiness({ userId }) {
         .from('businesses')
         .select('*')
         .eq('user_id', userId)
-      
+
       if (error) throw error
       setBusinesses(data || [])
-      if (data && data.length > 0) {
-        setSelectedBusiness(data[0])
-        setShowRegistrationForm(false)
-      } else {
-        setShowRegistrationForm(false)
-      }
+      setSelectedBusiness(null)
+      setShowRegistrationForm(false)
     } catch (err) {
       console.error('Failed to load businesses:', err)
     } finally {
@@ -612,6 +608,25 @@ export default function MyBusiness({ userId }) {
           </div>
         </div>
 
+        {/* No Business Selected View */}
+        {!selectedBusiness && (
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-12 text-center">
+            <div className="max-w-md mx-auto">
+              <svg className="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <h3 className="text-2xl font-semibold text-slate-900 mb-2">Select a Business</h3>
+              <p className="text-slate-600 mb-6">Choose a business from above to view its overview, documents, settings, and more.</p>
+              <button
+                onClick={initializeForm}
+                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                Create New Business
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Tab Navigation */}
         <div className="bg-white border-b border-slate-200 rounded-t-lg">
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
@@ -642,8 +657,9 @@ export default function MyBusiness({ userId }) {
         </div>
 
         {/* Tab Content */}
+        {selectedBusiness && (
         <div className="bg-white rounded-b-lg border border-t-0 border-slate-200 p-8">
-          {activeTab === 'overview' && selectedBusiness && (
+          {activeTab === 'overview' && (
             <div>
               <h2 className="text-2xl font-light text-slate-900 mb-6">Business Overview</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -752,6 +768,7 @@ export default function MyBusiness({ userId }) {
             </div>
           )}
         </div>
+        )}
       </div>
     </div>
   )
