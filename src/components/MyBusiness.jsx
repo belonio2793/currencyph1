@@ -237,7 +237,7 @@ export default function MyBusiness({ userId }) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">��</span>
+                      <span className="text-2xl">👨‍💼</span>
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Employees & Payroll</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage employees, payroll, and compensation</p>
