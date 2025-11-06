@@ -246,9 +246,18 @@ export default function MyBusiness({ userId }) {
   }
 
   const handleAddBusiness = async () => {
+    // Validate common fields
     if (!formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available) {
       alert('Please fill all required fields and ensure business name is available')
       return
+    }
+
+    // Additional validation for existing business mode
+    if (formMode === 'existing') {
+      if (!formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate) {
+        alert('Please fill all required fields: Business Name, Type, City, TIN, Certificate, and Registration Date')
+        return
+      }
     }
 
     try {
