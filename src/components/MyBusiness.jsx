@@ -149,6 +149,8 @@ export default function MyBusiness({ userId }) {
   const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [businessNameAvailability, setBusinessNameAvailability] = useState(null)
   const [checkingAvailability, setCheckingAvailability] = useState(false)
+  const [mainTab, setMainTab] = useState('businesses')
+  const [formMode, setFormMode] = useState(null) // 'create' or 'existing'
   const [formData, setFormData] = useState({
     businessName: '',
     registrationType: 'sole',
