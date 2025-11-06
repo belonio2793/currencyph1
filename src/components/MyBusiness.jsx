@@ -154,7 +154,21 @@ export default function MyBusiness({ userId }) {
           )}
           
           <button
-            onClick={() => setShowAddBusiness(!showAddBusiness)}
+            onClick={() => {
+              if (!showAddBusiness) {
+                // Auto-generate values when opening the form
+                setFormData({
+                  businessName: '',
+                  registrationType: 'sole',
+                  tin: generateTIN(),
+                  certificateOfIncorporation: generateCertificate(),
+                  cityOfRegistration: '',
+                  registrationDate: getCurrentManillaDate()
+                })
+                setCitySearch('')
+              }
+              setShowAddBusiness(!showAddBusiness)
+            }}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
           >
             {showAddBusiness ? 'Cancel' : '+ Add New Business'}
