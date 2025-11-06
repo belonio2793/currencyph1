@@ -288,15 +288,16 @@ export default function MyBusiness({ userId }) {
     }
   }
 
-  const initializeForm = () => {
+  const initializeForm = (mode) => {
+    setFormMode(mode)
     setShowRegistrationForm(true)
     setFormData({
       businessName: '',
       registrationType: 'sole',
-      tin: generateTIN(),
-      certificateOfIncorporation: generateCertificate(),
+      tin: mode === 'create' ? generateTIN() : '',
+      certificateOfIncorporation: mode === 'create' ? generateCertificate() : '',
       cityOfRegistration: '',
-      registrationDate: getCurrentManillaDate()
+      registrationDate: mode === 'create' ? getCurrentManillaDate() : ''
     })
     setBusinessNameAvailability(null)
     setCitySearch('')
