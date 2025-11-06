@@ -316,9 +316,6 @@ export default function MyBusiness({ userId }) {
     setCitySearch('')
   }
 
-  const [mainTab, setMainTab] = useState('businesses')
-  const [formMode, setFormMode] = useState(null) // 'create' or 'existing'
-
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
