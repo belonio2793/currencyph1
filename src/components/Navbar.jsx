@@ -10,7 +10,8 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'nearby', label: 'Nearby', public: true },
     { id: 'online-users', label: 'Online Users', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
-    { id: 'rates', label: 'Rates', public: true }
+    { id: 'rates', label: 'Rates', public: true },
+    { id: 'my-business', label: 'My Business', auth: true }
   ]
 
   const secondaryNav = [
