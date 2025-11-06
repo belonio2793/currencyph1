@@ -303,6 +303,7 @@ export default function MyBusiness({ userId }) {
   }
 
   const [mainTab, setMainTab] = useState('businesses')
+  const [formMode, setFormMode] = useState(null) // 'create' or 'existing'
 
   if (loading) {
     return (
