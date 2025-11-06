@@ -2,6 +2,108 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 
+// Simple PDF generation function
+const generateAndDownloadPDF = (documentType, business) => {
+  const canvas = document.createElement('canvas')
+  canvas.width = 800
+  canvas.height = 1100
+  const ctx = canvas.getContext('2d')
+
+  // Set white background
+  ctx.fillStyle = '#FFFFFF'
+  ctx.fillRect(0, 0, 800, 1100)
+
+  // Header
+  ctx.fillStyle = '#1E40AF'
+  ctx.fillRect(0, 0, 800, 120)
+
+  // Title
+  ctx.fillStyle = '#FFFFFF'
+  ctx.font = 'bold 32px Arial'
+  ctx.textAlign = 'center'
+  ctx.fillText('REPUBLIC OF THE PHILIPPINES', 400, 40)
+  ctx.font = '16px Arial'
+  ctx.fillText('Bureau of Internal Revenue', 400, 65)
+  ctx.fillText('Official Document', 400, 90)
+
+  ctx.fillStyle = '#000000'
+  ctx.font = 'bold 18px Arial'
+  ctx.textAlign = 'left'
+
+  let yPos = 160
+
+  if (documentType === 'business-name') {
+    ctx.fillText('BUSINESS NAME REGISTRATION CERTIFICATE', 50, yPos)
+    yPos += 50
+
+    ctx.font = '12px Arial'
+    ctx.fillText(`Business Name: ${business.business_name}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Registration Type: ${business.registration_type.toUpperCase()}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Certificate Number: ${business.certificate_of_incorporation}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`City of Registration: ${business.city_of_registration}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Registration Date: ${new Date(business.registration_date).toLocaleDateString('en-PH')}`, 50, yPos)
+    yPos += 50
+
+    ctx.font = 'italic 11px Arial'
+    ctx.fillText('This certifies that the above business name is officially registered with the', 50, yPos)
+    yPos += 20
+    ctx.fillText('Bureau of Internal Revenue and is valid for commercial operations.', 50, yPos)
+  } else if (documentType === 'incorporation') {
+    ctx.fillText('CERTIFICATE OF INCORPORATION', 50, yPos)
+    yPos += 50
+
+    ctx.font = '12px Arial'
+    ctx.fillText(`Business Name: ${business.business_name}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Tax Identification Number (TIN): ${business.tin}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Registration Type: ${business.registration_type.toUpperCase()}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`City of Registration: ${business.city_of_registration}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Registration Date: ${new Date(business.registration_date).toLocaleDateString('en-PH')}`, 50, yPos)
+    yPos += 30
+    ctx.fillText(`Status: ACTIVE`, 50, yPos)
+    yPos += 50
+
+    ctx.font = 'italic 11px Arial'
+    ctx.fillText('This officially certifies that the above entity is incorporated and authorized to', 50, yPos)
+    yPos += 20
+    ctx.fillText('conduct business operations in the Republic of the Philippines.', 50, yPos)
+  }
+
+  yPos += 100
+  ctx.font = '10px Arial'
+  ctx.fillText('Issued: ' + new Date().toLocaleDateString('en-PH') + ' ' + new Date().toLocaleTimeString('en-PH'), 50, yPos)
+
+  yPos += 50
+  ctx.font = 'bold 11px Arial'
+  ctx.fillText('Official Seal and Signature', 50, yPos)
+  yPos += 30
+  ctx.fillStyle = '#D1D5DB'
+  ctx.fillRect(50, yPos, 200, 80)
+  ctx.fillStyle = '#6B7280'
+  ctx.font = '10px Arial'
+  ctx.textAlign = 'center'
+  ctx.fillText('[Digital Signature]', 150, yPos + 40)
+
+  // Convert canvas to blob and download
+  canvas.toBlob((blob) => {
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${business.business_name.replace(/\s+/g, '_')}_${documentType}.pdf`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }, 'image/png', 1.0)
+}
+
 export default function MyBusiness({ userId }) {
   const [activeTab, setActiveTab] = useState('overview')
   const [businesses, setBusinesses] = useState([])
