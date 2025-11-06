@@ -280,6 +280,7 @@ export default function MyBusiness({ userId }) {
       setBusinesses([...businesses, data[0]])
       setSelectedBusiness(data[0])
       setShowRegistrationForm(false)
+      setFormMode(null)
       setCitySearch('')
       setShowCityDropdown(false)
       setBusinessNameAvailability(null)
@@ -294,6 +295,7 @@ export default function MyBusiness({ userId }) {
     } catch (err) {
       console.error('Failed to add business:', err)
       alert('Failed to register business. Please try again.')
+      setFormMode(null)
     }
   }
 
