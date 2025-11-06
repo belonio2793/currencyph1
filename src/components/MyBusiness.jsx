@@ -1,107 +1,142 @@
 import React, { useState, useEffect } from 'react'
+import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 
-// Simple PDF generation function
-const generateAndDownloadPDF = (documentType, business) => {
-  const canvas = document.createElement('canvas')
-  canvas.width = 800
-  canvas.height = 1100
-  const ctx = canvas.getContext('2d')
+// Generate PDF document with metadata
+const generatePDFDocument = (documentType, business) => {
+  const doc = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  })
 
-  // Set white background
-  ctx.fillStyle = '#FFFFFF'
-  ctx.fillRect(0, 0, 800, 1100)
+  // Set document metadata
+  doc.setProperties({
+    title: documentType === 'business-name' ? 'Business Name Registration Certificate' : 'Certificate of Incorporation',
+    subject: `Official Document for ${business.business_name}`,
+    author: 'Bureau of Internal Revenue',
+    keywords: 'business, registration, certificate, philippines'
+  })
 
-  // Header
-  ctx.fillStyle = '#1E40AF'
-  ctx.fillRect(0, 0, 800, 120)
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
 
-  // Title
-  ctx.fillStyle = '#FFFFFF'
-  ctx.font = 'bold 32px Arial'
-  ctx.textAlign = 'center'
-  ctx.fillText('REPUBLIC OF THE PHILIPPINES', 400, 40)
-  ctx.font = '16px Arial'
-  ctx.fillText('Bureau of Internal Revenue', 400, 65)
-  ctx.fillText('Official Document', 400, 90)
+  // Header - Blue background
+  doc.setFillColor(30, 64, 175)
+  doc.rect(0, 0, pageWidth, 35, 'F')
 
-  ctx.fillStyle = '#000000'
-  ctx.font = 'bold 18px Arial'
-  ctx.textAlign = 'left'
+  // Header text - White
+  doc.setTextColor(255, 255, 255)
+  doc.setFont('Arial', 'bold')
+  doc.setFontSize(16)
+  doc.text('REPUBLIC OF THE PHILIPPINES', pageWidth / 2, 12, { align: 'center' })
 
-  let yPos = 160
+  doc.setFont('Arial', 'normal')
+  doc.setFontSize(10)
+  doc.text('Bureau of Internal Revenue', pageWidth / 2, 20, { align: 'center' })
+  doc.text('Official Document', pageWidth / 2, 26, { align: 'center' })
+
+  // Reset text color to black
+  doc.setTextColor(0, 0, 0)
+  doc.setFont('Arial', 'bold')
+  doc.setFontSize(14)
+
+  let yPos = 45
 
   if (documentType === 'business-name') {
-    ctx.fillText('BUSINESS NAME REGISTRATION CERTIFICATE', 50, yPos)
-    yPos += 50
+    doc.text('BUSINESS NAME REGISTRATION CERTIFICATE', pageWidth / 2, yPos, { align: 'center' })
+    yPos += 15
 
-    ctx.font = '12px Arial'
-    ctx.fillText(`Business Name: ${business.business_name}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Registration Type: ${business.registration_type.toUpperCase()}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Certificate Number: ${business.certificate_of_incorporation}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`City of Registration: ${business.city_of_registration}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Registration Date: ${new Date(business.registration_date).toLocaleDateString('en-PH')}`, 50, yPos)
-    yPos += 50
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(11)
 
-    ctx.font = 'italic 11px Arial'
-    ctx.fillText('This certifies that the above business name is officially registered with the', 50, yPos)
+    doc.text(`Business Name: ${business.business_name || 'N/A'}`, 20, yPos)
+    yPos += 10
+    doc.text(`Registration Type: ${(business.registration_type || 'N/A').toUpperCase()}`, 20, yPos)
+    yPos += 10
+    doc.text(`Certificate Number: ${business.certificate_of_incorporation || 'N/A'}`, 20, yPos)
+    yPos += 10
+    doc.text(`City of Registration: ${business.city_of_registration || 'N/A'}`, 20, yPos)
+    yPos += 10
+    const regDate = business.registration_date ? new Date(business.registration_date).toLocaleDateString('en-PH') : 'N/A'
+    doc.text(`Registration Date: ${regDate}`, 20, yPos)
+    yPos += 15
+
+    doc.setFont('Arial', 'italic')
+    doc.setFontSize(10)
+    const certText = 'This certifies that the above business name is officially registered with the Bureau of Internal Revenue and is valid for commercial operations.'
+    doc.text(certText, 20, yPos, { maxWidth: pageWidth - 40, align: 'left' })
     yPos += 20
-    ctx.fillText('Bureau of Internal Revenue and is valid for commercial operations.', 50, yPos)
   } else if (documentType === 'incorporation') {
-    ctx.fillText('CERTIFICATE OF INCORPORATION', 50, yPos)
-    yPos += 50
+    doc.text('CERTIFICATE OF INCORPORATION', pageWidth / 2, yPos, { align: 'center' })
+    yPos += 15
 
-    ctx.font = '12px Arial'
-    ctx.fillText(`Business Name: ${business.business_name}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Tax Identification Number (TIN): ${business.tin}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Registration Type: ${business.registration_type.toUpperCase()}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`City of Registration: ${business.city_of_registration}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Registration Date: ${new Date(business.registration_date).toLocaleDateString('en-PH')}`, 50, yPos)
-    yPos += 30
-    ctx.fillText(`Status: ACTIVE`, 50, yPos)
-    yPos += 50
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(11)
 
-    ctx.font = 'italic 11px Arial'
-    ctx.fillText('This officially certifies that the above entity is incorporated and authorized to', 50, yPos)
+    doc.text(`Business Name: ${business.business_name || 'N/A'}`, 20, yPos)
+    yPos += 10
+    doc.text(`Tax Identification Number (TIN): ${business.tin || 'N/A'}`, 20, yPos)
+    yPos += 10
+    doc.text(`Registration Type: ${(business.registration_type || 'N/A').toUpperCase()}`, 20, yPos)
+    yPos += 10
+    doc.text(`City of Registration: ${business.city_of_registration || 'N/A'}`, 20, yPos)
+    yPos += 10
+    const regDate = business.registration_date ? new Date(business.registration_date).toLocaleDateString('en-PH') : 'N/A'
+    doc.text(`Registration Date: ${regDate}`, 20, yPos)
+    yPos += 10
+    doc.text('Status: ACTIVE', 20, yPos)
+    yPos += 15
+
+    doc.setFont('Arial', 'italic')
+    doc.setFontSize(10)
+    const corpText = 'This officially certifies that the above entity is incorporated and authorized to conduct business operations in the Republic of the Philippines.'
+    doc.text(corpText, 20, yPos, { maxWidth: pageWidth - 40, align: 'left' })
     yPos += 20
-    ctx.fillText('conduct business operations in the Republic of the Philippines.', 50, yPos)
   }
 
-  yPos += 100
-  ctx.font = '10px Arial'
-  ctx.fillText('Issued: ' + new Date().toLocaleDateString('en-PH') + ' ' + new Date().toLocaleTimeString('en-PH'), 50, yPos)
-
-  yPos += 50
-  ctx.font = 'bold 11px Arial'
-  ctx.fillText('Official Seal and Signature', 50, yPos)
+  // Signature section
   yPos += 30
-  ctx.fillStyle = '#D1D5DB'
-  ctx.fillRect(50, yPos, 200, 80)
-  ctx.fillStyle = '#6B7280'
-  ctx.font = '10px Arial'
-  ctx.textAlign = 'center'
-  ctx.fillText('[Digital Signature]', 150, yPos + 40)
+  doc.setFont('Arial', 'bold')
+  doc.setFontSize(10)
+  doc.text('Official Seal and Signature', 20, yPos)
+  yPos += 8
 
-  // Convert canvas to blob and download
-  canvas.toBlob((blob) => {
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `${business.business_name.replace(/\s+/g, '_')}_${documentType}.pdf`
-    document.body.appendChild(a)
-    a.click()
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
-  }, 'image/png', 1.0)
+  doc.setDrawColor(200, 200, 200)
+  doc.rect(20, yPos, 80, 40)
+  doc.setFont('Arial', 'normal')
+  doc.setFontSize(8)
+  doc.text('[Digital Signature]', 60, yPos + 20, { align: 'center' })
+
+  // Footer
+  yPos = pageHeight - 25
+  doc.setFont('Arial', 'normal')
+  doc.setFontSize(9)
+  const issuedDate = new Date().toLocaleDateString('en-PH')
+  const issuedTime = new Date().toLocaleTimeString('en-PH')
+  doc.text(`Issued: ${issuedDate} ${issuedTime}`, 20, yPos)
+
+  doc.setFont('Arial', 'normal')
+  doc.setFontSize(8)
+  doc.text(`Document ID: ${business.id.substring(0, 12).toUpperCase()}`, 20, yPos + 6)
+  doc.text('This is an official document issued by the Bureau of Internal Revenue', 20, yPos + 12)
+
+  return doc
+}
+
+// View PDF in new window
+const generateAndViewPDF = (documentType, business) => {
+  const doc = generatePDFDocument(documentType, business)
+  const fileName = `${business.business_name.replace(/\s+/g, '_')}_${documentType}.pdf`
+  doc.output('dataurlnewwindow', { filename: fileName })
+}
+
+// Download PDF
+const generateAndDownloadPDF = (documentType, business) => {
+  const doc = generatePDFDocument(documentType, business)
+  const fileName = `${business.business_name.replace(/\s+/g, '_')}_${documentType}.pdf`
+  doc.save(fileName)
 }
 
 export default function MyBusiness({ userId }) {
