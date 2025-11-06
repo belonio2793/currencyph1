@@ -457,6 +457,7 @@ export default function App() {
             {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
             {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
             {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
+            {activeTab === 'my-business' && <MyBusiness userId={userId} />}
             {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'play-currency' && <PlayCurrency userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
