@@ -10,8 +10,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'nearby', label: 'Nearby', public: true },
     { id: 'online-users', label: 'Online Users', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
-    { id: 'rates', label: 'Rates', public: true },
-    { id: 'my-business', label: 'My Business', auth: true }
+    { id: 'rates', label: 'Rates', public: true }
   ]
 
   const secondaryNav = [
@@ -25,7 +24,8 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'bills', label: 'Bills', auth: true },
     { id: 'transactions', label: 'History', auth: true },
     { id: 'profile', label: 'Profile', auth: true },
-    { id: 'inbox', label: 'Inbox', auth: true }
+    { id: 'inbox', label: 'Inbox', auth: true },
+    { id: 'my-business', label: 'My Business', auth: true }
   ]
 
   // Borrow Money dropdown options
