@@ -179,63 +179,140 @@ export default function MyBusiness({ userId }) {
             <div className="mt-6 pt-6 border-t border-slate-200">
               <h3 className="text-md font-semibold text-slate-900 mb-4">Register New Business</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Business Name"
-                  value={formData.businessName}
-                  onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                />
-                
-                <select
-                  value={formData.registrationType}
-                  onChange={(e) => setFormData({ ...formData, registrationType: e.target.value })}
-                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                >
-                  <option value="sole">Sole Proprietorship</option>
-                  <option value="partnership">Partnership</option>
-                  <option value="corporation">Corporation</option>
-                  <option value="llc">LLC</option>
-                </select>
+                <div>
+                  <label className="block text-sm text-slate-600 font-medium mb-1">Business Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your business name"
+                    value={formData.businessName}
+                    onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  />
+                </div>
 
-                <input
-                  type="text"
-                  placeholder="Tax Identification Number (TIN)"
-                  value={formData.tin}
-                  onChange={(e) => setFormData({ ...formData, tin: e.target.value })}
-                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                />
+                <div>
+                  <label className="block text-sm text-slate-600 font-medium mb-1">Business Type</label>
+                  <select
+                    value={formData.registrationType}
+                    onChange={(e) => setFormData({ ...formData, registrationType: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="sole">Sole Proprietorship</option>
+                    <option value="partnership">Partnership</option>
+                    <option value="corporation">Corporation</option>
+                    <option value="llc">LLC</option>
+                  </select>
+                </div>
 
-                <input
-                  type="text"
-                  placeholder="Certificate of Incorporation"
-                  value={formData.certificateOfIncorporation}
-                  onChange={(e) => setFormData({ ...formData, certificateOfIncorporation: e.target.value })}
-                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                />
+                <div>
+                  <label className="block text-sm text-slate-600 font-medium mb-1">Tax Identification Number (TIN)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={formData.tin}
+                      readOnly
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 cursor-not-allowed"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, tin: generateTIN() })}
+                      className="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-medium whitespace-nowrap"
+                      title="Generate new TIN"
+                    >
+                      🔄 Regenerate
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">Auto-generated. Click Regenerate for a new number.</p>
+                </div>
 
-                <input
-                  type="text"
-                  placeholder="City of Registration"
-                  value={formData.cityOfRegistration}
-                  onChange={(e) => setFormData({ ...formData, cityOfRegistration: e.target.value })}
-                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                />
+                <div>
+                  <label className="block text-sm text-slate-600 font-medium mb-1">Certificate of Incorporation</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={formData.certificateOfIncorporation}
+                      readOnly
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 text-slate-600 cursor-not-allowed"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, certificateOfIncorporation: generateCertificate() })}
+                      className="px-3 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-medium whitespace-nowrap"
+                      title="Generate new certificate"
+                    >
+                      🔄 Regenerate
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">Auto-generated. Click Regenerate for a new number.</p>
+                </div>
 
-                <input
-                  type="date"
-                  value={formData.registrationDate}
-                  onChange={(e) => setFormData({ ...formData, registrationDate: e.target.value })}
-                  className="px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                />
+                <div className="md:col-span-2">
+                  <label className="block text-sm text-slate-600 font-medium mb-1">City of Registration</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search or select a city..."
+                      value={citySearch || formData.cityOfRegistration}
+                      onChange={(e) => {
+                        setCitySearch(e.target.value)
+                        setShowCityDropdown(true)
+                      }}
+                      onFocus={() => setShowCityDropdown(true)}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    />
+                    {showCityDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-10 max-h-64 overflow-y-auto">
+                        {filteredCities.length > 0 ? (
+                          filteredCities.map((city) => (
+                            <button
+                              key={city.name}
+                              type="button"
+                              onClick={() => {
+                                setFormData({ ...formData, cityOfRegistration: city.name })
+                                setCitySearch('')
+                                setShowCityDropdown(false)
+                              }}
+                              className="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-100 last:border-b-0 transition-colors"
+                            >
+                              <div className="font-medium text-slate-900">{city.name}</div>
+                              <div className="text-xs text-slate-500">{city.region} • Population: {city.population.toLocaleString()}</div>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-3 text-sm text-slate-500 text-center">No cities found</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-slate-600 font-medium mb-1">Registration Date (Manila Time)</label>
+                  <input
+                    type="date"
+                    value={formData.registrationDate}
+                    onChange={(e) => setFormData({ ...formData, registrationDate: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  />
+                  <p className="text-xs text-slate-500 mt-1">Currently set to: {new Date(formData.registrationDate + 'T00:00:00').toLocaleDateString('en-PH', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                </div>
               </div>
 
-              <button
-                onClick={handleAddBusiness}
-                className="mt-4 px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-              >
-                Save Business
-              </button>
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={handleAddBusiness}
+                  disabled={!formData.businessName || !formData.cityOfRegistration}
+                  className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-sm font-medium transition-colors"
+                >
+                  Save Business
+                </button>
+                <button
+                  onClick={() => setShowAddBusiness(false)}
+                  className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
           )}
         </div>
