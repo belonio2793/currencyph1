@@ -1,8 +1,5 @@
-// Currency rates from free financial APIs
-// Using exchangerate-api.com and exchangerate.host (free, no key required)
-
-const FIXER_API = 'https://api.exchangerate-api.com/v4/latest'
-const FALLBACK_API = 'https://open.er-api.com/v6/latest'
+// Currency rates from Supabase edge function (avoids CORS issues)
+import { supabase } from './supabaseClient'
 
 // List of all global currencies to track
 const CURRENCIES = [
@@ -33,93 +30,77 @@ const CURRENCIES = [
   { code: 'AED', symbol: 'AED', name: 'UAE Dirham' },
 ]
 
-// Crypto to USD rates from free APIs
-const CRYPTO_API = 'https://api.coingecko.com/api/v3'
-
 export const currencyAPI = {
-  // Get all currency rates relative to USD
+  // Get all currency rates relative to USD via edge function
   async getGlobalRates() {
-    // Try multiple public endpoints to maximize chance of full coverage
-    const endpoints = [
-      'https://api.exchangerate.host/latest?base=USD', // broad coverage, no key
-      `${FIXER_API}/USD`, // exchangerate-api.com
-      `${FALLBACK_API}/USD` // open.er-api.com
-    ]
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-rates', {
+        method: 'GET'
+      })
 
-    let data = null
-    let lastErr = null
-
-    for (const url of endpoints) {
-      try {
-        const resp = await fetch(url)
-        if (!resp.ok) throw new Error(`HTTP ${resp.status} from ${url}`)
-        const json = await resp.json()
-        // Normalise responses which provide rates under different keys
-        if (json && (json.rates || json.conversion_rates)) {
-          data = { rates: json.rates || json.conversion_rates }
-          break
-        }
-      } catch (err) {
-        lastErr = err
-        // try next
+      if (error) {
+        console.warn('Edge function error:', error)
+        return this.getFallbackRates()
       }
-    }
 
-    if (!data || !data.rates) {
-      console.warn('All currency endpoints failed, falling back to cached rates', lastErr)
+      if (!data || !data.exchangeRates) {
+        console.warn('No exchange rates returned from edge function')
+        return this.getFallbackRates()
+      }
+
+      const rates = {}
+      const now = new Date()
+
+      CURRENCIES.forEach(currency => {
+        if (currency.code === 'USD') {
+          rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
+          return
+        }
+        const rateVal = data.exchangeRates[currency.code]
+        rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
+      })
+
+      return rates
+    } catch (err) {
+      console.warn('Failed to fetch rates from edge function:', err?.message)
       return this.getFallbackRates()
     }
-
-    const rates = {}
-    const now = new Date()
-
-    CURRENCIES.forEach(currency => {
-      if (currency.code === 'USD') {
-        rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
-        return
-      }
-      const rateVal = data.rates[currency.code]
-      rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
-    })
-
-    return rates
   },
 
   // Get Bitcoin and Ethereum prices in USD and other currencies
   async getCryptoPrices() {
     try {
-      const response = await fetch(
-        `${CRYPTO_API}/simple/price?ids=bitcoin,ethereum,dogecoin&vs_currencies=usd,eur,gbp,jpy,cny,inr,php&include_market_cap=true&include_24hr_vol=true`
-      )
+      const { data, error } = await supabase.functions.invoke('fetch-rates', {
+        method: 'GET'
+      })
 
-      if (!response.ok) {
-        throw new Error('Crypto API failed')
+      if (error || !data || !data.cryptoPrices) {
+        console.warn('Error fetching crypto prices:', error?.message)
+        return null
       }
-
-      const data = await response.json()
 
       return {
         BTC: {
           name: 'Bitcoin',
           symbol: 'BTC',
-          prices: data.bitcoin,
+          prices: data.cryptoPrices.bitcoin || {},
           lastUpdated: new Date()
         },
         ETH: {
           name: 'Ethereum',
           symbol: 'ETH',
-          prices: data.ethereum,
+          prices: data.cryptoPrices.ethereum || {},
           lastUpdated: new Date()
         },
         DOGE: {
           name: 'Dogecoin',
           symbol: 'DOGE',
-          prices: data.dogecoin,
+          prices: data.cryptoPrices.dogecoin || {},
           lastUpdated: new Date()
         }
       }
     } catch (error) {
-      console.warn('Error fetching crypto prices:', error)
+      console.warn('Error fetching crypto prices:', error?.message)
       return null
     }
   },
