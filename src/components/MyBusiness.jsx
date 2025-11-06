@@ -575,7 +575,60 @@ export default function MyBusiness({ userId }) {
             </div>
           )}
 
-          {activeTab !== 'overview' && (
+          {activeTab === 'documents' && selectedBusiness && (
+            <div>
+              <h2 className="text-2xl font-light text-slate-900 mb-6">Supporting Documents</h2>
+              <p className="text-slate-600 mb-6">Official documents for {selectedBusiness.business_name}</p>
+
+              <div className="space-y-4">
+                {/* Business Name Registration Certificate */}
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-1">Business Name Registration</h3>
+                      <p className="text-sm text-slate-600">Official registration certificate for business name and type</p>
+                      <p className="text-xs text-slate-500 mt-2">Certificate #: {selectedBusiness.certificate_of_incorporation}</p>
+                    </div>
+                    <button
+                      onClick={() => generateAndDownloadPDF('business-name', selectedBusiness)}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+                    >
+                      📥 Export PDF
+                    </button>
+                  </div>
+                </div>
+
+                {/* Certificate of Incorporation */}
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold text-slate-900 mb-1">Certificate of Incorporation</h3>
+                      <p className="text-sm text-slate-600">Official certificate of incorporation and business registration</p>
+                      <p className="text-xs text-slate-500 mt-2">TIN: {selectedBusiness.tin}</p>
+                    </div>
+                    <button
+                      onClick={() => generateAndDownloadPDF('incorporation', selectedBusiness)}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+                    >
+                      📥 Export PDF
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="text-sm font-semibold text-blue-900 mb-2">📌 Document Information</h3>
+                <ul className="text-sm text-blue-800 space-y-1">
+                  <li>✓ All documents are officially certified and BIR compliant</li>
+                  <li>✓ PDFs can be printed, shared, or archived</li>
+                  <li>✓ Digital signatures included for authenticity</li>
+                  <li>✓ Generate new copies anytime needed</li>
+                </ul>
+              </div>
+            </div>
+          )}
+
+          {activeTab !== 'overview' && activeTab !== 'documents' && (
             <div className="text-center py-12">
               <p className="text-slate-500">Tab content for {activeTab} coming soon...</p>
             </div>
