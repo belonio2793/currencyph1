@@ -617,13 +617,20 @@ export default function MyBusiness({ userId }) {
                 <div className="flex gap-3 pt-6 border-t border-slate-200">
                   <button
                     onClick={handleAddBusiness}
-                    disabled={!formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available}
+                    disabled={
+                      formMode === 'create'
+                        ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available
+                        : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !businessNameAvailability?.available
+                    }
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors"
                   >
-                    Register Business
+                    {formMode === 'create' ? 'Create Business' : 'Add Business'}
                   </button>
                   <button
-                    onClick={() => setShowRegistrationForm(false)}
+                    onClick={() => {
+                      setShowRegistrationForm(false)
+                      setFormMode(null)
+                    }}
                     className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors"
                   >
                     Cancel
