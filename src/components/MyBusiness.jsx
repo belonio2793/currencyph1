@@ -552,25 +552,45 @@ export default function MyBusiness({ userId }) {
                   </div>
                 </div>
 
-                {/* Auto-Generated Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                {/* TIN & Certificate Fields */}
+                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 rounded-lg border ${
+                  formMode === 'create'
+                    ? 'bg-slate-50 border-slate-200'
+                    : 'bg-white border-slate-300'
+                }`}>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">Tax Identification Number (TIN)</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">
+                      Tax Identification Number (TIN) {formMode === 'existing' && <span className="text-red-500">*</span>}
+                    </label>
                     <input
                       type="text"
+                      placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : ''}
                       value={formData.tin}
-                      readOnly
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white text-slate-900 font-mono text-sm cursor-not-allowed font-semibold"
+                      onChange={(e) => formMode === 'existing' && setFormData({ ...formData, tin: e.target.value })}
+                      readOnly={formMode === 'create'}
+                      className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-sm font-semibold transition-colors ${
+                        formMode === 'create'
+                          ? 'border-slate-200 bg-white text-slate-900 cursor-not-allowed'
+                          : 'border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-blue-600'
+                      }`}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">Certificate Number</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">
+                      Certificate of Incorporation {formMode === 'existing' && <span className="text-red-500">*</span>}
+                    </label>
                     <input
                       type="text"
+                      placeholder={formMode === 'existing' ? 'Enter certificate number' : ''}
                       value={formData.certificateOfIncorporation}
-                      readOnly
-                      className="w-full px-4 py-3 border-2 border-slate-200 rounded-lg bg-white text-slate-900 font-mono text-sm cursor-not-allowed font-semibold"
+                      onChange={(e) => formMode === 'existing' && setFormData({ ...formData, certificateOfIncorporation: e.target.value })}
+                      readOnly={formMode === 'create'}
+                      className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-sm font-semibold transition-colors ${
+                        formMode === 'create'
+                          ? 'border-slate-200 bg-white text-slate-900 cursor-not-allowed'
+                          : 'border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-blue-600'
+                      }`}
                     />
                   </div>
                 </div>
