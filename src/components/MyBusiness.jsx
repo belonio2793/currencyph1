@@ -8,6 +8,8 @@ export default function MyBusiness({ userId }) {
   const [selectedBusiness, setSelectedBusiness] = useState(null)
   const [showAddBusiness, setShowAddBusiness] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [citySearch, setCitySearch] = useState('')
+  const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [formData, setFormData] = useState({
     businessName: '',
     registrationType: 'sole',
@@ -16,6 +18,36 @@ export default function MyBusiness({ userId }) {
     cityOfRegistration: '',
     registrationDate: ''
   })
+
+  // Auto-generate TIN (12-digit format)
+  const generateTIN = () => {
+    const randomTIN = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)).join('')
+    return randomTIN.replace(/(\d{3})(\d{3})(\d{3})(\d{3})/, '$1-$2-$3-$4')
+  }
+
+  // Auto-generate Certificate number
+  const generateCertificate = () => {
+    const year = new Date().getFullYear()
+    const random = Array.from({ length: 8 }, () => Math.floor(Math.random() * 10)).join('')
+    return `CERT-${year}-${random}`
+  }
+
+  // Get current date in Manila timezone (PHT = UTC+8)
+  const getCurrentManillaDate = () => {
+    const now = new Date()
+    const manilaTime = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Manila' }))
+    const year = manilaTime.getFullYear()
+    const month = String(manilaTime.getMonth() + 1).padStart(2, '0')
+    const day = String(manilaTime.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
+  // Filter cities based on search
+  const filteredCities = citySearch.length > 0
+    ? PHILIPPINES_CITIES.filter(city =>
+        city.name.toLowerCase().includes(citySearch.toLowerCase())
+      )
+    : PHILIPPINES_CITIES
 
   useEffect(() => {
     if (userId) {
