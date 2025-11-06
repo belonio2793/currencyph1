@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { PHILIPPINES_CITIES } from '../data/philippinesCities'
 
 export default function MyBusiness({ userId }) {
   const [activeTab, setActiveTab] = useState('overview')
