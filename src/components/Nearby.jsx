@@ -837,7 +837,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                 + Add your business
               </button>
             </div>
-            <p className="text-blue-100 mb-4">Select a letter to see all cities starting with that letter</p>
+            <p className="text-white mb-4">Select a letter to see all cities starting with that letter</p>
 
             {/* Prominent A-Z Alphabet Selector */}
             <div className="bg-transparent rounded-xl p-2 w-full">
