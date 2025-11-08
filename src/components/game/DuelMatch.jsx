@@ -71,22 +71,26 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd }) {
   }
 
   const attack = async () => {
-    if (isAttacking) return
+    if (isAttacking || matchEnded) return
     setIsAttacking(true)
+    setRoundNumber(r => r + 1)
     const damage = 5 + Math.floor(Math.random() * 16) // 5-20
     setLogs((l) => [`You hit ${opponent?.name || 'opponent'} for ${damage}`, ...l].slice(0,20))
     setOpponentHP((hp) => Math.max(0, hp - damage))
+    await recordAction('attack', damage)
     // broadcast
     await sendAction({ sessionId, type: 'attack', from: player?.id, from_name: player?.name, damage })
     setTimeout(() => setIsAttacking(false), 800)
   }
 
   const skill = async () => {
-    if (isAttacking) return
+    if (isAttacking || matchEnded) return
     setIsAttacking(true)
+    setRoundNumber(r => r + 1)
     const damage = 15 + Math.floor(Math.random() * 26) // 15-40
     setLogs((l) => [`You used Skill on ${opponent?.name || 'opponent'} for ${damage}`, ...l].slice(0,20))
     setOpponentHP((hp) => Math.max(0, hp - damage))
+    await recordAction('skill', damage)
     await sendAction({ sessionId, type: 'attack', from: player?.id, from_name: player?.name, damage })
     setTimeout(() => setIsAttacking(false), 1800)
   }
