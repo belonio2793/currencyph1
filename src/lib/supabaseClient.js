@@ -192,14 +192,40 @@ export const tokenAPI = {
     return data
   },
 
-  // Subscribe to balance updates
+  // Subscribe to balance updates (supports Supabase JS v2 realtime)
   subscribeToBalance(userId, callback) {
-    return supabase
-      .from(`users:id=eq.${userId}`)
-      .on('UPDATE', payload => {
-        callback(payload.new.balance)
-      })
-      .subscribe()
+    try {
+      const client = initClient()
+      if (!client || typeof client.channel !== 'function') {
+        // Not supported in environment
+        return { unsubscribe: () => {} }
+      }
+
+      const channel = client
+        .channel(`public:users:id=eq.${userId}`)
+        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'users', filter: `id=eq.${userId}` }, (payload) => {
+          try { callback(payload.new.balance) } catch (e) { console.error('subscribeToBalance callback error', e) }
+        })
+        .subscribe()
+
+      return {
+        unsubscribe: () => {
+          try {
+            // Unsubscribe using channel object
+            if (channel && typeof channel.unsubscribe === 'function') {
+              channel.unsubscribe()
+            } else if (client && typeof client.removeChannel === 'function') {
+              client.removeChannel(channel)
+            }
+          } catch (e) {
+            console.debug('Error unsubscribing balance channel', e)
+          }
+        }
+      }
+    } catch (err) {
+      console.debug('subscribeToBalance not available', err)
+      return { unsubscribe: () => {} }
+    }
   },
 
   // Get token stats
