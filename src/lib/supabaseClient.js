@@ -67,8 +67,12 @@ function initClient() {
           clearTimeout(id)
           try {
             const url = typeof input === 'string' ? input : input && input.url
-            console.warn(`[customFetch] attempt ${i+1} failed for ${url}`, err && err.name, err && err.message)
+            const info = { name: err && err.name, message: err && err.message }
+            // If the error contains a response-like object, include status
+            if (err && err.response && err.response.status) info.status = err.response.status
+            console.warn(`[customFetch] attempt ${i+1} failed for ${url}`, info)
           } catch (e) {}
+          // If aborted, do not retry immediately more than once
           if (i < retries) await new Promise(r => setTimeout(r, 500 * (i + 1)))
         }
       }
