@@ -104,10 +104,10 @@ export const gameAPI = {
 
     // Try to get avatar URL from different possible locations
     return (
-      appearance?.rpm?.model_url ||
-      appearance?.model_url ||
       appearance?.avatar_url ||
-      appearance?.rpm?.meta?.model_url ||
+      appearance?.model_url ||
+      appearance?.thumbnail ||
+      appearance?.rpm?.model_url ||
       null
     )
   },
