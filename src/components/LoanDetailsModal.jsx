@@ -30,6 +30,29 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
     try {
       setLoading(true)
 
+      // Check if viewing own loan
+      const isOwnLoan = userId && userId === loan.user_id
+      setIsViewingOwnLoan(isOwnLoan)
+
+      // Check for accepted offer between current user and borrower
+      let hasAccepted = false
+      if (userId && userId !== loan.user_id && !userId.includes('guest')) {
+        try {
+          const { data: offers } = await supabase
+            .from('loan_offers')
+            .select('id, status')
+            .eq('loan_request_id', loan.id)
+            .eq('lender_id', userId)
+            .eq('status', 'accepted')
+            .single()
+
+          hasAccepted = !!offers
+        } catch (err) {
+          // No accepted offer
+        }
+      }
+      setHasAcceptedOffer(hasAccepted)
+
       // Load borrower user info
       const { data: borrower, error: borrowerError } = await supabase
         .from('users')
