@@ -536,40 +536,37 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                     {/* Borrower Profile Section */}
                     <div className="bg-slate-50 rounded-lg p-4 mb-4 border border-slate-100">
                       <p className="text-xs text-slate-600 uppercase font-semibold mb-2">Borrower Profile</p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div>
-                          <p className="text-xs text-slate-500">Name</p>
-                          <div className="flex items-center gap-2">
-                            {request.requester?.profile_image_url ? (
-                              <img src={request.requester.profile_image_url} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
-                            ) : (
-                              <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs text-slate-600">{(request.requester?.display_name || request.user_id || 'U').toString().substring(0,1).toUpperCase()}</div>
-                            )}
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          {request.requester?.profile_image_url ? (
+                            <img src={request.requester.profile_image_url} alt={request.requester?.display_name || 'avatar'} className="w-10 h-10 rounded-full object-cover" />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-sm text-slate-600">{(request.requester?.display_name || request.user_id || 'U').toString().substring(0,1).toUpperCase()}</div>
+                          )}
 
-                            <button type="button" onClick={() => setProfileToView(request.user_id)} className="text-indigo-600 hover:text-indigo-800 no-underline p-0 text-left font-medium">
-                              {request.requester?.display_name ? request.requester.display_name : `Borrower ${request.user_id?.substring(0, 4)}`}
-                            </button>
-
-                            <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-2 py-1 text-xs bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                              <p className="font-medium text-slate-900">{request.requester?.display_name ? request.requester.display_name : `Borrower ${request.user_id?.substring(0,4)}`}</p>
+                              <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-2 py-1 text-xs bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
+                            </div>
                           </div>
                         </div>
-                        <div>
-                          <p className="text-xs text-slate-500">Verification</p>
-                          <p className="text-xs font-medium">
-                            {request.verification_status ? '✓ Verified' : 'Not verified'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-slate-500">Contact</p>
-                          <p className="text-xs font-medium text-slate-600">
-                            {request.phone_number
-                              ? request.phone_number.substring(0, 3) + '****' + request.phone_number.substring(request.phone_number.length - 2)
-                              : 'Via platform'}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-slate-500">History</p>
-                          <p className="text-xs font-medium text-slate-900">First time borrowing</p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                          <div>
+                            <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Verification</p>
+                            <p className="text-sm font-medium">{request.verification_status ? '✓ Verified' : 'Not verified'}</p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-slate-500 uppercase font-semibold mb-1">Contact</p>
+                            <p className="text-sm font-medium text-slate-600">{request.phone_number ? (request.phone_number.substring(0,3) + '****' + request.phone_number.substring(request.phone_number.length - 2)) : 'Via platform'}</p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs text-slate-500 uppercase font-semibold mb-1">History</p>
+                            <p className="text-sm font-medium text-slate-900">First time borrowing</p>
+                          </div>
                         </div>
                       </div>
                     </div>
