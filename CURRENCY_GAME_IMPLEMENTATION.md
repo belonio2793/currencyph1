@@ -151,7 +151,7 @@ Main game hub integrating:
 - id, user_id, name, level, experience
 - money, energy, health
 - current_location, home_city
-- appearance (ReadyPlayer.me avatar)
+- appearance (avatar thumbnail or avatar_url)
 ```
 
 **game_properties**: Player-owned properties
