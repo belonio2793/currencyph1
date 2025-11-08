@@ -593,32 +593,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         )}
         </div>
       </div>
-    {showRPM && (
-      <AvatarCreatorRPM
-        open={true}
-        onClose={()=>setShowRPM(false)}
-        characterId={character.id}
-        userId={userId}
-        userEmail={userEmail}
-        onSaved={async (updatedChar) => {
-          try {
-            // Make sure we have the full character data with appearance
-            if (updatedChar && updatedChar.appearance) {
-              setCharacter(updatedChar)
-            } else {
-              // Fallback: reload character from database to ensure avatar is persisted
-              const reloadedChar = await gameAPI.getCharacter(userId)
-              if (reloadedChar) {
-                setCharacter(reloadedChar)
-              }
-            }
-            setShowRPM(false)
-          } catch(e) {
-            console.warn('Avatar save handler error', e)
-          }
-        }}
-      />
-    )}
 
     {/* Game Settings Modal */}
     {showSettings && (
