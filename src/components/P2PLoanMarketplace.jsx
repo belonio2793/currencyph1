@@ -508,7 +508,9 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                           <p className="text-xs text-slate-500">Name</p>
-                          <p className="font-medium text-slate-900">{request.display_name ? request.display_name : `Borrower ${request.user_id?.substring(0, 4)}`}</p>
+                          <button type="button" onClick={() => setProfileToView(request.user_id)} className="font-medium text-slate-900 hover:underline text-left p-0">
+                            {request.display_name ? request.display_name : `Borrower ${request.user_id?.substring(0, 4)}`}
+                          </button>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Verification</p>
