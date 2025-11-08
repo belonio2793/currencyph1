@@ -81,12 +81,22 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
       // Load borrower user info (include display name, phone, avatar)
       const { data: borrower, error: borrowerError } = await supabase
         .from('users')
-        .select('id, email, created_at, display_name, profile_image_url, phone_number')
+        .select('id, email, created_at, phone_number')
         .eq('id', loan.user_id)
-        .single()
+        .maybeSingle()
 
-      if (!borrowerError && borrower) {
+      if (borrower) {
         setBorrowerInfo(borrower)
+      }
+
+      // Try to fetch profile summary (avatar/display name) from lender_profile_summary
+      try {
+        const profile = await p2pLoanService.getLenderProfile(loan.user_id)
+        if (profile) {
+          setBorrowerInfo(prev => ({ ...(prev||{}), display_name: profile.display_name || prev?.display_name, profile_image_url: profile.profile_image_url || prev?.profile_image_url }))
+        }
+      } catch (e) {
+        // ignore
       }
 
       // Load borrower verification status
