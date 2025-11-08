@@ -134,7 +134,24 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         if (reqError) {
           console.warn('Could not load loan requests:', reqError)
         }
-        setLoanRequests(requests || [])
+
+        // Attach lightweight user profiles (display_name, profile_image_url) for each request when available
+        let enriched = requests || []
+        try {
+          const userIds = Array.from(new Set((enriched || []).map(r => r.user_id).filter(Boolean)))
+          if (userIds.length > 0) {
+            const { data: usersData } = await supabase
+              .from('users')
+              .select('id, display_name, profile_image_url')
+              .in('id', userIds)
+            const usersMap = (usersData || []).reduce((m, u) => (m[u.id] = u, m), {})
+            enriched = (enriched || []).map(r => ({ ...r, requester: usersMap[r.user_id] || null }))
+          }
+        } catch (e) {
+          console.debug('Could not fetch requester profiles', e)
+        }
+
+        setLoanRequests(enriched)
       } catch (err) {
         console.warn('Error loading loan requests:', err)
       }
