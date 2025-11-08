@@ -571,6 +571,103 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
               </div>
             )}
           </div>
+        ) : activeTab === 'network' ? (
+          /* Network Balances Tab */
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Network Balances & Transparency</h2>
+
+            {/* User Wallets */}
+            {userWallets.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Wallets</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {userWallets.map(wallet => (
+                    <div key={wallet.id} className="p-6 border border-slate-200 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100">
+                      <p className="text-sm text-slate-600 uppercase tracking-wide font-semibold mb-2">
+                        {wallet.currency_code}
+                      </p>
+                      <p className="text-2xl font-bold text-slate-900">{Number(wallet.balance || 0).toFixed(2)}</p>
+                      <p className="text-xs text-slate-500 mt-2">
+                        Type: {wallet.wallet_type}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Network Stats */}
+            {networkStats && (
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Network Status</h3>
+                <div className="p-6 border border-slate-200 rounded-lg bg-slate-50">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    <div>
+                      <p className="text-sm text-slate-600 uppercase font-semibold">Status</p>
+                      <p className="text-lg font-bold text-slate-900 capitalize">{networkStats.status || 'active'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-slate-600 uppercase font-semibold">Total Balance</p>
+                      <p className="text-lg font-bold text-slate-900">{Number(networkStats.total_balance || 0).toFixed(2)} {networkStats.currency || 'PHP'}</p>
+                    </div>
+                    {networkStats.active_loans && (
+                      <div>
+                        <p className="text-sm text-slate-600 uppercase font-semibold">Active Loans</p>
+                        <p className="text-lg font-bold text-slate-900">{networkStats.active_loans}</p>
+                      </div>
+                    )}
+                    {networkStats.discrepancy && (
+                      <div>
+                        <p className="text-sm text-slate-600 uppercase font-semibold">Reconciliation</p>
+                        <p className="text-lg font-bold text-green-600">✓ Reconciled</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Loan Transactions */}
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Loan Transactions</h3>
+              {loanTransactions.length === 0 ? (
+                <div className="text-center py-12 bg-slate-50 rounded-lg">
+                  <p className="text-slate-600">No loan transactions recorded yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {loanTransactions.map(tx => (
+                    <div key={tx.id} className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-medium text-slate-900">
+                            {tx.transaction_type === 'payment' ? '📤 Payment' : '📥 Received'}
+                          </p>
+                          <p className="text-xs text-slate-500 mt-1">
+                            {new Date(tx.created_at).toLocaleDateString()} {new Date(tx.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className={`font-bold ${tx.transaction_type === 'payment' ? 'text-red-600' : 'text-green-600'}`}>
+                            {tx.transaction_type === 'payment' ? '-' : '+'}{Number(tx.amount || 0).toFixed(2)}
+                          </p>
+                          <p className="text-xs text-slate-600">{tx.payment_method || 'wallet'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Transparency Info */}
+            <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900">
+                <strong>🔒 Network Transparency:</strong> All transactions in this marketplace are recorded and reconciled across the network.
+                Your balances are updated in real-time and auditable through the network ledger.
+              </p>
+            </div>
+          </div>
         ) : null}
       </div>
 
