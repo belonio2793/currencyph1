@@ -1,604 +1,568 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { gameAPI } from '../lib/gameAPI'
-import { citySimulationTicker } from '../lib/citySimulationTicker'
-import CharacterCreation from './game/CharacterCreation'
-import GameWorld from './game/GameWorld'
-import World3DRenderer from './game/World3DRenderer'
-import IsometricGameMap from './game/IsometricGameMap'
-import GameSettings from './game/GameSettings'
-import CharactersPanel from './CharactersPanel'
-import GameInventory from './game/GameInventory'
-import GameMarketplace from './game/GameMarketplace'
-import GameProperties from './game/GameProperties'
-import GameCombat from './game/GameCombat'
-import CityMap from './game/CityMap'
-import CityManager from './game/CityManager'
-import CurrencyGameUI from './game/CurrencyGameUI'
-import CurrencyMarketplace from './game/CurrencyMarketplace'
-import GameWork from './game/GameWork'
-import PropertyInteractionModal from './game/PropertyInteractionModal'
 
+// Lightweight, self-contained RPG-like game tailored for MVP.
+// Stores and syncs with Supabase when available (uses tables: game_characters, game_assets, game_presence, game_leaderboard, game_daily_rewards).
+
+const STARTING_PROPERTIES = [
+  { id: 'sari-sari', name: 'Sari-Sari Store', price: 500, income: 5 },
+  { id: 'food-cart', name: 'Food Cart', price: 1200, income: 15 },
+  { id: 'tricycle', name: 'Tricycle Business', price: 3000, income: 40 }
+]
+
+const JOBS = [
+  { id: 'delivery', name: 'Delivery Job', reward: 50, xp: 10, duration: 3000 },
+  { id: 'bartender', name: 'Bartender Shift', reward: 120, xp: 25, duration: 5000 },
+  { id: 'developer', name: 'Freelance Dev Task', reward: 300, xp: 60, duration: 7000 }
+]
+
+function formatMoney(n) {
+  return `P${Number(n || 0).toLocaleString()}`
+}
 
 export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
-  // Check if user is logged in
-  if (!userId) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-4">
-        <div className="w-full max-w-2xl">
-          <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 md:p-12 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-blue-400 mb-4">Play Currency</h1>
-            <p className="text-slate-300 text-lg mb-8">Create Your Adventure in the Philippines Economy Game</p>
-
-            <div className="bg-slate-700/50 border border-slate-600 rounded-lg p-6 mb-8">
-              <p className="text-slate-300 mb-6">
-                Experience an immersive 3D world where you can customize your character, trade, build businesses, and compete in the economy.
-                Login or register to begin your journey.
-              </p>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    if (typeof onShowAuth === 'function') {
-                      onShowAuth('login')
-                    }
-                  }}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
-                >
-                  Login
-                </button>
-                <button
-                  onClick={() => {
-                    if (typeof onShowAuth === 'function') {
-                      onShowAuth('register')
-                    }
-                  }}
-                  className="w-full px-6 py-3 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-bold rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-all"
-                >
-                  Register
-                </button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-400 mb-8">
-              <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
-                <div className="text-2xl mb-2"></div>
-                <div className="font-semibold text-slate-300">Create Avatar (disabled)</div>
-                <div className="text-xs mt-1">Avatar feature removed — use a simple avatar or upload later</div>
-              </div>
-              <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
-                <div className="text-2xl mb-2"></div>
-                <div className="font-semibold text-slate-300">Explore World</div>
-                <div className="text-xs mt-1">Walk around Philippine cities and meet NPCs</div>
-              </div>
-              <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
-                <div className="text-2xl mb-2"></div>
-                <div className="font-semibold text-slate-300">Build Wealth</div>
-                <div className="text-xs mt-1">Trade, invest, and manage your empire</div>
-              </div>
-            </div>
-
-            <p className="text-xs text-slate-500">
-              By logging in, you agree to our terms of service. Your data is secure and private.
-            </p>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  const [character, setCharacter] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState('world')
-  const [inventory, setInventory] = useState([])
-  const [equipment, setEquipment] = useState([])
+  const [character, setCharacter] = useState(null)
+  const [isWorking, setIsWorking] = useState(false)
+  const [workProgress, setWorkProgress] = useState(0)
   const [properties, setProperties] = useState([])
-  const [bankAccounts, setBankAccounts] = useState([])
-  const [combatActive, setCombatActive] = useState(false)
-  const [combatData, setCombatData] = useState(null)
-  const [claimingReward, setClaimingReward] = useState(false)
-  const [selectedCity, setSelectedCity] = useState(null)
-  const [showCityManager, setShowCityManager] = useState(false)
-  const [showCharactersPanel, setShowCharactersPanel] = useState(false)
-  const [openModal, setOpenModal] = useState(null)
-  const [showSettings, setShowSettings] = useState(false)
-  const [showCurrencyGame, setShowCurrencyGame] = useState(false)
-  const [selectedPropertyForModal, setSelectedPropertyForModal] = useState(null)
-  const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
-  const [characterPosition, setCharacterPosition] = useState({ x: 150, y: 175, city: 'Manila' })
-  const world3DRef = useRef(null)
+  const [market, setMarket] = useState(STARTING_PROPERTIES)
+  const [error, setError] = useState('')
+  const [onlinePlayers, setOnlinePlayers] = useState([])
+  const [leaderboard, setLeaderboard] = useState([])
+  const passiveTimerRef = useRef(null)
+  const presenceChannelRef = useRef(null)
 
   useEffect(() => {
-    initializeGame()
-  }, [userId])
-
-  useEffect(() => {
-    if (userId) {
-      citySimulationTicker.setUser(userId)
-      citySimulationTicker.start()
-
-      const handleCityUpdate = (cities) => {
-      }
-
-      citySimulationTicker.addCallback(handleCityUpdate)
-
-      return () => {
-        citySimulationTicker.stop()
-        citySimulationTicker.removeCallback(handleCityUpdate)
-      }
-    }
-  }, [userId])
-
-  const initializeGame = async () => {
-    try {
-      setLoading(true)
-      const char = await gameAPI.getCharacter(userId)
-
-      if (!char) {
-        setCharacter(null)
-      } else {
-        // Ensure appearance data is loaded
-        if (!char.appearance) {
-          const appearance = await gameAPI.getCharacterAppearance(char.id)
-          if (appearance) {
-            char.appearance = appearance
+    let mounted = true
+    async function init() {
+      try {
+        setLoading(true)
+        // Try to load character from DB if logged in
+        if (userId) {
+          const { data, error: e } = await supabase
+            .from('game_characters')
+            .select('*')
+            .eq('user_id', userId)
+            .limit(1)
+            .single()
+            .catch(err => ({ data: null, error: err }))
+          if (!e && data) {
+            if (mounted) {
+              setCharacter(data)
+              setProperties(data.properties || [])
+            }
+          } else {
+            // no character -> leave null so UI prompts creation
+            setCharacter(null)
           }
+        } else {
+          // Guest view: create ephemeral character in memory
+          setCharacter((c) => c || {
+            id: 'guest-' + Math.random().toString(36).slice(2, 9),
+            name: 'Guest',
+            user_id: null,
+            wealth: 200,
+            income_rate: 0,
+            xp: 0,
+            level: 1,
+            last_daily: null,
+            properties: []
+          })
         }
-        setCharacter(char)
-        await loadGameData(char.id)
+
+        // Load market (could be dynamic from DB later)
+        setMarket(STARTING_PROPERTIES)
+
+        // Leaderboard fetch
+        await loadLeaderboard()
+
+        // Start passive income ticker
+        startPassiveIncome()
+
+        // Setup presence/realtime if supabase enabled
+        if (userId) await setupPresence()
+      } catch (err) {
+        console.error('Init error', err)
+        setError('Could not initialize game: ' + (err.message || String(err)))
+      } finally {
+        if (mounted) setLoading(false)
+      }
+    }
+    init()
+
+    return () => {
+      mounted = false
+      stopPassiveIncome()
+      teardownPresence()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId])
+
+  // Passive income adds character.income_rate to wealth every 10 seconds
+  const startPassiveIncome = () => {
+    stopPassiveIncome()
+    passiveTimerRef.current = setInterval(async () => {
+      setCharacter((c) => {
+        if (!c) return c
+        const updated = { ...c, wealth: Number(c.wealth || 0) + Number(c.income_rate || 0) }
+        // persist small update
+        persistCharacterPartial(updated)
+        return updated
+      })
+      // Refresh leaderboard occasionally
+      if (Math.random() < 0.05) loadLeaderboard()
+    }, 10000)
+  }
+
+  const stopPassiveIncome = () => {
+    if (passiveTimerRef.current) {
+      clearInterval(passiveTimerRef.current)
+      passiveTimerRef.current = null
+    }
+  }
+
+  const persistCharacterPartial = async (char) => {
+    if (!userId) return
+    try {
+      await supabase.from('game_characters').upsert({
+        id: char.id,
+        user_id: userId,
+        name: char.name,
+        wealth: char.wealth,
+        income_rate: char.income_rate,
+        xp: char.xp,
+        level: char.level,
+        properties: char.properties || [],
+        last_daily: char.last_daily || null
+      }, { onConflict: 'id' })
+    } catch (e) {
+      // ignore persistence errors but log
+      console.warn('persistCharacterPartial failed', e)
+    }
+  }
+
+  const saveCharacterToDB = async (char) => {
+    if (!userId) return
+    try {
+      const payload = {
+        id: char.id,
+        user_id: userId,
+        name: char.name,
+        wealth: char.wealth,
+        income_rate: char.income_rate,
+        xp: char.xp,
+        level: char.level,
+        properties: char.properties || [],
+        last_daily: char.last_daily || null
+      }
+      const { error: e } = await supabase.from('game_characters').upsert(payload, { onConflict: 'id' })
+      if (e) throw e
+      // update leaderboard table also
+      await supabase.from('game_leaderboard').upsert({ user_id: userId, name: char.name, wealth: char.wealth }, { onConflict: 'user_id' }).catch(() => {})
+    } catch (err) {
+      console.warn('saveCharacterToDB failed', err)
+      setError('Could not save character: ' + (err.message || String(err)))
+    }
+  }
+
+  const createCharacter = async ({ name, starterJob }) => {
+    const newChar = {
+      id: userId ? `ch_${userId}` : 'guest_' + Math.random().toString(36).slice(2, 9),
+      name: name || (userEmail || 'Player'),
+      user_id: userId || null,
+      wealth: 500,
+      income_rate: starterJob === 'business' ? 2 : 0,
+      xp: 0,
+      level: 1,
+      properties: [],
+      last_daily: null
+    }
+    setCharacter(newChar)
+    if (userId) await saveCharacterToDB(newChar)
+    // announce presence/leaderboard
+    if (userId) updatePresence({ action: 'join', char: { id: newChar.id, name: newChar.name } })
+  }
+
+  const performJob = async (job) => {
+    if (!character) return
+    if (isWorking) return
+    setIsWorking(true)
+    setWorkProgress(0)
+    const start = Date.now()
+    const duration = job.duration
+    const tick = setInterval(() => {
+      const elapsed = Date.now() - start
+      const pct = Math.min(100, Math.floor((elapsed / duration) * 100))
+      setWorkProgress(pct)
+      if (pct >= 100) {
+        clearInterval(tick)
+      }
+    }, 100)
+
+    setTimeout(async () => {
+      // reward
+      setCharacter((c) => {
+        if (!c) return c
+        const updated = { ...c, wealth: Number(c.wealth || 0) + job.reward, xp: Number(c.xp || 0) + job.xp }
+        // level up logic
+        const newLevel = Math.max(1, Math.floor((updated.xp || 0) / 100) + 1)
+        if (newLevel !== updated.level) updated.level = newLevel
+        // persist
+        persistCharacterPartial(updated)
+        return updated
+      })
+      setIsWorking(false)
+      setWorkProgress(0)
+      await loadLeaderboard()
+      if (userId) saveCharacterToDB(character)
+    }, duration + 200)
+  }
+
+  const buyProperty = async (asset) => {
+    if (!character) return
+    if ((character.wealth || 0) < asset.price) {
+      setError('Not enough money')
+      return
+    }
+    const updated = { ...character }
+    updated.wealth = Number(updated.wealth || 0) - asset.price
+    updated.properties = (updated.properties || []).concat({ ...asset, purchased_at: new Date().toISOString() })
+    updated.income_rate = Number(updated.income_rate || 0) + Number(asset.income || 0)
+    setCharacter(updated)
+    persistCharacterPartial(updated)
+    if (userId) saveCharacterToDB(updated)
+    await loadLeaderboard()
+  }
+
+  const sellProperty = async (assetId) => {
+    if (!character) return
+    const idx = (character.properties || []).findIndex(p => p.id === assetId)
+    if (idx === -1) return
+    const asset = character.properties[idx]
+    const updated = { ...character }
+    updated.properties = (updated.properties || []).filter(p => p.id !== assetId)
+    // sell for 70% of price
+    const refund = Math.floor((asset.price || 0) * 0.7)
+    updated.wealth = Number(updated.wealth || 0) + refund
+    updated.income_rate = Math.max(0, Number(updated.income_rate || 0) - Number(asset.income || 0))
+    setCharacter(updated)
+    persistCharacterPartial(updated)
+    if (userId) saveCharacterToDB(updated)
+    await loadLeaderboard()
+  }
+
+  const claimDaily = async () => {
+    if (!character) return
+    const now = Date.now()
+    const last = character.last_daily ? new Date(character.last_daily).getTime() : 0
+    if (now - last < 24 * 60 * 60 * 1000) {
+      setError('Daily reward already claimed within 24 hours')
+      return
+    }
+    const reward = 200 + Math.floor(Math.random() * 300)
+    const updated = { ...character, wealth: Number(character.wealth || 0) + reward, last_daily: new Date().toISOString() }
+    setCharacter(updated)
+    persistCharacterPartial(updated)
+    if (userId) saveCharacterToDB(updated)
+    // log daily reward table
+    if (userId) {
+      try {
+        await supabase.from('game_daily_rewards').insert({ user_id: userId, amount: reward }).catch(() => {})
+      } catch (e) { /* ignore */ }
+    }
+    await loadLeaderboard()
+  }
+
+  const loadLeaderboard = async () => {
+    try {
+      const { data, error: e } = await supabase.from('game_characters').select('name,user_id,wealth').order('wealth', { ascending: false }).limit(10)
+        .catch(err => ({ data: null, error: err }))
+      if (!e && data) {
+        setLeaderboard(data.map(r => ({ name: r.name, wealth: r.wealth || 0, user_id: r.user_id })))
+      } else {
+        // fallback: if DB not present, construct from local char only
+        if (character) setLeaderboard([{ name: character.name, wealth: character.wealth }])
       }
     } catch (err) {
-      console.error('Game initialization error:', err)
-      setError('Failed to load game: ' + err.message)
-    } finally {
-      setLoading(false)
+      console.warn('loadLeaderboard failed', err)
     }
   }
 
-  const loadGameData = async (characterId) => {
+  // Presence: publish simple join/leave and listen for presence list
+  const setupPresence = async () => {
     try {
-      const [inv, equip, props, bank] = await Promise.all([
-        gameAPI.getInventory(characterId),
-        gameAPI.getEquipment(characterId),
-        gameAPI.getProperties(characterId),
-        gameAPI.getBankAccounts(characterId)
-      ])
-      setInventory(inv)
-      setEquipment(equip)
-      setProperties(props)
-      setBankAccounts(bank)
+      teardownPresence()
+      const channel = supabase.channel('public:game_presence')
+      channel.on('presence', { event: 'sync' }, () => {})
+      // Listen for broadcasts
+      channel.on('broadcast', { event: 'character_update' }, (payload) => {
+        // payload: { user_id, name, wealth }
+        if (payload && payload.payload) {
+          // Refresh leaderboard periodically
+          loadLeaderboard()
+        }
+      })
+      await channel.subscribe()
+      presenceChannelRef.current = channel
+      // broadcast join
+      await updatePresence({ action: 'join', char: { id: character?.id, name: character?.name } })
+
+      // Fetch list of subscribers using realtime presence API is not standardized across SDKs; instead rely on leaderboard and simple presence broadcasts
     } catch (err) {
-      console.error('Error loading game data:', err)
+      console.warn('setupPresence failed', err)
     }
   }
 
-  const handleCreateCharacter = async (name, appearance, homeCity) => {
+  const teardownPresence = async () => {
     try {
-      setLoading(true)
-      const char = await gameAPI.createCharacter(userId, name, appearance, homeCity)
-      setCharacter(char)
-      await loadGameData(char.id)
-    } catch (err) {
-      setError('Failed to create character: ' + err.message)
-    } finally {
-      setLoading(false)
-    }
+      if (presenceChannelRef.current) {
+        try { await presenceChannelRef.current.unsubscribe() } catch (e) {}
+        presenceChannelRef.current = null
+      }
+    } catch (err) { /* ignore */ }
   }
 
-  const handleCharacterCustomization = async (newAppearance) => {
+  const updatePresence = async (data) => {
     try {
-      const updated = await gameAPI.updateCharacterAppearance(character.id, newAppearance)
-      setCharacter(updated)
+      if (!presenceChannelRef.current) return
+      await presenceChannelRef.current.send({ type: 'broadcast', event: 'character_update', payload: data })
     } catch (err) {
-      setError('Failed to update appearance: ' + err.message)
+      console.warn('updatePresence failed', err)
     }
   }
 
-  const handleBuyProperty = async (propertyId, price) => {
-    try {
-      await gameAPI.buyProperty(character.id, propertyId, price)
-      await loadGameData(character.id)
-      const updated = await gameAPI.getCharacter(character.id)
-      setCharacter(updated)
-      setOpenModal(null)
-    } catch (err) {
-      setError('Failed to buy property: ' + err.message)
-    }
+  const handleNameChange = (name) => {
+    setCharacter((c) => ({ ...c, name }))
   }
 
-  const handleSellProperty = async (propertyId, salePrice) => {
-    try {
-      await gameAPI.sellProperty(character.id, propertyId, salePrice)
-      await loadGameData(character.id)
-      const updated = await gameAPI.getCharacter(character.id)
-      setCharacter(updated)
-      setOpenModal(null)
-    } catch (err) {
-      setError('Failed to sell property: ' + err.message)
+  const handleCreateAndSave = async (name) => {
+    if (!name) return
+    const starterJob = 'business'
+    const newChar = {
+      id: userId ? `ch_${userId}` : 'guest_' + Math.random().toString(36).slice(2, 9),
+      name,
+      user_id: userId || null,
+      wealth: 800,
+      income_rate: starterJob === 'business' ? 2 : 0,
+      xp: 0,
+      level: 1,
+      properties: [],
+      last_daily: null
     }
-  }
-
-  const handleUpgradeProperty = async (propertyId, upgradeCost) => {
-    try {
-      await gameAPI.upgradeProperty(propertyId, upgradeCost)
-      await loadGameData(character.id)
-      const updated = await gameAPI.getCharacter(character.id)
-      setCharacter(updated)
-    } catch (err) {
-      setError('Failed to upgrade property: ' + err.message)
-    }
-  }
-
-  const handleInventoryUpdate = async () => {
-    if (character) {
-      const inv = await gameAPI.getInventory(character.id)
-      setInventory(inv)
-    }
-  }
-
-  const handleDailyReward = async () => {
-    if (!character) return
-    try {
-      setClaimingReward(true)
-      await gameAPI.getOrCreateDailyReward(character.id)
-      const updated = await gameAPI.getCharacter(userId)
-      setCharacter(updated)
-      setError('')
-    } catch (err) {
-      setError('Daily reward: ' + err.message)
-    } finally {
-      setClaimingReward(false)
-    }
-  }
-
-  const handleCombat = async (enemyType, enemyLevel = 1) => {
-    try {
-      setCombatActive(true)
-      const result = await gameAPI.startCombat(character.id, enemyType, enemyLevel)
-      setCombatData(result)
-
-      // Update character data
-      const updated = await gameAPI.getCharacter(userId)
-      setCharacter(updated)
-    } catch (err) {
-      setError('Combat failed: ' + err.message)
-    } finally {
-      setCombatActive(false)
-    }
-  }
-
-  const handleCharacterMove = (position) => {
-    setCharacterPosition(position)
-    if (character) {
-      character.current_location = position.city
-    }
+    setCharacter(newChar)
+    if (userId) await saveCharacterToDB(newChar)
+    if (userId) updatePresence({ action: 'join', char: { id: newChar.id, name: newChar.name } })
   }
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl font-bold text-blue-400 mb-4">Play Currency</div>
-          <p className="text-slate-400">Loading your adventure...</p>
+        <div className="text-center text-slate-100">
+          <div className="text-4xl font-bold mb-2">Play Currency — Loading</div>
+          <p className="text-slate-300">Initializing game...</p>
         </div>
       </div>
     )
   }
 
-  if (!character) {
-    return <CharacterCreation onCharacterCreated={handleCreateCharacter} userId={userId} />
+  if (!character || !character.name) {
+    // Character creation UI
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6 flex items-center justify-center">
+        <div className="w-full max-w-2xl bg-slate-800/60 border border-slate-700 rounded-lg p-8 text-slate-100">
+          <h1 className="text-3xl font-bold mb-4">Create Your Character</h1>
+          <p className="text-slate-400 mb-6">Begin your journey: create a name and a starter background.</p>
+          <CharacterCreator onCreate={handleCreateAndSave} onShowAuth={onShowAuth} userId={userId} />
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100">
-      {/* Error Message */}
-      {error && (
-        <div className="mx-6 mt-4">
-          <div className="p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
-            {error}
-          </div>
-        </div>
-      )}
-
-      {/* Characters Panel */}
-      {showCharactersPanel && (
-        <CharactersPanel userId={userId} currentCharacter={character} onSelectCharacter={(c) => { setCharacter(c); setShowCharactersPanel(false); loadGameData(c.id) }} onClose={() => setShowCharactersPanel(false)} />
-      )}
-
-      {/* Main Content with Sidebar Layout */}
-      <div className="bg-slate-900/50 text-slate-100">
-        <div className="mx-6 py-6">
-        {/* World View with Right Sidebar */}
-        {character && (
-          <div className="flex gap-6 max-h-[750px]">
-            {/* Left: Game Map */}
-            <div className="flex-1 min-w-0">
-              <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden h-full flex flex-col">
-                <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                  <div className="flex-1">
-                    <h2 className="text-xl font-bold text-slate-100">Game World</h2>
-                    <p className="text-xs text-slate-400 mt-1">Interactive isometric map view. Click on properties to manage your investments.</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setOpenModal('properties')}
-                      className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                      title="View your properties"
-                    >
-                      My Properties
-                    </button>
-                    <button
-                      onClick={() => setShowSettings(true)}
-                      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm font-medium whitespace-nowrap"
-                      title="Open camera and game settings"
-                    >
-                      Settings
-                    </button>
-                  </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100 p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left: World / Map */}
+          <div className="lg:col-span-2">
+            <div className="bg-slate-800/40 border border-slate-700 rounded-lg overflow-hidden">
+              <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold">Game World</h2>
+                  <p className="text-xs text-slate-400">Click a location to perform tasks and earn income.</p>
                 </div>
-                <div style={{ height: '600px' }} className="flex-1">
-                  <IsometricGameMap
-                    properties={properties}
-                    character={character}
-                    city={character.current_location || character.home_city || 'Manila'}
-                    onPropertyClick={(property) => {
-                      setSelectedPropertyForModal(property)
-                      setOpenModal('property-detail')
-                    }}
-                    mapSettings={mapSettings}
-                    onCharacterMove={handleCharacterMove}
-                  />
+                <div className="text-xs text-slate-400">Players online: {onlinePlayers.length}</div>
+              </div>
+
+              <div className="p-4">
+                <WorldMap onClickLocation={async (loc) => {
+                  // Simple click reward
+                  const reward = 10 + Math.floor(Math.random() * 40)
+                  setCharacter((c) => {
+                    const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
+                    persistCharacterPartial(updated)
+                    if (userId) saveCharacterToDB(updated)
+                    return updated
+                  })
+                  loadLeaderboard()
+                }} />
+
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {JOBS.map(job => (
+                    <div key={job.id} className="p-3 bg-slate-800/60 border border-slate-700 rounded-lg">
+                      <div className="font-semibold text-slate-100">{job.name}</div>
+                      <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
+                      <div className="mt-3">
+                        <button disabled={isWorking} onClick={() => performJob(job)} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium">Work</button>
+                      </div>
+                      {isWorking && <div className="mt-2 text-xs text-slate-300">Progress: {workProgress}%</div>}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Right: Character Info Sidebar */}
-            <div className="w-80">
-              <div className="bg-slate-800/40 border-slate-700 border rounded-lg p-6 h-full overflow-y-auto space-y-6">
-                {/* Character Header */}
-                <div className="border-b border-slate-700 pb-6">
-                  <h1
-                    onClick={() => setShowCharactersPanel(true)}
-                    className="text-2xl font-bold text-blue-300 cursor-pointer hover:text-blue-200 transition-colors mb-2"
-                    title="Click to open characters panel"
-                  >
-                    {character.name}
-                  </h1>
-                  <p className="text-slate-400 text-sm mb-4">Level {character.level} • {character.current_location}</p>
-                  {character.home_city && character.home_city !== character.current_location && (
-                    <p className="text-slate-500 text-xs">Home: {character.home_city}</p>
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+                <h3 className="text-lg font-bold mb-2">Marketplace</h3>
+                <p className="text-xs text-slate-400 mb-3">Buy assets that generate passive income.</p>
+                <div className="space-y-3">
+                  {market.map(item => (
+                    <div key={item.id} className="flex items-center justify-between bg-slate-900/20 p-3 rounded">
+                      <div>
+                        <div className="font-medium">{item.name}</div>
+                        <div className="text-xs text-slate-400">Income: {formatMoney(item.income)}/10s • Price: {formatMoney(item.price)}</div>
+                      </div>
+                      <div>
+                        <button onClick={() => buyProperty(item)} className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Buy</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+                <h3 className="text-lg font-bold mb-2">Your Properties</h3>
+                <p className="text-xs text-slate-400 mb-3">Owned assets that provide passive income.</p>
+                <div className="space-y-3">
+                  {(character.properties || []).length === 0 && <div className="text-slate-400 text-sm">You do not own any properties yet.</div>}
+                  {(character.properties || []).map(prop => (
+                    <div key={prop.id + (prop.purchased_at || '')} className="flex items-center justify-between bg-slate-900/20 p-3 rounded">
+                      <div>
+                        <div className="font-medium">{prop.name}</div>
+                        <div className="text-xs text-slate-400">Income: {formatMoney(prop.income)}</div>
+                      </div>
+                      <div>
+                        <button onClick={() => sellProperty(prop.id)} className="px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-white">Sell</button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Right: Character Card & Leaderboard */}
+          <div>
+            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
+              <h2 className="text-xl font-bold">{character.name}</h2>
+              <p className="text-xs text-slate-400">Level {character.level} • XP {character.xp}</p>
+              <div className="mt-4 space-y-2">
+                <div className="p-3 bg-slate-900/30 rounded">
+                  <div className="text-xs text-slate-400">Total Wealth</div>
+                  <div className="text-2xl font-bold text-yellow-300">{formatMoney(character.wealth)}</div>
+                </div>
+                <div className="p-3 bg-slate-900/30 rounded">
+                  <div className="text-xs text-slate-400">Income Rate</div>
+                  <div className="text-xl font-bold text-emerald-300">{formatMoney(character.income_rate)}/10s</div>
+                </div>
+                <div className="mt-2 flex gap-2">
+                  <button onClick={claimDaily} className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white">Claim Daily</button>
+                  {!userId && (
+                    <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login</button>
                   )}
                 </div>
-
-                {/* Character Stats */}
-                <div className="space-y-4">
-                  <div className="bg-slate-700/30 rounded-lg p-4">
-                    <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Total Wealth</p>
-                    <p className="text-3xl font-bold text-yellow-300">P{character.money?.toLocaleString() || 0}</p>
-                  </div>
-                  <div className="bg-slate-700/30 rounded-lg p-4">
-                    <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Experience</p>
-                    <p className="text-3xl font-bold text-emerald-300">{character.experience?.toLocaleString() || 0}</p>
-                  </div>
-                </div>
-
-                {/* Experience Progress */}
-                <div className="border-t border-slate-700 pt-4">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-xs text-slate-400">Progress to Next Level</span>
-                    <span className="text-xs text-slate-400">{character.experience % 1000} / 1000</span>
-                  </div>
-                  <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-green-500 to-emerald-400 h-full transition-all duration-300"
-                      style={{ width: `${(character.experience % 1000) / 10}%` }}
-                    />
-                  </div>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="space-y-3 border-t border-slate-700 pt-4">
-                  {/* Edit Avatar disabled (external avatar provider removed) */}
-                  <div className="text-xs text-slate-400 p-2 bg-slate-800 rounded">Avatar editing removed — use Characters panel to set an image URL.</div>
-                  <button
-                    onClick={handleDailyReward}
-                    disabled={claimingReward}
-                    className="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 rounded text-white font-medium transition-colors"
-                  >
-                    {claimingReward ? 'Claiming...' : 'Claim Daily Reward'}
-                  </button>
-                </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Navigation Tabs for Modals */}
-        <div className="flex gap-2 mb-6 overflow-x-auto pb-2 mt-6">
-          <button
-            onClick={() => setShowCurrencyGame(!showCurrencyGame)}
-            className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors font-bold ${
-              showCurrencyGame
-                ? 'bg-green-600 text-white'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-            }`}
-          >
-            Currency Game
-          </button>
-          {[
-            { id: 'cities', label: 'Cities' },
-            { id: 'inventory', label: 'Inventory' },
-            { id: 'equipment', label: 'Equipment' },
-            { id: 'marketplace', label: 'Marketplace' },
-            { id: 'properties', label: 'Properties' },
-            { id: 'banking', label: 'Banking' }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setOpenModal(tab.id)}
-              className={`px-4 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                openModal === tab.id
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-bold mb-2">Leaderboard</h3>
+              <ol className="list-decimal list-inside text-sm space-y-2">
+                {leaderboard.map((p, idx) => (
+                  <li key={p.user_id || p.name} className="flex items-center justify-between">
+                    <span>{p.name}</span>
+                    <span className="text-slate-300">{formatMoney(p.wealth)}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
 
-        {/* Currency Game Panel */}
-        {showCurrencyGame && (
-          <div className="bg-slate-800/40 border-slate-700 border rounded-lg overflow-hidden mb-6 max-h-[600px] overflow-y-auto">
-            <CurrencyGameUI
-              character={character}
-              world3D={world3DRef.current}
-              onCharacterUpdate={(updated) => setCharacter(updated)}
-              isDark={true}
-            />
-          </div>
-        )}
-
-        {/* Property Detail Modal from Map */}
-        {openModal === 'property-detail' && selectedPropertyForModal && (
-          <PropertyInteractionModal isDark={true}
-            property={selectedPropertyForModal}
-            character={character}
-            isOpen={true}
-            onClose={() => {
-              setOpenModal(null)
-              setSelectedPropertyForModal(null)
-            }}
-            onBuy={handleBuyProperty}
-            onSell={handleSellProperty}
-            onUpgrade={handleUpgradeProperty}
-          />
-        )}
-
-        {/* Modal for tabs */}
-        {openModal && openModal !== 'property-detail' && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-lg max-w-5xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b border-slate-700 flex items-center justify-between">
-                <h3 className="text-2xl font-bold text-slate-100">
-                  {openModal === 'cities' && 'Cities'}
-                  {openModal === 'inventory' && 'Inventory'}
-                  {openModal === 'equipment' && 'Equipment'}
-                  {openModal === 'marketplace' && 'Marketplace'}
-                  {openModal === 'properties' && 'Properties'}
-                  {openModal === 'banking' && 'Banking'}
-                </h3>
-                <button onClick={() => setOpenModal(null)} className="text-slate-400 hover:text-slate-200">X</button>
-              </div>
-              <div className="p-6 text-slate-100">
-                {openModal === 'inventory' && (
-                  <GameInventory character={character} inventory={inventory} onInventoryUpdate={handleInventoryUpdate} />
-                )}
-
-                {openModal === 'cities' && (
-                  <div className="space-y-6">
-                    <div className="bg-slate-700/30 border border-slate-700 rounded-lg overflow-hidden" style={{ height: '600px' }}>
-                      <CityMap userId={userId} onCitySelect={setSelectedCity} />
-                    </div>
-                    {selectedCity && (
-                      <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
-                        <h3 className="text-xl font-bold mb-2 text-slate-100">{selectedCity.name}</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div>
-                            <p className="text-slate-400 text-sm">Population</p>
-                            <p className="text-2xl font-bold text-blue-400">{(selectedCity.population || 0).toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-slate-400 text-sm">Budget</p>
-                            <p className="text-2xl font-bold text-emerald-400">P{(selectedCity.budget || 0).toLocaleString()}</p>
-                          </div>
-                          <div>
-                            <p className="text-slate-400 text-sm">Happiness</p>
-                            <p className="text-2xl font-bold text-yellow-400">{Math.floor(selectedCity.happiness || 0)}%</p>
-                          </div>
-                          <div>
-                            <p className="text-slate-400 text-sm">Region</p>
-                            <p className="text-2xl font-bold text-purple-400">{selectedCity.region || 'N/A'}</p>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+              <h3 className="text-lg font-bold mb-2">Players Online</h3>
+              <div className="text-sm text-slate-300 space-y-2">
+                {onlinePlayers.length === 0 && <div className="text-slate-400">No players currently online.</div>}
+                {onlinePlayers.map(p => (
+                  <div key={p.user_id} className="flex items-center justify-between">
+                    <div>{p.name || 'Anonymous'}</div>
+                    <div className="text-xs text-slate-400">{p.status || 'online'}</div>
                   </div>
-                )}
-
-                {openModal === 'equipment' && (
-                  <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-6 text-slate-100">Equipment</h2>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {['head', 'body', 'legs', 'feet', 'right_hand', 'left_hand', 'necklace', 'backpack'].map(slot => {
-                        const equipped = equipment.find(e => e.equipment_slot === slot)
-                        return (
-                          <div key={slot} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
-                            <p className="text-xs text-slate-400 uppercase mb-2">{slot.replace('_', ' ')}</p>
-                            {equipped ? (
-                              <div>
-                                <p className="font-bold text-sm text-slate-100">{equipped.game_items?.name}</p>
-                                <p className="text-xs text-slate-400">{equipped.game_items?.brand}</p>
-                              </div>
-                            ) : (
-                              <p className="text-slate-400 text-sm">Empty</p>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {openModal === 'marketplace' && (
-                  <CurrencyMarketplace
-                    character={character}
-                    onInventoryUpdate={handleInventoryUpdate}
-                    onListingCreated={() => loadGameData(character.id)}
-                    onPurchaseComplete={() => setCharacter({...character, money: character.money})}
-                  />
-                )}
-
-                {openModal === 'properties' && (
-                  <GameProperties character={character} properties={properties} />
-                )}
-
-                {openModal === 'banking' && (
-                  <div className="bg-slate-700/40 border border-slate-700 rounded-lg p-6">
-                    <h2 className="text-2xl font-bold mb-6 text-slate-100">Banking System</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {bankAccounts.map(account => (
-                        <div key={account.id} className="bg-slate-700/50 border border-slate-600 rounded-lg p-4">
-                          <p className="text-slate-400 text-sm uppercase">{account.account_type} Account</p>
-                          <p className="text-2xl font-bold mt-2 text-slate-100">{account.currency_code} {account.balance?.toLocaleString() || 0}</p>
-                          <p className="text-xs text-slate-400 mt-1">Interest Rate: {(account.interest_rate * 100).toFixed(1)}%</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                <div className="mt-6 flex gap-2 justify-end">
-                  <button onClick={() => setOpenModal(null)} className="px-4 py-2 bg-slate-700 text-slate-100 rounded hover:bg-slate-600">Close</button>
-                </div>
+                ))}
               </div>
             </div>
+
           </div>
-        )}
         </div>
       </div>
+    </div>
+  )
+}
 
-    {/* Game Settings Modal */}
-    {showSettings && (
-      <GameSettings
-        world3D={world3DRef.current}
-        onClose={() => setShowSettings(false)}
-        mapSettings={mapSettings}
-        onMapSettingsChange={setMapSettings}
-        isDark={true}
-      />
-    )}
+
+// Small helpers / subcomponents
+function CharacterCreator({ onCreate, onShowAuth, userId }) {
+  const [name, setName] = useState('')
+
+  return (
+    <div>
+      <div className="mb-4">
+        <label className="block text-xs text-slate-400 mb-1">Character Name</label>
+        <input value={name} onChange={(e) => setName(e.target.value)} className="w-full px-3 py-2 rounded bg-slate-900/20 border border-slate-700 text-white" placeholder="Enter a name" />
+      </div>
+
+      <div className="flex gap-2">
+        <button onClick={() => onCreate(name)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Create</button>
+        {!userId && (
+          <button onClick={() => onShowAuth && onShowAuth('login')} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login to Save</button>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function WorldMap({ onClickLocation }) {
+  // Simple clickable map made of city tiles to keep visuals light and responsive.
+  const cities = [
+    { id: 'manila', name: 'Manila' },
+    { id: 'cebu', name: 'Cebu' },
+    { id: 'davao', name: 'Davao' },
+    { id: 'bacolod', name: 'Bacolod' },
+    { id: 'baguio', name: 'Baguio' }
+  ]
+
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {cities.map(city => (
+        <div key={city.id} className="bg-slate-900/20 border border-slate-700 rounded-lg p-4 flex flex-col justify-between">
+          <div>
+            <div className="font-semibold text-slate-100">{city.name}</div>
+            <div className="text-xs text-slate-400 mt-1">Click to perform a local task and earn income.</div>
+          </div>
+          <div className="mt-3 text-right">
+            <button onClick={() => onClickLocation(city)} className="px-3 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white">Visit</button>
+          </div>
+        </div>
+      ))}
     </div>
   )
 }
