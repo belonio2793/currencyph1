@@ -804,7 +804,7 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
 
   // Draw other players
   otherPlayers.forEach(player => {
-    const avatarUrl = player.avatar_url || player.avatarUrl || player.rpm_avatar || player.rpm_model_url || (player.presence && (player.presence.avatar_url || player.presence.rpm_avatar))
+    const avatarUrl = player.avatar_url || player.avatarUrl || (player.presence && player.presence.avatar_url) || null
     if (avatarUrl) {
       const img = getAvatarImage(avatarUrl)
       const r = 10
