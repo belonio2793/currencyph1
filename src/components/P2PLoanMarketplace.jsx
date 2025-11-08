@@ -307,6 +307,16 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                 >
                   History & Ratings
                 </button>
+                <button
+                  onClick={() => setActiveTab('network')}
+                  className={`px-6 py-4 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === 'network'
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  Network Balances
+                </button>
               </>
             )}
           </div>
