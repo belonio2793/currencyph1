@@ -58,10 +58,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           if (!e && data) {
             if (mounted) {
               setCharactersList(data || [])
-              // choose the first character as active if none selected
-              if (data && data.length > 0) {
-                setCharacter(data[0])
-                setProperties(data[0].properties || [])
+              // try to restore last-played from localStorage, otherwise pick most recent (ordered by updated_at desc)
+              const lastPlayedId = typeof window !== 'undefined' ? localStorage.getItem('game_last_played') : null
+              let selected = null
+              if (lastPlayedId) selected = (data || []).find(d => d.id === lastPlayedId)
+              if (!selected && data && data.length > 0) selected = data[0]
+              if (selected) {
+                setCharacter(selected)
+                setProperties(selected.properties || [])
               } else {
                 setCharacter(null)
               }
@@ -468,9 +472,41 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       if (character && character.id === id) {
         setCharacter(null)
       }
+      // clear last-played if it referenced this id
+      try { if (typeof window !== 'undefined') { const last = localStorage.getItem('game_last_played'); if (last === id) localStorage.removeItem('game_last_played') } } catch(e){}
     } catch (e) {
       console.warn('deleteCharacter failed', e)
       setError('Could not delete character')
+    }
+  }
+
+  const markCharacterPlayed = async (c) => {
+    if (!c) return
+    try {
+      // touch DB row so updated_at changes and it becomes the most-recently-played
+      if (userId) {
+        await supabase.from('game_characters').update({}).eq('id', c.id).select()
+      }
+    } catch (e) { console.warn('markCharacterPlayed failed', e) }
+    try { if (typeof window !== 'undefined') localStorage.setItem('game_last_played', c.id) } catch(e){}
+  }
+
+  const renameCharacter = async (id, newName) => {
+    if (!id || !newName) return
+    try {
+      if (userId) {
+        const { data, error } = await supabase.from('game_characters').update({ name: newName }).eq('id', id).select().single()
+        if (!error && data) {
+          setCharactersList((prev) => (prev || []).map(ch => ch.id === id ? data : ch))
+          if (character && character.id === id) setCharacter(data)
+        }
+      } else {
+        setCharactersList((prev) => (prev || []).map(ch => ch.id === id ? { ...ch, name: newName } : ch))
+        if (character && character.id === id) setCharacter((c) => ({ ...c, name: newName }))
+      }
+    } catch (e) {
+      console.warn('renameCharacter failed', e)
+      setError('Could not rename character')
     }
   }
 
@@ -544,7 +580,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       <div className="text-xs text-slate-400">Level {c.level} • Wealth: P{Number(c.wealth || 0).toLocaleString()}</div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <button onClick={() => { setCharacter(c); setProperties(c.properties || []) }} className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Play</button>
+                      <button onClick={async () => { await markCharacterPlayed(c); setCharacter(c); setProperties(c.properties || []) }} className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Play</button>
+                      <button onClick={() => { const newName = prompt('Rename character', c.name); if (newName) renameCharacter(c.id, newName) }} className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 rounded text-white">Rename</button>
                       <button onClick={() => { if (confirm('Delete character?')) deleteCharacter(c.id) }} className="px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-white">Delete</button>
                     </div>
                   </div>
