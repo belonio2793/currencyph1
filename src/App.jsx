@@ -28,6 +28,7 @@ import ListingDetail from './components/ListingDetail'
 import Network from './components/Network'
 import NetworkBalances from './components/NetworkBalances'
 import BorrowMoney from './components/BorrowMoney'
+import P2PLoanMarketplace from './components/P2PLoanMarketplace'
 import About from './components/About'
 import Inbox from './components/Inbox'
 import ChatBar from './components/ChatBar'
@@ -469,8 +470,7 @@ export default function App() {
             }} /> }
             {activeTab === 'network' && <Network userId={userId} />}
             {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
-            {activeTab === 'borrow-personal' && <BorrowMoney userId={userId} loanType="personal" />}
-            {activeTab === 'borrow-business' && <BorrowMoney userId={userId} loanType="business" />}
+            {activeTab === 'p2p-loans' && <P2PLoanMarketplace userId={userId} userEmail={userEmail} onTabChange={setActiveTab} />}
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
             {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
