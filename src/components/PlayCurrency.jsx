@@ -874,8 +874,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   )}
                 </div>
                 <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button onClick={() => { setCharacter(null); setCharactersList([]) }} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white text-sm">My Characters</button>
-                  <button onClick={() => setActiveTab && setActiveTab('home')} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white text-sm">Exit Game</button>
+                  <button onClick={() => setCharacter(null)} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white text-sm">Switch Char</button>
+                  <button onClick={() => { if (typeof window !== 'undefined') window.location.hash = '#home'; setCharacter(null) }} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white text-sm">Main Menu</button>
                 </div>
               </div>
             </div>
