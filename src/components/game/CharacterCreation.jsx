@@ -56,7 +56,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       <div className="w-full max-w-4xl mt-6">
         <div className="bg-slate-800 border border-slate-700 rounded-lg p-4 md:p-8">
           <h1 className="text-3xl md:text-4xl font-bold text-center text-blue-400 mb-2">Play Currency</h1>
-          <p className="text-center text-slate-400 mb-8">Create Your Adventure — with ReadyPlayer.me</p>
+          <p className="text-center text-slate-400 mb-8">Create Your Adventure — avatar optional</p>
 
           {error && (
             <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded text-red-400 text-sm">
