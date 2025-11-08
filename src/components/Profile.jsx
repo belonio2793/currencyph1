@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { deviceFingerprint } from '../lib/deviceFingerprint'
+import { p2pLoanService } from '../lib/p2pLoanService'
 
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
@@ -53,6 +54,14 @@ export default function Profile({ userId, onSignOut }) {
   const [autoScrollToTop, setAutoScrollToTop] = useState(true)
   const [signingOut, setSigningOut] = useState(false)
   const [deviceInfo, setDeviceInfo] = useState(null)
+  const [verificationStatus, setVerificationStatus] = useState(null)
+  const [verifyingId, setVerifyingId] = useState(false)
+  const [showIdForm, setShowIdForm] = useState(false)
+  const [idFormData, setIdFormData] = useState({
+    idType: 'national_id',
+    idNumber: '',
+    idImageUrl: ''
+  })
 
   const isValidUUID = (id) => {
     return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
@@ -63,6 +72,7 @@ export default function Profile({ userId, onSignOut }) {
   useEffect(() => {
     loadUser()
     loadDeviceInfo()
+    loadVerificationStatus()
     setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
   }, [userId])
 
@@ -79,6 +89,49 @@ export default function Profile({ userId, onSignOut }) {
     } catch (error) {
       console.warn('Error loading device info:', error)
     }
+  }
+
+  const loadVerificationStatus = async () => {
+    if (!userId || userId.includes('guest')) return
+    try {
+      const status = await p2pLoanService.getVerificationStatus(userId)
+      setVerificationStatus(status)
+    } catch (err) {
+      console.warn('Error loading verification status:', err)
+    }
+  }
+
+  const handleSubmitVerification = async (e) => {
+    e.preventDefault()
+    if (!idFormData.idNumber || !idFormData.idType) {
+      setError('Please fill in all verification fields')
+      return
+    }
+
+    try {
+      setVerifyingId(true)
+      const result = await p2pLoanService.submitVerification(userId, idFormData.idType, idFormData.idNumber, idFormData.idImageUrl)
+      if (result.success) {
+        setSuccess('Verification submitted! Awaiting review.')
+        setShowIdForm(false)
+        setIdFormData({ idType: 'national_id', idNumber: '', idImageUrl: '' })
+        loadVerificationStatus()
+      }
+    } catch (err) {
+      setError('Failed to submit verification: ' + (err.message || 'Unknown error'))
+      console.error('Verification error:', err)
+    } finally {
+      setVerifyingId(false)
+    }
+  }
+
+  const getIdTypeLabel = (type) => {
+    const labels = {
+      'national_id': 'National ID',
+      'drivers_license': 'Driver\'s License',
+      'passport': 'Passport'
+    }
+    return labels[type] || type
   }
 
   const handleSignOut = async () => {
