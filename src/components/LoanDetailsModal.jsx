@@ -124,6 +124,17 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
     return phone.substring(0, 3) + '****' + phone.substring(phone.length - 2)
   }
 
+  const calculateOfferInterest = () => {
+    const amt = parseFloat(offerAmount) || 0
+    const rate = parseFloat(interestRate) || 0
+    return amt * (rate / 100)
+  }
+
+  const calculateOfferTotalRepay = () => {
+    const amt = parseFloat(offerAmount) || 0
+    return amt + calculateOfferInterest()
+  }
+
   const handleSubmitOffer = async (e) => {
     e.preventDefault()
     if (!userId || userId.includes('guest')) {
@@ -502,6 +513,17 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                         <label htmlFor="platform" className="text-sm text-slate-600">
                           To Use platform for secure exchange transaction (approval rate and 10% fee applies)
                         </label>
+                      </div>
+
+                      <div className="border-t pt-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-slate-700">Interest ({interestRate}%):</span>
+                          <span className="font-semibold text-slate-900">{calculateOfferInterest().toFixed(2)} {loan.currency_code}</span>
+                        </div>
+                        <div className="flex justify-between text-base border-t pt-2">
+                          <span className="font-bold text-slate-900">Total to Repay:</span>
+                          <span className="font-bold text-blue-600">{calculateOfferTotalRepay().toFixed(2)} {loan.currency_code}</span>
+                        </div>
                       </div>
 
                       <div className="flex gap-2 border-t border-slate-200 pt-4">
