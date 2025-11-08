@@ -461,6 +461,30 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  const acceptMatch = async (req) => {
+    try {
+      if (!presenceChannelRef.current) return
+      // send response to requester
+      await presenceChannelRef.current.send({ type: 'broadcast', event: 'match_response', payload: { to: req.user_id, from: userId || character?.id, from_name: character?.name, accepted: true } })
+      // remove request locally
+      setMatchRequests((prev) => prev.filter(m => m !== req))
+      // optionally start a duel/minigame: for now just notify
+      alert(`Match accepted with ${req.name || req.user_id}`)
+    } catch (e) {
+      console.warn('acceptMatch failed', e)
+    }
+  }
+
+  const rejectMatch = async (req) => {
+    try {
+      if (!presenceChannelRef.current) return
+      await presenceChannelRef.current.send({ type: 'broadcast', event: 'match_response', payload: { to: req.user_id, from: userId || character?.id, from_name: character?.name, accepted: false } })
+      setMatchRequests((prev) => prev.filter(m => m !== req))
+    } catch (e) {
+      console.warn('rejectMatch failed', e)
+    }
+  }
+
   const handleNameChange = (name) => {
     setCharacter((c) => ({ ...c, name }))
   }
@@ -756,7 +780,24 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </ol>
             </div>
 
-            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-bold mb-2">Match Requests</h3>
+              <div className="text-sm text-slate-300 space-y-2 mb-3">
+                {matchRequests.length === 0 && <div className="text-slate-400">No incoming match requests.</div>}
+                {matchRequests.map((r, idx) => (
+                  <div key={r.user_id + '_' + idx} className="flex items-center justify-between bg-slate-900/20 p-2 rounded">
+                    <div>
+                      <div className="font-medium">{r.name || r.user_id}</div>
+                      <div className="text-xs text-slate-400">Requested {new Date(r.timestamp).toLocaleTimeString()}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={() => acceptMatch(r)} className="px-2 py-1 bg-emerald-600 rounded text-white text-sm">Accept</button>
+                      <button onClick={() => rejectMatch(r)} className="px-2 py-1 bg-red-600 rounded text-white text-sm">Reject</button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
               <h3 className="text-lg font-bold mb-2">Players Online</h3>
               <div className="text-sm text-slate-300 space-y-2">
                 {onlinePlayers.length === 0 && <div className="text-slate-400">No players currently online.</div>}
