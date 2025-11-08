@@ -1,6 +1,6 @@
-import { createClient } from '@supabase/supabase-js'
+import * as Supabase from '@supabase/supabase-js'
 
-import { createClient } from '@supabase/supabase-js'
+import * as Supabase from '@supabase/supabase-js'
 
 // Helper to read env both in browser (import.meta.env) and Node (process.env)
 const getEnv = (name) => {
