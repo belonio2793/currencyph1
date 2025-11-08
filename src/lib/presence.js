@@ -63,30 +63,20 @@ async function updatePresence(status) {
       updateData.location_updated_at = new Date().toISOString()
     }
 
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000)
+    const { error } = await supabase
+      .from('user_presence')
+      .upsert([updateData])
 
-    try {
-      const { error } = await supabase
-        .from('user_presence')
-        .upsert([updateData])
-
-      clearTimeout(timeoutId)
-
-      if (error) {
-        if (error.code === 'PGRST116' || error.code === '404') {
-          // Table doesn't exist, silently skip
-          return
-        }
-        // Silently skip other errors as presence is non-critical
+    if (error) {
+      if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
+        // Table doesn't exist, silently skip
+        return
       }
-    } finally {
-      clearTimeout(timeoutId)
+      // Silently skip other errors as presence is non-critical
     }
   } catch (err) {
-    // Network errors, table might not exist, timeout, or other issues - silently skip
+    // Network errors, table might not exist, or other issues - silently skip
     // Presence tracking is optional functionality
-    // These errors are expected when tables don't exist or network is unavailable
   }
 }
 
