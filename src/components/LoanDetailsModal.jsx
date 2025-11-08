@@ -421,16 +421,29 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                           <label className="block text-sm font-medium text-slate-700 mb-2">
                             Interest Rate (%) *
                           </label>
-                          <input
-                            type="number"
-                            value={interestRate}
-                            onChange={(e) => setInterestRate(e.target.value)}
-                            placeholder="Interest rate"
-                            className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
-                            step="0.1"
-                            min="0"
-                            required
-                          />
+                          <div className="flex gap-3 items-center">
+                            <input
+                              type="number"
+                              value={interestRate}
+                              onChange={(e) => setInterestRate(e.target.value)}
+                              placeholder="Interest rate"
+                              className="w-1/3 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                              step="0.1"
+                              min="0"
+                              max="50"
+                              required
+                            />
+                            <input
+                              type="range"
+                              min="0"
+                              max="50"
+                              step="0.1"
+                              value={Number(interestRate)}
+                              onChange={(e) => setInterestRate(e.target.value)}
+                              className="flex-1"
+                            />
+                            <div className="w-16 text-right text-sm text-slate-700">{interestRate}%</div>
+                          </div>
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-slate-700 mb-2">
