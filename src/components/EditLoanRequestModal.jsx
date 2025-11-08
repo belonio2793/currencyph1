@@ -99,12 +99,12 @@ export default function EditLoanRequestModal({ userId, loan, onClose, onSuccess 
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">Requested Amount</label>
-              <div className="flex gap-2">
-                <input type="number" step="0.01" min="0" value={amount} onChange={e=>setAmount(e.target.value)} className="flex-1 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
-                <select value={currency} onChange={e=>setCurrency(e.target.value)} className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600">
+              <div className="flex gap-2 items-center">
+                <input type="number" step="0.01" min="0" value={amount} onChange={e=>setAmount(e.target.value)} className="flex-1 min-w-0 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
+                <select value={currency} onChange={e=>setCurrency(e.target.value)} className="w-28 px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600">
                   <option value="PHP">PHP</option>
                   <option value="USD">USD</option>
                   <option value="EUR">EUR</option>
