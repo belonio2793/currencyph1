@@ -424,7 +424,7 @@ export const p2pLoanService = {
         .eq('id', loanId)
         .select()
         .single()
-      
+
       if (error) throw error
       return { success: true, data }
     } catch (err) {
@@ -445,11 +445,85 @@ export const p2pLoanService = {
         .eq('id', loanId)
         .select()
         .single()
-      
+
       if (error) throw error
       return { success: true, data }
     } catch (err) {
       console.error('Error marking loan as completed:', err)
+      throw err
+    }
+  },
+
+  // ============================================================================
+  // EDIT LOAN REQUEST (secure with offer retraction)
+  // ============================================================================
+  async getPendingOfferCount(loanId) {
+    try {
+      const { count, error } = await supabase
+        .from('loan_offers')
+        .select('id', { count: 'exact', head: true })
+        .eq('loan_request_id', loanId)
+        .eq('status', 'pending')
+      if (error) throw error
+      return count || 0
+    } catch (err) {
+      console.error('Error counting pending offers:', err)
+      throw err
+    }
+  },
+
+  async updateLoanRequest(loanId, borrowerId, updates) {
+    try {
+      // 1) Load and validate ownership and status
+      const { data: loan, error: loanErr } = await supabase
+        .from('loans')
+        .select('*')
+        .eq('id', loanId)
+        .single()
+      if (loanErr) throw loanErr
+      if (!loan || loan.user_id !== borrowerId) throw new Error('Not authorized to edit this loan')
+      if (loan.status !== 'pending' || loan.lender_id) throw new Error('Cannot edit once paired or not pending')
+
+      // 2) Retract any pending offers
+      const pendingCount = await this.getPendingOfferCount(loanId)
+      if (pendingCount > 0) {
+        const { error: retractErr } = await supabase
+          .from('loan_offers')
+          .update({ status: 'rejected' })
+          .eq('loan_request_id', loanId)
+          .eq('status', 'pending')
+        if (retractErr) throw retractErr
+      }
+
+      // 3) Update the loan request
+      const requestedAmount = typeof updates.requested_amount === 'number' ? updates.requested_amount : loan.requested_amount
+      const totalOwed = Number(requestedAmount * 1.10)
+
+      const payload = {
+        requested_amount: requestedAmount,
+        currency_code: updates.currency_code ?? loan.currency_code,
+        display_name: updates.display_name ?? loan.display_name,
+        city: updates.city ?? loan.city,
+        phone_number: updates.phone_number ?? loan.phone_number,
+        reason_for_loan: updates.reason_for_loan ?? loan.reason_for_loan,
+        total_owed: totalOwed,
+        updated_at: new Date()
+      }
+
+      const { data: updated, error: updErr } = await supabase
+        .from('loans')
+        .update(payload)
+        .eq('id', loanId)
+        .eq('user_id', borrowerId)
+        .is('lender_id', null)
+        .eq('status', 'pending')
+        .select()
+        .single()
+      if (updErr) throw updErr
+
+      return { success: true, data: updated, offers_retracted: pendingCount }
+    } catch (err) {
+      console.error('Error updating loan request:', err)
       throw err
     }
   }
