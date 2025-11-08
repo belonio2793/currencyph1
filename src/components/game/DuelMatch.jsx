@@ -254,12 +254,10 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd, userId, 
           <div className="col-span-1">
             <div className="flex flex-col h-56 border border-slate-700 rounded bg-slate-900/30">
               <div className="text-xs font-bold text-slate-400 p-2 border-b border-slate-700">Match Chat</div>
-              <div className="flex-1 flex flex-col">
+              <div className="flex-1 flex flex-col overflow-hidden">
                 <ChatBar
-                  context={`duel:${sessionId}`}
-                  placeholder="Chat during duel..."
-                  minimal={true}
-                  compact={true}
+                  userId={userId}
+                  userEmail={userEmail}
                 />
               </div>
             </div>
