@@ -79,6 +79,8 @@ const supabase = new Proxy({}, {
 
 export { supabase }
 
+export const isSupabaseConfigured = !!(SUPABASE_URL && SUPABASE_ANON_KEY)
+
 // Generic Token API utilities (replacing deprecated dog token API)
 export const tokenAPI = {
   // Get current user balance
