@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { gameAPI } from '../lib/gameAPI'
 import CharacterCreation from './game/CharacterCreation'
-import AvatarCreatorRPM from './game/AvatarCreatorRPM'
 
 export default function CharactersPanel({ userId, currentCharacter, onSelectCharacter, onClose }) {
   const [loading, setLoading] = useState(false)
@@ -95,59 +94,59 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
 
         {showCreate ? (
           <div className="mb-3 h-[70vh] flex flex-col">
-            <div className="flex-1 bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
-              <AvatarCreatorRPM open={true} onClose={() => setShowCreate(false)} onExport={(data) => { setExportedData(data) }} userId={userId} showCloseButton={false} />
+            <div className="flex-1 bg-slate-800 rounded-lg overflow-hidden border border-slate-700 p-4">
+              <div className="text-sm text-slate-400 mb-3">ReadyPlayer.me support removed. Provide a simple avatar image URL below (optional) or skip to create a character with a default icon.</div>
+              <div className="mb-3">
+                <label className="block text-sm text-slate-300 mb-1">Avatar Image URL (optional)</label>
+                <input value={exportedData?.thumbnail || ''} onChange={(e)=>setExportedData({ ...(exportedData || {}), thumbnail: e.target.value })} placeholder="https://.../avatar.jpg" className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100" />
+              </div>
             </div>
 
             <div className="mt-3">
-              {!exportedData ? (
-                <div className="text-sm text-slate-400">Use the avatar editor above. After exporting your avatar, fill the name and create your character below.</div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
-                  <div className="col-span-2">
-                    <label className="block text-sm text-slate-300 mb-1">Character Name</label>
-                    <input value={newName} onChange={(e)=>setNewName(e.target.value)} placeholder="Enter character name" className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                <div className="col-span-2">
+                  <label className="block text-sm text-slate-300 mb-1">Character Name</label>
+                  <input value={newName} onChange={(e)=>setNewName(e.target.value)} placeholder="Enter character name" className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100" />
 
-                    <label className="block text-sm text-slate-300 mt-3 mb-1">Home City</label>
-                    <select value={newHomeCity} onChange={(e)=>setNewHomeCity(e.target.value)} className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100">
-                      <option>Manila</option>
-                      <option>Quezon City</option>
-                      <option>Cebu</option>
-                      <option>Davao</option>
-                    </select>
+                  <label className="block text-sm text-slate-300 mt-3 mb-1">Home City</label>
+                  <select value={newHomeCity} onChange={(e)=>setNewHomeCity(e.target.value)} className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100">
+                    <option>Manila</option>
+                    <option>Quezon City</option>
+                    <option>Cebu</option>
+                    <option>Davao</option>
+                  </select>
 
-                    <div className="flex gap-2 mt-3">
-                      <button onClick={async () => {
-                        if (!newName.trim()) {
-                          alert('Please enter a character name')
-                          return
-                        }
-                        const appearance = {
-                          ...(exportedData || {}),
-                          gender: 'male',
-                          skin_tone: 'medium',
-                          height: 175,
-                          build: 'average'
-                        }
-                        await handleCreate(newName, appearance, newHomeCity)
-                        setExportedData(null)
-                        setNewName('')
-                        setNewHomeCity('Manila')
-                      }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Create Character</button>
-                      <button onClick={() => { setExportedData(null) }} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-100">Reset</button>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <div className="w-28 h-28 bg-slate-700 rounded overflow-hidden flex items-center justify-center">
-                      {exportedData?.rpm_meta?.imageUrl ? (
-                        <img src={exportedData.rpm_meta.imageUrl} className="w-full h-full object-cover" alt="preview" />
-                      ) : (
-                        <div className="text-xs text-slate-400">No preview</div>
-                      )}
-                    </div>
+                  <div className="flex gap-2 mt-3">
+                    <button onClick={async () => {
+                      if (!newName.trim()) {
+                        alert('Please enter a character name')
+                        return
+                      }
+                      const appearance = {
+                        ...(exportedData || {}),
+                        gender: 'male',
+                        skin_tone: 'medium',
+                        height: 175,
+                        build: 'average'
+                      }
+                      await handleCreate(newName, appearance, newHomeCity)
+                      setExportedData(null)
+                      setNewName('')
+                      setNewHomeCity('Manila')
+                    }} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Create Character</button>
+                    <button onClick={() => { setExportedData(null) }} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-100">Reset</button>
                   </div>
                 </div>
-              )}
+                <div className="flex items-center justify-center">
+                  <div className="w-28 h-28 bg-slate-700 rounded overflow-hidden flex items-center justify-center">
+                    {exportedData?.thumbnail ? (
+                      <img src={exportedData.thumbnail} className="w-full h-full object-cover" alt="preview" />
+                    ) : (
+                      <div className="text-xs text-slate-400">No preview</div>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
@@ -184,16 +183,25 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
       {showEditor && editingCharacter && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70" onClick={() => { setShowEditor(false); setEditingCharacter(null) }} />
-          <div className="relative w-full max-w-5xl h-[85vh] bg-slate-900 border border-slate-700 rounded-lg overflow-hidden">
-            <AvatarCreatorRPM open={true} onClose={() => { setShowEditor(false); setEditingCharacter(null) }} characterId={editingCharacter.id} userId={userId} showCloseButton={false} onSaved={async (updatedChar) => {
-              try {
-                // refresh list and notify parent
-                await fetchCharacters()
-                if (typeof onSelectCharacter === 'function') onSelectCharacter(updatedChar)
-                setShowEditor(false)
-                setEditingCharacter(null)
-              } catch(e) { console.warn('onSaved handler error', e) }
-            }} />
+          <div className="relative w-full max-w-5xl h-[85vh] bg-slate-900 border border-slate-700 rounded-lg overflow-hidden p-4">
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm text-slate-300 mb-1">Avatar Image URL</label>
+                <input value={editingCharacter?.appearance?.thumbnail || ''} onChange={(e)=>setEditingCharacter({...editingCharacter, appearance: {...(editingCharacter.appearance||{}), thumbnail: e.target.value }})} className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-slate-100" />
+              </div>
+              <div className="flex gap-2">
+                <button onClick={async () => {
+                  try {
+                    const updated = await gameAPI.updateCharacterAppearance(editingCharacter.id, editingCharacter.appearance || {})
+                    await fetchCharacters()
+                    if (typeof onSelectCharacter === 'function') onSelectCharacter(updated)
+                    setShowEditor(false)
+                    setEditingCharacter(null)
+                  } catch(e) { console.warn('Save avatar failed', e); alert('Failed to save avatar') }
+                }} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Save</button>
+                <button onClick={() => { setShowEditor(false); setEditingCharacter(null) }} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-slate-100">Cancel</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
