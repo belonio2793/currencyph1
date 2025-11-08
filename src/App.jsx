@@ -308,7 +308,7 @@ export default function App() {
     if (!user.id.includes('guest-local')) {
       try {
         await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
-        initializePresence(user.id)
+        if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id)
       } catch (err) {
         console.error('Could not initialize user profile:', err)
         setError('Failed to set up your account. Please try again or contact support.')
