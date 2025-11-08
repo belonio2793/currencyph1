@@ -697,10 +697,48 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
       </div>
 
       {/* Modals */}
-      {showRequestModal && (
+      {showLoanTypeSelector && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
+            <div className="border-b border-slate-200 px-6 py-4">
+              <h2 className="text-xl font-semibold text-slate-900">Select Loan Type</h2>
+            </div>
+            <div className="p-6 space-y-4">
+              <button
+                onClick={() => handleSelectLoanType('personal')}
+                className="w-full p-4 border-2 border-slate-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors text-left"
+              >
+                <h3 className="font-semibold text-slate-900 mb-1">Personal Loan</h3>
+                <p className="text-sm text-slate-600">Borrow for personal needs, education, emergency, or other purposes</p>
+              </button>
+              <button
+                onClick={() => handleSelectLoanType('business')}
+                className="w-full p-4 border-2 border-slate-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors text-left"
+              >
+                <h3 className="font-semibold text-slate-900 mb-1">Business Loan</h3>
+                <p className="text-sm text-slate-600">Borrow for business expansion, operations, or growth</p>
+              </button>
+            </div>
+            <div className="border-t border-slate-200 px-6 py-4">
+              <button
+                onClick={() => setShowLoanTypeSelector(false)}
+                className="w-full px-4 py-2 border-2 border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRequestModal && selectedLoanType && (
         <RequestLoanModal
           userId={userId}
-          onClose={() => setShowRequestModal(false)}
+          loanType={selectedLoanType}
+          onClose={() => {
+            setShowRequestModal(false)
+            setSelectedLoanType(null)
+          }}
           onSuccess={handleRequestSuccess}
         />
       )}
