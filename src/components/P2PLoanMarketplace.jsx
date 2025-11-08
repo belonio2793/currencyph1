@@ -788,7 +788,19 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         />
       )}
 
-      {selectedLenderId && !showSubmitOfferModal && !showOffersListModal && (
+      {showLoanDetails && selectedLoanRequest && (
+        <LoanDetailsModal
+          loan={selectedLoanRequest}
+          userId={userId}
+          onClose={() => {
+            setShowLoanDetails(false)
+            setSelectedLoanRequest(null)
+          }}
+          onSubmitOffer={handleOfferSubmitted}
+        />
+      )}
+
+      {selectedLenderId && !showSubmitOfferModal && !showOffersListModal && !showLoanDetails && (
         <LenderProfileView
           userId={userId}
           lenderId={selectedLenderId}
