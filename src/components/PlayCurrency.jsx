@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import IsometricGameMap from './game/IsometricGameMap'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
 // Stores and syncs with Supabase when available (uses tables: game_characters, game_assets, game_presence, game_leaderboard, game_daily_rewards).
@@ -392,6 +393,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       await presenceChannelRef.current.send({ type: 'broadcast', event, payload: data })
     } catch (err) {
       console.warn('updatePresence failed', err)
+    }
+  }
+
+  // Simple matchmaking request broadcast
+  const requestMatch = async () => {
+    try {
+      if (!presenceChannelRef.current) return
+      const payload = { user_id: userId || character?.id, name: character?.name, timestamp: Date.now() }
+      await presenceChannelRef.current.send({ type: 'broadcast', event: 'match_request', payload })
+      setMatchRequests((prev) => prev.concat({ ...payload, status: 'sent' }))
+    } catch (e) {
+      console.warn('requestMatch failed', e)
     }
   }
 
