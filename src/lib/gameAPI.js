@@ -65,14 +65,9 @@ export const gameAPI = {
 
   async updateCharacterAppearance(characterId, appearance) {
     try {
-      // Ensure appearance has proper structure
+      // Keep appearance shape simple and avoid ReadyPlayer.me specific nesting
       const cleanedAppearance = {
-        ...(appearance || {}),
-        rpm: {
-          model_url: appearance?.rpm?.model_url || appearance?.model_url || null,
-          thumbnail: appearance?.rpm?.thumbnail || appearance?.thumbnail || null,
-          meta: appearance?.rpm?.meta || appearance?.meta || {}
-        }
+        ...(appearance || {})
       }
 
       const { data, error } = await supabase
