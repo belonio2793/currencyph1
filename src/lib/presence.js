@@ -75,8 +75,8 @@ async function updatePresence(status) {
       // Silently skip other errors as presence is non-critical
     }
   } catch (err) {
-    // Network errors, table might not exist, or other issues - silently skip
-    // Presence tracking is optional functionality
+    // Network errors, table might not exist, or other issues - log for debugging but don't crash app
+    console.warn('Presence update failed:', err)
   }
 }
 
