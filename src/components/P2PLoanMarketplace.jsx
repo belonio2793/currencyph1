@@ -336,8 +336,10 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Contact</p>
-                          <p className="text-xs font-medium text-blue-600">
-                            {request.phone_number ? request.phone_number : 'Via platform'}
+                          <p className="text-xs font-medium text-slate-600">
+                            {request.phone_number
+                              ? request.phone_number.substring(0, 3) + '****' + request.phone_number.substring(request.phone_number.length - 2)
+                              : 'Via platform'}
                           </p>
                         </div>
                         <div>
