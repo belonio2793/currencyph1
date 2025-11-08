@@ -99,7 +99,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [combatData, setCombatData] = useState(null)
   const [claimingReward, setClaimingReward] = useState(false)
   const [selectedCity, setSelectedCity] = useState(null)
-  const [showRPM, setShowRPM] = useState(false)
   const [showCityManager, setShowCityManager] = useState(false)
   const [showCharactersPanel, setShowCharactersPanel] = useState(false)
   const [openModal, setOpenModal] = useState(null)
