@@ -9,6 +9,8 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [showOfferForm, setShowOfferForm] = useState(false)
+  const [hasAcceptedOffer, setHasAcceptedOffer] = useState(false)
+  const [isViewingOwnLoan, setIsViewingOwnLoan] = useState(false)
 
   // Offer form state
   const [offerAmount, setOfferAmount] = useState(loan?.requested_amount || '')
