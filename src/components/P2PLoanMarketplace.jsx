@@ -29,6 +29,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
   const [showSubmitOfferModal, setShowSubmitOfferModal] = useState(false)
   const [showOffersListModal, setShowOffersListModal] = useState(false)
   const [showVerificationModal, setShowVerificationModal] = useState(false)
+  const [showLoanDetails, setShowLoanDetails] = useState(false)
   const [selectedLoanRequest, setSelectedLoanRequest] = useState(null)
   const [selectedLenderId, setSelectedLenderId] = useState(null)
 
