@@ -72,6 +72,11 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
     return parseFloat(formData.offeredAmount || 0) * 0.10
   }
 
+  const calculateTotalRepay = () => {
+    const amount = parseFloat(formData.offeredAmount) || 0
+    return amount + calculateInterestAmount()
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -307,6 +312,11 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
                 </span>
               </div>
             )}
+
+            <div className="flex justify-between text-base border-t pt-2">
+              <span className="font-bold text-slate-900">Total to Repay:</span>
+              <span className="font-bold text-blue-600">{calculateTotalRepay().toFixed(2)} {loanRequest.currency_code}</span>
+            </div>
           </div>
 
           {/* Submit Button */}
