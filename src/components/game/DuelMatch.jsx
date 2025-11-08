@@ -92,10 +92,105 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd }) {
   }
 
   const endMatch = async (winner) => {
+    if (matchEnded) return
+    setMatchEnded(true)
+
+    // Broadcast end action
     try {
       await sendAction({ sessionId, type: 'end', winner })
-    } catch (e) {}
-    try { onEnd && onEnd({ winner }) } catch (e) {}
+    } catch (e) { console.warn('sendAction failed', e) }
+
+    // Determine winner ID
+    const winnerId = winner === player?.name ? player?.id : opponent?.id
+    const isPlayerWinner = winnerId === player?.id
+
+    // Save match to database
+    try {
+      const durationSeconds = Math.floor((Date.now() - matchStartTime) / 1000)
+
+      const { error: matchError } = await supabase
+        .from('game_matches')
+        .insert([{
+          session_id: sessionId,
+          player1_id: player?.id,
+          player2_id: opponent?.id,
+          player1_name: player?.name,
+          player2_name: opponent?.name,
+          winner_id: winnerId,
+          player1_final_hp: isPlayerWinner ? playerHP : opponentHP,
+          player2_final_hp: isPlayerWinner ? opponentHP : playerHP,
+          duration_seconds: durationSeconds,
+          total_rounds: roundNumber,
+          reward_winner: 100,
+          reward_loser: 25,
+          status: 'completed'
+        }])
+
+      if (matchError) {
+        console.error('Failed to save match:', matchError)
+      } else {
+        // Distribute rewards
+        await distributeRewards(isPlayerWinner)
+        setLogs((l) => ['Match saved to history.', ...l].slice(0, 25))
+      }
+    } catch (e) {
+      console.error('Error saving match:', e)
+    }
+
+    // Notify parent component
+    try { onEnd && onEnd({ winner, winnerId, isPlayerWinner }) } catch (e) {}
+  }
+
+  const distributeRewards = async (playerWon) => {
+    try {
+      const winnerReward = 100
+      const loserReward = 25
+
+      const winnerId = playerWon ? player?.id : opponent?.id
+      const loserId = playerWon ? opponent?.id : player?.id
+
+      // Award winner
+      const { error: winError } = await supabase
+        .from('game_characters')
+        .update({
+          money: supabase.rpc('increment_money', { char_id: winnerId, amount: winnerReward }),
+          wealth: supabase.rpc('increment_wealth', { char_id: winnerId, amount: winnerReward }),
+          updated_at: new Date()
+        })
+        .eq('id', winnerId)
+
+      // Award loser consolation
+      const { error: loseError } = await supabase
+        .from('game_characters')
+        .update({
+          money: supabase.rpc('increment_money', { char_id: loserId, amount: loserReward }),
+          wealth: supabase.rpc('increment_wealth', { char_id: loserId, amount: loserReward }),
+          updated_at: new Date()
+        })
+        .eq('id', loserId)
+
+      if (!winError && !loseError) {
+        setLogs((l) => [
+          `Winner received ${winnerReward} credits!`,
+          `Loser received ${loserReward} credits consolation.`,
+          ...l
+        ].slice(0, 25))
+      }
+    } catch (e) {
+      console.error('Error distributing rewards:', e)
+    }
+  }
+
+  const recordAction = async (actionType, damage) => {
+    try {
+      actionsRef.current.push({
+        type: actionType,
+        damage,
+        playerHP,
+        opponentHP,
+        round: roundNumber
+      })
+    } catch (e) { /* ignore */ }
   }
 
   return (
