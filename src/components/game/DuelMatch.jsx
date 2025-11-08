@@ -198,33 +198,72 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 p-6 flex items-center justify-center bg-black/60">
-      <div className="bg-slate-900 border border-slate-700 rounded-lg max-w-2xl w-full p-4 text-slate-100">
+    <div className="fixed inset-0 z-50 p-4 flex items-center justify-center bg-black/60">
+      <div className="bg-slate-900 border border-slate-700 rounded-lg max-w-4xl w-full p-4 text-slate-100 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-3">
-          <div className="font-bold">Duel: {player?.name} vs {opponent?.name}</div>
-          <div className="text-sm text-slate-400">Session: {sessionId}</div>
+          <div className="font-bold text-lg">Duel: {player?.name} vs {opponent?.name}</div>
+          <div className="text-xs text-slate-400">Round {roundNumber} • {sessionId}</div>
         </div>
+
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="p-3 bg-slate-800/30 rounded text-center">
             <div className="text-sm text-slate-400">You</div>
             <div className="text-xl font-bold text-yellow-300">{player?.name}</div>
-            <div className="text-2xl font-bold mt-2">{playerHP} HP</div>
+            <div className="text-2xl font-bold mt-2 text-green-400">{playerHP} / 100 HP</div>
+            <div className="mt-2 h-2 bg-slate-700 rounded overflow-hidden">
+              <div className="h-full bg-green-500" style={{ width: `${playerHP}%` }} />
+            </div>
           </div>
           <div className="p-3 bg-slate-800/30 rounded text-center">
             <div className="text-sm text-slate-400">Opponent</div>
             <div className="text-xl font-bold text-slate-100">{opponent?.name}</div>
-            <div className="text-2xl font-bold mt-2">{opponentHP} HP</div>
+            <div className="text-2xl font-bold mt-2 text-green-400">{opponentHP} / 100 HP</div>
+            <div className="mt-2 h-2 bg-slate-700 rounded overflow-hidden">
+              <div className="h-full bg-green-500" style={{ width: `${opponentHP}%` }} />
+            </div>
           </div>
         </div>
 
-        <div className="flex gap-3 mb-3">
-          <button onClick={attack} disabled={isAttacking} className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 rounded">Attack</button>
-          <button onClick={skill} disabled={isAttacking} className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded">Skill</button>
-          <button onClick={() => endMatch(opponent?.name || 'Opponent')} className="px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded">Forfeit</button>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <button onClick={attack} disabled={isAttacking || matchEnded} className="px-3 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded font-medium">
+            {isAttacking ? 'Attacking...' : 'Attack'}
+          </button>
+          <button onClick={skill} disabled={isAttacking || matchEnded} className="px-3 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded font-medium">
+            {isAttacking ? 'Skill...' : 'Skill'}
+          </button>
+          <button onClick={() => endMatch(opponent?.name || 'Opponent')} disabled={matchEnded} className="px-3 py-2 bg-gray-600 hover:bg-gray-700 disabled:opacity-50 rounded font-medium">
+            {matchEnded ? 'Match Ended' : 'Forfeit'}
+          </button>
         </div>
 
-        <div className="h-36 overflow-y-auto bg-slate-900/20 p-2 rounded text-sm">
-          {logs.map((l, i) => <div key={i} className="mb-1">{l}</div>)}
+        <div className="grid grid-cols-3 gap-4">
+          {/* Combat Log */}
+          <div className="col-span-2">
+            <div className="h-56 overflow-y-auto bg-slate-900/30 p-3 rounded text-sm border border-slate-700">
+              <div className="text-xs text-slate-400 mb-2 font-bold">Combat Log:</div>
+              {logs.length === 0 && <div className="text-slate-500">Match started...</div>}
+              {logs.map((l, i) => (
+                <div key={i} className="mb-1.5 text-slate-200">
+                  <span className="text-slate-500">•</span> {l}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Chat */}
+          <div className="col-span-1">
+            <div className="flex flex-col h-56 border border-slate-700 rounded bg-slate-900/30">
+              <div className="text-xs font-bold text-slate-400 p-2 border-b border-slate-700">Match Chat</div>
+              <div className="flex-1 flex flex-col">
+                <ChatBar
+                  context={`duel:${sessionId}`}
+                  placeholder="Chat during duel..."
+                  minimal={true}
+                  compact={true}
+                />
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
