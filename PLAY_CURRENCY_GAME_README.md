@@ -53,13 +53,12 @@ A turn-based economic simulation minigame built into Currency.ph where players m
 
 ## 📋 PLANNED FEATURES (Next Phase)
 
-### Phase 1: Enhanced Duel System
-- [ ] **Chat Integration**: ChatBar component integrated into duel sessions for player communication
-- [ ] **Match History**: Persist match outcomes to `game_matches` table
-  - Columns: match_id, player1_id, player2_id, winner_id, duration, created_at, updated_at
-- [ ] **Leaderboard Filtering**: Sort by wins, level, experience
-- [ ] **Server-Side Validation**: Edge function to validate match results (anti-cheat)
-- [ ] **Duel Rewards**: Award currency/XP to winner, consolation rewards to loser
+### Phase 1: Enhanced Duel System ✅ COMPLETE
+- [x] **Chat Integration**: ChatBar component integrated into duel sessions for player communication
+- [x] **Match History**: Persist match outcomes to `game_matches` table with full statistics
+- [x] **Server-Side Validation**: Edge function to validate match results (anti-cheat)
+- [x] **Duel Rewards**: Award 100 credits to winner, 25 consolation credits to loser
+- [x] **Match Statistics**: Track win rate, average duration, total matches
 
 ### Phase 2: Advanced Duel Mechanics
 - [ ] **Turn Timer**: 30-second action timer per turn
