@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import React, { useState, useEffect } from 'react'
 import { p2pLoanService } from '../lib/p2pLoanService'
 
 export default function EditLoanRequestModal({ userId, loan, onClose, onSuccess }) {
@@ -44,7 +43,6 @@ export default function EditLoanRequestModal({ userId, loan, onClose, onSuccess 
 
   const getReasonText = () => {
     if (loanReason === 'other') return customReason || ''
-    // Normalize the predefined labels to nice text
     const label = loanReason.replace('_',' ')
     return label.charAt(0).toUpperCase() + label.slice(1)
   }
