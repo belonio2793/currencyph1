@@ -6,6 +6,7 @@ import SubmitLoanOfferModal from './SubmitLoanOfferModal'
 import LoanOffersListView from './LoanOffersListView'
 import UserVerificationModal from './UserVerificationModal'
 import LenderProfileView from './LenderProfileView'
+import LoanDetailsModal from './LoanDetailsModal'
 
 const LOAN_STATUSES = {
   pending: { label: 'Pending Offers', color: 'bg-yellow-50', textColor: 'text-yellow-700' },
