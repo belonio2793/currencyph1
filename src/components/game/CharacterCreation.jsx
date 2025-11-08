@@ -101,7 +101,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
               </div>
             </div>
 
-            {/* Avatar (ReadyPlayer.me removed) */}
+            {/* Avatar (external avatar providers removed) */}
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-2">Your Avatar (optional)</label>
               <p className="text-xs text-slate-400 mb-3">Paste an avatar image URL or skip to use a default icon.</p>
