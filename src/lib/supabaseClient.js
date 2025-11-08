@@ -58,6 +58,7 @@ function initClient() {
           const baseFetch = (typeof globalThis !== 'undefined' && globalThis.fetch) ? globalThis.fetch.bind(globalThis) : fetch
           // Merge init but avoid forcing 'mode' which can break in some environments
           const merged = Object.assign({}, init, { signal: controller.signal })
+          console.debug(`[customFetch] attempt ${i+1} to fetch`, typeof input === 'string' ? input : (input && input.url) || input)
           const res = await baseFetch(input, merged)
           clearTimeout(id)
           return res
@@ -73,8 +74,7 @@ function initClient() {
     // Initialize supabase client using createClient
     _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: {
-        fetch: customFetch,
-        headers: { apikey: SUPABASE_ANON_KEY }
+        fetch: customFetch
       }
     })
   } else {
