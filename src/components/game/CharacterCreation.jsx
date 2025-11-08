@@ -4,6 +4,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [name, setName] = useState('')
   const [homeCity, setHomeCity] = useState('Manila')
   const [avatarAppearance, setAvatarAppearance] = useState(null)
+  const [avatarUrl, setAvatarUrl] = useState('')
   const [creating, setCreating] = useState(false)
   const [error, setError] = useState('')
   const [showAvatarCreator, setShowAvatarCreator] = useState(false)
