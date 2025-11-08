@@ -44,7 +44,40 @@ function createDummyClient() {
 function initClient() {
   if (_client) return _client
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    // Custom fetch with timeout and retries to avoid transient "Failed to fetch" in sandbox proxies
+    const customFetch = async (input, init = {}) => {
+      const retries = 2
+      const timeoutMs = 10000
+      let lastErr
+      for (let i = 0; i <= retries; i++) {
+        const controller = new AbortController()
+        const id = setTimeout(() => controller.abort(), timeoutMs)
+        try {
+          const res = await fetch(input, {
+            ...init,
+            // Prevent caching/proxy weirdness
+            cache: 'no-store',
+            // Explicitly set mode/cors for clarity
+            mode: 'cors',
+            signal: controller.signal
+          })
+          clearTimeout(id)
+          return res
+        } catch (err) {
+          lastErr = err
+          clearTimeout(id)
+          if (i < retries) await new Promise(r => setTimeout(r, 500 * (i + 1)))
+        }
+      }
+      throw lastErr || new Error('Network error')
+    }
+
+    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      global: {
+        fetch: customFetch,
+        headers: { apikey: SUPABASE_ANON_KEY }
+      }
+    })
   } else {
     _client = createDummyClient()
   }
