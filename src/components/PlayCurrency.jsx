@@ -892,6 +892,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </ol>
             </div>
 
+            {character && <MatchHistory characterId={character.id} maxMatches={8} />}
+
             <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
               <h3 className="text-lg font-bold mb-2">Match Requests</h3>
               <div className="text-sm text-slate-300 space-y-2 mb-3">
