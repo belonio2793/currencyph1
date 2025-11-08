@@ -117,8 +117,6 @@ export const gameAPI = {
     return (
       appearance?.thumbnail ||
       appearance?.avatar_url ||
-      appearance?.rpm?.thumbnail ||
-      appearance?.rpm?.meta?.imageUrl ||
       null
     )
   },
