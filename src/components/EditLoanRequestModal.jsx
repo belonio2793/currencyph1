@@ -1,5 +1,8 @@
 import { p2pLoanService } from '../lib/p2pLoanService'
 
+import React, { useState, useEffect } from 'react'
+import { p2pLoanService } from '../lib/p2pLoanService'
+
 export default function EditLoanRequestModal({ userId, loan, onClose, onSuccess }) {
   const [amount, setAmount] = useState(String(loan.requested_amount || ''))
   const [currency, setCurrency] = useState(loan.currency_code || 'PHP')
