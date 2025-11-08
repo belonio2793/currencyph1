@@ -139,6 +139,11 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
     setShowOffersListModal(true)
   }
 
+  const handleViewLoanDetails = (request) => {
+    setSelectedLoanRequest(request)
+    setShowLoanDetails(true)
+  }
+
   const handleRequestSuccess = () => {
     setShowRequestModal(false)
     setSelectedLoanType(null)
