@@ -399,7 +399,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 {/* Action Buttons */}
                 <div className="space-y-3 border-t border-slate-700 pt-4">
-                  {/* Edit Avatar disabled (ReadyPlayer.me removed) */}
+                  {/* Edit Avatar disabled (external avatar provider removed) */}
                   <div className="text-xs text-slate-400 p-2 bg-slate-800 rounded">Avatar editing removed — use Characters panel to set an image URL.</div>
                   <button
                     onClick={handleDailyReward}
