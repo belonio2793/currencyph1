@@ -49,7 +49,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
           const verification = await p2pLoanService.getVerificationStatus(userId)
           setVerificationStatus(verification)
         } catch (err) {
-          console.warn('Could not load verification status (table may not exist yet):', err?.message || err)
+          // Silently fail - verification is optional
           setVerificationStatus(null)
         }
 
@@ -58,7 +58,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
           const profile = await p2pLoanService.getLenderProfile(userId)
           setLenderProfile(profile)
         } catch (err) {
-          console.warn('Could not load lender profile (table may not exist yet):', err?.message || err)
+          // Silently fail - lender profile is optional
           setLenderProfile(null)
         }
       }
