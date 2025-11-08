@@ -547,7 +547,10 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                           <div className="flex-1">
                             <div className="flex items-center gap-3">
                               <p className="font-medium text-slate-900">{request.requester?.display_name || request.requester?.email || 'User'}</p>
-                              <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-2 py-1 text-xs bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
+                              <div className="flex items-center gap-2">
+                                <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-3 py-1 text-xs bg-white border border-slate-200 text-slate-700 rounded-md hover:bg-slate-50">View Profile</button>
+                                <button type="button" onClick={() => { const email = request.requester?.email; if (email) { window.open(`mailto:${email}?subject=Loan%20Inquiry&body=Hi`, '_blank'); } else { alert('User has no public email. Open their profile to request contact.'); } }} className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Message</button>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -574,14 +577,14 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleViewLoanDetails(request)}
-                        className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-medium"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                       >
                         View Details
                       </button>
                       {userId === request.user_id ? (
                         <button
                           onClick={() => handleViewOffers(request)}
-                          className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
+                          className="flex-1 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
                         >
                           View Offers ({request.total_offers || 0})
                         </button>
@@ -606,7 +609,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                                   </button>
                                   <button
                                     onClick={() => handleViewOffers(request)}
-                                    className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
+                                    className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50 text-sm font-medium"
                                   >
                                     Offers ({request.total_offers || 0})
                                   </button>
