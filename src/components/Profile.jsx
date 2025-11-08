@@ -572,6 +572,104 @@ export default function Profile({ userId, onSignOut }) {
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-6 mt-4">
+            <h3 className="text-lg font-medium text-slate-900 mb-3">Identity Verification (for P2P Loans)</h3>
+
+            <div className="space-y-4">
+              {/* Current Verification Status */}
+              {verificationStatus ? (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className={`w-3 h-3 rounded-full ${verificationStatus.status === 'approved' ? 'bg-green-500' : verificationStatus.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
+                        <p className="font-medium text-slate-900">
+                          {verificationStatus.status === 'approved' ? '✓ Verified' : verificationStatus.status === 'pending' ? '⏳ Pending Review' : '✗ Rejected'}
+                        </p>
+                      </div>
+                      <p className="text-sm text-slate-700 mb-2">ID Type: <span className="font-medium">{getIdTypeLabel(verificationStatus.id_type)}</span></p>
+                      {verificationStatus.verified_at && (
+                        <p className="text-xs text-slate-600">Verified on: {new Date(verificationStatus.verified_at).toLocaleDateString()}</p>
+                      )}
+                      {verificationStatus.verification_notes && (
+                        <p className="text-xs text-slate-600 mt-1">Notes: {verificationStatus.verification_notes}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                  <p className="text-sm text-slate-600 mb-2">No verification submitted yet</p>
+                  <p className="text-xs text-slate-500">Verify your identity to build trust with lenders in the P2P marketplace</p>
+                </div>
+              )}
+
+              {/* Verification Form */}
+              {showIdForm ? (
+                <form onSubmit={handleSubmitVerification} className="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">ID Type</label>
+                    <select
+                      value={idFormData.idType}
+                      onChange={(e) => setIdFormData({...idFormData, idType: e.target.value})}
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    >
+                      <option value="national_id">National ID</option>
+                      <option value="drivers_license">Driver's License</option>
+                      <option value="passport">Passport</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">ID Number</label>
+                    <input
+                      type="text"
+                      value={idFormData.idNumber}
+                      onChange={(e) => setIdFormData({...idFormData, idNumber: e.target.value})}
+                      placeholder="Enter your ID number"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">ID Image URL (optional)</label>
+                    <input
+                      type="url"
+                      value={idFormData.idImageUrl}
+                      onChange={(e) => setIdFormData({...idFormData, idImageUrl: e.target.value})}
+                      placeholder="https://example.com/id-image.jpg"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                    />
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="submit"
+                      disabled={verifyingId}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium text-sm"
+                    >
+                      {verifyingId ? 'Submitting...' : 'Submit Verification'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowIdForm(false)}
+                      className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium text-sm"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <button
+                  onClick={() => setShowIdForm(true)}
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                >
+                  {verificationStatus ? 'Update Verification' : 'Verify Your Identity'}
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-xl p-6 mt-4">
             <h3 className="text-lg font-medium text-slate-900 mb-3">Security</h3>
 
             <div className="space-y-3">
