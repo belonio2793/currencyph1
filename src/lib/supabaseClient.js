@@ -74,7 +74,7 @@ function initClient() {
       throw lastErr || new Error('Network error')
     }
 
-    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    _client = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: {
         fetch: customFetch,
         headers: { apikey: SUPABASE_ANON_KEY }
