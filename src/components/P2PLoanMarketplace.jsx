@@ -35,6 +35,9 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
   const [selectedLenderId, setSelectedLenderId] = useState(null)
   const [editingRequest, setEditingRequest] = useState(null)
 
+  // User profile modal state
+  const [profileToView, setProfileToView] = useState(null)
+
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [lenderProfile, setLenderProfile] = useState(null)
 
