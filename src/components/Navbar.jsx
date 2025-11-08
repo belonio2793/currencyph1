@@ -30,7 +30,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
   // Loans dropdown options
   const loansOptions = [
-    { id: 'p2p-loans', label: 'P2P Loan Marketplace', auth: true }
+    { id: 'p2p-loans', label: 'Peer To Peer Loan Marketplace', auth: true }
   ]
 
   return (
