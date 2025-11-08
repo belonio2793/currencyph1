@@ -102,26 +102,11 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
               </div>
             </div>
 
-            {/* Avatar Creation */}
+            {/* Avatar (ReadyPlayer.me removed) */}
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">Your Avatar</label>
-              <p className="text-xs text-slate-400 mb-3">
-                {avatarAppearance
-                  ? 'Avatar created. Click below to modify.'
-                  : 'Create or customize your 3D avatar using ReadyPlayer.me'}
-              </p>
-              <button
-                type="button"
-                onClick={() => setShowAvatarCreator(true)}
-                disabled={creating}
-                className={`w-full px-6 py-4 rounded-lg border-2 transition-colors ${
-                  avatarAppearance
-                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
-                    : 'border-blue-500 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20'
-                } disabled:opacity-50 font-medium`}
-              >
-                {avatarAppearance ? 'Avatar Ready — Click to Modify' : 'Design Your Avatar'}
-              </button>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Your Avatar (optional)</label>
+              <p className="text-xs text-slate-400 mb-3">Paste an avatar image URL or skip to use a default icon.</p>
+              <input type="text" value={avatarUrl} onChange={(e)=>setAvatarUrl(e.target.value)} placeholder="https://.../avatar.png (optional)" className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:border-blue-500" />
             </div>
 
             {/* Create Button */}
