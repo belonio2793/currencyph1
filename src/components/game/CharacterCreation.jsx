@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import AvatarCreatorRPM from './AvatarCreatorRPM'
 
 export default function CharacterCreation({ onCharacterCreated, userId }) {
   const [name, setName] = useState('')
