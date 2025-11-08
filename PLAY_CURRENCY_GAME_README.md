@@ -33,6 +33,10 @@ A turn-based economic simulation minigame built into Currency.ph where players m
 - **Combat Logs**: Action history during match
 - **HP Management**: Health tracking and damage calculation
 - **Match Outcomes**: Winner determination and rewards
+- **In-Game Chat**: ChatBar integrated into duel sessions for player communication
+- **Match History**: Complete duel records with statistics (win rate, duration, rounds)
+- **Match Rewards**: Winners receive 100 credits, losers receive 25 consolation credits
+- **Server-Side Validation**: Edge function validates match results to prevent cheating
 
 #### Navigation
 - Character switcher button ("Characters & Create New")
