@@ -131,7 +131,7 @@ export class WorldSync {
           x,
           y,
           direction,
-          rpm_avatar: rpm_avatar || null,
+          avatar_url: avatarUrl || null,
           timestamp: now
         }
       })
