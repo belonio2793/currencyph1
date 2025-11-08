@@ -261,7 +261,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
           x: newX,
           y: newZ,
           direction: Math.atan2(dx, dz) * (180 / Math.PI),
-          rpm_avatar: avatarUrl
+          avatar_url: avatarUrl
         })
 
         // Save character position to localStorage (debounced - max once per 500ms)
