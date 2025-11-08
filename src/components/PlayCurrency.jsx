@@ -55,7 +55,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             .select('*')
             .eq('user_id', userId)
             .order('created_at', { ascending: true })
-            .catch(err => ({ data: null, error: err }))
           if (!e && data) {
             if (mounted) {
               setCharactersList(data || [])
