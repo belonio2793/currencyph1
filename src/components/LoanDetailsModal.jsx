@@ -272,35 +272,38 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-4 items-center">
-                    <div className="flex items-center gap-3">
+                  <div className="space-y-3 mb-4">
+                    <div className="flex items-center gap-4">
                       {borrowerInfo?.profile_image_url ? (
                         <img src={borrowerInfo.profile_image_url} alt={borrowerInfo.display_name || 'avatar'} className="w-12 h-12 rounded-full object-cover" />
                       ) : (
                         <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-sm text-slate-600">{(borrowerInfo?.display_name || loan.display_name || loan.user_id || 'U').toString().substring(0,1).toUpperCase()}</div>
                       )}
-                      <div>
-                        <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Name</p>
-                        <div className="flex items-center gap-2">
-                          <p className="font-medium text-slate-900">{borrowerInfo?.display_name || loan.display_name || borrowerInfo?.email || 'Not provided'}</p>
-                          <button onClick={() => setShowProfileModal(true)} className="text-xs px-2 py-1 bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
+
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <p className="font-medium text-slate-900 text-lg">{borrowerInfo?.display_name || loan.display_name || borrowerInfo?.email || 'Not provided'}</p>
+                          <button onClick={() => setShowProfileModal(true)} className="ml-2 px-3 py-1 text-sm bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
                         </div>
                       </div>
+
                     </div>
 
-                    <div>
-                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">City</p>
-                      <p className="font-medium text-slate-900">{loan.city}</p>
-                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold mb-1">City</p>
+                        <p className="font-medium text-slate-900">{loan.city || '—'}</p>
+                      </div>
 
-                    <div>
-                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Phone</p>
-                      <p className="font-medium text-slate-900">{borrowerInfo?.phone_number || loan.phone_number || 'Not provided'}</p>
-                    </div>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Phone</p>
+                        <p className="font-medium text-slate-900">{borrowerInfo?.phone_number || loan.phone_number ? (borrowerInfo?.phone_number || loan.phone_number) : 'Not provided'}</p>
+                      </div>
 
-                    <div>
-                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Member Since</p>
-                      <p className="font-medium text-slate-900">{borrowerInfo?.created_at ? new Date(borrowerInfo.created_at).toLocaleDateString() : 'Recently'}</p>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Member Since</p>
+                        <p className="font-medium text-slate-900">{borrowerInfo?.created_at ? new Date(borrowerInfo.created_at).toLocaleDateString() : 'Recently'}</p>
+                      </div>
                     </div>
                   </div>
 
