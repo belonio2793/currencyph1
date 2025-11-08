@@ -1,5 +1,7 @@
 import * as Supabase from '@supabase/supabase-js'
 
+import { createClient } from '@supabase/supabase-js'
+
 // Helper to read env both in browser (import.meta.env) and Node (process.env)
 const getEnv = (name) => {
   try {
@@ -53,13 +55,10 @@ function initClient() {
         const controller = new AbortController()
         const id = setTimeout(() => controller.abort(), timeoutMs)
         try {
-          const baseFetch = (globalThis && globalThis.fetch) ? globalThis.fetch.bind(globalThis) : fetch
-          const res = await baseFetch(input, {
-            ...init,
-            cache: 'no-store',
-            mode: 'cors',
-            signal: controller.signal
-          })
+          const baseFetch = (typeof globalThis !== 'undefined' && globalThis.fetch) ? globalThis.fetch.bind(globalThis) : fetch
+          // Merge init but avoid forcing 'mode' which can break in some environments
+          const merged = Object.assign({}, init, { signal: controller.signal })
+          const res = await baseFetch(input, merged)
           clearTimeout(id)
           return res
         } catch (err) {
@@ -71,7 +70,8 @@ function initClient() {
       throw lastErr || new Error('Network error')
     }
 
-    _client = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    // Initialize supabase client using createClient
+    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       global: {
         fetch: customFetch,
         headers: { apikey: SUPABASE_ANON_KEY }
