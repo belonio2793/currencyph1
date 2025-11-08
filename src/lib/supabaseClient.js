@@ -49,7 +49,9 @@ function initClient() {
     // Initialize supabase client using the default fetch implementation to avoid issues with
     // instrumented or proxied fetch implementations in some environments (e.g. FullStory, dev proxies).
     try {
-      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      // Prefer using native window.fetch when available to avoid proxy/instrumentation causing network errors
+      const fetchImpl = (typeof window !== 'undefined' && window.fetch) ? window.fetch.bind(window) : undefined
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, fetchImpl ? { global: { fetch: fetchImpl } } : undefined)
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
       _client = createDummyClient()
