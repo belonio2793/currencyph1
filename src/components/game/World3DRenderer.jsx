@@ -330,12 +330,21 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
 
     otherPlayers.forEach(player => {
       if (!world3DRef.current.players.has(player.user_id)) {
-        const avatarUrl = player.rpm_avatar || null
+        const avatarUrl = player.avatar_url || player.avatarUrl || player.rpm_avatar || null
         if (avatarUrl) {
           world3DRef.current.addPlayer(
             player.user_id,
             player.character_name || player.name,
             avatarUrl,
+            player.x || 0,
+            player.y || 0
+          )
+        } else {
+          // add player without avatar
+          world3DRef.current.addPlayer(
+            player.user_id,
+            player.character_name || player.name,
+            null,
             player.x || 0,
             player.y || 0
           )
