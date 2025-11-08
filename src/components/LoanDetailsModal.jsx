@@ -28,6 +28,27 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
     loadBorrowerInfo()
   }, [loan])
 
+  useEffect(() => {
+    let mounted = true
+    const fetchBalance = async () => {
+      try {
+        if (!userId) return
+        const b = await tokenAPI.getUserBalance(userId)
+        if (mounted) setBalance(b)
+      } catch (err) {
+        console.debug('Could not fetch balance', err)
+      }
+    }
+    fetchBalance()
+    const sub = tokenAPI.subscribeToBalance(userId, (newBalance) => {
+      if (mounted) setBalance(newBalance)
+    })
+    return () => {
+      mounted = false
+      try { sub?.unsubscribe?.() } catch (e) {}
+    }
+  }, [userId])
+
   const loadBorrowerInfo = async () => {
     try {
       setLoading(true)
