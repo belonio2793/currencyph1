@@ -5,24 +5,11 @@ export const gameAPI = {
   async createCharacter(userId, name, appearance, homeCity = 'Manila') {
     try {
         // Normalize avatar thumbnail: support appearance.thumbnail or appearance.avatar_url
+      // Keep thumbnail/avatar_url as-is; do not upload to storage
       let finalAppearance = { ...(appearance || {}) }
       const incomingThumb = appearance?.thumbnail || appearance?.avatar_url || null
-      if (incomingThumb && typeof incomingThumb === 'string' && !incomingThumb.includes('supabase')) {
-        try {
-          const res = await fetch(incomingThumb)
-          if (res.ok) {
-            const blob = await res.blob()
-            const ext = blob.type?.split('/')?.[1] || 'png'
-            const path = `${userId}/${name}-${Date.now()}.${ext}`
-            const { error: upErr } = await supabase.storage.from('avatars').upload(path, blob)
-            if (!upErr) {
-              const { data: publicData } = supabase.storage.from('avatars').getPublicUrl(path)
-              finalAppearance = { ...finalAppearance, thumbnail: publicData.publicUrl }
-            }
-          }
-        } catch (e) {
-          console.warn('Failed to upload avatar thumbnail:', e.message)
-        }
+      if (incomingThumb && typeof incomingThumb === 'string') {
+        finalAppearance.thumbnail = incomingThumb
       }
 
       const { data, error } = await supabase
