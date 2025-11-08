@@ -482,6 +482,7 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                             onChange={(e) => setPaymentMethod(e.target.value)}
                             className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
                           >
+                            <option value="balance">{balance !== null ? `Balance (${loan.currency_code} ${Number(balance).toFixed(2)})` : 'Balance'}</option>
                             <option value="gcash">GCash</option>
                             <option value="bank_transfer">Bank Transfer</option>
                             <option value="crypto">Cryptocurrency</option>
