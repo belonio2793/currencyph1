@@ -387,7 +387,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-slate-900">My Loan Requests</h2>
               <button
-                onClick={() => setShowRequestModal(true)}
+                onClick={handleRequestLoanClick}
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
               >
                 + New Request
