@@ -63,8 +63,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-400 mb-8">
               <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
                 <div className="text-2xl mb-2"></div>
-                <div className="font-semibold text-slate-300">Create Avatar</div>
-                <div className="text-xs mt-1">Design your 3D character with ReadyPlayer.me</div>
+                <div className="font-semibold text-slate-300">Create Avatar (disabled)</div>
+                <div className="text-xs mt-1">Avatar feature removed — use a simple avatar or upload later</div>
               </div>
               <div className="p-3 bg-slate-700/30 rounded border border-slate-700/50">
                 <div className="text-2xl mb-2"></div>
