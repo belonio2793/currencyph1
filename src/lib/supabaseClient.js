@@ -75,12 +75,22 @@ function initClient() {
       throw lastErr || new Error('Network error')
     }
 
-    // Initialize supabase client using createClient
-    _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: {
-        fetch: customFetch
+    // Initialize supabase client using createClient (try with customFetch, fallback to default fetch on failure)
+    try {
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: {
+          fetch: customFetch
+        }
+      })
+    } catch (clientErr) {
+      console.warn('createClient with customFetch failed, falling back to default fetch:', clientErr && clientErr.message)
+      try {
+        _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      } catch (fallbackErr) {
+        console.error('Failed to initialize Supabase client:', fallbackErr)
+        _client = createDummyClient()
       }
-    })
+    }
   } else {
     _client = createDummyClient()
   }
