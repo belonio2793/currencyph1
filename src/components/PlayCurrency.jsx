@@ -399,13 +399,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 {/* Action Buttons */}
                 <div className="space-y-3 border-t border-slate-700 pt-4">
-                  <button
-                    onClick={() => setShowRPM(true)}
-                    className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white text-sm font-medium transition-colors"
-                    title="Edit your character avatar"
-                  >
-                    Edit Avatar
-                  </button>
+                  {/* Edit Avatar disabled (ReadyPlayer.me removed) */}
+                  <div className="text-xs text-slate-400 p-2 bg-slate-800 rounded">Avatar editing removed — use Characters panel to set an image URL.</div>
                   <button
                     onClick={handleDailyReward}
                     disabled={claimingReward}
