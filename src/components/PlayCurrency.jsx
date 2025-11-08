@@ -24,6 +24,8 @@ function formatMoney(n) {
 export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [loading, setLoading] = useState(true)
   const [character, setCharacter] = useState(null)
+  const [charactersList, setCharactersList] = useState([])
+  const [loadingChars, setLoadingChars] = useState(false)
   const [isWorking, setIsWorking] = useState(false)
   const [workProgress, setWorkProgress] = useState(0)
   const [properties, setProperties] = useState([])
@@ -44,24 +46,31 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     async function init() {
       try {
         setLoading(true)
-        // Try to load character from DB if logged in
+        // Try to load characters from DB if logged in
         if (userId) {
+          setLoadingChars(true)
           const { data, error: e } = await supabase
             .from('game_characters')
             .select('*')
             .eq('user_id', userId)
-            .limit(1)
-            .single()
+            .order('created_at', { ascending: true })
             .catch(err => ({ data: null, error: err }))
           if (!e && data) {
             if (mounted) {
-              setCharacter(data)
-              setProperties(data.properties || [])
+              setCharactersList(data || [])
+              // choose the first character as active if none selected
+              if (data && data.length > 0) {
+                setCharacter(data[0])
+                setProperties(data[0].properties || [])
+              } else {
+                setCharacter(null)
+              }
             }
           } else {
-            // no character -> leave null so UI prompts creation
+            setCharactersList([])
             setCharacter(null)
           }
+          setLoadingChars(false)
         } else {
           // Guest view: create ephemeral character in memory
           setCharacter((c) => c || {
@@ -173,8 +182,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   }
 
   const createCharacter = async ({ name, starterJob }) => {
+    const id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `ch_${Date.now()}_${Math.floor(Math.random()*10000)}`
     const newChar = {
-      id: userId ? `ch_${userId}` : 'guest_' + Math.random().toString(36).slice(2, 9),
+      id,
       name: name || (userEmail || 'Player'),
       user_id: userId || null,
       wealth: 500,
@@ -185,7 +195,25 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       last_daily: null
     }
     setCharacter(newChar)
-    if (userId) await saveCharacterToDB(newChar)
+    // persist to DB as a new row for this user
+    if (userId) {
+      try {
+        const { data: inserted, error: insertErr } = await supabase.from('game_characters').insert([newChar]).select().single()
+        if (!insertErr && inserted) {
+          setCharacter(inserted)
+          setCharactersList((prev) => (prev || []).concat(inserted))
+        } else {
+          // fallback to upsert
+          await saveCharacterToDB(newChar)
+          setCharactersList((prev) => (prev || []).concat(newChar))
+        }
+      } catch (e) {
+        console.warn('createCharacter insert failed', e)
+        setCharactersList((prev) => (prev || []).concat(newChar))
+      }
+    } else {
+      setCharactersList((prev) => (prev || []).concat(newChar))
+    }
     // announce presence/leaderboard
     if (userId) updatePresence({ action: 'join', char: { id: newChar.id, name: newChar.name } })
   }
@@ -295,6 +323,22 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  // Load all characters for a user
+  const loadCharactersForUser = async () => {
+    if (!userId) return
+    setLoadingChars(true)
+    try {
+      const { data, error } = await supabase.from('game_characters').select('*').eq('user_id', userId).order('created_at', { ascending: true })
+      if (!error && data) {
+        setCharactersList(data)
+      }
+    } catch (e) {
+      console.warn('loadCharactersForUser failed', e)
+    } finally {
+      setLoadingChars(false)
+    }
+  }
+
   // Presence: publish simple join/leave and listen for presence list
   const setupPresence = async () => {
     try {
@@ -379,6 +423,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     try {
       if (presenceTimerRef.current) { clearInterval(presenceTimerRef.current); presenceTimerRef.current = null }
       if (presenceChannelRef.current) {
+        try { await presenceChannelRef.current.send({ type: 'broadcast', event: 'character_update', payload: { action: 'leave', char: { id: character?.id, name: character?.name } } }) } catch(e){}
         try { await presenceChannelRef.current.unsubscribe() } catch (e) {}
         presenceChannelRef.current = null
       }
@@ -412,11 +457,29 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     setCharacter((c) => ({ ...c, name }))
   }
 
+  // delete a character
+  const deleteCharacter = async (id) => {
+    if (!id) return
+    try {
+      if (userId) {
+        await supabase.from('game_characters').delete().eq('id', id)
+      }
+      setCharactersList((prev) => (prev || []).filter(c => c.id !== id))
+      if (character && character.id === id) {
+        setCharacter(null)
+      }
+    } catch (e) {
+      console.warn('deleteCharacter failed', e)
+      setError('Could not delete character')
+    }
+  }
+
   const handleCreateAndSave = async (name) => {
     if (!name) return
     const starterJob = 'business'
+    const id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `ch_${Date.now()}_${Math.floor(Math.random()*10000)}`
     const newChar = {
-      id: userId ? `ch_${userId}` : 'guest_' + Math.random().toString(36).slice(2, 9),
+      id,
       name,
       user_id: userId || null,
       wealth: 800,
@@ -427,7 +490,23 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       last_daily: null
     }
     setCharacter(newChar)
-    if (userId) await saveCharacterToDB(newChar)
+    if (userId) {
+      try {
+        const { data: inserted, error: insertErr } = await supabase.from('game_characters').insert([newChar]).select().single()
+        if (!insertErr && inserted) {
+          setCharacter(inserted)
+          setCharactersList((prev) => (prev || []).concat(inserted))
+        } else {
+          await saveCharacterToDB(newChar)
+          setCharactersList((prev) => (prev || []).concat(newChar))
+        }
+      } catch (e) {
+        console.warn('handleCreateAndSave insert failed', e)
+        setCharactersList((prev) => (prev || []).concat(newChar))
+      }
+    } else {
+      setCharactersList((prev) => (prev || []).concat(newChar))
+    }
     if (userId) updatePresence({ action: 'join', char: { id: newChar.id, name: newChar.name } })
   }
 
