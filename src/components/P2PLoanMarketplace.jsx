@@ -516,7 +516,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="text-lg font-bold text-slate-900">{request.requested_amount} {request.currency_code}</h3>
                           {userId === request.user_id && (
-                            <span className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg">Your Request</span>
+                            <span className="inline-block text-xs font-semibold text-blue-700 border border-blue-100 px-2 py-1">Your Request</span>
                           )}
                         </div>
                         <p className="text-sm text-slate-600 mt-1">
