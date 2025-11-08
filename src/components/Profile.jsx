@@ -92,12 +92,16 @@ export default function Profile({ userId, onSignOut }) {
   }
 
   const loadVerificationStatus = async () => {
-    if (!userId || userId.includes('guest')) return
+    if (!userId || userId.includes('guest') || !isValidUUID(userId)) {
+      setVerificationStatus(null)
+      return
+    }
     try {
       const status = await p2pLoanService.getVerificationStatus(userId)
       setVerificationStatus(status)
     } catch (err) {
-      console.warn('Error loading verification status:', err)
+      console.warn('Could not load verification status (table may not exist yet):', err?.message || err)
+      setVerificationStatus(null)
     }
   }
 
@@ -108,18 +112,25 @@ export default function Profile({ userId, onSignOut }) {
       return
     }
 
+    if (isGuestAccount || !isValidUUID(userId)) {
+      setError('Guest accounts cannot submit verification. Please create an account first.')
+      return
+    }
+
     try {
       setVerifyingId(true)
+      setError('')
       const result = await p2pLoanService.submitVerification(userId, idFormData.idType, idFormData.idNumber, idFormData.idImageUrl)
       if (result.success) {
         setSuccess('Verification submitted! Awaiting review.')
         setShowIdForm(false)
         setIdFormData({ idType: 'national_id', idNumber: '', idImageUrl: '' })
         loadVerificationStatus()
+        setTimeout(() => setSuccess(''), 3000)
       }
     } catch (err) {
-      setError('Failed to submit verification: ' + (err.message || 'Unknown error'))
       console.error('Verification error:', err)
+      setError('Failed to submit verification: ' + (err?.message || 'Database table may not be initialized yet. Please try again later.'))
     } finally {
       setVerifyingId(false)
     }
