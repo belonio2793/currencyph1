@@ -21,7 +21,7 @@
    - Property suggestions based on wealth
 
 ### 3. **UI Components**
-   - **SpriteCustomizer** - Character customization (replaces ReadyPlayer.me)
+   - **SpriteCustomizer** - Character customization (replaces external avatar providers)
    - **PropertyMarket** - Buy/sell/upgrade properties interface
 
 ### 4. **Edge Function** (`supabase/functions/collect-passive-income/`)
