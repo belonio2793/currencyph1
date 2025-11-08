@@ -31,7 +31,6 @@ export default function EditLoanRequestModal({ userId, loan, onClose, onSuccess 
     return () => { mounted = false }
   }, [loan.id])
 
-  const totalOwed = amount ? Number(parseFloat(amount) * 1.1).toFixed(2) : '0.00'
 
   const validate = () => {
     if (!amount || parseFloat(amount) <= 0) { setError('Enter a valid amount'); return false }
@@ -111,10 +110,6 @@ export default function EditLoanRequestModal({ userId, loan, onClose, onSuccess 
                   <option value="EUR">EUR</option>
                 </select>
               </div>
-            </div>
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex flex-col justify-center">
-              <div className="text-xs text-slate-600">Total with 10% interest</div>
-              <div className="text-lg font-semibold text-blue-600">{totalOwed} {currency}</div>
             </div>
 
             <div>
