@@ -15,13 +15,14 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
 
   // Offer form state
   const [offerAmount, setOfferAmount] = useState(loan?.requested_amount || '')
-  const [interestRate, setInterestRate] = useState('12')
+  const [interestRate, setInterestRate] = useState('0')
   const [durationDays, setDurationDays] = useState('30')
-  const [repaymentSchedule, setRepaymentSchedule] = useState('monthly')
-  const [paymentMethod, setPaymentMethod] = useState('gcash')
+  const [repaymentSchedule, setRepaymentSchedule] = useState('lump_sum')
+  const [paymentMethod, setPaymentMethod] = useState('balance')
   const [usePlatformFacilitation, setUsePlatformFacilitation] = useState(false)
   const [submitLoading, setSubmitLoading] = useState(false)
   const [submitError, setSubmitError] = useState('')
+  const [balance, setBalance] = useState(null)
 
   useEffect(() => {
     loadBorrowerInfo()
