@@ -31,6 +31,9 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [lenderProfile, setLenderProfile] = useState(null)
+  const [userWallets, setUserWallets] = useState([])
+  const [loanTransactions, setLoanTransactions] = useState([])
+  const [networkStats, setNetworkStats] = useState(null)
 
   useEffect(() => {
     loadInitialData()
