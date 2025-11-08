@@ -922,7 +922,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             </div>
 
             {duelSession && (
-              <DuelMatch sessionId={duelSession.sessionId} player={character} opponent={duelSession.opponent} onEnd={endDuel} />
+              <DuelMatch
+                sessionId={duelSession.sessionId}
+                player={character}
+                opponent={duelSession.opponent}
+                onEnd={endDuel}
+                userId={userId}
+                userEmail={userEmail}
+              />
             )}
 
           </div>
