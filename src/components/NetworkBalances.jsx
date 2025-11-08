@@ -254,7 +254,15 @@ export default function NetworkBalances({ userId }) {
       case 'wallets':
         return { data: schemaData?.wallets || [], columns: ['id', 'currency_code', 'balance', 'total_deposited', 'total_withdrawn', 'is_active'] }
       case 'loans':
-        return { data: schemaData?.loans || [], columns: ['id', 'loan_type', 'requested_amount', 'total_owed', 'amount_paid', 'status', 'created_at'] }
+        // Hide sensitive loan information by default
+        return { data: (schemaData?.loans || []).map(loan => ({
+          id: loan.id,
+          loan_type: loan.loan_type,
+          requested_amount: loan.requested_amount,
+          status: loan.status,
+          created_at: loan.created_at
+          // Excluded: phone_number, display_name, email - these are sensitive
+        })), columns: ['id', 'loan_type', 'requested_amount', 'status', 'created_at'] }
       case 'wallet_transactions':
         return { data: schemaData?.wallet_transactions || [], columns: ['id', 'type', 'amount', 'currency_code', 'description', 'created_at'] }
       case 'loan_payments':
