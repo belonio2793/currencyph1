@@ -48,7 +48,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
 
   function handleAvatarExport(appearance) {
     setAvatarAppearance(appearance)
-    setShowAvatarCreator(false)
   }
 
   return (
