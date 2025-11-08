@@ -501,8 +501,27 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  const [duelSession, setDuelSession] = useState(null)
+
   const handleNameChange = (name) => {
     setCharacter((c) => ({ ...c, name }))
+  }
+
+  const startDuel = (sessionId, opponent) => {
+    setDuelSession({ sessionId, opponent })
+  }
+
+  const endDuel = async ({ winner }) => {
+    setDuelSession(null)
+    // award small reward to winner locally
+    try {
+      if (winner && character && winner === character.name) {
+        const updated = { ...character, wealth: Number(character.wealth || 0) + 100, xp: Number(character.xp || 0) + 20 }
+        setCharacter(updated)
+        persistCharacterPartial(updated)
+        if (userId) saveCharacterToDB(updated)
+      }
+    } catch (e) { console.warn('endDuel update failed', e) }
   }
 
   // delete a character
