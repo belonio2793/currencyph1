@@ -35,7 +35,8 @@ export default function UserProfileModal({ userId, onClose }) {
         }
       } catch (err) {
         console.error('Error loading user profile', err)
-        if (mounted) setError('Failed to load profile')
+        const msg = err && err.message ? err.message : JSON.stringify(err)
+        if (mounted) setError(`Failed to load profile: ${msg}`)
       } finally {
         if (mounted) setLoading(false)
       }
