@@ -231,24 +231,25 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         </div>
       </div>
 
-      {/* Verification Banner */}
-      {verificationStatus?.status !== 'approved' && userId && (
-        <div className="bg-amber-50 border-b border-amber-200 p-4">
+      {/* Optional Verification Banner */}
+      {userId && (
+        <div className="bg-blue-50 border-b border-blue-200 p-3">
           <div className="max-w-6xl mx-auto flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-amber-900">
-                ⚠️ Identity verification required to participate
-              </p>
-              <p className="text-xs text-amber-700 mt-1">
-                Submit your ID to start borrowing or lending
+              <p className="text-xs text-blue-700">
+                {verificationStatus?.status === 'approved' ?
+                  '✓ Your identity is verified. Lenders can trust your profile.' :
+                  'Consider verifying your identity to build trust with lenders (optional)'}
               </p>
             </div>
-            <button
-              onClick={() => setShowVerificationModal(true)}
-              className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 text-sm font-medium"
-            >
-              Verify Now
-            </button>
+            {verificationStatus?.status !== 'approved' && (
+              <button
+                onClick={() => setShowVerificationModal(true)}
+                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 font-medium"
+              >
+                Verify ID (Optional)
+              </button>
+            )}
           </div>
         </div>
       )}
