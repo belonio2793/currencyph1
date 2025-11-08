@@ -142,10 +142,23 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
           if (userIds.length > 0) {
             const { data: usersData } = await supabase
               .from('users')
-              .select('id, display_name, profile_image_url')
+              .select('id, email, phone_number, created_at')
               .in('id', userIds)
             const usersMap = (usersData || []).reduce((m, u) => (m[u.id] = u, m), {})
-            enriched = (enriched || []).map(r => ({ ...r, requester: usersMap[r.user_id] || null }))
+
+            // Try to attach profile summaries (avatar/display_name) from lender_profile_summary
+            let profileMap = {}
+            try {
+              const { data: profiles } = await supabase
+                .from('lender_profile_summary')
+                .select('user_id, display_name, profile_image_url')
+                .in('user_id', userIds)
+              profileMap = (profiles || []).reduce((m, p) => (m[p.user_id] = p, m), {})
+            } catch (e) {
+              console.debug('Could not fetch profile summaries', e)
+            }
+
+            enriched = (enriched || []).map(r => ({ ...r, requester: Object.assign({}, usersMap[r.user_id] || {}, profileMap[r.user_id] || {}) }))
           }
         } catch (e) {
           console.debug('Could not fetch requester profiles', e)
