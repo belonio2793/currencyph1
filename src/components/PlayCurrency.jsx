@@ -405,8 +405,23 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         if (!p) return
         // handle responses to our requests
         if (p.to === (userId || character?.id)) {
-          // simple notification: add to onlinePlayers or handle a match
-          setOnlinePlayers((prev) => prev.concat({ user_id: p.from, name: p.from_name || 'Opponent', status: p.accepted ? 'matched' : 'rejected' }))
+          if (p.accepted) {
+            // create a session and notify accepter (if they didn't send one) and start duel locally
+            const sessionId = `ms_${Date.now()}_${Math.floor(Math.random()*10000)}`
+            try { channel.send({ type: 'broadcast', event: 'match_started', payload: { sessionId, to: p.to, from: p.from, from_name: p.from_name, opponent_name: p.from_name } }) } catch(e){}
+            startDuel(sessionId, { id: p.from, name: p.from_name || 'Opponent' })
+          } else {
+            setOnlinePlayers((prev) => prev.concat({ user_id: p.from, name: p.from_name || 'Opponent', status: 'rejected' }))
+          }
+        }
+      })
+
+      channel.on('broadcast', { event: 'match_started' }, (payload) => {
+        const p = payload?.payload
+        if (!p) return
+        // if this match_started is targeting us, open duel
+        if (p.to === (userId || character?.id)) {
+          startDuel(p.sessionId, { id: p.from, name: p.from_name || p.opponent_name || 'Opponent' })
         }
       })
 
