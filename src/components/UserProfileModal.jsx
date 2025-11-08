@@ -14,14 +14,32 @@ export default function UserProfileModal({ userId, onClose }) {
     const load = async () => {
       try {
         setLoading(true)
+        // Query only safe columns from users (some deployments don't have extra columns)
         const { data: user, error: userError } = await supabase
           .from('users')
-          .select('id, email, display_name, phone_number, created_at')
+          .select('id, email, phone_number, created_at')
           .eq('id', userId)
-          .single()
-        if (userError) throw userError
+          .maybeSingle()
+
+        if (userError) {
+          // If the error is that column doesn't exist, fall back to empty profile
+          console.debug('user fetch error', userError)
+        }
+
         if (!mounted) return
-        setProfile(user)
+        setProfile(user || null)
+
+        // Try to get a richer profile from lender_profile_summary (may contain avatar/display name)
+        let profileSummary = null
+        try {
+          profileSummary = await p2pLoanService.getLenderProfile(userId)
+        } catch (e) {
+          console.debug('no profile summary', e)
+        }
+        if (mounted && profileSummary) {
+          // Merge fields
+          setProfile(prev => ({ ...(prev||{}), display_name: profileSummary.display_name || prev?.display_name, profile_image_url: profileSummary.profile_image_url || prev?.profile_image_url }))
+        }
 
         const v = await p2pLoanService.getVerificationStatus(userId)
         if (mounted) setVerification(v)
