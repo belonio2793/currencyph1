@@ -549,7 +549,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                               <p className="font-medium text-slate-900">{request.requester?.display_name || request.requester?.email || 'User'}</p>
                               <div className="flex items-center gap-2">
                                 <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-3 py-1 text-xs bg-white border border-slate-200 text-slate-700 rounded-md hover:bg-slate-50">View Profile</button>
-                                <button type="button" onClick={() => { const email = request.requester?.email; if (email) { window.open(`mailto:${email}?subject=Loan%20Inquiry&body=Hi`, '_blank'); } else { alert('User has no public email. Open their profile to request contact.'); } }} className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Message</button>
+                                <button type="button" onClick={() => { if (!userId) { alert('Please sign in to send messages'); return; } const otherUser = { id: request.user_id, email: request.requester?.email, full_name: request.requester?.display_name || request.requester?.email || 'User' }; window.dispatchEvent(new CustomEvent('openChatWithUser', { detail: { otherUser } })); }} className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Message</button>
                               </div>
                             </div>
                           </div>
