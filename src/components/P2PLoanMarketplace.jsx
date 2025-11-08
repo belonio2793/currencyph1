@@ -1019,6 +1019,13 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         />
       )}
 
+      {profileToView && (
+        <UserProfileModal
+          userId={profileToView}
+          onClose={() => setProfileToView(null)}
+        />
+      )}
+
       {selectedLenderId && !showSubmitOfferModal && !showOffersListModal && !showLoanDetails && (
         <LenderProfileView
           userId={userId}
