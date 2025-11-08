@@ -46,54 +46,13 @@ function createDummyClient() {
 function initClient() {
   if (_client) return _client
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    // Custom fetch with timeout and retries to avoid transient "Failed to fetch" in sandbox proxies
-    const customFetch = async (input, init = {}) => {
-      const retries = 2
-      const timeoutMs = 10000
-      let lastErr
-      for (let i = 0; i <= retries; i++) {
-        const controller = new AbortController()
-        const id = setTimeout(() => controller.abort(), timeoutMs)
-        try {
-          const baseFetch = (typeof globalThis !== 'undefined' && globalThis.fetch) ? globalThis.fetch.bind(globalThis) : fetch
-          // Merge init but avoid forcing 'mode' which can break in some environments
-          const merged = Object.assign({}, init, { signal: controller.signal })
-          console.debug(`[customFetch] attempt ${i+1} to fetch`, typeof input === 'string' ? input : (input && input.url) || input)
-          const res = await baseFetch(input, merged)
-          clearTimeout(id)
-          return res
-        } catch (err) {
-          lastErr = err
-          clearTimeout(id)
-          try {
-            const url = typeof input === 'string' ? input : input && input.url
-            const info = { name: err && err.name, message: err && err.message }
-            // If the error contains a response-like object, include status
-            if (err && err.response && err.response.status) info.status = err.response.status
-            console.warn(`[customFetch] attempt ${i+1} failed for ${url}`, info)
-          } catch (e) {}
-          // If aborted, do not retry immediately more than once
-          if (i < retries) await new Promise(r => setTimeout(r, 500 * (i + 1)))
-        }
-      }
-      throw lastErr || new Error('Network error')
-    }
-
-    // Initialize supabase client using createClient (try with customFetch, fallback to default fetch on failure)
+    // Initialize supabase client using the default fetch implementation to avoid issues with
+    // instrumented or proxied fetch implementations in some environments (e.g. FullStory, dev proxies).
     try {
-      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        global: {
-          fetch: customFetch
-        }
-      })
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     } catch (clientErr) {
-      console.warn('createClient with customFetch failed, falling back to default fetch:', clientErr && clientErr.message)
-      try {
-        _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      } catch (fallbackErr) {
-        console.error('Failed to initialize Supabase client:', fallbackErr)
-        _client = createDummyClient()
-      }
+      console.error('Failed to initialize Supabase client:', clientErr)
+      _client = createDummyClient()
     }
   } else {
     _client = createDummyClient()
