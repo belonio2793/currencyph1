@@ -503,6 +503,7 @@ export default function App() {
               <ul className="space-y-3 text-sm">
                 <li><button onClick={() => setActiveTab('poker')} className="text-slate-600 hover:text-slate-900 transition-colors">Poker</button></li>
                 <li><button onClick={() => setActiveTab('chess')} className="text-slate-600 hover:text-slate-900 transition-colors">Chess</button></li>
+                <li><button onClick={() => setActiveTab('play-currency')} className="text-slate-600 hover:text-slate-900 transition-colors">Play Currency</button></li>
               </ul>
             </div>
           </div>

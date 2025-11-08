@@ -46,15 +46,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
               </div>
             )}
-            {/* Play Currency - Left of Borrow Money */}
-            {userEmail && (
-              <button
-                onClick={() => onTabChange('play-currency')}
-                className="text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors cursor-pointer hidden sm:block"
-              >
-                Play Currency
-              </button>
-            )}
             {/* Borrow Money Dropdown - Next to Total Balance */}
             {userEmail && (
               <div className="relative hidden sm:block">
@@ -234,15 +225,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 </button>
               ))}
 
-              {/* Play Currency (Mobile) */}
-              {userEmail && (
-                <button
-                  onClick={() => { onTabChange('play-currency'); setMobileMenuOpen(false) }}
-                  className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50"
-                >
-                  Play Currency
-                </button>
-              )}
 
               {/* Mobile Borrow Money dropdown */}
               {userEmail && (
