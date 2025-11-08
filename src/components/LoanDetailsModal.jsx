@@ -282,7 +282,7 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
 
                       <div className="flex-1">
                         <div className="flex items-center gap-3">
-                          <p className="font-medium text-slate-900 text-lg">{borrowerInfo?.display_name || loan.display_name || borrowerInfo?.email || 'Not provided'}</p>
+                          <p className="font-medium text-slate-900 text-lg">{borrowerInfo?.display_name || borrowerInfo?.email || loan.display_name || 'User'}</p>
                           <button onClick={() => setShowProfileModal(true)} className="ml-2 px-3 py-1 text-sm bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
                         </div>
                       </div>
