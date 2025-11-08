@@ -143,22 +143,40 @@ CREATE TABLE game_daily_rewards (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- [PLANNED] Match History
+-- Match History (Duel Records)
 CREATE TABLE game_matches (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_id TEXT UNIQUE,
   player1_id UUID NOT NULL,
   player2_id UUID NOT NULL,
+  player1_name TEXT,
+  player2_name TEXT,
   winner_id UUID,
-  player1_hp_final INT,
-  player2_hp_final INT,
+  player1_final_hp INT DEFAULT 0,
+  player2_final_hp INT DEFAULT 0,
   duration_seconds INT,
+  total_rounds INT DEFAULT 0,
   reward_winner NUMERIC DEFAULT 100,
   reward_loser NUMERIC DEFAULT 25,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW(),
-  FOREIGN KEY (player1_id) REFERENCES game_characters(id),
-  FOREIGN KEY (player2_id) REFERENCES game_characters(id),
-  FOREIGN KEY (winner_id) REFERENCES game_characters(id)
+  status TEXT DEFAULT 'completed',
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX idx_game_matches_player1 ON game_matches(player1_id);
+CREATE INDEX idx_game_matches_player2 ON game_matches(player2_id);
+
+-- Match Actions Log (for validation and replay)
+CREATE TABLE game_match_actions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  match_id UUID NOT NULL,
+  player_id UUID NOT NULL,
+  action_type TEXT NOT NULL,
+  damage_dealt INT DEFAULT 0,
+  hp_remaining INT,
+  round_number INT,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  FOREIGN KEY (match_id) REFERENCES game_matches(id) ON DELETE CASCADE,
+  FOREIGN KEY (player_id) REFERENCES game_characters(id) ON DELETE CASCADE
 );
 ```
 
