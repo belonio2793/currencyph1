@@ -1,12 +1,17 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabaseClient'
+import ChatBar from '../ChatBar'
 
 export default function DuelMatch({ sessionId, player, opponent, onEnd }) {
   const [playerHP, setPlayerHP] = useState(100)
   const [opponentHP, setOpponentHP] = useState(100)
   const [logs, setLogs] = useState([])
   const [isAttacking, setIsAttacking] = useState(false)
+  const [matchStartTime] = useState(Date.now())
+  const [roundNumber, setRoundNumber] = useState(0)
+  const [matchEnded, setMatchEnded] = useState(false)
   const channelRef = useRef(null)
+  const actionsRef = useRef([])
 
   useEffect(() => {
     let mounted = true
