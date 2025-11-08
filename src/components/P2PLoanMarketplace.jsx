@@ -181,29 +181,6 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         </div>
       </div>
 
-      {/* Optional Verification Banner */}
-      {userId && (
-        <div className="bg-blue-50 border-b border-blue-200 p-3">
-          <div className="max-w-6xl mx-auto flex items-center justify-between">
-            <div>
-              <p className="text-xs text-blue-700">
-                {verificationStatus?.status === 'approved' ?
-                  '✓ Your identity is verified. Lenders can trust your profile.' :
-                  'Consider verifying your identity to build trust with lenders (optional)'}
-              </p>
-            </div>
-            {verificationStatus?.status !== 'approved' && (
-              <button
-                onClick={() => setShowVerificationModal(true)}
-                className="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700 font-medium"
-              >
-                Verify ID (Optional)
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-
       {error && (
         <div className="max-w-6xl mx-auto px-6 py-4">
           <div className="p-3 bg-red-50 border border-red-200 rounded text-sm text-red-700">
@@ -556,7 +533,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
             {/* P2P Loans Table Schema */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">📊 Loans Network Schema</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">���� Loans Network Schema</h3>
               <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 border-b border-slate-200">
