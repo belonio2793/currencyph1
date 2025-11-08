@@ -65,7 +65,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         }
       }
 
-      // Load loan requests for browsing
+      // Load loan requests for browsing (all pending loans including own)
       try {
         const { data: requests, error: reqError } = await supabase
           .from('loans')
@@ -73,7 +73,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
           .eq('lender_id', null)
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
-          .limit(20)
+          .limit(100)
 
         if (reqError) {
           console.warn('Could not load loan requests:', reqError)
