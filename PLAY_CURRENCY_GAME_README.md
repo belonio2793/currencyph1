@@ -207,29 +207,35 @@ CREATE TABLE game_match_actions (
 
 ## 🚀 Development Roadmap
 
-### Week 1: Duel Enhancement
-- [ ] Integrate ChatBar into duel sessions
-- [ ] Create game_matches table migration
-- [ ] Implement match persistence and history UI
-- [ ] Add match rewards system
+### Phase 1: Enhanced Duel System ✅ COMPLETE
+- [x] Integrate ChatBar into duel sessions
+- [x] Create game_matches table migration
+- [x] Implement match persistence and history UI
+- [x] Add match rewards system (100 credits winner, 25 loser)
+- [x] Server-side validation edge function
+- [x] Match statistics (win rate, duration, rounds)
 
-### Week 2: Mechanics & Polish
+### Phase 2: Mechanics & Polish (Next)
 - [ ] Implement turn timer (30s per action)
-- [ ] Add ability system with cooldowns
+- [ ] Add ability system with cooldowns and energy costs
 - [ ] Basic animations for attacks/damage
 - [ ] Sound effects (optional: use Web Audio API)
+- [ ] Status effects (stun, bleed, shield)
+- [ ] Improved damage calculation based on stats
 
-### Week 3: Social Features
-- [ ] Player profiles with match history
+### Phase 3: Social Features
+- [ ] Enhanced player profiles with stats display
 - [ ] Trading system for items/properties
-- [ ] Seasonal leaderboard resets
-- [ ] Achievement badges
+- [ ] Seasonal leaderboard resets with special rewards
+- [ ] Achievement/badge system
+- [ ] Spectate active matches
 
-### Week 4: Economy & World Systems
-- [ ] Random event system
+### Phase 4: Economy & World Systems
+- [ ] Random events affecting market
 - [ ] Tax/redistribution mechanics
-- [ ] NPC vendor system
+- [ ] NPC vendor system with dynamic pricing
 - [ ] Stock market prototype
+- [ ] Guild/clan system
 
 ---
 
