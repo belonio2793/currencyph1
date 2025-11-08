@@ -41,13 +41,14 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
       setLoading(true)
       setError('')
 
-      // Load verification status if userId exists
-      if (userId) {
+      // Load verification status if userId exists and is valid
+      if (userId && !userId.includes('guest')) {
         try {
           const verification = await p2pLoanService.getVerificationStatus(userId)
           setVerificationStatus(verification)
         } catch (err) {
-          console.warn('Could not load verification status:', err)
+          console.warn('Could not load verification status (table may not exist yet):', err?.message || err)
+          setVerificationStatus(null)
         }
 
         // Load lender profile
@@ -55,7 +56,8 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
           const profile = await p2pLoanService.getLenderProfile(userId)
           setLenderProfile(profile)
         } catch (err) {
-          console.warn('Could not load lender profile:', err)
+          console.warn('Could not load lender profile (table may not exist yet):', err?.message || err)
+          setLenderProfile(null)
         }
       }
 
@@ -533,7 +535,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
             {/* P2P Loans Table Schema */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">���� Loans Network Schema</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">📊 Loans Network Schema</h3>
               <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 border-b border-slate-200">
