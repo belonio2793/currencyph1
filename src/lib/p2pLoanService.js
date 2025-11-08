@@ -33,8 +33,9 @@ export const p2pLoanService = {
         .from('user_verifications')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
+      // Supabase REST returns 406 when no rows for single(); maybeSingle avoids that
       if (error && error.code !== 'PGRST116' && error.code !== '42P01') throw error
       return data || null
     } catch (err) {
