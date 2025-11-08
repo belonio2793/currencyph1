@@ -873,9 +873,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login</button>
                   )}
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-2">
-                  <button onClick={() => setCharacter(null)} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white text-sm">Switch Char</button>
-                  <button onClick={() => { if (typeof window !== 'undefined') window.location.hash = '#home'; setCharacter(null) }} className="px-3 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white text-sm">Main Menu</button>
+                <div className="mt-3 flex flex-col gap-2">
+                  <button onClick={() => setCharacter(null)} className="px-3 py-2 bg-slate-600 hover:bg-slate-500 rounded text-white text-sm font-medium">Characters & Create New</button>
                 </div>
               </div>
             </div>
