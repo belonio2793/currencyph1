@@ -371,6 +371,33 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                       </div>
                     </div>
 
+                    {/* Borrower Profile Section */}
+                    <div className="bg-slate-50 rounded-lg p-4 mb-4 border border-slate-100">
+                      <p className="text-xs text-slate-600 uppercase font-semibold mb-2">Borrower Profile</p>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div>
+                          <p className="text-xs text-slate-500">Name</p>
+                          <p className="font-medium text-slate-900">Borrower {request.user_id?.substring(0, 4)}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500">Verification</p>
+                          <p className="text-xs font-medium">
+                            {request.verification_status ? '✓ Verified' : 'Not verified'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500">Contact</p>
+                          <p className="text-xs font-medium text-blue-600">
+                            {request.phone_number ? request.phone_number : 'Via platform'}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-500">History</p>
+                          <p className="text-xs font-medium text-slate-900">First time borrowing</p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="flex gap-2">
                       {userId ? (
                         <>
