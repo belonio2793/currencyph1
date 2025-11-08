@@ -640,8 +640,8 @@ export default function ChatBar({ userId, userEmail }) {
                   <option value="online">Online</option>
                   <option value="busy">Busy</option>
                   <option value="away">Away</option>
-                  <option value="invisible">Invisible (Offline)</option>
-                  <option value="hide">Hide (no search)</option>
+                  <option value="invisible">Offline</option>
+                  <option value="hide">Hide</option>
                 </select>
               </div>
             </div>
