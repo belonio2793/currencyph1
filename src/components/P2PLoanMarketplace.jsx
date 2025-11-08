@@ -959,6 +959,15 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         />
       )}
 
+      {editingRequest && (
+        <EditLoanRequestModal
+          userId={userId}
+          loan={editingRequest}
+          onClose={() => setEditingRequest(null)}
+          onSuccess={() => { setEditingRequest(null); loadInitialData() }}
+        />
+      )}
+
       {showSubmitOfferModal && selectedLoanRequest && (
         <SubmitLoanOfferModal
           userId={userId}
