@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { p2pLoanService } from '../lib/p2pLoanService'
+import { tokenAPI } from '../lib/supabaseClient'
 
 export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer }) {
   const [borrowerInfo, setBorrowerInfo] = useState(null)
