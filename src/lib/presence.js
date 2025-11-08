@@ -1,7 +1,5 @@
 import { supabase } from './supabaseClient'
 
-import { supabase } from './supabaseClient'
-
 const PRESENCE_UPDATE_INTERVAL = 30000 // 30 seconds
 const OFFLINE_TIMEOUT = 120000 // 2 minutes
 
