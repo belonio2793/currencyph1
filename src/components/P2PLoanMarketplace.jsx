@@ -573,100 +573,155 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
             )}
           </div>
         ) : activeTab === 'network' ? (
-          /* Network Balances Tab */
+          /* Network Balances Tab - P2P Loans Schema */
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Network Balances & Transparency</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Network Balances - P2P Loans Ledger</h2>
 
-            {/* User Wallets */}
-            {userWallets.length > 0 && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Wallets</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {userWallets.map(wallet => (
-                    <div key={wallet.id} className="p-6 border border-slate-200 rounded-lg bg-gradient-to-br from-blue-50 to-blue-100">
-                      <p className="text-sm text-slate-600 uppercase tracking-wide font-semibold mb-2">
-                        {wallet.currency_code}
-                      </p>
-                      <p className="text-2xl font-bold text-slate-900">{Number(wallet.balance || 0).toFixed(2)}</p>
-                      <p className="text-xs text-slate-500 mt-2">
-                        Type: {wallet.wallet_type}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Network Stats */}
-            {networkStats && (
-              <div className="mb-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Network Status</h3>
-                <div className="p-6 border border-slate-200 rounded-lg bg-slate-50">
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    <div>
-                      <p className="text-sm text-slate-600 uppercase font-semibold">Status</p>
-                      <p className="text-lg font-bold text-slate-900 capitalize">{networkStats.status || 'active'}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-600 uppercase font-semibold">Total Balance</p>
-                      <p className="text-lg font-bold text-slate-900">{Number(networkStats.total_balance || 0).toFixed(2)} {networkStats.currency || 'PHP'}</p>
-                    </div>
-                    {networkStats.active_loans && (
-                      <div>
-                        <p className="text-sm text-slate-600 uppercase font-semibold">Active Loans</p>
-                        <p className="text-lg font-bold text-slate-900">{networkStats.active_loans}</p>
-                      </div>
+            {/* P2P Loans Table Schema */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">📊 Loans Network Schema</h3>
+              <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
+                <table className="w-full text-sm">
+                  <thead className="bg-slate-100 border-b border-slate-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-900">Borrower</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-900">Amount</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-900">Status</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-900">Lender</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-900">Interest</th>
+                      <th className="px-4 py-3 text-left font-semibold text-slate-900">Due Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-200">
+                    {myRequests && myRequests.length > 0 ? (
+                      myRequests.map(loan => (
+                        <tr key={loan.id} className="hover:bg-slate-50 transition-colors">
+                          <td className="px-4 py-3">
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-slate-900">{userEmail?.split('@')[0]}</span>
+                              {verificationStatus?.status === 'approved' && <span className="text-xs">✓</span>}
+                            </div>
+                          </td>
+                          <td className="px-4 py-3 font-medium">{loan.requested_amount} {loan.currency_code}</td>
+                          <td className="px-4 py-3">
+                            <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              loan.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                              loan.status === 'active' ? 'bg-blue-100 text-blue-800' :
+                              loan.status === 'completed' ? 'bg-green-100 text-green-800' :
+                              'bg-slate-100 text-slate-800'
+                            }`}>
+                              {loan.status.charAt(0).toUpperCase() + loan.status.slice(1)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3 text-slate-600">
+                            {loan.lender_id ? 'Assigned' : 'Seeking'}
+                          </td>
+                          <td className="px-4 py-3">
+                            {loan.interest_rate ? `${loan.interest_rate}%` : '-'}
+                          </td>
+                          <td className="px-4 py-3 text-slate-600 text-xs">
+                            {loan.due_date ? new Date(loan.due_date).toLocaleDateString() : '-'}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="px-4 py-8 text-center text-slate-600">
+                          No loan records in network
+                        </td>
+                      </tr>
                     )}
-                    {networkStats.discrepancy && (
-                      <div>
-                        <p className="text-sm text-slate-600 uppercase font-semibold">Reconciliation</p>
-                        <p className="text-lg font-bold text-green-600">✓ Reconciled</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                  </tbody>
+                </table>
               </div>
-            )}
-
-            {/* Loan Transactions */}
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Loan Transactions</h3>
-              {loanTransactions.length === 0 ? (
-                <div className="text-center py-12 bg-slate-50 rounded-lg">
-                  <p className="text-slate-600">No loan transactions recorded yet</p>
-                </div>
-              ) : (
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {loanTransactions.map(tx => (
-                    <div key={tx.id} className="p-4 border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="font-medium text-slate-900">
-                            {tx.transaction_type === 'payment' ? '📤 Payment' : '📥 Received'}
-                          </p>
-                          <p className="text-xs text-slate-500 mt-1">
-                            {new Date(tx.created_at).toLocaleDateString()} {new Date(tx.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className={`font-bold ${tx.transaction_type === 'payment' ? 'text-red-600' : 'text-green-600'}`}>
-                            {tx.transaction_type === 'payment' ? '-' : '+'}{Number(tx.amount || 0).toFixed(2)}
-                          </p>
-                          <p className="text-xs text-slate-600">{tx.payment_method || 'wallet'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
             </div>
 
-            {/* Transparency Info */}
-            <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-900">
-                <strong>🔒 Network Transparency:</strong> All transactions in this marketplace are recorded and reconciled across the network.
-                Your balances are updated in real-time and auditable through the network ledger.
+            {/* User Profiles in Network */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">👥 Network User Profiles</h3>
+              <div className="p-6 border border-slate-200 rounded-lg bg-slate-50">
+                <div className="space-y-4">
+                  {/* Current User Profile */}
+                  <div className="p-4 bg-white border border-slate-200 rounded-lg">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <p className="font-semibold text-slate-900 text-lg">
+                          {userEmail?.split('@')[0]}
+                        </p>
+                        <p className="text-xs text-slate-500 mt-1">Current User</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-2">
+                          {verificationStatus?.status === 'approved' ? (
+                            <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">
+                              ✓ ID Verified
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 bg-slate-100 text-slate-600 text-xs font-medium rounded">
+                              ID Not Verified
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold">Rating</p>
+                        <p className="text-lg font-bold text-slate-900">
+                          {lenderProfile?.rating ? renderStars(lenderProfile.rating) : 'No ratings'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold">Completed Loans</p>
+                        <p className="text-lg font-bold text-slate-900">{lenderProfile?.completed_loans_count || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold">Active Loans</p>
+                        <p className="text-lg font-bold text-slate-900">{lenderProfile?.active_loans_count || 0}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold">Contact</p>
+                        <p className="text-sm font-medium text-blue-600">{myRequests?.[0]?.phone_number || 'Not provided'}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Active Lenders Info */}
+                  {loanOffers && loanOffers.length > 0 && (
+                    <div className="mt-4 p-4 bg-white border border-slate-200 rounded-lg">
+                      <p className="text-sm font-semibold text-slate-900 mb-3">Connected Lenders</p>
+                      <div className="space-y-2">
+                        {loanOffers.map(offer => (
+                          <div key={offer.id} className="flex items-center justify-between text-sm p-2 bg-slate-50 rounded">
+                            <div>
+                              <p className="font-medium text-slate-900">Lender Offer</p>
+                              <p className="text-xs text-slate-600">{offer.interest_rate}% interest • {offer.duration_days} days</p>
+                            </div>
+                            <span className="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-700 rounded">
+                              {offer.status}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Network Transparency Info */}
+            <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900 mb-2">
+                <strong>🔗 Network Transparency:</strong>
               </p>
+              <ul className="text-sm text-blue-800 space-y-1 ml-4 list-disc">
+                <li>All loans are recorded in the network ledger</li>
+                <li>User names are visible only through accepted offers (not public IDs)</li>
+                <li>Phone numbers are shared only between borrower and lender for direct contact</li>
+                <li>Ratings and history scores are public to build trust</li>
+                <li>ID verification is optional and shown as a trust indicator</li>
+              </ul>
             </div>
           </div>
         ) : null}
