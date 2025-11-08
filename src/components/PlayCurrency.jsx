@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import IsometricGameMap from './game/IsometricGameMap'
+import DuelMatch from './game/DuelMatch'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
 // Stores and syncs with Supabase when available (uses tables: game_characters, game_assets, game_presence, game_leaderboard, game_daily_rewards).
