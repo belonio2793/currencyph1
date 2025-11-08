@@ -55,11 +55,10 @@ function initClient() {
         const controller = new AbortController()
         const id = setTimeout(() => controller.abort(), timeoutMs)
         try {
-          const res = await fetch(input, {
+          const baseFetch = (globalThis && globalThis.fetch) ? globalThis.fetch.bind(globalThis) : fetch
+          const res = await baseFetch(input, {
             ...init,
-            // Prevent caching/proxy weirdness
             cache: 'no-store',
-            // Explicitly set mode/cors for clarity
             mode: 'cors',
             signal: controller.signal
           })
