@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import ChatBar from '../ChatBar'
 
-export default function DuelMatch({ sessionId, player, opponent, onEnd }) {
+export default function DuelMatch({ sessionId, player, opponent, onEnd, userId, userEmail }) {
   const [playerHP, setPlayerHP] = useState(100)
   const [opponentHP, setOpponentHP] = useState(100)
   const [logs, setLogs] = useState([])
