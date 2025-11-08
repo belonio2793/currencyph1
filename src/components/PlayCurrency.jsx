@@ -190,41 +190,75 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   }
 
   const createCharacter = async ({ name, starterJob }) => {
-    const id = (typeof crypto !== 'undefined' && crypto.randomUUID) ? crypto.randomUUID() : `ch_${Date.now()}_${Math.floor(Math.random()*10000)}`
+    if (!name || !name.trim()) {
+      throw new Error('Character name is required')
+    }
+
     const newChar = {
-      id,
-      name: name || (userEmail || 'Player'),
+      name: name.trim(),
       user_id: userId || null,
-      wealth: 500,
+      level: 1,
+      experience: 0,
+      money: starterJob === 'business' ? 2000 : 500,
+      home_city: 'Manila',
+      current_location: 'Manila',
+      health: 100,
+      max_health: 100,
+      energy: 100,
+      max_energy: 100,
+      hunger: 100,
+      base_speed: 5,
+      appearance: {
+        gender: 'male',
+        skin_tone: 'medium',
+        hair_style: 'short',
+        height: 175,
+        build: 'average',
+        hair_color: 'black'
+      },
+      wealth: starterJob === 'business' ? 2000 : 500,
       income_rate: starterJob === 'business' ? 2 : 0,
       xp: 0,
-      level: 1,
       properties: [],
       last_daily: null
     }
+
     setCharacter(newChar)
-    // persist to DB as a new row for this user
+
     if (userId) {
       try {
-        const { data: inserted, error: insertErr } = await supabase.from('game_characters').insert([newChar]).select().single()
-        if (!insertErr && inserted) {
+        const { data: inserted, error: insertErr } = await supabase
+          .from('game_characters')
+          .insert([newChar])
+          .select()
+          .single()
+
+        if (insertErr) {
+          console.error('Insert error:', insertErr)
+          throw insertErr
+        }
+
+        if (inserted) {
           setCharacter(inserted)
           setCharactersList((prev) => (prev || []).concat(inserted))
-        } else {
-          // fallback to upsert
-          await saveCharacterToDB(newChar)
-          setCharactersList((prev) => (prev || []).concat(newChar))
         }
       } catch (e) {
-        console.warn('createCharacter insert failed', e)
-        setCharactersList((prev) => (prev || []).concat(newChar))
+        console.error('Character creation failed:', e)
+        throw new Error('Failed to create character: ' + (e.message || String(e)))
       }
-      try { await loadCharactersForUser() } catch(e) { /* ignore */ }
+
+      try {
+        await loadCharactersForUser()
+      } catch(e) {
+        console.warn('Could not reload characters', e)
+      }
     } else {
       setCharactersList((prev) => (prev || []).concat(newChar))
     }
-    // announce presence/leaderboard
-    if (userId) updatePresence({ action: 'join', char: { id: newChar.id, name: newChar.name } })
+
+    if (userId) {
+      updatePresence({ action: 'join', char: { name: newChar.name } })
+    }
   }
 
   const performJob = async (job) => {
