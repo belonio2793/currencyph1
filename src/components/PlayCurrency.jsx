@@ -105,7 +105,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         console.error('Init error', err)
         setError('Could not initialize game: ' + (err.message || String(err)))
       } finally {
-        if (mounted) setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          setLoadingChars(false)
+        }
       }
     }
     init()
