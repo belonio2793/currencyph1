@@ -32,6 +32,11 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [leaderboard, setLeaderboard] = useState([])
   const passiveTimerRef = useRef(null)
   const presenceChannelRef = useRef(null)
+  const presenceTimerRef = useRef(null)
+  const [isIsometric, setIsIsometric] = useState(false)
+  const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
+  const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
+  const [matchRequests, setMatchRequests] = useState([])
 
   useEffect(() => {
     let mounted = true
@@ -294,21 +299,76 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     try {
       teardownPresence()
       const channel = supabase.channel('public:game_presence')
-      channel.on('presence', { event: 'sync' }, () => {})
-      // Listen for broadcasts
+
+      // Handle generic broadcasts for presence, matchmaking and updates
       channel.on('broadcast', { event: 'character_update' }, (payload) => {
-        // payload: { user_id, name, wealth }
-        if (payload && payload.payload) {
-          // Refresh leaderboard periodically
+        // payload: { action, char, user_id }
+        try {
+          const p = payload?.payload
+          if (!p) return
+          if (p.action === 'join' && p.char) {
+            setOnlinePlayers((prev) => {
+              if (prev.find(x => x.user_id === p.char.id || x.name === p.char.name)) return prev
+              return prev.concat({ user_id: p.char.id, name: p.char.name, status: 'online' })
+            })
+          }
+          if (p.action === 'leave' && p.char) {
+            setOnlinePlayers((prev) => prev.filter(x => x.user_id !== p.char.id && x.name !== p.char.name))
+          }
+          // Refresh leaderboard on updates
           loadLeaderboard()
+        } catch (e) { console.warn(e) }
+      })
+
+      channel.on('broadcast', { event: 'presence_heartbeat' }, (payload) => {
+        const p = payload?.payload
+        if (!p) return
+        setOnlinePlayers((prev) => {
+          const idx = prev.findIndex(x => x.user_id === p.user_id || x.name === p.name)
+          if (idx === -1) return prev.concat({ user_id: p.user_id, name: p.name, status: p.status || 'online' })
+          const copy = [...prev]
+          copy[idx] = { ...copy[idx], last_seen: new Date().toISOString(), status: p.status || 'online' }
+          return copy
+        })
+      })
+
+      // Matchmaking requests
+      channel.on('broadcast', { event: 'match_request' }, (payload) => {
+        const p = payload?.payload
+        if (!p) return
+        // add incoming request if it's not from us
+        if (p.user_id !== (userId || character?.id)) {
+          setMatchRequests((prev) => prev.concat(p))
+          // auto-respond with simple acceptance for demo: send match_response
+          setTimeout(() => {
+            try { channel.send({ type: 'broadcast', event: 'match_response', payload: { to: p.user_id, from: userId || character?.id, accepted: true } }) } catch(e){}
+          }, 1000 + Math.floor(Math.random() * 3000))
         }
       })
+
+      channel.on('broadcast', { event: 'match_response' }, (payload) => {
+        const p = payload?.payload
+        if (!p) return
+        // handle responses to our requests
+        if (p.to === (userId || character?.id)) {
+          // simple notification: add to onlinePlayers or handle a match
+          setOnlinePlayers((prev) => prev.concat({ user_id: p.from, name: p.from_name || 'Opponent', status: p.accepted ? 'matched' : 'rejected' }))
+        }
+      })
+
       await channel.subscribe()
       presenceChannelRef.current = channel
-      // broadcast join
-      await updatePresence({ action: 'join', char: { id: character?.id, name: character?.name } })
 
-      // Fetch list of subscribers using realtime presence API is not standardized across SDKs; instead rely on leaderboard and simple presence broadcasts
+      // broadcast join
+      await updatePresence({ action: 'join', char: { id: character?.id, name: character?.name }, user_id: userId || character?.id })
+
+      // start heartbeat to announce presence every 15s
+      presenceTimerRef.current = setInterval(() => {
+        try {
+          updatePresence({ action: 'heartbeat', user_id: userId || character?.id, name: character?.name, status: 'online' })
+        } catch (e) {}
+      }, 15000)
+
     } catch (err) {
       console.warn('setupPresence failed', err)
     }
@@ -316,6 +376,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   const teardownPresence = async () => {
     try {
+      if (presenceTimerRef.current) { clearInterval(presenceTimerRef.current); presenceTimerRef.current = null }
       if (presenceChannelRef.current) {
         try { await presenceChannelRef.current.unsubscribe() } catch (e) {}
         presenceChannelRef.current = null
@@ -326,7 +387,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const updatePresence = async (data) => {
     try {
       if (!presenceChannelRef.current) return
-      await presenceChannelRef.current.send({ type: 'broadcast', event: 'character_update', payload: data })
+      // choose event by action
+      const event = data && data.action === 'heartbeat' ? 'presence_heartbeat' : (data && data.type) || 'character_update'
+      await presenceChannelRef.current.send({ type: 'broadcast', event, payload: data })
     } catch (err) {
       console.warn('updatePresence failed', err)
     }
@@ -395,17 +458,48 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
 
               <div className="p-4">
-                <WorldMap onClickLocation={async (loc) => {
-                  // Simple click reward
-                  const reward = 10 + Math.floor(Math.random() * 40)
-                  setCharacter((c) => {
-                    const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
-                    persistCharacterPartial(updated)
-                    if (userId) saveCharacterToDB(updated)
-                    return updated
-                  })
-                  loadLeaderboard()
-                }} />
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-sm text-slate-400">Interact with the world below.</div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setIsIsometric(!isIsometric)} className="px-2 py-1 text-xs bg-slate-700 rounded">{isIsometric ? 'Switch to Grid' : 'Isometric View'}</button>
+                    <button onClick={() => requestMatch()} className="px-2 py-1 text-xs bg-amber-600 rounded text-black">Find Match</button>
+                  </div>
+                </div>
+
+                {isIsometric ? (
+                  <div style={{ height: 520 }} className="border border-slate-700 rounded">
+                    <IsometricGameMap
+                      properties={character.properties || []}
+                      character={character}
+                      city={character.current_location || character.home_city || 'Manila'}
+                      onPropertyClick={(property) => {
+                        // open quick buy modal: for now, give click reward
+                        const reward = 20 + Math.floor(Math.random() * 80)
+                        setCharacter((c) => {
+                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
+                          persistCharacterPartial(updated)
+                          if (userId) saveCharacterToDB(updated)
+                          return updated
+                        })
+                        loadLeaderboard()
+                      }}
+                      mapSettings={mapSettings}
+                      onCharacterMove={(pos) => setCharacterPosition(pos)}
+                    />
+                  </div>
+                ) : (
+                  <WorldMap onClickLocation={async (loc) => {
+                    // Simple click reward
+                    const reward = 10 + Math.floor(Math.random() * 40)
+                    setCharacter((c) => {
+                      const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
+                      persistCharacterPartial(updated)
+                      if (userId) saveCharacterToDB(updated)
+                      return updated
+                    })
+                    loadLeaderboard()
+                  }} />
+                )}
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                   {JOBS.map(job => (
