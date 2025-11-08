@@ -131,14 +131,6 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
         </div>
       </div>
 
-      {/* Avatar Creator Modal */}
-      <AvatarCreatorRPM
-        open={showAvatarCreator}
-        onClose={() => setShowAvatarCreator(false)}
-        onExport={handleAvatarExport}
-        userId={userId}
-        showCloseButton={true}
-      />
     </div>
   )
 }
