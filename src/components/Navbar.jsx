@@ -28,10 +28,9 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'my-business', label: 'My Business', auth: true }
   ]
 
-  // Borrow Money dropdown options
-  const borrowOptions = [
-    { id: 'borrow-personal', label: 'Personal Loan', auth: true },
-    { id: 'borrow-business', label: 'Business Loan', auth: true }
+  // Loans dropdown options
+  const loansOptions = [
+    { id: 'p2p-loans', label: 'P2P Loan Marketplace', auth: true }
   ]
 
   return (
@@ -70,7 +69,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                     <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 rounded-t-lg">
                       <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Loans</p>
                     </div>
-                    {borrowOptions.map(option => (
+                    {loansOptions.map(option => (
                       <button
                         key={option.id}
                         onClick={() => {
