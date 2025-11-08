@@ -346,6 +346,11 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                     </div>
                   </div>
                 </div>
+
+                {showProfileModal && (
+                  <UserProfileModal userId={loan.user_id} onClose={() => setShowProfileModal(false)} />
+                )}
+
               </div>
 
               {/* Recent Reviews */}
