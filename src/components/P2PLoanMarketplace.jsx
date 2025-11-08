@@ -39,44 +39,76 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
   const loadInitialData = async () => {
     try {
       setLoading(true)
-      
-      // Load verification status
-      const verification = await p2pLoanService.getVerificationStatus(userId)
-      setVerificationStatus(verification)
+      setError('')
 
-      // Load lender profile
-      const profile = await p2pLoanService.getLenderProfile(userId)
-      setLenderProfile(profile)
+      // Load verification status if userId exists
+      if (userId) {
+        try {
+          const verification = await p2pLoanService.getVerificationStatus(userId)
+          setVerificationStatus(verification)
+        } catch (err) {
+          console.warn('Could not load verification status:', err)
+        }
+
+        // Load lender profile
+        try {
+          const profile = await p2pLoanService.getLenderProfile(userId)
+          setLenderProfile(profile)
+        } catch (err) {
+          console.warn('Could not load lender profile:', err)
+        }
+      }
 
       // Load loan requests for browsing
-      const { data: requests } = await supabase
-        .from('loans')
-        .select('*')
-        .eq('lender_id', null)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false })
-        .limit(20)
+      try {
+        const { data: requests, error: reqError } = await supabase
+          .from('loans')
+          .select('*')
+          .eq('lender_id', null)
+          .eq('status', 'pending')
+          .order('created_at', { ascending: false })
+          .limit(20)
 
-      setLoanRequests(requests || [])
+        if (reqError) {
+          console.warn('Could not load loan requests:', reqError)
+        }
+        setLoanRequests(requests || [])
+      } catch (err) {
+        console.warn('Error loading loan requests:', err)
+      }
 
       if (userId) {
         // Load user's own requests
-        const { data: myReqs } = await supabase
-          .from('loans')
-          .select('*')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false })
+        try {
+          const { data: myReqs, error: myReqsError } = await supabase
+            .from('loans')
+            .select('*')
+            .eq('user_id', userId)
+            .order('created_at', { ascending: false })
 
-        setMyRequests(myReqs || [])
+          if (myReqsError) {
+            console.warn('Could not load user requests:', myReqsError)
+          }
+          setMyRequests(myReqs || [])
+        } catch (err) {
+          console.warn('Error loading user requests:', err)
+        }
 
         // Load user's submitted offers
-        const { data: offers } = await supabase
-          .from('loan_offers')
-          .select('*, loan_request:loan_request_id(*)')
-          .eq('lender_id', userId)
-          .order('created_at', { ascending: false })
+        try {
+          const { data: offers, error: offersError } = await supabase
+            .from('loan_offers')
+            .select('*, loan_request:loan_request_id(*)')
+            .eq('lender_id', userId)
+            .order('created_at', { ascending: false })
 
-        setLoanOffers(offers || [])
+          if (offersError) {
+            console.warn('Could not load loan offers:', offersError)
+          }
+          setLoanOffers(offers || [])
+        } catch (err) {
+          console.warn('Error loading loan offers:', err)
+        }
       }
     } catch (err) {
       console.error('Error loading data:', err)
