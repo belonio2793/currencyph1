@@ -48,6 +48,19 @@ export default function ChatBar({ userId, userEmail }) {
     loadRequests()
   }, [userId, activeTab])
 
+  // Allow other components to open the chat and start a conversation via a global event
+  useEffect(() => {
+    const handler = (e) => {
+      const otherUser = e?.detail?.otherUser
+      if (!otherUser) return
+      setMinimized(false)
+      setActiveTab('chats')
+      startChat(otherUser)
+    }
+    window.addEventListener('openChatWithUser', handler)
+    return () => window.removeEventListener('openChatWithUser', handler)
+  }, [])
+
   useEffect(() => {
     if (!userId || activeTab !== 'all') return
     loadAllUsers()
