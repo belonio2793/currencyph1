@@ -641,14 +641,26 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                       </div>
                     )}
 
-                    {request.status === 'active' && (
-                      <button
-                        onClick={() => markAsCompleted(request.id)}
-                        className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-                      >
-                        Mark as Completed
-                      </button>
-                    )}
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                      {request.status === 'pending' && !request.lender_id && (
+                        <button
+                          onClick={() => setEditingRequest(request)}
+                          className="flex-1 px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
+                        >
+                          Edit Request
+                        </button>
+                      )}
+
+                      {request.status === 'active' && (
+                        <button
+                          onClick={() => markAsCompleted(request.id)}
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+                        >
+                          Mark as Completed
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
