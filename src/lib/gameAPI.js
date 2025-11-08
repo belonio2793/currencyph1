@@ -65,7 +65,7 @@ export const gameAPI = {
 
   async updateCharacterAppearance(characterId, appearance) {
     try {
-      // Keep appearance shape simple and avoid ReadyPlayer.me specific nesting
+      // Keep appearance shape simple and avoid provider-specific nesting
       const cleanedAppearance = {
         ...(appearance || {})
       }
