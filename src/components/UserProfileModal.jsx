@@ -57,7 +57,12 @@ export default function UserProfileModal({ userId, onClose }) {
 
         <div className="p-4">
           {loading && <p className="text-sm text-slate-600">Loading...</p>}
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <div className="mb-4">
+              <p className="text-sm text-red-600">{error}</p>
+              <button onClick={() => { setError(''); setLoading(true); (async ()=>{ try { const { data: user, error: userError } = await supabase.from('users').select('id, email, display_name, phone_number, created_at').eq('id', userId).single(); if (userError) throw userError; setProfile(user); const v = await p2pLoanService.getVerificationStatus(userId); setVerification(v); const r = await p2pLoanService.getLenderRatings(userId); setRatings(r || []); } catch (e) { setError(e && e.message ? e.message : JSON.stringify(e)); } finally { setLoading(false) } })() }} className="mt-2 px-3 py-1 bg-blue-600 text-white rounded">Retry</button>
+            </div>
+          )}
 
           {profile && (
             <div className="space-y-4">
