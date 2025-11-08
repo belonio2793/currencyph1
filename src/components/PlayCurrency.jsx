@@ -478,6 +478,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       }
       // clear last-played if it referenced this id
       try { if (typeof window !== 'undefined') { const last = localStorage.getItem('game_last_played'); if (last === id) localStorage.removeItem('game_last_played') } } catch(e){}
+      try { await loadCharactersForUser() } catch(e) {}
     } catch (e) {
       console.warn('deleteCharacter failed', e)
       setError('Could not delete character')
