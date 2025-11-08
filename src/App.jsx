@@ -202,7 +202,7 @@ export default function App() {
           console.error('Failed to create user profile:', e)
           setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
         }
-        try { initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
+        try { if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
         try { await loadTotalBalance(user.id) } catch (e) { console.warn('loadTotalBalance failed', e) }
         // If user is authenticated, don't forcibly change the current route — let handleRouting manage it
         setShowAuth(false)
