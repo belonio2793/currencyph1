@@ -159,7 +159,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
               </div>
               <span className="text-2xl">💳</span>
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">P2P Loan Marketplace</h3>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Peer To Peer Loan Marketplace</h3>
             <p className="text-sm text-slate-600 mb-4">Browse loans • Submit offers • Manage your lending portfolio</p>
             <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Explore marketplace →</div>
           </button>
