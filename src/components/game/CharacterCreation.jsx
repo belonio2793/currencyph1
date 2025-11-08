@@ -113,7 +113,7 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
             <div className="pt-4">
               <button
                 type="submit"
-                disabled={creating || !avatarAppearance}
+                disabled={creating || !name.trim()}
                 className="w-full px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 transition-all"
               >
                 {creating ? 'Creating Adventure...' : 'Begin Adventure'}
