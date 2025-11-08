@@ -260,46 +260,35 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                     </div>
                   )}
 
-                  <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Name</p>
-                      {isViewingOwnLoan || hasAcceptedOffer ? (
-                        <p className="font-medium text-slate-900">
-                          {loan.display_name || 'Not provided'}
-                        </p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-4 items-center">
+                    <div className="flex items-center gap-3">
+                      {borrowerInfo?.profile_image_url ? (
+                        <img src={borrowerInfo.profile_image_url} alt={borrowerInfo.display_name || 'avatar'} className="w-12 h-12 rounded-full object-cover" />
                       ) : (
-                        <p className="font-medium text-slate-900 blur-sm select-none">
-                          {loan.display_name ? loan.display_name.substring(0, 1) + '***' : 'Not provided'}
-                        </p>
+                        <div className="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center text-sm text-slate-600">{(borrowerInfo?.display_name || loan.display_name || loan.user_id || 'U').toString().substring(0,1).toUpperCase()}</div>
                       )}
+                      <div>
+                        <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Name</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-slate-900">{borrowerInfo?.display_name || loan.display_name || borrowerInfo?.email || 'Not provided'}</p>
+                          <button onClick={() => setShowProfileModal(true)} className="text-xs px-2 py-1 bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
+                        </div>
+                      </div>
                     </div>
+
                     <div>
                       <p className="text-xs text-slate-600 uppercase font-semibold mb-1">City</p>
                       <p className="font-medium text-slate-900">{loan.city}</p>
                     </div>
+
                     <div>
-                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">
-                        Phone
-                      </p>
-                      {isViewingOwnLoan || hasAcceptedOffer ? (
-                        <p className="font-medium text-slate-900">{loan.phone_number || 'Not provided'}</p>
-                      ) : (
-                        <p className="font-medium text-slate-900">
-                          {loan.phone_number
-                            ? loan.phone_number.substring(0, 3) + '****' + loan.phone_number.substring(loan.phone_number.length - 2)
-                            : 'Not provided'}
-                        </p>
-                      )}
+                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Phone</p>
+                      <p className="font-medium text-slate-900">{borrowerInfo?.phone_number || loan.phone_number || 'Not provided'}</p>
                     </div>
+
                     <div>
-                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">
-                        Member Since
-                      </p>
-                      <p className="font-medium text-slate-900">
-                        {borrowerInfo?.created_at
-                          ? new Date(borrowerInfo.created_at).toLocaleDateString()
-                          : 'Recently'}
-                      </p>
+                      <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Member Since</p>
+                      <p className="font-medium text-slate-900">{borrowerInfo?.created_at ? new Date(borrowerInfo.created_at).toLocaleDateString() : 'Recently'}</p>
                     </div>
                   </div>
 
