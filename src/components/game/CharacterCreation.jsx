@@ -28,10 +28,8 @@ export default function CharacterCreation({ onCharacterCreated, userId }) {
       setError('Please enter a character name')
       return
     }
-    if (!avatarAppearance) {
-      setError('Please create an avatar first')
-      return
-    }
+    // Avatar optional now
+    setError('')
     setError('')
     doCreate()
   }
