@@ -76,10 +76,10 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
       }
       setHasAcceptedOffer(hasAccepted)
 
-      // Load borrower user info
+      // Load borrower user info (include display name, phone, avatar)
       const { data: borrower, error: borrowerError } = await supabase
         .from('users')
-        .select('id, email, created_at')
+        .select('id, email, created_at, display_name, profile_image_url, phone_number')
         .eq('id', loan.user_id)
         .single()
 
