@@ -146,42 +146,22 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Open inbox →</div>
           </button>
 
-          {/* Personal Loans Card */}
+          {/* P2P Loan Marketplace Card */}
           <button
-            onClick={() => onTabChange('borrow-personal')}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-amber-300 transition-all group"
+            onClick={() => onTabChange('p2p-loans')}
+            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group col-span-2"
           >
             <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-amber-100 group-hover:bg-amber-200 transition-colors">
-                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <span className="text-2xl">👤</span>
+              <span className="text-2xl">💳</span>
             </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Personal Loans</h3>
-            <p className="text-sm text-slate-600 mb-4">{personalLoans.length} loan{personalLoans.length !== 1 ? 's' : ''} • View details and manage payments</p>
-            <div className="text-sm font-medium text-amber-600 group-hover:text-amber-700">View →</div>
-          </button>
-
-          {/* Business Loans Card */}
-          <button
-            onClick={() => onTabChange('borrow-business')}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-indigo-300 transition-all group"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-100 group-hover:bg-indigo-200 transition-colors">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-                  <polyline points="17 21 17 13 7 13 7 21" />
-                  <polyline points="7 5 7 13 17 13 17 5" />
-                </svg>
-              </div>
-              <span className="text-2xl">🏢</span>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Business Loans</h3>
-            <p className="text-sm text-slate-600 mb-4">{businessLoans.length} loan{businessLoans.length !== 1 ? 's' : ''} • Manage your business financing</p>
-            <div className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">View →</div>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">P2P Loan Marketplace</h3>
+            <p className="text-sm text-slate-600 mb-4">Browse loans • Submit offers • Manage your lending portfolio</p>
+            <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Explore marketplace →</div>
           </button>
 
           {/* Poker Card */}
