@@ -304,10 +304,21 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
             ) : (
               <div className="grid grid-cols-1 gap-4">
                 {loanRequests.map(request => (
-                  <div key={request.id} className="border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div key={request.id} className={`border rounded-lg p-6 hover:shadow-md transition-shadow ${
+                    userId === request.user_id
+                      ? 'border-blue-300 bg-blue-50'
+                      : 'border-slate-200'
+                  }`}>
                     <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-bold text-slate-900">{request.requested_amount} {request.currency_code}</h3>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-lg font-bold text-slate-900">{request.requested_amount} {request.currency_code}</h3>
+                          {userId === request.user_id && (
+                            <span className="px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
+                              Your Request
+                            </span>
+                          )}
+                        </div>
                         <p className="text-sm text-slate-600 mt-1">
                           📍 {request.city} • {request.loan_type === 'personal' ? 'Personal' : 'Business'} Loan
                         </p>
