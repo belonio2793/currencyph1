@@ -248,7 +248,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8 px-6">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">P2P Loan Marketplace</h1>
+          <h1 className="text-3xl font-bold mb-2">Peer To Peer Loan Marketplace</h1>
           <p className="text-blue-100">Borrow or lend directly with other users in your community</p>
         </div>
       </div>
