@@ -74,7 +74,7 @@ export const p2pLoanService = {
         .from('lender_profile_summary')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116' && error.code !== '42P01') throw error
       return data || null
