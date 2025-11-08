@@ -34,12 +34,12 @@ export const p2pLoanService = {
         .select('*')
         .eq('user_id', userId)
         .single()
-      
-      if (error && error.code !== 'PGRST116') throw error
+
+      if (error && error.code !== 'PGRST116' && error.code !== '42P01') throw error
       return data || null
     } catch (err) {
-      console.error('Error fetching verification status:', err)
-      throw err
+      // Silently handle errors - verification is optional
+      return null
     }
   },
 
