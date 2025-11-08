@@ -31,9 +31,6 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [lenderProfile, setLenderProfile] = useState(null)
-  const [userWallets, setUserWallets] = useState([])
-  const [loanTransactions, setLoanTransactions] = useState([])
-  const [networkStats, setNetworkStats] = useState(null)
 
   useEffect(() => {
     loadInitialData()
@@ -113,53 +110,6 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
           console.warn('Error loading loan offers:', err)
         }
 
-        // Load user's wallets for network balances
-        try {
-          const { data: wallets, error: walletsError } = await supabase
-            .from('wallets')
-            .select('*')
-            .eq('user_id', userId)
-
-          if (walletsError) {
-            console.warn('Could not load wallets:', walletsError)
-          }
-          setUserWallets(wallets || [])
-        } catch (err) {
-          console.warn('Error loading wallets:', err)
-        }
-
-        // Load loan payment transactions
-        try {
-          const { data: transactions, error: txError } = await supabase
-            .from('loan_payments')
-            .select('*')
-            .or(`borrower_id.eq.${userId},lender_id.eq.${userId}`)
-            .order('created_at', { ascending: false })
-            .limit(50)
-
-          if (txError) {
-            console.warn('Could not load loan transactions:', txError)
-          }
-          setLoanTransactions(transactions || [])
-        } catch (err) {
-          console.warn('Error loading loan transactions:', err)
-        }
-
-        // Load network stats
-        try {
-          const { data: stats, error: statsError } = await supabase
-            .from('network_balances')
-            .select('*')
-            .eq('user_id', userId)
-            .single()
-
-          if (statsError && statsError.code !== 'PGRST116') {
-            console.warn('Could not load network stats:', statsError)
-          }
-          setNetworkStats(stats || null)
-        } catch (err) {
-          console.warn('Error loading network stats:', err)
-        }
       }
     } catch (err) {
       console.error('Error loading data:', err)
