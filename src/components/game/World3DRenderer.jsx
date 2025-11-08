@@ -164,7 +164,7 @@ export default function World3DRenderer({ character, userId, city = 'Manila', on
             x: 0,
             y: 0,
             direction: 0,
-            rpm_avatar: avatarUrl
+            avatar_url: avatarUrl
           })
         } catch(e) {
           console.warn('Could not update presence:', e)
