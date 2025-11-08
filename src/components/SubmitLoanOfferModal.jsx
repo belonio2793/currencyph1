@@ -1,13 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { p2pLoanService } from '../lib/p2pLoanService'
+import { tokenAPI } from '../lib/supabaseClient'
 
 const REPAYMENT_SCHEDULES = [
-  { value: 'lump_sum', label: 'Lump Sum (Full amount at end)' },
+  { value: 'lump_sum', label: 'One Time Lump Sum' },
   { value: 'monthly', label: 'Monthly Payments' },
   { value: 'weekly', label: 'Weekly Payments' }
 ]
 
-const PAYMENT_METHODS = [
+const PAYMENT_METHODS_STATIC = [
   { value: 'cash', label: '💵 Cash' },
   { value: 'gcash', label: '📱 GCash' },
   { value: 'crypto', label: '🔐 Crypto' },
@@ -18,15 +19,37 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [balance, setBalance] = useState(null)
 
   const [formData, setFormData] = useState({
     offeredAmount: loanRequest.requested_amount,
     interestRate: 5,
     durationDays: 180,
-    repaymentSchedule: 'monthly',
-    paymentMethod: 'gcash',
+    repaymentSchedule: 'lump_sum',
+    paymentMethod: 'balance',
     usePlatformFacilitation: false
   })
+
+  useEffect(() => {
+    let mounted = true
+    const fetchBalance = async () => {
+      try {
+        if (!userId) return
+        const bal = await tokenAPI.getUserBalance(userId)
+        if (mounted) setBalance(bal)
+      } catch (err) {
+        console.debug('Could not fetch balance', err)
+      }
+    }
+    fetchBalance()
+    const sub = tokenAPI.subscribeToBalance(userId, (newBalance) => {
+      if (mounted) setBalance(newBalance)
+    })
+    return () => {
+      mounted = false
+      try { sub?.unsubscribe?.() } catch (e) {}
+    }
+  }, [userId])
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -38,15 +61,15 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
     return date
   }
 
-  const calculateTotalWithInterest = () => {
-    const amount = parseFloat(formData.offeredAmount)
-    const interest = (amount * (parseFloat(formData.interestRate) / 100))
-    return amount + interest
+  const calculateInterestAmount = () => {
+    const amount = parseFloat(formData.offeredAmount) || 0
+    const interest = amount * (parseFloat(formData.interestRate) / 100)
+    return interest
   }
 
   const calculatePlatformFee = () => {
     if (!formData.usePlatformFacilitation) return 0
-    return parseFloat(formData.offeredAmount) * 0.10
+    return parseFloat(formData.offeredAmount || 0) * 0.10
   }
 
   const handleSubmit = async (e) => {
@@ -55,7 +78,6 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
     setLoading(true)
 
     try {
-      // Validation
       if (parseFloat(formData.offeredAmount) <= 0) {
         throw new Error('Offer amount must be greater than 0')
       }
@@ -86,7 +108,7 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
       setTimeout(() => {
         if (onSuccess) onSuccess()
         onClose()
-      }, 2000)
+      }, 1200)
     } catch (err) {
       setError(err.message || 'Failed to submit offer')
     } finally {
@@ -153,24 +175,35 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
             </p>
           </div>
 
-          {/* Interest Rate */}
+          {/* Interest Rate with Slider */}
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
               Interest Rate (%)
             </label>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              max="50"
-              value={formData.interestRate}
-              onChange={(e) => handleChange('interestRate', e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={loading}
-            />
-            <p className="text-xs text-slate-600 mt-1">
-              Set your interest rate (0-50%)
-            </p>
+            <div className="flex gap-3 items-center">
+              <input
+                type="number"
+                step="0.1"
+                min="0"
+                max="50"
+                value={formData.interestRate}
+                onChange={(e) => handleChange('interestRate', Number(e.target.value))}
+                className="w-1/3 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading}
+              />
+              <input
+                type="range"
+                min="0"
+                max="50"
+                step="0.1"
+                value={formData.interestRate}
+                onChange={(e) => handleChange('interestRate', Number(e.target.value))}
+                className="flex-1"
+                disabled={loading}
+              />
+              <div className="w-16 text-right text-sm text-slate-700">{formData.interestRate}%</div>
+            </div>
+            <p className="text-xs text-slate-600 mt-1">Set your interest rate (0-50%)</p>
           </div>
 
           {/* Duration */}
@@ -222,7 +255,8 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
               className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={loading}
             >
-              {PAYMENT_METHODS.map(method => (
+              <option value="balance">{balance !== null ? `Balance (${loanRequest.currency_code} ${Number(balance).toFixed(2)})` : 'Balance'}</option>
+              {PAYMENT_METHODS_STATIC.map(method => (
                 <option key={method.value} value={method.value}>
                   {method.label}
                 </option>
@@ -242,16 +276,16 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
               />
               <div>
                 <p className="text-sm font-medium text-slate-900">
-                  Use Platform for Transaction Facilitation
+                  To Use platform for secure exchange transaction (approval rate and 10% fee applies)
                 </p>
                 <p className="text-xs text-slate-600 mt-1">
-                  If checked, platform will take 10% fee from the total amount
+                  When enabled, platform may moderate and charge a 10% fee on the transaction.
                 </p>
               </div>
             </label>
           </div>
 
-          {/* Summary */}
+          {/* Summary (Interest & Platform Fee only) */}
           <div className="border-t pt-4 space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-700">Offered Amount:</span>
@@ -262,7 +296,7 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
             <div className="flex justify-between text-sm">
               <span className="text-slate-700">Interest ({formData.interestRate}%):</span>
               <span className="font-semibold text-slate-900">
-                {(parseFloat(formData.offeredAmount) * (parseFloat(formData.interestRate) / 100)).toFixed(2)} {loanRequest.currency_code}
+                {calculateInterestAmount().toFixed(2)} {loanRequest.currency_code}
               </span>
             </div>
             {formData.usePlatformFacilitation && (
@@ -273,12 +307,6 @@ export default function SubmitLoanOfferModal({ userId, loanRequest, onClose, onS
                 </span>
               </div>
             )}
-            <div className="flex justify-between text-base border-t pt-2">
-              <span className="font-bold text-slate-900">Total with Interest:</span>
-              <span className="font-bold text-blue-600">
-                {calculateTotalWithInterest().toFixed(2)} {loanRequest.currency_code}
-              </span>
-            </div>
           </div>
 
           {/* Submit Button */}
