@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import RequestLoanModal from './RequestLoanModal'
@@ -35,6 +35,56 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [lenderProfile, setLenderProfile] = useState(null)
+
+  // Browse tab filters
+  const [filters, setFilters] = useState({
+    city: '',
+    currency: '',
+    loanType: '',
+    minAmount: '',
+    maxAmount: '',
+    hasOffers: false,
+    verifiedOnly: false,
+    search: ''
+  })
+  const [sortBy, setSortBy] = useState('newest')
+
+  const cities = useMemo(() => (
+    Array.from(new Set((loanRequests || []).map(r => r.city).filter(Boolean))).sort()
+  ), [loanRequests])
+
+  const currencies = useMemo(() => (
+    Array.from(new Set((loanRequests || []).map(r => r.currency_code).filter(Boolean))).sort()
+  ), [loanRequests])
+
+  const filteredRequests = useMemo(() => {
+    let arr = [...(loanRequests || [])]
+
+    if (filters.city) arr = arr.filter(r => (r.city || '').toLowerCase() === filters.city.toLowerCase())
+    if (filters.currency) arr = arr.filter(r => r.currency_code === filters.currency)
+    if (filters.loanType) arr = arr.filter(r => r.loan_type === filters.loanType)
+    if (filters.minAmount !== '' && !Number.isNaN(Number(filters.minAmount))) arr = arr.filter(r => Number(r.requested_amount) >= Number(filters.minAmount))
+    if (filters.maxAmount !== '' && !Number.isNaN(Number(filters.maxAmount))) arr = arr.filter(r => Number(r.requested_amount) <= Number(filters.maxAmount))
+    if (filters.hasOffers) arr = arr.filter(r => (r.total_offers || 0) > 0)
+    if (filters.verifiedOnly) arr = arr.filter(r => !!r.verification_status)
+    if (filters.search) {
+      const q = filters.search.toLowerCase()
+      arr = arr.filter(r =>
+        (r.reason_for_loan || '').toLowerCase().includes(q) ||
+        (r.city || '').toLowerCase().includes(q) ||
+        String(r.requested_amount || '').toLowerCase().includes(q)
+      )
+    }
+
+    // Sort
+    const sorted = [...arr]
+    if (sortBy === 'newest') sorted.sort((a,b)=> new Date(b.created_at) - new Date(a.created_at))
+    else if (sortBy === 'amount_desc') sorted.sort((a,b)=> (Number(b.requested_amount||0) - Number(a.requested_amount||0)))
+    else if (sortBy === 'amount_asc') sorted.sort((a,b)=> (Number(a.requested_amount||0) - Number(b.requested_amount||0)))
+    else if (sortBy === 'city') sorted.sort((a,b)=> (a.city||'').localeCompare(b.city||''))
+
+    return sorted
+  }, [loanRequests, filters, sortBy])
 
   useEffect(() => {
     loadInitialData()
@@ -282,7 +332,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         ) : activeTab === 'browse' ? (
           /* Browse Loans Tab */
           <div>
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-slate-900">Available Loan Requests</h2>
               {userId && (
                 <button
@@ -294,6 +344,112 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
               )}
             </div>
 
+            {/* Filters */}
+            <div className="bg-white border border-slate-200 rounded-lg p-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-6 gap-3">
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Search</label>
+                  <input
+                    type="text"
+                    value={filters.search}
+                    onChange={e => setFilters({ ...filters, search: e.target.value })}
+                    placeholder="City, reason, or amount"
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">City</label>
+                  <select
+                    value={filters.city}
+                    onChange={e => setFilters({ ...filters, city: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="">All</option>
+                    {cities.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Currency</label>
+                  <select
+                    value={filters.currency}
+                    onChange={e => setFilters({ ...filters, currency: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="">All</option>
+                    {currencies.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Loan Type</label>
+                  <select
+                    value={filters.loanType}
+                    onChange={e => setFilters({ ...filters, loanType: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="">All</option>
+                    <option value="personal">Personal</option>
+                    <option value="business">Business</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Min Amount</label>
+                  <input
+                    type="number"
+                    value={filters.minAmount}
+                    onChange={e => setFilters({ ...filters, minAmount: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    min="0"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-600 mb-1">Max Amount</label>
+                  <input
+                    type="number"
+                    value={filters.maxAmount}
+                    onChange={e => setFilters({ ...filters, maxAmount: e.target.value })}
+                    className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    min="0"
+                  />
+                </div>
+              </div>
+              <div className="mt-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-4">
+                  <label className="inline-flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="w-4 h-4" checked={filters.hasOffers} onChange={e => setFilters({ ...filters, hasOffers: e.target.checked })} />
+                    Only with offers
+                  </label>
+                  <label className="inline-flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="w-4 h-4" checked={filters.verifiedOnly} onChange={e => setFilters({ ...filters, verifiedOnly: e.target.checked })} />
+                    Verified borrowers only
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs font-medium text-slate-600">Sort</label>
+                  <select
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                    className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="amount_desc">Amount: High → Low</option>
+                    <option value="amount_asc">Amount: Low → High</option>
+                    <option value="city">City (A–Z)</option>
+                  </select>
+                  <button
+                    onClick={() => { setFilters({ city:'', currency:'', loanType:'', minAmount:'', maxAmount:'', hasOffers:false, verifiedOnly:false, search:'' }); setSortBy('newest') }}
+                    className="px-3 py-2 border-2 border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
+                  >
+                    Reset
+                  </button>
+                </div>
+              </div>
+              <div className="mt-3 text-xs text-slate-600">Showing {filteredRequests.length} of {loanRequests.length} requests</div>
+            </div>
+
             {loanRequests.length === 0 ? (
               <div className="text-center py-12 bg-slate-50 rounded-lg">
                 <p className="text-slate-600 mb-4">No loan requests available right now</p>
@@ -301,9 +457,19 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                   <p className="text-sm text-slate-500">Sign in to submit your own loan request</p>
                 )}
               </div>
+            ) : filteredRequests.length === 0 ? (
+              <div className="text-center py-12 bg-slate-50 rounded-lg">
+                <p className="text-slate-600 mb-3">No results match your filters</p>
+                <button
+                  onClick={() => { setFilters({ city:'', currency:'', loanType:'', minAmount:'', maxAmount:'', hasOffers:false, verifiedOnly:false, search:'' }); setSortBy('newest') }}
+                  className="px-4 py-2 border-2 border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50 text-sm"
+                >
+                  Clear filters
+                </button>
+              </div>
             ) : (
               <div className="grid grid-cols-1 gap-4">
-                {loanRequests.map(request => (
+                {filteredRequests.map(request => (
                   <div key={request.id} className={`border rounded-lg p-6 hover:shadow-md transition-shadow ${
                     userId === request.user_id
                       ? 'border-blue-300 bg-blue-50'
