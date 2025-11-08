@@ -526,9 +526,19 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
                           <p className="text-xs text-slate-500">Name</p>
-                          <button type="button" onClick={() => setProfileToView(request.user_id)} className="font-medium text-slate-900 hover:underline text-left p-0">
-                            {request.display_name ? request.display_name : `Borrower ${request.user_id?.substring(0, 4)}`}
-                          </button>
+                          <div className="flex items-center gap-2">
+                            {request.requester?.profile_image_url ? (
+                              <img src={request.requester.profile_image_url} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs text-slate-600">{(request.requester?.display_name || request.user_id || 'U').toString().substring(0,1).toUpperCase()}</div>
+                            )}
+
+                            <button type="button" onClick={() => setProfileToView(request.user_id)} className="text-indigo-600 hover:text-indigo-800 no-underline p-0 text-left font-medium">
+                              {request.requester?.display_name ? request.requester.display_name : `Borrower ${request.user_id?.substring(0, 4)}`}
+                            </button>
+
+                            <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-2 py-1 text-xs bg-slate-100 rounded-md hover:bg-slate-200">View Profile</button>
+                          </div>
                         </div>
                         <div>
                           <p className="text-xs text-slate-500">Verification</p>
