@@ -544,6 +544,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         console.warn('handleCreateAndSave insert failed', e)
         setCharactersList((prev) => (prev || []).concat(newChar))
       }
+      try { await loadCharactersForUser() } catch(e) { /* ignore */ }
     } else {
       setCharactersList((prev) => (prev || []).concat(newChar))
     }
