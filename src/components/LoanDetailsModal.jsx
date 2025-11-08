@@ -217,12 +217,27 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Borrower Profile</h3>
                 <div className="border border-slate-200 rounded-lg p-4">
+                  {/* Privacy Notice */}
+                  {!isViewingOwnLoan && !hasAcceptedOffer && (
+                    <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-xs text-blue-800">
+                        ℹ️ Full contact details will be shared once an offer is accepted.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
                       <p className="text-xs text-slate-600 uppercase font-semibold mb-1">Name</p>
-                      <p className="font-medium text-slate-900">
-                        {loan.display_name || 'Not provided'}
-                      </p>
+                      {isViewingOwnLoan || hasAcceptedOffer ? (
+                        <p className="font-medium text-slate-900">
+                          {loan.display_name || 'Not provided'}
+                        </p>
+                      ) : (
+                        <p className="font-medium text-slate-900 blur-sm select-none">
+                          {loan.display_name ? loan.display_name.substring(0, 1) + '***' : 'Not provided'}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <p className="text-xs text-slate-600 uppercase font-semibold mb-1">City</p>
@@ -230,9 +245,17 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                     </div>
                     <div>
                       <p className="text-xs text-slate-600 uppercase font-semibold mb-1">
-                        Phone (Masked)
+                        Phone
                       </p>
-                      <p className="font-medium text-slate-900">{maskPhoneNumber(loan.phone_number)}</p>
+                      {isViewingOwnLoan || hasAcceptedOffer ? (
+                        <p className="font-medium text-slate-900">{loan.phone_number || 'Not provided'}</p>
+                      ) : (
+                        <p className="font-medium text-slate-900">
+                          {loan.phone_number
+                            ? loan.phone_number.substring(0, 3) + '****' + loan.phone_number.substring(loan.phone_number.length - 2)
+                            : 'Not provided'}
+                        </p>
+                      )}
                     </div>
                     <div>
                       <p className="text-xs text-slate-600 uppercase font-semibold mb-1">
