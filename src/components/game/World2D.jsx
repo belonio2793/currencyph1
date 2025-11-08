@@ -851,7 +851,7 @@ function renderWorld(ctx, canvas, world, otherPlayers, camera, options = {}) {
   ctx.arc(px, py, 24, 0, Math.PI * 2)
   ctx.fill()
   // core avatar (or image if available)
-  const localAvatar = world.player.avatarUrl || world.player.rpm_avatar || null
+  const localAvatar = world.player.avatarUrl || world.player.avatar_url || world.player.rpm_avatar || null
   if (localAvatar) {
     const img = getAvatarImage(localAvatar)
     const r = baseR
