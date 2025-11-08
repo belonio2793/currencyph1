@@ -500,7 +500,7 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                           className="w-4 h-4"
                         />
                         <label htmlFor="platform" className="text-sm text-slate-600">
-                          Use platform facilitation (10% fee applies)
+                          To Use platform for secure exchange transaction (approval rate and 10% fee applies)
                         </label>
                       </div>
 
