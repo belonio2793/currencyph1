@@ -516,9 +516,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                         <div className="flex items-center gap-2 mb-2">
                           <h3 className="text-lg font-bold text-slate-900">{request.requested_amount} {request.currency_code}</h3>
                           {userId === request.user_id && (
-                            <span className="px-2 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full">
-                              Your Request
-                            </span>
+                            <span className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg">Your Request</span>
                           )}
                         </div>
                         <p className="text-sm text-slate-600 mt-1">
@@ -548,8 +546,8 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                             <div className="flex items-center gap-3">
                               <p className="font-medium text-slate-900">{request.requester?.display_name || request.requester?.email || 'User'}</p>
                               <div className="flex items-center gap-2">
-                                <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-3 py-1 text-xs bg-white border border-slate-200 text-slate-700 rounded-md hover:bg-slate-50">View Profile</button>
-                                <button type="button" onClick={() => { if (!userId) { alert('Please sign in to send messages'); return; } const otherUser = { id: request.user_id, email: request.requester?.email, full_name: request.requester?.display_name || request.requester?.email || 'User' }; window.dispatchEvent(new CustomEvent('openChatWithUser', { detail: { otherUser } })); }} className="px-3 py-1 text-xs bg-blue-600 text-white rounded-md hover:bg-blue-700">Send Message</button>
+                                <button type="button" onClick={() => setProfileToView(request.user_id)} className="ml-2 px-4 py-2 text-sm bg-white border border-slate-200 text-slate-700 rounded-lg hover:bg-slate-50">View Profile</button>
+                                <button type="button" onClick={() => { if (!userId) { alert('Please sign in to send messages'); return; } const otherUser = { id: request.user_id, email: request.requester?.email, full_name: request.requester?.display_name || request.requester?.email || 'User' }; window.dispatchEvent(new CustomEvent('openChatWithUser', { detail: { otherUser } })); }} className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">Send Message</button>
                               </div>
                             </div>
                           </div>
@@ -674,9 +672,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                       </div>
                     ) : (
                       <div className="mb-4">
-                        <p className="text-sm text-slate-600 mb-2">
-                          Pending offers: {request.total_offers || 0}
-                        </p>
+                        <span className="inline-block px-4 py-2 text-sm bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-medium mb-2">Pending offers: {request.total_offers || 0}</span>
                         {request.total_offers > 0 && (
                           <button
                             onClick={() => handleViewOffers(request)}
