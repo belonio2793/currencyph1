@@ -139,7 +139,18 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
   const handleRequestSuccess = () => {
     setShowRequestModal(false)
+    setSelectedLoanType(null)
     loadInitialData()
+  }
+
+  const handleRequestLoanClick = () => {
+    setShowLoanTypeSelector(true)
+  }
+
+  const handleSelectLoanType = (loanType) => {
+    setSelectedLoanType(loanType)
+    setShowLoanTypeSelector(false)
+    setShowRequestModal(true)
   }
 
   const handleOfferSubmitted = () => {
