@@ -63,12 +63,12 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   onClick={() => setBorrowDropdownOpen(!borrowDropdownOpen)}
                   className="text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors cursor-pointer"
                 >
-                  Borrow Money
+                  Loans
                 </button>
                 {borrowDropdownOpen && (
                   <div className="absolute left-0 mt-2 w-56 bg-white border border-slate-200 rounded-lg shadow-xl z-50">
                     <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 rounded-t-lg">
-                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Borrow Money</p>
+                      <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Loans</p>
                     </div>
                     {borrowOptions.map(option => (
                       <button
@@ -248,7 +248,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               {/* Mobile Borrow Money dropdown */}
               {userEmail && (
                 <div className="border-t border-slate-100 mt-2 pt-2">
-                  <div className="text-xs font-bold text-green-700 px-3 py-2 uppercase tracking-wide">Borrow Money</div>
+                  <div className="text-xs font-bold text-green-700 px-3 py-2 uppercase tracking-wide">Loans</div>
                   {borrowOptions.map(option => (
                     <button
                       key={option.id}
