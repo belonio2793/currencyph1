@@ -70,7 +70,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
         const { data: requests, error: reqError } = await supabase
           .from('loans')
           .select('*')
-          .eq('lender_id', null)
+          .is('lender_id', null)
           .eq('status', 'pending')
           .order('created_at', { ascending: false })
           .limit(100)
