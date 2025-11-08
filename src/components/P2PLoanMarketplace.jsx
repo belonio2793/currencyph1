@@ -348,6 +348,12 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                     </div>
 
                     <div className="flex gap-2">
+                      <button
+                        onClick={() => handleViewLoanDetails(request)}
+                        className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 text-sm font-medium"
+                      >
+                        View Details
+                      </button>
                       {userId ? (
                         <>
                           {request.lender_id ? (
@@ -369,7 +375,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                                 onClick={() => handleViewOffers(request)}
                                 className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 text-sm font-medium"
                               >
-                                View Offers ({request.total_offers || 0})
+                                Offers ({request.total_offers || 0})
                               </button>
                             </>
                           )}
