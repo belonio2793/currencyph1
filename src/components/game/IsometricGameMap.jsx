@@ -182,6 +182,22 @@ export default function IsometricGameMap({
     const bottomColor = outfit?.bottom || '#2196f3'
 
     ctx.save()
+
+    // Working glow effect
+    if (isWorking) {
+      const glowIntensity = Math.sin(avatarAnimationFrame.current * 0.15) * 0.5 + 0.5
+      const glowAlpha = 0.3 + glowIntensity * 0.3
+      const glowRadius = 20 + Math.sin(avatarAnimationFrame.current * 0.1) * 5
+
+      const glowGrad = ctx.createRadialGradient(screenX + size / 2, screenY + size / 2, 0, screenX + size / 2, screenY + size / 2, glowRadius)
+      glowGrad.addColorStop(0, `rgba(255, 200, 0, ${glowAlpha})`)
+      glowGrad.addColorStop(1, 'rgba(255, 200, 0, 0)')
+      ctx.fillStyle = glowGrad
+      ctx.beginPath()
+      ctx.arc(screenX + size / 2, screenY + size / 2, glowRadius, 0, Math.PI * 2)
+      ctx.fill()
+    }
+
     if (avatarFacing === -1) {
       ctx.scale(-1, 1)
       screenX = -screenX - size
@@ -195,6 +211,15 @@ export default function IsometricGameMap({
     ctx.beginPath()
     ctx.arc(screenX + size / 2, screenY + size / 2, 16, 0, Math.PI * 2)
     ctx.fill()
+
+    ctx.save()
+    // Rotate when working
+    if (isWorking) {
+      const rotation = (avatarAnimationFrame.current * 0.08) % (Math.PI * 2)
+      ctx.translate(screenX + size / 2, screenY + size / 2)
+      ctx.rotate(rotation)
+      ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
+    }
 
     // shirt
     ctx.fillStyle = topColor
@@ -226,14 +251,15 @@ export default function IsometricGameMap({
     ctx.fill()
 
     // legs
-    const legOffset = isRunning ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 : 0
+    const legOffset = isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 : 0
     ctx.fillStyle = '#333'
     ctx.fillRect(screenX + 6, screenY + (2 * size) / 3, 5, size / 3 + legOffset)
     ctx.fillRect(screenX + size - 11, screenY + (2 * size) / 3, 5, size / 3 - legOffset)
 
     ctx.restore()
+    ctx.restore()
 
-    if (isRunning) {
+    if (isRunning && !isWorking) {
       // speed trail particles
       particlesRef.current.push({
         x: screenX + size / 2 + (avatarFacing === -1 ? -6 : 6),
@@ -244,7 +270,19 @@ export default function IsometricGameMap({
         color: 'rgba(59,130,246,0.7)'
       })
     }
-  }, [avatarFacing, avatarMoving, cosmetics])
+
+    // Working particles - energy burst effect
+    if (isWorking) {
+      particlesRef.current.push({
+        x: screenX + size / 2 + (Math.random() - 0.5) * 20,
+        y: screenY + (Math.random() - 0.5) * 20,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5 - 0.5,
+        life: 30,
+        color: `rgba(255, 200, 0, 0.8)`
+      })
+    }
+  }, [avatarFacing, avatarMoving, cosmetics, isWorking])
 
   const drawParticles = (ctx) => {
     const cam = { x: cameraPos.x, y: cameraPos.y, zoom }
