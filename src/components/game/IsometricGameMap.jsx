@@ -983,6 +983,10 @@ export default function IsometricGameMap({
     }
 
     const handleKeyDown = (e) => {
+      // Ignore movement keys when typing in inputs or when a modal has focus
+      const active = document.activeElement
+      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return
+
       keysPressed.current[e.key.toLowerCase()] = true
 
       // cancel click-to-move on manual input
@@ -990,7 +994,7 @@ export default function IsometricGameMap({
         moveTargetRef.current = null
       }
 
-      // Prevent default scroll behavior
+      // Prevent default scroll behavior for movement keys
       if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
         e.preventDefault()
       }
