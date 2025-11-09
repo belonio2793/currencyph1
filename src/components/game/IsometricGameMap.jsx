@@ -255,13 +255,17 @@ export default function IsometricGameMap({
     ctx.arc(screenX + size / 2, screenY - 6 + floatOffset, 8, 0, Math.PI * 2)
     ctx.fill()
 
-    // eyes
+    // eyes with blink animation
+    const blinkCycle = (avatarAnimationFrame.current % 120) // blink every 2 seconds
+    const isBlinking = blinkCycle > 110 // last 10 frames of cycle
+    const blinkHeight = isBlinking ? 0.5 : 2
+
     ctx.fillStyle = '#000'
     ctx.beginPath()
-    ctx.arc(screenX + size / 2 - 2, screenY - 8, 2, 0, Math.PI * 2)
+    ctx.arc(screenX + size / 2 - 2, screenY - 8 + floatOffset, blinkHeight, 0, Math.PI * 2)
     ctx.fill()
     ctx.beginPath()
-    ctx.arc(screenX + size / 2 + 2, screenY - 8, 2, 0, Math.PI * 2)
+    ctx.arc(screenX + size / 2 + 2, screenY - 8 + floatOffset, blinkHeight, 0, Math.PI * 2)
     ctx.fill()
 
     // hair
