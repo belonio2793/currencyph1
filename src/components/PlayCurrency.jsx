@@ -443,26 +443,39 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }, 100)
 
     setTimeout(async () => {
-      // reward
+      // reward with skill scaling based on difficulty and character level
       setCharacter((c) => {
         if (!c) return c
-        const updated = { ...c, wealth: Number(c.wealth || 0) + job.reward, xp: Number(c.xp || 0) + job.xp }
-        // level up logic
+        const charLevel = c.level || 1
+        const difficultyMultiplier = 0.8 + (job.difficulty * 0.1) // Higher difficulty = higher base reward
+        const levelMultiplier = 1 + (charLevel * 0.15) // Higher level = higher rewards (scales 15% per level)
+
+        // Scale reward and XP based on character level
+        const scaledReward = Math.floor(job.reward * levelMultiplier)
+        const scaledXP = Math.floor(job.xp * levelMultiplier)
+
+        const updated = { ...c, wealth: Number(c.wealth || 0) + scaledReward, xp: Number(c.xp || 0) + scaledXP }
+
+        // level up logic (every 100 xp = 1 level)
         const newLevel = Math.max(1, Math.floor((updated.xp || 0) / 100) + 1)
         if (newLevel !== updated.level) updated.level = newLevel
+
         // persist
         persistCharacterPartial(updated)
         return updated
       })
 
       // Update city stats
-      setCityStats((prev) => ({
-        ...prev,
-        [cityFocus]: {
-          jobsCompleted: (prev[cityFocus]?.jobsCompleted || 0) + 1,
-          moneyEarned: (prev[cityFocus]?.moneyEarned || 0) + job.reward
+      setCityStats((prev) => {
+        const scaledReward = Math.floor(job.reward * (1 + (character.level * 0.15)))
+        return {
+          ...prev,
+          [cityFocus]: {
+            jobsCompleted: (prev[cityFocus]?.jobsCompleted || 0) + 1,
+            moneyEarned: (prev[cityFocus]?.moneyEarned || 0) + scaledReward
+          }
         }
-      }))
+      })
 
       setIsWorking(false)
       setWorkingJobId(null)
