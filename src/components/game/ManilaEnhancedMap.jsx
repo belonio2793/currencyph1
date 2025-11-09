@@ -398,15 +398,33 @@ export default function ManilaEnhancedMap({
           <h3 className="font-bold text-slate-100">Manila City Map</h3>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setMapOffset({ x: 0, y: 0 })}
+              onClick={handleZoomOut}
+              disabled={zoom <= 0.5}
+              className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded text-slate-200 font-medium"
+              title="Zoom out (or scroll down)"
+            >
+              🔍−
+            </button>
+            <span className="text-xs text-slate-300 min-w-12 text-center font-semibold">{(zoom * 100).toFixed(0)}%</span>
+            <button
+              onClick={handleZoomIn}
+              disabled={zoom >= 3}
+              className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed rounded text-slate-200 font-medium"
+              title="Zoom in (or scroll up)"
+            >
+              🔍+
+            </button>
+            <button
+              onClick={handleResetView}
               className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-slate-200"
+              title="Reset zoom and pan"
             >
               Reset View
             </button>
           </div>
         </div>
         <div className="text-xs text-slate-400">
-          Left-click: Select district | Right-drag: Pan | Drag properties to reposition
+          Left-click: Select district | Right-drag: Pan | Mouse wheel: Zoom | Drag properties to reposition
         </div>
       </div>
 
