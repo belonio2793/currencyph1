@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import IsometricGameMap from './game/IsometricGameMap'
 import DuelMatch from './game/DuelMatch'
 import MatchHistory from './game/MatchHistory'
+import CharacterCustomizer from './game/CharacterCustomizer'
+import { validateCosmetics, DEFAULT_COSMETICS } from '../lib/characterCosmetics'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
 // Stores and syncs with Supabase when available (uses tables: game_characters, game_assets, game_presence, game_leaderboard, game_daily_rewards).
