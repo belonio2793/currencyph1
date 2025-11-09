@@ -1551,31 +1551,15 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 <div className="border border-slate-700 rounded overflow-hidden" style={{ height: 520 }}>
                   {mapViewMode === 'isometric' ? (
-                    <IsometricGameMap
+                    <PlayerView
                       properties={[...((character.properties || []).map(normalizeProperty)), ...((remoteAssets || []).map(normalizeProperty))].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i)}
                       character={character}
-                      city={cityFocus}
                       initialAvatarPos={initialAvatarPos}
-                      onConsumeEnergy={consumeEnergy}
-                      externalPlacingProperty={placingAsset}
+                      onCharacterMove={(pos) => setCharacterPosition(pos)}
+                      mapSettings={mapSettings}
+                      placingProperty={placingAsset}
                       onConfirmPlace={(coords) => confirmPlacement(coords)}
                       onCancelPlace={() => setPlacingAsset(null)}
-                      onPropertyClick={(property) => {
-                        const reward = 20 + Math.floor(Math.random() * 80)
-                        setCharacter((c) => {
-                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
-                          persistCharacterPartial(updated)
-                          if (userId) saveCharacterToDB(updated)
-                          return updated
-                        })
-                        loadLeaderboard()
-                      }}
-                      mapSettings={mapSettings}
-                      onCharacterMove={(pos) => setCharacterPosition(pos)}
-                      cosmetics={cosmetics}
-                      isWorking={isWorking}
-                      workProgress={workProgress}
-                      workingJobId={workingJobId}
                     />
                   ) : (
                     <WorldMap
@@ -1608,7 +1592,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                             {cityBonus > 0 && <span className="text-xs bg-emerald-600/40 text-emerald-300 px-2 py-0.5 rounded">+{bonusPercent}%</span>}
                           </div>
                           <div className="text-xs text-slate-400 mt-1">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
-                          <div className="text-xs text-slate-500 mt-1">Difficulty: {'��'.repeat(job.difficulty)}</div>
+                          <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
                         </div>
 
                         <div className="mt-3">
