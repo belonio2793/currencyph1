@@ -98,10 +98,19 @@ export default function IsometricGameMap({
     particlesRef.current = cleaned
   }, [])
 
-  // Mark static layer as dirty when properties or city changes (so it gets re-rendered)
-  useEffect(() => {
-    staticLayerDirtyRef.current = true
-  }, [selectedCity, properties])
+  // Viewport culling: calculate which tiles are visible to avoid drawing off-screen tiles
+  const getVisibleTileBounds = useCallback((cameraX, cameraY, zoomLevel, canvasWidth = 500, canvasHeight = 500) => {
+    // Calculate viewport bounds in world space
+    const halfWidth = canvasWidth / (2 * zoomLevel)
+    const halfHeight = canvasHeight / (2 * zoomLevel)
+
+    return {
+      minX: Math.max(0, Math.floor((cameraX - halfWidth) / TILE_SIZE) - 1),
+      maxX: Math.min(GRID_WIDTH, Math.ceil((cameraX + halfWidth) / TILE_SIZE) + 1),
+      minY: Math.max(0, Math.floor((cameraY - halfHeight) / TILE_SIZE) - 1),
+      maxY: Math.min(GRID_HEIGHT, Math.ceil((cameraY + halfHeight) / TILE_SIZE) + 1)
+    }
+  }, [])
 
   const PROPERTY_COLORS = {
     house: '#ff9800',
