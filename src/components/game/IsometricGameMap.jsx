@@ -813,13 +813,6 @@ export default function IsometricGameMap({
 
       avatarAnimationFrame.current++
 
-      if (npcManagerRef.current) {
-        npcManagerRef.current.update()
-      }
-      if (eventSystemRef.current) {
-        eventSystemRef.current.update()
-      }
-
       draw()
       animationRef.current = requestAnimationFrame(animate)
     }
