@@ -753,6 +753,30 @@ export default function IsometricGameMap({
           <div className="text-[10px] text-slate-300 mt-1 text-center">Mini-map</div>
         </div>
 
+        {/* Working Indicator */}
+        {isWorking && (
+          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-20">
+            <div className="bg-slate-900/90 border border-yellow-500/50 rounded-lg shadow-lg p-4 w-64">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></div>
+                  <span className="text-xs font-semibold text-yellow-300">{workingJobId}</span>
+                </div>
+                <span className="text-xs text-slate-400">{workProgress}%</span>
+              </div>
+              <div className="w-full bg-slate-700/50 rounded-full h-3 overflow-hidden">
+                <div
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-300 h-full rounded-full transition-all duration-100"
+                  style={{ width: `${workProgress}%` }}
+                ></div>
+              </div>
+              <div className="mt-2 text-center">
+                <div className="text-[10px] text-slate-400">Character is working...</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Tooltip */}
         {tooltipPos && tooltipData && (
           <div
