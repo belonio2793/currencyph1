@@ -774,27 +774,6 @@ export default function IsometricGameMap({
           style={{ display: 'block' }}
         />
 
-        {/* Collapsible Controls Help */}
-        <div className={`absolute top-2 left-2 transition-all duration-300 z-20 ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-          <div className="bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 text-xs text-slate-300">
-            <div className="flex items-center justify-between mb-1">
-              <div className="font-bold text-yellow-400">Controls</div>
-              <button
-                onClick={() => setShowControls(!showControls)}
-                className="ml-2 text-slate-400 hover:text-slate-200 transition"
-                title="Toggle controls"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="space-y-0.5">
-              <div>🎮 WASD / Arrows = Move</div>
-              <div>🖱�� Drag = Pan Map</div>
-              <div>🔍 Scroll = Zoom</div>
-              <div>Click = Job / Property</div>
-            </div>
-          </div>
-        </div>
 
         {/* Collapsible Minimap */}
         <CollapsibleMinimap
