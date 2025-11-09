@@ -218,7 +218,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     visitedAllCities: false,
     reachedLevel10: false,
     wonMultipleDuels: false,
-    achievedPassiveIncome100: false
+    achievedPassiveIncome100: false,
+    // Endgame phases
+    earnedWealth50000: false,
+    reachedLevel20: false,
+    achievedPassiveIncome500: false,
+    ownedAllPropertyTypes: false,
+    completedDailyStreak30: false,
+    wonTenDuels: false,
+    prestigeOnce: false,
+    prestigeLevel5: false,
+    maxedAllStats: false,
+    masterAllJobs: false
   })
 
   // Character stats specialization (upgrade with jobs)
