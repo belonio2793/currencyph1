@@ -85,6 +85,128 @@ export default function GamePlayerProfile({ playerId, onClose }) {
     }
   }
 
+  async function loadFollowStatus(userId, targetId) {
+    try {
+      const { data, error } = await supabase
+        .from('game_player_follows')
+        .select('id')
+        .eq('follower_id', userId)
+        .eq('following_id', targetId)
+        .single()
+
+      if (!error && data) {
+        setIsFollowing(true)
+      } else {
+        setIsFollowing(false)
+      }
+    } catch (err) {
+      console.warn('Failed to load follow status:', err)
+    }
+  }
+
+  async function loadBlockStatus(userId, targetId) {
+    try {
+      const { data, error } = await supabase
+        .from('game_player_blocks')
+        .select('id')
+        .eq('blocker_id', userId)
+        .eq('blocked_id', targetId)
+        .single()
+
+      if (!error && data) {
+        setIsBlocked(true)
+      } else {
+        setIsBlocked(false)
+      }
+    } catch (err) {
+      console.warn('Failed to load block status:', err)
+    }
+  }
+
+  async function handleFollow() {
+    if (!currentUserId || !playerId) return
+
+    try {
+      setActionLoading(true)
+
+      if (isFollowing) {
+        const { error } = await supabase
+          .from('game_player_follows')
+          .delete()
+          .eq('follower_id', currentUserId)
+          .eq('following_id', playerId)
+
+        if (error) throw error
+        setIsFollowing(false)
+      } else {
+        const { error } = await supabase
+          .from('game_player_follows')
+          .insert([
+            {
+              follower_id: currentUserId,
+              following_id: playerId,
+              created_at: new Date().toISOString()
+            }
+          ])
+
+        if (error) throw error
+        setIsFollowing(true)
+      }
+    } catch (err) {
+      console.error('Failed to toggle follow:', err)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  async function handleBlock() {
+    if (!currentUserId || !playerId) return
+
+    try {
+      setActionLoading(true)
+
+      if (isBlocked) {
+        const { error } = await supabase
+          .from('game_player_blocks')
+          .delete()
+          .eq('blocker_id', currentUserId)
+          .eq('blocked_id', playerId)
+
+        if (error) throw error
+        setIsBlocked(false)
+      } else {
+        const { error } = await supabase
+          .from('game_player_blocks')
+          .insert([
+            {
+              blocker_id: currentUserId,
+              blocked_id: playerId,
+              created_at: new Date().toISOString()
+            }
+          ])
+
+        if (error) throw error
+        setIsBlocked(true)
+      }
+    } catch (err) {
+      console.error('Failed to toggle block:', err)
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  function handleMessage() {
+    if (!currentUserId || !playerId) return
+    // This would navigate to a chat/messaging component
+    console.log('Message functionality - navigate to chat with player:', playerId)
+  }
+
+  function handleTrade() {
+    if (!currentUserId || !playerId) return
+    // This would navigate to trade request component
+    console.log('Trade functionality - initiate trade with player:', playerId)
+  }
+
   if (loading) {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
