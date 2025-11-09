@@ -8,6 +8,21 @@ A turn-based economic simulation minigame built into Currency.ph where players m
 
 ### ✅ IMPLEMENTED
 
+#### Advanced Combat System (Phase 2)
+- **Turn Timer**: 30-second countdown per action (auto-forfeit if time expires)
+- **5 Unique Abilities**:
+  - ⚔️ **Attack**: Basic attack 5-20 damage (instant)
+  - 💥 **Power Strike**: Devastating 15-40 damage (3-turn cooldown)
+  - 🛡️ **Counter**: Defensive stance blocks damage & counters (2-turn cooldown)
+  - 💚 **Heal**: Restore 30-50 HP (4-turn cooldown)
+  - ⚡ **Execute**: Ultimate 25-50 damage (6-turn cooldown)
+- **Ability Cooldowns**: Each ability has tactical cooldown to prevent spam
+- **Energy System**: Actions consume energy (displayed in-game)
+- **Status Effects**: Stun, Bleed, Shield, Poison, Regeneration with duration tracking
+- **Combat Animations**: Floating damage/heal numbers with visual effects
+- **Critical Hits**: 15% chance for 1.5x damage multiplier
+- **Smart AI Opponent**: Heals when HP is low, adapts to situation
+
 #### Character System
 - Create multiple characters per user (fixed UNIQUE constraint issue)
 - Character customization with avatar URLs
