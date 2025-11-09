@@ -20,7 +20,9 @@ CREATE TABLE IF NOT EXISTS public.game_characters (
   xp integer DEFAULT 0,
   level integer DEFAULT 1,
   properties jsonb DEFAULT '[]'::jsonb,
+  cosmetics jsonb DEFAULT '{}'::jsonb,
   last_daily timestamptz,
+  archived_at timestamptz,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
 );
@@ -36,6 +38,12 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='game_characters' AND column_name='last_daily') THEN
     ALTER TABLE public.game_characters ADD COLUMN last_daily timestamptz;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='game_characters' AND column_name='cosmetics') THEN
+    ALTER TABLE public.game_characters ADD COLUMN cosmetics jsonb DEFAULT '{}'::jsonb;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema='public' AND table_name='game_characters' AND column_name='archived_at') THEN
+    ALTER TABLE public.game_characters ADD COLUMN archived_at timestamptz;
   END IF;
 END$$;
 
