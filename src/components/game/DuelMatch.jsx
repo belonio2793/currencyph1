@@ -40,23 +40,31 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd, userId, 
     if (turn === 'player') {
       const newOpponentHealth = Math.max(0, opponentHealth - actualDamage)
       setOpponentHealth(newOpponentHealth)
-      setGameLog(prev => [...prev, `${player.name} uses ${action.name}! ${isHealing ? 'Heals' : 'Deals'} ${actualDamage} ${isHealing ? 'HP' : 'damage'}!`])
+      setGameLog(prev => {
+        const newLog = [...prev, `${player.name} uses ${action.name}! ${isHealing ? 'Heals' : 'Deals'} ${actualDamage} ${isHealing ? 'HP' : 'damage'}!`]
+        return newLog.length > MAX_LOG_ENTRIES ? newLog.slice(-MAX_LOG_ENTRIES) : newLog
+      })
       setSelectedAction(action.id)
 
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setTurn('opponent')
         setSelectedAction(null)
       }, 800)
+      timeoutIdsRef.current.push(timeoutId)
     } else {
       const newPlayerHealth = Math.max(0, playerHealth - actualDamage)
       setPlayerHealth(newPlayerHealth)
-      setGameLog(prev => [...prev, `${opponent.name} uses ${action.name}! ${isHealing ? 'Heals' : 'Deals'} ${actualDamage} ${isHealing ? 'HP' : 'damage'}!`])
+      setGameLog(prev => {
+        const newLog = [...prev, `${opponent.name} uses ${action.name}! ${isHealing ? 'Heals' : 'Deals'} ${actualDamage} ${isHealing ? 'HP' : 'damage'}!`]
+        return newLog.length > MAX_LOG_ENTRIES ? newLog.slice(-MAX_LOG_ENTRIES) : newLog
+      })
       setSelectedAction(action.id)
 
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         setTurn('player')
         setSelectedAction(null)
       }, 800)
+      timeoutIdsRef.current.push(timeoutId)
     }
   }
 
