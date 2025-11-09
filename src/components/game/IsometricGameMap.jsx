@@ -424,15 +424,18 @@ export default function IsometricGameMap({
     ctx.fill()
 
     ctx.save()
-    // Apply 360-degree rotation to character
+    // Apply directional rotation to character (clamped to prevent upside-down)
     if (isWorking) {
       const rotation = (avatarAnimationFrame.current * 0.08) % (Math.PI * 2)
       ctx.translate(screenX + size / 2, screenY + size / 2)
       ctx.rotate(rotation)
       ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
     } else {
-      // Rotate towards movement direction
-      const angleRadians = (avatarAngle * Math.PI) / 180
+      // Clamp rotation to -90 to 90 degrees to prevent upside-down appearance
+      let clampedAngle = avatarAngle
+      if (clampedAngle > 90) clampedAngle = 90
+      if (clampedAngle < -90) clampedAngle = -90
+      const angleRadians = (clampedAngle * Math.PI) / 180
       ctx.translate(screenX + size / 2, screenY + size / 2)
       ctx.rotate(angleRadians)
       ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
