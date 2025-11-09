@@ -1023,7 +1023,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                   {jobs.map((job, idx) => (
-                    <div key={job.name + idx} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
+                    <div key={`job-${idx}-${jobSeed}`} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
                       <div className="font-semibold text-slate-100">{job.name}</div>
                       <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
                       <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
@@ -1134,7 +1134,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
               <ol className="list-decimal list-inside text-sm space-y-2">
                 {leaderboard.map((p, idx) => (
-                  <li key={p.user_id || p.name} className="flex items-center justify-between hover:bg-slate-900/20 px-2 py-1 rounded transition">
+                  <li key={`leaderboard-${idx}-${p.user_id || p.name}`} className="flex items-center justify-between hover:bg-slate-900/20 px-2 py-1 rounded transition">
                     <span>{p.name}</span>
                     <span className="text-yellow-300 font-semibold">{formatMoney(p.wealth)}</span>
                   </li>
