@@ -22,6 +22,15 @@ export default function MatchHistory({ characterId, maxMatches = 10 }) {
       setLoading(true)
       setError('')
 
+      // Skip if characterId is not a valid UUID (guest users)
+      const isValidUUID = typeof characterId === 'string' && /^[0-9a-fA-F-]{36}$/.test(characterId)
+      if (!isValidUUID) {
+        setMatches([])
+        setStats({ totalMatches: 0, totalWins: 0, winRate: 0, avgDuration: 0 })
+        setLoading(false)
+        return
+      }
+
       // Load player's recent matches
       const { data: playerMatches, error: matchError } = await supabase
         .from('game_matches')
