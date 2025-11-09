@@ -479,6 +479,40 @@ export default function IsometricGameMap({
       }
     }
 
+    // Draw job location markers
+    Object.entries(JOB_LOCATIONS).forEach(([jobName, loc]) => {
+      const isoPos = gridToIsometric(loc.x / 12.5, loc.y / 14.58)
+      ctx.save()
+      ctx.globalAlpha = 0.7
+
+      // Job marker circle
+      const markerGradient = ctx.createRadialGradient(isoPos.x, isoPos.y, 0, isoPos.x, isoPos.y, 15)
+      markerGradient.addColorStop(0, 'rgba(255, 193, 7, 0.8)')
+      markerGradient.addColorStop(1, 'rgba(255, 193, 7, 0.2)')
+      ctx.fillStyle = markerGradient
+      ctx.beginPath()
+      ctx.arc(isoPos.x, isoPos.y, 15, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Marker icon
+      ctx.fillStyle = '#ffc107'
+      ctx.font = 'bold 12px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('💼', isoPos.x, isoPos.y)
+
+      ctx.restore()
+    })
+
+    // Draw NPCs
+    if (npcManagerRef.current) {
+      const npcs = npcManagerRef.current.getNPCs()
+      npcs.forEach(npc => {
+        const isoPos = gridToIsometric(npc.position.x / 12.5, npc.position.y / 14.58)
+        npc.draw(ctx, isoPos.x, isoPos.y, { gameToIsometric, gridToIsometric })
+      })
+    }
+
     // avatar
     const avatarScreenPos = gameToIsometric(avatarPos.x, avatarPos.y)
     drawAvatar(ctx, avatarScreenPos.x - AVATAR_SIZE / 2, avatarScreenPos.y - AVATAR_SIZE)
@@ -487,6 +521,20 @@ export default function IsometricGameMap({
     drawParticles(ctx)
 
     ctx.restore()
+
+    // Draw event effects (outside of transforms)
+    if (eventSystemRef.current) {
+      const events = eventSystemRef.current.getActiveEvents()
+      events.forEach(event => {
+        const progress = (Date.now() - event.timestamp) / event.duration
+        const isoPos = gridToIsometric(event.position.x / 12.5, event.position.y / 14.58)
+        const screenPos = {
+          screenX: centerX - cameraPos.x * zoom + (isoPos.x - (centerX - cameraPos.x * zoom)) * zoom,
+          screenY: centerY - cameraPos.y * zoom + (isoPos.y - (centerY - cameraPos.y * zoom)) * zoom
+        }
+        drawEventEffect(ctx, screenPos, event.type, progress)
+      })
+    }
 
     // day/night cycle overlay and vignette
     const cycle = (Date.now() % 600000) / 600000 // 10-minute cycle
