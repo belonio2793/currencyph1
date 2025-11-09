@@ -160,9 +160,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [charactersList, setCharactersList] = useState([])
   const [loadingChars, setLoadingChars] = useState(false)
   const [isWorking, setIsWorking] = useState(false)
+  const [workingJobId, setWorkingJobId] = useState(null)
   const [workProgress, setWorkProgress] = useState(0)
   const [properties, setProperties] = useState([])
   const [market, setMarket] = useState(STARTING_PROPERTIES)
+  const [jobs, setJobs] = useState([])
+  const [jobSeed, setJobSeed] = useState(Math.random() * 10000)
   const [error, setError] = useState('')
   const [onlinePlayers, setOnlinePlayers] = useState([])
   const [leaderboard, setLeaderboard] = useState([])
@@ -173,6 +176,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
   const [matchRequests, setMatchRequests] = useState([])
+  const [cityFocus, setCityFocus] = useState('Manila')
+  const [cityStats, setCityStats] = useState({})
 
   useEffect(() => {
     let mounted = true
