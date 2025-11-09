@@ -220,6 +220,23 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     wonMultipleDuels: false,
     achievedPassiveIncome100: false
   })
+
+  // Character stats specialization (upgrade with jobs)
+  const [characterStats, setCharacterStats] = useState({
+    strength: 0,      // Manual labor jobs
+    intelligence: 0,  // Tech jobs
+    charisma: 0,      // Service/sales jobs
+    endurance: 0,     // Farm/labor jobs
+    dexterity: 0,     // Precision jobs
+    luck: 0           // General bonus
+  })
+
+  // Prestige system
+  const [prestigeData, setPrestigeData] = useState({
+    prestigeLevel: 0,
+    totalPrestigeResets: 0,
+    prestigeMultiplier: 1.0 // 1.0 + (0.1 * prestigeLevel)
+  })
   const lastAutosaveRef = useRef(0)
   const dailyStreakRef = useRef(0)
   const lastDailyClaimRef = useRef(0)
