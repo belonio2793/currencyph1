@@ -267,11 +267,13 @@ export default function IsometricGameMap({
     ctx.arc(screenX + size / 2, screenY - 10, 8, Math.PI, 0, true)
     ctx.fill()
 
-    // legs
-    const legOffset = isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 : 0
+    // legs with idle sway
+    const legOffset = isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 :
+                      !isWorking ? Math.sin(avatarAnimationFrame.current * 0.03) * 1.5 : 0
+    const idleBob = !isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.02) * 0.5 : 0
     ctx.fillStyle = '#333'
-    ctx.fillRect(screenX + 6, screenY + (2 * size) / 3, 5, size / 3 + legOffset)
-    ctx.fillRect(screenX + size - 11, screenY + (2 * size) / 3, 5, size / 3 - legOffset)
+    ctx.fillRect(screenX + 6, screenY + (2 * size) / 3 + idleBob, 5, size / 3 + legOffset)
+    ctx.fillRect(screenX + size - 11, screenY + (2 * size) / 3 + idleBob, 5, size / 3 - legOffset)
 
     ctx.restore()
     ctx.restore()
