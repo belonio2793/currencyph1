@@ -432,25 +432,10 @@ export default function IsometricGameMap({
       ctx.rotate(rotation)
       ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
     } else {
-      // Normalize angle to 0-360 range
-      let normalizedAngle = ((avatarAngle % 360) + 360) % 360
-
-      // Determine if we need to flip horizontally (facing left)
-      const shouldFlip = normalizedAngle > 90 && normalizedAngle < 270
-
-      // Convert angle to -90 to 90 range for proper rotation
-      let rotationAngle = normalizedAngle
-      if (normalizedAngle > 90 && normalizedAngle <= 180) {
-        rotationAngle = 180 - normalizedAngle
-      } else if (normalizedAngle > 180 && normalizedAngle < 270) {
-        rotationAngle = 180 - normalizedAngle
-      } else if (normalizedAngle >= 270) {
-        rotationAngle = normalizedAngle - 360
-      }
-
-      const angleRadians = (rotationAngle * Math.PI) / 180
+      // Full 360° rotation based on movement direction
+      const normalizedAngle = ((avatarAngle % 360) + 360) % 360
+      const angleRadians = (normalizedAngle * Math.PI) / 180
       ctx.translate(screenX + size / 2, screenY + size / 2)
-      if (shouldFlip) ctx.scale(-1, 1)
       ctx.rotate(angleRadians)
       ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
     }
