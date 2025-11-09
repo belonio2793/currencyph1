@@ -4,6 +4,7 @@ export default function CollapsibleMinimap({
   properties = [],
   character = null,
   avatarPos = { x: 150, y: 175 },
+  avatarAngle = 0,
   zoom = 1,
   cameraPos = { x: 0, y: 0 },
   onMinimapClick = null,
