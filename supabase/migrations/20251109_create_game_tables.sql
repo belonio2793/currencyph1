@@ -13,7 +13,7 @@ $$ LANGUAGE plpgsql;
 -- game_characters table
 CREATE TABLE IF NOT EXISTS public.game_characters (
   id text PRIMARY KEY,
-  user_id uuid,
+  user_id text,
   name text,
   wealth numeric DEFAULT 0,
   income_rate numeric DEFAULT 0,
