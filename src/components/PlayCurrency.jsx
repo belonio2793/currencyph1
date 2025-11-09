@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import IsometricGameMap from './game/IsometricGameMap'
+import PlayerView from './game/PlayerView'
 import DuelMatch from './game/DuelMatch'
 import MatchHistory from './game/MatchHistory'
 import CharacterCustomizer from './game/CharacterCustomizer'
@@ -1607,7 +1608,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                             {cityBonus > 0 && <span className="text-xs bg-emerald-600/40 text-emerald-300 px-2 py-0.5 rounded">+{bonusPercent}%</span>}
                           </div>
                           <div className="text-xs text-slate-400 mt-1">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
-                          <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
+                          <div className="text-xs text-slate-500 mt-1">Difficulty: {'��'.repeat(job.difficulty)}</div>
                         </div>
 
                         <div className="mt-3">
