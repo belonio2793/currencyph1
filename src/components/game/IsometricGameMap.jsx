@@ -15,7 +15,10 @@ export default function IsometricGameMap({
   workingJobId = null,
   initialAvatarPos = null,
   onConsumeEnergy = null,
-  onJobMarkerClick = null
+  onJobMarkerClick = null,
+  placingProperty = null,
+  onConfirmPlace = null,
+  onCancelPlace = null
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
