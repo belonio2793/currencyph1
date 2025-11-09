@@ -143,21 +143,36 @@ export default function IsometricGameMap({
     const size = AVATAR_SIZE
     const isRunning = avatarMoving
 
+    // Get cosmetics colors
+    const { COSMETICS, getCosmeticOption } = require('../../lib/characterCosmetics')
+    const skinColor = cosmetics ? getCosmeticOption('skinTones', cosmetics.skinTone)?.hex : '#fdbf5f'
+    const hairColor = cosmetics ? getCosmeticOption('hairColors', cosmetics.hairColor)?.hex : '#1a1a1a'
+    const outfit = cosmetics ? COSMETICS.outfits.find(o => o.id === cosmetics.outfit) : null
+    const topColor = outfit?.top || '#3f51b5'
+    const bottomColor = outfit?.bottom || '#2196f3'
+
     ctx.save()
     if (avatarFacing === -1) {
       ctx.scale(-1, 1)
       screenX = -screenX - size
     }
 
-    ctx.fillStyle = '#ff6b6b'
+    // Draw body (shirt)
+    ctx.fillStyle = topColor
     ctx.fillRect(screenX + 4, screenY, size - 8, size / 3)
 
-    ctx.fillStyle = '#fdbf5f'
+    // Draw pants/bottom
+    ctx.fillStyle = bottomColor
+    ctx.fillRect(screenX + 4, screenY + size / 3, size - 8, size / 3)
+
+    // Draw head with skin tone
+    ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.arc(screenX + size / 2, screenY - 6, 8, 0, Math.PI * 2)
     ctx.fill()
 
-    ctx.fillStyle = '#333'
+    // Draw eyes
+    ctx.fillStyle = '#000'
     ctx.beginPath()
     ctx.arc(screenX + size / 2 - 2, screenY - 8, 2, 0, Math.PI * 2)
     ctx.fill()
@@ -165,20 +180,27 @@ export default function IsometricGameMap({
     ctx.arc(screenX + size / 2 + 2, screenY - 8, 2, 0, Math.PI * 2)
     ctx.fill()
 
+    // Draw hair
+    ctx.fillStyle = hairColor
+    ctx.beginPath()
+    ctx.arc(screenX + size / 2, screenY - 10, 8, Math.PI, 0, true)
+    ctx.fill()
+
+    // Draw legs with animation
     const legOffset = isRunning ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 : 0
     ctx.fillStyle = '#333'
-    ctx.fillRect(screenX + 6, screenY + size / 3, 5, size / 2 + legOffset)
-    ctx.fillRect(screenX + size - 11, screenY + size / 3, 5, size / 2 - legOffset)
+    ctx.fillRect(screenX + 6, screenY + size / 3 + size / 3, 5, size / 3 + legOffset)
+    ctx.fillRect(screenX + size - 11, screenY + size / 3 + size / 3, 5, size / 3 - legOffset)
 
     ctx.restore()
 
     if (isRunning) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)'
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
       ctx.font = 'bold 10px Arial'
       ctx.textAlign = 'center'
       ctx.fillText('Moving', screenX + size / 2 - (avatarFacing === -1 ? -size : 0), screenY - 20)
     }
-  }, [avatarFacing, avatarMoving])
+  }, [avatarFacing, avatarMoving, cosmetics])
 
 
   const draw = useCallback(() => {
