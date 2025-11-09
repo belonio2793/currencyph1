@@ -963,6 +963,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 ) : (
                   <WorldMap
                     currentCity={cityFocus}
+                    cityStats={cityStats}
                     onClickLocation={(loc) => {
                       handleCityClick(loc.name)
                       // Small bonus for visiting
