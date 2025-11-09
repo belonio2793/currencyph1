@@ -552,7 +552,7 @@ export class World3D {
     }
   }
 
-  movePlayer(userId, speed = 8) {
+  movePlayer(userId, speed = 25) {
     const player = this.players.get(userId)
     if (!player) return
 
@@ -568,7 +568,7 @@ export class World3D {
       group.position.x += moveX
       group.position.z += moveZ
 
-      // Smooth rotation to face direction
+      // Smooth rotation to face direction (360-degree capable)
       const targetRotation = Math.atan2(dx, dz)
       const angleDiff = targetRotation - group.rotation.y
 
@@ -577,7 +577,8 @@ export class World3D {
       while (normalizedDiff > Math.PI) normalizedDiff -= 2 * Math.PI
       while (normalizedDiff < -Math.PI) normalizedDiff += 2 * Math.PI
 
-      group.rotation.y += normalizedDiff * 0.1 // Smooth rotation
+      // Faster and smoother rotation interpolation
+      group.rotation.y += normalizedDiff * 0.25
       player.direction = group.rotation.y
 
       player.isMoving = true
@@ -727,7 +728,7 @@ export class World3D {
     this.deltaTime = this.clock.getDelta()
 
     // Update player positions with smooth movement
-    this.players.forEach((_, userId) => this.movePlayer(userId, 12))
+    this.players.forEach((_, userId) => this.movePlayer(userId, 25))
 
     // Update NPC positions with AI-like behavior
     this.npcs.forEach((npc, id) => {
