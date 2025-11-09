@@ -195,18 +195,6 @@ export default function IsometricGameMap({
     ctx.fill()
 
     ctx.save()
-    if (isWorking) {
-      const rotation = (avatarAnimationFrame.current * 0.08) % (Math.PI * 2)
-      ctx.translate(screenX + size / 2, screenY + size / 2)
-      ctx.rotate(rotation)
-      ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
-    } else {
-      const normalizedAngle = ((avatarAngle % 360) + 360) % 360
-      const angleRadians = (normalizedAngle * Math.PI) / 180
-      ctx.translate(screenX + size / 2, screenY + size / 2)
-      ctx.rotate(angleRadians)
-      ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
-    }
 
     const floatOffset = !isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.02) * 1.2 : 0
     const legOffset = isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.12) * 4 : 0
