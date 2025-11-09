@@ -424,17 +424,17 @@ export default function IsometricGameMap({
     ctx.fill()
 
     ctx.save()
-    // Handle horizontal flip for left/right facing
-    const facingDirection = avatarFacing < 0 ? -1 : 1
-    if (facingDirection === -1) {
-      ctx.scale(-1, 1)
-      screenX = -screenX - size
-    }
-    // Rotate when working
+    // Apply 360-degree rotation to character
     if (isWorking) {
       const rotation = (avatarAnimationFrame.current * 0.08) % (Math.PI * 2)
       ctx.translate(screenX + size / 2, screenY + size / 2)
       ctx.rotate(rotation)
+      ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
+    } else {
+      // Rotate towards movement direction
+      const angleRadians = (avatarAngle * Math.PI) / 180
+      ctx.translate(screenX + size / 2, screenY + size / 2)
+      ctx.rotate(angleRadians)
       ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
     }
 
