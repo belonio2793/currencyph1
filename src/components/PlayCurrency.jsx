@@ -488,12 +488,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         // persist
         persistCharacterPartial(updated)
+        // Save using the updated object (avoid stale closure)
+        if (userId) saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
         return updated
       })
 
       // Update city stats
       setCityStats((prev) => {
-        const scaledReward = Math.floor(job.reward * (1 + (character.level * 0.15)))
+        const scaledReward = Math.floor(job.reward * (1 + ((character && character.level) ? character.level * 0.15 : 0)))
         return {
           ...prev,
           [cityFocus]: {
@@ -507,7 +509,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setWorkingJobId(null)
       setWorkProgress(0)
       await loadLeaderboard()
-      if (userId) saveCharacterToDB(character)
     }, duration + 200)
   }
 
