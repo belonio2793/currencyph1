@@ -530,7 +530,7 @@ export default function IsometricGameMap({
         })
       }
     }
-  }, [avatarFacing, avatarMoving, cosmetics, isWorking])
+  }, [avatarAngle, avatarMoving, cosmetics, isWorking])
 
   const drawParticles = (ctx) => {
     const cam = { x: cameraPos.x, y: cameraPos.y, zoom }
