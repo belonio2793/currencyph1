@@ -1101,16 +1101,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
                     <button onClick={() => setIsIsometric(!isIsometric)} className="px-2 py-1 text-xs bg-slate-700 rounded">{isIsometric ? 'Switch to Grid' : 'Isometric View'}</button>
                     <button onClick={() => requestMatch()} className="px-2 py-1 text-xs bg-amber-600 rounded text-black">Find Match</button>
-                    <button onClick={() => {
-                      try {
-                        if (!character || !character.id) return
-                        const key = `pc_saved_position_${character.id}`
-                        const payload = { x: Math.round(characterPosition.x || 0), y: Math.round(characterPosition.y || 0), city: cityFocus }
-                        localStorage.setItem(key, JSON.stringify(payload))
-                        setSavedFlash(true); setTimeout(() => setSavedFlash(false), 800)
-                      } catch (e) {}
-                    }} className="px-2 py-1 text-xs bg-emerald-600 hover:bg-emerald-700 rounded text-white">Save</button>
-                    {savedFlash && (<span className="text-xs text-emerald-400">Saved</span>)}
                   </div>
                 </div>
 
