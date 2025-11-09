@@ -682,7 +682,7 @@ export default function IsometricGameMap({
     const handleClick = (e) => {
       if (isDragging) return
       // If placing a property, compute world coords and call confirm handler
-      if (placingProperty && typeof onConfirmPlace === 'function') {
+      if (externalPlacingProperty && typeof onConfirmPlace === 'function') {
         const rect = canvas.getBoundingClientRect()
         const clientX = e.clientX - rect.left
         const clientY = e.clientY - rect.top
