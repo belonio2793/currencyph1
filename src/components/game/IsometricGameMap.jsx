@@ -565,28 +565,6 @@ export default function IsometricGameMap({
       }
     }
 
-    // Job markers
-    Object.entries(JOB_LOCATIONS).forEach(([jobName, loc]) => {
-      const isoPos = gridToIsometric(loc.x / 12.5, loc.y / 14.58)
-      ctx.save()
-      ctx.globalAlpha = 0.75
-
-      const markerGradient = ctx.createRadialGradient(isoPos.x, isoPos.y, 0, isoPos.x, isoPos.y, 16)
-      markerGradient.addColorStop(0, 'rgba(255, 193, 7, 0.85)')
-      markerGradient.addColorStop(1, 'rgba(255, 193, 7, 0.15)')
-      ctx.fillStyle = markerGradient
-      ctx.beginPath()
-      ctx.arc(isoPos.x, isoPos.y, 16, 0, Math.PI * 2)
-      ctx.fill()
-
-      ctx.fillStyle = '#ffc107'
-      ctx.font = 'bold 13px Arial'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText('⚙️', isoPos.x, isoPos.y)
-
-      ctx.restore()
-    })
 
     // Avatar
     const avatarScreenPosRaw = gameToIsometric(avatarPos.x, avatarPos.y)
@@ -937,7 +915,7 @@ export default function IsometricGameMap({
           className="w-10 h-10 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded flex items-center justify-center text-white font-bold transition-colors"
           title="Zoom out"
         >
-          ��
+          −
         </button>
         <button
           onClick={() => setFollowAvatar(!followAvatar)}
