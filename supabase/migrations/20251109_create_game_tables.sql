@@ -98,12 +98,12 @@ ALTER TABLE public.game_characters ENABLE ROW LEVEL SECURITY;
 -- RLS Policies for game_characters
 DO $$
 BEGIN
-  -- Users can view their own characters
+  -- Users can view their own characters (handle both uuid and text types for user_id)
   IF NOT EXISTS (
     SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can view their own characters'
   ) THEN
     CREATE POLICY "Users can view their own characters" ON public.game_characters
-      FOR SELECT USING (user_id = auth.uid() OR user_id IS NULL);
+      FOR SELECT USING (user_id = auth.uid() OR user_id IS NULL OR user_id::text = auth.uid()::text);
   END IF;
 
   -- Users can insert their own characters
@@ -111,7 +111,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can insert their own characters'
   ) THEN
     CREATE POLICY "Users can insert their own characters" ON public.game_characters
-      FOR INSERT WITH CHECK (user_id = auth.uid());
+      FOR INSERT WITH CHECK (user_id = auth.uid() OR user_id::text = auth.uid()::text);
   END IF;
 
   -- Users can update their own characters
@@ -119,7 +119,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can update their own characters'
   ) THEN
     CREATE POLICY "Users can update their own characters" ON public.game_characters
-      FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+      FOR UPDATE USING (user_id = auth.uid() OR user_id::text = auth.uid()::text) WITH CHECK (user_id = auth.uid() OR user_id::text = auth.uid()::text);
   END IF;
 
   -- Users can delete their own characters
@@ -127,7 +127,7 @@ BEGIN
     SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can delete their own characters'
   ) THEN
     CREATE POLICY "Users can delete their own characters" ON public.game_characters
-      FOR DELETE USING (user_id = auth.uid());
+      FOR DELETE USING (user_id = auth.uid() OR user_id::text = auth.uid()::text);
   END IF;
 
   -- Public can view all characters (for leaderboard, etc)
