@@ -765,7 +765,7 @@ export default function IsometricGameMap({
       setAvatarPos(prev => {
         const maxX = MAP_WIDTH
         const maxY = MAP_HEIGHT
-        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x * dt))
+        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x))
         const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y * dt))
 
         if ((newX !== prev.x || newY !== prev.y) && onCharacterMove) {
