@@ -10,6 +10,7 @@ import MarketEconomyUI from './game/MarketEconomyUI'
 import MatchSpectator from './game/MatchSpectator'
 import ManilaEnhancedMap from './game/ManilaEnhancedMap'
 import PropertyManagementPanel from './game/PropertyManagementPanel'
+import PropertyEmpireAchievements from './game/PropertyEmpireAchievements'
 import { validateCosmetics, DEFAULT_COSMETICS } from '../lib/characterCosmetics'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
