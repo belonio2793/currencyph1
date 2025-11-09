@@ -406,39 +406,56 @@ export default function IsometricGameMap({
     ctx.arc(screenX + size / 2, screenY - 10 + floatOffset, 8, Math.PI, 0, true)
     ctx.fill()
 
-    // legs with idle sway
-    const legOffset = isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 :
-                      !isWorking ? Math.sin(avatarAnimationFrame.current * 0.03) * 1.5 : 0
-    const idleBob = !isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.02) * 0.5 : 0
+    // legs with realistic walking/running animation
+    const legOffset = isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.12) * 5 :
+                      !isWorking ? Math.sin(avatarAnimationFrame.current * 0.04) * 2 : 0
+    const idleBob = !isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.025) * 0.7 : 0
     ctx.fillStyle = '#333'
     ctx.fillRect(screenX + 6, screenY + (2 * size) / 3 + idleBob, 5, size / 3 + legOffset)
     ctx.fillRect(screenX + size - 11, screenY + (2 * size) / 3 + idleBob, 5, size / 3 - legOffset)
+
+    // footstep dust effect on movement
+    if (isRunning && !isWorking && avatarAnimationFrame.current % 8 === 0) {
+      const footX = screenX + (avatarFacing === -1 ? 8 : size - 8)
+      particlesRef.current.push({
+        x: footX,
+        y: screenY + (2 * size) / 3 + 12,
+        vx: (Math.random() - 0.5) * 1.2,
+        vy: Math.random() * 0.8,
+        life: 18,
+        color: 'rgba(180, 160, 120, 0.5)'
+      })
+    }
 
     ctx.restore()
     ctx.restore()
 
     if (isRunning && !isWorking) {
-      // speed trail particles
-      particlesRef.current.push({
-        x: screenX + size / 2 + (avatarFacing === -1 ? -6 : 6),
-        y: screenY + size / 2,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: -0.8 - Math.random() * 0.6,
-        life: 24,
-        color: 'rgba(59,130,246,0.7)'
-      })
+      // speed trail particles - more frequent for visual impact
+      if (avatarAnimationFrame.current % 3 === 0) {
+        particlesRef.current.push({
+          x: screenX + size / 2 + (avatarFacing === -1 ? -8 : 8),
+          y: screenY + size / 2,
+          vx: (Math.random() - 0.5) * 0.8,
+          vy: -1.0 - Math.random() * 0.8,
+          life: 28,
+          color: 'rgba(100,180,255,0.6)'
+        })
+      }
     }
 
-    // Working particles - energy burst effect
+    // Working particles - more energetic energy burst effect
     if (isWorking) {
-      particlesRef.current.push({
-        x: screenX + size / 2 + (Math.random() - 0.5) * 20,
-        y: screenY + (Math.random() - 0.5) * 20,
-        vx: (Math.random() - 0.5) * 1.5,
-        vy: (Math.random() - 0.5) * 1.5 - 0.5,
-        life: 30,
-        color: `rgba(255, 200, 0, 0.8)`
-      })
+      if (avatarAnimationFrame.current % 4 === 0) {
+        particlesRef.current.push({
+          x: screenX + size / 2 + (Math.random() - 0.5) * 22,
+          y: screenY + (Math.random() - 0.5) * 22,
+          vx: (Math.random() - 0.5) * 1.8,
+          vy: (Math.random() - 0.5) * 1.8 - 0.6,
+          life: 35,
+          color: `rgba(255, 220, 50, ${0.7 + Math.random() * 0.3})`
+        })
+      }
     }
   }, [avatarFacing, avatarMoving, cosmetics, isWorking])
 
