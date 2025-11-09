@@ -7,6 +7,10 @@ export default function GamePlayerProfile({ playerId, onClose }) {
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [currentUserId, setCurrentUserId] = useState(null)
+  const [isFollowing, setIsFollowing] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     if (playerId) {
