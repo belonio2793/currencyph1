@@ -447,15 +447,6 @@ export default function GamePlayerProfile({ playerId, onClose }) {
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="bg-slate-800/50 border-t border-slate-700 px-6 py-4 flex gap-3 justify-end">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-white font-medium transition-colors"
-          >
-            Close
-          </button>
-        </div>
       </div>
     </div>
   )
