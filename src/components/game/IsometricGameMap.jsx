@@ -856,7 +856,7 @@ export default function IsometricGameMap({
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
 
   const moveAvatar = useCallback((direction) => {
-    const speed = (mapSettings.avatarSpeed || 1) * 280
+    const speed = (mapSettings.avatarSpeed || 1) * 140
 
     // Set velocity and angle based on direction
     switch (direction) {
