@@ -444,19 +444,23 @@ export default function IsometricGameMap({
     if (!canvas) return
 
     const ctx = canvas.getContext('2d')
-    const width = canvas.width
-    const height = canvas.height
+    const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
+    const cssWidth = Math.max(1, canvas.width / dpr)
+    const cssHeight = Math.max(1, canvas.height / dpr)
 
-    // Clear with gradient background
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, height)
+    // Reset transform and scale so drawing uses CSS pixels but high DPI backing
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+    // Clear with gradient background (use CSS dims)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, cssHeight)
     bgGradient.addColorStop(0, '#4a7c59')
     bgGradient.addColorStop(0.5, '#5a9c69')
     bgGradient.addColorStop(1, '#3a6c49')
     ctx.fillStyle = bgGradient
-    ctx.fillRect(0, 0, width, height)
+    ctx.fillRect(0, 0, cssWidth, cssHeight)
 
-    const centerX = width / 2
-    const centerY = height / 2
+    const centerX = cssWidth / 2
+    const centerY = cssHeight / 2
     const z = zoomRef.current || 1
 
     ctx.save()
