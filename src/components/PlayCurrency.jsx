@@ -338,7 +338,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     } catch (e) { /* ignore */ }
   }, [character?.id])
 
-  // Debounced autosave of position/city
+  // Debounced autosave of position/city (silent, background)
   useEffect(() => {
     if (!character || !character.id) return
     const now = Date.now()
@@ -348,8 +348,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       const key = `pc_saved_position_${character.id}`
       const payload = { x: Math.round(characterPosition.x || 0), y: Math.round(characterPosition.y || 0), city: cityFocus }
       localStorage.setItem(key, JSON.stringify(payload))
-      setSavedFlash(true)
-      setTimeout(() => setSavedFlash(false), 400)
+      // Silently save - no UI notification needed
     } catch (e) { /* ignore */ }
   }, [characterPosition, cityFocus, character?.id])
 
