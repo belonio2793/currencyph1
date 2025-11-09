@@ -1023,6 +1023,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       mapSettings={mapSettings}
                       onCharacterMove={(pos) => setCharacterPosition(pos)}
                       cosmetics={cosmetics}
+                      isWorking={isWorking}
+                      workProgress={workProgress}
+                      workingJobId={workingJobId}
                     />
                   </div>
                 ) : (
