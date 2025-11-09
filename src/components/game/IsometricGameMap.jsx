@@ -548,52 +548,36 @@ export default function IsometricGameMap({
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos])
 
   const moveAvatar = useCallback((direction) => {
-    const speed = mapSettings.avatarSpeed || 2
-    const maxX = MAP_WIDTH
-    const maxY = MAP_HEIGHT
+    const speed = mapSettings.avatarSpeed || 3
 
-    setAvatarPos(prev => {
-      let newX = prev.x
-      let newY = prev.y
-      let newFacing = avatarFacing
+    // Set velocity based on direction
+    switch (direction) {
+      case 'up':
+        velocityRef.current.y = -speed
+        break
+      case 'down':
+        velocityRef.current.y = speed
+        break
+      case 'left':
+        velocityRef.current.x = -speed
+        setAvatarFacing(-1)
+        break
+      case 'right':
+        velocityRef.current.x = speed
+        setAvatarFacing(1)
+        break
+      default:
+        break
+    }
 
-      switch (direction) {
-        case 'up':
-          newY = Math.max(0, prev.y - speed)
-          break
-        case 'down':
-          newY = Math.min(maxY, prev.y + speed)
-          break
-        case 'left':
-          newX = Math.max(0, prev.x - speed)
-          newFacing = -1
-          break
-        case 'right':
-          newX = Math.min(maxX, prev.x + speed)
-          newFacing = 1
-          break
-        default:
-          return prev
-      }
+    setAvatarMoving(true)
+  }, [mapSettings, avatarFacing])
 
-      setAvatarFacing(newFacing)
-      setAvatarMoving(true)
-
-      if (onCharacterMove) {
-        if (cityData) {
-          const latLng = convertGameCoordsToLatLng(newX, newY, cityData, MAP_WIDTH, MAP_HEIGHT)
-          onCharacterMove({ x: newX, y: newY, lat: latLng.lat, lng: latLng.lng, city: selectedCity })
-        } else {
-          onCharacterMove({ x: newX, y: newY, city: selectedCity })
-        }
-      }
-
-      // smooth camera target
-      targetCameraRef.current = { x: newX - 75, y: newY - 87 }
-
-      return { x: newX, y: newY }
-    })
-  }, [avatarFacing, mapSettings, onCharacterMove, cityData, selectedCity])
+  const stopMovement = useCallback(() => {
+    velocityRef.current.x = 0
+    velocityRef.current.y = 0
+    setAvatarMoving(false)
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
