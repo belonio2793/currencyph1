@@ -707,18 +707,36 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setError('Daily reward already claimed within 24 hours')
       return
     }
-    const reward = 200 + Math.floor(Math.random() * 300)
+    // Track daily streak
+    const timeSinceLast = now - last
+    const oneDayMs = 24 * 60 * 60 * 1000
+    let streak = 1
+    if (timeSinceLast > oneDayMs && timeSinceLast < oneDayMs * 2) {
+      streak = (dailyStreakRef.current || 0) + 1
+    }
+    dailyStreakRef.current = streak
+
+    const reward = 200 + Math.floor(Math.random() * 300) + (streak > 1 ? streak * 10 : 0) // Bonus for streaks
     const updated = { ...character, wealth: Number(character.wealth || 0) + reward, last_daily: new Date().toISOString() }
     setCharacter(updated)
     persistCharacterPartial(updated)
     if (userId) saveCharacterToDB(updated)
-    setPhases(prev => { const next = { ...prev, claimedDaily: true }; savePhases(next); return next })
+
+    setPhases(prev => {
+      const next = { ...prev, claimedDaily: true }
+      if (streak >= 3 && !next.completedDailyStreak3) {
+        next.completedDailyStreak3 = true
+      }
+      savePhases(next)
+      return next
+    })
     // log daily reward table
     if (userId) {
       try {
-        await supabase.from('game_daily_rewards').insert({ user_id: userId, amount: reward }).catch(() => {})
+        await supabase.from('game_daily_rewards').insert({ user_id: userId, amount: reward, streak }).catch(() => {})
       } catch (e) { /* ignore */ }
     }
+    checkAndUpdatePhases(updated)
     await loadLeaderboard()
   }
 
