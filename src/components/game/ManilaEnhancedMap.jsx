@@ -90,23 +90,34 @@ export default function ManilaEnhancedMap({
 
   const drawRoads = (ctx) => {
     ROADS.forEach((road) => {
-      ctx.strokeStyle = road.type === 'main' ? '#d4d4d4' : '#e8e8e8'
-      ctx.lineWidth = road.type === 'main' ? 12 : 6
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
-
-      ctx.beginPath()
-      const firstPoint = road.points[0]
-      ctx.moveTo(firstPoint[0], firstPoint[1])
-      for (let i = 1; i < road.points.length; i++) {
-        ctx.lineTo(road.points[i][0], road.points[i][1])
-      }
-      ctx.stroke()
-
       if (road.type === 'main') {
-        ctx.strokeStyle = '#FFD700'
+        // Main road shadow
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)'
+        ctx.lineWidth = 14
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.beginPath()
+        const firstPoint = road.points[0]
+        ctx.moveTo(firstPoint[0] + 1, firstPoint[1] + 1)
+        for (let i = 1; i < road.points.length; i++) {
+          ctx.lineTo(road.points[i][0] + 1, road.points[i][1] + 1)
+        }
+        ctx.stroke()
+
+        // Main road
+        ctx.strokeStyle = '#e5e7eb'
+        ctx.lineWidth = 12
+        ctx.beginPath()
+        ctx.moveTo(firstPoint[0], firstPoint[1])
+        for (let i = 1; i < road.points.length; i++) {
+          ctx.lineTo(road.points[i][0], road.points[i][1])
+        }
+        ctx.stroke()
+
+        // Road markings
+        ctx.strokeStyle = '#fbbf24'
         ctx.lineWidth = 2
-        ctx.setLineDash([10, 5])
+        ctx.setLineDash([12, 8])
         ctx.beginPath()
         ctx.moveTo(firstPoint[0], firstPoint[1])
         for (let i = 1; i < road.points.length; i++) {
@@ -114,6 +125,29 @@ export default function ManilaEnhancedMap({
         }
         ctx.stroke()
         ctx.setLineDash([])
+      } else {
+        // Secondary road
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)'
+        ctx.lineWidth = 8
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.beginPath()
+        const firstPoint = road.points[0]
+        ctx.moveTo(firstPoint[0] + 0.5, firstPoint[1] + 0.5)
+        for (let i = 1; i < road.points.length; i++) {
+          ctx.lineTo(road.points[i][0] + 0.5, road.points[i][1] + 0.5)
+        }
+        ctx.stroke()
+
+        // Secondary road surface
+        ctx.strokeStyle = '#f3f4f6'
+        ctx.lineWidth = 6
+        ctx.beginPath()
+        ctx.moveTo(firstPoint[0], firstPoint[1])
+        for (let i = 1; i < road.points.length; i++) {
+          ctx.lineTo(road.points[i][0], road.points[i][1])
+        }
+        ctx.stroke()
       }
     })
   }
