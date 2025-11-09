@@ -1041,11 +1041,11 @@ export default function IsometricGameMap({
         // Very responsive angle interpolation for immediate direction changes
         setAvatarAngle(prev => {
           let diff = targetAngle - prev
-          // Handle angle wrapping (shortest path)
           if (diff > 180) diff -= 360
           if (diff < -180) diff += 360
-          // Much faster rotation for arrow key responsiveness (0.5 = nearly instant)
-          const newAngle = prev + diff * 0.5
+          // Time-based interpolation: rotate faster at higher dt but clamp
+          const rotSpeed = Math.min(1, dt * 8) // larger multiplier = faster turning
+          const newAngle = prev + diff * Math.min(0.9, rotSpeed + 0.2)
           return (newAngle + 360) % 360
         })
       }
