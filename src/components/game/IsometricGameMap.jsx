@@ -38,6 +38,10 @@ export default function IsometricGameMap({
   const [showGrid, setShowGrid] = useState(false)
   const [showDistricts, setShowDistricts] = useState(true)
   const [showDecor, setShowDecor] = useState(true)
+  const [placingProperty, setPlacingProperty] = useState(null) // {type, id, cost}
+  const [placedBuildings, setPlacedBuildings] = useState([]) // Array of {id, type, x, y, level, workers}
+  const [selectedBuilding, setSelectedBuilding] = useState(null) // Currently selected building for management
+  const [buildingHovered, setBuildingHovered] = useState(null) // Hovering over a building
   const keysPressed = useRef({})
   const animationRef = useRef(null)
   const avatarAnimationFrame = useRef(0)
