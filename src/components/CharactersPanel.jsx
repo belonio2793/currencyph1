@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { gameAPI } from '../lib/gameAPI'
 import CharacterCreation from './game/CharacterCreation'
+import RenameCharacterModal from './RenameCharacterModal'
+import DeleteCharacterConfirmModal from './DeleteCharacterConfirmModal'
 
 export default function CharactersPanel({ userId, currentCharacter, onSelectCharacter, onClose }) {
   const [loading, setLoading] = useState(false)
