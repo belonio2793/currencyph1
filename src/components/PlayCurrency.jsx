@@ -1408,7 +1408,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   <div className="flex items-center gap-2">
                     <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
                     <button onClick={() => setIsIsometric(!isIsometric)} className="px-2 py-1 text-xs bg-slate-700 rounded">{isIsometric ? 'Switch to Grid' : 'Isometric View'}</button>
-                    <button onClick={() => requestMatch()} className="px-2 py-1 text-xs bg-amber-600 rounded text-black">Find Match</button>
                   </div>
                 </div>
 
@@ -1775,7 +1774,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
                         <span>👑 Earn ₱50,000</span>
-                        <span className={`text-xs ${phases.earnedWealth50000 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.earnedWealth50000 ? '✓' : '○'}</span>
+                        <span className={`text-xs ${phases.earnedWealth50000 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.earnedWealth50000 ? '✓' : '��'}</span>
                       </li>
                       <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
                         <span>🔥 Reach Level 20</span>
