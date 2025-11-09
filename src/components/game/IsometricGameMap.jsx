@@ -297,16 +297,16 @@ export default function IsometricGameMap({
     // camera viewport rectangle
     try {
       const mainRect = main.getBoundingClientRect()
-      const centerX = main.width / 2
-      const centerY = main.height / 2
-      const viewW = (main.width / zoom) / MAP_WIDTH * w
-      const viewH = (main.height / zoom) / MAP_HEIGHT * h
+      const mainW = mainRect.width || main.width
+      const mainH = mainRect.height || main.height
+      const viewW = (mainW / zoom) / MAP_WIDTH * w
+      const viewH = (mainH / zoom) / MAP_HEIGHT * h
       const camX = ((cameraPos.x) / MAP_WIDTH) * w
       const camY = ((cameraPos.y) / MAP_HEIGHT) * h
       mctx.strokeStyle = '#e2e8f0'
       mctx.lineWidth = 1
-      mctx.strokeRect(camX, camY, viewW, viewH)
-    } catch (e) {}
+      mctx.strokeRect(Math.max(0, camX), Math.max(0, camY), Math.min(w, viewW), Math.min(h, viewH))
+    } catch (e) { console.warn('minimap viewport calc failed', e) }
   }
 
   const draw = useCallback(() => {
