@@ -37,7 +37,7 @@ export default function ManilaEnhancedMap({
   onBuyProperty,
   onMapClick,
   isInteractive = true,
-  zoom: externalZoom = 1,
+  zoom: externalZoom = 2.2,
   onPropertyDragEnd,
   canPlaceProperties = true
 }) {
@@ -45,10 +45,10 @@ export default function ManilaEnhancedMap({
   const [selectedDistrict, setSelectedDistrict] = useState(null)
   const [hoveredItem, setHoveredItem] = useState(null)
   const [draggedProperty, setDraggedProperty] = useState(null)
-  const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 })
+  const [mapOffset, setMapOffset] = useState({ x: -200, y: -150 })
   const [isPanning, setIsPanning] = useState(false)
   const [panStart, setPanStart] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(externalZoom || 1)
+  const [zoom, setZoom] = useState(externalZoom || 2.2)
 
   const baseWidth = 800
   const baseHeight = 500
