@@ -1450,7 +1450,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-xl font-bold">{character.name}</h2>
-                  <p className="text-xs text-slate-400">Level {character.level} • XP {character.xp}</p>
+                  <p className="text-xs text-slate-400">Level {character.level} • XP {character.xp} {prestigeData.prestigeLevel > 0 && `• Prestige ${prestigeData.prestigeLevel}`}</p>
                 </div>
                 <div className="flex flex-col gap-2">
                   <button onClick={() => setCustomizationOpen(true)} className="w-full px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded font-medium transition-colors">Customize</button>
