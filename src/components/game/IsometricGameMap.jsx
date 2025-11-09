@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { getCityById, convertGameCoordsToLatLng } from '../../data/philippinesGeography'
 import { COSMETICS, getCosmeticOption } from '../../lib/characterCosmetics'
-import { NPCManager, JOB_LOCATIONS, drawEventEffect, EventSystem } from '../../lib/gameNPCSystem'
-import CollapsibleMinimap from './CollapsibleMinimap'
 
 export default function IsometricGameMap({
   properties = [],
