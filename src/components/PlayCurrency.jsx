@@ -271,6 +271,21 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId])
 
+  // Rotate jobs based on city and seed
+  const rotateJobs = () => {
+    const newSeed = jobSeed + 1
+    setJobSeed(newSeed)
+    const newJobs = getAvailableJobs(newSeed)
+    setJobs(newJobs)
+  }
+
+  // Handle city click - changes location and rotates jobs
+  const handleCityClick = (cityName) => {
+    setCityFocus(cityName)
+    setCharacterPosition({ ...characterPosition, city: cityName })
+    rotateJobs()
+  }
+
   // Passive income adds character.income_rate to wealth every 10 seconds
   const startPassiveIncome = () => {
     stopPassiveIncome()
