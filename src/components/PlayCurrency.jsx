@@ -1790,6 +1790,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                         <span className={`text-xs ${phases.ownedAllPropertyTypes ? 'text-amber-400' : 'text-slate-400'}`}>{phases.ownedAllPropertyTypes ? '✓' : '○'}</span>
                       </li>
                       <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
+                        <span>📅 30-day daily streak</span>
+                        <span className={`text-xs ${phases.completedDailyStreak30 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.completedDailyStreak30 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
                         <span>✨ Prestige Level: {prestigeData.prestigeLevel}</span>
                         <span className="text-xs text-amber-300">×{prestigeData.prestigeMultiplier.toFixed(1)}</span>
                       </li>
