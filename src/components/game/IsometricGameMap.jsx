@@ -16,7 +16,8 @@ export default function IsometricGameMap({
   workProgress = 0,
   workingJobId = null,
   initialAvatarPos = null,
-  onConsumeEnergy = null
+  onConsumeEnergy = null,
+  onJobMarkerClick = null
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -695,6 +696,19 @@ export default function IsometricGameMap({
       const isoX = (clientX - centerX) / zoom + cameraPos.x
       const isoY = (clientY - centerY) / zoom + cameraPos.y
 
+      // Check job marker proximity first
+      const markerRadius = 22
+      let clickedJob = null
+      Object.entries(JOB_LOCATIONS).forEach(([jobName, loc]) => {
+        const mPos = gridToIsometric(loc.x / 12.5, loc.y / 14.58)
+        const dx = isoX - mPos.x
+        const dy = isoY - mPos.y
+        if (!clickedJob && Math.hypot(dx, dy) <= markerRadius) clickedJob = jobName
+      })
+      if (clickedJob && typeof onPropertyClick !== 'string' && typeof onJobMarkerClick === 'function') {
+        try { onJobMarkerClick(clickedJob) } catch (e) {}
+      }
+
       const gridPos = isometricToGrid(isoX, isoY)
       const gameX = (gridPos.x / GRID_WIDTH) * MAP_WIDTH
       const gameY = (gridPos.y / GRID_HEIGHT) * MAP_HEIGHT
@@ -750,7 +764,8 @@ export default function IsometricGameMap({
     const animate = () => {
       // Determine velocity from keys or click-to-move
       const baseSpeed = mapSettings.avatarSpeed || 3
-      const sprint = keysPressed.current['shift'] ? 1.8 : 1
+      const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
+      const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
       let vx = 0, vy = 0
       if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= baseSpeed * sprint
       if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += baseSpeed * sprint
