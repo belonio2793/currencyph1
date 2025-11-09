@@ -1591,6 +1591,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login</button>
                   )}
                 </div>
+                <div className="mt-2">
+                  <button onClick={() => requestMatch()} className="w-full px-3 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white font-medium">Find Match</button>
+                </div>
               </div>
             </div>
 
@@ -1774,7 +1777,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <ul className="space-y-2 text-sm">
                       <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
                         <span>👑 Earn ₱50,000</span>
-                        <span className={`text-xs ${phases.earnedWealth50000 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.earnedWealth50000 ? '✓' : '��'}</span>
+                        <span className={`text-xs ${phases.earnedWealth50000 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.earnedWealth50000 ? '✓' : '○'}</span>
                       </li>
                       <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
                         <span>🔥 Reach Level 20</span>
