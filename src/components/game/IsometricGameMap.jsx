@@ -31,12 +31,15 @@ export default function IsometricGameMap({
   const [selectedCity, setSelectedCity] = useState(city)
   const [cityData, setCityData] = useState(null)
   const [showControls, setShowControls] = useState(true)
+  const [followAvatar, setFollowAvatar] = useState(true)
+  const [showGrid, setShowGrid] = useState(false)
   const keysPressed = useRef({})
   const animationRef = useRef(null)
   const avatarAnimationFrame = useRef(0)
   const particlesRef = useRef([])
   const ambientParticlesRef = useRef([])
   const velocityRef = useRef({ x: 0, y: 0 })
+  const moveTargetRef = useRef(null)
   const showControlsRef = useRef(true)
   const targetCameraRef = useRef({ x: 0, y: 0 })
 
@@ -425,13 +428,15 @@ export default function IsometricGameMap({
       )
     }
 
-    // tiles
+    // tiles and optional grid overlay
     for (let gridX = 0; gridX < GRID_WIDTH; gridX++) {
       for (let gridY = 0; gridY < GRID_HEIGHT; gridY++) {
         const isRoad = gridX % 4 === 0 || gridY % 4 === 0
         const isoPos = gridToIsometric(gridX, gridY)
 
-        if (isRoad) {
+        if (showGrid && ((gridX % 2 === 0) || (gridY % 2 === 0))) {
+          drawIsometricTile(ctx, isoPos.x, isoPos.y, '#7b8794', 0, false)
+        } else if (isRoad) {
           drawIsometricTile(ctx, isoPos.x, isoPos.y, '#4a5568', 0, false)
         } else {
           const gameX = (gridX / GRID_WIDTH) * MAP_WIDTH
@@ -480,13 +485,20 @@ export default function IsometricGameMap({
 
     ctx.restore()
 
-    // post FX vignette
+    // day/night cycle overlay and vignette
+    const cycle = (Date.now() % 600000) / 600000 // 10-minute cycle
+    const night = Math.abs(Math.sin(cycle * Math.PI)) // 0 day, 1 night
+    ctx.save()
+    ctx.fillStyle = `rgba(10, 20, 40, ${0.25 * night})`
+    ctx.fillRect(0, 0, width, height)
+    ctx.restore()
+
     ctx.save()
     ctx.globalCompositeOperation = 'multiply'
     const g = ctx.createRadialGradient(width / 2, height * 0.45, width * 0.05, width / 2, height * 0.45, Math.max(width, height))
     g.addColorStop(0, 'rgba(255,255,255,0)')
-    g.addColorStop(0.6, 'rgba(0,0,0,0.15)')
-    g.addColorStop(1, 'rgba(0,0,0,0.6)')
+    g.addColorStop(0.6, 'rgba(0,0,0,0.12)')
+    g.addColorStop(1, 'rgba(0,0,0,0.5)')
     ctx.fillStyle = g
     ctx.fillRect(0, 0, width, height)
     ctx.restore()
@@ -602,6 +614,10 @@ export default function IsometricGameMap({
 
       if (prop && onPropertyClick) {
         onPropertyClick(prop)
+      } else {
+        // click-to-move to arbitrary point
+        moveTargetRef.current = { x: Math.max(0, Math.min(MAP_WIDTH, gameX)), y: Math.max(0, Math.min(MAP_HEIGHT, gameY)) }
+        if (followAvatar) targetCameraRef.current = { x: moveTargetRef.current.x - 75, y: moveTargetRef.current.y - 87 }
       }
     }
 
@@ -614,26 +630,9 @@ export default function IsometricGameMap({
     const handleKeyDown = (e) => {
       keysPressed.current[e.key.toLowerCase()] = true
 
-      // Handle multiple simultaneous key presses for diagonal movement
-      const speed = mapSettings.avatarSpeed || 3
-
-      if (keysPressed.current['w'] || keysPressed.current['arrowup']) {
-        velocityRef.current.y = -speed
-        setAvatarMoving(true)
-      }
-      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) {
-        velocityRef.current.y = speed
-        setAvatarMoving(true)
-      }
-      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) {
-        velocityRef.current.x = -speed
-        setAvatarFacing(-1)
-        setAvatarMoving(true)
-      }
-      if (keysPressed.current['d'] || keysPressed.current['arrowright']) {
-        velocityRef.current.x = speed
-        setAvatarFacing(1)
-        setAvatarMoving(true)
+      // cancel click-to-move on manual input
+      if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase())) {
+        moveTargetRef.current = null
       }
 
       // Prevent default scroll behavior
@@ -644,29 +643,12 @@ export default function IsometricGameMap({
 
     const handleKeyUp = (e) => {
       keysPressed.current[e.key.toLowerCase()] = false
-
-      // Reset velocity when key is released
-      const speed = mapSettings.avatarSpeed || 3
-
-      if (!keysPressed.current['w'] && !keysPressed.current['arrowup'] &&
-          !keysPressed.current['s'] && !keysPressed.current['arrowdown']) {
-        velocityRef.current.y = 0
-      }
-
-      if (!keysPressed.current['a'] && !keysPressed.current['arrowleft'] &&
-          !keysPressed.current['d'] && !keysPressed.current['arrowright']) {
-        velocityRef.current.x = 0
-      }
-
-      // Check if any movement keys are still pressed
+      // When all keys released, stop continuous movement
       const isMoving = keysPressed.current['w'] || keysPressed.current['arrowup'] ||
                        keysPressed.current['s'] || keysPressed.current['arrowdown'] ||
                        keysPressed.current['a'] || keysPressed.current['arrowleft'] ||
                        keysPressed.current['d'] || keysPressed.current['arrowright']
-
-      if (!isMoving) {
-        velocityRef.current = { x: 0, y: 0 }
-      }
+      if (!isMoving) velocityRef.current = { x: 0, y: 0 }
     }
 
     canvas.addEventListener('mousedown', handleMouseDown)
@@ -678,6 +660,36 @@ export default function IsometricGameMap({
     window.addEventListener('keyup', handleKeyUp)
 
     const animate = () => {
+      // Determine velocity from keys or click-to-move
+      const baseSpeed = mapSettings.avatarSpeed || 3
+      const sprint = keysPressed.current['shift'] ? 1.8 : 1
+      let vx = 0, vy = 0
+      if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= baseSpeed * sprint
+      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += baseSpeed * sprint
+      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) { vx -= baseSpeed * sprint; setAvatarFacing(-1) }
+      if (keysPressed.current['d'] || keysPressed.current['arrowright']) { vx += baseSpeed * sprint; setAvatarFacing(1) }
+
+      // Normalize diagonal movement
+      if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071 }
+
+      // If no keys, use click-to-move target
+      if (vx === 0 && vy === 0 && moveTargetRef.current) {
+        const dx = moveTargetRef.current.x - avatarPos.x
+        const dy = moveTargetRef.current.y - avatarPos.y
+        const dist = Math.hypot(dx, dy)
+        if (dist < 2) {
+          moveTargetRef.current = null
+          vx = 0; vy = 0
+        } else {
+          vx = (dx / dist) * baseSpeed
+          vy = (dy / dist) * baseSpeed
+          setAvatarFacing(dx < 0 ? -1 : 1)
+        }
+      }
+      velocityRef.current.x = vx
+      velocityRef.current.y = vy
+      setAvatarMoving(vx !== 0 || vy !== 0)
+
       // Apply velocity to avatar position
       setAvatarPos(prev => {
         const maxX = MAP_WIDTH
@@ -694,8 +706,8 @@ export default function IsometricGameMap({
           }
         }
 
-        // Update camera target
-        targetCameraRef.current = { x: newX - 75, y: newY - 87 }
+        // Update camera target when following avatar
+        if (followAvatar) targetCameraRef.current = { x: newX - 75, y: newY - 87 }
         return { x: newX, y: newY }
       })
 
@@ -792,11 +804,11 @@ export default function IsometricGameMap({
           zoom={zoom}
           cameraPos={cameraPos}
           onMinimapClick={(coords) => {
-            // Move avatar to clicked location via pathfinding
-            const viewport = { left: cameraPos.x - 150, right: cameraPos.x + 150, top: cameraPos.y - 130, bottom: cameraPos.y + 130 }
-            const targetX = coords.x
-            const targetY = coords.y
-            targetCameraRef.current = { x: targetX, y: targetY }
+            const targetX = Math.max(0, Math.min(MAP_WIDTH, coords.x))
+            const targetY = Math.max(0, Math.min(MAP_HEIGHT, coords.y))
+            moveTargetRef.current = { x: targetX, y: targetY }
+            if (followAvatar) targetCameraRef.current = { x: targetX - 75, y: targetY - 87 }
+            else targetCameraRef.current = { x: targetX, y: targetY }
           }}
           city={selectedCity}
         />
@@ -824,6 +836,30 @@ export default function IsometricGameMap({
             </div>
           </div>
         )}
+
+        {/* Top-right quick controls */}
+        <div className="absolute top-2 right-2 z-20 flex items-center gap-2">
+          <button
+            onClick={() => setZoom(z => Math.max(0.5, Math.min(3, z * 0.9)))}
+            className="px-2 py-1 text-xs bg-white/80 border border-slate-300 rounded hover:bg-white"
+            title="Zoom out"
+          >−</button>
+          <button
+            onClick={() => setZoom(z => Math.max(0.5, Math.min(3, z * 1.1)))}
+            className="px-2 py-1 text-xs bg-white/80 border border-slate-300 rounded hover:bg-white"
+            title="Zoom in"
+          >+</button>
+          <button
+            onClick={() => setFollowAvatar(v => !v)}
+            className={`px-2 py-1 text-xs rounded border ${followAvatar ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white/80 border-slate-300'}`}
+            title="Toggle camera follow"
+          >Follow</button>
+          <button
+            onClick={() => setShowGrid(v => !v)}
+            className={`px-2 py-1 text-xs rounded border ${showGrid ? 'bg-blue-600 text-white border-blue-700' : 'bg-white/80 border-slate-300'}`}
+            title="Toggle grid overlay"
+          >Grid</button>
+        </div>
 
         {/* Tooltip */}
         {tooltipPos && tooltipData && (
