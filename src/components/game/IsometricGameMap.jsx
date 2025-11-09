@@ -620,7 +620,7 @@ export default function IsometricGameMap({
     ctx.fillStyle = vignetteGrad
     ctx.fillRect(0, 0, width, height)
     ctx.restore()
-  }, [cameraPos, gridToIsometric, gameToIsometric, drawTile, drawImprovedAvatar, avatarPos, showDistricts, showGrid, showDecor])
+  }, [cameraPos, gridToIsometric, gameToIsometric, drawTile, drawBuilding, drawImprovedAvatar, avatarPos, showDistricts, showGrid, showDecor, properties, hoveredPropertyId])
 
   const moveAvatar = useCallback((direction) => {
     const speed = (mapSettings.avatarSpeed ?? 1.3) * 180
