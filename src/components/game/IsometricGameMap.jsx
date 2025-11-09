@@ -62,11 +62,16 @@ export default function IsometricGameMap({
   const propertiesRef = useRef([])
 
   const TILE_SIZE = 48
-  const GRID_WIDTH = 40
-  const GRID_HEIGHT = 30
+  const BASE_GRID_WIDTH = 40
+  const BASE_GRID_HEIGHT = 30
+  const sizeMultiplier = mapSettings?.sizeMultiplier || 1
+  const GRID_WIDTH = Math.max(10, Math.floor(BASE_GRID_WIDTH * sizeMultiplier))
+  const GRID_HEIGHT = Math.max(8, Math.floor(BASE_GRID_HEIGHT * sizeMultiplier))
   const AVATAR_SIZE = 40
   const MAP_WIDTH = GRID_WIDTH * TILE_SIZE
   const MAP_HEIGHT = GRID_HEIGHT * TILE_SIZE
+
+  const mousePosRef = useRef(null)
 
   const PROPERTY_COLORS = {
     sari_sari: '#F97316', food_cart: '#EF4444', tricycle: '#3B82F6',
