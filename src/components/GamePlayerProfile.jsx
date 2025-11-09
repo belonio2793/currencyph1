@@ -240,43 +240,98 @@ export default function GamePlayerProfile({ playerId, onClose }) {
       <div className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-8 flex items-start justify-between">
-          <div className="flex items-start gap-4">
-            {/* Avatar */}
-            <div className="w-24 h-24 bg-slate-800 rounded-lg overflow-hidden border-2 border-white/20 flex items-center justify-center">
-              {player.appearance?.thumbnail ? (
-                <img src={player.appearance.thumbnail} alt={player.name} className="w-full h-full object-cover" />
-              ) : (
-                <div className="text-3xl">🎮</div>
-              )}
-            </div>
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex items-start gap-4 flex-1">
+              {/* Avatar */}
+              <div className="w-24 h-24 bg-slate-800 rounded-lg overflow-hidden border-2 border-white/20 flex items-center justify-center flex-shrink-0">
+                {player.appearance?.thumbnail ? (
+                  <img src={player.appearance.thumbnail} alt={player.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="text-3xl">🎮</div>
+                )}
+              </div>
 
-            {/* Info */}
-            <div className="text-white">
-              <h1 className="text-3xl font-bold">{player.name}</h1>
-              <p className="text-purple-100 text-lg">Level {player.level || 1}</p>
-              <div className="mt-2 flex gap-4 text-sm">
-                <div>
-                  <p className="text-purple-200">Experience</p>
-                  <p className="font-semibold">{(player.experience || 0).toLocaleString()}</p>
-                </div>
-                <div>
-                  <p className="text-purple-200">Wealth</p>
-                  <p className="font-semibold text-green-300">₱{(player.wealth || 0).toLocaleString()}</p>
+              {/* Info */}
+              <div className="text-white flex-1">
+                <h1 className="text-3xl font-bold">{player.name}</h1>
+                <p className="text-purple-100 text-lg">Level {player.level || 1}</p>
+                <div className="mt-2 flex gap-4 text-sm">
+                  <div>
+                    <p className="text-purple-200">Experience</p>
+                    <p className="font-semibold">{(player.experience || 0).toLocaleString()}</p>
+                  </div>
+                  <div>
+                    <p className="text-purple-200">Wealth</p>
+                    <p className="font-semibold text-green-300">₱{(player.wealth || 0).toLocaleString()}</p>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                {currentUserId && currentUserId !== playerId && (
+                  <>
+                    <button
+                      onClick={handleFollow}
+                      disabled={actionLoading}
+                      className={`px-4 py-2 rounded font-medium transition-colors text-sm whitespace-nowrap ${
+                        isFollowing
+                          ? 'bg-white/20 text-white hover:bg-white/30'
+                          : 'bg-white text-purple-600 hover:bg-purple-50'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    >
+                      {isFollowing ? 'Following' : 'Follow'}
+                    </button>
+                    <button
+                      onClick={handleMessage}
+                      className="px-4 py-2 bg-white text-purple-600 rounded font-medium hover:bg-purple-50 transition-colors text-sm whitespace-nowrap"
+                      title="Send message"
+                    >
+                      💬
+                    </button>
+                    <button
+                      onClick={handleTrade}
+                      className="px-4 py-2 bg-white text-purple-600 rounded font-medium hover:bg-purple-50 transition-colors text-sm whitespace-nowrap"
+                      title="Initiate trade"
+                    >
+                      📦
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Close Button */}
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-white/20 rounded transition-colors text-white"
+                title="Close profile"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
 
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-white/20 rounded transition-colors"
-          >
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          {/* Additional options */}
+          {currentUserId && currentUserId !== playerId && (
+            <div className="mt-3 flex gap-2 justify-end">
+              <button
+                onClick={handleBlock}
+                disabled={actionLoading}
+                className={`px-3 py-1 text-sm rounded transition-colors ${
+                  isBlocked
+                    ? 'bg-red-600 text-white hover:bg-red-700'
+                    : 'bg-white/10 text-white hover:bg-white/20'
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
+              >
+                {isBlocked ? '🚫 Blocked' : '🚫 Block'}
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Content */}
