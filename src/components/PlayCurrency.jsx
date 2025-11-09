@@ -1515,7 +1515,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       city={cityFocus}
                       initialAvatarPos={initialAvatarPos}
                       onConsumeEnergy={consumeEnergy}
-                      placingProperty={placingAsset}
+                      externalPlacingProperty={placingAsset}
                       onConfirmPlace={(coords) => confirmPlacement(coords)}
                       onCancelPlace={() => setPlacingAsset(null)}
                       onPropertyClick={(property) => {
