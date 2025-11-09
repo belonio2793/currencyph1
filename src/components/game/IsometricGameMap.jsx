@@ -603,9 +603,17 @@ export default function IsometricGameMap({
 
     ctx.clearRect(0, 0, width, height)
 
-    // ground
-    ctx.fillStyle = '#6ba54a'
-    ctx.fillRect(0, 0, width, height)
+    // ground - subtle checkered grass tiles to match original aesthetic
+    const baseA = '#6ba54a'
+    const baseB = adjustBrightness(baseA, -6)
+    const tilePx = TILE_SIZE
+    for (let gx = -tilePx; gx < width + tilePx; gx += tilePx) {
+      for (let gy = -tilePx; gy < height + tilePx; gy += tilePx) {
+        const isAlt = ((gx / tilePx) + (gy / tilePx)) % 2 === 0
+        ctx.fillStyle = isAlt ? baseA : baseB
+        ctx.fillRect(gx, gy, tilePx, tilePx)
+      }
+    }
 
     const centerX = width / 2
     const centerY = height / 2
