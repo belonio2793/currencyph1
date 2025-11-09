@@ -237,7 +237,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const passiveTimerRef = useRef(null)
   const presenceChannelRef = useRef(null)
   const presenceTimerRef = useRef(null)
-  const [isIsometric, setIsIsometric] = useState(false)
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
   const [matchRequests, setMatchRequests] = useState([])
