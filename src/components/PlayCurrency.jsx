@@ -1412,8 +1412,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   <div className="flex items-center gap-2">
                     <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
                     <select onChange={(e) => setMapViewMode(e.target.value)} value={mapViewMode} className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-white">
-                      <option value="manila">Manila Map</option>
-                      <option value="isometric">Isometric View</option>
+                      <option value="isometric">Player View</option>
                       <option value="grid">City Grid</option>
                     </select>
                   </div>
