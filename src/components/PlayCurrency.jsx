@@ -328,7 +328,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setSavedFlash(true)
       setTimeout(() => setSavedFlash(false), 400)
     } catch (e) { /* ignore */ }
-  }, [characterPosition, cityFocus, character && character.id])
+  }, [characterPosition, cityFocus, character?.id])
 
   // Ensure character.current_location reflects UI cityFocus and persist lightly
   useEffect(() => {
