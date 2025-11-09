@@ -202,6 +202,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
   const [savedFlash, setSavedFlash] = useState(false)
+  const [phases, setPhases] = useState({ didJob: false, boughtAsset: false, claimedDaily: false, visitedCities: {}, winDuel: false })
   const lastAutosaveRef = useRef(0)
 
   useEffect(() => {
@@ -319,6 +320,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     } catch (e) { /* ignore */ }
   }, [character?.id])
 
+  // Load phases from localStorage for this character
+  useEffect(() => {
+    if (!character || !character.id) return
+    try {
+      const raw = localStorage.getItem(`pc_phases_${character.id}`)
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed === 'object') setPhases(parsed)
+      }
+    } catch (e) { /* ignore */ }
+  }, [character?.id])
+
   // Debounced autosave of position/city
   useEffect(() => {
     if (!character || !character.id) return
@@ -358,6 +371,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     setCityFocus(cityName)
     setCharacterPosition({ ...characterPosition, city: cityName })
     rotateJobs()
+    markVisitedCity(cityName)
   }
 
   // Update cosmetics and persist to character
@@ -394,6 +408,21 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       clearInterval(passiveTimerRef.current)
       passiveTimerRef.current = null
     }
+  }
+
+  const savePhases = (next) => {
+    try {
+      if (!character || !character.id) return
+      localStorage.setItem(`pc_phases_${character.id}`, JSON.stringify(next))
+    } catch (e) { /* ignore */ }
+  }
+
+  const markVisitedCity = (name) => {
+    setPhases(prev => {
+      const updated = { ...prev, visitedCities: { ...(prev.visitedCities || {}), [name]: true } }
+      savePhases(updated)
+      return updated
+    })
   }
 
   const persistCharacterPartial = async (char) => {
@@ -575,6 +604,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setIsWorking(false)
       setWorkingJobId(null)
       setWorkProgress(0)
+      setPhases(prev => { const next = { ...prev, didJob: true }; savePhases(next); return next })
       await loadLeaderboard()
     }, duration + 200)
   }
@@ -601,6 +631,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     setCharacter(updated)
     persistCharacterPartial(updated)
     if (userId) saveCharacterToDB(updated)
+    setPhases(prev => { const next = { ...prev, boughtAsset: true }; savePhases(next); return next })
     await loadLeaderboard()
   }
 
@@ -634,6 +665,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     setCharacter(updated)
     persistCharacterPartial(updated)
     if (userId) saveCharacterToDB(updated)
+    setPhases(prev => { const next = { ...prev, claimedDaily: true }; savePhases(next); return next })
     // log daily reward table
     if (userId) {
       try {
@@ -825,6 +857,17 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     } catch (e) {
       console.warn('rejectMatch failed', e)
     }
+  }
+
+  const consumeEnergy = (amount = 1) => {
+    setCharacter((c) => {
+      if (!c) return c
+      const maxE = c.max_energy || 100
+      const next = { ...c, energy: Math.max(0, (c.energy ?? maxE) - amount) }
+      persistCharacterPartial(next)
+      if (userId) saveCharacterToDB(next)
+      return next
+    })
   }
 
   const [duelSession, setDuelSession] = useState(null)
@@ -1073,6 +1116,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       character={character}
                       city={cityFocus}
                       initialAvatarPos={initialAvatarPos}
+                      onConsumeEnergy={(amt) => consumeEnergy(amt)}
                       onPropertyClick={(property) => {
                         // open quick buy modal: for now, give click reward
                         const reward = 20 + Math.floor(Math.random() * 80)
@@ -1207,6 +1251,12 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   <div className="text-xs text-slate-400">Income Rate</div>
                   <div className="text-xl font-bold text-emerald-300">{formatMoney(character.income_rate)}/10s</div>
                 </div>
+                <div className="p-3 bg-slate-900/30 rounded">
+                  <div className="text-xs text-slate-400">Energy</div>
+                  <div className="w-full h-2 bg-slate-700 rounded overflow-hidden mt-2">
+                    <div className="h-full bg-emerald-400" style={{ width: `${Math.max(0, Math.min(100, ((character.energy ?? 100) / (character.max_energy ?? 100)) * 100))}%` }}></div>
+                  </div>
+                </div>
                 <div className="mt-2 flex gap-2">
                   <button onClick={claimDaily} className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white">Claim Daily</button>
                   {!userId && (
@@ -1243,6 +1293,35 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Game Phases */}
+            {character && (
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-bold mb-3">Game Phases</h3>
+                <ul className="space-y-2 text-sm">
+                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                    <span>Do a job</span>
+                    <span className={`text-xs ${phases.didJob ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.didJob ? 'Done' : 'Pending'}</span>
+                  </li>
+                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                    <span>Buy an asset</span>
+                    <span className={`text-xs ${phases.boughtAsset ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.boughtAsset ? 'Done' : 'Pending'}</span>
+                  </li>
+                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                    <span>Claim daily reward</span>
+                    <span className={`text-xs ${phases.claimedDaily ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.claimedDaily ? 'Done' : 'Pending'}</span>
+                  </li>
+                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                    <span>Visit 3 cities</span>
+                    <span className="text-xs text-slate-400">{Object.keys(phases.visitedCities || {}).length}/3</span>
+                  </li>
+                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                    <span>Win a duel</span>
+                    <span className={`text-xs ${phases.winDuel ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.winDuel ? 'Done' : 'Pending'}</span>
+                  </li>
+                </ul>
               </div>
             )}
 
