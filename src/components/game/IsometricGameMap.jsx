@@ -271,7 +271,7 @@ export default function IsometricGameMap({
     // hair
     ctx.fillStyle = hairColor
     ctx.beginPath()
-    ctx.arc(screenX + size / 2, screenY - 10, 8, Math.PI, 0, true)
+    ctx.arc(screenX + size / 2, screenY - 10 + floatOffset, 8, Math.PI, 0, true)
     ctx.fill()
 
     // legs with idle sway
