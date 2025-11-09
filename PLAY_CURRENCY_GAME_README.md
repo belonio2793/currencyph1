@@ -101,6 +101,47 @@ A turn-based economic simulation minigame built into Currency.ph where players m
 
 ---
 
+## ⚔️ Combat Mechanics Deep Dive
+
+### Ability System
+All abilities have distinct tactical purposes:
+
+| Ability | Damage | Cost | Cooldown | Effect |
+|---------|--------|------|----------|--------|
+| ⚔️ Attack | 5-20 | 10 energy | None | Basic attack, always available |
+| 💥 Power Strike | 15-40 | 20 energy | 3 turns | High damage, strategic use |
+| 🛡️ Counter | 10 + block | 15 energy | 2 turns | Defensive, blocks damage |
+| 💚 Heal | 30-50 HP | 15 energy | 4 turns | Restore health, tactical healing |
+| ⚡ Execute | 25-50 + crit | 40 energy | 6 turns | Ultimate ability, critical bonus |
+
+### Status Effects
+Each effect has tactical implications:
+- **Stun** (💫): Cannot act this turn — 1 turn duration
+- **Bleed** (🩸): Takes 5 damage per turn — 3 turns duration
+- **Shield** (🛡️): Reduces incoming damage by 50% — 2 turns duration
+- **Poison** (☠️): Takes 3 damage per turn — 3 turns duration
+- **Regen** (✨): Restores 10 HP per turn — 2 turns duration
+
+### Game Flow
+1. **Turn Start**: 30-second timer begins
+2. **Action Phase**: Player selects ability to execute
+3. **Animation**: Damage/heal float numbers appear
+4. **Broadcast**: Action sent to opponent via realtime channel
+5. **Status Processing**: Apply effect damage/healing
+6. **AI Turn**: Opponent automatically takes turn
+7. **Cooldown Management**: Reduce all ability cooldowns by 1
+8. **Repeat**: Next turn begins
+
+### Damage Calculation
+```javascript
+baseDamage = ability.execute(attacker.stats).damage
+actualDamage = baseDamage - (defender.shield % if active)
+finalDamage = isCritical ? actualDamage * 1.5 : actualDamage
+// Critical hit chance: 15%
+```
+
+---
+
 ## 🏗️ Architecture
 
 ### Components
