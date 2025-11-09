@@ -405,7 +405,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         level: char.level,
         properties: char.properties || [],
         cosmetics: char.cosmetics || null,
-        last_daily: char.last_daily || null
+        last_daily: char.last_daily || null,
+        current_location: char.current_location || null,
+        home_city: char.home_city || null
       }, { onConflict: 'id' })
     } catch (e) {
       // ignore persistence errors but log
@@ -426,7 +428,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         level: char.level,
         properties: char.properties || [],
         cosmetics: char.cosmetics || null,
-        last_daily: char.last_daily || null
+        last_daily: char.last_daily || null,
+        current_location: char.current_location || null,
+        home_city: char.home_city || null
       }
       const { error: e } = await supabase.from('game_characters').upsert(payload, { onConflict: 'id' })
       if (e) throw e
@@ -1108,7 +1112,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <div key={`job-${idx}-${jobSeed}`} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
                       <div className="font-semibold text-slate-100">{job.name}</div>
                       <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
-                      <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
+                      <div className="text-xs text-slate-500 mt-1">Difficulty: {'��'.repeat(job.difficulty)}</div>
                       <div className="mt-3">
                         <button
                           disabled={isWorking && workingJobId !== job.name}
