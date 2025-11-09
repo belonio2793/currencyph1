@@ -645,16 +645,27 @@ export default function IsometricGameMap({
       }
     }
 
-    // tiles and optional grid overlay
+    // tiles and optional grid overlay with improved roads
     for (let gridX = 0; gridX < GRID_WIDTH; gridX++) {
       for (let gridY = 0; gridY < GRID_HEIGHT; gridY++) {
-        const isRoad = gridX % 4 === 0 || gridY % 4 === 0
+        const isMainRoad = gridX % 5 === 0 || gridY % 5 === 0
+        const isSecondaryRoad = (gridX % 2 === 0 && gridX % 5 !== 0) || (gridY % 2 === 0 && gridY % 5 !== 0)
         const isoPos = gridToIsometric(gridX, gridY)
 
         if (showGrid && ((gridX % 2 === 0) || (gridY % 2 === 0))) {
           drawIsometricTile(ctx, isoPos.x, isoPos.y, '#7b8794', 0, false)
-        } else if (isRoad) {
-          drawIsometricTile(ctx, isoPos.x, isoPos.y, '#4a5568', 0, false)
+        } else if (isMainRoad) {
+          // Major roads - darker asphalt
+          drawIsometricTile(ctx, isoPos.x, isoPos.y, '#2d3436', 0, false)
+          // Road markings
+          if (gridX % 10 === 0 && gridY % 10 === 0) {
+            ctx.fillStyle = '#FFD700'
+            ctx.globalAlpha = 0.4
+            ctx.fillRect(isoPos.x - 3, isoPos.y - 2, 6, 1)
+          }
+        } else if (isSecondaryRoad) {
+          // Secondary roads - lighter asphalt
+          drawIsometricTile(ctx, isoPos.x, isoPos.y, '#424242', 0, false)
         } else {
           const gameX = (gridX / GRID_WIDTH) * MAP_WIDTH
           const gameY = (gridY / GRID_HEIGHT) * MAP_HEIGHT
