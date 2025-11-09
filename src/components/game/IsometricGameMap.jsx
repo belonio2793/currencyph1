@@ -1030,7 +1030,7 @@ export default function IsometricGameMap({
 
     const animate = () => {
       // Determine velocity from keys or click-to-move
-      const baseSpeed = (mapSettings.avatarSpeed || 1) * 280
+      const baseSpeed = (mapSettings.avatarSpeed || 1) * 140
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
       const sprint = (keysPressed.current['shift'] && canSprint) ? 2.2 : 1
       let vx = 0, vy = 0
