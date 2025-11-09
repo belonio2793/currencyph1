@@ -724,19 +724,6 @@ export default function IsometricGameMap({
       }
     }
 
-    const handleMiniMapClick = (e) => {
-      const mini = miniMapRef.current
-      if (!mini) return
-      const rect = mini.getBoundingClientRect()
-      const px = (e.clientX - rect.left) / rect.width
-      const py = (e.clientY - rect.top) / rect.height
-      const targetX = px * MAP_WIDTH
-      const targetY = py * MAP_HEIGHT
-      const target = { x: targetX, y: targetY }
-      // center camera on minimap click
-      targetCameraRef.current = { x: target.x, y: target.y }
-    }
-
     canvas.addEventListener('mousedown', handleMouseDown)
     canvas.addEventListener('mousemove', handleMouseMove)
     canvas.addEventListener('mouseup', handleMouseUp)
@@ -744,9 +731,6 @@ export default function IsometricGameMap({
     canvas.addEventListener('wheel', handleWheel, { passive: false })
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
-
-    const mini = miniMapRef.current
-    if (mini) mini.addEventListener('click', handleMiniMapClick)
 
     const animate = () => {
       // Apply velocity to avatar position
@@ -848,7 +832,7 @@ export default function IsometricGameMap({
             </div>
             <div className="space-y-0.5">
               <div>🎮 WASD / Arrows = Move</div>
-              <div>🖱️ Drag = Pan Map</div>
+              <div>🖱�� Drag = Pan Map</div>
               <div>🔍 Scroll = Zoom</div>
               <div>Click = Job / Property</div>
             </div>
