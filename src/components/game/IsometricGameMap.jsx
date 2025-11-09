@@ -563,7 +563,7 @@ export default function IsometricGameMap({
 
 
     // If placing a property, draw a ghosted building at mouse
-    if (placingProperty && mousePosRef.current) {
+    if (externalPlacingProperty && mousePosRef.current) {
       const m = mousePosRef.current
       const centerX = width / 2
       const centerY = height / 2
