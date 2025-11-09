@@ -610,9 +610,12 @@ export default function IsometricGameMap({
     const centerX = width / 2
     const centerY = height / 2
 
+    // Use smooth interpolated zoom from zoomRef to avoid abrupt jumps
+    const z = zoomRef.current || 1
+
     ctx.save()
-    ctx.translate(centerX - cameraPos.x * zoom, centerY - cameraPos.y * zoom)
-    ctx.scale(zoom, zoom)
+    ctx.translate(centerX - cameraPos.x * z, centerY - cameraPos.y * z)
+    ctx.scale(z, z)
 
     // District background rendering
     if (showDistricts) {
