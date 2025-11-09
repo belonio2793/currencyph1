@@ -247,6 +247,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
   const [mapViewMode, setMapViewMode] = useState('manila') // 'manila', 'isometric', 'grid'
+  const [propertyPanelOpen, setPropertyPanelOpen] = useState(false)
   const [phases, setPhases] = useState({
     // Basic phases
     didJob: false,
@@ -1662,7 +1663,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <span className="text-sm font-semibold text-amber-300">{characterStats.endurance}</span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">🎯 Dexterity</span>
+                    <span className="text-sm">���� Dexterity</span>
                     <span className="text-sm font-semibold text-green-300">{characterStats.dexterity}</span>
                   </div>
                   <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
