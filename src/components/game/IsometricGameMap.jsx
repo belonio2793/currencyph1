@@ -269,44 +269,61 @@ export default function IsometricGameMap({
     const mini = miniMapRef.current
     const main = canvasRef.current
     if (!mini || !main) return
-    const mctx = mini.getContext('2d')
-    const w = mini.width
-    const h = mini.height
-    mctx.clearRect(0, 0, w, h)
 
-    // background
-    mctx.fillStyle = '#0b1220'
-    mctx.fillRect(0, 0, w, h)
+    // Ensure mini is a canvas and has 2D context
+    if (typeof mini.getContext !== 'function' || (mini.tagName && mini.tagName.toLowerCase() !== 'canvas')) {
+      console.warn('Mini-map element is not a canvas', mini)
+      return
+    }
 
-    // properties
-    (properties || []).forEach(p => {
-      if (!p.location_x || !p.location_y) return
-      const px = (p.location_x % MAP_WIDTH) / MAP_WIDTH
-      const py = (p.location_y % MAP_HEIGHT) / MAP_HEIGHT
-      const color = PROPERTY_COLORS[p.property_type] || PROPERTY_COLORS.default
-      mctx.fillStyle = color
-      mctx.fillRect(px * w - 1, py * h - 1, 2, 2)
-    })
+    const mctx = mini.getContext && mini.getContext('2d')
+    if (!mctx || typeof mctx.fillRect !== 'function') {
+      console.warn('Mini-map 2D context unavailable or invalid', mctx)
+      return
+    }
 
-    // avatar
-    mctx.fillStyle = '#22d3ee'
-    mctx.beginPath()
-    mctx.arc((avatarPos.x / MAP_WIDTH) * w, (avatarPos.y / MAP_HEIGHT) * h, 2, 0, Math.PI * 2)
-    mctx.fill()
+    const w = Number(mini.width) || 140
+    const h = Number(mini.height) || 100
 
-    // camera viewport rectangle
     try {
-      const mainRect = main.getBoundingClientRect()
-      const mainW = mainRect.width || main.width
-      const mainH = mainRect.height || main.height
-      const viewW = (mainW / zoom) / MAP_WIDTH * w
-      const viewH = (mainH / zoom) / MAP_HEIGHT * h
-      const camX = ((cameraPos.x) / MAP_WIDTH) * w
-      const camY = ((cameraPos.y) / MAP_HEIGHT) * h
-      mctx.strokeStyle = '#e2e8f0'
-      mctx.lineWidth = 1
-      mctx.strokeRect(Math.max(0, camX), Math.max(0, camY), Math.min(w, viewW), Math.min(h, viewH))
-    } catch (e) { console.warn('minimap viewport calc failed', e) }
+      mctx.clearRect(0, 0, w, h)
+
+      // background
+      mctx.fillStyle = '#0b1220'
+      mctx.fillRect(0, 0, w, h)
+
+      // properties
+      (properties || []).forEach(p => {
+        if (p.location_x == null || p.location_y == null) return
+        const px = ((p.location_x % MAP_WIDTH) + MAP_WIDTH) % MAP_WIDTH / MAP_WIDTH
+        const py = ((p.location_y % MAP_HEIGHT) + MAP_HEIGHT) % MAP_HEIGHT / MAP_HEIGHT
+        const color = PROPERTY_COLORS[p.property_type] || PROPERTY_COLORS.default
+        mctx.fillStyle = color
+        mctx.fillRect(Math.round(px * w) - 1, Math.round(py * h) - 1, 2, 2)
+      })
+
+      // avatar
+      mctx.fillStyle = '#22d3ee'
+      mctx.beginPath()
+      mctx.arc(Math.round((avatarPos.x / MAP_WIDTH) * w), Math.round((avatarPos.y / MAP_HEIGHT) * h), 2, 0, Math.PI * 2)
+      mctx.fill()
+
+      // camera viewport rectangle
+      try {
+        const mainRect = main.getBoundingClientRect()
+        const mainW = mainRect.width || main.width
+        const mainH = mainRect.height || main.height
+        const viewW = (mainW / zoom) / MAP_WIDTH * w
+        const viewH = (mainH / zoom) / MAP_HEIGHT * h
+        const camX = ((cameraPos.x) / MAP_WIDTH) * w
+        const camY = ((cameraPos.y) / MAP_HEIGHT) * h
+        mctx.strokeStyle = '#e2e8f0'
+        mctx.lineWidth = 1
+        mctx.strokeRect(Math.max(0, camX), Math.max(0, camY), Math.min(w, viewW), Math.min(h, viewH))
+      } catch (e) { console.warn('minimap viewport calc failed', e) }
+    } catch (e) {
+      console.warn('drawMinimap failed', e)
+    }
   }
 
   const draw = useCallback(() => {
