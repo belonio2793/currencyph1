@@ -1255,26 +1255,6 @@ export default function IsometricGameMap({
             className="px-2 py-1 text-xs bg-slate-700 text-white border border-slate-600 rounded hover:bg-slate-600 transition-colors"
             title="Zoom in"
           >+</button>
-          <button
-            onClick={() => setFollowAvatar(v => !v)}
-            className={`px-2 py-1 text-xs rounded border transition-colors ${followAvatar ? 'bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
-            title="Toggle camera follow"
-          >Follow</button>
-          <button
-            onClick={() => setShowGrid(v => !v)}
-            className={`px-2 py-1 text-xs rounded border transition-colors ${showGrid ? 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
-            title="Toggle grid overlay"
-          >Grid</button>
-          <button
-            onClick={() => setShowDistricts(v => !v)}
-            className={`px-2 py-1 text-xs rounded border transition-colors ${showDistricts ? 'bg-purple-600 text-white border-purple-700 hover:bg-purple-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
-            title="Toggle district overlay"
-          >Districts</button>
-          <button
-            onClick={() => setShowDecor(v => !v)}
-            className={`px-2 py-1 text-xs rounded border transition-colors ${showDecor ? 'bg-amber-600 text-black border-amber-700 hover:bg-amber-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
-            title="Toggle decorations"
-          >Decor</button>
         </div>
 
         {/* Enhanced Property Tooltip */}
