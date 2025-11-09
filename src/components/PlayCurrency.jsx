@@ -1546,58 +1546,41 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
-                <h3 className="text-lg font-bold mb-2">Marketplace</h3>
-                <p className="text-xs text-slate-400 mb-3">Buy assets that generate passive income.</p>
-                <div className="space-y-3">
-                  {market.map(item => (
-                    <div key={item.id} className="flex items-center justify-between bg-slate-900/20 p-3 rounded">
-                      <div>
-                        <div className="font-medium">{item.name}</div>
-                        <div className="text-xs text-slate-400">Income: {formatMoney(item.income)}/10s • Price: {formatMoney(item.price)}</div>
-                      </div>
-                      <div>
-                        <button onClick={() => buyProperty(item)} className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Buy</button>
-                      </div>
-                    </div>
-                  ))}
+            {propertyPanelOpen && (
+              <div className="mt-4 fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="w-full max-w-2xl max-h-[90vh] rounded-lg overflow-hidden">
+                  <PropertyManagementPanel
+                    character={character}
+                    properties={character.properties || []}
+                    market={market}
+                    wealth={character.wealth || 0}
+                    onBuyProperty={buyProperty}
+                    onUpgradeProperty={upgradeProperty}
+                    onSellProperty={sellProperty}
+                    onCollectIncome={(propId) => {
+                      const prop = (character.properties || []).find(p => p.id === propId)
+                      if (prop) {
+                        const reward = Number(prop.income || 0) * 3.6
+                        setCharacter((c) => {
+                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward }
+                          persistCharacterPartial(updated)
+                          if (userId) saveCharacterToDB(updated)
+                          return updated
+                        })
+                      }
+                    }}
+                    onClose={() => setPropertyPanelOpen(false)}
+                  />
                 </div>
               </div>
+            )}
 
-              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
-                <h3 className="text-lg font-bold mb-2">Your Properties</h3>
-                <p className="text-xs text-slate-400 mb-3">Owned assets that provide passive income. Upgrade to increase earnings!</p>
-                <div className="space-y-3">
-                  {(character.properties || []).length === 0 && <div className="text-slate-400 text-sm">You do not own any properties yet.</div>}
-                  {(character.properties || []).map(prop => {
-                    const upgradeCost = Math.floor(prop.price * (0.25 * (prop.upgrade_level + 1)))
-                    return (
-                      <div key={prop.id + (prop.purchased_at || '')} className="bg-slate-900/20 p-3 rounded space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="font-medium">{prop.name}</div>
-                            <div className="text-xs text-slate-400">Lvl {prop.upgrade_level || 0} • Income: {formatMoney(prop.income)}/10s • Value: ₱{Number(prop.current_value || 0).toLocaleString()}</div>
-                          </div>
-                          <div className="text-xs text-purple-300 font-semibold">Lvl {prop.upgrade_level || 0}</div>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs">
-                          <button
-                            onClick={() => upgradeProperty(prop.id)}
-                            disabled={(character.wealth || 0) < upgradeCost}
-                            className={`flex-1 px-2 py-1 rounded text-white font-medium transition-colors ${(character.wealth || 0) < upgradeCost ? 'bg-slate-600 opacity-50 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}
-                            title={`Upgrade cost: ₱${upgradeCost}`}
-                          >
-                            ⬆️ Upgrade (₱{upgradeCost})
-                          </button>
-                          <button onClick={() => sellProperty(prop.id)} className="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-white">Sell</button>
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
+            <button
+              onClick={() => setPropertyPanelOpen(true)}
+              className="mt-4 w-full px-4 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 rounded-lg text-white font-bold text-lg transition-all"
+            >
+              🏢 Property Empire Manager ({(character.properties || []).length} owned)
+            </button>
 
           </div>
 
