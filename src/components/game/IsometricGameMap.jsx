@@ -122,15 +122,17 @@ export default function IsometricGameMap({
     ctx.closePath()
     ctx.fill()
 
-    // highlight
+    // multi-layer highlight for depth
     const gradient = ctx.createLinearGradient(screenX - w, screenY, screenX, screenY + h * 2)
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.08)')
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.12)')
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.12)')
+    gradient.addColorStop(0.4, 'rgba(255, 255, 255, 0.04)')
+    gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.06)')
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.18)')
     ctx.fillStyle = gradient
     ctx.fill()
 
     // border
-    ctx.strokeStyle = isHovered ? 'rgba(255, 200, 50, 0.9)' : 'rgba(0, 0, 0, 0.2)'
+    ctx.strokeStyle = isHovered ? 'rgba(255, 200, 50, 0.9)' : 'rgba(0, 0, 0, 0.25)'
     ctx.lineWidth = isHovered ? 2.5 : 1.5
     ctx.stroke()
 
@@ -141,9 +143,10 @@ export default function IsometricGameMap({
       ctx.stroke()
     }
 
-    // 3D height
+    // 3D height/depth
     if (height > 0) {
-      ctx.fillStyle = adjustBrightness(color, -25)
+      // left side
+      ctx.fillStyle = adjustBrightness(color, -30)
       ctx.beginPath()
       ctx.moveTo(screenX, screenY)
       ctx.lineTo(screenX, screenY - height)
@@ -152,7 +155,8 @@ export default function IsometricGameMap({
       ctx.closePath()
       ctx.fill()
 
-      ctx.fillStyle = adjustBrightness(color, -45)
+      // right side
+      ctx.fillStyle = adjustBrightness(color, -50)
       ctx.beginPath()
       ctx.moveTo(screenX, screenY)
       ctx.lineTo(screenX + w, screenY + h)
@@ -161,9 +165,22 @@ export default function IsometricGameMap({
       ctx.closePath()
       ctx.fill()
 
+      // depth gradient on left face
+      const leftGrad = ctx.createLinearGradient(screenX - w, screenY + h, screenX, screenY)
+      leftGrad.addColorStop(0, 'rgba(0, 0, 0, 0.15)')
+      leftGrad.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.fillStyle = leftGrad
+      ctx.beginPath()
+      ctx.moveTo(screenX, screenY)
+      ctx.lineTo(screenX, screenY - height)
+      ctx.lineTo(screenX - w, screenY - height + h)
+      ctx.lineTo(screenX - w, screenY + h)
+      ctx.closePath()
+      ctx.fill()
+
       // edge highlight
-      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
-      ctx.lineWidth = 0.5
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'
+      ctx.lineWidth = 0.8
       ctx.beginPath()
       ctx.moveTo(screenX, screenY - height)
       ctx.lineTo(screenX - w, screenY - height + h)
