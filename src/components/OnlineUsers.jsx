@@ -258,6 +258,7 @@ export default function OnlineUsers({ userId, userEmail }) {
             <MapContainer
               center={[12.5, 121.5]}
               zoom={13}
+              keyboard={false}
               style={{ height: '100%', width: '100%' }}
             >
               <TileLayer
