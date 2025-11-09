@@ -207,6 +207,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               if (selected) {
                 setCharacter(selected)
                 setProperties(selected.properties || [])
+                // Load cosmetics from character or use defaults
+                if (selected.cosmetics) {
+                  setCosmetics(validateCosmetics(selected.cosmetics))
+                }
               } else {
                 setCharacter(null)
               }
