@@ -839,22 +839,44 @@ export default function IsometricGameMap({
           style={{ display: 'block' }}
         />
 
-        {/* Controls Help */}
-        <div className="absolute top-2 left-2 bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 z-20 text-xs text-slate-300">
-          <div className="font-bold text-yellow-400 mb-1">Controls:</div>
-          <div className="space-y-0.5">
-            <div>🎮 WASD / Arrows = Move</div>
-            <div>🖱️ Drag = Pan Map</div>
-            <div>🔍 Scroll = Zoom</div>
-            <div>Click = Job / Property</div>
+        {/* Collapsible Controls Help */}
+        <div className={`absolute top-2 left-2 transition-all duration-300 z-20 ${showControls ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+          <div className="bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 text-xs text-slate-300">
+            <div className="flex items-center justify-between mb-1">
+              <div className="font-bold text-yellow-400">Controls</div>
+              <button
+                onClick={() => setShowControls(!showControls)}
+                className="ml-2 text-slate-400 hover:text-slate-200 transition"
+                title="Toggle controls"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="space-y-0.5">
+              <div>🎮 WASD / Arrows = Move</div>
+              <div>🖱️ Drag = Pan Map</div>
+              <div>🔍 Scroll = Zoom</div>
+              <div>Click = Job / Property</div>
+            </div>
           </div>
         </div>
 
-        {/* Mini-map */}
-        <div className="absolute top-2 right-2 bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 z-20">
-          <canvas ref={miniMapRef} width={140} height={100} className="block rounded" />
-          <div className="text-[10px] text-slate-300 mt-1 text-center">Mini-map</div>
-        </div>
+        {/* Collapsible Minimap */}
+        <CollapsibleMinimap
+          properties={properties}
+          character={character}
+          avatarPos={avatarPos}
+          zoom={zoom}
+          cameraPos={cameraPos}
+          onMinimapClick={(coords) => {
+            // Move avatar to clicked location via pathfinding
+            const viewport = { left: cameraPos.x - 150, right: cameraPos.x + 150, top: cameraPos.y - 130, bottom: cameraPos.y + 130 }
+            const targetX = coords.x
+            const targetY = coords.y
+            targetCameraRef.current = { x: targetX, y: targetY }
+          }}
+          city={selectedCity}
+        />
 
         {/* Working Indicator */}
         {isWorking && (
