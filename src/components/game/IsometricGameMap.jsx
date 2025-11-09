@@ -15,7 +15,8 @@ export default function IsometricGameMap({
   isWorking = false,
   workProgress = 0,
   workingJobId = null,
-  initialAvatarPos = null
+  initialAvatarPos = null,
+  onConsumeEnergy = null
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -34,6 +35,8 @@ export default function IsometricGameMap({
   const [showControls, setShowControls] = useState(true)
   const [followAvatar, setFollowAvatar] = useState(true)
   const [showGrid, setShowGrid] = useState(false)
+  const [showDistricts, setShowDistricts] = useState(true)
+  const [showDecor, setShowDecor] = useState(true)
   const keysPressed = useRef({})
   const animationRef = useRef(null)
   const avatarAnimationFrame = useRef(0)
@@ -45,6 +48,7 @@ export default function IsometricGameMap({
   const targetCameraRef = useRef({ x: 0, y: 0 })
   const npcManagerRef = useRef(null)
   const eventSystemRef = useRef(null)
+  const lastEnergyDrainRef = useRef(0)
 
   const TILE_SIZE = 64
   const GRID_WIDTH = 24
@@ -134,6 +138,30 @@ export default function IsometricGameMap({
       (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
       (B < 255 ? (B < 1 ? 0 : B) : 255))
       .toString(16).slice(1)
+  }
+
+  // Seeded pseudo-random based on tile and city for consistent decoration placement
+  const seededRand = (x, y, seedStr = selectedCity) => {
+    const seed = Array.from(String(seedStr)).reduce((a, c) => a + c.charCodeAt(0), 0)
+    let t = x * 374761393 + y * 668265263 + seed * 1442695040888963407
+    t = (t ^ (t >> 13)) * 1274126177
+    t = (t ^ (t >> 16)) >>> 0
+    return (t % 1000) / 1000
+  }
+
+  const drawTree = (ctx, x, y) => {
+    // simple low-poly tree
+    ctx.save()
+    ctx.fillStyle = '#2e7d32'
+    ctx.beginPath()
+    ctx.moveTo(x, y - 6)
+    ctx.lineTo(x + 4, y + 2)
+    ctx.lineTo(x - 4, y + 2)
+    ctx.closePath()
+    ctx.fill()
+    ctx.fillStyle = '#5d4037'
+    ctx.fillRect(x - 0.8, y + 2, 1.6, 3)
+    ctx.restore()
   }
 
   const drawIsometricTile = useCallback((ctx, screenX, screenY, color, height = 0, isHovered = false) => {
@@ -419,16 +447,18 @@ export default function IsometricGameMap({
     ctx.scale(zoom, zoom)
 
     // neighborhoods background blocks
-    for (let neighborhood of Object.values(NEIGHBORHOODS)) {
-      const topLeft = gridToIsometric(neighborhood.bounds.x0, neighborhood.bounds.y0)
-      const bottomRight = gridToIsometric(neighborhood.bounds.x1, neighborhood.bounds.y1)
-      ctx.fillStyle = neighborhood.color
-      ctx.fillRect(
-        topLeft.x,
-        topLeft.y,
-        bottomRight.x - topLeft.x,
-        bottomRight.y - topLeft.y
-      )
+    if (showDistricts) {
+      for (let neighborhood of Object.values(NEIGHBORHOODS)) {
+        const topLeft = gridToIsometric(neighborhood.bounds.x0, neighborhood.bounds.y0)
+        const bottomRight = gridToIsometric(neighborhood.bounds.x1, neighborhood.bounds.y1)
+        ctx.fillStyle = neighborhood.color
+        ctx.fillRect(
+          topLeft.x,
+          topLeft.y,
+          bottomRight.x - topLeft.x,
+          bottomRight.y - topLeft.y
+        )
+      }
     }
 
     // tiles and optional grid overlay
@@ -474,6 +504,13 @@ export default function IsometricGameMap({
             }
           } else {
             drawIsometricTile(ctx, isoPos.x, isoPos.y, adjustBrightness('#6ba54a', -10), 0, false)
+            if (showDecor) {
+              const r = seededRand(gridX, gridY)
+              if (r > 0.82) {
+                // draw a small tree centered on tile
+                drawTree(ctx, isoPos.x, isoPos.y + (TILE_SIZE / 8))
+              }
+            }
           }
         }
       }
@@ -723,6 +760,15 @@ export default function IsometricGameMap({
       // Normalize diagonal movement
       if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071 }
 
+      // Energy drain while sprinting
+      if (onConsumeEnergy && sprint > 1 && (vx !== 0 || vy !== 0)) {
+        const now = performance.now()
+        if (now - lastEnergyDrainRef.current > 500) {
+          try { onConsumeEnergy(1) } catch (e) {}
+          lastEnergyDrainRef.current = now
+        }
+      }
+
       // If no keys, use click-to-move target
       if (vx === 0 && vy === 0 && moveTargetRef.current) {
         const dx = moveTargetRef.current.x - avatarPos.x
@@ -906,6 +952,16 @@ export default function IsometricGameMap({
             className={`px-2 py-1 text-xs rounded border transition-colors ${showGrid ? 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
             title="Toggle grid overlay"
           >Grid</button>
+          <button
+            onClick={() => setShowDistricts(v => !v)}
+            className={`px-2 py-1 text-xs rounded border transition-colors ${showDistricts ? 'bg-purple-600 text-white border-purple-700 hover:bg-purple-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
+            title="Toggle district overlay"
+          >Districts</button>
+          <button
+            onClick={() => setShowDecor(v => !v)}
+            className={`px-2 py-1 text-xs rounded border transition-colors ${showDecor ? 'bg-amber-600 text-black border-amber-700 hover:bg-amber-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
+            title="Toggle decorations"
+          >Decor</button>
         </div>
 
         {/* Tooltip */}
@@ -923,6 +979,18 @@ export default function IsometricGameMap({
                 <div>Tier: {tooltipData.upgrade}</div>
               </div>
             )}
+          </div>
+        )}
+        {/* Energy overlay */}
+        {character && typeof character.energy === 'number' && (
+          <div className="absolute left-2 bottom-2 z-20 bg-slate-900/70 border border-slate-700 rounded px-3 py-2 text-[10px] text-slate-200">
+            <div className="mb-1">Energy</div>
+            <div className="w-40 h-2 bg-slate-700 rounded overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-emerald-400 to-emerald-300"
+                style={{ width: `${Math.max(0, Math.min(100, (character.energy / (character.max_energy || 100)) * 100))}%` }}
+              />
+            </div>
           </div>
         )}
       </div>
