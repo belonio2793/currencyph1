@@ -1351,32 +1351,81 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
             )}
 
-            {/* Game Phases */}
+            {/* Game Phases / Achievements */}
             {character && (
               <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-bold mb-3">Game Phases</h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                    <span>Do a job</span>
-                    <span className={`text-xs ${phases.didJob ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.didJob ? 'Done' : 'Pending'}</span>
-                  </li>
-                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                    <span>Buy an asset</span>
-                    <span className={`text-xs ${phases.boughtAsset ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.boughtAsset ? 'Done' : 'Pending'}</span>
-                  </li>
-                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                    <span>Claim daily reward</span>
-                    <span className={`text-xs ${phases.claimedDaily ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.claimedDaily ? 'Done' : 'Pending'}</span>
-                  </li>
-                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                    <span>Visit 3 cities</span>
-                    <span className="text-xs text-slate-400">{Object.keys(phases.visitedCities || {}).length}/3</span>
-                  </li>
-                  <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                    <span>Win a duel</span>
-                    <span className={`text-xs ${phases.winDuel ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.winDuel ? 'Done' : 'Pending'}</span>
-                  </li>
-                </ul>
+                <h3 className="text-lg font-bold mb-3">Achievement Milestones</h3>
+                <div className="space-y-3">
+                  <div>
+                    <div className="text-xs font-semibold text-slate-300 mb-2">Basic Achievements</div>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>💼 Do a job</span>
+                        <span className={`text-xs ${phases.didJob ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.didJob ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>🏠 Buy an asset</span>
+                        <span className={`text-xs ${phases.boughtAsset ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.boughtAsset ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>🎁 Claim daily reward</span>
+                        <span className={`text-xs ${phases.claimedDaily ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.claimedDaily ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>🌍 Visit all cities</span>
+                        <span className="text-xs text-slate-400">{Object.keys(phases.visitedCities || {}).length}/5</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>⚔️ Win a duel</span>
+                        <span className={`text-xs ${phases.winDuel ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.winDuel ? '✓' : '○'}</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold text-slate-300 mb-2">Progression Goals</div>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>💰 Earn ₱500</span>
+                        <span className={`text-xs ${phases.earnedWealth500 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.earnedWealth500 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>📈 Reach Level 5</span>
+                        <span className={`text-xs ${phases.reachedLevel5 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.reachedLevel5 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>🏘️ Own multiple assets</span>
+                        <span className={`text-xs ${phases.ownedMultipleAssets ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.ownedMultipleAssets ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>🔥 3-day daily streak</span>
+                        <span className={`text-xs ${phases.completedDailyStreak3 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.completedDailyStreak3 ? '✓' : '○'}</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-semibold text-slate-300 mb-2">Elite Achievements</div>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>💎 Earn ₱5000</span>
+                        <span className={`text-xs ${phases.earnedWealth5000 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.earnedWealth5000 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>⭐ Reach Level 10</span>
+                        <span className={`text-xs ${phases.reachedLevel10 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.reachedLevel10 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>🎯 Win multiple duels</span>
+                        <span className={`text-xs ${phases.wonMultipleDuels ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.wonMultipleDuels ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                        <span>💸 ₱100+ passive income/10s</span>
+                        <span className={`text-xs ${phases.achievedPassiveIncome100 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.achievedPassiveIncome100 ? '✓' : '○'}</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
 
