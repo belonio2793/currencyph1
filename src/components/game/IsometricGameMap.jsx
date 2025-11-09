@@ -34,6 +34,8 @@ export default function IsometricGameMap({
   const avatarAnimationFrame = useRef(0)
   const particlesRef = useRef([])
   const ambientParticlesRef = useRef([])
+  const velocityRef = useRef({ x: 0, y: 0 })
+  const showControlsRef = useRef(true)
   const targetCameraRef = useRef({ x: 0, y: 0 })
 
   const TILE_SIZE = 64
