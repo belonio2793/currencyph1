@@ -29,7 +29,7 @@ export default function IsometricGameMap({
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [avatarPos, setAvatarPos] = useState(initialAvatarPos && typeof initialAvatarPos.x === 'number' && typeof initialAvatarPos.y === 'number' ? initialAvatarPos : { x: 150, y: 175 })
-  const [avatarFacing, setAvatarFacing] = useState(1)
+  const [avatarFacing, setAvatarFacing] = useState(0) // 0-360 degrees
   const [avatarMoving, setAvatarMoving] = useState(false)
   const [selectedCity, setSelectedCity] = useState(city)
   const [cityData, setCityData] = useState(null)
@@ -414,10 +414,10 @@ export default function IsometricGameMap({
       ctx.fill()
     }
 
-    if (avatarFacing === -1) {
-      ctx.scale(-1, 1)
-      screenX = -screenX - size
-    }
+    // Rotate character to face the correct direction (360 degrees)
+    ctx.translate(screenX + size / 2, screenY + size / 2)
+    ctx.rotate(avatarFacing * Math.PI / 180)
+    ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
 
     // soft shadow
     const shadowGrad = ctx.createRadialGradient(screenX + size / 2, screenY + size / 2, 2, screenX + size / 2, screenY + size / 2, 16)
@@ -834,30 +834,34 @@ export default function IsometricGameMap({
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
 
   const moveAvatar = useCallback((direction) => {
-    const speed = mapSettings.avatarSpeed || 15
+    const speed = mapSettings.avatarSpeed || 12
 
     // Set velocity based on direction
+    let vx = 0, vy = 0
     switch (direction) {
       case 'up':
-        velocityRef.current.y = -speed
+        vy = -speed
         break
       case 'down':
-        velocityRef.current.y = speed
+        vy = speed
         break
       case 'left':
-        velocityRef.current.x = -speed
-        setAvatarFacing(-1)
+        vx = -speed
         break
       case 'right':
-        velocityRef.current.x = speed
-        setAvatarFacing(1)
+        vx = speed
         break
       default:
         break
     }
 
+    if (vx !== 0 || vy !== 0) {
+      const angle = Math.atan2(vy, vx) * (180 / Math.PI)
+      setAvatarFacing(angle)
+    }
+
     setAvatarMoving(true)
-  }, [mapSettings, avatarFacing])
+  }, [mapSettings])
 
   const stopMovement = useCallback(() => {
     velocityRef.current.x = 0
@@ -1002,14 +1006,20 @@ export default function IsometricGameMap({
 
     const animate = () => {
       // Determine velocity from keys or click-to-move
-      const baseSpeed = mapSettings.avatarSpeed || 3
+      const baseSpeed = mapSettings.avatarSpeed || 12
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
       const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
       let vx = 0, vy = 0
       if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= baseSpeed * sprint
       if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += baseSpeed * sprint
-      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) { vx -= baseSpeed * sprint; setAvatarFacing(-1) }
-      if (keysPressed.current['d'] || keysPressed.current['arrowright']) { vx += baseSpeed * sprint; setAvatarFacing(1) }
+      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= baseSpeed * sprint
+      if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += baseSpeed * sprint
+
+      // Update facing direction based on velocity (360 degrees)
+      if (vx !== 0 || vy !== 0) {
+        const angle = Math.atan2(vy, vx) * (180 / Math.PI)
+        setAvatarFacing(angle)
+      }
 
       // Normalize diagonal movement
       if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071 }
@@ -1034,7 +1044,8 @@ export default function IsometricGameMap({
         } else {
           vx = (dx / dist) * baseSpeed
           vy = (dy / dist) * baseSpeed
-          setAvatarFacing(dx < 0 ? -1 : 1)
+          const angle = Math.atan2(vy, vx) * (180 / Math.PI)
+          setAvatarFacing(angle)
         }
       }
       velocityRef.current.x = vx
