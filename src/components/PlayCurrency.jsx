@@ -313,7 +313,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         if (saved && saved.city) setCityFocus(saved.city)
       }
     } catch (e) { /* ignore */ }
-  }, [character && character.id])
+  }, [character?.id])
 
   // Debounced autosave of position/city
   useEffect(() => {
@@ -1112,7 +1112,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <div key={`job-${idx}-${jobSeed}`} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
                       <div className="font-semibold text-slate-100">{job.name}</div>
                       <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
-                      <div className="text-xs text-slate-500 mt-1">Difficulty: {'��'.repeat(job.difficulty)}</div>
+                      <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
                       <div className="mt-3">
                         <button
                           disabled={isWorking && workingJobId !== job.name}
