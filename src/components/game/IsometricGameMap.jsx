@@ -439,7 +439,7 @@ export default function IsometricGameMap({
 
     // draw minimap
     drawMinimap()
-  }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos])
+  }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, drawMinimap])
 
   const moveAvatar = useCallback((direction) => {
     const speed = mapSettings.avatarSpeed || 2
