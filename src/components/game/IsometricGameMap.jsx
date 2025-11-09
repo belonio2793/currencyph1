@@ -906,12 +906,19 @@ export default function IsometricGameMap({
     const canvas = canvasRef.current
     if (!canvas) return
 
-    canvas.width = canvas.offsetWidth
-    canvas.height = canvas.offsetHeight
+    const setCanvasSize = () => {
+      const dpr = typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1
+      const cssW = Math.max(1, canvas.offsetWidth)
+      const cssH = Math.max(1, canvas.offsetHeight)
+      canvas.width = Math.floor(cssW * dpr)
+      canvas.height = Math.floor(cssH * dpr)
+      // keep CSS size untouched
+    }
+
+    setCanvasSize()
 
     const resizeObserver = new ResizeObserver(() => {
-      canvas.width = canvas.offsetWidth
-      canvas.height = canvas.offsetHeight
+      setCanvasSize()
     })
 
     resizeObserver.observe(canvas)
