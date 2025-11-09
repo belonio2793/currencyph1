@@ -1481,6 +1481,76 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
             </div>
 
+            {/* Character Stats */}
+            {character && (
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-bold mb-3">Character Stats</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span className="text-sm">💪 Strength</span>
+                    <span className="text-sm font-semibold text-red-300">{characterStats.strength}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span className="text-sm">🧠 Intelligence</span>
+                    <span className="text-sm font-semibold text-blue-300">{characterStats.intelligence}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span className="text-sm">😊 Charisma</span>
+                    <span className="text-sm font-semibold text-pink-300">{characterStats.charisma}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span className="text-sm">⚡ Endurance</span>
+                    <span className="text-sm font-semibold text-amber-300">{characterStats.endurance}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span className="text-sm">🎯 Dexterity</span>
+                    <span className="text-sm font-semibold text-green-300">{characterStats.dexterity}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span className="text-sm">🍀 Luck</span>
+                    <span className="text-sm font-semibold text-yellow-300">{characterStats.luck}</span>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-400 mt-3">Stats increase as you complete jobs. Each job type boosts different stats.</p>
+              </div>
+            )}
+
+            {/* Prestige System */}
+            {character && (
+              <div className="bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border border-yellow-600/40 rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-bold mb-2 text-yellow-300">✨ Prestige System</h3>
+                <div className="space-y-2 mb-3 text-sm">
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span>Current Level</span>
+                    <span className="font-semibold text-yellow-300">{prestigeData.prestigeLevel || 0}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span>Multiplier</span>
+                    <span className="font-semibold text-yellow-300">{prestigeData.prestigeMultiplier.toFixed(1)}x</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <span>Total Resets</span>
+                    <span className="font-semibold text-yellow-300">{prestigeData.totalPrestigeResets || 0}</span>
+                  </div>
+                  <div className="text-xs text-slate-400 mt-2">
+                    <div>Gain 1 prestige level for every ₱10,000 earned.</div>
+                    <div>Current: {Math.floor((character.wealth || 0) / 10000)} levels available</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    if (confirm(`Reset character for ${Math.max(1, Math.floor((character.wealth || 0) / 10000))} prestige level? Starting bonus: ₱${Math.floor(500 * (1.0 + ((prestigeData.prestigeLevel + Math.max(1, Math.floor((character.wealth || 0) / 10000))) * 0.1)))}`)) {
+                      prestigeReset()
+                    }
+                  }}
+                  disabled={(character.wealth || 0) < 10000}
+                  className={`w-full px-3 py-2 rounded text-white font-medium transition-colors ${(character.wealth || 0) < 10000 ? 'bg-slate-600 opacity-50 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-700'}`}
+                >
+                  {(character.wealth || 0) < 10000 ? '💰 Need ₱10,000 to Prestige' : '✨ Prestige Reset'}
+                </button>
+              </div>
+            )}
+
             <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
               <h3 className="text-lg font-bold mb-2">Leaderboard</h3>
               <div className="mb-3 p-2 bg-slate-900/30 rounded text-xs text-slate-300">
@@ -1532,7 +1602,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                         <span className={`text-xs ${phases.claimedDaily ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.claimedDaily ? '✓' : '○'}</span>
                       </li>
                       <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>🌍 Visit all cities</span>
+                        <span>���� Visit all cities</span>
                         <span className="text-xs text-slate-400">{Object.keys(phases.visitedCities || {}).length}/5</span>
                       </li>
                       <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
