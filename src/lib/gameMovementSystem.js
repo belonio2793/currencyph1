@@ -261,7 +261,7 @@ export class CameraController {
     this.mapHeight = mapHeight
     this.viewportWidth = viewportWidth
     this.viewportHeight = viewportHeight
-    this.smoothness = 0.1
+    this.smoothness = 0.18
     this.zoom = 1
   }
 
@@ -270,7 +270,7 @@ export class CameraController {
     this.targetPosition.x = characterX
     this.targetPosition.y = characterY
 
-    // Smooth camera movement
+    // Smooth camera movement (faster response)
     this.position.x += (this.targetPosition.x - this.position.x) * this.smoothness
     this.position.y += (this.targetPosition.y - this.position.y) * this.smoothness
 
