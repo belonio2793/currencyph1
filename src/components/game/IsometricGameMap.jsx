@@ -722,6 +722,27 @@ export default function IsometricGameMap({
     if (mini) mini.addEventListener('click', handleMiniMapClick)
 
     const animate = () => {
+      // Apply velocity to avatar position
+      setAvatarPos(prev => {
+        const maxX = MAP_WIDTH
+        const maxY = MAP_HEIGHT
+        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x))
+        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y))
+
+        if ((newX !== prev.x || newY !== prev.y) && onCharacterMove) {
+          if (cityData) {
+            const latLng = convertGameCoordsToLatLng(newX, newY, cityData, MAP_WIDTH, MAP_HEIGHT)
+            onCharacterMove({ x: newX, y: newY, lat: latLng.lat, lng: latLng.lng, city: selectedCity })
+          } else {
+            onCharacterMove({ x: newX, y: newY, city: selectedCity })
+          }
+        }
+
+        // Update camera target
+        targetCameraRef.current = { x: newX - 75, y: newY - 87 }
+        return { x: newX, y: newY }
+      })
+
       // smooth camera approach
       setCameraPos(prev => {
         const tx = targetCameraRef.current.x
@@ -731,15 +752,9 @@ export default function IsometricGameMap({
         return { x: nx, y: ny }
       })
 
-      // stop running state gradually
-      if (avatarMoving) {
-        // decay moving flag after a few frames without keys
-        if (!keysPressed.current['w'] && !keysPressed.current['arrowup'] &&
-            !keysPressed.current['s'] && !keysPressed.current['arrowdown'] &&
-            !keysPressed.current['a'] && !keysPressed.current['arrowleft'] &&
-            !keysPressed.current['d'] && !keysPressed.current['arrowright']) {
-          if (avatarAnimationFrame.current % 10 === 0) setAvatarMoving(false)
-        }
+      // stop running state gradually if no velocity
+      if (avatarMoving && velocityRef.current.x === 0 && velocityRef.current.y === 0) {
+        if (avatarAnimationFrame.current % 10 === 0) setAvatarMoving(false)
       }
 
       avatarAnimationFrame.current++
