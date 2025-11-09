@@ -182,7 +182,7 @@ export default function HeaderMap({ userId: headerUserId }) {
                 center={[displayLocation.latitude, displayLocation.longitude]}
                 zoom={13}
                 keyboard={false}
-                style={{ height: '100%, width: \'100%' }}
+                style={{ height: '100%', width: '100%' }}
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
