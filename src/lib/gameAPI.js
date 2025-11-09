@@ -71,6 +71,41 @@ export const gameAPI = {
     }
   },
 
+  async updateCharacterCosmetics(characterId, cosmetics) {
+    try {
+      const cleanedCosmetics = {
+        ...(cosmetics || {})
+      }
+
+      const { data, error } = await supabase
+        .from('game_characters')
+        .update({ cosmetics: cleanedCosmetics, updated_at: new Date() })
+        .eq('id', characterId)
+        .select()
+        .single()
+      if (error) throw error
+      return data
+    } catch (err) {
+      console.error('Error updating cosmetics:', err)
+      throw err
+    }
+  },
+
+  async getCharacterCosmetics(characterId) {
+    try {
+      const { data, error } = await supabase
+        .from('game_characters')
+        .select('id, cosmetics')
+        .eq('id', characterId)
+        .single()
+      if (error) throw error
+      return data?.cosmetics || null
+    } catch (err) {
+      console.error('Error fetching character cosmetics:', err)
+      return null
+    }
+  },
+
   async getCharacterAppearance(characterId) {
     try {
       const { data, error } = await supabase
