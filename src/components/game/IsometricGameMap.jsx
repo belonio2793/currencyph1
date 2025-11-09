@@ -606,18 +606,42 @@ export default function IsometricGameMap({
     ctx.translate(centerX - cameraPos.x * zoom, centerY - cameraPos.y * zoom)
     ctx.scale(zoom, zoom)
 
-    // neighborhoods background blocks
+    // District background rendering
     if (showDistricts) {
-      for (let neighborhood of Object.values(NEIGHBORHOODS)) {
-        const topLeft = gridToIsometric(neighborhood.bounds.x0, neighborhood.bounds.y0)
-        const bottomRight = gridToIsometric(neighborhood.bounds.x1, neighborhood.bounds.y1)
-        ctx.fillStyle = neighborhood.color
+      for (let [key, district] of Object.entries(DISTRICTS)) {
+        const topLeft = gridToIsometric(district.x, district.y)
+        const bottomRight = gridToIsometric(district.x + district.width, district.y + district.height)
+
+        // Semi-transparent district background
+        ctx.fillStyle = district.color
+        ctx.globalAlpha = 0.08
         ctx.fillRect(
           topLeft.x,
           topLeft.y,
           bottomRight.x - topLeft.x,
           bottomRight.y - topLeft.y
         )
+
+        // District border
+        ctx.strokeStyle = district.color
+        ctx.globalAlpha = 0.25
+        ctx.lineWidth = 2
+        ctx.strokeRect(
+          topLeft.x,
+          topLeft.y,
+          bottomRight.x - topLeft.x,
+          bottomRight.y - topLeft.y
+        )
+
+        // District label
+        const labelX = topLeft.x + (bottomRight.x - topLeft.x) / 2
+        const labelY = topLeft.y + 15
+        ctx.fillStyle = district.color
+        ctx.globalAlpha = 0.6
+        ctx.font = 'bold 11px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(`${district.emoji} ${district.name}`, labelX, labelY)
+        ctx.globalAlpha = 1
       }
     }
 
