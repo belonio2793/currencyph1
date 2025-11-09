@@ -250,14 +250,60 @@ export default function PlayerProfile({ characterId, onClose }) {
     <div className="fixed inset-0 z-50 p-4 flex items-center justify-center bg-black/60 overflow-y-auto">
       <div className="bg-slate-900 border border-slate-700 rounded-lg max-w-4xl w-full p-6 text-slate-100 my-8">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-start justify-between mb-6 gap-4">
           <div>
             <h1 className="text-3xl font-bold">{character.name}</h1>
             <p className="text-slate-400">Level {character.level || 1}</p>
           </div>
-          <button onClick={onClose} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded">
-            Close
-          </button>
+          <div className="flex flex-col gap-2 items-end">
+            {currentUserId && currentUserId !== characterId && (
+              <div className="flex gap-2">
+                <button
+                  onClick={handleFollow}
+                  disabled={actionLoading}
+                  className={`px-4 py-2 rounded font-medium transition-colors text-sm whitespace-nowrap ${
+                    isFollowing
+                      ? 'bg-slate-700 text-white hover:bg-slate-600'
+                      : 'bg-white text-slate-900 hover:bg-slate-50'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {isFollowing ? '✓ Following' : 'Follow'}
+                </button>
+                <button
+                  onClick={handleMessage}
+                  className="px-4 py-2 bg-white text-slate-900 rounded font-medium hover:bg-slate-50 transition-colors text-sm whitespace-nowrap"
+                  title="Send message"
+                >
+                  💬 Message
+                </button>
+                <button
+                  onClick={handleTrade}
+                  className="px-4 py-2 bg-white text-slate-900 rounded font-medium hover:bg-slate-50 transition-colors text-sm whitespace-nowrap"
+                  title="Initiate trade"
+                >
+                  📦 Trade
+                </button>
+              </div>
+            )}
+            <div className="flex gap-2 items-center">
+              {currentUserId && currentUserId !== characterId && (
+                <button
+                  onClick={handleBlock}
+                  disabled={actionLoading}
+                  className={`px-3 py-1 text-sm rounded transition-colors whitespace-nowrap ${
+                    isBlocked
+                      ? 'bg-red-600 text-white hover:bg-red-700'
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                >
+                  {isBlocked ? '🚫 Blocked' : '🚫 Block'}
+                </button>
+              )}
+              <button onClick={onClose} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded transition-colors">
+                Close
+              </button>
+            </div>
+          </div>
         </div>
 
         {error && (
