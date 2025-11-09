@@ -68,6 +68,7 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd, userId, 
     }
   }
 
+  // Opponent AI turn
   useEffect(() => {
     if (turn === 'opponent' && !gameOver && !selectedAction) {
       const opponentDelay = setTimeout(() => {
@@ -75,9 +76,18 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd, userId, 
         executeAction(randomAction)
       }, 1200)
 
+      timeoutIdsRef.current.push(opponentDelay)
       return () => clearTimeout(opponentDelay)
     }
   }, [turn, gameOver, selectedAction])
+
+  // Cleanup all timeouts on unmount
+  useEffect(() => {
+    return () => {
+      timeoutIdsRef.current.forEach(id => clearTimeout(id))
+      timeoutIdsRef.current = []
+    }
+  }, [])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
