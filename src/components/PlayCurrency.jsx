@@ -238,7 +238,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const passiveTimerRef = useRef(null)
   const presenceChannelRef = useRef(null)
   const presenceTimerRef = useRef(null)
-  const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1 })
+  const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1, sizeMultiplier: 10 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
   const [matchRequests, setMatchRequests] = useState([])
   const [cityFocus, setCityFocus] = useState('Manila')
@@ -248,6 +248,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
   const [mapViewMode, setMapViewMode] = useState('isometric') // 'isometric', 'grid'
   const [propertyPanelOpen, setPropertyPanelOpen] = useState(false)
+  const [placingAsset, setPlacingAsset] = useState(null)
+  const [remoteAssets, setRemoteAssets] = useState([])
   const [phases, setPhases] = useState({
     // Basic phases
     didJob: false,
