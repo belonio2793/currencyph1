@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { PHILIPPINES_CITIES, getCityById, convertLatLngToGameCoords, convertGameCoordsToLatLng } from '../../data/philippinesGeography'
+import { COSMETICS, getCosmeticOption } from '../../lib/characterCosmetics'
 
 export default function IsometricGameMap({
   properties = [],
@@ -12,6 +13,7 @@ export default function IsometricGameMap({
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
+  const miniMapRef = useRef(null)
   const [hoveredPropertyId, setHoveredPropertyId] = useState(null)
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
@@ -27,6 +29,8 @@ export default function IsometricGameMap({
   const keysPressed = useRef({})
   const animationRef = useRef(null)
   const avatarAnimationFrame = useRef(0)
+  const particlesRef = useRef([])
+  const targetCameraRef = useRef({ x: 0, y: 0 })
 
   const TILE_SIZE = 64
   const GRID_WIDTH = 24
@@ -55,8 +59,8 @@ export default function IsometricGameMap({
   }
 
   useEffect(() => {
-    const city = getCityById(selectedCity.toLowerCase().replace(/\s+/g, '-'))
-    setCityData(city || null)
+    const c = getCityById(selectedCity.toLowerCase().replace(/\s+/g, '-'))
+    setCityData(c || null)
   }, [selectedCity])
 
   const gridToIsometric = useCallback((gridX, gridY) => {
@@ -89,11 +93,23 @@ export default function IsometricGameMap({
     })
   }, [properties])
 
+  const adjustBrightness = (color, percent) => {
+    const num = parseInt(color.replace('#', ''), 16)
+    const amt = Math.round(2.55 * percent)
+    const R = (num >> 16) + amt
+    const G = (num >> 8 & 0x00FF) + amt
+    const B = (num & 0x0000FF) + amt
+    return '#' + (0x1000000 + (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+      (B < 255 ? (B < 1 ? 0 : B) : 255))
+      .toString(16).slice(1)
+  }
+
   const drawIsometricTile = useCallback((ctx, screenX, screenY, color, height = 0, isHovered = false) => {
     const w = TILE_SIZE / 2
     const h = TILE_SIZE / 4
 
-    // Main tile with gradient
+    // base
     ctx.fillStyle = color
     ctx.beginPath()
     ctx.moveTo(screenX, screenY)
@@ -103,26 +119,26 @@ export default function IsometricGameMap({
     ctx.closePath()
     ctx.fill()
 
-    // Add subtle highlight
+    // highlight
     const gradient = ctx.createLinearGradient(screenX - w, screenY, screenX, screenY + h * 2)
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)')
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.1)')
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.08)')
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.12)')
     ctx.fillStyle = gradient
     ctx.fill()
 
-    // Border
+    // border
     ctx.strokeStyle = isHovered ? 'rgba(255, 200, 50, 0.9)' : 'rgba(0, 0, 0, 0.2)'
     ctx.lineWidth = isHovered ? 2.5 : 1.5
     ctx.stroke()
 
-    // Add glow effect when hovered
+    // glow when hovered
     if (isHovered) {
       ctx.strokeStyle = 'rgba(255, 200, 50, 0.3)'
       ctx.lineWidth = 4
       ctx.stroke()
     }
 
-    // 3D height effect
+    // 3D height
     if (height > 0) {
       ctx.fillStyle = adjustBrightness(color, -25)
       ctx.beginPath()
@@ -142,7 +158,7 @@ export default function IsometricGameMap({
       ctx.closePath()
       ctx.fill()
 
-      // Add edge highlighting to 3D
+      // edge highlight
       ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
       ctx.lineWidth = 0.5
       ctx.beginPath()
@@ -152,24 +168,10 @@ export default function IsometricGameMap({
     }
   }, [])
 
-  const adjustBrightness = (color, percent) => {
-    const num = parseInt(color.replace('#', ''), 16)
-    const amt = Math.round(2.55 * percent)
-    const R = (num >> 16) + amt
-    const G = (num >> 8 & 0x00FF) + amt
-    const B = (num & 0x0000FF) + amt
-    return '#' + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-      (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-      (B < 255 ? B < 1 ? 0 : B : 255))
-      .toString(16).slice(1)
-  }
-
   const drawAvatar = useCallback((ctx, screenX, screenY) => {
     const size = AVATAR_SIZE
     const isRunning = avatarMoving
 
-    // Get cosmetics colors
-    const { COSMETICS, getCosmeticOption } = require('../../lib/characterCosmetics')
     const skinColor = cosmetics ? getCosmeticOption('skinTones', cosmetics.skinTone)?.hex : '#fdbf5f'
     const hairColor = cosmetics ? getCosmeticOption('hairColors', cosmetics.hairColor)?.hex : '#1a1a1a'
     const outfit = cosmetics ? COSMETICS.outfits.find(o => o.id === cosmetics.outfit) : null
@@ -182,21 +184,30 @@ export default function IsometricGameMap({
       screenX = -screenX - size
     }
 
-    // Draw body (shirt)
+    // soft shadow
+    const shadowGrad = ctx.createRadialGradient(screenX + size / 2, screenY + size / 2, 2, screenX + size / 2, screenY + size / 2, 16)
+    shadowGrad.addColorStop(0, 'rgba(0,0,0,0.25)')
+    shadowGrad.addColorStop(1, 'rgba(0,0,0,0)')
+    ctx.fillStyle = shadowGrad
+    ctx.beginPath()
+    ctx.arc(screenX + size / 2, screenY + size / 2, 16, 0, Math.PI * 2)
+    ctx.fill()
+
+    // shirt
     ctx.fillStyle = topColor
     ctx.fillRect(screenX + 4, screenY, size - 8, size / 3)
 
-    // Draw pants/bottom
+    // pants
     ctx.fillStyle = bottomColor
     ctx.fillRect(screenX + 4, screenY + size / 3, size - 8, size / 3)
 
-    // Draw head with skin tone
+    // head
     ctx.fillStyle = skinColor
     ctx.beginPath()
     ctx.arc(screenX + size / 2, screenY - 6, 8, 0, Math.PI * 2)
     ctx.fill()
 
-    // Draw eyes
+    // eyes
     ctx.fillStyle = '#000'
     ctx.beginPath()
     ctx.arc(screenX + size / 2 - 2, screenY - 8, 2, 0, Math.PI * 2)
@@ -205,28 +216,98 @@ export default function IsometricGameMap({
     ctx.arc(screenX + size / 2 + 2, screenY - 8, 2, 0, Math.PI * 2)
     ctx.fill()
 
-    // Draw hair
+    // hair
     ctx.fillStyle = hairColor
     ctx.beginPath()
     ctx.arc(screenX + size / 2, screenY - 10, 8, Math.PI, 0, true)
     ctx.fill()
 
-    // Draw legs with animation
+    // legs
     const legOffset = isRunning ? Math.sin(avatarAnimationFrame.current * 0.1) * 4 : 0
     ctx.fillStyle = '#333'
-    ctx.fillRect(screenX + 6, screenY + size / 3 + size / 3, 5, size / 3 + legOffset)
-    ctx.fillRect(screenX + size - 11, screenY + size / 3 + size / 3, 5, size / 3 - legOffset)
+    ctx.fillRect(screenX + 6, screenY + (2 * size) / 3, 5, size / 3 + legOffset)
+    ctx.fillRect(screenX + size - 11, screenY + (2 * size) / 3, 5, size / 3 - legOffset)
 
     ctx.restore()
 
     if (isRunning) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'
-      ctx.font = 'bold 10px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText('Moving', screenX + size / 2 - (avatarFacing === -1 ? -size : 0), screenY - 20)
+      // speed trail particles
+      particlesRef.current.push({
+        x: screenX + size / 2 + (avatarFacing === -1 ? -6 : 6),
+        y: screenY + size / 2,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: -0.8 - Math.random() * 0.6,
+        life: 24,
+        color: 'rgba(59,130,246,0.7)'
+      })
     }
   }, [avatarFacing, avatarMoving, cosmetics])
 
+  const drawParticles = (ctx) => {
+    const cam = { x: cameraPos.x, y: cameraPos.y, zoom }
+    const toRemove = []
+    particlesRef.current.forEach((p, idx) => {
+      p.x += p.vx
+      p.y += p.vy
+      p.life -= 1
+      const alpha = Math.max(0, p.life / 24)
+      ctx.save()
+      ctx.globalAlpha = alpha
+      ctx.fillStyle = p.color
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, 2, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
+      if (p.life <= 0) toRemove.push(idx)
+    })
+    if (toRemove.length > 0) {
+      particlesRef.current = particlesRef.current.filter((_, i) => !toRemove.includes(i))
+    }
+  }
+
+  const drawMinimap = () => {
+    const mini = miniMapRef.current
+    const main = canvasRef.current
+    if (!mini || !main) return
+    const mctx = mini.getContext('2d')
+    const w = mini.width
+    const h = mini.height
+    mctx.clearRect(0, 0, w, h)
+
+    // background
+    mctx.fillStyle = '#0b1220'
+    mctx.fillRect(0, 0, w, h)
+
+    // properties
+    (properties || []).forEach(p => {
+      if (!p.location_x || !p.location_y) return
+      const px = (p.location_x % MAP_WIDTH) / MAP_WIDTH
+      const py = (p.location_y % MAP_HEIGHT) / MAP_HEIGHT
+      const color = PROPERTY_COLORS[p.property_type] || PROPERTY_COLORS.default
+      mctx.fillStyle = color
+      mctx.fillRect(px * w - 1, py * h - 1, 2, 2)
+    })
+
+    // avatar
+    mctx.fillStyle = '#22d3ee'
+    mctx.beginPath()
+    mctx.arc((avatarPos.x / MAP_WIDTH) * w, (avatarPos.y / MAP_HEIGHT) * h, 2, 0, Math.PI * 2)
+    mctx.fill()
+
+    // camera viewport rectangle
+    try {
+      const mainRect = main.getBoundingClientRect()
+      const centerX = main.width / 2
+      const centerY = main.height / 2
+      const viewW = (main.width / zoom) / MAP_WIDTH * w
+      const viewH = (main.height / zoom) / MAP_HEIGHT * h
+      const camX = ((cameraPos.x) / MAP_WIDTH) * w
+      const camY = ((cameraPos.y) / MAP_HEIGHT) * h
+      mctx.strokeStyle = '#e2e8f0'
+      mctx.lineWidth = 1
+      mctx.strokeRect(camX, camY, viewW, viewH)
+    } catch (e) {}
+  }
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current
@@ -238,6 +319,7 @@ export default function IsometricGameMap({
 
     ctx.clearRect(0, 0, width, height)
 
+    // ground
     ctx.fillStyle = '#6ba54a'
     ctx.fillRect(0, 0, width, height)
 
@@ -248,10 +330,10 @@ export default function IsometricGameMap({
     ctx.translate(centerX - cameraPos.x * zoom, centerY - cameraPos.y * zoom)
     ctx.scale(zoom, zoom)
 
+    // neighborhoods background blocks
     for (let neighborhood of Object.values(NEIGHBORHOODS)) {
       const topLeft = gridToIsometric(neighborhood.bounds.x0, neighborhood.bounds.y0)
       const bottomRight = gridToIsometric(neighborhood.bounds.x1, neighborhood.bounds.y1)
-
       ctx.fillStyle = neighborhood.color
       ctx.fillRect(
         topLeft.x,
@@ -261,16 +343,14 @@ export default function IsometricGameMap({
       )
     }
 
+    // tiles
     for (let gridX = 0; gridX < GRID_WIDTH; gridX++) {
       for (let gridY = 0; gridY < GRID_HEIGHT; gridY++) {
         const isRoad = gridX % 4 === 0 || gridY % 4 === 0
         const isoPos = gridToIsometric(gridX, gridY)
 
         if (isRoad) {
-          ctx.fillStyle = '#4a5568'
-          ctx.globalAlpha = 0.6
           drawIsometricTile(ctx, isoPos.x, isoPos.y, '#4a5568', 0, false)
-          ctx.globalAlpha = 1
         } else {
           const gameX = (gridX / GRID_WIDTH) * MAP_WIDTH
           const gameY = (gridY / GRID_HEIGHT) * MAP_HEIGHT
@@ -279,50 +359,27 @@ export default function IsometricGameMap({
           if (prop) {
             const color = PROPERTY_COLORS[prop.property_type] || PROPERTY_COLORS.default
             const upgradeLevel = prop.upgrade_level || 0
-            // Height increases with upgrade level: base 3px + 2px per upgrade level
-            const baseHeight = 3 + (upgradeLevel * 2)
+            const baseHeight = 3 + upgradeLevel * 2
             const valueHeight = Math.min(10, Math.log(prop.current_value || 100000) / 10)
-            const height = baseHeight + valueHeight
+            const heightPx = baseHeight + valueHeight
             const isHovered = prop.id === hoveredPropertyId
-            const isOwned = prop.owner_id
+            const isOwned = !!prop.owner_id
 
-            // Brighten color based on upgrade level
             let displayColor = color
-            if (isHovered) {
-              displayColor = adjustBrightness(color, 30)
-            } else if (upgradeLevel > 0) {
-              displayColor = adjustBrightness(color, Math.min(40, upgradeLevel * 5))
-            }
+            if (isHovered) displayColor = adjustBrightness(color, 30)
+            else if (upgradeLevel > 0) displayColor = adjustBrightness(color, Math.min(40, upgradeLevel * 5))
 
-            drawIsometricTile(
-              ctx,
-              isoPos.x,
-              isoPos.y,
-              displayColor,
-              isOwned ? height : 0,
-              isHovered || upgradeLevel > 0
-            )
+            drawIsometricTile(ctx, isoPos.x, isoPos.y, displayColor, isOwned ? heightPx : 0, isHovered || upgradeLevel > 0)
 
-            // Show property name and tier indicator
             if (isOwned) {
               ctx.fillStyle = upgradeLevel > 0 ? '#ffd700' : 'white'
               ctx.font = `bold ${upgradeLevel > 0 ? '11px' : '10px'} Arial`
               ctx.textAlign = 'center'
-              ctx.fillText(
-                prop.name ? prop.name.substring(0, 10) : 'Prop',
-                isoPos.x,
-                isoPos.y - 3
-              )
-
-              // Draw tier indicator
+              ctx.fillText(prop.name ? prop.name.substring(0, 10) : 'Prop', isoPos.x, isoPos.y - 3)
               if (upgradeLevel > 0) {
                 ctx.fillStyle = '#ffd700'
                 ctx.font = 'bold 8px Arial'
-                ctx.fillText(
-                  `★${upgradeLevel}`,
-                  isoPos.x,
-                  isoPos.y + 5
-                )
+                ctx.fillText(`★${upgradeLevel}`, isoPos.x, isoPos.y + 5)
               }
             }
           } else {
@@ -332,10 +389,28 @@ export default function IsometricGameMap({
       }
     }
 
+    // avatar
     const avatarScreenPos = gameToIsometric(avatarPos.x, avatarPos.y)
     drawAvatar(ctx, avatarScreenPos.x - AVATAR_SIZE / 2, avatarScreenPos.y - AVATAR_SIZE)
 
+    // particles
+    drawParticles(ctx)
+
     ctx.restore()
+
+    // post FX vignette
+    ctx.save()
+    ctx.globalCompositeOperation = 'multiply'
+    const g = ctx.createRadialGradient(width / 2, height * 0.45, width * 0.05, width / 2, height * 0.45, Math.max(width, height))
+    g.addColorStop(0, 'rgba(255,255,255,0)')
+    g.addColorStop(0.6, 'rgba(0,0,0,0.15)')
+    g.addColorStop(1, 'rgba(0,0,0,0.6)')
+    ctx.fillStyle = g
+    ctx.fillRect(0, 0, width, height)
+    ctx.restore()
+
+    // draw minimap
+    drawMinimap()
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos])
 
   const moveAvatar = useCallback((direction) => {
@@ -379,7 +454,8 @@ export default function IsometricGameMap({
         }
       }
 
-      setCameraPos({ x: newX - 75, y: newY - 87 })
+      // smooth camera target
+      targetCameraRef.current = { x: newX - 75, y: newY - 87 }
 
       return { x: newX, y: newY }
     })
@@ -402,10 +478,11 @@ export default function IsometricGameMap({
       if (isDragging) {
         const deltaX = (e.clientX - dragStart.x) / zoom
         const deltaY = (e.clientY - dragStart.y) / zoom
-        setCameraPos(prev => ({
-          x: prev.x - deltaX,
-          y: prev.y - deltaY
-        }))
+        setCameraPos(prev => {
+          const n = { x: prev.x - deltaX, y: prev.y - deltaY }
+          targetCameraRef.current = n
+          return n
+        })
         setDragStart({ x: e.clientX, y: e.clientY })
       } else {
         const centerX = rect.width / 2
@@ -417,10 +494,24 @@ export default function IsometricGameMap({
         const gridPos = isometricToGrid(isoX, isoY)
         const gameX = (gridPos.x / GRID_WIDTH) * MAP_WIDTH
         const gameY = (gridPos.y / GRID_HEIGHT) * MAP_HEIGHT
-        // Don't show hover effects or tooltips
-        // Tiles are managed via the Properties tab instead
-        setHoveredPropertyId(null)
-        setTooltipData(null)
+        const prop = getPropertyAtGamePos(gameX, gameY)
+
+        if (prop) {
+          setHoveredPropertyId(prop.id)
+          setTooltipData({
+            name: prop.name || 'Property',
+            type: prop.property_type || 'property',
+            income: prop.income || 0,
+            value: prop.current_value || 0,
+            upgrade: prop.upgrade_level || 0,
+            owned: !!prop.owner_id
+          })
+          setTooltipPos({ x: clientX + 12, y: clientY + 12 })
+        } else {
+          setHoveredPropertyId(null)
+          setTooltipData(null)
+          setTooltipPos(null)
+        }
       }
     }
 
@@ -458,7 +549,6 @@ export default function IsometricGameMap({
 
     const handleKeyDown = (e) => {
       keysPressed.current[e.key.toLowerCase()] = true
-
       switch (e.key.toLowerCase()) {
         case 'w':
         case 'arrowup':
@@ -489,6 +579,19 @@ export default function IsometricGameMap({
       keysPressed.current[e.key.toLowerCase()] = false
     }
 
+    const handleMiniMapClick = (e) => {
+      const mini = miniMapRef.current
+      if (!mini) return
+      const rect = mini.getBoundingClientRect()
+      const px = (e.clientX - rect.left) / rect.width
+      const py = (e.clientY - rect.top) / rect.height
+      const targetX = px * MAP_WIDTH
+      const targetY = py * MAP_HEIGHT
+      const target = { x: targetX, y: targetY }
+      // center camera on minimap click
+      targetCameraRef.current = { x: target.x, y: target.y }
+    }
+
     canvas.addEventListener('mousedown', handleMouseDown)
     canvas.addEventListener('mousemove', handleMouseMove)
     canvas.addEventListener('mouseup', handleMouseUp)
@@ -497,7 +600,30 @@ export default function IsometricGameMap({
     window.addEventListener('keydown', handleKeyDown)
     window.addEventListener('keyup', handleKeyUp)
 
+    const mini = miniMapRef.current
+    if (mini) mini.addEventListener('click', handleMiniMapClick)
+
     const animate = () => {
+      // smooth camera approach
+      setCameraPos(prev => {
+        const tx = targetCameraRef.current.x
+        const ty = targetCameraRef.current.y
+        const nx = prev.x + (tx - prev.x) * 0.1
+        const ny = prev.y + (ty - prev.y) * 0.1
+        return { x: nx, y: ny }
+      })
+
+      // stop running state gradually
+      if (avatarMoving) {
+        // decay moving flag after a few frames without keys
+        if (!keysPressed.current['w'] && !keysPressed.current['arrowup'] &&
+            !keysPressed.current['s'] && !keysPressed.current['arrowdown'] &&
+            !keysPressed.current['a'] && !keysPressed.current['arrowleft'] &&
+            !keysPressed.current['d'] && !keysPressed.current['arrowright']) {
+          if (avatarAnimationFrame.current % 10 === 0) setAvatarMoving(false)
+        }
+      }
+
       avatarAnimationFrame.current++
       draw()
       animationRef.current = requestAnimationFrame(animate)
@@ -513,9 +639,10 @@ export default function IsometricGameMap({
       canvas.removeEventListener('wheel', handleWheel)
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
+      if (mini) mini.removeEventListener('click', handleMiniMapClick)
       cancelAnimationFrame(animationRef.current)
     }
-  }, [draw, isometricToGrid, getPropertyAtGamePos, onPropertyClick, cameraPos, zoom, isDragging, dragStart, moveAvatar])
+  }, [draw, isometricToGrid, getPropertyAtGamePos, onPropertyClick, cameraPos, zoom, isDragging, dragStart, moveAvatar, avatarMoving])
 
   useEffect(() => {
     const resizeCanvas = () => {
@@ -523,6 +650,10 @@ export default function IsometricGameMap({
         const rect = containerRef.current.getBoundingClientRect()
         canvasRef.current.width = rect.width
         canvasRef.current.height = rect.height
+      }
+      if (miniMapRef.current) {
+        miniMapRef.current.width = 140
+        miniMapRef.current.height = 100
       }
     }
 
@@ -535,6 +666,7 @@ export default function IsometricGameMap({
     setSelectedCity(cityName)
     setAvatarPos({ x: 150, y: 175 })
     setCameraPos({ x: 0, y: 0 })
+    targetCameraRef.current = { x: 0, y: 0 }
   }
 
   return (
@@ -545,6 +677,30 @@ export default function IsometricGameMap({
           className="block w-full h-full cursor-grab active:cursor-grabbing"
           style={{ display: 'block' }}
         />
+
+        {/* Mini-map */}
+        <div className="absolute top-2 right-2 bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 z-20">
+          <canvas ref={miniMapRef} width={140} height={100} className="block rounded" />
+          <div className="text-[10px] text-slate-300 mt-1 text-center">Mini-map</div>
+        </div>
+
+        {/* Tooltip */}
+        {tooltipPos && tooltipData && (
+          <div
+            className="absolute z-30 bg-slate-900/90 border border-slate-700 rounded p-2 text-xs text-slate-200 shadow-xl"
+            style={{ left: tooltipPos.x, top: tooltipPos.y }}
+          >
+            <div className="font-semibold text-slate-100">{tooltipData.name}</div>
+            <div className="text-[10px] text-slate-400 capitalize">{tooltipData.type}</div>
+            {tooltipData.owned && (
+              <div className="mt-1 space-y-0.5">
+                <div>Income: ₱{Number(tooltipData.income || 0).toLocaleString()}</div>
+                <div>Value: ₱{Number(tooltipData.value || 0).toLocaleString()}</div>
+                <div>Tier: {tooltipData.upgrade}</div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
