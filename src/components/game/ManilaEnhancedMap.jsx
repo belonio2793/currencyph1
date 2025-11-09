@@ -78,13 +78,35 @@ export default function ManilaEnhancedMap({
   }, [zoom, mapOffset, properties, character, selectedDistrict, hoveredItem, baseWidth, baseHeight])
 
   const drawWater = (ctx) => {
-    ctx.fillStyle = '#4a90e2'
+    // Water gradient
+    const gradient = ctx.createLinearGradient(0, 330, 0, baseHeight)
+    gradient.addColorStop(0, '#3b82f6')
+    gradient.addColorStop(1, '#1e40af')
+    ctx.fillStyle = gradient
     ctx.fillRect(0, 330, baseWidth, 170)
-    ctx.fillStyle = 'rgba(74, 144, 226, 0.3)'
-    for (let i = 0; i < 5; i++) {
+
+    // Water waves
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'
+    for (let i = 0; i < 8; i++) {
       ctx.beginPath()
-      ctx.arc(50 + i * 150, 370 + Math.sin(i) * 20, 30, 0, Math.PI * 2)
+      ctx.arc(
+        30 + i * 120,
+        360 + Math.sin(i * 0.8) * 15,
+        20 + Math.cos(i * 0.5) * 8,
+        0,
+        Math.PI * 2
+      )
       ctx.fill()
+    }
+
+    // Water reflection shimmer
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+    ctx.lineWidth = 1
+    for (let i = 0; i < 3; i++) {
+      ctx.beginPath()
+      ctx.moveTo(0, 330 + i * 30)
+      ctx.lineTo(baseWidth, 330 + i * 30)
+      ctx.stroke()
     }
   }
 
