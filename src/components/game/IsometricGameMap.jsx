@@ -503,9 +503,12 @@ export default function IsometricGameMap({
     if (isRunning && !isWorking) {
       // speed trail particles - more frequent for visual impact
       if (avatarAnimationFrame.current % 3 === 0) {
+        const angleRad = (avatarAngle * Math.PI) / 180
+        const trailX = screenX + size / 2 + Math.cos(angleRad + Math.PI) * 10
+        const trailY = screenY + size / 2 + Math.sin(angleRad + Math.PI) * 10
         particlesRef.current.push({
-          x: screenX + size / 2 + (avatarFacing < 0 ? -8 : 8),
-          y: screenY + size / 2,
+          x: trailX,
+          y: trailY,
           vx: (Math.random() - 0.5) * 0.8,
           vy: -1.0 - Math.random() * 0.8,
           life: 28,
