@@ -7,7 +7,8 @@ export default function IsometricGameMap({
   onPropertyClick = null,
   city = 'Manila',
   onCharacterMove = null,
-  mapSettings = {}
+  mapSettings = {},
+  cosmetics = null
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
