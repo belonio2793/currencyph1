@@ -74,12 +74,32 @@ export default function IsometricGameMap({
     return gradientCacheRef.current[key]
   }, [])
 
-  const TILE_SIZE = 64
-  const GRID_WIDTH = 24
-  const GRID_HEIGHT = 18
+  const TILE_SIZE = 48 // Slightly smaller to fit more tiles
+  const GRID_WIDTH = 40 // Much larger: from 24 to 40 (66% bigger)
+  const GRID_HEIGHT = 30 // Much larger: from 18 to 30 (66% bigger)
   const AVATAR_SIZE = 32
-  const MAP_WIDTH = 300
-  const MAP_HEIGHT = 350
+  const MAP_WIDTH = GRID_WIDTH * TILE_SIZE // 1920px
+  const MAP_HEIGHT = GRID_HEIGHT * TILE_SIZE // 1440px
+
+  // Manila-inspired districts with characteristics
+  const DISTRICTS = {
+    financial: { name: 'Financial District', color: '#4F46E5', x: 5, y: 5, width: 8, height: 8, emoji: '🏢' },
+    residential: { name: 'Residential', color: '#10B981', x: 15, y: 5, width: 8, height: 10, emoji: '🏠' },
+    industrial: { name: 'Industrial Zone', color: '#F59E0B', x: 25, y: 8, width: 8, height: 10, emoji: '🏭' },
+    commercial: { name: 'Commercial Hub', color: '#EC4899', x: 5, y: 18, width: 10, height: 8, emoji: '🛍️' },
+    parks: { name: 'Parks & Recreation', color: '#14B8A6', x: 18, y: 18, width: 8, height: 8, emoji: '🌳' },
+    historic: { name: 'Historic District', color: '#D97706', x: 28, y: 20, width: 8, height: 8, emoji: '🏛️' }
+  }
+
+  // Building placement zones (property types allowed in each district)
+  const ZONE_RULES = {
+    financial: ['office', 'bank', 'corporate'],
+    residential: ['house', 'apartment', 'market_stall'],
+    industrial: ['factory', 'warehouse', 'workshop'],
+    commercial: ['store', 'restaurant', 'mall'],
+    parks: ['park', 'garden', 'plaza'],
+    historic: ['museum', 'landmark', 'heritage']
+  }
 
   // Particle pool system: reuse particle objects instead of creating new ones
   const spawnParticle = useCallback((x, y, vx, vy, color, life = 1000) => {
