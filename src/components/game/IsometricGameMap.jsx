@@ -16,7 +16,7 @@ export default function IsometricGameMap({
   initialAvatarPos = null,
   onConsumeEnergy = null,
   onJobMarkerClick = null,
-  placingProperty = null,
+  externalPlacingProperty = null,
   onConfirmPlace = null,
   onCancelPlace = null
 }) {
