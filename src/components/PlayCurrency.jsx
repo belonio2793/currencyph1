@@ -975,14 +975,32 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 )}
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {JOBS.map(job => (
-                    <div key={job.id} className="p-3 bg-slate-800/60 border border-slate-700 rounded-lg">
+                  {jobs.map((job, idx) => (
+                    <div key={job.name + idx} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
                       <div className="font-semibold text-slate-100">{job.name}</div>
                       <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
+                      <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
                       <div className="mt-3">
-                        <button disabled={isWorking} onClick={() => performJob(job)} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-medium">Work</button>
+                        <button
+                          disabled={isWorking && workingJobId !== job.name}
+                          onClick={() => performJob(job)}
+                          className={`w-full px-3 py-2 rounded text-white font-medium transition-colors ${
+                            isWorking && workingJobId === job.name
+                              ? 'bg-blue-700 cursor-not-allowed'
+                              : 'bg-blue-600 hover:bg-blue-700'
+                          }`}
+                        >
+                          {workingJobId === job.name ? 'Working...' : 'Work'}
+                        </button>
                       </div>
-                      {isWorking && <div className="mt-2 text-xs text-slate-300">Progress: {workProgress}%</div>}
+                      {workingJobId === job.name && (
+                        <div className="mt-2">
+                          <div className="w-full bg-slate-700 rounded h-2">
+                            <div className="bg-emerald-500 h-2 rounded transition-all" style={{width: `${workProgress}%`}}></div>
+                          </div>
+                          <div className="text-xs text-slate-300 mt-1 text-center">{workProgress}%</div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
