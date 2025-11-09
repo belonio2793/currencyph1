@@ -484,10 +484,12 @@ export default function IsometricGameMap({
 
     // footstep dust effect on movement
     if (isRunning && !isWorking && avatarAnimationFrame.current % 8 === 0) {
-      const footX = screenX + (avatarFacing < 0 ? 8 : size - 8)
+      const angleRad = (avatarAngle * Math.PI) / 180
+      const footX = screenX + size / 2 + Math.cos(angleRad + Math.PI) * 8
+      const footY = screenY + size / 2 + Math.sin(angleRad + Math.PI) * 8
       particlesRef.current.push({
         x: footX,
-        y: screenY + (2 * size) / 3 + 12,
+        y: footY,
         vx: (Math.random() - 0.5) * 1.2,
         vy: Math.random() * 0.8,
         life: 18,
