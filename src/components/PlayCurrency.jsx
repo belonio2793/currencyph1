@@ -246,6 +246,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [cosmetics, setCosmetics] = useState(DEFAULT_COSMETICS)
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
+  const [mapViewMode, setMapViewMode] = useState('manila') // 'manila', 'isometric', 'grid'
   const [phases, setPhases] = useState({
     // Basic phases
     didJob: false,
