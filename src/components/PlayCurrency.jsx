@@ -201,9 +201,15 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [cosmetics, setCosmetics] = useState(DEFAULT_COSMETICS)
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
-  const [savedFlash, setSavedFlash] = useState(false)
   const [phases, setPhases] = useState({ didJob: false, boughtAsset: false, claimedDaily: false, visitedCities: {}, winDuel: false })
   const lastAutosaveRef = useRef(0)
+
+  // AUTOSAVE SYSTEM DOCUMENTATION:
+  // - Uses localStorage for lightweight metadata (position/city) - very efficient, minimal memory impact
+  // - Debounced to 800ms to prevent excessive writes
+  // - Supabase persistCharacterPartial syncs game state asynchronously
+  // - Each save only replaces previous data (no accumulation), so memory usage is constant
+  // - No UI notifications - saves happen silently in background
 
   useEffect(() => {
     let mounted = true
