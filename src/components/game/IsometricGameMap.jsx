@@ -544,8 +544,6 @@ export default function IsometricGameMap({
     ctx.fillRect(0, 0, width, height)
     ctx.restore()
 
-    // draw minimap
-    drawMinimap()
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos])
 
   const moveAvatar = useCallback((direction) => {
