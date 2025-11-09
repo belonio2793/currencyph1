@@ -387,6 +387,47 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         // Setup presence/realtime if supabase enabled
         if (userId) await setupPresence()
+
+        // Load remote assets and subscribe to changes (game_assets table)
+        try {
+          const { data: assets } = await supabase.from('game_assets').select('*')
+          if (mounted && assets) setRemoteAssets(assets)
+        } catch (e) {
+          console.warn('Could not load game_assets', e)
+        }
+
+        if (mounted && typeof supabase.channel === 'function') {
+          try {
+            const channel = supabase
+              .channel('public:game_assets')
+              .on('postgres_changes', { event: '*', schema: 'public', table: 'game_assets' }, (payload) => {
+                try {
+                  // payload.eventType in v2, payload.new/payload.old
+                  const ev = payload.eventType || payload.event
+                  const rec = payload.new || payload.record || payload.new
+                  if (!rec) return
+                  setRemoteAssets((prev) => {
+                    const copy = [...(prev || [])]
+                    if (ev === 'INSERT' || ev === 'UPDATE') {
+                      const idx = copy.findIndex(a => a.id === rec.id)
+                      if (idx === -1) copy.push(rec)
+                      else copy[idx] = rec
+                    } else if (ev === 'DELETE') {
+                      return copy.filter(a => a.id !== (payload.old?.id || payload.old?.id))
+                    }
+                    return copy
+                  })
+                } catch (e) { console.warn('asset channel handler failed', e) }
+              })
+              .subscribe()
+
+            // store channel on presenceChannelRef to cleanup
+            presenceChannelRef.current = channel
+          } catch (e) {
+            console.warn('Could not subscribe to game_assets channel', e)
+          }
+        }
+
       } catch (err) {
         console.error('Init error', err)
         setError('Could not initialize game: ' + (err.message || String(err)))
