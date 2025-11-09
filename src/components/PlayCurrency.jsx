@@ -1195,6 +1195,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           </div>
         </div>
       </div>
+
+      {/* Character Customizer Panel */}
+      <CharacterCustomizer
+        cosmetics={cosmetics}
+        onUpdateCosmetics={handleUpdateCosmetics}
+        isOpen={customizationOpen}
+        onToggle={() => setCustomizationOpen(!customizationOpen)}
+      />
     </div>
   )
 }
