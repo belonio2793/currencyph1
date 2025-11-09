@@ -459,6 +459,43 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     } catch (e) { /* ignore */ }
   }
 
+  // Get stat boosts based on job category
+  const getStatBoostFromJob = useCallback((job) => {
+    const boosts = {
+      strength: 0,
+      intelligence: 0,
+      charisma: 0,
+      endurance: 0,
+      dexterity: 0,
+      luck: 0
+    }
+
+    // Determine category by job name patterns
+    const jobName = job.name.toLowerCase()
+
+    if (['programmer', 'developer', 'administrator', 'engineer', 'analyst', 'designer', 'tester'].some(t => jobName.includes(t))) {
+      boosts.intelligence += 2
+      boosts.dexterity += 1
+    } else if (['carpenter', 'welder', 'plumber', 'electrician', 'mason', 'construction'].some(t => jobName.includes(t))) {
+      boosts.strength += 2
+      boosts.endurance += 1
+    } else if (['manager', 'coordinator', 'guide', 'stylist', 'bartender', 'waiter', 'receptionist'].some(t => jobName.includes(t))) {
+      boosts.charisma += 2
+      boosts.intelligence += 1
+    } else if (['farmer', 'vendor', 'laborer', 'gardener', 'janitor', 'delivery'].some(t => jobName.includes(t))) {
+      boosts.endurance += 2
+      boosts.strength += 1
+    } else if (['driver', 'designer', 'editor', 'marketer', 'content'].some(t => jobName.includes(t))) {
+      boosts.dexterity += 2
+      boosts.charisma += 1
+    }
+
+    // Small luck bonus for all jobs
+    boosts.luck += 1
+
+    return boosts
+  }, [])
+
   const markVisitedCity = (name) => {
     setPhases(prev => {
       const visited = { ...(prev.visitedCities || {}), [name]: true }
