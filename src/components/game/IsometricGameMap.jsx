@@ -842,7 +842,7 @@ export default function IsometricGameMap({
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
 
   const moveAvatar = useCallback((direction) => {
-    const speed = (mapSettings.avatarSpeed || 1) * 140
+    const speed = (mapSettings.avatarSpeed ?? 1.3) * 180
 
     // Set velocity and angle based on direction
     switch (direction) {
@@ -1015,15 +1015,21 @@ export default function IsometricGameMap({
     window.addEventListener('keyup', handleKeyUp)
 
     const animate = () => {
-      // Determine velocity from keys or click-to-move
-      const baseSpeed = (mapSettings.avatarSpeed || 1) * 140
+      // Time step for smooth, frame-rate independent movement
+      const now = performance.now()
+      const dt = Math.min(0.05, (now - lastTimeRef.current) / 1000)
+      lastTimeRef.current = now
+
+      // Determine velocity from keys or click-to-move (pixels per second)
+      const baseSpeed = (mapSettings.avatarSpeed ?? 1.3) * 180
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
       const sprint = (keysPressed.current['shift'] && canSprint) ? 2.2 : 1
+      const moveSpeed = baseSpeed * sprint
       let vx = 0, vy = 0
-      if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= baseSpeed * sprint
-      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += baseSpeed * sprint
-      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= baseSpeed * sprint
-      if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += baseSpeed * sprint
+      if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= moveSpeed
+      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += moveSpeed
+      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= moveSpeed
+      if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += moveSpeed
 
       // Calculate angle from velocity (0 = right, 90 = down, 180 = left, 270 = up)
       if (vx !== 0 || vy !== 0) {
@@ -1081,8 +1087,8 @@ export default function IsometricGameMap({
       setAvatarPos(prev => {
         const maxX = MAP_WIDTH
         const maxY = MAP_HEIGHT
-        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x))
-        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y))
+        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x * dt))
+        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y * dt))
 
         if ((newX !== prev.x || newY !== prev.y) && onCharacterMove) {
           if (cityData) {
@@ -1105,8 +1111,8 @@ export default function IsometricGameMap({
         const dx = tx - prev.x
         const dy = ty - prev.y
         const dist = Math.hypot(dx, dy)
-        // Adaptive easing: use 0.15 normally, 0.08 when very close for precision
-        const easeFactor = dist < 5 ? 0.08 : 0.15
+        // Adaptive easing: slightly faster for more responsive feel
+        const easeFactor = dist < 5 ? 0.1 : 0.2
         const nx = prev.x + dx * easeFactor
         const ny = prev.y + dy * easeFactor
         return { x: nx, y: ny }
