@@ -92,4 +92,51 @@ CREATE TABLE IF NOT EXISTS public.game_presence (
   last_seen timestamptz DEFAULT now()
 );
 
+-- Enable RLS on game_characters
+ALTER TABLE public.game_characters ENABLE ROW LEVEL SECURITY;
+
+-- RLS Policies for game_characters
+DO $$
+BEGIN
+  -- Users can view their own characters
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can view their own characters'
+  ) THEN
+    CREATE POLICY "Users can view their own characters" ON public.game_characters
+      FOR SELECT USING (user_id = auth.uid() OR user_id IS NULL);
+  END IF;
+
+  -- Users can insert their own characters
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can insert their own characters'
+  ) THEN
+    CREATE POLICY "Users can insert their own characters" ON public.game_characters
+      FOR INSERT WITH CHECK (user_id = auth.uid());
+  END IF;
+
+  -- Users can update their own characters
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can update their own characters'
+  ) THEN
+    CREATE POLICY "Users can update their own characters" ON public.game_characters
+      FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
+  END IF;
+
+  -- Users can delete their own characters
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Users can delete their own characters'
+  ) THEN
+    CREATE POLICY "Users can delete their own characters" ON public.game_characters
+      FOR DELETE USING (user_id = auth.uid());
+  END IF;
+
+  -- Public can view all characters (for leaderboard, etc)
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'game_characters' AND policyname = 'Public can view all characters'
+  ) THEN
+    CREATE POLICY "Public can view all characters" ON public.game_characters
+      FOR SELECT USING (true);
+  END IF;
+END$$;
+
 COMMIT;
