@@ -749,7 +749,7 @@ export default function IsometricGameMap({
       const zoomTarget = zoom
       zoomRef.current += (zoomTarget - zoomRef.current) * Math.min(1, dt * 8)
 
-      const baseSpeed = (mapSettings.avatarSpeed ?? 1.3) * 180
+      const baseSpeed = (mapSettings.avatarSpeed ?? 1.3) * 2.5
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
       const sprint = (keysPressed.current['shift'] && canSprint) ? 2.2 : 1
       const moveSpeed = baseSpeed * sprint
@@ -758,6 +758,11 @@ export default function IsometricGameMap({
       if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += moveSpeed
       if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= moveSpeed
       if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += moveSpeed
+
+      // Debug keys every 60 frames
+      if (avatarAnimationFrame.current % 60 === 0 && (Object.keys(keysPressed.current).some(k => keysPressed.current[k]))) {
+        console.log('Keys pressed:', Object.keys(keysPressed.current).filter(k => keysPressed.current[k]))
+      }
 
       if (vx !== 0 || vy !== 0) {
         const targetAngle = Math.atan2(vy, vx) * (180 / Math.PI)
