@@ -229,12 +229,14 @@ export class NPCManager {
       npc.update(this.gameWidth, this.gameHeight)
     })
 
-    // Random events
-    this.eventTimer++
-    if (this.eventTimer > 600) {
-      this.eventTimer = 0
+    // Random events with 15% chance every frame (roughly every 6 seconds)
+    if (Math.random() < 0.0015) {
       this.spawnRandomEvent()
     }
+
+    // Clean up old events
+    const now = Date.now()
+    this.events = this.events.filter(e => now - e.createdAt < 3000)
   }
 
   spawnRandomEvent() {
@@ -244,13 +246,16 @@ export class NPCManager {
       { type: 'opportunity', intensity: 0.4 },
       { type: 'challenge', intensity: 0.5 }
     ]
-    const event = eventTypes[Math.floor(Math.random() * eventTypes.length)]
-    event.position = {
-      x: Math.random() * this.gameWidth,
-      y: Math.random() * this.gameHeight
+    const eventData = eventTypes[Math.floor(Math.random() * eventTypes.length)]
+    const event = {
+      type: eventData.type,
+      intensity: eventData.intensity,
+      position: {
+        x: Math.random() * this.gameWidth,
+        y: Math.random() * this.gameHeight
+      },
+      createdAt: Date.now()
     }
-    event.duration = 60
-    event.createdAt = Date.now()
     this.events.push(event)
   }
 
