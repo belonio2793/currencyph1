@@ -800,7 +800,7 @@ export default function IsometricGameMap({
 
     const handleWheel = (e) => {
       e.preventDefault()
-      const delta = e.deltaY > 0 ? 0.9 : 1.1
+      const delta = e.deltaY > 0 ? 0.92 : 1.08 // smoother zoom increments
       setZoom(prev => Math.max(0.5, Math.min(3, prev * delta)))
     }
 
@@ -1082,7 +1082,7 @@ export default function IsometricGameMap({
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">📈 Value:</span>
-                  <span className="font-semibold text-yellow-300">₱{Number(tooltipData.value || 0).toLocaleString()}</span>
+                  <span className="font-semibold text-yellow-300">��{Number(tooltipData.value || 0).toLocaleString()}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">⭐ Level:</span>
