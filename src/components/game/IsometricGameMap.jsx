@@ -29,7 +29,7 @@ export default function IsometricGameMap({
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [avatarPos, setAvatarPos] = useState(initialAvatarPos && typeof initialAvatarPos.x === 'number' && typeof initialAvatarPos.y === 'number' ? initialAvatarPos : { x: 150, y: 175 })
-  const [avatarFacing, setAvatarFacing] = useState(0) // 0-360 degrees
+  const [avatarFacing, setAvatarFacing] = useState(1)
   const [avatarMoving, setAvatarMoving] = useState(false)
   const [selectedCity, setSelectedCity] = useState(city)
   const [cityData, setCityData] = useState(null)
@@ -424,10 +424,12 @@ export default function IsometricGameMap({
     ctx.fill()
 
     ctx.save()
-    // Apply rotation for 360-degree facing
-    ctx.translate(screenX + size / 2, screenY + size / 2)
-    ctx.rotate(avatarFacing * Math.PI / 180)
-    ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
+    // Handle horizontal flip for left/right facing
+    const facingDirection = avatarFacing < 0 ? -1 : 1
+    if (facingDirection === -1) {
+      ctx.scale(-1, 1)
+      screenX = -screenX - size
+    }
     // Rotate when working
     if (isWorking) {
       const rotation = (avatarAnimationFrame.current * 0.08) % (Math.PI * 2)
@@ -482,7 +484,7 @@ export default function IsometricGameMap({
 
     // footstep dust effect on movement
     if (isRunning && !isWorking && avatarAnimationFrame.current % 8 === 0) {
-      const footX = screenX + size / 2 + Math.cos(avatarFacing * Math.PI / 180) * 8
+      const footX = screenX + (avatarFacing < 0 ? 8 : size - 8)
       particlesRef.current.push({
         x: footX,
         y: screenY + (2 * size) / 3 + 12,
@@ -500,7 +502,7 @@ export default function IsometricGameMap({
       // speed trail particles - more frequent for visual impact
       if (avatarAnimationFrame.current % 3 === 0) {
         particlesRef.current.push({
-          x: screenX + size / 2 + (avatarFacing === -1 ? -8 : 8),
+          x: screenX + size / 2 + (avatarFacing < 0 ? -8 : 8),
           y: screenY + size / 2,
           vx: (Math.random() - 0.5) * 0.8,
           vy: -1.0 - Math.random() * 0.8,
@@ -836,27 +838,23 @@ export default function IsometricGameMap({
     const speed = mapSettings.avatarSpeed || 12
 
     // Set velocity based on direction
-    let vx = 0, vy = 0
     switch (direction) {
       case 'up':
-        vy = -speed
+        velocityRef.current.y = -speed
         break
       case 'down':
-        vy = speed
+        velocityRef.current.y = speed
         break
       case 'left':
-        vx = -speed
+        velocityRef.current.x = -speed
+        setAvatarFacing(-1)
         break
       case 'right':
-        vx = speed
+        velocityRef.current.x = speed
+        setAvatarFacing(1)
         break
       default:
         break
-    }
-
-    if (vx !== 0 || vy !== 0) {
-      const angle = Math.atan2(vy, vx) * (180 / Math.PI)
-      setAvatarFacing(angle)
     }
 
     setAvatarMoving(true)
@@ -1014,10 +1012,11 @@ export default function IsometricGameMap({
       if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= baseSpeed * sprint
       if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += baseSpeed * sprint
 
-      // Update facing direction based on velocity (360 degrees)
-      if (vx !== 0 || vy !== 0) {
-        const angle = Math.atan2(vy, vx) * (180 / Math.PI)
-        setAvatarFacing(angle)
+      // Update facing direction based on horizontal velocity
+      if (vx !== 0) {
+        setAvatarFacing(vx > 0 ? 1 : -1)
+      } else if (vy !== 0 && avatarFacing === 0) {
+        setAvatarFacing(1) // default to right-facing
       }
 
       // Normalize diagonal movement
@@ -1043,8 +1042,7 @@ export default function IsometricGameMap({
         } else {
           vx = (dx / dist) * baseSpeed
           vy = (dy / dist) * baseSpeed
-          const angle = Math.atan2(vy, vx) * (180 / Math.PI)
-          setAvatarFacing(angle)
+          setAvatarFacing(dx > 0 ? 1 : -1)
         }
       }
       velocityRef.current.x = vx
