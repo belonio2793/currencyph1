@@ -717,6 +717,32 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       await supabase.from('game_leaderboard').upsert({ user_id: userId, name: char.name, wealth: char.wealth }, { onConflict: 'user_id' }).catch(() => {})
     } catch (err) {
       console.warn('saveCharacterToDB failed', err)
+      // If error mentions cosmetics (schema mismatch), retry without cosmetics
+      const msg = (err && (err.message || err.error_description || err.details || '')).toString().toLowerCase()
+      if (msg.includes('cosmetics') || msg.includes('column') || msg.includes('null value')) {
+        try {
+          const { error: e2 } = await supabase.from('game_characters').upsert({
+            id: char.id,
+            user_id: userId,
+            name: char.name,
+            wealth: char.wealth,
+            income_rate: char.income_rate,
+            xp: char.xp,
+            level: char.level,
+            properties: char.properties || [],
+            last_daily: char.last_daily || null,
+            current_location: char.current_location || null,
+            home_city: char.home_city || null
+          }, { onConflict: 'id' })
+          if (!e2) {
+            await supabase.from('game_leaderboard').upsert({ user_id: userId, name: char.name, wealth: char.wealth }, { onConflict: 'user_id' }).catch(() => {})
+            return
+          }
+        } catch (e3) {
+          console.warn('Retry upsert without cosmetics failed', e3)
+        }
+      }
+
       setError('Could not save character: ' + (err.message || String(err)))
     }
   }
