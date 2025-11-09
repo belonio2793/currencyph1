@@ -630,6 +630,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         persistCharacterPartial(updated)
         // Save using the updated object (avoid stale closure)
         if (userId) saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
+        // Check phase progression
+        checkAndUpdatePhases(updated)
         return updated
       })
 
