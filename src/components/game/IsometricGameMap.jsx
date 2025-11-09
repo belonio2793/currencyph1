@@ -702,19 +702,21 @@ export default function IsometricGameMap({
       const active = document.activeElement
       if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return
 
-      const key = e.key.toLowerCase()
-      keysPressed.current[key] = true
+      const key = e.key
+      const keyLower = key.toLowerCase()
 
-      const movementKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']
-      if (movementKeys.includes(key)) {
+      keysPressed.current[keyLower] = true
+
+      if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight' ||
+          keyLower === 'w' || keyLower === 'a' || keyLower === 's' || keyLower === 'd') {
         moveTargetRef.current = null
         e.preventDefault()
       }
     }
 
     const handleKeyUp = (e) => {
-      const key = e.key.toLowerCase()
-      keysPressed.current[key] = false
+      const keyLower = e.key.toLowerCase()
+      keysPressed.current[keyLower] = false
 
       const isMoving = keysPressed.current['w'] || keysPressed.current['arrowup'] ||
                        keysPressed.current['s'] || keysPressed.current['arrowdown'] ||
