@@ -1,7 +1,6 @@
 -- Achievement definitions
 CREATE TABLE IF NOT EXISTS public.game_achievements (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  key TEXT UNIQUE NOT NULL,
+  key TEXT PRIMARY KEY,
   name TEXT NOT NULL,
   description TEXT,
   icon TEXT,
@@ -75,7 +74,7 @@ INSERT INTO public.game_achievements (key, name, description, icon, reward_credi
 ('wealth_10000', 'Mogul', 'Accumulate 10,000 credits', '🏆', 500, 1000, 'rare', 'economy'),
 ('match_historian', 'Veteran', 'Participate in 50 matches', '📜', 200, 300, 'rare', 'combat'),
 ('perfect_victory', 'Flawless Victory', 'Win a duel without taking damage', '✨', 250, 500, 'epic', 'combat'),
-('property_owner', 'Landlord', 'Own 5 properties', '🏠', 150, 200, 'uncommon', 'economy')
+('property_owner', 'Landlord', 'Own 5 properties', '����', 150, 200, 'uncommon', 'economy')
 ON CONFLICT(key) DO NOTHING;
 
 -- Create indexes
