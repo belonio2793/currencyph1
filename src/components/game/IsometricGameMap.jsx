@@ -93,6 +93,7 @@ export default function IsometricGameMap({
     const w = TILE_SIZE / 2
     const h = TILE_SIZE / 4
 
+    // Main tile with gradient
     ctx.fillStyle = color
     ctx.beginPath()
     ctx.moveTo(screenX, screenY)
@@ -102,12 +103,28 @@ export default function IsometricGameMap({
     ctx.closePath()
     ctx.fill()
 
-    ctx.strokeStyle = isHovered ? 'rgba(255, 255, 0, 0.8)' : 'rgba(0, 0, 0, 0.15)'
-    ctx.lineWidth = isHovered ? 2 : 1
+    // Add subtle highlight
+    const gradient = ctx.createLinearGradient(screenX - w, screenY, screenX, screenY + h * 2)
+    gradient.addColorStop(0, 'rgba(255, 255, 255, 0.1)')
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.1)')
+    ctx.fillStyle = gradient
+    ctx.fill()
+
+    // Border
+    ctx.strokeStyle = isHovered ? 'rgba(255, 200, 50, 0.9)' : 'rgba(0, 0, 0, 0.2)'
+    ctx.lineWidth = isHovered ? 2.5 : 1.5
     ctx.stroke()
 
+    // Add glow effect when hovered
+    if (isHovered) {
+      ctx.strokeStyle = 'rgba(255, 200, 50, 0.3)'
+      ctx.lineWidth = 4
+      ctx.stroke()
+    }
+
+    // 3D height effect
     if (height > 0) {
-      ctx.fillStyle = adjustBrightness(color, -20)
+      ctx.fillStyle = adjustBrightness(color, -25)
       ctx.beginPath()
       ctx.moveTo(screenX, screenY)
       ctx.lineTo(screenX, screenY - height)
@@ -116,7 +133,7 @@ export default function IsometricGameMap({
       ctx.closePath()
       ctx.fill()
 
-      ctx.fillStyle = adjustBrightness(color, -40)
+      ctx.fillStyle = adjustBrightness(color, -45)
       ctx.beginPath()
       ctx.moveTo(screenX, screenY)
       ctx.lineTo(screenX + w, screenY + h)
@@ -124,6 +141,14 @@ export default function IsometricGameMap({
       ctx.lineTo(screenX, screenY - height)
       ctx.closePath()
       ctx.fill()
+
+      // Add edge highlighting to 3D
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)'
+      ctx.lineWidth = 0.5
+      ctx.beginPath()
+      ctx.moveTo(screenX, screenY - height)
+      ctx.lineTo(screenX - w, screenY - height + h)
+      ctx.stroke()
     }
   }, [])
 
