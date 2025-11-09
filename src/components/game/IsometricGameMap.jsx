@@ -1058,21 +1058,46 @@ export default function IsometricGameMap({
           >Decor</button>
         </div>
 
-        {/* Tooltip */}
+        {/* Enhanced Property Tooltip */}
         {tooltipPos && tooltipData && (
           <div
-            className="absolute z-30 bg-slate-900/90 border border-slate-700 rounded p-2 text-xs text-slate-200 shadow-xl"
+            className="absolute z-30 bg-gradient-to-b from-slate-900 to-slate-800 border border-purple-500/40 rounded-lg p-3 text-xs text-slate-200 shadow-2xl min-w-48"
             style={{ left: tooltipPos.x, top: tooltipPos.y }}
           >
-            <div className="font-semibold text-slate-100">{tooltipData.name}</div>
-            <div className="text-[10px] text-slate-400 capitalize">{tooltipData.type}</div>
-            {tooltipData.owned && (
-              <div className="mt-1 space-y-0.5">
-                <div>Income: ₱{Number(tooltipData.income || 0).toLocaleString()}</div>
-                <div>Value: ₱{Number(tooltipData.value || 0).toLocaleString()}</div>
-                <div>Tier: {tooltipData.upgrade}</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="font-bold text-slate-100 text-sm">{tooltipData.name}</div>
+              <div className="text-[10px] px-2 py-0.5 bg-purple-600/30 rounded text-purple-300 capitalize">{tooltipData.type}</div>
+            </div>
+
+            {tooltipData.owned ? (
+              <div className="space-y-1.5 border-t border-slate-700 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">💰 Income:</span>
+                  <span className="font-semibold text-emerald-300">₱{Number(tooltipData.income || 0).toLocaleString()}/10s</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">📈 Value:</span>
+                  <span className="font-semibold text-yellow-300">₱{Number(tooltipData.value || 0).toLocaleString()}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">⭐ Level:</span>
+                  <span className="font-semibold text-purple-300">{tooltipData.upgrade || 0}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="border-t border-slate-700 pt-2">
+                <div className="text-slate-400 text-[10px]">Available for purchase</div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Job Location Hint Overlay */}
+        {Object.keys(JOB_LOCATIONS || {}).length > 0 && (
+          <div className="absolute bottom-12 left-2 z-15 bg-slate-900/70 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-400">
+            <div className="mb-0.5 text-slate-300 font-semibold">💼 Job Tips</div>
+            <div>Hover over job markers on map</div>
+            <div>to see available work</div>
           </div>
         )}
         {/* Energy overlay */}
