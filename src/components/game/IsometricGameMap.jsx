@@ -781,8 +781,8 @@ export default function IsometricGameMap({
         if (followAvatar) {
           const canvas = canvasRef.current
           if (canvas) {
-            const canvasWidth = canvas.width / z
-            const canvasHeight = canvas.height / z
+            const canvasWidth = canvas.width / zoomRef.current
+            const canvasHeight = canvas.height / zoomRef.current
             targetCameraRef.current = {
               x: newX - canvasWidth / 2,
               y: newY - canvasHeight / 2
