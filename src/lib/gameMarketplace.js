@@ -374,6 +374,166 @@ export const gameMarketplace = {
     }
   },
 
+  // TRADE OFFERS
+  async createTradeOffer(listingId, buyerId, sellerId, offeredPrice, offeredItems = []) {
+    try {
+      const { data, error } = await supabase
+        .from('game_trade_offers')
+        .insert([{
+          listing_id: listingId,
+          buyer_id: buyerId,
+          seller_id: sellerId,
+          offered_price: offeredPrice,
+          offered_items: offeredItems,
+          status: 'pending'
+        }])
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (err) {
+      console.error('Error creating trade offer:', err)
+      throw err
+    }
+  },
+
+  async acceptTradeOffer(offerId, acceptorId) {
+    try {
+      const { data: offer, error: offerError } = await supabase
+        .from('game_trade_offers')
+        .select(`
+          *,
+          listing:game_marketplace_listings(*)
+        `)
+        .eq('id', offerId)
+        .single()
+
+      if (offerError || !offer) {
+        throw new Error('Trade offer not found')
+      }
+
+      if (offer.seller_id !== acceptorId && offer.buyer_id !== acceptorId) {
+        throw new Error('You cannot accept this offer')
+      }
+
+      // Determine buyer and seller
+      const isBuyer = offer.buyer_id === acceptorId
+      const buyerId = isBuyer ? offer.buyer_id : offer.seller_id
+      const sellerId = isBuyer ? offer.seller_id : offer.buyer_id
+      const offerAmount = offer.offered_price
+
+      // Get both parties
+      const buyer = await gameAPI.getCharacter(buyerId)
+      const seller = await gameAPI.getCharacter(sellerId)
+
+      if ((buyer?.money || 0) < offerAmount) {
+        throw new Error('Buyer has insufficient funds')
+      }
+
+      // Transfer money
+      await gameAPI.updateCharacterStats(buyerId, {
+        money: (buyer?.money || 0) - offerAmount
+      })
+
+      await gameAPI.updateCharacterStats(sellerId, {
+        money: (seller?.money || 0) + offerAmount
+      })
+
+      // If listing is a property, transfer ownership
+      if (offer.listing.listing_type === 'property') {
+        await supabase
+          .from('game_properties')
+          .update({ owner_id: buyerId })
+          .eq('id', offer.listing.property_id)
+      } else if (offer.listing.listing_type === 'item') {
+        // Transfer items from seller to buyer
+        await gameAPI.addItemToInventory(buyerId, offer.listing.item_id, offer.listing.quantity)
+
+        // Remove from seller inventory or reduce quantity
+        await gameAPI.removeItemFromInventory(sellerId, offer.listing.item_id, offer.listing.quantity)
+      }
+
+      // Mark listing as sold
+      await supabase
+        .from('game_marketplace_listings')
+        .update({ status: 'sold' })
+        .eq('id', offer.listing.id)
+
+      // Mark offer as completed
+      await supabase
+        .from('game_trade_offers')
+        .update({ status: 'completed' })
+        .eq('id', offerId)
+
+      // Log trade completion
+      await supabase
+        .from('game_trades_completed')
+        .insert([{
+          buyer_id: buyerId,
+          seller_id: sellerId,
+          item_type: offer.listing.item_type,
+          description: offer.listing.description,
+          price_paid: offerAmount,
+          buyer_rating: 5,
+          seller_rating: 5
+        }])
+
+      // Award experience
+      await gameAPI.addExperience(buyerId, 20, 'trade_completed', offerId)
+      await gameAPI.addExperience(sellerId, 20, 'trade_completed', offerId)
+
+      return { success: true }
+    } catch (err) {
+      console.error('Error accepting trade offer:', err)
+      throw err
+    }
+  },
+
+  async rejectTradeOffer(offerId, rejectingUserId) {
+    try {
+      const { data: offer } = await supabase
+        .from('game_trade_offers')
+        .select('seller_id, buyer_id')
+        .eq('id', offerId)
+        .single()
+
+      if (offer.seller_id !== rejectingUserId && offer.buyer_id !== rejectingUserId) {
+        throw new Error('You cannot reject this offer')
+      }
+
+      const { error } = await supabase
+        .from('game_trade_offers')
+        .update({ status: 'rejected' })
+        .eq('id', offerId)
+
+      if (error) throw error
+      return { success: true }
+    } catch (err) {
+      console.error('Error rejecting trade offer:', err)
+      throw err
+    }
+  },
+
+  async getTradeOffers(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('game_trade_offers')
+        .select(`
+          *,
+          listing:game_marketplace_listings(*)
+        `)
+        .or(`buyer_id.eq.${userId},seller_id.eq.${userId}`)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.error('Error fetching trade offers:', err)
+      return []
+    }
+  },
+
   // MARKET STATISTICS
   async getMarketStats() {
     try {
