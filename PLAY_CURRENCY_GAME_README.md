@@ -105,7 +105,9 @@ A turn-based economic simulation minigame built into Currency.ph where players m
 
 ### Components
 - **PlayCurrency.jsx**: Main game container, state management, game loops
-- **DuelMatch.jsx**: Turn-based duel UI, real-time sync, action broadcasting
+- **DuelMatch.jsx**: Enhanced turn-based duel UI with timer, abilities, animations
+- **DuelEnhancements.js**: Combat engine, ability definitions, status effects, timer utilities
+- **MatchHistory.jsx**: Player match statistics and past duel records
 - **CharacterCreation.jsx**: Character setup and customization
 - **CharactersPanel.jsx**: Character list, creation, deletion, selection
 - **IsometricGameMap.jsx**: Visual game world map (future 3D rendering)
