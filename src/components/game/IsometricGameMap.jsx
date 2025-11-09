@@ -29,7 +29,7 @@ export default function IsometricGameMap({
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [avatarPos, setAvatarPos] = useState(initialAvatarPos && typeof initialAvatarPos.x === 'number' && typeof initialAvatarPos.y === 'number' ? initialAvatarPos : { x: 150, y: 175 })
-  const [avatarFacing, setAvatarFacing] = useState(1)
+  const [avatarAngle, setAvatarAngle] = useState(0)
   const [avatarMoving, setAvatarMoving] = useState(false)
   const [selectedCity, setSelectedCity] = useState(city)
   const [cityData, setCityData] = useState(null)
