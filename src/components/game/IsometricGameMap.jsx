@@ -840,7 +840,7 @@ export default function IsometricGameMap({
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
 
   const moveAvatar = useCallback((direction) => {
-    const speed = mapSettings.avatarSpeed || 18
+    const speed = mapSettings.avatarSpeed || 28
 
     // Set velocity and angle based on direction
     switch (direction) {
@@ -1014,9 +1014,9 @@ export default function IsometricGameMap({
 
     const animate = () => {
       // Determine velocity from keys or click-to-move
-      const baseSpeed = mapSettings.avatarSpeed || 18
+      const baseSpeed = mapSettings.avatarSpeed || 28
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
-      const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
+      const sprint = (keysPressed.current['shift'] && canSprint) ? 2.2 : 1
       let vx = 0, vy = 0
       if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= baseSpeed * sprint
       if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += baseSpeed * sprint
@@ -1026,14 +1026,14 @@ export default function IsometricGameMap({
       // Calculate angle from velocity (0 = right, 90 = down, 180 = left, 270 = up)
       if (vx !== 0 || vy !== 0) {
         const targetAngle = Math.atan2(vy, vx) * (180 / Math.PI)
-        // Smooth angle interpolation for 360-degree turning
+        // Smooth angle interpolation for 360-degree turning - faster rotation
         setAvatarAngle(prev => {
           let diff = targetAngle - prev
           // Handle angle wrapping (shortest path)
           if (diff > 180) diff -= 360
           if (diff < -180) diff += 360
-          // Smooth transition with lerp
-          const newAngle = prev + diff * 0.15
+          // Faster smooth transition with lerp (increased from 0.15 to 0.28)
+          const newAngle = prev + diff * 0.28
           return (newAngle + 360) % 360
         })
       }
@@ -1044,7 +1044,7 @@ export default function IsometricGameMap({
       // Energy drain while sprinting
       if (onConsumeEnergy && sprint > 1 && (vx !== 0 || vy !== 0)) {
         const now = performance.now()
-        if (now - lastEnergyDrainRef.current > 500) {
+        if (now - lastEnergyDrainRef.current > 400) {
           try { onConsumeEnergy(1) } catch (e) {}
           lastEnergyDrainRef.current = now
         }
@@ -1066,7 +1066,7 @@ export default function IsometricGameMap({
             let diff = targetAngle - prev
             if (diff > 180) diff -= 360
             if (diff < -180) diff += 360
-            const newAngle = prev + diff * 0.15
+            const newAngle = prev + diff * 0.28
             return (newAngle + 360) % 360
           })
         }
