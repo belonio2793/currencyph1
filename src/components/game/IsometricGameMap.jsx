@@ -888,22 +888,22 @@ export default function IsometricGameMap({
         <div className="absolute top-2 right-2 z-20 flex items-center gap-2">
           <button
             onClick={() => setZoom(z => Math.max(0.5, Math.min(3, z * 0.9)))}
-            className="px-2 py-1 text-xs bg-white/80 border border-slate-300 rounded hover:bg-white"
+            className="px-2 py-1 text-xs bg-slate-700 text-white border border-slate-600 rounded hover:bg-slate-600 transition-colors"
             title="Zoom out"
           >−</button>
           <button
             onClick={() => setZoom(z => Math.max(0.5, Math.min(3, z * 1.1)))}
-            className="px-2 py-1 text-xs bg-white/80 border border-slate-300 rounded hover:bg-white"
+            className="px-2 py-1 text-xs bg-slate-700 text-white border border-slate-600 rounded hover:bg-slate-600 transition-colors"
             title="Zoom in"
           >+</button>
           <button
             onClick={() => setFollowAvatar(v => !v)}
-            className={`px-2 py-1 text-xs rounded border ${followAvatar ? 'bg-emerald-600 text-white border-emerald-700' : 'bg-white/80 border-slate-300'}`}
+            className={`px-2 py-1 text-xs rounded border transition-colors ${followAvatar ? 'bg-emerald-600 text-white border-emerald-700 hover:bg-emerald-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
             title="Toggle camera follow"
           >Follow</button>
           <button
             onClick={() => setShowGrid(v => !v)}
-            className={`px-2 py-1 text-xs rounded border ${showGrid ? 'bg-blue-600 text-white border-blue-700' : 'bg-white/80 border-slate-300'}`}
+            className={`px-2 py-1 text-xs rounded border transition-colors ${showGrid ? 'bg-blue-600 text-white border-blue-700 hover:bg-blue-700' : 'bg-slate-700 text-slate-300 border-slate-600 hover:bg-slate-600'}`}
             title="Toggle grid overlay"
           >Grid</button>
         </div>
