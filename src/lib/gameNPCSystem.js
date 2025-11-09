@@ -309,42 +309,85 @@ export class EventSystem {
 export function drawEventEffect(ctx, position, type, progress) {
   const screenX = position.screenX
   const screenY = position.screenY
+  const easeProgress = Math.sin(progress * Math.PI)
   const alpha = Math.max(0, 1 - progress)
 
   ctx.save()
   ctx.globalAlpha = alpha
 
   if (type === 'market_boom') {
+    // Green particles expanding outward
     ctx.fillStyle = '#4caf50'
-    const size = 10 + progress * 20
-    for (let i = 0; i < 3; i++) {
+    const size = 10 + easeProgress * 30
+    const particleCount = 5
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (i * Math.PI * 2 / particleCount) + (progress * Math.PI * 4)
+      const radius = size + progress * 20
+      const pX = screenX + Math.cos(angle) * radius
+      const pY = screenY + Math.sin(angle) * radius
       ctx.beginPath()
-      ctx.arc(screenX + Math.cos(i * Math.PI * 2 / 3) * size, screenY + Math.sin(i * Math.PI * 2 / 3) * size, 3, 0, Math.PI * 2)
+      ctx.arc(pX, pY, 3 + progress * 2, 0, Math.PI * 2)
       ctx.fill()
     }
     ctx.fillStyle = '#7cb342'
-    ctx.font = 'bold 12px Arial'
+    ctx.font = 'bold 16px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('📈', screenX, screenY)
+    ctx.textBaseline = 'middle'
+    ctx.fillText('📈', screenX, screenY - progress * 20)
   } else if (type === 'market_crash') {
+    // Red particles falling
     ctx.fillStyle = '#f44336'
-    const size = 10 + progress * 20
-    ctx.font = 'bold 12px Arial'
+    for (let i = 0; i < 4; i++) {
+      const pX = screenX + (Math.random() - 0.5) * 30
+      const pY = screenY + progress * 40
+      ctx.beginPath()
+      ctx.arc(pX, pY, 2, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.font = 'bold 16px Arial'
     ctx.textAlign = 'center'
-    ctx.fillText('📉', screenX, screenY)
+    ctx.textBaseline = 'middle'
+    ctx.fillText('📉', screenX, screenY + progress * 20)
   } else if (type === 'opportunity') {
+    // Gold sparkle effect
     ctx.fillStyle = '#ffd700'
-    const size = 15 + progress * 10
+    ctx.shadowColor = 'rgba(255, 215, 0, 0.8)'
+    ctx.shadowBlur = 10
+    const size = 15 + easeProgress * 10
     ctx.beginPath()
     ctx.arc(screenX, screenY, size, 0, Math.PI * 2)
     ctx.stroke()
-    ctx.font = 'bold 14px Arial'
+    for (let i = 0; i < 8; i++) {
+      const angle = (i * Math.PI * 2 / 8) + progress * Math.PI
+      const radius = 20 + easeProgress * 10
+      const pX = screenX + Math.cos(angle) * radius
+      const pY = screenY + Math.sin(angle) * radius
+      ctx.beginPath()
+      ctx.arc(pX, pY, 1.5, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.font = 'bold 18px Arial'
     ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
     ctx.fillText('✨', screenX, screenY)
   } else if (type === 'challenge') {
+    // Lightning/electric effect
     ctx.fillStyle = '#ff9800'
-    ctx.font = 'bold 14px Arial'
+    ctx.strokeStyle = '#ffb74d'
+    ctx.lineWidth = 2
+    for (let i = 0; i < 3; i++) {
+      const startX = screenX + (Math.random() - 0.5) * 20
+      const startY = screenY
+      const endX = screenX + (Math.random() - 0.5) * 20
+      const endY = screenY + 20 + progress * 10
+      ctx.beginPath()
+      ctx.moveTo(startX, startY)
+      ctx.lineTo(endX, endY)
+      ctx.stroke()
+    }
+    ctx.font = 'bold 18px Arial'
     ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
     ctx.fillText('⚡', screenX, screenY)
   }
 
