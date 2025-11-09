@@ -238,18 +238,21 @@ export default function IsometricGameMap({
       ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
     }
 
+    // Add idle floating effect
+    const floatOffset = !isRunning && !isWorking ? Math.sin(avatarAnimationFrame.current * 0.02) * 1.5 : 0
+
     // shirt
     ctx.fillStyle = topColor
-    ctx.fillRect(screenX + 4, screenY, size - 8, size / 3)
+    ctx.fillRect(screenX + 4, screenY + floatOffset, size - 8, size / 3)
 
     // pants
     ctx.fillStyle = bottomColor
-    ctx.fillRect(screenX + 4, screenY + size / 3, size - 8, size / 3)
+    ctx.fillRect(screenX + 4, screenY + size / 3 + floatOffset, size - 8, size / 3)
 
     // head
     ctx.fillStyle = skinColor
     ctx.beginPath()
-    ctx.arc(screenX + size / 2, screenY - 6, 8, 0, Math.PI * 2)
+    ctx.arc(screenX + size / 2, screenY - 6 + floatOffset, 8, 0, Math.PI * 2)
     ctx.fill()
 
     // eyes
