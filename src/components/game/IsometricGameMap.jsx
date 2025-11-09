@@ -736,6 +736,50 @@ export default function IsometricGameMap({
       ctx.restore()
     })
 
+    // Draw placed buildings/properties
+    placedBuildings.forEach(building => {
+      const isoPos = gridToIsometric(building.x, building.y)
+      drawBuilding(ctx, isoPos.x, isoPos.y, building.type, building.level || 1)
+
+      // Building hover effect
+      if (building.id === buildingHovered) {
+        ctx.globalAlpha = 0.5
+        ctx.strokeStyle = '#FFD700'
+        ctx.lineWidth = 2
+        ctx.strokeRect(isoPos.x - 15, isoPos.y - 30, 30, 30)
+        ctx.globalAlpha = 1
+      }
+
+      // Income indicator above building
+      if (building.incomeRate) {
+        ctx.fillStyle = '#10B981'
+        ctx.font = 'bold 8px Arial'
+        ctx.textAlign = 'center'
+        ctx.globalAlpha = 0.8
+        ctx.fillText(`₱${Math.round(building.incomeRate)}/s`, isoPos.x, isoPos.y - 40)
+      }
+    })
+
+    // Draw placement preview if placing a property
+    if (placingProperty) {
+      const isoPos = gameToIsometric(avatarPos.x, avatarPos.y)
+      ctx.globalAlpha = 0.5
+      drawBuilding(ctx, isoPos.x, isoPos.y, placingProperty.type, 1)
+      ctx.globalAlpha = 1
+
+      // Show zone validity
+      const districtKey = Object.keys(DISTRICTS).find(key => {
+        const d = DISTRICTS[key]
+        return avatarPos.x >= d.x * TILE_SIZE && avatarPos.x < (d.x + d.width) * TILE_SIZE &&
+               avatarPos.y >= d.y * TILE_SIZE && avatarPos.y < (d.y + d.height) * TILE_SIZE
+      })
+      const isValidZone = districtKey && ZONE_RULES[districtKey]?.includes(placingProperty.type)
+      ctx.fillStyle = isValidZone ? '#10B981' : '#EF4444'
+      ctx.font = '9px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText(isValidZone ? '✓ Valid Zone' : '✗ Invalid Zone', isoPos.x, isoPos.y - 50)
+    }
+
     // Draw NPCs
     if (npcManagerRef.current) {
       const npcs = npcManagerRef.current.getNPCs()
