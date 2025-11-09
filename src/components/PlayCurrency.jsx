@@ -764,6 +764,80 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     await loadLeaderboard()
   }
 
+  const upgradeProperty = async (propertyId) => {
+    if (!character) return
+    const property = (character.properties || []).find(p => p.id === propertyId)
+    if (!property) return
+
+    // Upgrade cost: 25% of property base price per level
+    const upgradeCost = Math.floor(property.price * (0.25 * (property.upgrade_level + 1)))
+    if ((character.wealth || 0) < upgradeCost) {
+      setError(`Need ₱${upgradeCost} to upgrade`)
+      return
+    }
+
+    const updated = { ...character }
+    updated.properties = updated.properties.map(p => {
+      if (p.id === propertyId) {
+        const newLevel = (p.upgrade_level || 0) + 1
+        const incomeBoost = Math.floor(Number(p.income || 0) * (0.2 * newLevel))
+        return {
+          ...p,
+          upgrade_level: newLevel,
+          current_value: Number(p.current_value || 0) * 1.15,
+          income: Number(p.income || 0) + incomeBoost
+        }
+      }
+      return p
+    })
+
+    updated.wealth = Number(updated.wealth || 0) - upgradeCost
+    updated.income_rate = updated.properties.reduce((sum, p) => sum + (Number(p.income || 0)), 0)
+
+    setCharacter(updated)
+    persistCharacterPartial(updated)
+    if (userId) saveCharacterToDB(updated)
+    setError('')
+  }
+
+  const prestigeReset = async () => {
+    if (!character) return
+
+    const currentWealth = character.wealth || 0
+    const prestigeGain = Math.max(1, Math.floor(currentWealth / 10000))
+    const newPrestigeLevel = (prestigeData.prestigeLevel || 0) + prestigeGain
+    const newMultiplier = 1.0 + (newPrestigeLevel * 0.1)
+
+    const resetCharacter = {
+      ...character,
+      wealth: Math.floor(500 * newMultiplier),
+      xp: 0,
+      level: 1,
+      properties: [],
+      income_rate: 0,
+      energy: character.max_energy || 100,
+      last_daily: null
+    }
+
+    setCharacter(resetCharacter)
+    setCharacterStats({ strength: 0, intelligence: 0, charisma: 0, endurance: 0, dexterity: 0, luck: 0 })
+    setPrestigeData({
+      prestigeLevel: newPrestigeLevel,
+      totalPrestigeResets: (prestigeData.totalPrestigeResets || 0) + 1,
+      prestigeMultiplier: newMultiplier
+    })
+
+    setPhases(prev => ({
+      ...prev,
+      didJob: false,
+      boughtAsset: false,
+      claimedDaily: false
+    }))
+
+    persistCharacterPartial(resetCharacter)
+    if (userId) saveCharacterToDB(resetCharacter)
+  }
+
   const claimDaily = async () => {
     if (!character) return
     const now = Date.now()
