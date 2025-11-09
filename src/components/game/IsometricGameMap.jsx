@@ -135,7 +135,7 @@ export default function IsometricGameMap({
     industrial: { name: 'Industrial Zone', color: '#F59E0B', x: 25, y: 8, width: 8, height: 10, emoji: '🏭' },
     commercial: { name: 'Commercial Hub', color: '#EC4899', x: 5, y: 18, width: 10, height: 8, emoji: '🛍️' },
     parks: { name: 'Parks & Recreation', color: '#14B8A6', x: 18, y: 18, width: 8, height: 8, emoji: '🌳' },
-    historic: { name: 'Historic District', color: '#D97706', x: 28, y: 20, width: 8, height: 8, emoji: '🏛️' }
+    historic: { name: 'Historic District', color: '#D97706', x: 28, y: 20, width: 8, height: 8, emoji: '🏛���' }
   }
 
   // Building placement zones (property types allowed in each district)
@@ -414,11 +414,6 @@ export default function IsometricGameMap({
       ctx.fill()
     }
 
-    // Rotate character to face the correct direction (360 degrees)
-    ctx.translate(screenX + size / 2, screenY + size / 2)
-    ctx.rotate(avatarFacing * Math.PI / 180)
-    ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
-
     // soft shadow
     const shadowGrad = ctx.createRadialGradient(screenX + size / 2, screenY + size / 2, 2, screenX + size / 2, screenY + size / 2, 16)
     shadowGrad.addColorStop(0, 'rgba(0,0,0,0.25)')
@@ -429,6 +424,10 @@ export default function IsometricGameMap({
     ctx.fill()
 
     ctx.save()
+    // Apply rotation for 360-degree facing
+    ctx.translate(screenX + size / 2, screenY + size / 2)
+    ctx.rotate(avatarFacing * Math.PI / 180)
+    ctx.translate(-(screenX + size / 2), -(screenY + size / 2))
     // Rotate when working
     if (isWorking) {
       const rotation = (avatarAnimationFrame.current * 0.08) % (Math.PI * 2)
@@ -483,7 +482,7 @@ export default function IsometricGameMap({
 
     // footstep dust effect on movement
     if (isRunning && !isWorking && avatarAnimationFrame.current % 8 === 0) {
-      const footX = screenX + (avatarFacing === -1 ? 8 : size - 8)
+      const footX = screenX + size / 2 + Math.cos(avatarFacing * Math.PI / 180) * 8
       particlesRef.current.push({
         x: footX,
         y: screenY + (2 * size) / 3 + 12,
