@@ -144,6 +144,50 @@ const JOB_DATABASE = {
   ],
 }
 
+// City-specific bonuses and specializations
+const CITY_BONUSES = {
+  Manila: {
+    name: 'Manila',
+    emoji: '🏙️',
+    businessBonus: 0.15, // +15% to business/sales jobs
+    incomeMultiplier: 1.1,
+    specializedJobs: ['business', 'professional'],
+    description: 'Business & Finance Hub'
+  },
+  Cebu: {
+    name: 'Cebu',
+    emoji: '🏖️',
+    techBonus: 0.12, // +12% to tech jobs
+    incomeMultiplier: 1.08,
+    specializedJobs: ['tech', 'internet'],
+    description: 'Tech & Digital Center'
+  },
+  Davao: {
+    name: 'Davao',
+    emoji: '🌾',
+    farmingBonus: 0.18, // +18% to farming jobs (highest)
+    incomeMultiplier: 1.12,
+    specializedJobs: ['farming', 'agricultural'],
+    description: 'Agricultural Stronghold'
+  },
+  Bacolod: {
+    name: 'Bacolod',
+    emoji: '🎭',
+    serviceBonus: 0.14, // +14% to service jobs
+    incomeMultiplier: 1.09,
+    specializedJobs: ['service'],
+    description: 'Service & Hospitality Hub'
+  },
+  Baguio: {
+    name: 'Baguio',
+    emoji: '❄️',
+    manualBonus: 0.16, // +16% to manual labor
+    incomeMultiplier: 1.11,
+    specializedJobs: ['manual'],
+    description: 'Labor & Construction Center'
+  }
+}
+
 // Helper to get jobs and rotate them
 const getAvailableJobs = (seed) => {
   const allJobs = Object.values(JOB_DATABASE).flat()
