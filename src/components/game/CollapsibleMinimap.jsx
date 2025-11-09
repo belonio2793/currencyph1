@@ -160,11 +160,11 @@ export default function CollapsibleMinimap({
         border: '2px solid rgba(150, 200, 255, 0.5)',
         borderRadius: '12px',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(100, 200, 255, 0.1)',
-        padding: '6px'
+        padding: '4px'
       }}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-2" style={{ height: '24px' }}>
+      <div className="flex items-center justify-between mb-1" style={{ height: '20px' }}>
         {isExpanded && (
           <h3 className="text-xs font-bold text-cyan-300" style={{ textShadow: '0 0 10px rgba(0, 212, 255, 0.5)' }}>
             MINIMAP
