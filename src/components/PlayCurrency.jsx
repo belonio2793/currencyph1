@@ -612,6 +612,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       if (updatedChar.income_rate >= 100 && !next.achievedPassiveIncome100) next.achievedPassiveIncome100 = true
       if (updatedChar.income_rate >= 500 && !next.achievedPassiveIncome500) next.achievedPassiveIncome500 = true
       if ((updatedChar.properties || []).length >= 3 && updatedChar.properties.some(p => p.id === 'sari-sari') && updatedChar.properties.some(p => p.id === 'food-cart') && updatedChar.properties.some(p => p.id === 'tricycle') && !next.ownedAllPropertyTypes) next.ownedAllPropertyTypes = true
+      if (prestigeData.prestigeLevel >= 1 && !next.prestigeOnce) next.prestigeOnce = true
+      if (prestigeData.prestigeLevel >= 5 && !next.prestigeLevel5) next.prestigeLevel5 = true
       if (Object.keys(prev).length !== Object.keys(next).length) savePhases(next)
       return next
     })
