@@ -799,7 +799,6 @@ export default function IsometricGameMap({
       canvas.removeEventListener('wheel', handleWheel)
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('keyup', handleKeyUp)
-      if (mini) mini.removeEventListener('click', handleMiniMapClick)
       cancelAnimationFrame(animationRef.current)
     }
   }, [draw, isometricToGrid, getPropertyAtGamePos, onPropertyClick, cameraPos, zoom, isDragging, dragStart, moveAvatar, avatarMoving])
