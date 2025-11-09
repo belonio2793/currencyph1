@@ -51,6 +51,18 @@ export default function IsometricGameMap({
   const eventSystemRef = useRef(null)
   const lastEnergyDrainRef = useRef(0)
 
+  // PERFORMANCE OPTIMIZATION: Refs for state tracking in animation loop to avoid re-creation
+  const cameraPosRef = useRef({ x: 0, y: 0 })
+  const zoomRef = useRef(1)
+  const avatarPosRef = useRef({ x: 150, y: 175 })
+  const selectedCityRef = useRef(city)
+  const propertiesRef = useRef([])
+  const showControlsHiddenRef = useRef(true)
+
+  // Particle pool for reuse (max 200 particles for efficiency)
+  const particlePoolRef = useRef([])
+  const MAX_PARTICLES = 200
+
   const TILE_SIZE = 64
   const GRID_WIDTH = 24
   const GRID_HEIGHT = 18
