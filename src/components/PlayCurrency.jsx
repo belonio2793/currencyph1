@@ -4,6 +4,10 @@ import IsometricGameMap from './game/IsometricGameMap'
 import DuelMatch from './game/DuelMatch'
 import MatchHistory from './game/MatchHistory'
 import CharacterCustomizer from './game/CharacterCustomizer'
+import PlayerTradingUI from './game/PlayerTradingUI'
+import GuildManager from './game/GuildManager'
+import MarketEconomyUI from './game/MarketEconomyUI'
+import MatchSpectator from './game/MatchSpectator'
 import { validateCosmetics, DEFAULT_COSMETICS } from '../lib/characterCosmetics'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
