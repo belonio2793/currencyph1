@@ -1195,6 +1195,7 @@ export default function IsometricGameMap({
           ref={canvasRef}
           className="block w-full h-full cursor-grab active:cursor-grabbing"
           style={{ display: 'block' }}
+          onContextMenu={(e) => e.preventDefault()}
         />
 
 
@@ -1203,6 +1204,7 @@ export default function IsometricGameMap({
           properties={properties}
           character={character}
           avatarPos={avatarPos}
+          avatarAngle={avatarAngle}
           zoom={zoom}
           cameraPos={cameraPos}
           onMinimapClick={(coords) => {
