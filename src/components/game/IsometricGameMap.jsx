@@ -70,6 +70,23 @@ export default function IsometricGameMap({
   const MAP_WIDTH = 300
   const MAP_HEIGHT = 350
 
+  // Particle pool system: reuse particle objects instead of creating new ones
+  const spawnParticle = useCallback((x, y, vx, vy, color, life = 1000) => {
+    if (particlesRef.current.length >= MAX_PARTICLES) return
+    particlesRef.current.push({ x, y, vx, vy, color, life, maxLife: life })
+  }, [])
+
+  // Efficient particle cleanup: keep only alive particles
+  const updateAndCleanParticles = useCallback(() => {
+    const now = performance.now()
+    const cleaned = particlesRef.current.filter(p => {
+      if (!p.spawnTime) p.spawnTime = now
+      const age = now - p.spawnTime
+      return age < p.life
+    })
+    particlesRef.current = cleaned
+  }, [])
+
   const PROPERTY_COLORS = {
     house: '#ff9800',
     business: '#2196f3',
