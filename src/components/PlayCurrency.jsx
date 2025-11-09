@@ -1833,6 +1833,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
             )}
 
+            {character && (
+              <PropertyEmpireAchievements
+                character={character}
+                properties={character.properties || []}
+              />
+            )}
+
             {character && <MatchHistory characterId={character.id} maxMatches={8} />}
 
             <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
