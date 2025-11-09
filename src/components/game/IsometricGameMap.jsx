@@ -111,6 +111,27 @@ export default function IsometricGameMap({
     setCityData(c || null)
   }, [selectedCity])
 
+  // Sync refs with state for animation loop efficiency
+  useEffect(() => {
+    cameraPosRef.current = cameraPos
+  }, [cameraPos])
+
+  useEffect(() => {
+    zoomRef.current = zoom
+  }, [zoom])
+
+  useEffect(() => {
+    avatarPosRef.current = avatarPos
+  }, [avatarPos])
+
+  useEffect(() => {
+    selectedCityRef.current = selectedCity
+  }, [selectedCity])
+
+  useEffect(() => {
+    propertiesRef.current = properties
+  }, [properties])
+
   // Keep internal city in sync with parent prop
   useEffect(() => {
     if (city && city !== selectedCity) {
