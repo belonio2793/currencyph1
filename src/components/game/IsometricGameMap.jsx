@@ -43,6 +43,8 @@ export default function IsometricGameMap({
   const moveTargetRef = useRef(null)
   const showControlsRef = useRef(true)
   const targetCameraRef = useRef({ x: 0, y: 0 })
+  const npcManagerRef = useRef(null)
+  const eventSystemRef = useRef(null)
 
   const TILE_SIZE = 64
   const GRID_WIDTH = 24
