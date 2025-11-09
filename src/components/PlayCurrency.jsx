@@ -201,8 +201,28 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [cosmetics, setCosmetics] = useState(DEFAULT_COSMETICS)
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
-  const [phases, setPhases] = useState({ didJob: false, boughtAsset: false, claimedDaily: false, visitedCities: {}, winDuel: false })
+  const [phases, setPhases] = useState({
+    // Basic phases
+    didJob: false,
+    boughtAsset: false,
+    claimedDaily: false,
+    visitedCities: {},
+    winDuel: false,
+    // Intermediate phases
+    earnedWealth500: false,
+    ownedMultipleAssets: false,
+    reachedLevel5: false,
+    completedDailyStreak3: false,
+    // Advanced phases
+    earnedWealth5000: false,
+    visitedAllCities: false,
+    reachedLevel10: false,
+    wonMultipleDuels: false,
+    achievedPassiveIncome100: false
+  })
   const lastAutosaveRef = useRef(0)
+  const dailyStreakRef = useRef(0)
+  const lastDailyClaimRef = useRef(0)
 
   // AUTOSAVE SYSTEM DOCUMENTATION:
   // - Uses localStorage for lightweight metadata (position/city) - very efficient, minimal memory impact
