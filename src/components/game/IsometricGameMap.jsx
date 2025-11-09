@@ -49,8 +49,6 @@ export default function IsometricGameMap({
   const velocityRef = useRef({ x: 0, y: 0 })
   const moveTargetRef = useRef(null)
   const targetCameraRef = useRef({ x: 0, y: 0 })
-  const npcManagerRef = useRef(null)
-  const eventSystemRef = useRef(null)
   const lastEnergyDrainRef = useRef(0)
   const lastTimeRef = useRef(performance.now())
 
@@ -939,7 +937,7 @@ export default function IsometricGameMap({
           className="w-10 h-10 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded flex items-center justify-center text-white font-bold transition-colors"
           title="Zoom out"
         >
-          −
+          ��
         </button>
         <button
           onClick={() => setFollowAvatar(!followAvatar)}
