@@ -142,7 +142,12 @@ export class CharacterMovement {
       }
 
       this.isMoving = true
-      // Update facing direction
+
+      // Update rotation angle for 360-degree facing
+      const targetAngle = Math.atan2(inputVector.y, inputVector.x)
+      this.updateRotation(targetAngle)
+
+      // Keep facing for backwards compatibility
       if (inputVector.x !== 0) {
         this.facing = inputVector.x > 0 ? 1 : -1
       }
@@ -157,6 +162,14 @@ export class CharacterMovement {
         this.isMoving = false
       }
     }
+  }
+
+  updateRotation(targetAngle) {
+    // Smooth rotation to target angle
+    let diff = targetAngle - this.angle
+    if (diff > Math.PI) diff -= Math.PI * 2
+    if (diff < -Math.PI) diff += Math.PI * 2
+    this.angle += diff * this.rotationSpeed
   }
 
   followPath(deltaTime = 16) {
