@@ -230,13 +230,15 @@ CREATE TABLE game_match_actions (
 - [x] Server-side validation edge function
 - [x] Match statistics (win rate, duration, rounds)
 
-### Phase 2: Mechanics & Polish (Next)
-- [ ] Implement turn timer (30s per action)
-- [ ] Add ability system with cooldowns and energy costs
-- [ ] Basic animations for attacks/damage
-- [ ] Sound effects (optional: use Web Audio API)
-- [ ] Status effects (stun, bleed, shield)
-- [ ] Improved damage calculation based on stats
+### Phase 2: Mechanics & Polish ✅ COMPLETE
+- [x] Implement turn timer (30s per action with auto-forfeit)
+- [x] Add ability system with 5 skills and cooldown mechanics
+- [x] Combat animations for attacks/damage/healing (floating numbers)
+- [x] Status effects (stun, bleed, shield, poison, regen) with duration tracking
+- [x] Energy system with per-ability costs
+- [x] Smart AI opponent with tactical decisions
+- [x] Critical hit chance (15% for 1.5x damage)
+- [ ] Sound effects (optional: use Web Audio API) — **Planned for Phase 2.5**
 
 ### Phase 3: Social Features
 - [ ] Enhanced player profiles with stats display
