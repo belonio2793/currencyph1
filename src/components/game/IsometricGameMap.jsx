@@ -54,6 +54,7 @@ export default function IsometricGameMap({
   const npcManagerRef = useRef(null)
   const eventSystemRef = useRef(null)
   const lastEnergyDrainRef = useRef(0)
+  const lastTimeRef = useRef(performance.now())
 
   // PERFORMANCE OPTIMIZATION: Refs for state tracking in animation loop to avoid re-creation
   const cameraPosRef = useRef({ x: 0, y: 0 })
