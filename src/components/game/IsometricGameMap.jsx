@@ -707,11 +707,6 @@ export default function IsometricGameMap({
 
       keysPressed.current[keyLower] = true
 
-      // Debug: log arrow key presses
-      if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
-        console.log('Arrow key pressed:', key, '→ stored as:', keyLower)
-      }
-
       if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight' ||
           keyLower === 'w' || keyLower === 'a' || keyLower === 's' || keyLower === 'd') {
         moveTargetRef.current = null
