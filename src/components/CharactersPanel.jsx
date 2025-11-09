@@ -49,22 +49,30 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
     }
   }
 
-  async function handleDelete(id) {
-    if (!confirm('Delete this character? This action cannot be undone.')) return
-    try {
-      setLoading(true)
-      const { error } = await supabase.from('game_characters').delete().eq('id', id)
-      if (error) throw error
-      setCharacters(prev => prev.filter(c => c.id !== id))
-      if (currentCharacter && currentCharacter.id === id) {
-        onSelectCharacter(null)
-      }
-    } catch (err) {
-      console.error('Failed to delete character', err)
-      setError(err.message || String(err))
-    } finally {
-      setLoading(false)
+  function openDeleteModal(character) {
+    setDeleteCharacter(character)
+    setDeleteModalOpen(true)
+  }
+
+  function handleDeleteSuccess(characterId) {
+    setCharacters(prev => prev.filter(c => c.id !== characterId))
+    if (currentCharacter && currentCharacter.id === characterId) {
+      onSelectCharacter(null)
     }
+    setError('')
+  }
+
+  function openRenameModal(character) {
+    setRenameCharacter(character)
+    setRenameModalOpen(true)
+  }
+
+  function handleRenameSuccess(updatedCharacter) {
+    setCharacters(prev => prev.map(c => c.id === updatedCharacter.id ? updatedCharacter : c))
+    if (currentCharacter && currentCharacter.id === updatedCharacter.id) {
+      onSelectCharacter(updatedCharacter)
+    }
+    setError('')
   }
 
   async function handleCreate(name, appearance, homeCity) {
