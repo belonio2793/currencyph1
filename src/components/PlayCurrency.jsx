@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import IsometricGameMap from './game/IsometricGameMap'
 import DuelMatch from './game/DuelMatch'
