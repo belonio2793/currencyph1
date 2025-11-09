@@ -244,13 +244,21 @@ export class NPCManager {
   }
 
   update() {
-    // Update all NPCs
+    // Throttle expensive updates to run every this.updateStep frames
+    this.frameCounter = (this.frameCounter || 0) + 1
+    if (this.frameCounter % this.updateStep !== 0) {
+      // Still advance minor animationFrame counters for smooth visuals
+      this.npcs.forEach(npc => npc.animationFrame++)
+      return
+    }
+
+    // Update all NPCs (position, behavior) at reduced frequency
     this.npcs.forEach(npc => {
       npc.update(this.gameWidth, this.gameHeight)
     })
 
-    // Random events with 15% chance every frame (roughly every 6 seconds)
-    if (Math.random() < 0.0015) {
+    // Random events with lower chance per update (reduced frequency => keep overall similar)
+    if (Math.random() < 0.003) {
       this.spawnRandomEvent()
     }
 
