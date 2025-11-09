@@ -667,34 +667,60 @@ export default function IsometricGameMap({
 
     const handleKeyDown = (e) => {
       keysPressed.current[e.key.toLowerCase()] = true
-      switch (e.key.toLowerCase()) {
-        case 'w':
-        case 'arrowup':
-          moveAvatar('up')
-          e.preventDefault()
-          break
-        case 's':
-        case 'arrowdown':
-          moveAvatar('down')
-          e.preventDefault()
-          break
-        case 'a':
-        case 'arrowleft':
-          moveAvatar('left')
-          e.preventDefault()
-          break
-        case 'd':
-        case 'arrowright':
-          moveAvatar('right')
-          e.preventDefault()
-          break
-        default:
-          break
+
+      // Handle multiple simultaneous key presses for diagonal movement
+      const speed = mapSettings.avatarSpeed || 3
+
+      if (keysPressed.current['w'] || keysPressed.current['arrowup']) {
+        velocityRef.current.y = -speed
+        setAvatarMoving(true)
+      }
+      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) {
+        velocityRef.current.y = speed
+        setAvatarMoving(true)
+      }
+      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) {
+        velocityRef.current.x = -speed
+        setAvatarFacing(-1)
+        setAvatarMoving(true)
+      }
+      if (keysPressed.current['d'] || keysPressed.current['arrowright']) {
+        velocityRef.current.x = speed
+        setAvatarFacing(1)
+        setAvatarMoving(true)
+      }
+
+      // Prevent default scroll behavior
+      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
+        e.preventDefault()
       }
     }
 
     const handleKeyUp = (e) => {
       keysPressed.current[e.key.toLowerCase()] = false
+
+      // Reset velocity when key is released
+      const speed = mapSettings.avatarSpeed || 3
+
+      if (!keysPressed.current['w'] && !keysPressed.current['arrowup'] &&
+          !keysPressed.current['s'] && !keysPressed.current['arrowdown']) {
+        velocityRef.current.y = 0
+      }
+
+      if (!keysPressed.current['a'] && !keysPressed.current['arrowleft'] &&
+          !keysPressed.current['d'] && !keysPressed.current['arrowright']) {
+        velocityRef.current.x = 0
+      }
+
+      // Check if any movement keys are still pressed
+      const isMoving = keysPressed.current['w'] || keysPressed.current['arrowup'] ||
+                       keysPressed.current['s'] || keysPressed.current['arrowdown'] ||
+                       keysPressed.current['a'] || keysPressed.current['arrowleft'] ||
+                       keysPressed.current['d'] || keysPressed.current['arrowright']
+
+      if (!isMoving) {
+        velocityRef.current = { x: 0, y: 0 }
+      }
     }
 
     const handleMiniMapClick = (e) => {
