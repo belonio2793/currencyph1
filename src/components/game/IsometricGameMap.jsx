@@ -761,6 +761,14 @@ export default function IsometricGameMap({
     return () => window.removeEventListener('resize', resizeCanvas)
   }, [])
 
+  // Initialize NPC manager and event system
+  useEffect(() => {
+    if (!npcManagerRef.current) {
+      npcManagerRef.current = new NPCManager(MAP_WIDTH, MAP_HEIGHT)
+      eventSystemRef.current = new EventSystem()
+    }
+  }, [])
+
   const handleCityChange = (cityName) => {
     setSelectedCity(cityName)
     setAvatarPos({ x: 150, y: 175 })
