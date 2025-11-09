@@ -932,8 +932,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="text-sm text-slate-400">Interact with the world below.</div>
+                  <div className="text-sm text-slate-400">Now in <span className="font-semibold text-emerald-400">{cityFocus}</span> • Interact with available jobs.</div>
                   <div className="flex items-center gap-2">
+                    <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
                     <button onClick={() => setIsIsometric(!isIsometric)} className="px-2 py-1 text-xs bg-slate-700 rounded">{isIsometric ? 'Switch to Grid' : 'Isometric View'}</button>
                     <button onClick={() => requestMatch()} className="px-2 py-1 text-xs bg-amber-600 rounded text-black">Find Match</button>
                   </div>
