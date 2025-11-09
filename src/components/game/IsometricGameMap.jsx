@@ -1003,7 +1003,7 @@ export default function IsometricGameMap({
 
     const animate = () => {
       // Determine velocity from keys or click-to-move
-      const baseSpeed = mapSettings.avatarSpeed || 12
+      const baseSpeed = mapSettings.avatarSpeed || 18
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
       const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
       let vx = 0, vy = 0
@@ -1012,11 +1012,19 @@ export default function IsometricGameMap({
       if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= baseSpeed * sprint
       if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += baseSpeed * sprint
 
-      // Update facing direction based on horizontal velocity
-      if (vx !== 0) {
-        setAvatarFacing(vx > 0 ? 1 : -1)
-      } else if (vy !== 0 && avatarFacing === 0) {
-        setAvatarFacing(1) // default to right-facing
+      // Calculate angle from velocity (0 = right, 90 = down, 180 = left, 270 = up)
+      if (vx !== 0 || vy !== 0) {
+        const targetAngle = Math.atan2(vy, vx) * (180 / Math.PI)
+        // Smooth angle interpolation for 360-degree turning
+        setAvatarAngle(prev => {
+          let diff = targetAngle - prev
+          // Handle angle wrapping (shortest path)
+          if (diff > 180) diff -= 360
+          if (diff < -180) diff += 360
+          // Smooth transition with lerp
+          const newAngle = prev + diff * 0.15
+          return (newAngle + 360) % 360
+        })
       }
 
       // Normalize diagonal movement
