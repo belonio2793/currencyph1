@@ -13,11 +13,142 @@ const STARTING_PROPERTIES = [
   { id: 'tricycle', name: 'Tricycle Business', price: 3000, income: 40 }
 ]
 
-const JOBS = [
-  { id: 'delivery', name: 'Delivery Job', reward: 50, xp: 10, duration: 3000 },
-  { id: 'bartender', name: 'Bartender Shift', reward: 120, xp: 25, duration: 5000 },
-  { id: 'developer', name: 'Freelance Dev Task', reward: 300, xp: 60, duration: 7000 }
-]
+// Comprehensive job database with 80+ realistic occupations
+const JOB_DATABASE = {
+  // Traditional/Manual Jobs
+  manual: [
+    { name: 'Tricycle Driver', reward: 45, xp: 10, duration: 2500, difficulty: 1 },
+    { name: 'Construction Worker', reward: 80, xp: 18, duration: 3500, difficulty: 2 },
+    { name: 'Jeepney Driver', reward: 60, xp: 12, duration: 3000, difficulty: 1 },
+    { name: 'Street Vendor', reward: 35, xp: 8, duration: 2000, difficulty: 1 },
+    { name: 'Farm Laborer', reward: 50, xp: 11, duration: 3000, difficulty: 1 },
+    { name: 'Gardener', reward: 45, xp: 9, duration: 2800, difficulty: 1 },
+    { name: 'Janitor', reward: 40, xp: 8, duration: 2500, difficulty: 1 },
+    { name: 'Electrician', reward: 120, xp: 25, duration: 4000, difficulty: 3 },
+    { name: 'Plumber', reward: 110, xp: 23, duration: 3800, difficulty: 3 },
+    { name: 'Welder', reward: 100, xp: 22, duration: 3800, difficulty: 3 },
+    { name: 'Carpenter', reward: 95, xp: 20, duration: 3600, difficulty: 2 },
+    { name: 'Mason', reward: 85, xp: 18, duration: 3400, difficulty: 2 },
+  ],
+
+  // Service Industry Jobs
+  service: [
+    { name: 'Restaurant Waiter', reward: 55, xp: 12, duration: 3000, difficulty: 1 },
+    { name: 'Bartender', reward: 75, xp: 16, duration: 3200, difficulty: 2 },
+    { name: 'Security Guard', reward: 65, xp: 14, duration: 3500, difficulty: 2 },
+    { name: 'Hotel Receptionist', reward: 70, xp: 15, duration: 3300, difficulty: 2 },
+    { name: 'Hair Stylist', reward: 80, xp: 17, duration: 3000, difficulty: 2 },
+    { name: 'Massage Therapist', reward: 85, xp: 18, duration: 3200, difficulty: 2 },
+    { name: 'Taxi Driver', reward: 60, xp: 13, duration: 3100, difficulty: 1 },
+    { name: 'Delivery Person', reward: 50, xp: 11, duration: 2800, difficulty: 1 },
+    { name: 'Grocery Store Clerk', reward: 45, xp: 10, duration: 2600, difficulty: 1 },
+    { name: 'Cinema Staff', reward: 40, xp: 9, duration: 2400, difficulty: 1 },
+    { name: 'Tourist Guide', reward: 90, xp: 20, duration: 4000, difficulty: 2 },
+    { name: 'Event Coordinator', reward: 100, xp: 22, duration: 4200, difficulty: 3 },
+  ],
+
+  // Agricultural & Farming Jobs
+  farming: [
+    { name: 'Rice Farmer', reward: 55, xp: 12, duration: 4000, difficulty: 2 },
+    { name: 'Corn Planter', reward: 50, xp: 11, duration: 3800, difficulty: 1 },
+    { name: 'Vegetable Gardener', reward: 48, xp: 10, duration: 3600, difficulty: 1 },
+    { name: 'Coconut Harvester', reward: 65, xp: 14, duration: 3500, difficulty: 2 },
+    { name: 'Banana Plantation Worker', reward: 60, xp: 13, duration: 3400, difficulty: 2 },
+    { name: 'Fisherman', reward: 75, xp: 16, duration: 4500, difficulty: 2 },
+    { name: 'Fish Farmer', reward: 70, xp: 15, duration: 4000, difficulty: 2 },
+    { name: 'Livestock Herder', reward: 55, xp: 12, duration: 3600, difficulty: 2 },
+    { name: 'Poultry Farmer', reward: 60, xp: 13, duration: 3500, difficulty: 2 },
+    { name: 'Crop Inspector', reward: 85, xp: 18, duration: 3800, difficulty: 3 },
+  ],
+
+  // Tech & IT Jobs
+  tech: [
+    { name: 'Junior Programmer', reward: 150, xp: 35, duration: 4000, difficulty: 3 },
+    { name: 'Full Stack Developer', reward: 250, xp: 55, duration: 5000, difficulty: 4 },
+    { name: 'Web Developer', reward: 180, xp: 40, duration: 4200, difficulty: 3 },
+    { name: 'Mobile App Developer', reward: 200, xp: 45, duration: 4500, difficulty: 4 },
+    { name: 'Python Developer', reward: 190, xp: 42, duration: 4300, difficulty: 4 },
+    { name: 'Database Administrator', reward: 210, xp: 48, duration: 4600, difficulty: 4 },
+    { name: 'System Administrator', reward: 170, xp: 38, duration: 4100, difficulty: 3 },
+    { name: 'IT Support Specialist', reward: 100, xp: 22, duration: 3500, difficulty: 2 },
+    { name: 'QA Tester', reward: 130, xp: 28, duration: 3800, difficulty: 2 },
+    { name: 'UI/UX Designer', reward: 160, xp: 36, duration: 4100, difficulty: 3 },
+    { name: 'Cybersecurity Analyst', reward: 240, xp: 52, duration: 4800, difficulty: 4 },
+    { name: 'DevOps Engineer', reward: 220, xp: 50, duration: 4700, difficulty: 4 },
+  ],
+
+  // Internet & Digital Jobs
+  internet: [
+    { name: 'Freelance Writer', reward: 95, xp: 21, duration: 3600, difficulty: 2 },
+    { name: 'Content Creator', reward: 120, xp: 26, duration: 3800, difficulty: 2 },
+    { name: 'Social Media Manager', reward: 110, xp: 24, duration: 3700, difficulty: 2 },
+    { name: 'SEO Specialist', reward: 140, xp: 31, duration: 4000, difficulty: 3 },
+    { name: 'Digital Marketer', reward: 130, xp: 29, duration: 3900, difficulty: 3 },
+    { name: 'Email Campaign Manager', reward: 100, xp: 22, duration: 3500, difficulty: 2 },
+    { name: 'Graphic Designer', reward: 120, xp: 26, duration: 3800, difficulty: 2 },
+    { name: 'Video Editor', reward: 125, xp: 27, duration: 3900, difficulty: 2 },
+    { name: 'Virtual Assistant', reward: 85, xp: 19, duration: 3300, difficulty: 2 },
+    { name: 'Affiliate Marketer', reward: 105, xp: 23, duration: 3700, difficulty: 2 },
+    { name: 'Influencer Campaign Manager', reward: 135, xp: 30, duration: 3950, difficulty: 3 },
+    { name: 'Online Seller', reward: 90, xp: 20, duration: 3400, difficulty: 2 },
+  ],
+
+  // AI & Machine Learning Jobs
+  ai: [
+    { name: 'Machine Learning Engineer', reward: 280, xp: 62, duration: 5200, difficulty: 5 },
+    { name: 'AI Trainer', reward: 200, xp: 45, duration: 4500, difficulty: 3 },
+    { name: 'Data Scientist', reward: 260, xp: 58, duration: 5000, difficulty: 5 },
+    { name: 'Deep Learning Specialist', reward: 290, xp: 64, duration: 5300, difficulty: 5 },
+    { name: 'NLP Engineer', reward: 270, xp: 60, duration: 5100, difficulty: 5 },
+    { name: 'Computer Vision Specialist', reward: 280, xp: 62, duration: 5200, difficulty: 5 },
+    { name: 'AI Research Assistant', reward: 220, xp: 49, duration: 4700, difficulty: 4 },
+    { name: 'Prompt Engineer', reward: 160, xp: 36, duration: 4100, difficulty: 3 },
+    { name: 'Data Annotator', reward: 110, xp: 24, duration: 3700, difficulty: 2 },
+    { name: 'Model Evaluator', reward: 140, xp: 31, duration: 3950, difficulty: 3 },
+    { name: 'AI Ethics Consultant', reward: 250, xp: 55, duration: 4900, difficulty: 4 },
+  ],
+
+  // Business & Corporate Jobs
+  business: [
+    { name: 'Sales Representative', reward: 110, xp: 24, duration: 3700, difficulty: 2 },
+    { name: 'Business Analyst', reward: 155, xp: 34, duration: 4050, difficulty: 3 },
+    { name: 'Project Manager', reward: 170, xp: 38, duration: 4150, difficulty: 3 },
+    { name: 'Accountant', reward: 140, xp: 31, duration: 3950, difficulty: 3 },
+    { name: 'Human Resources Manager', reward: 145, xp: 32, duration: 4000, difficulty: 3 },
+    { name: 'Marketing Manager', reward: 150, xp: 33, duration: 4050, difficulty: 3 },
+    { name: 'Customer Service Manager', reward: 120, xp: 26, duration: 3800, difficulty: 2 },
+    { name: 'Office Manager', reward: 105, xp: 23, duration: 3700, difficulty: 2 },
+  ],
+
+  // Professional Jobs
+  professional: [
+    { name: 'Consultant', reward: 200, xp: 45, duration: 4500, difficulty: 4 },
+    { name: 'Financial Advisor', reward: 180, xp: 40, duration: 4200, difficulty: 3 },
+    { name: 'Accountant', reward: 160, xp: 36, duration: 4100, difficulty: 3 },
+    { name: 'Lawyer (Contract Review)', reward: 220, xp: 49, duration: 4700, difficulty: 4 },
+    { name: 'Tax Advisor', reward: 190, xp: 42, duration: 4300, difficulty: 4 },
+  ],
+
+  // Education Jobs
+  education: [
+    { name: 'Tutor', reward: 80, xp: 17, duration: 3200, difficulty: 2 },
+    { name: 'Online Teacher', reward: 100, xp: 22, duration: 3500, difficulty: 2 },
+    { name: 'Course Instructor', reward: 140, xp: 31, duration: 4000, difficulty: 3 },
+    { name: 'Language Tutor', reward: 95, xp: 21, duration: 3400, difficulty: 2 },
+  ],
+}
+
+// Helper to get jobs and rotate them
+const getAvailableJobs = (seed) => {
+  const allJobs = Object.values(JOB_DATABASE).flat()
+  // Shuffle jobs based on seed (changes per play session)
+  const shuffled = allJobs
+    .map((job, idx) => ({ ...job, sortKey: Math.sin(idx + seed) }))
+    .sort((a, b) => a.sortKey - b.sortKey)
+    .slice(0, 3)
+    .map(({ sortKey, ...job }) => job)
+  return shuffled
+}
 
 function formatMoney(n) {
   return `P${Number(n || 0).toLocaleString()}`
