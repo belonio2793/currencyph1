@@ -10,7 +10,10 @@ export class WorldSync {
     this.cityName = cityName
     this.subscription = null
     this.lastSyncTime = 0
-    this.syncInterval = 500 // ms between syncs
+    this.syncInterval = 500 // ms between syncs (batch interval)
+    this._pendingMove = null
+    this._moveTimer = null
+    this._lastReverseGeocode = 0
     this.otherPlayers = new Map()
     this.callbacks = {
       onPlayerUpdate: null,
@@ -81,13 +84,17 @@ export class WorldSync {
         presence.lat = lat
         presence.lng = lng
 
-        // Reverse geocode to get street and locality (best-effort)
+        // Reverse geocode sparingly (only if enough time has passed)
         try {
-          const geo = await reverseGeocode(lat, lng)
-          if (geo) {
-            presence.street = geo.street || geo.road || geo.name || null
-            presence.locality = geo.city || geo.town || geo.village || geo.county || null
-            presence.display_name = geo.display_name || null
+          const now = Date.now()
+          if (!this._lastReverseGeocode || now - this._lastReverseGeocode > 60000) {
+            const geo = await reverseGeocode(lat, lng)
+            if (geo) {
+              presence.street = geo.street || geo.road || geo.name || null
+              presence.locality = geo.city || geo.town || geo.village || geo.county || null
+              presence.display_name = geo.display_name || null
+            }
+            this._lastReverseGeocode = now
           }
         } catch (gerr) {
           console.warn('Reverse geocode failed:', gerr)
@@ -118,28 +125,43 @@ export class WorldSync {
 
   // Broadcast player movement
   async broadcastMove(x, y, direction = 'down', avatarUrl = null) {
-    const now = Date.now()
-    if (now - this.lastSyncTime < this.syncInterval) return
+    // Batch moves: store latest move and schedule a single broadcast per interval
+    this._pendingMove = { x, y, direction, avatarUrl, timestamp: Date.now() }
 
-    try {
-      await this.subscription?.send({
-        type: 'broadcast',
-        event: 'player_move',
-        payload: {
-          user_id: this.userId,
-          character_id: this.characterId,
-          x,
-          y,
-          direction,
-          avatar_url: avatarUrl || null,
-          timestamp: now
-        }
-      })
+    if (this._moveTimer) return
 
-      this.lastSyncTime = now
-    } catch (error) {
-      console.error('Move broadcast error:', error)
-    }
+    this._moveTimer = setTimeout(async () => {
+      const p = this._pendingMove
+      if (!p || !this.subscription) {
+        this._moveTimer = null
+        this._pendingMove = null
+        return
+      }
+
+      try {
+        await this.subscription.send({
+          type: 'broadcast',
+          event: 'player_move',
+          payload: {
+            user_id: this.userId,
+            character_id: this.characterId,
+            x: p.x,
+            y: p.y,
+            direction: p.direction || 'down',
+            avatar_url: p.avatarUrl || null,
+            timestamp: p.timestamp || Date.now()
+          }
+        })
+        this.lastSyncTime = Date.now()
+      } catch (error) {
+        console.error('Move broadcast error:', error)
+      }
+
+      // clear pending and timer
+      this._pendingMove = null
+      clearTimeout(this._moveTimer)
+      this._moveTimer = null
+    }, this.syncInterval)
   }
 
   // Broadcast chat message
