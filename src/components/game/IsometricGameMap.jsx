@@ -766,7 +766,7 @@ export default function IsometricGameMap({
         const maxX = MAP_WIDTH
         const maxY = MAP_HEIGHT
         const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x))
-        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y * dt))
+        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y))
 
         if ((newX !== prev.x || newY !== prev.y) && onCharacterMove) {
           if (cityData) {
