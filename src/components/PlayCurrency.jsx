@@ -1510,11 +1510,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 <div className="border border-slate-700 rounded overflow-hidden" style={{ height: 520 }}>
                   {mapViewMode === 'isometric' ? (
                     <IsometricGameMap
-                      properties={(character.properties || []).map(normalizeProperty)}
+                      properties={[...((character.properties || []).map(normalizeProperty)), ...((remoteAssets || []).map(normalizeProperty))].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i)}
                       character={character}
                       city={cityFocus}
                       initialAvatarPos={initialAvatarPos}
                       onConsumeEnergy={consumeEnergy}
+                      placingProperty={placingAsset}
+                      onConfirmPlace={(coords) => confirmPlacement(coords)}
+                      onCancelPlace={() => setPlacingAsset(null)}
                       onPropertyClick={(property) => {
                         const reward = 20 + Math.floor(Math.random() * 80)
                         setCharacter((c) => {
