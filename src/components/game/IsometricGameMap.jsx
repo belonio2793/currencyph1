@@ -520,9 +520,39 @@ export default function IsometricGameMap({
           drawTile(ctx, isoPos.x, isoPos.y, '#374151', false)
         } else {
           drawTile(ctx, isoPos.x, isoPos.y, adjustBrightness('#5a9c69', -8), false)
-          
-          // Decorative trees
-          if (showDecor && seededRand(gridX, gridY) > 0.85) {
+
+          // Check for properties at this location
+          const gameX = (gridX / GRID_WIDTH) * MAP_WIDTH
+          const gameY = (gridY / GRID_HEIGHT) * MAP_HEIGHT
+          const prop = properties.find(p => {
+            if (!p.location_x || !p.location_y) return false
+            const px = p.location_x % 300
+            const py = p.location_y % 350
+            return Math.abs(px - gameX) < 25 && Math.abs(py - gameY) < 25
+          })
+
+          if (prop) {
+            const color = PROPERTY_COLORS[prop.property_type] || PROPERTY_COLORS.default
+            const upgradeLevel = prop.upgrade_level || 0
+            const isHovered = prop.id === hoveredPropertyId
+            let displayColor = color
+            if (isHovered) displayColor = adjustBrightness(color, 35)
+            else if (upgradeLevel > 0) displayColor = adjustBrightness(color, Math.min(45, upgradeLevel * 6))
+            drawBuilding(ctx, isoPos.x, isoPos.y, prop.property_type, upgradeLevel > 0 ? upgradeLevel : 1, true)
+
+            if (prop.owner_id) {
+              ctx.fillStyle = upgradeLevel > 0 ? '#ffd700' : '#e0e7ff'
+              ctx.font = `bold ${upgradeLevel > 0 ? '10px' : '9px'} Arial`
+              ctx.textAlign = 'center'
+              ctx.fillText(prop.name ? prop.name.substring(0, 8) : 'Prop', isoPos.x, isoPos.y - 3)
+              if (upgradeLevel > 0) {
+                ctx.fillStyle = '#ffd700'
+                ctx.font = 'bold 8px Arial'
+                ctx.fillText(`★${upgradeLevel}`, isoPos.x, isoPos.y + 5)
+              }
+            }
+          } else if (showDecor && seededRand(gridX, gridY) > 0.85) {
+            // Decorative trees
             ctx.save()
             ctx.fillStyle = '#2d5a3d'
             ctx.beginPath()
