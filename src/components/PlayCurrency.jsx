@@ -1006,7 +1006,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 {isIsometric ? (
                   <div style={{ height: 520 }} className="border border-slate-700 rounded">
                     <IsometricGameMap
-                      properties={character.properties || []}
+                      properties={(character.properties || []).map(normalizeProperty)}
                       character={character}
                       city={character.current_location || character.home_city || 'Manila'}
                       onPropertyClick={(property) => {
