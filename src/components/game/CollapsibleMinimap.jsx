@@ -151,7 +151,7 @@ export default function CollapsibleMinimap({
   return (
     <div
       ref={containerRef}
-      className={`fixed bottom-4 right-4 transition-all duration-300 z-40 ${
+      className={`fixed top-4 left-4 transition-all duration-300 z-40 ${
         isExpanded ? 'w-64 h-52' : 'w-24 h-20'
       }`}
       style={{
