@@ -1410,20 +1410,34 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
               <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
                 <h3 className="text-lg font-bold mb-2">Your Properties</h3>
-                <p className="text-xs text-slate-400 mb-3">Owned assets that provide passive income.</p>
+                <p className="text-xs text-slate-400 mb-3">Owned assets that provide passive income. Upgrade to increase earnings!</p>
                 <div className="space-y-3">
                   {(character.properties || []).length === 0 && <div className="text-slate-400 text-sm">You do not own any properties yet.</div>}
-                  {(character.properties || []).map(prop => (
-                    <div key={prop.id + (prop.purchased_at || '')} className="flex items-center justify-between bg-slate-900/20 p-3 rounded">
-                      <div>
-                        <div className="font-medium">{prop.name}</div>
-                        <div className="text-xs text-slate-400">Income: {formatMoney(prop.income)}</div>
+                  {(character.properties || []).map(prop => {
+                    const upgradeCost = Math.floor(prop.price * (0.25 * (prop.upgrade_level + 1)))
+                    return (
+                      <div key={prop.id + (prop.purchased_at || '')} className="bg-slate-900/20 p-3 rounded space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <div className="font-medium">{prop.name}</div>
+                            <div className="text-xs text-slate-400">Lvl {prop.upgrade_level || 0} • Income: {formatMoney(prop.income)}/10s • Value: ₱{Number(prop.current_value || 0).toLocaleString()}</div>
+                          </div>
+                          <div className="text-xs text-purple-300 font-semibold">Lvl {prop.upgrade_level || 0}</div>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs">
+                          <button
+                            onClick={() => upgradeProperty(prop.id)}
+                            disabled={(character.wealth || 0) < upgradeCost}
+                            className={`flex-1 px-2 py-1 rounded text-white font-medium transition-colors ${(character.wealth || 0) < upgradeCost ? 'bg-slate-600 opacity-50 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}
+                            title={`Upgrade cost: ₱${upgradeCost}`}
+                          >
+                            ⬆️ Upgrade (₱{upgradeCost})
+                          </button>
+                          <button onClick={() => sellProperty(prop.id)} className="px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-white">Sell</button>
+                        </div>
                       </div>
-                      <div>
-                        <button onClick={() => sellProperty(prop.id)} className="px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-white">Sell</button>
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </div>
