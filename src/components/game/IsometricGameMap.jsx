@@ -844,7 +844,7 @@ export default function IsometricGameMap({
     ctx.fillRect(0, 0, width, height)
     ctx.restore()
 
-  }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
+  }, [cameraPos, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
 
   const moveAvatar = useCallback((direction) => {
     const speed = (mapSettings.avatarSpeed ?? 1.3) * 180
