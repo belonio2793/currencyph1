@@ -1111,6 +1111,20 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </ol>
             </div>
 
+            {character && (
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
+                <h3 className="text-lg font-bold mb-3">City Progress</h3>
+                <div className="space-y-2 text-sm">
+                  {Object.entries(cityStats).map(([city, stats]) => (
+                    <div key={city} className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
+                      <span className="font-medium">{city}</span>
+                      <span className="text-xs text-slate-400">Jobs: {stats.jobsCompleted} | ₱{stats.moneyEarned}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {character && <MatchHistory characterId={character.id} maxMatches={8} />}
 
             <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
