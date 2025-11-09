@@ -1260,14 +1260,6 @@ export default function IsometricGameMap({
           </div>
         )}
 
-        {/* Job Location Hint Overlay */}
-        {Object.keys(JOB_LOCATIONS || {}).length > 0 && (
-          <div className="absolute bottom-12 left-2 z-15 bg-slate-900/70 border border-slate-700 rounded px-2 py-1 text-[10px] text-slate-400">
-            <div className="mb-0.5 text-slate-300 font-semibold">💼 Job Tips</div>
-            <div>Hover over job markers on map</div>
-            <div>to see available work</div>
-          </div>
-        )}
         {/* Energy overlay */}
         {character && typeof character.energy === 'number' && (
           <div className="absolute left-2 bottom-2 z-20 bg-slate-900/70 border border-slate-700 rounded px-3 py-2 text-[10px] text-slate-200">
