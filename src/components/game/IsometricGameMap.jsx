@@ -641,6 +641,9 @@ export default function IsometricGameMap({
       const clientX = e.clientX - rect.left
       const clientY = e.clientY - rect.top
 
+      // store last mouse pos for placement ghost
+      mousePosRef.current = { x: clientX, y: clientY }
+
       if (isDragging) {
         const deltaX = (e.clientX - dragStart.x) / zoom
         const deltaY = (e.clientY - dragStart.y) / zoom
@@ -659,6 +662,29 @@ export default function IsometricGameMap({
 
     const handleClick = (e) => {
       if (isDragging) return
+      // If placing a property, compute world coords and call confirm handler
+      if (placingProperty && typeof onConfirmPlace === 'function') {
+        const rect = canvas.getBoundingClientRect()
+        const clientX = e.clientX - rect.left
+        const clientY = e.clientY - rect.top
+        const width = canvas.width
+        const height = canvas.height
+        const centerX = width / 2
+        const centerY = height / 2
+        const z = zoomRef.current || 1
+        const worldX = (clientX - centerX + cameraPos.x * z) / z
+        const worldY = (clientY - centerY + cameraPos.y * z) / z
+        const grid = isometricToGrid(worldX, worldY)
+        const gridX = Math.max(0, Math.min(GRID_WIDTH - 1, grid.x))
+        const gridY = Math.max(0, Math.min(GRID_HEIGHT - 1, grid.y))
+        const gameX = (gridX / GRID_WIDTH) * MAP_WIDTH
+        const gameY = (gridY / GRID_HEIGHT) * MAP_HEIGHT
+        try {
+          onConfirmPlace({ x: Math.round(gameX), y: Math.round(gameY), gridX, gridY })
+        } catch (err) {
+          console.warn('onConfirmPlace failed', err)
+        }
+      }
     }
 
     const handleWheel = (e) => {
@@ -714,7 +740,7 @@ export default function IsometricGameMap({
       const zoomTarget = zoom
       zoomRef.current += (zoomTarget - zoomRef.current) * Math.min(1, dt * 8)
 
-      const baseSpeed = 300
+      const baseSpeed = (mapSettings?.avatarSpeed ?? 1.3) * 180
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
       const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
       const moveSpeed = baseSpeed * sprint
@@ -766,15 +792,20 @@ export default function IsometricGameMap({
           })
         }
       }
+      // store velocities (pixels per second)
       velocityRef.current.x = vx
       velocityRef.current.y = vy
       setAvatarMoving(vx !== 0 || vy !== 0)
 
+      // compute displacement this frame
+      const dx = velocityRef.current.x * dt
+      const dy = velocityRef.current.y * dt
+
       setAvatarPos(prev => {
         const maxX = MAP_WIDTH
         const maxY = MAP_HEIGHT
-        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x))
-        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y))
+        const newX = Math.max(0, Math.min(maxX, prev.x + dx))
+        const newY = Math.max(0, Math.min(maxY, prev.y + dy))
 
         if ((newX !== prev.x || newY !== prev.y) && onCharacterMove) {
           if (cityData) {
