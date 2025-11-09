@@ -17,7 +17,6 @@ export default function IsometricGameMap({
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
-  const miniMapRef = useRef(null)
   const [hoveredPropertyId, setHoveredPropertyId] = useState(null)
   const [cameraPos, setCameraPos] = useState({ x: 0, y: 0 })
   const [zoom, setZoom] = useState(1)
