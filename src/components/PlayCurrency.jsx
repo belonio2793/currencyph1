@@ -1103,9 +1103,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   <h2 className="text-xl font-bold">{character.name}</h2>
                   <p className="text-xs text-slate-400">Level {character.level} • XP {character.xp}</p>
                 </div>
-                <div className="flex items-center gap-2">
-                  <button onClick={() => setCustomizationOpen(true)} className="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded font-medium transition-colors">Customize</button>
-                  <button onClick={() => setCharacter(null)} className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-medium transition-colors">My Account</button>
+                <div className="flex flex-col gap-2">
+                  <button onClick={() => setCustomizationOpen(true)} className="w-full px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded font-medium transition-colors">Customize</button>
+                  <button onClick={() => setCharacter(null)} className="w-full px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-medium transition-colors">My Account</button>
                 </div>
               </div>
               <div className="space-y-2">
