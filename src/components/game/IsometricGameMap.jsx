@@ -757,6 +757,7 @@ export default function IsometricGameMap({
         ctx.textAlign = 'center'
         ctx.globalAlpha = 0.8
         ctx.fillText(`₱${Math.round(building.incomeRate)}/s`, isoPos.x, isoPos.y - 40)
+        ctx.globalAlpha = 1
       }
     })
 
@@ -833,7 +834,7 @@ export default function IsometricGameMap({
   }, [cameraPos, zoom, hoveredPropertyId, properties, gridToIsometric, gameToIsometric, getPropertyAtGamePos, drawIsometricTile, drawAvatar, avatarPos, npcManagerRef, eventSystemRef])
 
   const moveAvatar = useCallback((direction) => {
-    const speed = mapSettings.avatarSpeed || 3
+    const speed = mapSettings.avatarSpeed || 15
 
     // Set velocity based on direction
     switch (direction) {
