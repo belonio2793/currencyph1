@@ -576,7 +576,8 @@ export default function IsometricGameMap({
       const iso = gridToIsometric(gridX, gridY)
       ctx.save()
       ctx.globalAlpha = 0.75
-      drawBuilding(ctx, iso.x, iso.y, placingProperty.id || placingProperty.type || 'default', 1, true)
+      const bType = (placingProperty.id || placingProperty.type || 'default').toString().replace(/-/g, '_')
+      drawBuilding(ctx, iso.x, iso.y, bType, 1, true)
       ctx.restore()
     }
 
