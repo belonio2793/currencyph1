@@ -8,6 +8,7 @@ import PlayerTradingUI from './game/PlayerTradingUI'
 import GuildManager from './game/GuildManager'
 import MarketEconomyUI from './game/MarketEconomyUI'
 import MatchSpectator from './game/MatchSpectator'
+import ManilaEnhancedMap from './game/ManilaEnhancedMap'
 import { validateCosmetics, DEFAULT_COSMETICS } from '../lib/characterCosmetics'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
