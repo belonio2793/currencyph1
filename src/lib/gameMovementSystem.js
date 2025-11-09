@@ -110,10 +110,12 @@ export class CharacterMovement {
   constructor() {
     this.position = { x: 150, y: 175 }
     this.velocity = { x: 0, y: 0 }
-    this.speed = 3
-    this.maxSpeed = 5
-    this.acceleration = 0.4
-    this.friction = 0.85
+    this.angle = 0
+    this.speed = 6
+    this.maxSpeed = 10
+    this.acceleration = 0.8
+    this.friction = 0.8
+    this.rotationSpeed = 0.2
     this.facing = 1
     this.isMoving = false
     this.currentPath = []
