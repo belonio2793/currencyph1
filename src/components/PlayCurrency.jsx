@@ -156,6 +156,20 @@ function formatMoney(n) {
   return `P${Number(n || 0).toLocaleString()}`
 }
 
+// Normalize property to ensure all required fields exist for minimap rendering
+const normalizeProperty = (prop, index) => {
+  if (!prop) return null
+  return {
+    ...prop,
+    location_x: prop.location_x !== undefined ? prop.location_x : (index * 50 + Math.random() * 100) % 300,
+    location_y: prop.location_y !== undefined ? prop.location_y : (index * 50 + Math.random() * 100) % 350,
+    current_value: prop.current_value || prop.price || 100000,
+    owner_id: prop.owner_id || 'player',
+    upgrade_level: prop.upgrade_level || 0,
+    property_type: prop.property_type || prop.type || 'business'
+  }
+}
+
 export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [loading, setLoading] = useState(true)
   const [character, setCharacter] = useState(null)
