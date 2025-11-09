@@ -1029,6 +1029,10 @@ export default function IsometricGameMap({
       const dt = Math.min(0.05, (now - lastTimeRef.current) / 1000)
       lastTimeRef.current = now
 
+      // Smoothly interpolate zoom towards target state (frame-rate independent)
+      const zoomTarget = zoom
+      zoomRef.current += (zoomTarget - zoomRef.current) * Math.min(1, dt * 8)
+
       // Determine velocity from keys or click-to-move (pixels per second)
       const baseSpeed = (mapSettings.avatarSpeed ?? 1.3) * 180
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
