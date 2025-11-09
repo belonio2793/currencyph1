@@ -390,10 +390,16 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
         // Load remote assets and subscribe to changes (game_assets table)
         try {
-          const { data: assets } = await supabase.from('game_assets').select('*')
+          const { data: assets, error: assetsErr } = await supabase.from('game_assets').select('*')
+          if (assetsErr) throw assetsErr
           if (mounted && assets) setRemoteAssets(assets)
         } catch (e) {
-          console.warn('Could not load game_assets', e)
+          console.warn('Could not load game_assets from supabase, falling back to localStorage', e)
+          try {
+            const raw = localStorage.getItem('pc_local_game_assets')
+            const parsed = raw ? JSON.parse(raw) : []
+            setRemoteAssets(parsed || [])
+          } catch (le) { console.warn('Failed to load local assets', le) }
         }
 
         if (mounted && typeof supabase.channel === 'function') {
