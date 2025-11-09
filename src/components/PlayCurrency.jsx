@@ -963,6 +963,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       if (streak >= 3 && !next.completedDailyStreak3) {
         next.completedDailyStreak3 = true
       }
+      if (streak >= 30 && !next.completedDailyStreak30) {
+        next.completedDailyStreak30 = true
+      }
       savePhases(next)
       return next
     })
