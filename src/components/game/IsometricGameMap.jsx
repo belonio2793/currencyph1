@@ -371,6 +371,47 @@ export default function IsometricGameMap({
     }
   }
 
+  const drawBuilding = useCallback((ctx, isoX, isoY, buildingType, level = 1, isProperty = false) => {
+    const baseSize = 22
+    const heightPerLevel = 5
+    const totalHeight = baseSize + level * heightPerLevel
+
+    const buildingColors = {
+      sari_sari: '#F97316', food_cart: '#EF4444', tricycle: '#3B82F6',
+      office: '#4F46E5', bank: '#3B82F6', corporate: '#2563EB',
+      house: '#10B981', apartment: '#059669', market_stall: '#7C3AED',
+      factory: '#F59E0B', warehouse: '#EA580C', workshop: '#DC2626',
+      store: '#EC4899', restaurant: '#DB2777', mall: '#BE185D',
+      park: '#14B8A6', garden: '#06B6D4', plaza: '#0891B2',
+      museum: '#D97706', landmark: '#B45309', heritage: '#92400E',
+      default: '#64748B'
+    }
+    const color = buildingColors[buildingType] || buildingColors.default
+
+    ctx.save()
+    ctx.fillStyle = color
+    ctx.globalAlpha = isProperty ? 0.95 : 0.85
+    ctx.fillRect(isoX - baseSize / 2, isoY - totalHeight, baseSize, totalHeight)
+
+    ctx.fillStyle = adjustBrightness(color, 40)
+    ctx.globalAlpha = isProperty ? 0.7 : 0.5
+    ctx.fillRect(isoX - baseSize / 2 + 1, isoY - totalHeight + 1, baseSize * 0.5, totalHeight * 0.3)
+
+    ctx.fillStyle = adjustBrightness(color, -50)
+    ctx.globalAlpha = 0.8
+    ctx.fillRect(isoX - baseSize / 2, isoY - 3, baseSize, 3)
+
+    if (level > 0) {
+      ctx.fillStyle = '#FFD700'
+      ctx.globalAlpha = 1
+      ctx.font = 'bold 10px Arial'
+      ctx.textAlign = 'center'
+      ctx.fillText(`L${level}`, isoX, isoY - totalHeight + 9)
+    }
+
+    ctx.restore()
+  }, [adjustBrightness])
+
   const drawTile = useCallback((ctx, screenX, screenY, color, isHovered = false) => {
     const w = TILE_SIZE / 2
     const h = TILE_SIZE / 4
