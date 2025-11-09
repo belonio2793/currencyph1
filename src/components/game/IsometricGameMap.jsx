@@ -30,6 +30,7 @@ export default function IsometricGameMap({
   const [avatarMoving, setAvatarMoving] = useState(false)
   const [selectedCity, setSelectedCity] = useState(city)
   const [cityData, setCityData] = useState(null)
+  const [showControls, setShowControls] = useState(true)
   const keysPressed = useRef({})
   const animationRef = useRef(null)
   const avatarAnimationFrame = useRef(0)
