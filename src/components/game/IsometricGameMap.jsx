@@ -817,9 +817,10 @@ export default function IsometricGameMap({
       events.forEach(event => {
         const progress = (Date.now() - event.timestamp) / event.duration
         const isoPos = gridToIsometric(event.position.x / 12.5, event.position.y / 14.58)
+        const z = zoomRef.current || 1
         const screenPos = {
-          screenX: centerX - cameraPos.x * zoom + (isoPos.x - (centerX - cameraPos.x * zoom)) * zoom,
-          screenY: centerY - cameraPos.y * zoom + (isoPos.y - (centerY - cameraPos.y * zoom)) * zoom
+          screenX: centerX - cameraPos.x * z + (isoPos.x - (centerX - cameraPos.x * z)) * z,
+          screenY: centerY - cameraPos.y * z + (isoPos.y - (centerY - cameraPos.y * z)) * z
         }
         drawEventEffect(ctx, screenPos, event.type, progress)
       })
