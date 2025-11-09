@@ -444,9 +444,28 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   const markVisitedCity = (name) => {
     setPhases(prev => {
-      const updated = { ...prev, visitedCities: { ...(prev.visitedCities || {}), [name]: true } }
+      const visited = { ...(prev.visitedCities || {}), [name]: true }
+      const updated = { ...prev, visitedCities: visited }
+      // Check if visited all cities
+      if (Object.keys(visited).length >= 5) {
+        updated.visitedAllCities = true
+      }
       savePhases(updated)
       return updated
+    })
+  }
+
+  const checkAndUpdatePhases = (updatedChar) => {
+    setPhases(prev => {
+      let next = { ...prev }
+      if (updatedChar.wealth >= 500 && !next.earnedWealth500) next.earnedWealth500 = true
+      if (updatedChar.wealth >= 5000 && !next.earnedWealth5000) next.earnedWealth5000 = true
+      if (updatedChar.level >= 5 && !next.reachedLevel5) next.reachedLevel5 = true
+      if (updatedChar.level >= 10 && !next.reachedLevel10) next.reachedLevel10 = true
+      if ((updatedChar.properties || []).length >= 2 && !next.ownedMultipleAssets) next.ownedMultipleAssets = true
+      if (updatedChar.income_rate >= 100 && !next.achievedPassiveIncome100) next.achievedPassiveIncome100 = true
+      if (Object.keys(prev).length !== Object.keys(next).length) savePhases(next)
+      return next
     })
   }
 
