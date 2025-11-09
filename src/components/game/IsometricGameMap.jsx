@@ -63,6 +63,10 @@ export default function IsometricGameMap({
   const particlePoolRef = useRef([])
   const MAX_PARTICLES = 200
 
+  // Static layer caching: pre-render tiles to avoid per-frame redraw
+  const staticLayerCanvasRef = useRef(null)
+  const staticLayerDirtyRef = useRef(true) // Mark dirty when properties/city changes
+
   const TILE_SIZE = 64
   const GRID_WIDTH = 24
   const GRID_HEIGHT = 18
