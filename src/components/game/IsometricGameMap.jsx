@@ -898,12 +898,17 @@ export default function IsometricGameMap({
         return { x: newX, y: newY }
       })
 
-      // smooth camera approach
+      // smooth camera approach with adaptive easing (faster when far, slower when close for precision)
       setCameraPos(prev => {
         const tx = targetCameraRef.current.x
         const ty = targetCameraRef.current.y
-        const nx = prev.x + (tx - prev.x) * 0.1
-        const ny = prev.y + (ty - prev.y) * 0.1
+        const dx = tx - prev.x
+        const dy = ty - prev.y
+        const dist = Math.hypot(dx, dy)
+        // Adaptive easing: use 0.15 normally, 0.08 when very close for precision
+        const easeFactor = dist < 5 ? 0.08 : 0.15
+        const nx = prev.x + dx * easeFactor
+        const ny = prev.y + dy * easeFactor
         return { x: nx, y: ny }
       })
 
