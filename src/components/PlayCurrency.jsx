@@ -947,13 +947,20 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
   const endDuel = async ({ winner }) => {
     setDuelSession(null)
-    // award small reward to winner locally
+    // award reward to winner locally
     try {
       if (winner && character && winner === character.name) {
         const updated = { ...character, wealth: Number(character.wealth || 0) + 100, xp: Number(character.xp || 0) + 20 }
         setCharacter(updated)
         persistCharacterPartial(updated)
         if (userId) saveCharacterToDB(updated)
+        // Track duel win in phases
+        setPhases(prev => {
+          const next = { ...prev, winDuel: true, wonMultipleDuels: true }
+          savePhases(next)
+          return next
+        })
+        checkAndUpdatePhases(updated)
       }
     } catch (e) { console.warn('endDuel update failed', e) }
   }
