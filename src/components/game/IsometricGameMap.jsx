@@ -78,6 +78,49 @@ export default function IsometricGameMap({
     return gradientCacheRef.current[key]
   }, [])
 
+  // Draw a building on the map
+  const drawBuilding = useCallback((ctx, isoX, isoY, buildingType, level = 1) => {
+    const baseSize = 20
+    const heightPerLevel = 4
+    const totalHeight = baseSize + level * heightPerLevel
+
+    // Building colors by type
+    const buildingColors = {
+      office: '#4F46E5', bank: '#3B82F6', corporate: '#2563EB',
+      house: '#10B981', apartment: '#059669', market_stall: '#7C3AED',
+      factory: '#F59E0B', warehouse: '#EA580C', workshop: '#DC2626',
+      store: '#EC4899', restaurant: '#DB2777', mall: '#BE185D',
+      park: '#14B8A6', garden: '#06B6D4', plaza: '#0891B2',
+      museum: '#D97706', landmark: '#B45309', heritage: '#92400E'
+    }
+    const color = buildingColors[buildingType] || '#64748B'
+
+    // Draw building base
+    ctx.save()
+    ctx.fillStyle = color
+    ctx.globalAlpha = 0.9
+    ctx.fillRect(isoX - baseSize/2, isoY - totalHeight, baseSize, totalHeight)
+
+    // Building highlight
+    ctx.fillStyle = adjustBrightness(color, 40)
+    ctx.fillRect(isoX - baseSize/2 + 1, isoY - totalHeight + 1, baseSize * 0.5, totalHeight * 0.3)
+
+    // Building shadow
+    ctx.fillStyle = adjustBrightness(color, -50)
+    ctx.fillRect(isoX - baseSize/2, isoY - 3, baseSize, 3)
+
+    // Level indicator
+    if (level > 0) {
+      ctx.fillStyle = '#FFD700'
+      ctx.font = `bold 9px Arial`
+      ctx.textAlign = 'center'
+      ctx.globalAlpha = 1
+      ctx.fillText(`L${level}`, isoX, isoY - totalHeight + 8)
+    }
+
+    ctx.restore()
+  }, [])
+
   const TILE_SIZE = 48 // Slightly smaller to fit more tiles
   const GRID_WIDTH = 40 // Much larger: from 24 to 40 (66% bigger)
   const GRID_HEIGHT = 30 // Much larger: from 18 to 30 (66% bigger)
