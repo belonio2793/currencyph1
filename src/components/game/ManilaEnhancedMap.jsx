@@ -123,23 +123,57 @@ export default function ManilaEnhancedMap({
       const isSelected = selectedDistrict === district.id
       const isHovered = hoveredItem?.id === district.id
 
-      ctx.fillStyle = isSelected ? '#90EE90' : (isHovered ? '#FFD700' : district.color)
-      ctx.globalAlpha = isSelected ? 0.6 : (isHovered ? 0.5 : 0.4)
-      ctx.fillRect(district.x - 40, district.y - 30, 80, 60)
+      const width = 90
+      const height = 70
+
+      ctx.fillStyle = isSelected ? '#4ade80' : (isHovered ? '#fbbf24' : district.color)
+      ctx.globalAlpha = isSelected ? 0.75 : (isHovered ? 0.65 : 0.5)
+
+      // Draw rounded rectangle
+      ctx.beginPath()
+      ctx.moveTo(district.x - width/2 + 8, district.y - height/2)
+      ctx.lineTo(district.x + width/2 - 8, district.y - height/2)
+      ctx.quadraticCurveTo(district.x + width/2, district.y - height/2, district.x + width/2, district.y - height/2 + 8)
+      ctx.lineTo(district.x + width/2, district.y + height/2 - 8)
+      ctx.quadraticCurveTo(district.x + width/2, district.y + height/2, district.x + width/2 - 8, district.y + height/2)
+      ctx.lineTo(district.x - width/2 + 8, district.y + height/2)
+      ctx.quadraticCurveTo(district.x - width/2, district.y + height/2, district.x - width/2, district.y + height/2 - 8)
+      ctx.lineTo(district.x - width/2, district.y - height/2 + 8)
+      ctx.quadraticCurveTo(district.x - width/2, district.y - height/2, district.x - width/2 + 8, district.y - height/2)
+      ctx.closePath()
+      ctx.fill()
 
       ctx.globalAlpha = 1
-      ctx.strokeStyle = isSelected ? '#228B22' : (isHovered ? '#FFA500' : '#333')
-      ctx.lineWidth = isSelected ? 3 : 1
-      ctx.strokeRect(district.x - 40, district.y - 30, 80, 60)
+      ctx.strokeStyle = isSelected ? '#15803d' : (isHovered ? '#d97706' : '#1f2937')
+      ctx.lineWidth = isSelected ? 3 : 2
+      ctx.stroke()
 
+      // Add subtle shadow
+      ctx.globalAlpha = 0.1
       ctx.fillStyle = '#000'
-      ctx.font = 'bold 16px Arial'
-      ctx.textAlign = 'center'
-      ctx.fillText(district.emoji, district.x, district.y - 5)
+      ctx.beginPath()
+      ctx.moveTo(district.x - width/2 + 8, district.y - height/2 + 2)
+      ctx.lineTo(district.x + width/2 - 8, district.y - height/2 + 2)
+      ctx.quadraticCurveTo(district.x + width/2 + 2, district.y - height/2 + 2, district.x + width/2 + 2, district.y - height/2 + 8)
+      ctx.lineTo(district.x + width/2 + 2, district.y + height/2 - 8)
+      ctx.quadraticCurveTo(district.x + width/2 + 2, district.y + height/2 + 2, district.x + width/2 - 8, district.y + height/2 + 2)
+      ctx.lineTo(district.x - width/2 + 8, district.y + height/2 + 2)
+      ctx.quadraticCurveTo(district.x - width/2 - 2, district.y + height/2 + 2, district.x - width/2 - 2, district.y + height/2 - 8)
+      ctx.lineTo(district.x - width/2 - 2, district.y - height/2 + 8)
+      ctx.quadraticCurveTo(district.x - width/2 - 2, district.y - height/2 - 2, district.x - width/2 + 8, district.y - height/2 - 2)
+      ctx.closePath()
+      ctx.fill()
 
-      ctx.font = '10px Arial'
-      ctx.fillStyle = '#333'
-      ctx.fillText(district.name, district.x, district.y + 15)
+      ctx.globalAlpha = 1
+      ctx.fillStyle = '#1f2937'
+      ctx.font = 'bold 18px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(district.emoji, district.x, district.y - 8)
+
+      ctx.font = 'bold 11px Arial'
+      ctx.fillStyle = '#1f2937'
+      ctx.fillText(district.name, district.x, district.y + 18)
     })
   }
 
