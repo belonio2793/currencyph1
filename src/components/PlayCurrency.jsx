@@ -230,6 +230,19 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         // Load market (could be dynamic from DB later)
         setMarket(STARTING_PROPERTIES)
 
+        // Initialize jobs for first city
+        const initialJobs = getAvailableJobs(jobSeed)
+        setJobs(initialJobs)
+
+        // Initialize city stats
+        setCityStats({
+          Manila: { jobsCompleted: 0, moneyEarned: 0 },
+          Cebu: { jobsCompleted: 0, moneyEarned: 0 },
+          Davao: { jobsCompleted: 0, moneyEarned: 0 },
+          Bacolod: { jobsCompleted: 0, moneyEarned: 0 },
+          Baguio: { jobsCompleted: 0, moneyEarned: 0 }
+        })
+
         // Leaderboard fetch
         await loadLeaderboard()
 
