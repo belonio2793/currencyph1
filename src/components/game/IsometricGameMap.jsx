@@ -702,21 +702,28 @@ export default function IsometricGameMap({
       const active = document.activeElement
       if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return
 
-      keysPressed.current[e.key.toLowerCase()] = true
+      const key = e.key.toLowerCase()
+      keysPressed.current[key] = true
 
-      if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(e.key.toLowerCase())) {
+      const movementKeys = ['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']
+      if (movementKeys.includes(key)) {
         moveTargetRef.current = null
         e.preventDefault()
       }
     }
 
     const handleKeyUp = (e) => {
-      keysPressed.current[e.key.toLowerCase()] = false
+      const key = e.key.toLowerCase()
+      keysPressed.current[key] = false
+
       const isMoving = keysPressed.current['w'] || keysPressed.current['arrowup'] ||
                        keysPressed.current['s'] || keysPressed.current['arrowdown'] ||
                        keysPressed.current['a'] || keysPressed.current['arrowleft'] ||
                        keysPressed.current['d'] || keysPressed.current['arrowright']
-      if (!isMoving) velocityRef.current = { x: 0, y: 0 }
+      if (!isMoving) {
+        velocityRef.current = { x: 0, y: 0 }
+        setAvatarMoving(false)
+      }
     }
 
     canvas.addEventListener('mousedown', handleMouseDown)
