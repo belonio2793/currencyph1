@@ -345,6 +345,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         xp: char.xp,
         level: char.level,
         properties: char.properties || [],
+        cosmetics: char.cosmetics || null,
         last_daily: char.last_daily || null
       }, { onConflict: 'id' })
     } catch (e) {
@@ -365,6 +366,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         xp: char.xp,
         level: char.level,
         properties: char.properties || [],
+        cosmetics: char.cosmetics || null,
         last_daily: char.last_daily || null
       }
       const { error: e } = await supabase.from('game_characters').upsert(payload, { onConflict: 'id' })
