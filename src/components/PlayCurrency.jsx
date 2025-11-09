@@ -1097,11 +1097,15 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
             <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
               <h3 className="text-lg font-bold mb-2">Leaderboard</h3>
+              <div className="mb-3 p-2 bg-slate-900/30 rounded text-xs text-slate-300">
+                <div className="font-semibold text-slate-200 mb-1">Your City Stats ({cityFocus}):</div>
+                <div>Jobs: {cityStats[cityFocus]?.jobsCompleted || 0} | Earned: ₱{cityStats[cityFocus]?.moneyEarned || 0}</div>
+              </div>
               <ol className="list-decimal list-inside text-sm space-y-2">
                 {leaderboard.map((p, idx) => (
-                  <li key={p.user_id || p.name} className="flex items-center justify-between">
+                  <li key={p.user_id || p.name} className="flex items-center justify-between hover:bg-slate-900/20 px-2 py-1 rounded transition">
                     <span>{p.name}</span>
-                    <span className="text-slate-300">{formatMoney(p.wealth)}</span>
+                    <span className="text-yellow-300 font-semibold">{formatMoney(p.wealth)}</span>
                   </li>
                 ))}
               </ol>
