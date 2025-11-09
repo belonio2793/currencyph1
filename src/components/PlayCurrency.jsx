@@ -222,7 +222,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           setLoadingChars(false)
         } else {
           // Guest view: create ephemeral character in memory
-          setCharacter((c) => c || {
+          const guestChar = {
             id: 'guest-' + Math.random().toString(36).slice(2, 9),
             name: 'Guest',
             user_id: null,
@@ -231,8 +231,11 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             xp: 0,
             level: 1,
             last_daily: null,
-            properties: []
-          })
+            properties: [],
+            cosmetics: DEFAULT_COSMETICS
+          }
+          setCharacter(guestChar)
+          setCosmetics(DEFAULT_COSMETICS)
         }
 
         // Load market (could be dynamic from DB later)
