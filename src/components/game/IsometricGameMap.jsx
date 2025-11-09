@@ -812,14 +812,15 @@ export default function IsometricGameMap({
         className="w-full h-full block"
         style={{ display: 'block', touchAction: 'none', cursor: isDragging ? 'grabbing' : 'grab' }}
       />
-      
+
       {tooltipData && tooltipPos && (
         <div
-          className="fixed bg-slate-800 border border-slate-600 rounded px-3 py-2 text-xs text-slate-100 pointer-events-none"
+          className="fixed bg-slate-800 border border-slate-600 rounded px-3 py-2 text-xs text-slate-100 pointer-events-none shadow-lg"
           style={{
             left: `${tooltipPos.x}px`,
             top: `${tooltipPos.y}px`,
-            maxWidth: '200px'
+            maxWidth: '200px',
+            zIndex: 50
           }}
         >
           <div className="font-bold">{tooltipData.name}</div>
@@ -828,9 +829,51 @@ export default function IsometricGameMap({
         </div>
       )}
 
-      <div className="absolute bottom-4 left-4 text-xs text-slate-400">
-        <div>WASD or Arrows to move • Shift to sprint</div>
-        <div>Scroll to zoom • Drag to pan</div>
+      {/* Game Controls HUD */}
+      <div className="absolute top-4 right-4 flex gap-2">
+        <div className="bg-slate-800/80 border border-slate-600 rounded px-3 py-2 text-xs text-slate-300 backdrop-blur">
+          <div className="font-semibold mb-1">Zoom: {(zoom * 100).toFixed(0)}%</div>
+          <div className="text-slate-400">Scroll wheel to adjust</div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-4 left-4 text-xs text-slate-300 bg-slate-800/60 backdrop-blur border border-slate-600 rounded px-3 py-3">
+        <div className="font-semibold mb-2">Controls</div>
+        <div className="space-y-1 text-slate-400">
+          <div>📍 <kbd className="bg-slate-700 px-1.5 rounded">WASD</kbd> or <kbd className="bg-slate-700 px-1.5 rounded">Arrows</kbd> - Move</div>
+          <div>⚡ <kbd className="bg-slate-700 px-1.5 rounded">Shift</kbd> + Move - Sprint</div>
+          <div>🔍 Scroll wheel - Zoom in/out</div>
+          <div>👆 Drag - Pan camera</div>
+        </div>
+      </div>
+
+      {/* Zoom Controls */}
+      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
+        <button
+          onClick={() => setZoom(prev => Math.min(3, prev + 0.2))}
+          className="w-10 h-10 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded flex items-center justify-center text-white font-bold transition-colors"
+          title="Zoom in"
+        >
+          +
+        </button>
+        <button
+          onClick={() => setZoom(prev => Math.max(0.5, prev - 0.2))}
+          className="w-10 h-10 bg-slate-700 hover:bg-slate-600 border border-slate-600 rounded flex items-center justify-center text-white font-bold transition-colors"
+          title="Zoom out"
+        >
+          −
+        </button>
+        <button
+          onClick={() => setFollowAvatar(!followAvatar)}
+          className={`w-10 h-10 border rounded flex items-center justify-center font-bold transition-colors ${
+            followAvatar
+              ? 'bg-emerald-600/30 border-emerald-500 text-emerald-400'
+              : 'bg-slate-700 hover:bg-slate-600 border-slate-600 text-slate-400'
+          }`}
+          title={followAvatar ? 'Follow enabled' : 'Follow disabled'}
+        >
+          👁️
+        </button>
       </div>
     </div>
   )
