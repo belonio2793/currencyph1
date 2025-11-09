@@ -201,6 +201,10 @@ export class CharacterMovement {
     this.position.x += moveX
     this.position.y += moveY
 
+    // 360-degree rotation
+    this.updateRotation(angle)
+
+    // Keep facing for backwards compatibility
     if (dx !== 0) {
       this.facing = dx > 0 ? 1 : -1
     }
