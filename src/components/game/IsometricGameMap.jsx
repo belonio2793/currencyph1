@@ -765,8 +765,8 @@ export default function IsometricGameMap({
       setAvatarPos(prev => {
         const maxX = MAP_WIDTH
         const maxY = MAP_HEIGHT
-        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x))
-        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y))
+        const newX = Math.max(0, Math.min(maxX, prev.x + velocityRef.current.x * dt))
+        const newY = Math.max(0, Math.min(maxY, prev.y + velocityRef.current.y * dt))
 
         if ((newX !== prev.x || newY !== prev.y) && onCharacterMove) {
           if (cityData) {
@@ -777,7 +777,18 @@ export default function IsometricGameMap({
           }
         }
 
-        if (followAvatar) targetCameraRef.current = { x: newX - 75, y: newY - 87 }
+        // Center camera on avatar
+        if (followAvatar) {
+          const canvas = canvasRef.current
+          if (canvas) {
+            const canvasWidth = canvas.width / z
+            const canvasHeight = canvas.height / z
+            targetCameraRef.current = {
+              x: newX - canvasWidth / 2,
+              y: newY - canvasHeight / 2
+            }
+          }
+        }
         return { x: newX, y: newY }
       })
 
@@ -789,7 +800,9 @@ export default function IsometricGameMap({
         const dx = tx - prev.x
         const dy = ty - prev.y
         const dist = Math.hypot(dx, dy)
-        const easeFactor = dist < 5 ? 0.1 : 0.2
+
+        // Much tighter easing for responsive camera
+        const easeFactor = Math.min(1, dt * 8)
         const nx = prev.x + dx * easeFactor
         const ny = prev.y + dy * easeFactor
         return { x: nx, y: ny }
