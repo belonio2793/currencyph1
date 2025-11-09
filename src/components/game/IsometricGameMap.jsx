@@ -739,7 +739,7 @@ export default function IsometricGameMap({
       ctx.font = 'bold 12px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText('💼', isoPos.x, isoPos.y)
+      ctx.fillText('����', isoPos.x, isoPos.y)
 
       ctx.restore()
     })
@@ -1259,7 +1259,7 @@ export default function IsometricGameMap({
             title="Zoom in"
           >+</button>
           <button
-            onClick={() => setCameraPos({ x: avatarPos.x, y: avatarPos.y })}
+            onClick={() => { setCameraPos({ x: avatarPos.x, y: avatarPos.y }); setFollowAvatar(true); }}
             className="px-3 py-1 text-xs bg-emerald-600 text-white border border-emerald-700 rounded hover:bg-emerald-700 transition-colors font-medium"
             title="Center map on character"
           >⊙ Center</button>
