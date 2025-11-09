@@ -1050,7 +1050,14 @@ export default function IsometricGameMap({
         } else {
           vx = (dx / dist) * baseSpeed
           vy = (dy / dist) * baseSpeed
-          setAvatarFacing(dx > 0 ? 1 : -1)
+          const targetAngle = Math.atan2(dy, dx) * (180 / Math.PI)
+          setAvatarAngle(prev => {
+            let diff = targetAngle - prev
+            if (diff > 180) diff -= 360
+            if (diff < -180) diff += 360
+            const newAngle = prev + diff * 0.15
+            return (newAngle + 360) % 360
+          })
         }
       }
       velocityRef.current.x = vx
