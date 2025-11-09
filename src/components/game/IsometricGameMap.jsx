@@ -759,62 +759,72 @@ export default function IsometricGameMap({
       const zoomTarget = zoom
       zoomRef.current += (zoomTarget - zoomRef.current) * Math.min(1, dt * 8)
 
-      const baseSpeed = (mapSettings?.avatarSpeed ?? 1.3) * 180
+      // Smooth acceleration-based movement
+      const maxSpeed = (mapSettings?.avatarSpeed ?? 2) * 140 // pixels per second base
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
-      const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
-      const moveSpeed = baseSpeed * sprint
-      let vx = 0, vy = 0
-      if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= moveSpeed
-      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) vy += moveSpeed
-      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= moveSpeed
-      if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += moveSpeed
+      const sprint = (keysPressed.current['shift'] && canSprint) ? 1.6 : 1
+      const targetInput = { x: 0, y: 0 }
+      if (keysPressed.current['w'] || keysPressed.current['arrowup']) targetInput.y -= 1
+      if (keysPressed.current['s'] || keysPressed.current['arrowdown']) targetInput.y += 1
+      if (keysPressed.current['a'] || keysPressed.current['arrowleft']) targetInput.x -= 1
+      if (keysPressed.current['d'] || keysPressed.current['arrowright']) targetInput.x += 1
 
-      if (vx !== 0 || vy !== 0) {
-        const targetAngle = Math.atan2(vy, vx) * (180 / Math.PI)
+      // normalize input
+      let inputLen = Math.hypot(targetInput.x, targetInput.y)
+      if (inputLen > 0) {
+        targetInput.x /= inputLen
+        targetInput.y /= inputLen
+      }
+
+      // If click-to-move exists and no player input, use it as target direction
+      if ((targetInput.x === 0 && targetInput.y === 0) && moveTargetRef.current) {
+        const dxm = moveTargetRef.current.x - avatarPos.x
+        const dym = moveTargetRef.current.y - avatarPos.y
+        const distm = Math.hypot(dxm, dym)
+        if (distm < 2) {
+          moveTargetRef.current = null
+        } else {
+          targetInput.x = dxm / distm
+          targetInput.y = dym / distm
+        }
+      }
+
+      const targetVx = targetInput.x * maxSpeed * sprint
+      const targetVy = targetInput.y * maxSpeed * sprint
+
+      // acceleration smoothing
+      const accel = 12 // responsiveness
+      velocityRef.current.x += (targetVx - velocityRef.current.x) * Math.min(1, dt * accel)
+      velocityRef.current.y += (targetVy - velocityRef.current.y) * Math.min(1, dt * accel)
+
+      // small deadzone
+      if (Math.abs(velocityRef.current.x) < 0.5) velocityRef.current.x = 0
+      if (Math.abs(velocityRef.current.y) < 0.5) velocityRef.current.y = 0
+
+      const velMag = Math.hypot(velocityRef.current.x, velocityRef.current.y)
+      setAvatarMoving(velMag > 0)
+
+      // Rotate avatar towards movement direction smoothly
+      if (velMag > 0.1) {
+        const ang = Math.atan2(velocityRef.current.y, velocityRef.current.x) * (180 / Math.PI)
         setAvatarAngle(prev => {
-          let diff = targetAngle - prev
+          let diff = ang - prev
           if (diff > 180) diff -= 360
           if (diff < -180) diff += 360
-          const rotSpeed = Math.min(1, dt * 8)
-          const newAngle = prev + diff * Math.min(0.9, rotSpeed + 0.2)
+          const rotSpeed = Math.min(1, dt * 10)
+          const newAngle = prev + diff * Math.min(1, rotSpeed)
           return (newAngle + 360) % 360
         })
       }
 
-      if (vx !== 0 && vy !== 0) { vx *= 0.7071; vy *= 0.7071 }
-
-      if (onConsumeEnergy && sprint > 1 && (vx !== 0 || vy !== 0)) {
-        const now = performance.now()
-        if (now - lastEnergyDrainRef.current > 400) {
+      // Energy consumption when sprinting
+      if (onConsumeEnergy && sprint > 1 && velMag > 0.5) {
+        const now2 = performance.now()
+        if (now2 - lastEnergyDrainRef.current > 400) {
           try { onConsumeEnergy(1) } catch (e) {}
-          lastEnergyDrainRef.current = now
+          lastEnergyDrainRef.current = now2
         }
       }
-
-      if (vx === 0 && vy === 0 && moveTargetRef.current) {
-        const dx = moveTargetRef.current.x - avatarPos.x
-        const dy = moveTargetRef.current.y - avatarPos.y
-        const dist = Math.hypot(dx, dy)
-        if (dist < 2) {
-          moveTargetRef.current = null
-        } else {
-          vx = (dx / dist) * baseSpeed
-          vy = (dy / dist) * baseSpeed
-          const targetAngle = Math.atan2(dy, dx) * (180 / Math.PI)
-          setAvatarAngle(prev => {
-            let diff = targetAngle - prev
-            if (diff > 180) diff -= 360
-            if (diff < -180) diff += 360
-            const rotSpeed = Math.min(1, dt * 6)
-            const newAngle = prev + diff * Math.min(0.85, rotSpeed + 0.15)
-            return (newAngle + 360) % 360
-          })
-        }
-      }
-      // store velocities (pixels per second)
-      velocityRef.current.x = vx
-      velocityRef.current.y = vy
-      setAvatarMoving(vx !== 0 || vy !== 0)
 
       // compute displacement this frame
       const dx = velocityRef.current.x * dt
