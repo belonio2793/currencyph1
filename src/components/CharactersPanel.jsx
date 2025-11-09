@@ -15,6 +15,10 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
   const [newHomeCity, setNewHomeCity] = useState('Manila')
   const [editingCharacter, setEditingCharacter] = useState(null)
   const [showEditor, setShowEditor] = useState(false)
+  const [renameModalOpen, setRenameModalOpen] = useState(false)
+  const [renameCharacter, setRenameCharacter] = useState(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [deleteCharacter, setDeleteCharacter] = useState(null)
 
   useEffect(() => {
     if (!userId) return
