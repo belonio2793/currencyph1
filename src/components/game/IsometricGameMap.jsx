@@ -706,9 +706,9 @@ export default function IsometricGameMap({
       const zoomTarget = zoom
       zoomRef.current += (zoomTarget - zoomRef.current) * Math.min(1, dt * 8)
 
-      const baseSpeed = (mapSettings.avatarSpeed ?? 1.3) * 2.5
+      const baseSpeed = 300
       const canSprint = (character && typeof character.energy === 'number') ? character.energy > 0 : true
-      const sprint = (keysPressed.current['shift'] && canSprint) ? 2.2 : 1
+      const sprint = (keysPressed.current['shift'] && canSprint) ? 1.8 : 1
       const moveSpeed = baseSpeed * sprint
       let vx = 0, vy = 0
       if (keysPressed.current['w'] || keysPressed.current['arrowup']) vy -= moveSpeed
