@@ -112,6 +112,22 @@ export default function CollapsibleMinimap({
       ctx.strokeStyle = '#fff'
       ctx.lineWidth = 1.5
       ctx.stroke()
+
+      // Draw direction indicator if angle provided
+      if (typeof avatarAngle === 'number') {
+        ctx.save()
+        ctx.translate(charX, charY)
+        const ang = ((avatarAngle % 360) + 360) % 360
+        ctx.rotate((ang * Math.PI) / 180)
+        ctx.fillStyle = 'rgba(0, 212, 255, 0.95)'
+        ctx.beginPath()
+        ctx.moveTo(0, - (isExpanded ? 8 : 4))
+        ctx.lineTo((isExpanded ? 5 : 3), (isExpanded ? 6 : 3))
+        ctx.lineTo(-(isExpanded ? 5 : 3), (isExpanded ? 6 : 3))
+        ctx.closePath()
+        ctx.fill()
+        ctx.restore()
+      }
     }
 
     // Draw camera view (viewport indicator)
