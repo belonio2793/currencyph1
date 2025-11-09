@@ -13,6 +13,24 @@ export default function GamePlayerProfile({ playerId, onClose }) {
   const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
+    const getCurrentUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+          setCurrentUserId(user.id)
+          if (playerId && user.id !== playerId) {
+            loadFollowStatus(user.id, playerId)
+            loadBlockStatus(user.id, playerId)
+          }
+        }
+      } catch (err) {
+        console.warn('Failed to fetch current user:', err)
+      }
+    }
+    getCurrentUser()
+  }, [playerId])
+
+  useEffect(() => {
     if (playerId) {
       loadPlayerData()
     }
