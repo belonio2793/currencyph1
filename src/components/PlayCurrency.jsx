@@ -1164,7 +1164,7 @@ function CharacterCreator({ onCreate, onShowAuth, userId }) {
   )
 }
 
-function WorldMap({ onClickLocation }) {
+function WorldMap({ onClickLocation, currentCity, cityStats }) {
   // Simple clickable map made of city tiles to keep visuals light and responsive.
   const cities = [
     { id: 'manila', name: 'Manila' },
@@ -1176,17 +1176,38 @@ function WorldMap({ onClickLocation }) {
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-      {cities.map(city => (
-        <div key={city.id} className="bg-slate-900/20 border border-slate-700 rounded-lg p-4 flex flex-col justify-between">
-          <div>
-            <div className="font-semibold text-slate-100">{city.name}</div>
-            <div className="text-xs text-slate-400 mt-1">Click to perform a local task and earn income.</div>
+      {cities.map(city => {
+        const isCurrentCity = currentCity === city.name
+        const stats = cityStats?.[city.name] || { jobsCompleted: 0, moneyEarned: 0 }
+        return (
+          <div
+            key={city.id}
+            className={`border rounded-lg p-4 flex flex-col justify-between transition-all cursor-pointer ${
+              isCurrentCity
+                ? 'bg-emerald-600/30 border-emerald-500 ring-2 ring-emerald-500'
+                : 'bg-slate-900/20 border-slate-700 hover:border-slate-600'
+            }`}
+          >
+            <div>
+              <div className="font-semibold text-slate-100">{city.name}</div>
+              {isCurrentCity && <div className="text-xs text-emerald-300 mt-1 font-medium">Current Location</div>}
+              <div className="text-xs text-slate-400 mt-1">Jobs: {stats.jobsCompleted} | Earned: ₱{stats.moneyEarned}</div>
+            </div>
+            <div className="mt-3 text-right">
+              <button
+                onClick={() => onClickLocation(city)}
+                className={`px-3 py-2 rounded text-white font-medium transition-colors ${
+                  isCurrentCity
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    : 'bg-amber-600 hover:bg-amber-700'
+                }`}
+              >
+                {isCurrentCity ? 'Current' : 'Visit'}
+              </button>
+            </div>
           </div>
-          <div className="mt-3 text-right">
-            <button onClick={() => onClickLocation(city)} className="px-3 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white">Visit</button>
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
