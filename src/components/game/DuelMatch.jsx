@@ -8,7 +8,8 @@ export default function DuelMatch({ sessionId, player, opponent, onEnd, userId, 
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState(null)
   const [selectedAction, setSelectedAction] = useState(null)
-  const animationRef = useRef(null)
+  const timeoutIdsRef = useRef([])
+  const MAX_LOG_ENTRIES = 50
 
   const actions = [
     { id: 'attack', name: 'Attack', damage: { min: 15, max: 25 }, icon: '⚔️' },
