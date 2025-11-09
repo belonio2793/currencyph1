@@ -1394,37 +1394,38 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left: World / Map */}
+          {/* Main world area */}
           <div className="lg:col-span-2">
-            <div className="bg-slate-800/40 border border-slate-700 rounded-lg overflow-hidden">
-              <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+            <div className="relative bg-slate-800/40 border border-slate-700 rounded-lg overflow-hidden">
+              <header className="p-4 border-b border-slate-700 flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-bold">Game World</h2>
                   <p className="text-xs text-slate-400">Click a location to perform tasks and earn income.</p>
                 </div>
-                <div className="text-xs text-slate-400">Players online: {onlinePlayers.length}</div>
-              </div>
+                <div className="flex items-center gap-3">
+                  <div className="text-xs text-slate-400">Players online: <span className="font-semibold text-emerald-400">{onlinePlayers.length}</span></div>
+                  <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
+                  <select onChange={(e) => setMapViewMode(e.target.value)} value={mapViewMode} className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-white">
+                    <option value="isometric">Player View</option>
+                    <option value="grid">City Grid</option>
+                  </select>
+                </div>
+              </header>
 
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
-                  <div className="text-sm text-slate-400">Now in <span className="font-semibold text-emerald-400">{cityFocus}</span> • Interact with available jobs.</div>
-                  <div className="flex items-center gap-2">
-                    <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
-                    <select onChange={(e) => setMapViewMode(e.target.value)} value={mapViewMode} className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-white">
-                      <option value="isometric">Player View</option>
-                      <option value="grid">City Grid</option>
-                    </select>
-                  </div>
+                  <div className="text-sm text-slate-300">Now in <span className="font-semibold text-emerald-400">{cityFocus}</span> • Interact with available jobs.</div>
+                  <div className="text-xs text-slate-400">{CITY_BONUSES[cityFocus]?.emoji} {CITY_BONUSES[cityFocus]?.description}</div>
                 </div>
 
-                {mapViewMode === 'isometric' ? (
-                  <div style={{ height: 520 }} className="border border-slate-700 rounded">
+                <div className="border border-slate-700 rounded overflow-hidden" style={{ height: 520 }}>
+                  {mapViewMode === 'isometric' ? (
                     <IsometricGameMap
                       properties={(character.properties || []).map(normalizeProperty)}
                       character={character}
                       city={cityFocus}
                       initialAvatarPos={initialAvatarPos}
-                      onConsumeEnergy={(amt) => consumeEnergy(amt)}
+                      onConsumeEnergy={consumeEnergy}
                       onPropertyClick={(property) => {
                         const reward = 20 + Math.floor(Math.random() * 80)
                         setCharacter((c) => {
@@ -1442,66 +1443,59 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       workProgress={workProgress}
                       workingJobId={workingJobId}
                     />
-                  </div>
-                ) : (
-                  <WorldMap
-                    currentCity={cityFocus}
-                    cityStats={cityStats}
-                    onClickLocation={(loc) => {
-                      handleCityClick(loc.name)
-                      const reward = 5 + Math.floor(Math.random() * 15)
-                      setCharacter((c) => {
-                        const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 3 }
-                        persistCharacterPartial(updated)
-                        if (userId) saveCharacterToDB(updated)
-                        return updated
-                      })
-                      loadLeaderboard()
-                    }}
-                  />
-                )}
-
-                <div className="mb-3 p-3 bg-slate-900/40 border border-slate-700/50 rounded text-xs text-slate-300">
-                  <div className="font-semibold mb-1">{CITY_BONUSES[cityFocus]?.emoji} {cityFocus}: {CITY_BONUSES[cityFocus]?.description || 'City'}</div>
-                  <div className="text-slate-400">Matching jobs get bonus rewards in this city</div>
+                  ) : (
+                    <WorldMap
+                      currentCity={cityFocus}
+                      cityStats={cityStats}
+                      onClickLocation={(loc) => {
+                        handleCityClick(loc.name)
+                        const reward = 5 + Math.floor(Math.random() * 15)
+                        setCharacter((c) => {
+                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 3 }
+                          persistCharacterPartial(updated)
+                          if (userId) saveCharacterToDB(updated)
+                          return updated
+                        })
+                        loadLeaderboard()
+                      }}
+                    />
+                  )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
                   {jobs.map((job, idx) => {
                     const cityBonus = getCityBonus(job, cityFocus)
                     const bonusPercent = Math.round(cityBonus * 100)
                     return (
-                    <div key={`job-${idx}-${jobSeed}`} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
-                      <div className="flex items-start justify-between mb-1">
-                        <div className="font-semibold text-slate-100">{job.name}</div>
-                        {cityBonus > 0 && <span className="text-xs bg-emerald-600/40 text-emerald-300 px-2 py-0.5 rounded">+{bonusPercent}%</span>}
-                      </div>
-                      <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
-                      <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
-                      <div className="mt-3">
-                        <button
-                          disabled={isWorking && workingJobId !== job.name}
-                          onClick={() => performJob(job)}
-                          className={`w-full px-3 py-2 rounded text-white font-medium transition-colors ${
-                            isWorking && workingJobId === job.name
-                              ? 'bg-blue-700 cursor-not-allowed'
-                              : 'bg-blue-600 hover:bg-blue-700'
-                          }`}
-                        >
-                          {workingJobId === job.name ? 'Working...' : 'Work'}
-                        </button>
-                      </div>
-                      {workingJobId === job.name && (
-                        <div className="mt-2">
-                          <div className="w-full bg-slate-700 rounded h-2">
-                            <div className="bg-emerald-500 h-2 rounded transition-all" style={{width: `${workProgress}%`}}></div>
+                      <div key={`job-${idx}-${jobSeed}`} className={`p-3 border rounded-lg transition-all flex flex-col justify-between ${workingJobId === job.name ? 'bg-blue-600/20 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
+                        <div>
+                          <div className="flex items-center justify-between">
+                            <div className="font-semibold text-slate-100">{job.name}</div>
+                            {cityBonus > 0 && <span className="text-xs bg-emerald-600/40 text-emerald-300 px-2 py-0.5 rounded">+{bonusPercent}%</span>}
                           </div>
-                          <div className="text-xs text-slate-300 mt-1 text-center">{workProgress}%</div>
+                          <div className="text-xs text-slate-400 mt-1">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
+                          <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
                         </div>
-                      )}
-                    </div>
+
+                        <div className="mt-3">
+                          <div className="mb-2 h-2 bg-slate-700 rounded overflow-hidden">
+                            <div className="h-full bg-emerald-500" style={{ width: `${(workingJobId === job.name ? workProgress : 0)}%` }} />
+                          </div>
+                          <button
+                            disabled={isWorking && workingJobId !== job.name}
+                            onClick={() => performJob(job)}
+                            className={`w-full px-3 py-2 rounded text-white font-medium transition-colors ${isWorking && workingJobId === job.name ? 'bg-blue-700 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+                            {workingJobId === job.name ? 'Working...' : 'Work'}
+                          </button>
+                        </div>
+                      </div>
                     )
                   })}
+                </div>
+
+                <div className="mt-4 flex gap-3">
+                  <button onClick={() => setPropertyPanelOpen(true)} className="flex-1 px-4 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 rounded-lg text-white font-bold">🏢 Property Manager ({(character.properties || []).length})</button>
+                  <button onClick={() => rotateJobs()} className="px-4 py-3 bg-slate-700 rounded text-white">Shuffle Jobs</button>
                 </div>
               </div>
             </div>
@@ -1535,314 +1529,108 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               </div>
             )}
 
-            <button
-              onClick={() => setPropertyPanelOpen(true)}
-              className="mt-4 w-full px-4 py-3 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 rounded-lg text-white font-bold text-lg transition-all"
-            >
-              🏢 Property Empire Manager ({(character.properties || []).length} owned)
-            </button>
-
           </div>
 
-          {/* Right: Character Card & Leaderboard */}
-          <div>
-            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-xl font-bold">{character.name}</h2>
-                  <p className="text-xs text-slate-400">Level {character.level} • XP {character.xp} {prestigeData.prestigeLevel > 0 && `• Prestige ${prestigeData.prestigeLevel}`}</p>
+          {/* Right column: player panel */}
+          <aside>
+            <div className="sticky top-6 space-y-4">
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <h3 className="text-lg font-bold">{character.name}</h3>
+                    <div className="text-xs text-slate-400">Level {character.level} • XP {character.xp} {prestigeData.prestigeLevel > 0 && `• Prestige ${prestigeData.prestigeLevel}`}</div>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <button onClick={() => setCustomizationOpen(true)} className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded">Customize</button>
+                    <button onClick={() => setCharacter(null)} className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">My Account</button>
+                  </div>
                 </div>
-                <div className="flex flex-col gap-2">
-                  <button onClick={() => setCustomizationOpen(true)} className="w-full px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded font-medium transition-colors">Customize</button>
-                  <button onClick={() => setCharacter(null)} className="w-full px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded font-medium transition-colors">My Account</button>
+
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                  <div className="p-2 bg-slate-900/30 rounded text-center">
+                    <div className="text-xs text-slate-400">Wealth</div>
+                    <div className="text-lg font-bold text-yellow-300">{formatMoney(character.wealth)}</div>
+                  </div>
+                  <div className="p-2 bg-slate-900/30 rounded text-center">
+                    <div className="text-xs text-slate-400">Income/10s</div>
+                    <div className="text-lg font-bold text-emerald-300">{formatMoney(character.income_rate)}</div>
+                  </div>
                 </div>
-              </div>
-              <div className="space-y-2">
-                <div className="p-3 bg-slate-900/30 rounded">
-                  <div className="text-xs text-slate-400">Total Wealth</div>
-                  <div className="text-2xl font-bold text-yellow-300">{formatMoney(character.wealth)}</div>
-                </div>
-                <div className="p-3 bg-slate-900/30 rounded">
-                  <div className="text-xs text-slate-400">Income Rate</div>
-                  <div className="text-xl font-bold text-emerald-300">{formatMoney(character.income_rate)}/10s</div>
-                </div>
-                <div className="p-3 bg-slate-900/30 rounded">
+
+                <div className="mb-3">
                   <div className="text-xs text-slate-400">Energy</div>
-                  <div className="w-full h-2 bg-slate-700 rounded overflow-hidden mt-2">
+                  <div className="w-full h-3 bg-slate-700 rounded overflow-hidden mt-2">
                     <div className="h-full bg-emerald-400" style={{ width: `${Math.max(0, Math.min(100, ((character.energy ?? 100) / (character.max_energy ?? 100)) * 100))}%` }}></div>
                   </div>
                 </div>
-                <div className="mt-2 flex gap-2">
+
+                <div className="flex gap-2">
                   <button onClick={claimDaily} className="flex-1 px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded text-white">Claim Daily</button>
-                  {!userId && (
-                    <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login</button>
-                  )}
+                  {!userId && <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white">Login</button>}
                 </div>
-                <div className="mt-2">
-                  <button onClick={() => requestMatch()} className="w-full px-3 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white font-medium">Find Match</button>
+
+                <div className="mt-3">
+                  <button onClick={() => requestMatch()} className="w-full px-3 py-2 bg-amber-600 hover:bg-amber-700 rounded text-white">Find Match</button>
                 </div>
               </div>
-            </div>
 
-            {/* Character Stats */}
-            {character && (
-              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-bold mb-3">Character Stats</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">💪 Strength</span>
-                    <span className="text-sm font-semibold text-red-300">{characterStats.strength}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">🧠 Intelligence</span>
-                    <span className="text-sm font-semibold text-blue-300">{characterStats.intelligence}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">😊 Charisma</span>
-                    <span className="text-sm font-semibold text-pink-300">{characterStats.charisma}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">⚡ Endurance</span>
-                    <span className="text-sm font-semibold text-amber-300">{characterStats.endurance}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">���� Dexterity</span>
-                    <span className="text-sm font-semibold text-green-300">{characterStats.dexterity}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span className="text-sm">🍀 Luck</span>
-                    <span className="text-sm font-semibold text-yellow-300">{characterStats.luck}</span>
-                  </div>
+              {/* Stats */}
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+                <h4 className="font-bold mb-2">Stats</h4>
+                <div className="space-y-2 text-sm">
+                  <StatRow label="💪 Strength" value={characterStats.strength} color="red" />
+                  <StatRow label="🧠 Intelligence" value={characterStats.intelligence} color="blue" />
+                  <StatRow label="😊 Charisma" value={characterStats.charisma} color="pink" />
+                  <StatRow label="⚡ Endurance" value={characterStats.endurance} color="amber" />
+                  <StatRow label="🎯 Dexterity" value={characterStats.dexterity} color="green" />
+                  <StatRow label="🍀 Luck" value={characterStats.luck} color="yellow" />
                 </div>
                 <p className="text-xs text-slate-400 mt-3">Stats increase as you complete jobs. Each job type boosts different stats.</p>
               </div>
-            )}
 
-            {/* Prestige System */}
-            {character && (
-              <div className="bg-gradient-to-br from-amber-900/30 to-yellow-900/20 border border-yellow-600/40 rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-bold mb-2 text-yellow-300">✨ Prestige System</h3>
-                <div className="space-y-2 mb-3 text-sm">
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span>Current Level</span>
-                    <span className="font-semibold text-yellow-300">{prestigeData.prestigeLevel || 0}</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span>Multiplier</span>
-                    <span className="font-semibold text-yellow-300">{prestigeData.prestigeMultiplier.toFixed(1)}x</span>
-                  </div>
-                  <div className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
-                    <span>Total Resets</span>
-                    <span className="font-semibold text-yellow-300">{prestigeData.totalPrestigeResets || 0}</span>
-                  </div>
-                  <div className="text-xs text-slate-400 mt-2">
-                    <div>Gain 1 prestige level for every ₱10,000 earned.</div>
-                    <div>Current: {Math.floor((character.wealth || 0) / 10000)} levels available</div>
-                  </div>
+              {/* Leaderboard */}
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+                <h4 className="font-bold mb-2">Leaderboard</h4>
+                <ol className="list-decimal list-inside text-sm space-y-2">
+                  {leaderboard.map((p, idx) => (
+                    <li key={`lb-${idx}-${p.user_id || p.name}`} className="flex items-center justify-between">
+                      <span>{p.name}</span>
+                      <span className="text-yellow-300 font-semibold">{formatMoney(p.wealth)}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
+
+              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4">
+                <h4 className="font-bold mb-2">Matches & Players</h4>
+                <div className="text-sm mb-2">
+                  {matchRequests.length === 0 ? <div className="text-slate-400">No incoming match requests.</div> : matchRequests.map((r, idx) => (
+                    <div key={`mr-${idx}`} className="flex items-center justify-between p-2 bg-slate-900/20 rounded mb-2">
+                      <div>
+                        <div className="font-medium">{r.name || r.user_id}</div>
+                        <div className="text-xs text-slate-400">{new Date(r.timestamp).toLocaleTimeString()}</div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => acceptMatch(r)} className="px-2 py-1 bg-emerald-600 rounded text-white text-sm">Accept</button>
+                        <button onClick={() => rejectMatch(r)} className="px-2 py-1 bg-red-600 rounded text-white text-sm">Reject</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <button
-                  onClick={() => {
-                    if (confirm(`Reset character for ${Math.max(1, Math.floor((character.wealth || 0) / 10000))} prestige level? Starting bonus: ₱${Math.floor(500 * (1.0 + ((prestigeData.prestigeLevel + Math.max(1, Math.floor((character.wealth || 0) / 10000))) * 0.1)))}`)) {
-                      prestigeReset()
-                    }
-                  }}
-                  disabled={(character.wealth || 0) < 10000}
-                  className={`w-full px-3 py-2 rounded text-white font-medium transition-colors ${(character.wealth || 0) < 10000 ? 'bg-slate-600 opacity-50 cursor-not-allowed' : 'bg-yellow-600 hover:bg-yellow-700'}`}
-                >
-                  {(character.wealth || 0) < 10000 ? '💰 Need ₱10,000 to Prestige' : '✨ Prestige Reset'}
-                </button>
-              </div>
-            )}
 
-            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-              <h3 className="text-lg font-bold mb-2">Leaderboard</h3>
-              <div className="mb-3 p-2 bg-slate-900/30 rounded text-xs text-slate-300">
-                <div className="font-semibold text-slate-200 mb-1">Your City Stats ({cityFocus}):</div>
-                <div>Jobs: {cityStats[cityFocus]?.jobsCompleted || 0} | Earned: ₱{cityStats[cityFocus]?.moneyEarned || 0}</div>
-              </div>
-              <ol className="list-decimal list-inside text-sm space-y-2">
-                {leaderboard.map((p, idx) => (
-                  <li key={`leaderboard-${idx}-${p.user_id || p.name}`} className="flex items-center justify-between hover:bg-slate-900/20 px-2 py-1 rounded transition">
-                    <span>{p.name}</span>
-                    <span className="text-yellow-300 font-semibold">{formatMoney(p.wealth)}</span>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            {character && (
-              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-bold mb-3">City Progress</h3>
-                <div className="space-y-2 text-sm">
-                  {Object.entries(cityStats).map(([city, stats]) => (
-                    <div key={city} className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                      <span className="font-medium">{city}</span>
-                      <span className="text-xs text-slate-400">Jobs: {stats.jobsCompleted} | ₱{stats.moneyEarned}</span>
+                <div className="text-sm space-y-1">
+                  <div className="text-slate-400">Players online: {onlinePlayers.length}</div>
+                  {onlinePlayers.map(p => (
+                    <div key={`online-${p.user_id}`} className="flex items-center justify-between text-sm mt-1">
+                      <div>{p.name || 'Anonymous'}</div>
+                      <div className="text-xs text-slate-400">{p.status || 'online'}</div>
                     </div>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Game Phases / Achievements */}
-            {character && (
-              <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-                <h3 className="text-lg font-bold mb-3">Achievement Milestones</h3>
-                <div className="space-y-3">
-                  <div>
-                    <div className="text-xs font-semibold text-slate-300 mb-2">Basic Achievements</div>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>💼 Do a job</span>
-                        <span className={`text-xs ${phases.didJob ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.didJob ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>🏠 Buy an asset</span>
-                        <span className={`text-xs ${phases.boughtAsset ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.boughtAsset ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>🎁 Claim daily reward</span>
-                        <span className={`text-xs ${phases.claimedDaily ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.claimedDaily ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>���� Visit all cities</span>
-                        <span className="text-xs text-slate-400">{Object.keys(phases.visitedCities || {}).length}/5</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>⚔️ Win a duel</span>
-                        <span className={`text-xs ${phases.winDuel ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.winDuel ? '✓' : '○'}</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold text-slate-300 mb-2">Progression Goals</div>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>💰 Earn ₱500</span>
-                        <span className={`text-xs ${phases.earnedWealth500 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.earnedWealth500 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>📈 Reach Level 5</span>
-                        <span className={`text-xs ${phases.reachedLevel5 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.reachedLevel5 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>🏘️ Own multiple assets</span>
-                        <span className={`text-xs ${phases.ownedMultipleAssets ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.ownedMultipleAssets ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>🔥 3-day daily streak</span>
-                        <span className={`text-xs ${phases.completedDailyStreak3 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.completedDailyStreak3 ? '✓' : '○'}</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold text-slate-300 mb-2">Elite Achievements</div>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>💎 Earn ₱5000</span>
-                        <span className={`text-xs ${phases.earnedWealth5000 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.earnedWealth5000 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>⭐ Reach Level 10</span>
-                        <span className={`text-xs ${phases.reachedLevel10 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.reachedLevel10 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>🎯 Win multiple duels</span>
-                        <span className={`text-xs ${phases.wonMultipleDuels ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.wonMultipleDuels ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-slate-900/20 rounded">
-                        <span>💸 ₱100+ passive income/10s</span>
-                        <span className={`text-xs ${phases.achievedPassiveIncome100 ? 'text-emerald-400' : 'text-slate-400'}`}>{phases.achievedPassiveIncome100 ? '✓' : '○'}</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <div className="text-xs font-semibold text-slate-300 mb-2">Legendary Endgame</div>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
-                        <span>👑 Earn ₱50,000</span>
-                        <span className={`text-xs ${phases.earnedWealth50000 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.earnedWealth50000 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
-                        <span>🔥 Reach Level 20</span>
-                        <span className={`text-xs ${phases.reachedLevel20 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.reachedLevel20 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
-                        <span>💰 ₱500+ passive income/10s</span>
-                        <span className={`text-xs ${phases.achievedPassiveIncome500 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.achievedPassiveIncome500 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
-                        <span>🏢 Own all property types</span>
-                        <span className={`text-xs ${phases.ownedAllPropertyTypes ? 'text-amber-400' : 'text-slate-400'}`}>{phases.ownedAllPropertyTypes ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
-                        <span>📅 30-day daily streak</span>
-                        <span className={`text-xs ${phases.completedDailyStreak30 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.completedDailyStreak30 ? '✓' : '○'}</span>
-                      </li>
-                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
-                        <span>✨ Prestige Level: {prestigeData.prestigeLevel}</span>
-                        <span className="text-xs text-amber-300">×{prestigeData.prestigeMultiplier.toFixed(1)}</span>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {character && (
-              <PropertyEmpireAchievements
-                character={character}
-                properties={character.properties || []}
-              />
-            )}
-
-            {character && <MatchHistory characterId={character.id} maxMatches={8} />}
-
-            <div className="bg-slate-800/40 border border-slate-700 rounded-lg p-4 mb-4">
-              <h3 className="text-lg font-bold mb-2">Match Requests</h3>
-              <div className="text-sm text-slate-300 space-y-2 mb-3">
-                {matchRequests.length === 0 && <div className="text-slate-400">No incoming match requests.</div>}
-                {matchRequests.map((r, idx) => (
-                  <div key={r.user_id + '_' + idx} className="flex items-center justify-between bg-slate-900/20 p-2 rounded">
-                    <div>
-                      <div className="font-medium">{r.name || r.user_id}</div>
-                      <div className="text-xs text-slate-400">Requested {new Date(r.timestamp).toLocaleTimeString()}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => acceptMatch(r)} className="px-2 py-1 bg-emerald-600 rounded text-white text-sm">Accept</button>
-                      <button onClick={() => rejectMatch(r)} className="px-2 py-1 bg-red-600 rounded text-white text-sm">Reject</button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <h3 className="text-lg font-bold mb-2">Players Online</h3>
-              <div className="text-sm text-slate-300 space-y-2">
-                {onlinePlayers.length === 0 && <div className="text-slate-400">No players currently online.</div>}
-                {onlinePlayers.map(p => (
-                  <div key={p.user_id} className="flex items-center justify-between">
-                    <div>{p.name || 'Anonymous'}</div>
-                    <div className="text-xs text-slate-400">{p.status || 'online'}</div>
-                  </div>
-                ))}
-              </div>
             </div>
-
-            {duelSession && (
-              <DuelMatch
-                sessionId={duelSession.sessionId}
-                player={character}
-                opponent={duelSession.opponent}
-                onEnd={endDuel}
-                userId={userId}
-                userEmail={userEmail}
-              />
-            )}
-
-          </div>
+          </aside>
         </div>
       </div>
 
@@ -1853,6 +1641,30 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         isOpen={customizationOpen}
         onToggle={() => setCustomizationOpen(!customizationOpen)}
       />
+    </div>
+  )
+}
+
+// Small presentational helper for stat rows
+function StatRow({ label, value = 0, color = 'green' }) {
+  const colors = {
+    red: 'bg-red-500',
+    blue: 'bg-blue-500',
+    pink: 'bg-pink-500',
+    amber: 'bg-amber-400',
+    green: 'bg-green-400',
+    yellow: 'bg-yellow-300'
+  }
+  const pct = Math.max(0, Math.min(100, value * 8))
+  return (
+    <div className="flex items-center justify-between">
+      <div className="text-sm">{label}</div>
+      <div className="flex-1 mx-3">
+        <div className="w-full h-2 bg-slate-700 rounded overflow-hidden">
+          <div className={`${colors[color] || 'bg-green-400'} h-full`} style={{ width: `${pct}%` }} />
+        </div>
+      </div>
+      <div className="text-sm font-semibold">{value}</div>
     </div>
   )
 }
