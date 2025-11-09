@@ -75,7 +75,7 @@ export default function ManilaEnhancedMap({
     drawGridLines(ctx)
 
     ctx.restore()
-  }, [zoom, mapOffset, properties, character, selectedDistrict, hoveredItem])
+  }, [zoom, mapOffset, properties, character, selectedDistrict, hoveredItem, baseWidth, baseHeight])
 
   const drawWater = (ctx) => {
     ctx.fillStyle = '#4a90e2'
