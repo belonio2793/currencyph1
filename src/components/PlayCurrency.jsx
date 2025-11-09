@@ -604,10 +604,14 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       let next = { ...prev }
       if (updatedChar.wealth >= 500 && !next.earnedWealth500) next.earnedWealth500 = true
       if (updatedChar.wealth >= 5000 && !next.earnedWealth5000) next.earnedWealth5000 = true
+      if (updatedChar.wealth >= 50000 && !next.earnedWealth50000) next.earnedWealth50000 = true
       if (updatedChar.level >= 5 && !next.reachedLevel5) next.reachedLevel5 = true
       if (updatedChar.level >= 10 && !next.reachedLevel10) next.reachedLevel10 = true
+      if (updatedChar.level >= 20 && !next.reachedLevel20) next.reachedLevel20 = true
       if ((updatedChar.properties || []).length >= 2 && !next.ownedMultipleAssets) next.ownedMultipleAssets = true
       if (updatedChar.income_rate >= 100 && !next.achievedPassiveIncome100) next.achievedPassiveIncome100 = true
+      if (updatedChar.income_rate >= 500 && !next.achievedPassiveIncome500) next.achievedPassiveIncome500 = true
+      if ((updatedChar.properties || []).length >= 3 && updatedChar.properties.some(p => p.id === 'sari-sari') && updatedChar.properties.some(p => p.id === 'food-cart') && updatedChar.properties.some(p => p.id === 'tricycle') && !next.ownedAllPropertyTypes) next.ownedAllPropertyTypes = true
       if (Object.keys(prev).length !== Object.keys(next).length) savePhases(next)
       return next
     })
