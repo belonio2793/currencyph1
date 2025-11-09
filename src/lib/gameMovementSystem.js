@@ -244,6 +244,7 @@ export class CharacterMovement {
     return {
       position: { ...this.position },
       velocity: { ...this.velocity },
+      angle: this.angle,
       facing: this.facing,
       isMoving: this.isMoving,
       speed: this.speed
