@@ -961,17 +961,21 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     />
                   </div>
                 ) : (
-                  <WorldMap onClickLocation={async (loc) => {
-                    // Simple click reward
-                    const reward = 10 + Math.floor(Math.random() * 40)
-                    setCharacter((c) => {
-                      const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
-                      persistCharacterPartial(updated)
-                      if (userId) saveCharacterToDB(updated)
-                      return updated
-                    })
-                    loadLeaderboard()
-                  }} />
+                  <WorldMap
+                    currentCity={cityFocus}
+                    onClickLocation={(loc) => {
+                      handleCityClick(loc.name)
+                      // Small bonus for visiting
+                      const reward = 5 + Math.floor(Math.random() * 15)
+                      setCharacter((c) => {
+                        const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 3 }
+                        persistCharacterPartial(updated)
+                        if (userId) saveCharacterToDB(updated)
+                        return updated
+                      })
+                      loadLeaderboard()
+                    }}
+                  />
                 )}
 
                 <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
