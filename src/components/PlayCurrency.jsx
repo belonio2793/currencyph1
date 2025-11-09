@@ -514,6 +514,41 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     } catch (e) { /* ignore */ }
   }
 
+  // Get income multiplier based on city specialization
+  const getCityBonus = useCallback((job, cityName) => {
+    const cityData = CITY_BONUSES[cityName]
+    if (!cityData) return 0
+
+    const jobName = job.name.toLowerCase()
+
+    // Tech jobs: +12% in Cebu
+    if (cityData.techBonus && ['programmer', 'developer', 'administrator', 'engineer', 'designer', 'analyst', 'machine learning', 'data scientist', 'devops'].some(t => jobName.includes(t))) {
+      return cityData.techBonus
+    }
+
+    // Business/Sales jobs: +15% in Manila
+    if (cityData.businessBonus && ['manager', 'sales', 'business', 'accountant', 'consultant', 'advisor', 'coordinator'].some(t => jobName.includes(t))) {
+      return cityData.businessBonus
+    }
+
+    // Farming/Agriculture jobs: +18% in Davao
+    if (cityData.farmingBonus && ['farmer', 'farm', 'planter', 'harvester', 'fisherman', 'livestock', 'poultry'].some(t => jobName.includes(t))) {
+      return cityData.farmingBonus
+    }
+
+    // Service jobs: +14% in Bacolod
+    if (cityData.serviceBonus && ['waiter', 'bartender', 'receptionist', 'stylist', 'therapist', 'driver', 'guide'].some(t => jobName.includes(t))) {
+      return cityData.serviceBonus
+    }
+
+    // Manual labor jobs: +16% in Baguio
+    if (cityData.manualBonus && ['carpenter', 'welder', 'plumber', 'electrician', 'mason', 'construction', 'laborer'].some(t => jobName.includes(t))) {
+      return cityData.manualBonus
+    }
+
+    return 0
+  }, [])
+
   // Get stat boosts based on job category
   const getStatBoostFromJob = useCallback((job) => {
     const boosts = {
