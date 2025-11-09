@@ -369,6 +369,28 @@ export default function ManilaEnhancedMap({
     e.preventDefault()
   }
 
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.2, 3))
+  }
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.2, 0.5))
+  }
+
+  const handleCanvasWheel = (e) => {
+    e.preventDefault()
+    if (e.deltaY < 0) {
+      handleZoomIn()
+    } else {
+      handleZoomOut()
+    }
+  }
+
+  const handleResetView = () => {
+    setMapOffset({ x: 0, y: 0 })
+    setZoom(1)
+  }
+
   return (
     <div className="w-full h-full flex flex-col bg-slate-900 rounded-lg overflow-hidden">
       <div className="p-3 bg-slate-800 border-b border-slate-700">
