@@ -361,7 +361,7 @@ export default function ListingDetail({ slug, onBack }) {
             {(listing.latitude || listing.lat) && (listing.longitude || listing.lng) && (
               <div className="mt-4 rounded overflow-hidden border border-slate-200">
                 <div style={{ height: 300 }}>
-                  <MapContainer center={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]} zoom={15} style={{ height: '100%', width: '100%' }}>
+                  <MapContainer center={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]} zoom={15} keyboard={false} style={{ height: '100%', width: '100%' }}>
                     <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
                     <Marker position={[Number(listing.latitude ?? listing.lat), Number(listing.longitude ?? listing.lng)]}>
                       <Popup>
