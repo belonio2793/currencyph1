@@ -913,7 +913,11 @@ export default function IsometricGameMap({
       window.removeEventListener('keyup', handleKeyUp)
       cancelAnimationFrame(animationRef.current)
     }
-  }, [draw, isometricToGrid, getPropertyAtGamePos, onPropertyClick, cameraPos, zoom, isDragging, dragStart, moveAvatar, avatarMoving])
+  }, [draw, isometricToGrid, getPropertyAtGamePos, onPropertyClick, followAvatar])
+  // PERFORMANCE NOTE: Reduced dependencies by moving frequently-updated values to refs.
+  // This prevents the effect from re-running on every camera/zoom/avatar change,
+  // while still allowing the draw function and key logic to remain stable.
+  // Dynamic values (cameraPos, zoom, etc) are read from refs inside the animation loop.
 
   useEffect(() => {
     const resizeCanvas = () => {
