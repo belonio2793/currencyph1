@@ -313,6 +313,42 @@ export default function IsometricGameMap({
 
   const drawParticles = (ctx) => {
     const cam = { x: cameraPos.x, y: cameraPos.y, zoom }
+
+    // Ambient particles - spawn occasionally
+    if (Math.random() < 0.02) {
+      ambientParticlesRef.current.push({
+        x: Math.random() * ctx.canvas.width,
+        y: Math.random() * ctx.canvas.height,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: Math.random() * 0.2 - 0.3,
+        life: 120,
+        maxLife: 120,
+        color: 'rgba(200, 220, 240, 0.3)',
+        size: Math.random() * 1 + 0.5
+      })
+    }
+
+    // Update and draw ambient particles
+    const ambientToRemove = []
+    ambientParticlesRef.current.forEach((p, idx) => {
+      p.x += p.vx
+      p.y += p.vy
+      p.life -= 1
+      const alpha = Math.max(0, (p.life / p.maxLife) * 0.3)
+      ctx.save()
+      ctx.globalAlpha = alpha
+      ctx.fillStyle = 'rgba(200, 220, 240, 1)'
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.restore()
+      if (p.life <= 0) ambientToRemove.push(idx)
+    })
+    if (ambientToRemove.length > 0) {
+      ambientParticlesRef.current = ambientParticlesRef.current.filter((_, i) => !ambientToRemove.includes(i))
+    }
+
+    // Main particles
     const toRemove = []
     particlesRef.current.forEach((p, idx) => {
       p.x += p.vx
