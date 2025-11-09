@@ -678,6 +678,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     persistCharacterPartial(updated)
     if (userId) saveCharacterToDB(updated)
     setPhases(prev => { const next = { ...prev, boughtAsset: true }; savePhases(next); return next })
+    checkAndUpdatePhases(updated)
     await loadLeaderboard()
   }
 
