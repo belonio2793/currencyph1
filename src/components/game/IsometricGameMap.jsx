@@ -810,10 +810,6 @@ export default function IsometricGameMap({
         canvasRef.current.width = rect.width
         canvasRef.current.height = rect.height
       }
-      if (miniMapRef.current) {
-        miniMapRef.current.width = 140
-        miniMapRef.current.height = 100
-      }
     }
 
     resizeCanvas()
