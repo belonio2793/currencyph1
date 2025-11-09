@@ -1752,6 +1752,32 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       </li>
                     </ul>
                   </div>
+
+                  <div>
+                    <div className="text-xs font-semibold text-slate-300 mb-2">Legendary Endgame</div>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
+                        <span>👑 Earn ₱50,000</span>
+                        <span className={`text-xs ${phases.earnedWealth50000 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.earnedWealth50000 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
+                        <span>🔥 Reach Level 20</span>
+                        <span className={`text-xs ${phases.reachedLevel20 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.reachedLevel20 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
+                        <span>💰 ₱500+ passive income/10s</span>
+                        <span className={`text-xs ${phases.achievedPassiveIncome500 ? 'text-amber-400' : 'text-slate-400'}`}>{phases.achievedPassiveIncome500 ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
+                        <span>🏢 Own all property types</span>
+                        <span className={`text-xs ${phases.ownedAllPropertyTypes ? 'text-amber-400' : 'text-slate-400'}`}>{phases.ownedAllPropertyTypes ? '✓' : '○'}</span>
+                      </li>
+                      <li className="flex items-center justify-between p-2 bg-amber-900/20 rounded border border-amber-700/30">
+                        <span>✨ Prestige Level: {prestigeData.prestigeLevel}</span>
+                        <span className="text-xs text-amber-300">×{prestigeData.prestigeMultiplier.toFixed(1)}</span>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             )}
