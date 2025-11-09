@@ -222,6 +222,27 @@ export default function CharactersPanel({ userId, currentCharacter, onSelectChar
           </div>
         </div>
       )}
+        {/* Rename Modal */}
+        <RenameCharacterModal
+          isOpen={renameModalOpen}
+          character={renameCharacter}
+          onClose={() => {
+            setRenameModalOpen(false)
+            setRenameCharacter(null)
+          }}
+          onSuccess={handleRenameSuccess}
+        />
+
+        {/* Delete Confirmation Modal */}
+        <DeleteCharacterConfirmModal
+          isOpen={deleteModalOpen}
+          character={deleteCharacter}
+          onClose={() => {
+            setDeleteModalOpen(false)
+            setDeleteCharacter(null)
+          }}
+          onSuccess={handleDeleteSuccess}
+        />
       </div>
     </div>
   )
