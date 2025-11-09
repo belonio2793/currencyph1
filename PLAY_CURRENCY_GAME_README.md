@@ -197,9 +197,20 @@ CREATE TABLE game_match_actions (
 
 ---
 
-## 🔧 Recent Fixes
+## 🔧 Recent Updates
 
-### Character Creation Bug Fix (Latest)
+### Phase 2: Advanced Combat Mechanics (Latest)
+- **Turn Timer**: 30-second countdown per action with visual indicator
+- **5 Unique Abilities**: Attack, Power Strike, Counter, Heal, Execute with different cooldowns
+- **Status Effects**: Comprehensive effect system (Stun, Bleed, Shield, Poison, Regen)
+- **Combat Animations**: Floating damage/heal numbers with opacity animation
+- **Smart AI**: Opponent makes tactical decisions (heals when low, uses abilities strategically)
+- **Energy System**: All actions consume energy (depleted per ability)
+- **Critical Hits**: 15% chance to deal 1.5x damage
+- **New Component**: `DuelEnhancements.js` with reusable combat engine
+- **Status**: ✅ Fully functional and tested
+
+### Character Creation Bug Fix
 - **Issue**: `UNIQUE(user_id)` constraint prevented creating multiple characters per user
 - **Solution**: 
   1. Created migration `20250109_fix_game_characters_schema.sql`
