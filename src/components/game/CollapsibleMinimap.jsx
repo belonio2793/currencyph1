@@ -15,8 +15,8 @@ export default function CollapsibleMinimap({
 
   const MAP_WIDTH = 300
   const MAP_HEIGHT = 350
-  const MINI_MAP_WIDTH = isExpanded ? 250 : 80
-  const MINI_MAP_HEIGHT = isExpanded ? 200 : 65
+  const MINI_MAP_WIDTH = isExpanded ? 220 : 80
+  const MINI_MAP_HEIGHT = isExpanded ? 160 : 65
 
   const PROPERTY_COLORS = {
     house: '#ff9800',
