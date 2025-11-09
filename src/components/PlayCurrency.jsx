@@ -1409,11 +1409,54 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   <div className="text-sm text-slate-400">Now in <span className="font-semibold text-emerald-400">{cityFocus}</span> • Interact with available jobs.</div>
                   <div className="flex items-center gap-2">
                     <button onClick={() => rotateJobs()} className="px-2 py-1 text-xs bg-violet-600 hover:bg-violet-700 rounded text-white font-medium">Refresh Jobs</button>
-                    <button onClick={() => setIsIsometric(!isIsometric)} className="px-2 py-1 text-xs bg-slate-700 rounded">{isIsometric ? 'Switch to Grid' : 'Isometric View'}</button>
+                    <select onChange={(e) => setMapViewMode(e.target.value)} value={mapViewMode} className="px-2 py-1 text-xs bg-slate-700 hover:bg-slate-600 rounded text-white">
+                      <option value="manila">Manila Map</option>
+                      <option value="isometric">Isometric View</option>
+                      <option value="grid">City Grid</option>
+                    </select>
                   </div>
                 </div>
 
-                {isIsometric ? (
+                {mapViewMode === 'manila' ? (
+                  <div style={{ height: 520 }} className="border border-slate-700 rounded overflow-hidden">
+                    <ManilaEnhancedMap
+                      character={character}
+                      properties={(character.properties || []).map(normalizeProperty)}
+                      onPropertyClick={(property) => {
+                        const reward = 20 + Math.floor(Math.random() * 80)
+                        setCharacter((c) => {
+                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
+                          persistCharacterPartial(updated)
+                          if (userId) saveCharacterToDB(updated)
+                          return updated
+                        })
+                        loadLeaderboard()
+                      }}
+                      onMapClick={(district) => {
+                        // Bonus for exploring districts
+                        const reward = 10 + Math.floor(Math.random() * 20)
+                        setCharacter((c) => {
+                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 2 }
+                          persistCharacterPartial(updated)
+                          if (userId) saveCharacterToDB(updated)
+                          return updated
+                        })
+                        loadLeaderboard()
+                      }}
+                      onPropertyDragEnd={(property) => {
+                        const updatedProps = (character.properties || []).map(p =>
+                          p.id === property.id ? property : p
+                        )
+                        const updated = { ...character, properties: updatedProps }
+                        setCharacter(updated)
+                        persistCharacterPartial(updated)
+                        if (userId) saveCharacterToDB(updated)
+                      }}
+                      isInteractive={true}
+                      zoom={1}
+                    />
+                  </div>
+                ) : mapViewMode === 'isometric' ? (
                   <div style={{ height: 520 }} className="border border-slate-700 rounded">
                     <IsometricGameMap
                       properties={(character.properties || []).map(normalizeProperty)}
@@ -1422,7 +1465,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       initialAvatarPos={initialAvatarPos}
                       onConsumeEnergy={(amt) => consumeEnergy(amt)}
                       onPropertyClick={(property) => {
-                        // open quick buy modal: for now, give click reward
                         const reward = 20 + Math.floor(Math.random() * 80)
                         setCharacter((c) => {
                           const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
@@ -1446,7 +1488,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     cityStats={cityStats}
                     onClickLocation={(loc) => {
                       handleCityClick(loc.name)
-                      // Small bonus for visiting
                       const reward = 5 + Math.floor(Math.random() * 15)
                       setCharacter((c) => {
                         const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 3 }
