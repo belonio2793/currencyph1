@@ -763,9 +763,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
     // Persist asset globally
     try {
-      await supabase.from('game_assets').insert([prop])
+      const { error: insertErr } = await supabase.from('game_assets').insert([prop])
+      if (insertErr) throw insertErr
     } catch (e) {
-      console.warn('Could not insert game_asset', e)
+      console.warn('Could not insert game_asset to supabase, saving locally', e)
+      try {
+        const key = 'pc_local_game_assets'
+        const raw = localStorage.getItem(key)
+        const arr = raw ? JSON.parse(raw) : []
+        arr.push(prop)
+        localStorage.setItem(key, JSON.stringify(arr))
+        setRemoteAssets(prev => (prev || []).concat(prop))
+      } catch (le) { console.warn('Failed to persist local game asset', le) }
     }
 
     setPlacingAsset(null)
