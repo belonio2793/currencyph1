@@ -1078,7 +1078,8 @@ export default function IsometricGameMap({
             let diff = targetAngle - prev
             if (diff > 180) diff -= 360
             if (diff < -180) diff += 360
-            const newAngle = prev + diff * 0.5
+            const rotSpeed = Math.min(1, dt * 6)
+            const newAngle = prev + diff * Math.min(0.85, rotSpeed + 0.15)
             return (newAngle + 360) % 360
           })
         }
