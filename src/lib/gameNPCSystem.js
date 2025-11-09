@@ -159,11 +159,29 @@ export class NPC {
     ctx.fillStyle = this.outfitColor
     ctx.fillRect(screenX + 5, screenY + 1 + floatOffset, size - 10, size / 2 - 2)
 
+    // Walking animation
+    const walkCycle = Math.sin(this.animationFrame * 0.15)
+    const bobOffset = this.behavior === NPC_BEHAVIORS.WALKING ? Math.abs(walkCycle) * 0.5 : 0
+    const bodyBob = floatOffset + bobOffset
+
+    // Arms (swing with walking animation)
+    const armSwing = this.behavior === NPC_BEHAVIORS.WALKING ? walkCycle * 2 : 0
+    ctx.fillStyle = this.skinTone
+    // Left arm
+    ctx.fillRect(screenX + 2, screenY + 2 + bodyBob + armSwing, 3, 5)
+    // Right arm
+    ctx.fillRect(screenX + 19, screenY + 2 + bodyBob - armSwing, 3, 5)
+
     // Legs (walking animation)
-    const legOffset = this.behavior === NPC_BEHAVIORS.WALKING ? Math.sin(this.animationFrame * 0.15) * 1 : 0
+    const legOffset = this.behavior === NPC_BEHAVIORS.WALKING ? Math.sin(this.animationFrame * 0.15) * 1.5 : 0
     ctx.fillStyle = '#2c3e50'
-    ctx.fillRect(screenX + 7, screenY + 10 + floatOffset + legOffset, 4, 6)
-    ctx.fillRect(screenX + 13, screenY + 10 + floatOffset - legOffset, 4, 6)
+    ctx.fillRect(screenX + 7, screenY + 10 + bodyBob + legOffset, 4, 6)
+    ctx.fillRect(screenX + 13, screenY + 10 + bodyBob - legOffset, 4, 6)
+
+    // Shoes
+    ctx.fillStyle = '#000'
+    ctx.fillRect(screenX + 7, screenY + 16 + bodyBob, 4, 2)
+    ctx.fillRect(screenX + 13, screenY + 16 + bodyBob, 4, 2)
 
     // Name label (for vendors)
     if (this.type === NPC_TYPES.VENDOR) {
