@@ -429,6 +429,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     if (!character) return
     if (isWorking) return
     setIsWorking(true)
+    setWorkingJobId(job.name)
     setWorkProgress(0)
     const start = Date.now()
     const duration = job.duration
@@ -453,7 +454,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         persistCharacterPartial(updated)
         return updated
       })
+
+      // Update city stats
+      setCityStats((prev) => ({
+        ...prev,
+        [cityFocus]: {
+          jobsCompleted: (prev[cityFocus]?.jobsCompleted || 0) + 1,
+          moneyEarned: (prev[cityFocus]?.moneyEarned || 0) + job.reward
+        }
+      }))
+
       setIsWorking(false)
+      setWorkingJobId(null)
       setWorkProgress(0)
       await loadLeaderboard()
       if (userId) saveCharacterToDB(character)
