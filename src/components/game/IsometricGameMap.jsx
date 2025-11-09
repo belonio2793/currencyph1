@@ -798,8 +798,9 @@ export default function IsometricGameMap({
       })
     }
 
-    // avatar
-    const avatarScreenPos = gameToIsometric(avatarPos.x, avatarPos.y)
+    // avatar (round screen pos to reduce sub-pixel jitter)
+    const avatarScreenPosRaw = gameToIsometric(avatarPos.x, avatarPos.y)
+    const avatarScreenPos = { x: Math.round(avatarScreenPosRaw.x), y: Math.round(avatarScreenPosRaw.y) }
     drawAvatar(ctx, avatarScreenPos.x - AVATAR_SIZE / 2, avatarScreenPos.y - AVATAR_SIZE)
 
     // particles
