@@ -107,6 +107,28 @@ export class NPC {
 
     ctx.save()
 
+    // Draw vendor booth/stall for vendor NPCs
+    if (this.type === NPC_TYPES.VENDOR) {
+      // Booth background
+      ctx.fillStyle = 'rgba(139, 69, 19, 0.8)'
+      ctx.fillRect(screenX - 15, screenY + 5, 40, 20)
+
+      // Booth roof
+      ctx.fillStyle = '#d2691e'
+      ctx.beginPath()
+      ctx.moveTo(screenX - 15, screenY + 5)
+      ctx.lineTo(screenX + 25, screenY + 5)
+      ctx.lineTo(screenX + 10, screenY - 5)
+      ctx.lineTo(screenX - 5, screenY - 5)
+      ctx.closePath()
+      ctx.fill()
+
+      // Booth border
+      ctx.strokeStyle = '#a0522d'
+      ctx.lineWidth = 1
+      ctx.strokeRect(screenX - 15, screenY + 5, 40, 20)
+    }
+
     // Shadow
     const shadowGrad = ctx.createRadialGradient(screenX + size / 2, screenY + size / 2, 2, screenX + size / 2, screenY + size / 2, 10)
     shadowGrad.addColorStop(0, 'rgba(0,0,0,0.2)')
@@ -148,7 +170,7 @@ export class NPC {
       ctx.fillStyle = '#ffd700'
       ctx.font = 'bold 8px Arial'
       ctx.textAlign = 'center'
-      ctx.fillText(this.name, screenX + size / 2, screenY - 12)
+      ctx.fillText(this.name, screenX + size / 2, screenY - 20)
     }
 
     ctx.restore()
