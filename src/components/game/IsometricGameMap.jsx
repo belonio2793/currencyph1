@@ -837,6 +837,17 @@ export default function IsometricGameMap({
           style={{ display: 'block' }}
         />
 
+        {/* Controls Help */}
+        <div className="absolute top-2 left-2 bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 z-20 text-xs text-slate-300">
+          <div className="font-bold text-yellow-400 mb-1">Controls:</div>
+          <div className="space-y-0.5">
+            <div>🎮 WASD / Arrows = Move</div>
+            <div>🖱️ Drag = Pan Map</div>
+            <div>🔍 Scroll = Zoom</div>
+            <div>Click = Job / Property</div>
+          </div>
+        </div>
+
         {/* Mini-map */}
         <div className="absolute top-2 right-2 bg-slate-900/80 border border-slate-700 rounded shadow-lg p-2 z-20">
           <canvas ref={miniMapRef} width={140} height={100} className="block rounded" />
