@@ -759,10 +759,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         const charLevel = c.level || 1
         const difficultyMultiplier = 0.8 + (job.difficulty * 0.1) // Higher difficulty = higher base reward
         const levelMultiplier = 1 + (charLevel * 0.15) // Higher level = higher rewards (scales 15% per level)
+        const cityBonus = getCityBonus(job, cityFocus) // City-specific bonuses (5-18%)
+        const prestigeBonus = prestigeData.prestigeMultiplier || 1.0 // Prestige multiplier
 
-        // Scale reward and XP based on character level
-        const scaledReward = Math.floor(job.reward * levelMultiplier)
-        const scaledXP = Math.floor(job.xp * levelMultiplier)
+        // Scale reward and XP based on character level, city bonus, and prestige
+        const baseReward = job.reward * levelMultiplier * (1 + cityBonus) * prestigeBonus
+        const scaledReward = Math.floor(baseReward)
+        const scaledXP = Math.floor(job.xp * levelMultiplier * (1 + cityBonus * 0.5) * prestigeBonus)
 
         const updated = { ...c, wealth: Number(c.wealth || 0) + scaledReward, xp: Number(c.xp || 0) + scaledXP }
 
