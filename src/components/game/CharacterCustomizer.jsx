@@ -36,14 +36,7 @@ export default function CharacterCustomizer({ cosmetics, onUpdateCosmetics, isOp
   }, [isDragging, dragOffset])
 
   if (!isOpen) {
-    return (
-      <button
-        onClick={onToggle}
-        className="fixed bottom-6 right-6 z-40 px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg text-white font-semibold shadow-lg transition-transform hover:scale-105"
-      >
-        🎨 Customize
-      </button>
-    )
+    return null
   }
 
   const renderSkinTonePreview = () => {
