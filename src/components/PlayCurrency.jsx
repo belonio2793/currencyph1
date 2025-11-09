@@ -520,7 +520,16 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }
     const updated = { ...character }
     updated.wealth = Number(updated.wealth || 0) - asset.price
-    updated.properties = (updated.properties || []).concat({ ...asset, purchased_at: new Date().toISOString() })
+    updated.properties = (updated.properties || []).concat({
+      ...asset,
+      purchased_at: new Date().toISOString(),
+      location_x: Math.random() * 300,
+      location_y: Math.random() * 350,
+      current_value: asset.price,
+      owner_id: character.id || 'player',
+      upgrade_level: 0,
+      property_type: asset.type || 'business'
+    })
     updated.income_rate = Number(updated.income_rate || 0) + Number(asset.income || 0)
     setCharacter(updated)
     persistCharacterPartial(updated)
