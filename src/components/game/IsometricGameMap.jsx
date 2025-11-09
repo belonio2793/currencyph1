@@ -754,11 +754,6 @@ export default function IsometricGameMap({
       if (keysPressed.current['a'] || keysPressed.current['arrowleft']) vx -= moveSpeed
       if (keysPressed.current['d'] || keysPressed.current['arrowright']) vx += moveSpeed
 
-      // Debug keys every 60 frames
-      if (avatarAnimationFrame.current % 60 === 0 && (Object.keys(keysPressed.current).some(k => keysPressed.current[k]))) {
-        console.log('Keys pressed:', Object.keys(keysPressed.current).filter(k => keysPressed.current[k]))
-      }
-
       if (vx !== 0 || vy !== 0) {
         const targetAngle = Math.atan2(vy, vx) * (180 / Math.PI)
         setAvatarAngle(prev => {
