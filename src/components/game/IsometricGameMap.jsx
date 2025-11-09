@@ -63,9 +63,16 @@ export default function IsometricGameMap({
   const particlePoolRef = useRef([])
   const MAX_PARTICLES = 200
 
-  // Static layer caching: pre-render tiles to avoid per-frame redraw
-  const staticLayerCanvasRef = useRef(null)
-  const staticLayerDirtyRef = useRef(true) // Mark dirty when properties/city changes
+  // Gradient cache: reuse gradients instead of creating new ones every frame
+  const gradientCacheRef = useRef({})
+
+  // Helper to get or create cached gradient
+  const getCachedGradient = useCallback((ctx, key, builder) => {
+    if (!gradientCacheRef.current[key]) {
+      gradientCacheRef.current[key] = builder(ctx)
+    }
+    return gradientCacheRef.current[key]
+  }, [])
 
   const TILE_SIZE = 64
   const GRID_WIDTH = 24
