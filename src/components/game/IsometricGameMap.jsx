@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
-import { PHILIPPINES_CITIES, getCityById, convertLatLngToGameCoords, convertGameCoordsToLatLng } from '../../data/philippinesGeography'
+import { getCityById, convertGameCoordsToLatLng } from '../../data/philippinesGeography'
 import { COSMETICS, getCosmeticOption } from '../../lib/characterCosmetics'
 
 export default function IsometricGameMap({
