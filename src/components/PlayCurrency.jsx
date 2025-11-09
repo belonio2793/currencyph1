@@ -1418,46 +1418,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   </div>
                 </div>
 
-                {mapViewMode === 'manila' ? (
-                  <div style={{ height: 520 }} className="border border-slate-700 rounded overflow-hidden">
-                    <ManilaEnhancedMap
-                      character={character}
-                      properties={(character.properties || []).map(normalizeProperty)}
-                      onPropertyClick={(property) => {
-                        const reward = 20 + Math.floor(Math.random() * 80)
-                        setCharacter((c) => {
-                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 5 }
-                          persistCharacterPartial(updated)
-                          if (userId) saveCharacterToDB(updated)
-                          return updated
-                        })
-                        loadLeaderboard()
-                      }}
-                      onMapClick={(district) => {
-                        // Bonus for exploring districts
-                        const reward = 10 + Math.floor(Math.random() * 20)
-                        setCharacter((c) => {
-                          const updated = { ...c, wealth: Number(c.wealth || 0) + reward, xp: Number(c.xp || 0) + 2 }
-                          persistCharacterPartial(updated)
-                          if (userId) saveCharacterToDB(updated)
-                          return updated
-                        })
-                        loadLeaderboard()
-                      }}
-                      onPropertyDragEnd={(property) => {
-                        const updatedProps = (character.properties || []).map(p =>
-                          p.id === property.id ? property : p
-                        )
-                        const updated = { ...character, properties: updatedProps }
-                        setCharacter(updated)
-                        persistCharacterPartial(updated)
-                        if (userId) saveCharacterToDB(updated)
-                      }}
-                      isInteractive={true}
-                      zoom={1}
-                    />
-                  </div>
-                ) : mapViewMode === 'isometric' ? (
+                {mapViewMode === 'isometric' ? (
                   <div style={{ height: 520 }} className="border border-slate-700 rounded">
                     <IsometricGameMap
                       properties={(character.properties || []).map(normalizeProperty)}
