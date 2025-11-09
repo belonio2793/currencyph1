@@ -562,6 +562,24 @@ export default function IsometricGameMap({
     }
 
 
+    // If placing a property, draw a ghosted building at mouse
+    if (placingProperty && mousePosRef.current) {
+      const m = mousePosRef.current
+      const centerX = width / 2
+      const centerY = height / 2
+      const z = zoomRef.current || 1
+      const worldX = (m.x - centerX + cameraPos.x * z) / z
+      const worldY = (m.y - centerY + cameraPos.y * z) / z
+      const grid = isometricToGrid(worldX, worldY)
+      const gridX = Math.max(0, Math.min(GRID_WIDTH - 1, grid.x))
+      const gridY = Math.max(0, Math.min(GRID_HEIGHT - 1, grid.y))
+      const iso = gridToIsometric(gridX, gridY)
+      ctx.save()
+      ctx.globalAlpha = 0.75
+      drawBuilding(ctx, iso.x, iso.y, placingProperty.id || placingProperty.type || 'default', 1, true)
+      ctx.restore()
+    }
+
     // Avatar
     const avatarScreenPosRaw = gameToIsometric(avatarPos.x, avatarPos.y)
     const avatarScreenPos = { x: Math.round(avatarScreenPosRaw.x), y: Math.round(avatarScreenPosRaw.y) }
