@@ -180,6 +180,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [matchRequests, setMatchRequests] = useState([])
   const [cityFocus, setCityFocus] = useState('Manila')
   const [cityStats, setCityStats] = useState({})
+  const [cosmetics, setCosmetics] = useState(DEFAULT_COSMETICS)
+  const [customizationOpen, setCustomizationOpen] = useState(false)
 
   useEffect(() => {
     let mounted = true
