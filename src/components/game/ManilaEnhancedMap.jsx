@@ -454,8 +454,8 @@ export default function ManilaEnhancedMap({
 
       <div className="p-2 bg-slate-800 border-t border-slate-700 text-xs text-slate-400">
         <div className="flex items-center justify-between">
-          <span>Properties owned: {properties.length}</span>
-          <span>Zoom: {(zoom * 100).toFixed(0)}%</span>
+          <span>Properties owned: {properties.length} | Pan position: ({mapOffset.x.toFixed(0)}, {mapOffset.y.toFixed(0)})</span>
+          <span className="text-emerald-400">🔍 Zoom: {(zoom * 100).toFixed(0)}% (0.5x - 3x)</span>
         </div>
       </div>
     </div>
