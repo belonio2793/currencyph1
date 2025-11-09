@@ -715,6 +715,68 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  // Confirm a placement made on the map
+  const confirmPlacement = async ({ x, y, gridX, gridY }) => {
+    if (!placingAsset || !character) return
+    // Ensure one building per square: check remoteAssets and character.properties
+    const occupied = ((character.properties || [])
+      .concat(remoteAssets || [])
+      .some(p => Math.round((p.location_x || 0)) === Math.round(x) && Math.round((p.location_y || 0)) === Math.round(y)))
+    if (occupied) {
+      setError('Square already occupied')
+      setPlacingAsset(null)
+      return
+    }
+
+    // Create placement object
+    const prop = {
+      id: `${placingAsset.id}-${Date.now()}-${character.id || 'guest'}`,
+      name: placingAsset.name,
+      price: placingAsset.price,
+      income: placingAsset.income,
+      purchased_at: new Date().toISOString(),
+      location_x: x,
+      location_y: y,
+      grid_x: gridX,
+      grid_y: gridY,
+      current_value: placingAsset.price,
+      owner_id: character.id || 'guest',
+      upgrade_level: 0,
+      property_type: placingAsset.type || 'business'
+    }
+
+    // Deduct money and persist
+    const updated = { ...character }
+    updated.wealth = Number(updated.wealth || 0) - (placingAsset.price || 0)
+    updated.income_rate = Number(updated.income_rate || 0) + Number(placingAsset.income || 0)
+    updated.properties = (updated.properties || []).concat(prop)
+
+    setCharacter(updated)
+    persistCharacterPartial(updated)
+    if (userId) saveCharacterToDB(updated)
+
+    // Persist asset globally
+    try {
+      await supabase.from('game_assets').insert([prop])
+    } catch (e) {
+      console.warn('Could not insert game_asset', e)
+    }
+
+    setPlacingAsset(null)
+    await loadLeaderboard()
+  }
+
+  useEffect(() => {
+    return () => {
+      // cleanup supabase channel if present
+      try {
+        if (presenceChannelRef.current && typeof supabase.removeChannel === 'function') {
+          supabase.removeChannel(presenceChannelRef.current)
+        }
+      } catch (e) {}
+    }
+  }, [])
+
   const createCharacter = async ({ name, starterJob }) => {
     if (!name || !name.trim()) {
       throw new Error('Character name is required')
