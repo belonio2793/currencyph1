@@ -1453,10 +1453,21 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                   />
                 )}
 
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3">
-                  {jobs.map((job, idx) => (
+                <div className="mb-3 p-3 bg-slate-900/40 border border-slate-700/50 rounded text-xs text-slate-300">
+                  <div className="font-semibold mb-1">{CITY_BONUSES[cityFocus]?.emoji} {cityFocus}: {CITY_BONUSES[cityFocus]?.description || 'City'}</div>
+                  <div className="text-slate-400">Matching jobs get bonus rewards in this city</div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {jobs.map((job, idx) => {
+                    const cityBonus = getCityBonus(job, cityFocus)
+                    const bonusPercent = Math.round(cityBonus * 100)
+                    return (
                     <div key={`job-${idx}-${jobSeed}`} className={`p-3 border rounded-lg transition-all ${workingJobId === job.name ? 'bg-blue-600/30 border-blue-500' : 'bg-slate-800/60 border-slate-700'}`}>
-                      <div className="font-semibold text-slate-100">{job.name}</div>
+                      <div className="flex items-start justify-between mb-1">
+                        <div className="font-semibold text-slate-100">{job.name}</div>
+                        {cityBonus > 0 && <span className="text-xs bg-emerald-600/40 text-emerald-300 px-2 py-0.5 rounded">+{bonusPercent}%</span>}
+                      </div>
                       <div className="text-xs text-slate-400">Reward: {formatMoney(job.reward)} • XP: {job.xp}</div>
                       <div className="text-xs text-slate-500 mt-1">Difficulty: {'⭐'.repeat(job.difficulty)}</div>
                       <div className="mt-3">
@@ -1481,7 +1492,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                         </div>
                       )}
                     </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             </div>
