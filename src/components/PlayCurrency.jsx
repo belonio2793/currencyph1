@@ -680,6 +680,17 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         const newLevel = Math.max(1, Math.floor((updated.xp || 0) / 100) + 1)
         if (newLevel !== updated.level) updated.level = newLevel
 
+        // Apply stat boosts from job
+        const statBoost = getStatBoostFromJob(job)
+        setCharacterStats(prev => ({
+          strength: prev.strength + statBoost.strength,
+          intelligence: prev.intelligence + statBoost.intelligence,
+          charisma: prev.charisma + statBoost.charisma,
+          endurance: prev.endurance + statBoost.endurance,
+          dexterity: prev.dexterity + statBoost.dexterity,
+          luck: prev.luck + statBoost.luck
+        }))
+
         // persist
         persistCharacterPartial(updated)
         // Save using the updated object (avoid stale closure)
