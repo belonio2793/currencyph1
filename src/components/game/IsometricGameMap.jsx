@@ -1255,6 +1255,11 @@ export default function IsometricGameMap({
             className="px-2 py-1 text-xs bg-slate-700 text-white border border-slate-600 rounded hover:bg-slate-600 transition-colors"
             title="Zoom in"
           >+</button>
+          <button
+            onClick={() => setCameraPos({ x: avatarPos.x, y: avatarPos.y })}
+            className="px-3 py-1 text-xs bg-emerald-600 text-white border border-emerald-700 rounded hover:bg-emerald-700 transition-colors font-medium"
+            title="Center map on character"
+          >⊙ Center</button>
         </div>
 
         {/* Enhanced Property Tooltip */}
