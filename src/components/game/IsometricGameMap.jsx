@@ -91,6 +91,11 @@ export default function IsometricGameMap({
     particlesRef.current = cleaned
   }, [])
 
+  // Mark static layer as dirty when properties or city changes (so it gets re-rendered)
+  useEffect(() => {
+    staticLayerDirtyRef.current = true
+  }, [selectedCity, properties])
+
   const PROPERTY_COLORS = {
     house: '#ff9800',
     business: '#2196f3',
