@@ -13,7 +13,8 @@ export default function IsometricGameMap({
   cosmetics = null,
   isWorking = false,
   workProgress = 0,
-  workingJobId = null
+  workingJobId = null,
+  initialAvatarPos = null
 }) {
   const containerRef = useRef(null)
   const canvasRef = useRef(null)
@@ -24,7 +25,7 @@ export default function IsometricGameMap({
   const [tooltipData, setTooltipData] = useState(null)
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const [avatarPos, setAvatarPos] = useState({ x: 150, y: 175 })
+  const [avatarPos, setAvatarPos] = useState(initialAvatarPos && typeof initialAvatarPos.x === 'number' && typeof initialAvatarPos.y === 'number' ? initialAvatarPos : { x: 150, y: 175 })
   const [avatarFacing, setAvatarFacing] = useState(1)
   const [avatarMoving, setAvatarMoving] = useState(false)
   const [selectedCity, setSelectedCity] = useState(city)
@@ -69,6 +70,23 @@ export default function IsometricGameMap({
     const c = getCityById(selectedCity.toLowerCase().replace(/\s+/g, '-'))
     setCityData(c || null)
   }, [selectedCity])
+
+  // Keep internal city in sync with parent prop
+  useEffect(() => {
+    if (city && city !== selectedCity) {
+      setSelectedCity(city)
+      if (!initialAvatarPos) setAvatarPos({ x: 150, y: 175 })
+      setCameraPos({ x: 0, y: 0 })
+      targetCameraRef.current = { x: 0, y: 0 }
+    }
+  }, [city])
+
+  // Apply externally provided initial avatar position
+  useEffect(() => {
+    if (initialAvatarPos && typeof initialAvatarPos.x === 'number' && typeof initialAvatarPos.y === 'number') {
+      setAvatarPos(initialAvatarPos)
+    }
+  }, [initialAvatarPos])
 
   const gridToIsometric = useCallback((gridX, gridY) => {
     const isoX = (gridX - gridY) * (TILE_SIZE / 2)
