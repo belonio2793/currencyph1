@@ -180,29 +180,56 @@ export default function ManilaEnhancedMap({
   const drawLandmarks = (ctx) => {
     LANDMARKS.forEach((landmark) => {
       const isHovered = hoveredItem?.id === landmark.id
-      const radius = isHovered ? 16 : 12
+      const radius = isHovered ? 18 : 14
 
-      ctx.fillStyle = 'rgba(255, 200, 0, 0.8)'
+      // Outer glow
+      ctx.fillStyle = isHovered ? 'rgba(251, 191, 36, 0.3)' : 'rgba(251, 191, 36, 0.2)'
+      ctx.beginPath()
+      ctx.arc(landmark.x, landmark.y, radius + 4, 0, Math.PI * 2)
+      ctx.fill()
+
+      // Main circle
+      ctx.fillStyle = isHovered ? '#fbbf24' : '#fcd34d'
       ctx.beginPath()
       ctx.arc(landmark.x, landmark.y, radius, 0, Math.PI * 2)
       ctx.fill()
 
-      ctx.strokeStyle = '#FF8C00'
-      ctx.lineWidth = 2
+      ctx.strokeStyle = isHovered ? '#d97706' : '#f59e0b'
+      ctx.lineWidth = 3
       ctx.stroke()
 
-      ctx.fillStyle = '#000'
-      ctx.font = 'bold 20px Arial'
+      ctx.fillStyle = '#1f2937'
+      ctx.font = 'bold 22px Arial'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText(landmark.emoji, landmark.x, landmark.y)
 
       if (isHovered) {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)'
-        ctx.fillRect(landmark.x - 50, landmark.y - 25, 100, 20)
-        ctx.fillStyle = '#fff'
-        ctx.font = '11px Arial'
-        ctx.fillText(landmark.name, landmark.x, landmark.y - 15)
+        ctx.fillStyle = 'rgba(31, 41, 55, 0.95)'
+        ctx.strokeStyle = '#fbbf24'
+        ctx.lineWidth = 2
+
+        const textWidth = ctx.measureText(landmark.name).width
+        const boxWidth = Math.max(textWidth + 16, 110)
+
+        ctx.beginPath()
+        ctx.moveTo(landmark.x - boxWidth/2 + 6, landmark.y - 35)
+        ctx.lineTo(landmark.x + boxWidth/2 - 6, landmark.y - 35)
+        ctx.quadraticCurveTo(landmark.x + boxWidth/2, landmark.y - 35, landmark.x + boxWidth/2, landmark.y - 29)
+        ctx.lineTo(landmark.x + boxWidth/2, landmark.y - 15)
+        ctx.quadraticCurveTo(landmark.x + boxWidth/2, landmark.y - 9, landmark.x + boxWidth/2 - 6, landmark.y - 9)
+        ctx.lineTo(landmark.x - boxWidth/2 + 6, landmark.y - 9)
+        ctx.quadraticCurveTo(landmark.x - boxWidth/2, landmark.y - 9, landmark.x - boxWidth/2, landmark.y - 15)
+        ctx.lineTo(landmark.x - boxWidth/2, landmark.y - 29)
+        ctx.quadraticCurveTo(landmark.x - boxWidth/2, landmark.y - 35, landmark.x - boxWidth/2 + 6, landmark.y - 35)
+        ctx.closePath()
+        ctx.fill()
+        ctx.stroke()
+
+        ctx.fillStyle = '#fbbf24'
+        ctx.font = 'bold 11px Arial'
+        ctx.textAlign = 'center'
+        ctx.fillText(landmark.name, landmark.x, landmark.y - 22)
       }
     })
   }
