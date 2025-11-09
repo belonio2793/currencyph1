@@ -204,6 +204,8 @@ export class NPCManager {
     this.spawnPoints = []
     this.events = []
     this.eventTimer = 0
+    this.frameCounter = 0
+    this.updateStep = 2 // only run full NPC updates every N frames to reduce CPU/network
     this.initializeSpawns()
   }
 
