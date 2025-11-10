@@ -28,12 +28,27 @@ async function fetchCoinsList() {
   return await res.json()
 }
 
-function chooseCode(symbol, counts, id) {
-  const s = (symbol || '').toUpperCase()
-  if (!s) return id
-  if ((counts[s] || 0) === 1 && s.length <= 10) return s
-  // if duplicated symbol or too long, fallback to id
-  return id
+function sanitizeCodeRaw(str) {
+  return (str || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+}
+
+function chooseCode(symbol, counts, id, used) {
+  const s = sanitizeCodeRaw(symbol)
+  if (s && (counts[s] || 0) === 1 && s.length <= 10 && !used.has(s)) return s
+  // fallback: sanitize id and truncate
+  let cand = sanitizeCodeRaw(id)
+  if (!cand) cand = (symbol || '').toUpperCase().replace(/[^A-Z0-9]/g, '')
+  if (!cand) cand = 'CRYPTO'
+  if (cand.length > 10) cand = cand.substring(0, 10)
+  let unique = cand
+  let idx = 1
+  while (used.has(unique)) {
+    const suffix = String(idx)
+    const base = cand.substring(0, Math.max(0, 10 - suffix.length))
+    unique = (base + suffix).toUpperCase()
+    idx += 1
+  }
+  return unique
 }
 
 async function upsertCryptos(cryptos) {
