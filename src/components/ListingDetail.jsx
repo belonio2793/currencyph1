@@ -654,7 +654,7 @@ export default function ListingDetail({ slug, onBack }) {
         <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
           {(listing.phone_number || listing.phone) && (
             <div className="border border-slate-200 p-4 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">📞 Phone</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">Phone</h3>
               <a
                 href={`tel:${listing.phone_number || listing.phone}`}
                 className="text-blue-600 hover:underline"
@@ -673,7 +673,7 @@ export default function ListingDetail({ slug, onBack }) {
           )}
           {listing.website && (
             <div className="border border-slate-200 p-4 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">🌐 Website</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">Website</h3>
               <a
                 href={listing.website}
                 target="_blank"
@@ -686,7 +686,7 @@ export default function ListingDetail({ slug, onBack }) {
           )}
           {listing.web_url && (
             <div className="md:col-span-2 border border-slate-200 p-4 rounded-lg">
-              <h3 className="font-semibold text-slate-900 mb-2">🏆 TripAdvisor</h3>
+              <h3 className="font-semibold text-slate-900 mb-2">TripAdvisor</h3>
               <a
                 href={listing.web_url}
                 target="_blank"
@@ -702,13 +702,13 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Awards */}
         {listing.awards && listing.awards.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">🏆 Awards & Recognition</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Awards & Recognition</h2>
             <div className="flex flex-wrap gap-3">
               {listing.awards.map((award, idx) => {
                 const awardText = typeof award === 'string' ? award : award.name || award
                 return (
                   <span key={idx} className="px-4 py-2 bg-amber-100 text-amber-800 rounded-full text-sm font-medium">
-                    🏆 {awardText}
+                    {awardText}
                   </span>
                 )
               })}
@@ -719,7 +719,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Nearby Attractions */}
         {listing.nearby_attractions && listing.nearby_attractions.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">📍 Nearby Attractions</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Nearby Attractions</h2>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {listing.nearby_attractions.slice(0, 10).map((attraction, idx) => (
                 <li key={idx} className="flex items-start gap-2 text-slate-700">
