@@ -11,6 +11,7 @@ import MarketEconomyUI from './game/MarketEconomyUI'
 import MatchSpectator from './game/MatchSpectator'
 import PropertyManagementPanel from './game/PropertyManagementPanel'
 import PropertyEmpireAchievements from './game/PropertyEmpireAchievements'
+import Player3DModal from './game/Player3DModal'
 import { validateCosmetics, DEFAULT_COSMETICS } from '../lib/characterCosmetics'
 
 // Lightweight, self-contained RPG-like game tailored for MVP.
