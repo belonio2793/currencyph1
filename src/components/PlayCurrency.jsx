@@ -239,6 +239,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const passiveTimerRef = useRef(null)
   const presenceChannelRef = useRef(null)
   const presenceTimerRef = useRef(null)
+  const assetsChannelRef = useRef(null)
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1, sizeMultiplier: 10 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
   const [matchRequests, setMatchRequests] = useState([])
@@ -428,8 +429,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               })
               .subscribe()
 
-            // store channel on presenceChannelRef to cleanup
-            presenceChannelRef.current = channel
+            // store channel on assetsChannelRef to cleanup
+            assetsChannelRef.current = channel
           } catch (e) {
             console.warn('Could not subscribe to game_assets channel', e)
           }
@@ -761,59 +762,110 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       return
     }
 
-    // Create placement object
-    const prop = {
-      id: `${placingAsset.id}-${Date.now()}-${character.id || 'guest'}`,
-      name: placingAsset.name,
-      price: placingAsset.price,
-      income: placingAsset.income,
-      purchased_at: new Date().toISOString(),
-      location_x: x,
-      location_y: y,
-      grid_x: gridX,
-      grid_y: gridY,
-      current_value: placingAsset.price,
-      owner_id: character.id || 'guest',
-      upgrade_level: 0,
-      property_type: placingAsset.type || 'business'
-    }
-
-    // Deduct money and persist
-    const updated = { ...character }
-    updated.wealth = Number(updated.wealth || 0) - (placingAsset.price || 0)
-    updated.income_rate = Number(updated.income_rate || 0) + Number(placingAsset.income || 0)
-    updated.properties = (updated.properties || []).concat(prop)
-
-    setCharacter(updated)
-    persistCharacterPartial(updated)
-    if (userId) saveCharacterToDB(updated)
-
-    // Persist asset globally
+    // Call server-side RPC to atomically place asset and update character
     try {
-      const { error: insertErr } = await supabase.from('game_assets').insert([prop])
-      if (insertErr) throw insertErr
-    } catch (e) {
-      console.warn('Could not insert game_asset to supabase, saving locally', e)
-      try {
-        const key = 'pc_local_game_assets'
-        const raw = localStorage.getItem(key)
-        const arr = raw ? JSON.parse(raw) : []
-        arr.push(prop)
-        localStorage.setItem(key, JSON.stringify(arr))
-        setRemoteAssets(prev => (prev || []).concat(prop))
-      } catch (le) { console.warn('Failed to persist local game asset', le) }
-    }
+      const rpcParams = {
+        p_owner_id: userId || character.id || null,
+        p_owner_character_id: character.id || null,
+        p_name: placingAsset.name,
+        p_property_type: placingAsset.type || 'business',
+        p_price: placingAsset.price || 0,
+        p_income: placingAsset.income || 0,
+        p_grid_x: gridX || null,
+        p_grid_y: gridY || null,
+        p_location_x: Math.round(x || 0),
+        p_location_y: Math.round(y || 0),
+        p_metadata: {}
+      }
 
-    setPlacingAsset(null)
-    await loadLeaderboard()
+      const { data, error: rpcErr } = await supabase.rpc('place_asset_atomic', rpcParams)
+      if (rpcErr) throw rpcErr
+
+      // Attempt to resolve returned asset and updated character from RPC
+      let returnedAsset = null
+      let returnedChar = null
+
+      if (Array.isArray(data)) {
+        // common case: RPC returns single object or array with asset
+        if (data.length === 1) {
+          const d = data[0]
+          if (d && typeof d === 'object') {
+            returnedAsset = d.asset || d.game_asset || d
+            returnedChar = d.character || d.updated_character || null
+          }
+        } else {
+          // pick first object that looks like an asset
+          returnedAsset = data.find(i => i && i.owner_id) || data[0]
+        }
+      } else if (data && typeof data === 'object') {
+        returnedAsset = data.asset || data.game_asset || data
+        returnedChar = data.character || data.updated_character || null
+      }
+
+      // If RPC returned an updated character, use it
+      if (returnedChar && returnedChar.id) {
+        setCharacter(returnedChar)
+      } else {
+        // apply local update based on placingAsset if RPC didn't return character
+        const updated = { ...character }
+        updated.wealth = Number(updated.wealth || 0) - (placingAsset.price || 0)
+        updated.income_rate = Number(updated.income_rate || 0) + Number(placingAsset.income || 0)
+        const prop = {
+          id: (returnedAsset && returnedAsset.id) ? returnedAsset.id : `${placingAsset.id}-${Date.now()}-${character.id || 'guest'}`,
+          name: placingAsset.name,
+          price: placingAsset.price,
+          income: placingAsset.income,
+          purchased_at: new Date().toISOString(),
+          location_x: Math.round(x),
+          location_y: Math.round(y),
+          grid_x: gridX,
+          grid_y: gridY,
+          current_value: placingAsset.price,
+          owner_id: character.id || 'guest',
+          upgrade_level: 0,
+          property_type: placingAsset.type || 'business'
+        }
+        updated.properties = (updated.properties || []).concat(prop)
+        setCharacter(updated)
+        persistCharacterPartial(updated)
+        if (userId) saveCharacterToDB(updated)
+      }
+
+      // Add returned asset to remoteAssets if present
+      if (returnedAsset) {
+        setRemoteAssets(prev => {
+          const copy = [...(prev || [])]
+          const idx = copy.findIndex(a => a.id === returnedAsset.id)
+          if (idx === -1) copy.push(returnedAsset)
+          else copy[idx] = returnedAsset
+          return copy
+        })
+      }
+
+    } catch (e) {
+      console.warn('place_asset_atomic RPC failed', e)
+      setError('Could not place asset: ' + ((e && e.message) || String(e)))
+    } finally {
+      setPlacingAsset(null)
+      await loadLeaderboard()
+    }
   }
 
   useEffect(() => {
     return () => {
-      // cleanup supabase channel if present
+      // cleanup supabase channels if present
       try {
         if (presenceChannelRef.current && typeof supabase.removeChannel === 'function') {
           supabase.removeChannel(presenceChannelRef.current)
+        } else if (presenceChannelRef.current && typeof presenceChannelRef.current.unsubscribe === 'function') {
+          presenceChannelRef.current.unsubscribe()
+        }
+      } catch (e) {}
+      try {
+        if (assetsChannelRef.current && typeof supabase.removeChannel === 'function') {
+          supabase.removeChannel(assetsChannelRef.current)
+        } else if (assetsChannelRef.current && typeof assetsChannelRef.current.unsubscribe === 'function') {
+          assetsChannelRef.current.unsubscribe()
         }
       } catch (e) {}
     }
