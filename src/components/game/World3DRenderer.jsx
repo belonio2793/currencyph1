@@ -99,6 +99,17 @@ export default function World3DRenderer({
     const bodyMesh = new THREE.Mesh(body, playerMat)
     bodyMesh.position.y = 15
     playerGroup.add(bodyMesh)
+
+    // Add username label above player
+    const labelTexture = createTextTexture('Player', 48)
+    const labelMat = new THREE.MeshStandardMaterial({ map: labelTexture, emissive: 0x00d4ff, emissiveIntensity: 0.3 })
+    const labelGeo = new THREE.PlaneGeometry(60, 20)
+    const labelMesh = new THREE.Mesh(labelGeo, labelMat)
+    labelMesh.position.y = 60
+    labelMesh.rotation.x = 0
+    playerGroup.add(labelMesh)
+    playerLabelRef.current = labelMesh
+
     scene.add(playerGroup)
     playerRef.current = playerGroup
     const avatarX = initialAvatarPos?.x ?? 0
