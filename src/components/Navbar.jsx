@@ -230,7 +230,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               {userEmail && (
                 <div className="border-t border-slate-100 mt-2 pt-2">
                   <div className="text-xs font-bold text-green-700 px-3 py-2 uppercase tracking-wide">Loans</div>
-                  {borrowOptions.map(option => (
+                  {loansOptions.map(option => (
                     <button
                       key={option.id}
                       onClick={() => {
