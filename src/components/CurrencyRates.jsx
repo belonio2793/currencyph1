@@ -46,8 +46,8 @@ export default function CurrencyRates() {
 
     fetchRates()
 
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchRates, 30000)
+    // Auto-refresh hourly in development to reduce API calls
+    const interval = setInterval(fetchRates, 60 * 60 * 1000)
     return () => clearInterval(interval)
   }, [])
 
