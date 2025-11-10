@@ -376,7 +376,7 @@ export default function Rates({ globalCurrency }) {
           </div>
           <div className="text-right">
             <div className="text-2xl font-light text-slate-900">{rate != null ? rate.toFixed(4) : '—'}</div>
-            <div className="text-xs text-slate-500">1 {globalCurrency}</div>
+            <div className="text-xs text-slate-500">1 {baseCurrency}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
