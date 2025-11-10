@@ -666,23 +666,32 @@ export default function Rates({ globalCurrency }) {
                   <div className="text-sm text-slate-600">
                     {item.type === 'fiat' ? (
                       (() => {
-                        // Prefer USD -> CODE if present in currency_rates
-                        const usdPair = exchangeRates[`USD_${item.code}`]
-                        if (typeof usdPair === 'number') return usdPair.toFixed(6)
-                        // Try direct pair baseCurrency -> code
-                        const direct = getRate(baseCurrency, item.code)
-                        if (typeof direct === 'number') return direct.toFixed(6)
-                        // Try reverse (code -> baseCurrency)
+                        // If this is the base currency, show 1.000000
+                        if (item.code === baseCurrency) return '1.000000'
+
+                        // Preferred: compute base->item directly
+                        let baseToItem = getRate(baseCurrency, item.code)
+                        if (typeof baseToItem === 'number') return baseToItem.toFixed(6)
+
+                        // Try via USD pairs: base->item = (USD->item) / (USD->base)
+                        const usdToItem = exchangeRates[`USD_${item.code}`]
+                        const usdToBase = exchangeRates[`USD_${baseCurrency}`]
+                        if (typeof usdToItem === 'number' && typeof usdToBase === 'number' && usdToBase > 0) {
+                          const computed = usdToItem / usdToBase
+                          if (isFinite(computed)) return computed.toFixed(6)
+                        }
+
+                        // Try reverse pair (item->base)
                         const reverse = exchangeRates[`${item.code}_${baseCurrency}`]
                         if (typeof reverse === 'number' && reverse > 0) return (1 / reverse).toFixed(6)
+
                         return '—'
                       })()
                     ) : (
                       (() => {
-                        // For crypto, show USD price if available (cryptoRates uses USD->price converted to baseCurrency earlier)
+                        // For crypto, show converted price in baseCurrency if available
                         const p = cryptoRates[item.code]
                         if (typeof p === 'number') return p.toFixed(2)
-                        // fallback: show USD per unit if present in currency_rates as USD_BASE then compute
                         const usdToBase = exchangeRates[`USD_${baseCurrency}`] || 1
                         const defaultPrice = defaultCryptoPrices[item.code]
                         return defaultPrice ? (defaultPrice * (usdToBase || 1)).toFixed(2) : '—'
