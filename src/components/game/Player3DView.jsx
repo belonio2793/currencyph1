@@ -10,7 +10,8 @@ export default function Player3DView({
   placingProperty = null,
   onConfirmPlace = null,
   onCancelPlace = null,
-  onPropertyClick = null
+  onPropertyClick = null,
+  onWorldReady = null
 }) {
   const containerRef = useRef(null)
   const worldRef = useRef(null)
