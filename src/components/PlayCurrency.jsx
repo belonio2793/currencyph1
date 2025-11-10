@@ -1656,6 +1656,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       onConfirmPlace={(coords) => confirmPlacement(coords)}
                       onCancelPlace={() => setPlacingAsset(null)}
                       onPropertyClick={(prop) => { setPropertyPanelOpen(true) }}
+                      onWorldReady={(w) => { worldInstanceRef.current = w }}
                     />
                   ) : (
                     <WorldMap
