@@ -108,7 +108,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
           {/* Total Debt */}
           <div className="bg-gradient-to-br from-red-50 to-red-100 rounded-xl p-6 border border-red-200">
             <p className="text-sm text-red-600 font-medium uppercase tracking-wider mb-1">Total Debt</p>
-            <p className="text-3xl font-light text-red-900">{getTotalDebt()} {globalCurrency}</p>
+            <p className="text-3xl font-light text-red-900">{totalDebtConverted != null ? totalDebtConverted : getTotalDebt()} {globalCurrency}</p>
           </div>
         </div>
 
