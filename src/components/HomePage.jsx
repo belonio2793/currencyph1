@@ -95,6 +95,10 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const personalLoans = loans.filter(l => l.loan_type === 'personal')
   const businessLoans = loans.filter(l => l.loan_type === 'business')
 
+  const net = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
+  const isNegativeNet = net < 0
+  const netDisplay = Number.isFinite(net) ? net.toFixed(2) : '0.00'
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -112,10 +116,10 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             <p className="text-3xl font-light text-blue-900">{totalBalanceConverted != null ? totalBalanceConverted : getTotalBalance()} {globalCurrency}</p>
           </div>
 
-          {/* Active Loans */}
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-xl p-6 border border-orange-200">
-            <p className="text-sm text-orange-600 font-medium uppercase tracking-wider mb-1">Active Loans</p>
-            <p className="text-3xl font-light text-orange-900">{getActiveLoanCount()}</p>
+          {/* Net (Balance - Debt) */}
+          <div className={`rounded-xl p-6 border ${isNegativeNet ? 'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200' : 'bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200'}`}>
+            <p className={`text-sm font-medium uppercase tracking-wider mb-1 ${isNegativeNet ? 'text-rose-600' : 'text-emerald-600'}`}>Net</p>
+            <p className={`text-3xl font-light ${isNegativeNet ? 'text-rose-900' : 'text-emerald-900'}`}>{netDisplay} {globalCurrency}</p>
           </div>
 
           {/* Total Debt */}
