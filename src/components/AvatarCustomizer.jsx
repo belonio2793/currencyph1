@@ -166,7 +166,7 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
         <div className="w-3/5 overflow-y-auto p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {AVATAR_STYLES.map((style) => (
-              <div key={style.id} className={`relative p-0 rounded-lg transition-all transform ${selectedStyle?.id === style.id ? 'ring-2 ring-emerald-400 scale-105' : hoveredId === style.id ? 'scale-102' : ''}`}>
+              <div key={style.id} className={`relative p-0 rounded-lg transition-all transform ${selectedStyle?.id === style.id ? 'ring-2 ring-emerald-400 scale-105' : hoveredId === style.id ? 'scale-105' : ''}`}>
                 <button
                   onClick={() => { setHoveredId(style.id); if (!editing) { const updated = style; if (typeof onSelect === 'function') onSelect(updated, { close: false }) } }}
                   onMouseEnter={() => setHoveredId(style.id)}
