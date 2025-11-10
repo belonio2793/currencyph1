@@ -149,10 +149,31 @@ async function upsertPairs(pairs) {
 
 async function main() {
   console.log('Calling fetch-rates...')
-  const payload = await callFetchRates()
+  let payload = await callFetchRates()
   if (!payload) {
-    console.error('No data returned from fetch-rates')
-    process.exit(1)
+    console.warn('fetch-rates returned no data; falling back to public APIs (exchangerate.host + CoinGecko)')
+    try {
+      // 1) fetch fiat rates from exchangerate.host (base=USD)
+      const er = await (await fetch('https://api.exchangerate.host/latest?base=USD')).json()
+      // er.rates: map code -> rate (1 USD = rate * CODE)
+      const exchangeRates = {}
+      if (er && er.rates) {
+        for (const k of Object.keys(er.rates)) {
+          const v = er.rates[k]
+          if (isFinite(v)) exchangeRates[k] = v
+        }
+      }
+
+      // 2) fetch crypto prices from CoinGecko (USD)
+      const coinIds = ['bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether']
+      const cgResp = await (await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinIds.join(',')}&vs_currencies=usd`)).json()
+      const cryptoPrices = cgResp || null
+
+      payload = { exchangeRates, cryptoPrices }
+    } catch (fallbackErr) {
+      console.error('Fallback public API fetch failed:', fallbackErr)
+      process.exit(1)
+    }
   }
 
   // Normalize USD map
