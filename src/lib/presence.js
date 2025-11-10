@@ -117,19 +117,27 @@ export async function getUserPresence(userId) {
 }
 
 export async function subscribeToUserPresence(userId, callback) {
-  const channel = supabase
-    .channel(`user_presence:${userId}`)
-    .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'user_presence',
-      filter: `user_id=eq.${userId}`
-    }, (payload) => {
-      callback(payload.new.status)
-    })
-    .subscribe()
+  try {
+    if (!supabase || typeof supabase.channel !== 'function') return () => {}
+    const channel = supabase
+      .channel(`user_presence:${userId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'user_presence',
+        filter: `user_id=eq.${userId}`
+      }, (payload) => {
+        try { callback(payload.new.status) } catch (e) { console.error('presence callback error', e) }
+      })
+      .subscribe()
 
-  return () => supabase.removeChannel(channel)
+    return () => {
+      try { supabase.removeChannel(channel) } catch (e) { console.debug('Failed to remove presence channel', e) }
+    }
+  } catch (err) {
+    console.debug('subscribeToUserPresence not available', err)
+    return () => {}
+  }
 }
 
 export async function subscribeToMultiplePresence(userIds, callback) {
