@@ -464,10 +464,11 @@ export class WorldIsometric {
     this.inventory.push(item)
   }
 
-  enablePlacementMode(item) {
+  enablePlacementMode(item, ownerId = null) {
     // item: inventory item to place, e.g. {type:'house', label:'House'}
     this._placementMode = Boolean(item)
     this._placementPrototype = item || null
+    this._placementOwnerId = ownerId || null
     // create a ghost mesh to follow mouse
     if (this._placementMode && this._placementPrototype) {
       if (!this._placementGhost) this._placementGhost = this._createPropertyMesh(this._placementPrototype.type, 0, true)
@@ -490,6 +491,7 @@ export class WorldIsometric {
       try { if (this._placementMoveHandler) window.removeEventListener('pointermove', this._placementMoveHandler) } catch(e){}
       this._placementGhost = null
       this._placementMoveHandler = null
+      this._placementOwnerId = null
     }
   }
 
