@@ -43,7 +43,14 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             {userEmail && (
               <div className="ml-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex items-center">
                 <span className="text-slate-400 mr-2 text-xs">Total</span>
-                <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
+                {/* Display converted NET (balance - debt) in the selected display currency */}
+                {typeof totalNet !== 'undefined' ? (
+                  <span className={`font-medium ${totalNet < 0 ? 'text-rose-600' : 'text-slate-900'}`}>
+                    {Number(totalNet || 0).toFixed(2)} {globalCurrency}
+                  </span>
+                ) : (
+                  <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
+                )}
               </div>
             )}
             {/* Borrow Money Dropdown - Next to Total Balance */}
