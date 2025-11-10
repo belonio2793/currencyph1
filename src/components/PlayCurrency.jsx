@@ -249,6 +249,28 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const worldInstanceRef = useRef(null)
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1, sizeMultiplier: 10 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
+
+  // Called by PlayerIsometricView when avatar moves locally
+  const handleWorldCharacterMove = async (pos) => {
+    try {
+      setCharacterPosition(pos)
+      // broadcast to presence channel so other clients can see our position
+      try {
+        if (presenceChannelRef.current) {
+          await presenceChannelRef.current.send({ type: 'broadcast', event: 'player_position', payload: { user_id: userId || character?.id, name: character?.name, x: pos.x, y: pos.y } })
+        }
+      } catch(e) { /* ignore */ }
+
+      // persist position to DB and local character
+      if (character) {
+        const updated = { ...character, position_x: Math.round(pos.x || 0), position_y: Math.round(pos.y || 0), current_location: pos.city || character.current_location }
+        persistCharacterPartial(updated)
+        if (userId && character.id) {
+          try { await gameAPI.updateCharacterPosition(character.id, updated.position_x, updated.position_y, updated.current_location) } catch(e) {}
+        }
+      }
+    } catch (e) { console.warn('handleWorldCharacterMove failed', e) }
+  }
   const [matchRequests, setMatchRequests] = useState([])
   const [cityFocus, setCityFocus] = useState('Manila')
   const [cityStats, setCityStats] = useState({})
