@@ -101,11 +101,12 @@ export default function World3DRenderer({
     if (avatarStyle) {
       const playerGroup = new THREE.Group()
       const avatarMat = new THREE.MeshStandardMaterial({
-        color: avatarStyle?.color || 0xd4a574,
-        metalness: 0.6,
-        roughness: 0.4,
-        emissive: avatarStyle?.emissive || 0x6b5a3a,
-        emissiveIntensity: 0.2
+        // default to blue when style doesn't provide a color
+        color: avatarStyle?.color || 0x00a8ff,
+        metalness: 0.3,
+        roughness: 0.6,
+        emissive: avatarStyle?.emissive || 0x000000,
+        emissiveIntensity: 0.0
       })
 
       const addLabel = (name) => {
