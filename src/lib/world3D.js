@@ -168,45 +168,52 @@ export class World3D {
 
     // Create fallback texture while loading Google Maps
     const fallbackCanvas = document.createElement('canvas')
-    fallbackCanvas.width = 1024
-    fallbackCanvas.height = 1024
+    fallbackCanvas.width = 2048
+    fallbackCanvas.height = 2048
     const ctx = fallbackCanvas.getContext('2d')
 
-    // Base color
-    ctx.fillStyle = '#6b6b75'
-    ctx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height)
+    // Create a tiled atlas with stylized colors and dark outlines
+    const tile = 128
+    const cols = fallbackCanvas.width / tile
+    const rows = fallbackCanvas.height / tile
 
-    // Draw subtle grid tiles
-    const tile = 64
-    ctx.strokeStyle = 'rgba(0,0,0,0.18)'
-    ctx.lineWidth = 2
-    for (let x = 0; x < fallbackCanvas.width; x += tile) {
-      ctx.beginPath()
-      ctx.moveTo(x + 0.5, 0)
-      ctx.lineTo(x + 0.5, fallbackCanvas.height)
-      ctx.stroke()
-    }
-    for (let y = 0; y < fallbackCanvas.height; y += tile) {
-      ctx.beginPath()
-      ctx.moveTo(0, y + 0.5)
-      ctx.lineTo(fallbackCanvas.width, y + 0.5)
-      ctx.stroke()
+    const palette = [
+      '#6b6b75', '#5b6b62', '#7a6b85', '#6b7a6b', '#7a6b5b', '#5b6b7a'
+    ]
+
+    for (let y = 0; y < rows; y++) {
+      for (let x = 0; x < cols; x++) {
+        const cx = x * tile
+        const cy = y * tile
+        const base = palette[(x + y) % palette.length]
+        // base fill
+        ctx.fillStyle = base
+        ctx.fillRect(cx, cy, tile, tile)
+
+        // cell shading: top-left highlight
+        const grad = ctx.createLinearGradient(cx, cy, cx + tile, cy + tile)
+        grad.addColorStop(0, 'rgba(255,255,255,0.04)')
+        grad.addColorStop(1, 'rgba(0,0,0,0.06)')
+        ctx.fillStyle = grad
+        ctx.fillRect(cx, cy, tile, tile)
+
+        // inner darker border
+        ctx.strokeStyle = 'rgba(8,10,12,0.9)'
+        ctx.lineWidth = 6
+        ctx.strokeRect(cx + 2, cy + 2, tile - 4, tile - 4)
+
+        // occasional accent
+        if (Math.random() < 0.08) {
+          ctx.fillStyle = 'rgba(255,240,180,0.9)'
+          ctx.fillRect(cx + tile/4, cy + tile/4, tile/6, tile/6)
+        }
+      }
     }
 
-    // Add random colored accents like properties
-    for (let i = 0; i < 200; i++) {
-      const rx = Math.floor(Math.random() * (fallbackCanvas.width / tile)) * tile + 8
-      const ry = Math.floor(Math.random() * (fallbackCanvas.height / tile)) * tile + 8
-      const w = Math.random() * (tile - 16) + 8
-      const h = Math.random() * (tile - 16) + 8
-      ctx.fillStyle = `rgba(${Math.floor(30 + Math.random()*200)}, ${Math.floor(30 + Math.random()*200)}, ${Math.floor(30 + Math.random()*200)}, ${0.6 + Math.random()*0.4})`
-      ctx.fillRect(rx, ry, w, h)
-    }
-
-    // Slight noise overlay
+    // Slight pixel-noise for charm
     const imageData = ctx.getImageData(0,0,fallbackCanvas.width,fallbackCanvas.height)
     for (let i = 0; i < imageData.data.length; i += 4) {
-      const v = (Math.random() - 0.5) * 10
+      const v = (Math.random() - 0.5) * 6
       imageData.data[i] = Math.max(0, Math.min(255, imageData.data[i] + v))
       imageData.data[i+1] = Math.max(0, Math.min(255, imageData.data[i+1] + v))
       imageData.data[i+2] = Math.max(0, Math.min(255, imageData.data[i+2] + v))
@@ -216,14 +223,14 @@ export class World3D {
     const fallbackTexture = new THREE.CanvasTexture(fallbackCanvas)
     fallbackTexture.wrapS = THREE.RepeatWrapping
     fallbackTexture.wrapT = THREE.RepeatWrapping
-    fallbackTexture.repeat.set(6,6)
-    fallbackTexture.magFilter = THREE.LinearFilter
-    fallbackTexture.minFilter = THREE.LinearMipmapLinearFilter
+    fallbackTexture.repeat.set(3,3)
+    fallbackTexture.magFilter = THREE.NearestFilter
+    fallbackTexture.minFilter = THREE.LinearMipMapLinearFilter
 
-    const groundMaterial = new THREE.MeshStandardMaterial({
+    const groundMaterial = new THREE.MeshToonMaterial({
       map: fallbackTexture,
-      roughness: 0.9,
-      metalness: 0.05
+      gradientMap: null,
+      flatShading: true
     })
 
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
