@@ -26,6 +26,9 @@ export default function Player3DView({
     world.cameraConfig.showNameplates = false
     world.start()
     worldRef.current = world
+    if (typeof onWorldReady === 'function') {
+      try { onWorldReady(world) } catch(e) { console.warn('onWorldReady callback failed', e) }
+    }
 
     // property click handler
     world.setPropertyClickHandler((prop) => {
