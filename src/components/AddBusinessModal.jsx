@@ -290,19 +290,25 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     }, [pos])
 
     const eventHandlers = {
-      dragend() {
-        const marker = markerRef.current
-        if (marker) {
-          const latlng = marker.getLatLng()
+      dragend(e) {
+        try {
+          const latlng = e.target.getLatLng()
           const lat = latlng.lat
           const lng = latlng.lng
           setPos([lat, lng])
           setForm(prev => ({ ...prev, latitude: String(lat), longitude: String(lng) }))
-        }
+        } catch (ex) {}
       }
     }
 
-    return pos ? <Marker draggable={true} eventHandlers={eventHandlers} ref={markerRef} position={pos} /> : null
+    return pos ? (
+      <Marker
+        draggable={true}
+        eventHandlers={eventHandlers}
+        ref={(el) => { markerRef.current = el ? el : null }}
+        position={pos}
+      />
+    ) : null
   }
 
   if (pending) {
