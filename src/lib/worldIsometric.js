@@ -203,6 +203,32 @@ export class WorldIsometric {
       }
     }
 
+    // simple procedural road network (every ~6 tiles create a road)
+    const roadGroup = new THREE.Group()
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.8, metalness: 0.1 })
+    const roadWidth = Math.max(8, Math.floor(tileSize * 0.4))
+    for (let r = 0; r <= rows; r++) {
+      if (r % 6 === 0) {
+        const z = r * tileSize - halfH
+        const geom = new THREE.BoxGeometry(cols * tileSize + roadWidth, 0.2, roadWidth)
+        const road = new THREE.Mesh(geom, roadMat)
+        road.position.set(0, 0.05, z)
+        road.receiveShadow = false
+        roadGroup.add(road)
+      }
+    }
+    for (let c = 0; c <= cols; c++) {
+      if (c % 6 === 0) {
+        const x = c * tileSize - halfW
+        const geom = new THREE.BoxGeometry(roadWidth, 0.2, rows * tileSize + roadWidth)
+        const road = new THREE.Mesh(geom, roadMat)
+        road.position.set(x, 0.05, 0)
+        road.receiveShadow = false
+        roadGroup.add(road)
+      }
+    }
+    this.scene.add(roadGroup)
+
     // soft grid lines using thin boxes for crispness
     const gridGroup = new THREE.Group()
     const lineMat = new THREE.MeshBasicMaterial({ color: 0x0f1620 })
