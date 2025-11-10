@@ -344,6 +344,10 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 if (selected.cosmetics) {
                   setCosmetics(validateCosmetics(selected.cosmetics))
                 }
+                // Load saved stats if present
+                if (selected.stats && typeof selected.stats === 'object') {
+                  try { setCharacterStats(selected.stats) } catch(e) {}
+                }
               } else {
                 setCharacter(null)
               }
