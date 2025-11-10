@@ -413,8 +413,10 @@ export default function Rates({ globalCurrency }) {
   // UI state for stacked fiat + crypto view
   const [viewMode, setViewMode] = useState('fiat') // controls the right-side list
   const [search, setSearch] = useState('')
-  const [selectedFiat, setSelectedFiat] = useState(null)
-  const [selectedCrypto, setSelectedCrypto] = useState(null)
+  const [selectedFiat, setSelectedFiat] = useState(() => {
+    return fallbackFiats.find(f => f.code === baseCurrency) || { code: baseCurrency, name: baseCurrency }
+  })
+  const [selectedCrypto, setSelectedCrypto] = useState(() => ({ code: 'BTC', name: 'Bitcoin' }))
 
   useEffect(() => {
     // ensure allCurrencies has sensible entries and PHP is first
@@ -511,8 +513,8 @@ export default function Rates({ globalCurrency }) {
             <p className="text-xs text-slate-500">{selectedFiat.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-light text-slate-900">{rate != null ? rate.toFixed(4) : '—'}</div>
-            <div className="text-xs text-slate-500">1 {baseCurrency}</div>
+            <div className="text-2xl font-light text-slate-900">{(rate != null && selectedFiat && selectedFiat.code !== baseCurrency) ? rate.toFixed(4) : '—'}</div>
+            <div className="text-xs text-slate-500">{selectedFiat && selectedFiat.code !== baseCurrency ? `1 ${baseCurrency}` : ''}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
@@ -757,7 +759,7 @@ export default function Rates({ globalCurrency }) {
                         if (selectedFiat.code === item.code) return '—'
 
                         const pair = getPairRate(selectedFiat.code, item.code)
-                        return (typeof pair === 'number' ? pair.toFixed(6) : '��')
+                        return (typeof pair === 'number' ? pair.toFixed(6) : '—')
                       })()
                     ) : (
                       (() => {
