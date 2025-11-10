@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 
+import React, { useState } from 'react'
+
 // Define 50 different avatar styles with color and material variations
 const AVATAR_STYLES = [
   // Classic colors
