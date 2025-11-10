@@ -77,7 +77,7 @@ function initClient() {
             return await originalFetch(...args)
           } catch (err) {
             // Abort errors should be propagated immediately
-            if (err && (err.name === 'AbortError' || err.name === 'DOMException')) throw err
+            if (err && err.name === 'AbortError') throw err
 
             // On last attempt, instead of throwing a raw TypeError which causes noisy console traces
             // return a synthetic Response with 503 status so callers receive a proper response object.
