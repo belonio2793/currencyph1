@@ -37,16 +37,10 @@ export default function CharacterCustomizer({ isOpen, onToggle }) {
     return null
   }
 
-  const itemSlots = [
-    { id: 'head', label: '👤', name: 'Head' },
-    { id: 'chest', label: '👕', name: 'Chest' },
-    { id: 'hands', label: '🧤', name: 'Hands' },
-    { id: 'legs', label: '👖', name: 'Legs' },
-    { id: 'feet', label: '👞', name: 'Feet' },
-    { id: 'accessory1', label: '✨', name: 'Accessory 1' },
-    { id: 'accessory2', label: '💎', name: 'Accessory 2' },
-    { id: 'weapon', label: '⚔️', name: 'Weapon' }
-  ]
+  const itemSlots = Array.from({ length: 12 }, (_, i) => ({
+    id: `slot-${i}`,
+    index: i
+  }))
 
   return (
     <div
@@ -58,45 +52,49 @@ export default function CharacterCustomizer({ isOpen, onToggle }) {
         zIndex: 50,
         userSelect: isDragging ? 'none' : 'auto'
       }}
-      className="w-80 bg-gradient-to-br from-slate-900 to-slate-800 border border-purple-500/30 rounded-lg shadow-2xl overflow-hidden"
+      className="w-96 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-slate-700 rounded-lg shadow-2xl overflow-hidden"
     >
       <div
         onMouseDown={handleMouseDown}
-        className="bg-gradient-to-r from-purple-600 to-pink-600 px-4 py-3 flex items-center justify-between cursor-move"
+        className="bg-gradient-to-r from-teal-700 to-teal-800 px-4 py-3 flex items-center justify-between cursor-move border-b border-teal-600"
       >
-        <h3 className="text-lg font-bold text-white">Character Customizer</h3>
+        <div className="flex items-center gap-2">
+          <span className="text-xl">🎒</span>
+          <h3 className="text-lg font-bold text-white">Inventory</h3>
+        </div>
         <button
           onClick={onToggle}
           data-no-drag
-          className="text-white hover:text-slate-200 transition-colors"
+          className="text-white hover:text-slate-200 transition-colors text-xl"
         >
           ✕
         </button>
       </div>
 
-      <div className="p-4 space-y-4">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-slate-300">Item Slots:</label>
-          <div className="grid grid-cols-4 gap-3">
-            {itemSlots.map(slot => (
-              <div
-                key={slot.id}
-                className="aspect-square bg-slate-700/50 border-2 border-slate-600 rounded-lg hover:border-purple-500 transition-colors cursor-pointer flex flex-col items-center justify-center gap-1 p-2"
-                title={slot.name}
-              >
-                <span className="text-2xl">{slot.label}</span>
-                <span className="text-xs text-slate-400 text-center">{slot.name}</span>
+      <div className="p-4 space-y-4 bg-slate-800/50">
+        <div className="grid grid-cols-4 gap-3">
+          {itemSlots.map(slot => (
+            <div
+              key={slot.id}
+              className="relative aspect-square cursor-pointer group"
+            >
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-900 rounded border-2 border-slate-500 hover:border-teal-500 transition-all">
+                <div className="absolute inset-1 bg-gradient-to-br from-slate-700 via-slate-900 to-slate-950 rounded flex items-center justify-center text-slate-500 text-3xl hover:text-slate-400 transition-colors">
+                  <span className="opacity-40">📦</span>
+                </div>
               </div>
-            ))}
-          </div>
+              <div className="absolute inset-0 rounded opacity-0 group-hover:opacity-20 bg-teal-500 pointer-events-none transition-opacity"></div>
+            </div>
+          ))}
         </div>
 
-        <div className="pt-3 border-t border-slate-700 flex gap-2">
+        <div className="pt-2 border-t border-slate-700 flex items-center justify-between">
+          <div className="text-xs font-medium text-slate-400">Gold: <span className="text-yellow-400 font-bold">0</span></div>
           <button
             onClick={onToggle}
-            className="flex-1 px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-sm font-medium text-white transition-colors"
+            className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 rounded text-sm font-medium text-white transition-all shadow-lg"
           >
-            Done
+            Close
           </button>
         </div>
       </div>
