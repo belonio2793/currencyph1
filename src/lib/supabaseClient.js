@@ -46,6 +46,13 @@ function createDummyClient() {
 function initClient() {
   if (_client) return _client
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+    // Basic URL sanity check
+    if (typeof SUPABASE_URL !== 'string' || (!SUPABASE_URL.startsWith('http://') && !SUPABASE_URL.startsWith('https://'))) {
+      console.error('[supabase-client] Invalid SUPABASE_URL:', SUPABASE_URL)
+      _client = createDummyClient()
+      return _client
+    }
+
     try {
       // Initialize with default global fetch - don't override to avoid interfering with runtime fetch behavior
       console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
