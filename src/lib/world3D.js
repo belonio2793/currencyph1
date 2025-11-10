@@ -894,6 +894,9 @@ export class World3D {
             ctx.fillText(Math.floor(frac * 100) + '%', canvas.width/2, 40)
             tex.needsUpdate = true
           } catch(e) {}
+
+          // billboard the bar towards the camera for readability
+          try { if (bar && this.camera) bar.lookAt(this.camera.position) } catch(e) {}
         }
 
         // Simple procedural animation for simple avatars (fallback models)
