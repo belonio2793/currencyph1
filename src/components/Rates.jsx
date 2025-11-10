@@ -366,7 +366,7 @@ export default function Rates({ globalCurrency }) {
 
   const renderFiatCard = (isPrimary) => {
     if (!selectedFiat) return null
-    const rate = getRate(globalCurrency, selectedFiat.code)
+    const rate = getRate(baseCurrency, selectedFiat.code)
     return (
       <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center justify-between">
@@ -414,7 +414,7 @@ export default function Rates({ globalCurrency }) {
       setCryptoInput('')
       return
     }
-    const rate = getRate(globalCurrency, selectedFiat.code) // 1 global = rate selected
+    const rate = getRate(baseCurrency, selectedFiat.code) // 1 global = rate selected
     const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1))
     if (!rate || !cryptoPrice) {
       setCryptoInput('')
@@ -440,7 +440,7 @@ export default function Rates({ globalCurrency }) {
       setFiatInput('')
       return
     }
-    const rate = getRate(globalCurrency, selectedFiat.code)
+    const rate = getRate(baseCurrency, selectedFiat.code)
     const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1))
     if (!rate || !cryptoPrice) {
       setFiatInput('')
@@ -507,7 +507,7 @@ export default function Rates({ globalCurrency }) {
                       onChange={(e) => onChangeFiat(e.target.value)}
                       className="w-full mt-1 px-3 py-2 border rounded"
                       placeholder="0.00"
-                      disabled={!selectedFiat || !selectedCrypto || getRate(globalCurrency, selectedFiat ? selectedFiat.code : '') == null}
+                      disabled={!selectedFiat || !selectedCrypto || getRate(baseCurrency, selectedFiat ? selectedFiat.code : '') == null}
                     />
                     <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '—'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
                     {cryptoInput !== '' && (
@@ -563,7 +563,7 @@ export default function Rates({ globalCurrency }) {
                   </div>
                   <div className="text-sm text-slate-600">
                     {item.type === 'fiat' ? (
-                      (() => { const r = getRate(globalCurrency, item.code); return r != null ? r.toFixed(4) : '—' })()
+                      (() => { const r = getRate(baseCurrency, item.code); return r != null ? r.toFixed(4) : '—' })()
                     ) : (
                       (() => { const p = cryptoRates[item.code] || defaultCryptoPrices[item.code] * (exchangeRates[`USD_${baseCurrency}`] || 1); return p ? p.toFixed(2) : '—' })()
                     )}
