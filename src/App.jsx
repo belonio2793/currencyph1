@@ -49,6 +49,9 @@ export default function App() {
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
   const [totalBalancePHP, setTotalBalancePHP] = useState(0)
+  const [totalBalanceConverted, setTotalBalanceConverted] = useState(0)
+  const [totalDebtConverted, setTotalDebtConverted] = useState(0)
+  const totalNet = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
 
   // Content locker: enable by setting VITE_CONTENT_LOCKER=TRUE (client) or CONTENT_LOCKER=TRUE (server)
   const contentLocked = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTENT_LOCKER === 'TRUE') ||
@@ -299,6 +302,56 @@ export default function App() {
       try { if (channel && typeof channel.unsubscribe === 'function') channel.unsubscribe() } catch (e) { /* ignore */ }
     }
   }, [userId])
+
+  // Compute converted totals (balance and debt) in the selected display currency so the Navbar can show a synced NET
+  useEffect(() => {
+    let cancelled = false
+    const computeConvertedTotals = async () => {
+      if (!userId || userId.includes('guest-local')) {
+        setTotalBalanceConverted(0)
+        setTotalDebtConverted(0)
+        return
+      }
+      try {
+        const wallets = await wisegcashAPI.getWallets(userId).catch(() => [])
+        const balancePromises = (wallets || []).map(async (w) => {
+          const bal = Number(w.balance || 0)
+          if (!bal) return 0
+          const from = w.currency_code || globalCurrency
+          if (from === globalCurrency) return bal
+          const rate = await wisegcashAPI.getExchangeRate(from, globalCurrency)
+          return rate ? bal * Number(rate) : 0
+        })
+        const balanceValues = await Promise.all(balancePromises)
+        const balanceTotal = balanceValues.reduce((s, v) => s + v, 0)
+
+        const loans = await wisegcashAPI.getLoans(userId).catch(() => [])
+        const debtPromises = (loans || []).map(async (l) => {
+          const d = Number(l.remaining_balance || l.total_owed || 0)
+          if (!d) return 0
+          const from = l.currency || l.currency_code || globalCurrency
+          if (from === globalCurrency) return d
+          const rate = await wisegcashAPI.getExchangeRate(from, globalCurrency)
+          return rate ? d * Number(rate) : 0
+        })
+        const debtValues = await Promise.all(debtPromises)
+        const debtTotal = debtValues.reduce((s, v) => s + v, 0)
+
+        if (!cancelled) {
+          setTotalBalanceConverted(balanceTotal)
+          setTotalDebtConverted(debtTotal)
+        }
+      } catch (err) {
+        console.warn('Failed to compute converted totals for navbar:', err)
+        if (!cancelled) {
+          setTotalBalanceConverted(0)
+          setTotalDebtConverted(0)
+        }
+      }
+    }
+    computeConvertedTotals()
+    return () => { cancelled = true }
+  }, [userId, globalCurrency])
 
   const handleAuthSuccess = async (user) => {
     setUserId(user.id)
