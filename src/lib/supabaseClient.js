@@ -51,7 +51,9 @@ function initClient() {
       try {
         // Force CORS mode and sane defaults
         const opts = Object.assign({ mode: 'cors' }, init)
-        const res = await (typeof window !== 'undefined' && window.fetch ? window.fetch : fetch)(input, opts)
+        const fetchImpl = (typeof globalThis !== 'undefined' && globalThis.fetch) ? globalThis.fetch : (typeof window !== 'undefined' && window.fetch) ? window.fetch : null
+        if (!fetchImpl) throw new Error('No fetch implementation available')
+        const res = await fetchImpl(input, opts)
         return res
       } catch (err) {
         console.error('[supabase-client] fetch failed for', input, err)
