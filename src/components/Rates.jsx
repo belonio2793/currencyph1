@@ -99,6 +99,23 @@ export default function Rates({ globalCurrency }) {
     }
   }, [globalCurrency])
 
+  // Fetch raw currency_rates for verification/debugging
+  useEffect(() => {
+    let cancelled = false
+    const fetchRawRates = async () => {
+      try {
+        const { data, error } = await supabase.from('currency_rates').select('from_currency,to_currency,rate,updated_at').order('updated_at', { ascending: false }).limit(200)
+        if (!cancelled) setRawRates(data || [])
+      } catch (err) {
+        console.debug('Failed to fetch raw currency_rates:', err)
+        if (!cancelled) setRawRates([])
+      }
+    }
+    fetchRawRates()
+    const int = setInterval(fetchRawRates, 60 * 60 * 1000)
+    return () => { cancelled = true; clearInterval(int) }
+  }, [])
+
   const loadRates = async () => {
     try {
       setLoading(true)
