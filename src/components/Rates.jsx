@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react'
-import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/payments'
 import { currencyAPI } from '../lib/currencyAPI'
 import { supabase } from '../lib/supabaseClient'
