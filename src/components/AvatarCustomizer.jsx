@@ -107,15 +107,10 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
                     : 'border-slate-700 bg-slate-800 hover:border-slate-500'
                 }`}
               >
-                {/* Color preview sphere */}
-                <div
-                  className="w-full aspect-square rounded-lg mb-2 shadow-lg"
-                  style={{
-                    background: `linear-gradient(135deg, 
-                      rgb(${(style.color >> 16) & 255}, ${(style.color >> 8) & 255}, ${style.color & 255}) 0%,
-                      rgb(${(style.emissive >> 16) & 255}, ${(style.emissive >> 8) & 255}, ${style.emissive & 255}) 100%)`
-                  }}
-                />
+                {/* Avatar preview (emoji if available, fallback to color) */}
+                <div className="w-full aspect-square rounded-lg mb-2 shadow-lg flex items-center justify-center text-4xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06))' }}>
+                  <span>{(typeof AVATAR_PREVIEWS !== 'undefined' && AVATAR_PREVIEWS[style.id]) || '🙂'}</span>
+                </div>
 
                 {/* Style name */}
                 <div className="text-center">
