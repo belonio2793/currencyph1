@@ -119,7 +119,8 @@ export default function Rates({ globalCurrency }) {
 
       // 1) Prefer Supabase currency_rates table (real-time source)
       try {
-        const { data, error } = await supabase.from('currency_rates').select('from_currency,to_currency,rate,updated_at')
+        // select only expected columns to avoid schema mismatch
+        const { data, error } = await supabase.from('currency_rates').select('from_currency,to_currency,rate')
         if (!error && data && data.length) {
           data.forEach(r => {
             if (r && r.from_currency && r.to_currency && r.rate != null) {
@@ -135,7 +136,7 @@ export default function Rates({ globalCurrency }) {
 
       // 2) Fallback: try cached_rates table (if your SQL populated it)
       try {
-        const { data: cached, error: cachedErr } = await supabase.from('cached_rates').select('from_currency,to_currency,rate,updated_at')
+        const { data: cached, error: cachedErr } = await supabase.from('cached_rates').select('from_currency,to_currency,rate')
         if (!cachedErr && cached && cached.length) {
           cached.forEach(r => {
             if (r && r.from_currency && r.to_currency && r.rate != null) {
