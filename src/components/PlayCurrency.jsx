@@ -1787,6 +1787,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       properties={[...((character.properties || []).map(normalizeProperty)), ...((remoteAssets || []).map(normalizeProperty))].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i)}
                       character={character}
                       initialAvatarPos={initialAvatarPos}
+                      avatarStyle={selectedAvatarStyle}
                       onPropertyPlace={async ({ x, z }) => {
                         // reuse confirmPlacement API which expects { x, y, gridX, gridY }
                         try {
