@@ -461,8 +461,10 @@ export class World3D {
       throw new Error('Avatar URL is required')
     }
 
+    // If cached, return cloned scene and original animations
     if (modelCache.has(url)) {
-      return modelCache.get(url).clone()
+      const cached = modelCache.get(url)
+      return { scene: cached.scene.clone(), animations: cached.animations }
     }
 
     return new Promise((resolve, reject) => {
@@ -470,24 +472,33 @@ export class World3D {
         reject(new Error('Avatar loading timeout'))
       }, 15000)
 
-      const onSuccess = (model) => {
+      const onSuccess = (gltf) => {
         clearTimeout(timeout)
 
-        // Setup shadows
-        model.traverse((node) => {
-          if (node.isMesh) {
-            node.castShadow = true
-            node.receiveShadow = true
-          }
-          if (node.isSkinnedMesh) {
-            node.castShadow = true
-            node.receiveShadow = true
-          }
-        })
+        const model = gltf.scene || gltf.scenes?.[0]
+        const animations = gltf.animations || []
 
-        // Cache and clone
-        modelCache.set(url, model)
-        resolve(model.clone())
+        if (model) {
+          // Setup shadows
+          model.traverse((node) => {
+            if (node.isMesh) {
+              node.castShadow = true
+              node.receiveShadow = true
+            }
+            if (node.isSkinnedMesh) {
+              node.castShadow = true
+              node.receiveShadow = true
+            }
+          })
+
+          // Cache original gltf scene + animations
+          modelCache.set(url, { scene: model, animations })
+
+          // Resolve with a clone of the scene plus animations array
+          resolve({ scene: model.clone(), animations })
+        } else {
+          reject(new Error('GLTF had no scene'))
+        }
       }
 
       const onError = (error) => {
@@ -496,8 +507,8 @@ export class World3D {
         reject(error)
       }
 
-      // Load as GLTF
-      gltfLoader.load(url, (gltf) => onSuccess(gltf.scene), undefined, onError)
+      // Load as GLTF and return full gltf in onSuccess
+      gltfLoader.load(url, (gltf) => onSuccess(gltf), undefined, onError)
     })
   }
 
@@ -573,22 +584,27 @@ export class World3D {
       }
 
       // Try loading the avatar model if URL is provided
+      let modelNode = null
+      let animations = null
+
       if (modelUrl) {
         try {
-          model = await this.loadAvatarModel(modelUrl)
+          const loaded = await this.loadAvatarModel(modelUrl)
+          modelNode = loaded && loaded.scene ? loaded.scene : null
+          animations = (loaded && loaded.animations) || null
         } catch (e) {
           console.warn('Failed to load avatar, using fallback:', e)
-          model = this.createSimpleAvatar(name, colorOverride || 0x00a8ff)
+          modelNode = this.createSimpleAvatar(name, colorOverride || 0x00a8ff)
         }
       } else {
         // Create a simple avatar if no URL
-        model = this.createSimpleAvatar(name, colorOverride || 0x00a8ff)
+        modelNode = this.createSimpleAvatar(name, colorOverride || 0x00a8ff)
       }
 
       // Container for player (model + nameplate)
       const group = new THREE.Group()
       group.position.set(x, 0, z)
-      group.add(model)
+      group.add(modelNode)
 
       // Nameplate (only if enabled)
       if (this.cameraConfig.showNameplates) {
@@ -613,15 +629,26 @@ export class World3D {
 
       this.scene.add(group)
 
+      // Setup animation mixer if animations present
+      let mixer = null
+      try {
+        if (animations && animations.length) {
+          mixer = new THREE.AnimationMixer(modelNode)
+          // play first animation as default loop
+          try { mixer.clipAction(animations[0], modelNode).play() } catch(e) { /* ignore */ }
+        }
+      } catch (e) { console.warn('Failed to create animation mixer', e) }
+
       // Store with animation state
       this.players.set(userId, {
         group,
-        model,
+        model: modelNode,
         targetPos: { x, z },
         velocity: { x: 0, z: 0 },
         isMoving: false,
         direction: 0,
-        animations: null
+        animations: animations || null,
+        mixer
       })
 
       // If this is the first player added, select it
@@ -944,6 +971,15 @@ export class World3D {
 
     // Update player positions with smooth movement
     this.players.forEach((_, userId) => this.movePlayer(userId, 25))
+
+    // Advance any animation mixers
+    try {
+      this.players.forEach((pl) => {
+        if (pl && pl.mixer) {
+          try { pl.mixer.update(this.deltaTime) } catch(e) {}
+        }
+      })
+    } catch(e) {}
 
     // Update NPC positions with AI-like behavior
     this.npcs.forEach((npc, id) => {
