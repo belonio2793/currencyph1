@@ -535,6 +535,56 @@ export default function Rates({ globalCurrency }) {
     }
   }
 
+  // Helper: compute rate from 'from' currency to 'to' currency using exchangeRates map
+  const getPairRate = (from, to) => {
+    if (!from || !to) return null
+    if (from === to) return null
+    // direct
+    const direct = exchangeRates[`${from}_${to}`]
+    if (typeof direct === 'number' && isFinite(direct)) return direct
+    // try via USD
+    const usdToFrom = exchangeRates[`USD_${from}`]
+    const usdToTo = exchangeRates[`USD_${to}`]
+    if (typeof usdToFrom === 'number' && typeof usdToTo === 'number' && usdToFrom > 0) {
+      const computed = usdToTo / usdToFrom
+      if (isFinite(computed)) return computed
+    }
+    // try via baseCurrency
+    const baseToFrom = exchangeRates[`${baseCurrency}_${from}`]
+    const baseToTo = exchangeRates[`${baseCurrency}_${to}`]
+    if (typeof baseToFrom === 'number' && typeof baseToTo === 'number' && baseToFrom > 0) {
+      const computed = baseToTo / baseToFrom
+      if (isFinite(computed)) return computed
+    }
+    // try reverse
+    const rev = exchangeRates[`${to}_${from}`]
+    if (typeof rev === 'number' && rev > 0) return 1 / rev
+    return null
+  }
+
+  // helper: fallback crypto USD price from default map
+  const cryptoUsdFallback = (code) => {
+    // try approximate mapping
+    const mapping = {
+      BTC: defaultCryptoPrices.BTC,
+      ETH: defaultCryptoPrices.ETH,
+      LTC: defaultCryptoPrices.LTC,
+      DOGE: defaultCryptoPrices.DOGE,
+      XRP: defaultCryptoPrices.XRP,
+      ADA: defaultCryptoPrices.ADA,
+      SOL: defaultCryptoPrices.SOL,
+      AVAX: defaultCryptoPrices.AVAX,
+      MATIC: defaultCryptoPrices.MATIC,
+      DOT: defaultCryptoPrices.DOT,
+      LINK: defaultCryptoPrices.LINK,
+      UNI: defaultCryptoPrices.UNI,
+      AAVE: defaultCryptoPrices.AAVE,
+      USDC: defaultCryptoPrices.USDC,
+      USDT: defaultCryptoPrices.USDT
+    }
+    return mapping[code] || null
+  }
+
   const onChangeFiat = (val) => {
     // accept empty input
     if (val === '' || val === null) {
@@ -707,7 +757,7 @@ export default function Rates({ globalCurrency }) {
                         if (selectedFiat.code === item.code) return '—'
 
                         const pair = getPairRate(selectedFiat.code, item.code)
-                        return (typeof pair === 'number' ? pair.toFixed(6) : '—')
+                        return (typeof pair === 'number' ? pair.toFixed(6) : '��')
                       })()
                     ) : (
                       (() => {
