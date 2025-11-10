@@ -42,8 +42,7 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [categories, setCategories] = useState([])
   const [categorySelect, setCategorySelect] = useState('')
   const [customCategory, setCustomCategory] = useState('')
-  // map picker state
-  const [mapOpen, setMapOpen] = useState(false)
+  // map picker state (inline map)
   const [missingFields, setMissingFields] = useState([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
@@ -489,53 +488,32 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                     {error && form.longitude && isNaN(parseFloat(form.longitude)) && <p className="text-xs text-red-600 mt-1">Longitude must be a valid number</p>}
                   </div>
                   
-                  <div className="md:col-span-2 flex items-center gap-4">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        if (location) setForm(prev => ({
-                          ...prev,
-                          latitude: String(location.latitude),
-                          longitude: String(location.longitude),
-                          city: prev.city || detectedCity || prev.city
-                        }))
-                      }}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Use my current location
-                    </button>
+                  <div className="md:col-span-2">
+                    <div className="flex items-center gap-4 mb-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (location) setForm(prev => ({
+                            ...prev,
+                            latitude: String(location.latitude),
+                            longitude: String(location.longitude),
+                            city: prev.city || detectedCity || prev.city
+                          }))
+                        }}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Use my current location
+                      </button>
+                      <div className="text-sm text-slate-500">Or pick a location on the map below</div>
+                    </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setMapOpen(true)}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Pick location on map
-                    </button>
-
-                    {mapOpen && (
-                      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-                        <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl h-[70vh] flex flex-col overflow-hidden">
-                          <div className="flex items-center justify-between p-4 border-b">
-                            <h3 className="text-lg font-semibold">Pick location on map</h3>
-                            <button onClick={() => setMapOpen(false)} className="text-slate-500 hover:text-slate-700">✕</button>
-                          </div>
-                          <div className="flex-1">
-                            <MapContainer center={[form.latitude ? parseFloat(form.latitude) : 14.5995, form.longitude ? parseFloat(form.longitude) : 120.9842]} zoom={13} className="w-full h-full">
-                              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
-                              {
-                                // Marker that sets coordinates on map click
-                              }
-                              <LocationMarker />
-                            </MapContainer>
-                          </div>
-                          <div className="flex items-center justify-end gap-2 p-4 border-t">
-                            <button onClick={() => setMapOpen(false)} className="px-4 py-2 border rounded hover:bg-slate-50">Cancel</button>
-                            <button onClick={() => setMapOpen(false)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Done</button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    <div className="w-full h-64 border rounded overflow-hidden">
+                      <MapContainer center={[form.latitude ? parseFloat(form.latitude) : 14.5995, form.longitude ? parseFloat(form.longitude) : 120.9842]} zoom={13} className="w-full h-full">
+                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+                        <LocationMarker />
+                      </MapContainer>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-2">Click the map to place the marker. Drag the marker to fine-tune location. Latitude/Longitude are synchronized with the inputs above.</p>
                   </div>
 
                   <div>
