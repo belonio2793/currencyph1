@@ -7,12 +7,25 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Fix leaflet default icon paths (Vite + ESM)
+let DEFAULT_LEAFLET_ICON = null
 try {
   delete L.Icon.Default.prototype._getIconUrl
+  const iconRetinaUrl = new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href
+  const iconUrl = new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href
+  const shadowUrl = new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href
   L.Icon.Default.mergeOptions({
-    iconRetinaUrl: new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href,
-    iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
-    shadowUrl: new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href
+    iconRetinaUrl,
+    iconUrl,
+    shadowUrl
+  })
+  DEFAULT_LEAFLET_ICON = L.icon({
+    iconUrl,
+    iconRetinaUrl,
+    shadowUrl,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
   })
 } catch(e) {
   // ignore in environments where leaflet isn't available
