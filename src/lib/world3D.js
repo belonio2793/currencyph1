@@ -864,6 +864,81 @@ export class World3D {
       }
     })
 
+    // Update any active player jobs (progress bars and simple procedural animations)
+    this.players.forEach((pl, uid) => {
+      try {
+        const player = pl
+        if (!player || !player.job) return
+        const now = performance.now()
+        const elapsed = now - (player.job.startTime || now)
+        const pct = Math.min(1, elapsed / (player.job.duration || 1))
+
+        // update progress bar visuals if present
+        const bar = player.job.bar
+        if (bar && bar.userData) {
+          const { width, fg, canvas, ctx, tex } = bar.userData
+          // update foreground width via scale.x and adjust position
+          const frac = Math.max(0, Math.min(1, pct))
+          if (fg) {
+            fg.scale.x = frac
+            // move fg so left edge stays aligned
+            fg.position.x = -width / 2 + (frac * width) / 2
+          }
+
+          // update label canvas with percent text
+          try {
+            ctx.clearRect(0,0,canvas.width,canvas.height)
+            ctx.fillStyle = 'rgba(255,255,255,0.95)'
+            ctx.font = 'bold 18px Arial'
+            ctx.textAlign = 'center'
+            ctx.fillText(Math.floor(frac * 100) + '%', canvas.width/2, 40)
+            tex.needsUpdate = true
+          } catch(e) {}
+        }
+
+        // Simple procedural animation for simple avatars (fallback models)
+        const model = player.model
+        if (model && player.job && player.job.active !== false) {
+          const animType = player.job.animType || player.job.name || 'work'
+          const t = (now - player.job.startTime) / 1000
+          // attempt to find arms by name
+          const leftArm = model.getObjectByName && model.getObjectByName('leftArm')
+          const rightArm = model.getObjectByName && model.getObjectByName('rightArm')
+
+          if (animType === 'typing') {
+            // small alternating arm movement
+            if (leftArm) leftArm.rotation.z = Math.sin(t * 8) * 0.25 - 0.25
+            if (rightArm) rightArm.rotation.z = Math.cos(t * 8) * 0.25 - 0.25
+          } else if (animType === 'hammer') {
+            // hammering swing with right arm
+            if (leftArm) leftArm.rotation.z = Math.sin(t * 3) * 0.1 - 0.1
+            if (rightArm) rightArm.rotation.x = Math.sin(t * 6) * 0.9 - 0.7
+          } else if (animType === 'serve') {
+            // serving/handing animation
+            if (leftArm) leftArm.rotation.z = Math.sin(t * 4) * 0.6 - 0.6
+            if (rightArm) rightArm.rotation.z = Math.cos(t * 4) * 0.4 - 0.2
+          } else {
+            // generic working/idle bob
+            if (leftArm) leftArm.rotation.z = Math.sin(t * 2) * 0.2 - 0.1
+            if (rightArm) rightArm.rotation.z = Math.cos(t * 2) * 0.2 - 0.1
+          }
+        }
+
+        // Finish job when complete: remove bar and mark inactive (cleanup handled by startPlayerJob)
+        if (pct >= 1 && player.job && player.job.active === false) {
+          try {
+            if (player.job.bar) player.group.remove(player.job.bar)
+          } catch(e) {}
+          // small delay before deletion to allow final frame to display
+          setTimeout(() => {
+            try { delete player.job } catch(e) {}
+          }, 200)
+        }
+      } catch(e) {
+        // ignore per-player errors
+      }
+    })
+
     // Update camera if tracking player (not in freecam)
     if (this.cameraConfig.mode !== 'freecam' && this.selectedPlayer) {
       const player = this.players.get(this.selectedPlayer)
