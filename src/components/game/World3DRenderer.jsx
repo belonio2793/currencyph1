@@ -24,6 +24,7 @@ export default function World3DRenderer({
   const mouseRef = useRef(new THREE.Vector2())
   const playerRef = useRef(null)
   const playerLabelRef = useRef(null)
+  const gltfModelRef = useRef(null)
   const markersRef = useRef(new Map())
   const [zoom, setZoom] = useState(3.5)
   const [cameraFollowEnabled, setCameraFollowEnabled] = useState(true)
