@@ -94,92 +94,136 @@ export const isSupabaseConfigured = !!(SUPABASE_URL && SUPABASE_ANON_KEY)
 export const tokenAPI = {
   // Get current user balance
   async getUserBalance(userId) {
-    const { data, error } = await supabase
-      .from('users')
-      .select('balance')
-      .eq('id', userId)
-      .single()
-    if (error) throw error
-    return data?.balance || 0
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('balance')
+        .eq('id', userId)
+        .single()
+      if (error) {
+        console.error('[tokenAPI] getUserBalance error', error)
+        throw error
+      }
+      return data?.balance || 0
+    } catch (err) {
+      console.error('[tokenAPI] getUserBalance failed', err)
+      // return safe fallback when network issues occur
+      return 0
+    }
   },
 
   // Get or create user
   async getOrCreateUser(email, walletAddress = null) {
-    const { data, error } = await supabase
-      .from('users')
-      .upsert([
-        {
-          email,
-          wallet_address: walletAddress,
-          region_code: 'PH'
-        }
-      ])
-      .select()
-      .single()
-    if (error) throw error
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .upsert([
+          {
+            email,
+            wallet_address: walletAddress,
+            region_code: 'PH'
+          }
+        ])
+        .select()
+        .single()
+      if (error) {
+        console.error('[tokenAPI] getOrCreateUser error', error)
+        throw error
+      }
+      return data
+    } catch (err) {
+      console.error('[tokenAPI] getOrCreateUser failed', err)
+      return null
+    }
   },
 
   // Add deposit
   async addDeposit(userId, amount, depositType = 'manual') {
-    // First update user balance
-    const currentBalance = await this.getUserBalance(userId)
-    const newBalance = currentBalance + amount
+    try {
+      // First update user balance
+      const currentBalance = await this.getUserBalance(userId)
+      const newBalance = currentBalance + amount
 
-    const { data: updatedUser, error: updateError } = await supabase
-      .from('users')
-      .update({ balance: newBalance, updated_at: new Date() })
-      .eq('id', userId)
-      .select()
-      .single()
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update({ balance: newBalance, updated_at: new Date() })
+        .eq('id', userId)
+        .select()
+        .single()
 
-    if (updateError) throw updateError
+      if (updateError) {
+        console.error('[tokenAPI] addDeposit update error', updateError)
+        throw updateError
+      }
 
-    // Then record deposit in ledger
-    const { data: deposit, error: depositError } = await supabase
-      .from('deposits')
-      .insert([
-        {
-          user_id: userId,
-          amount,
-          deposit_type: depositType,
-          status: 'completed'
-        }
-      ])
-      .select()
-      .single()
+      // Then record deposit in ledger
+      const { data: deposit, error: depositError } = await supabase
+        .from('deposits')
+        .insert([
+          {
+            user_id: userId,
+            amount,
+            deposit_type: depositType,
+            status: 'completed'
+          }
+        ])
+        .select()
+        .single()
 
-    if (depositError) throw depositError
+      if (depositError) {
+        console.error('[tokenAPI] addDeposit insert error', depositError)
+        throw depositError
+      }
 
-    return { user: updatedUser, deposit }
+      return { user: updatedUser, deposit }
+    } catch (err) {
+      console.error('[tokenAPI] addDeposit failed', err)
+      throw err
+    }
   },
 
   // Get deposit history
   async getDepositHistory(userId) {
-    const { data, error } = await supabase
-      .from('deposits')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false })
-    if (error) throw error
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('deposits')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+      if (error) {
+        console.error('[tokenAPI] getDepositHistory error', error)
+        throw error
+      }
+      return data
+    } catch (err) {
+      console.error('[tokenAPI] getDepositHistory failed', err)
+      return []
+    }
   },
 
   // Request withdrawal
   async requestWithdrawal(userId, amount) {
-    const { data, error } = await supabase
-      .from('withdrawal_requests')
-      .insert([
-        {
-          user_id: userId,
-          amount,
-          status: 'pending'
-        }
-      ])
-      .select()
-      .single()
-    if (error) throw error
-    return data
+    try {
+      const { data, error } = await supabase
+        .from('withdrawal_requests')
+        .insert([
+          {
+            user_id: userId,
+            amount,
+            status: 'pending'
+          }
+        ])
+        .select()
+        .single()
+      if (error) {
+        console.error('[tokenAPI] requestWithdrawal error', error)
+        throw error
+      }
+      return data
+    } catch (err) {
+      console.error('[tokenAPI] requestWithdrawal failed', err)
+      throw err
+    }
   },
 
   // Subscribe to balance updates (supports Supabase JS v2 realtime)
