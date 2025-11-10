@@ -272,11 +272,17 @@ export default function World3DRenderer({
   // sync player
   useEffect(() => {
     const player = playerRef.current
+    const labelMesh = playerLabelRef.current
     if (!player) return
     if (character && (character.position_x !== undefined || character.position_y !== undefined)) {
       const x = character.position_x || 0
       const z = character.position_y || 0
       player.position.set(x, 0, z)
+    }
+    if (character && character.name && labelMesh) {
+      const newTexture = createTextTexture(character.name, 48)
+      labelMesh.material.map = newTexture
+      labelMesh.material.needsUpdate = true
     }
   }, [character])
 
