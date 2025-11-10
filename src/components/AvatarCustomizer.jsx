@@ -2,8 +2,8 @@ import { useState } from 'react'
 
 // Define avatar styles with optional GLTF model URLs
 const AVATAR_STYLES = [
-  { id: 1, name: 'Doggo', model: 'dog', model_url: 'https://threejs.org/examples/models/gltf/Flamingo.glb', color: 0xd4a574, emissive: 0x6b5a3a },
-  { id: 2, name: 'Kitty', model: 'cat', model_url: 'https://threejs.org/examples/models/gltf/Parrot.glb', color: 0xc0c0c0, emissive: 0x808080 },
+  { id: 1, name: 'Doggo', model: 'dog', model_url: 'https://threejs.org/examples/models/gltf/Flamingo.glb', model_scale: 0.03, model_offset: { x:0, y:-2, z:0 }, color: 0xd4a574, emissive: 0x6b5a3a },
+  { id: 2, name: 'Kitty', model: 'cat', model_url: 'https://threejs.org/examples/models/gltf/Parrot.glb', model_scale: 0.6, model_offset: { x:0, y: -1, z:0 }, color: 0xc0c0c0, emissive: 0x808080 },
   { id: 3, name: 'Fireman', model: 'fireman', model_url: null, color: 0xcd7f32, emissive: 0x6b3410 },
   { id: 4, name: 'Waitress', model: 'waitress', model_url: null, color: 0xb87333, emissive: 0x5a3a1f },
   { id: 5, name: 'Angel', model: 'angel', model_url: null, color: 0xeaeaea, emissive: 0xb0b0b0 },
