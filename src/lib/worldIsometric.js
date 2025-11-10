@@ -370,6 +370,7 @@ export class WorldIsometric {
     try { this.renderer.domElement.removeEventListener('click', this._onClick) } catch(e) {}
     try { this.resizeObserver.disconnect() } catch(e) {}
     try { this.container.removeChild(this.renderer.domElement) } catch(e) {}
+    try { if (this._inputCleanup) this._inputCleanup() } catch(e) {}
     this.players.clear()
   }
 }
