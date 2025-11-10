@@ -95,71 +95,156 @@ export default function World3DRenderer({
     ground.position.y = -0.5
     scene.add(ground)
 
-    // player marker - smooth avatar statue with customizable colors
+    // create player avatar group depending on selected model
     const playerGroup = new THREE.Group()
     const avatarMat = new THREE.MeshStandardMaterial({
-      color: avatarStyle.color || 0xd4a574,
-      metalness: 0.8,
-      roughness: 0.2,
-      emissive: avatarStyle.emissive || 0x6b5a3a,
-      emissiveIntensity: 0.3
+      color: avatarStyle?.color || 0xd4a574,
+      metalness: 0.6,
+      roughness: 0.4,
+      emissive: avatarStyle?.emissive || 0x6b5a3a,
+      emissiveIntensity: 0.2
     })
 
-    // Head - large sphere
-    const headGeo = new THREE.IcosahedronGeometry(10, 4)
-    const headMesh = new THREE.Mesh(headGeo, avatarMat)
-    headMesh.position.y = 34
-    playerGroup.add(headMesh)
+    const addLabel = (name) => {
+      const labelTexture = createTextTexture(name || 'Player', 48)
+      const labelMat = new THREE.MeshStandardMaterial({ map: labelTexture, emissive: 0x00d4ff, emissiveIntensity: 0.3, transparent: true })
+      const labelGeo = new THREE.PlaneGeometry(60, 20)
+      const labelMesh = new THREE.Mesh(labelGeo, labelMat)
+      labelMesh.position.y = 35
+      labelMesh.rotation.x = 0
+      playerGroup.add(labelMesh)
+      playerLabelRef.current = labelMesh
+    }
 
-    // Body/Torso - capsule-like shape (rounded cylinder)
-    const bodyGeo = new THREE.CapsuleGeometry(7, 18, 4, 8)
-    const bodyMesh = new THREE.Mesh(bodyGeo, avatarMat)
-    bodyMesh.position.y = 14
-    playerGroup.add(bodyMesh)
+    const model = (avatarStyle && avatarStyle.model) || (avatarStyle && avatarStyle.name && avatarStyle.name.toLowerCase()) || 'humanoid'
 
-    // Left arm - rounded capsule
-    const armGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
-    const leftArm = new THREE.Mesh(armGeo, avatarMat)
-    leftArm.position.set(-13, 16, 0)
-    leftArm.rotation.z = Math.PI / 2.2
-    playerGroup.add(leftArm)
+    if (model === 'dog' || model === 'cat' || model === 'detective_dog') {
+      // simple quadruped
+      const body = new THREE.Mesh(new THREE.BoxGeometry(22, 10, 10), avatarMat)
+      body.position.y = 8
+      playerGroup.add(body)
 
-    // Right arm - rounded capsule
-    const rightArm = new THREE.Mesh(armGeo, avatarMat)
-    rightArm.position.set(13, 16, 0)
-    rightArm.rotation.z = -Math.PI / 2.2
-    playerGroup.add(rightArm)
+      const head = new THREE.Mesh(new THREE.SphereGeometry(6, 8, 8), avatarMat)
+      head.position.set(12, 14, 0)
+      playerGroup.add(head)
 
-    // Left leg - capsule
-    const legGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
-    const leftLeg = new THREE.Mesh(legGeo, avatarMat)
-    leftLeg.position.set(-5, 2, 0)
-    playerGroup.add(leftLeg)
+      // legs
+      const legGeo = new THREE.BoxGeometry(3, 8, 3)
+      for (let i = 0; i < 4; i++) {
+        const leg = new THREE.Mesh(legGeo, avatarMat)
+        const x = i < 2 ? -6 : 6
+        const z = (i % 2 === 0) ? -3 : 3
+        leg.position.set(x, 4, z)
+        playerGroup.add(leg)
+      }
 
-    // Right leg - capsule
-    const rightLeg = new THREE.Mesh(legGeo, avatarMat)
-    rightLeg.position.set(5, 2, 0)
-    playerGroup.add(rightLeg)
+      // ears for cat/dog
+      const earGeo = new THREE.ConeGeometry(2, 4, 6)
+      const earL = new THREE.Mesh(earGeo, avatarMat)
+      earL.rotation.z = 0.3
+      earL.position.set(14, 18, -2)
+      playerGroup.add(earL)
+      const earR = earL.clone()
+      earR.position.set(14, 18, 2)
+      playerGroup.add(earR)
 
-    // Shoulder balls for smooth shoulder transitions
-    const shoulderGeo = new THREE.SphereGeometry(5, 16, 16)
-    const leftShoulder = new THREE.Mesh(shoulderGeo, avatarMat)
-    leftShoulder.position.set(-10, 24, 0)
-    playerGroup.add(leftShoulder)
+      addLabel(character?.name || 'Player')
+    } else if (model === 'fireman' || model === 'chef' || model === 'doctor' || model === 'ninja' || model === 'detective') {
+      // humanoid with a hat/helmet
+      const head = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), avatarMat)
+      head.position.y = 34
+      playerGroup.add(head)
 
-    const rightShoulder = new THREE.Mesh(shoulderGeo, avatarMat)
-    rightShoulder.position.set(10, 24, 0)
-    playerGroup.add(rightShoulder)
+      const body = new THREE.Mesh(new THREE.CapsuleGeometry(7, 18, 4, 8), avatarMat)
+      body.position.y = 14
+      playerGroup.add(body)
 
-    // Add username label above player
-    const labelTexture = createTextTexture('Player', 48)
-    const labelMat = new THREE.MeshStandardMaterial({ map: labelTexture, emissive: 0x00d4ff, emissiveIntensity: 0.3, transparent: true })
-    const labelGeo = new THREE.PlaneGeometry(60, 20)
-    const labelMesh = new THREE.Mesh(labelGeo, labelMat)
-    labelMesh.position.y = 35
-    labelMesh.rotation.x = 0
-    playerGroup.add(labelMesh)
-    playerLabelRef.current = labelMesh
+      const armGeo = new THREE.CapsuleGeometry(3.5, 14, 4, 8)
+      const leftArm = new THREE.Mesh(armGeo, avatarMat)
+      leftArm.position.set(-12, 16, 0)
+      leftArm.rotation.z = Math.PI / 2.2
+      playerGroup.add(leftArm)
+      const rightArm = leftArm.clone()
+      rightArm.position.set(12, 16, 0)
+      rightArm.rotation.z = -Math.PI / 2.2
+      playerGroup.add(rightArm)
+
+      const legGeo = new THREE.CapsuleGeometry(3.5, 14, 4, 8)
+      const leftLeg = new THREE.Mesh(legGeo, avatarMat)
+      leftLeg.position.set(-5, 2, 0)
+      playerGroup.add(leftLeg)
+      const rightLeg = leftLeg.clone()
+      rightLeg.position.set(5, 2, 0)
+      playerGroup.add(rightLeg)
+
+      // helmet or hat
+      const hat = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 4, 12), avatarMat)
+      hat.position.y = 40
+      playerGroup.add(hat)
+
+      addLabel(character?.name || 'Player')
+    } else if (model === 'robot') {
+      // blocky robot
+      const body = new THREE.Mesh(new THREE.BoxGeometry(16, 20, 10), avatarMat)
+      body.position.y = 16
+      playerGroup.add(body)
+
+      const head = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), avatarMat)
+      head.position.y = 32
+      playerGroup.add(head)
+
+      const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 6), avatarMat)
+      antenna.position.set(0, 38, 0)
+      playerGroup.add(antenna)
+
+      addLabel(character?.name || 'Player')
+    } else if (model === 'unicorn' || model === 'fairy') {
+      // fantasy creature - unicorn
+      const body = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 8), avatarMat)
+      body.position.y = 8
+      playerGroup.add(body)
+
+      const head = new THREE.Mesh(new THREE.SphereGeometry(6, 12, 12), avatarMat)
+      head.position.set(10, 14, 0)
+      playerGroup.add(head)
+
+      const horn = new THREE.Mesh(new THREE.ConeGeometry(1.5, 6, 8), avatarMat)
+      horn.position.set(13, 18, 0)
+      horn.rotation.z = Math.PI / 2
+      playerGroup.add(horn)
+
+      addLabel(character?.name || 'Player')
+    } else {
+      // default humanoid
+      const head = new THREE.Mesh(new THREE.IcosahedronGeometry(10, 4), avatarMat)
+      head.position.y = 34
+      playerGroup.add(head)
+
+      const body = new THREE.Mesh(new THREE.CapsuleGeometry(7, 18, 4, 8), avatarMat)
+      body.position.y = 14
+      playerGroup.add(body)
+
+      const armGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
+      const leftArm = new THREE.Mesh(armGeo, avatarMat)
+      leftArm.position.set(-13, 16, 0)
+      leftArm.rotation.z = Math.PI / 2.2
+      playerGroup.add(leftArm)
+
+      const rightArm = new THREE.Mesh(armGeo, avatarMat)
+      rightArm.position.set(13, 16, 0)
+      rightArm.rotation.z = -Math.PI / 2.2
+      playerGroup.add(rightArm)
+
+      const legGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
+      const leftLeg = new THREE.Mesh(legGeo, avatarMat)
+      leftLeg.position.set(-5, 2, 0)
+      playerGroup.add(leftLeg)
+      const rightLeg = new THREE.Mesh(legGeo, avatarMat)
+      rightLeg.position.set(5, 2, 0)
+      playerGroup.add(rightLeg)
+
+      addLabel(character?.name || 'Player')
+    }
 
     scene.add(playerGroup)
     playerRef.current = playerGroup
