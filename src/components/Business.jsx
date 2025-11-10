@@ -135,11 +135,7 @@ export default function Business({ businessId, onBack, userId }) {
 
           {data.latitude && data.longitude && (
             <div className="mb-4">
-              <iframe
-                title="map"
-                src={`https://www.google.com/maps?q=${data.latitude},${data.longitude}&z=15&output=embed`}
-                className="w-full h-64 border-0 rounded"
-              />
+              <MapEmbed latitude={data.latitude} longitude={data.longitude} />
             </div>
           )}
 
