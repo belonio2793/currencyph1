@@ -279,7 +279,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [cosmetics, setCosmetics] = useState(DEFAULT_COSMETICS)
   const [customizationOpen, setCustomizationOpen] = useState(false)
   const [avatarCustomizerOpen, setAvatarCustomizerOpen] = useState(false)
-  const [selectedAvatarStyle, setSelectedAvatarStyle] = useState({ id: 1, name: 'Golden Classic', color: 0xd4a574, emissive: 0x6b5a3a })
+  // default to null so fallback blue block is used until user selects an outfit
+  const [selectedAvatarStyle, setSelectedAvatarStyle] = useState(null)
   const [initialAvatarPos, setInitialAvatarPos] = useState(null)
   const [mapViewMode, setMapViewMode] = useState('isometric') // 'isometric', 'grid'
   const [propertyPanelOpen, setPropertyPanelOpen] = useState(false)
