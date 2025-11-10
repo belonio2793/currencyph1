@@ -6,6 +6,8 @@ import * as THREE from 'three'
 // - Simple avatar meshes with overhead progress bars (canvas sprites)
 // - Click handling (tiles, avatars)
 
+import { supabase } from './supabaseClient'
+
 export class WorldIsometric {
   constructor(container, opts = {}) {
     this.container = container
