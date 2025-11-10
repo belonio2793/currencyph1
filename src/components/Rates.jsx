@@ -104,8 +104,16 @@ export default function Rates({ globalCurrency }) {
     let cancelled = false
     const fetchRawRates = async () => {
       try {
-        const { data, error } = await supabase.from('currency_rates').select('from_currency,to_currency,rate,updated_at').order('updated_at', { ascending: false }).limit(200)
-        if (!cancelled) setRawRates(data || [])
+        // Some deployments don't have updated_at column; try with it first, fall back to select without order
+        try {
+          const { data, error } = await supabase.from('currency_rates').select('from_currency,to_currency,rate,updated_at').order('updated_at', { ascending: false }).limit(200)
+          if (!error && data) { if (!cancelled) setRawRates(data || []); return }
+        } catch (e) {
+          // fallthrough
+        }
+        // Fallback: select without updated_at/order
+        const { data: data2, error: err2 } = await supabase.from('currency_rates').select('from_currency,to_currency,rate').limit(200)
+        if (!err2 && data2) { if (!cancelled) setRawRates(data2 || []) }
       } catch (err) {
         console.debug('Failed to fetch raw currency_rates:', err)
         if (!cancelled) setRawRates([])
