@@ -31,6 +31,7 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [customCategory, setCustomCategory] = useState('')
   // map picker state
   const [mapOpen, setMapOpen] = useState(false)
+  const [missingFields, setMissingFields] = useState([])
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
