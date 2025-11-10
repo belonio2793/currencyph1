@@ -69,12 +69,67 @@ export default function PlayerIsometricView({
   }, [properties])
 
   // Expose simple API: start job for current player
+  // Movement: keyboard handlers (WASD + Arrow keys)
   useEffect(() => {
+    const keys = { current: {} }
+    const rafRef = { current: null }
     const world = worldRef.current
     if (!world) return
-    // attach to DOM for external use
-    return () => {}
-  }, [])
+
+    const handleDown = (e) => {
+      const k = e.key.toLowerCase()
+      if (['arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault()
+      keys.current[k] = true
+    }
+    const handleUp = (e) => {
+      const k = e.key.toLowerCase()
+      keys.current[k] = false
+    }
+    window.addEventListener('keydown', handleDown)
+    window.addEventListener('keyup', handleUp)
+
+    let last = performance.now()
+    const speed = (mapSettings?.avatarSpeed || 2) * 60
+    const loop = () => {
+      const now = performance.now()
+      const dt = Math.min(0.05, (now - last) / 1000)
+      last = now
+      try {
+        const pid = playerIdRef.current
+        if (pid && world && world.players && world.players.has(pid)) {
+          const player = world.players.get(pid)
+          let dx = 0, dz = 0
+          const k = keys.current
+          if (k['w'] || k['arrowup']) dz -= 1
+          if (k['s'] || k['arrowdown']) dz += 1
+          if (k['a'] || k['arrowleft']) dx -= 1
+          if (k['d'] || k['arrowright']) dx += 1
+          const len = Math.hypot(dx, dz)
+          if (len > 0) {
+            dx /= len; dz /= len
+            const nx = player.group.position.x + dx * speed * dt
+            const nz = player.group.position.z + dz * speed * dt
+            player.group.position.x = nx
+            player.group.position.z = nz
+            // notify parent
+            if (typeof onCharacterMove === 'function') {
+              try { onCharacterMove({ x: nx, y: nz, city: character?.current_location || 'Manila' }) } catch(e) {}
+            }
+          }
+        }
+      } catch (e) { console.warn('movement loop error', e) }
+      rafRef.current = requestAnimationFrame(loop)
+    }
+    rafRef.current = requestAnimationFrame(loop)
+
+    return () => {
+      try {
+        window.removeEventListener('keydown', handleDown)
+        window.removeEventListener('keyup', handleUp)
+        if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      } catch(e){}
+    }
+  }, [mapSettings, character])
 
   return (
     <div className="w-full h-full relative bg-transparent">
