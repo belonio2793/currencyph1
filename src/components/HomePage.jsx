@@ -131,23 +131,6 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
 
         {/* Featured Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Play Currency Game */}
-          <button
-            onClick={() => onTabChange('play-currency')}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-sky-300 transition-all group"
-          >
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-sky-100 group-hover:bg-sky-200 transition-colors">
-                <svg className="w-6 h-6 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6l4 2" />
-                </svg>
-              </div>
-              <span className="text-2xl">🎮</span>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Play Currency</h3>
-            <p className="text-sm text-slate-600 mb-4">Create your character, explore, fight, and trade</p>
-            <div className="text-sm font-medium text-sky-600 group-hover:text-sky-700">Open game →</div>
-          </button>
           {/* Deposit Card */}
           <button
             onClick={() => onTabChange('deposit')}
