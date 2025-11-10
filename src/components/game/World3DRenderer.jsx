@@ -668,7 +668,14 @@ export default function World3DRenderer({
 
     return () => {
       cancelled = true
-      try { if (gltfModelRef.current) { player.remove(gltfModelRef.current); gltfModelRef.current = null } } catch(e){}
+      try {
+        if (gltfModelRef.current) {
+          try { player.remove(gltfModelRef.current) } catch (e) {}
+          gltfModelRef.current = null
+        }
+        // restore primitive children visibility
+        try { player.children.forEach((ch) => { ch.visible = true }) } catch(e) {}
+      } catch(e) {}
     }
   }, [avatarStyle, character])
 
