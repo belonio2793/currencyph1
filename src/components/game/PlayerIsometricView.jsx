@@ -301,45 +301,85 @@ export default function PlayerIsometricView({
       const rect = canvas.getBoundingClientRect()
       const w = rect.width
       const h = rect.height
-      // background
+      // background gradient
       ctx.clearRect(0,0,w,h)
-      ctx.fillStyle = '#071228'
+      const bg = ctx.createLinearGradient(0,0,0,h)
+      bg.addColorStop(0,'#0b1b2a')
+      bg.addColorStop(1,'#071228')
+      ctx.fillStyle = bg
       ctx.fillRect(0,0,w,h)
 
-      // tile grid
-      const baseCellW = Math.max(6, Math.floor(w / cols))
-      const baseCellH = Math.max(6, Math.floor(h / rows))
-      const cellW = Math.max(4, Math.floor(baseCellW * (zoomRef.current || 1)))
-      const cellH = Math.max(4, Math.floor(baseCellH * (zoomRef.current || 1)))
+      // compute cells with zoom and center the map
+      const baseCellW = Math.max(10, Math.floor(w / cols))
+      const baseCellH = Math.max(10, Math.floor(h / rows))
+      const scale = Math.max(0.5, Math.min(3, (zoomRef.current || 1)))
+      const cellW = Math.max(8, Math.floor(baseCellW * scale))
+      const cellH = Math.max(8, Math.floor(baseCellH * scale))
+      const totalW = cellW * cols
+      const totalH = cellH * rows
+      const offsetX = Math.floor((w - totalW) / 2)
+      const offsetY = Math.floor((h - totalH) / 2)
+
+      // subtle grid and tiles
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const x = c * cellW
-          const y = r * cellH
-          ctx.fillStyle = (c + r) % 2 === 0 ? '#5b6470' : '#53606f'
+          const x = offsetX + c * cellW
+          const y = offsetY + r * cellH
+          const even = ((c + r) % 2 === 0)
+          ctx.fillStyle = even ? '#27404f' : '#233841'
           ctx.fillRect(x+1, y+1, cellW-2, cellH-2)
+          // tile highlight
+          ctx.strokeStyle = 'rgba(255,255,255,0.03)'
+          ctx.lineWidth = 1
+          ctx.strokeRect(x+1, y+1, cellW-2, cellH-2)
         }
       }
 
-      // roads
-      ctx.fillStyle = '#2b2b2b'
-      for (let r = 0; r <= rows; r++) if (r % 6 === 0) ctx.fillRect(0, r*cellH, w, Math.max(2, Math.floor(cellH*0.6)))
-      for (let c = 0; c <= cols; c++) if (c % 6 === 0) ctx.fillRect(c*cellW, 0, Math.max(2, Math.floor(cellW*0.6)), h)
+      // roads (lighter strips)
+      ctx.fillStyle = 'rgba(30,30,30,0.8)'
+      for (let r = 0; r <= rows; r++) {
+        if (r % 6 === 0) ctx.fillRect(offsetX, offsetY + r*cellH - Math.max(1, Math.floor(cellH*0.2)), totalW, Math.max(2, Math.floor(cellH*0.5)))
+      }
+      for (let c = 0; c <= cols; c++) {
+        if (c % 6 === 0) ctx.fillRect(offsetX + c*cellW - Math.max(1, Math.floor(cellW*0.2)), offsetY, Math.max(2, Math.floor(cellW*0.5)), totalH)
+      }
 
-      // properties
+      // draw a city center landmark for orientation
+      const centerX = offsetX + totalW/2
+      const centerY = offsetY + totalH/2
+      ctx.fillStyle = '#ffcc66'
+      ctx.beginPath()
+      ctx.arc(centerX, centerY, Math.max(12, Math.min(cellW, cellH) * 0.9), 0, Math.PI*2)
+      ctx.fill()
+      ctx.fillStyle = '#8a5f2f'
+      ctx.font = `${Math.max(10, Math.floor(cellH*0.6))}px sans-serif`
+      ctx.textAlign = 'center'
+      ctx.fillText('Center', centerX, centerY + Math.max(4, Math.floor(cellH*0.6)))
+
+      // properties (draw provided or sample markers)
       try {
-        for (const p of properties || []) {
+        const props = (properties && properties.length) ? properties : [ { id: 'demo1', location_x: 50, location_y: 60 }, { id: 'demo2', location_x: 150, location_y: 120 } ]
+        for (const p of props) {
           const gx = Math.max(0, Math.min(cols-1, Math.round((p.location_x || 0) / (300 / cols))))
           const gy = Math.max(0, Math.min(rows-1, Math.round((p.location_y || 0) / (350 / rows))))
-          const x = gx * cellW + cellW/2
-          const y = gy * cellH + cellH/2
+          const x = offsetX + gx * cellW + cellW/2
+          const y = offsetY + gy * cellH + cellH/2
+          ctx.save()
+          ctx.shadowColor = 'rgba(0,0,0,0.6)'
+          ctx.shadowBlur = 8
           ctx.fillStyle = p.owner_id ? '#4caf50' : '#ffd166'
           ctx.beginPath()
-          ctx.arc(x, y, Math.max(6, Math.min(cellW, cellH) * 0.28), 0, Math.PI*2)
+          ctx.rect(x - cellW*0.28, y - cellH*0.28, cellW*0.56, cellH*0.56)
           ctx.fill()
+          ctx.restore()
+          ctx.fillStyle = '#07202a'
+          ctx.font = `${Math.max(8, Math.floor(cellH*0.36))}px sans-serif`
+          ctx.textAlign = 'center'
+          ctx.fillText((p.type || 'Prop').substring(0,6), x, y + Math.max(4, Math.floor(cellH*0.2)))
         }
       } catch(e) {}
 
-      // player marker (approximate)
+      // player marker (approximate) with glow
       try {
         const pid = playerIdRef.current
         if (pid && world && world.players && world.players.has(pid)) {
@@ -348,14 +388,26 @@ export default function PlayerIsometricView({
           const wz = pl.group.position.z
           const gx = Math.floor((wx + (cols* (world.tileSize || 36))/2) / (cols*(world.tileSize || 36)) * cols)
           const gy = Math.floor((wz + (rows*(world.tileSize || 36))/2) / (rows*(world.tileSize || 36)) * rows)
-          const x = (gx+0.5) * cellW
-          const y = (gy+0.5) * cellH
+          const x = offsetX + (gx+0.5) * cellW
+          const y = offsetY + (gy+0.5) * cellH
+          ctx.save()
           ctx.fillStyle = '#00a8ff'
+          ctx.shadowColor = 'rgba(0,168,255,0.8)'
+          ctx.shadowBlur = 20
           ctx.beginPath()
-          ctx.arc(x, y, Math.max(6, Math.min(cellW, cellH) * 0.35), 0, Math.PI*2)
+          ctx.arc(x, y, Math.max(8, Math.min(cellW, cellH) * 0.45), 0, Math.PI*2)
           ctx.fill()
+          ctx.restore()
         }
       } catch(e) {}
+
+      // compass / HUD
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'
+      ctx.font = '12px sans-serif'
+      ctx.textAlign = 'left'
+      ctx.fillText(`Zoom: ${scale.toFixed(2)}`, 8, 16)
+      ctx.textAlign = 'right'
+      ctx.fillText('N', w - 12, 16)
     }
 
     resize()
