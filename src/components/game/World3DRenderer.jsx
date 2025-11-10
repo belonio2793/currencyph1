@@ -460,6 +460,157 @@ export default function World3DRenderer({
     cameraFollowRef.current = cameraFollowEnabled
   }, [cameraFollowEnabled])
 
+  // When avatarStyle changes, rebuild the primitive avatar geometry (non-GLTF)
+  useEffect(() => {
+    const scene = sceneRef.current
+    if (!scene) return
+
+    // Remove existing group
+    if (playerRef.current) {
+      try { scene.remove(playerRef.current) } catch (e) {}
+      playerRef.current = null
+    }
+
+    const style = avatarStyle || null
+    const group = new THREE.Group()
+
+    if (style) {
+      const avatarMat = new THREE.MeshStandardMaterial({
+        color: style?.color || 0x00a8ff,
+        metalness: 0.3,
+        roughness: 0.6,
+        emissive: style?.emissive || 0x000000,
+        emissiveIntensity: 0.0
+      })
+      const addLabel = (name) => {
+        const labelTexture = createTextTexture(name || 'Player', 48)
+        const labelMat = new THREE.MeshStandardMaterial({ map: labelTexture, emissive: 0x00d4ff, emissiveIntensity: 0.3, transparent: true })
+        const labelGeo = new THREE.PlaneGeometry(60, 20)
+        const labelMesh = new THREE.Mesh(labelGeo, labelMat)
+        labelMesh.position.y = 35
+        group.add(labelMesh)
+        playerLabelRef.current = labelMesh
+      }
+      const model = (style && style.model) || (style && style.name && style.name.toLowerCase())
+      if (model === 'dog' || model === 'cat' || model === 'detective_dog') {
+        const body = new THREE.Mesh(new THREE.BoxGeometry(22, 10, 10), avatarMat)
+        body.position.y = 8
+        group.add(body)
+        const head = new THREE.Mesh(new THREE.SphereGeometry(6, 8, 8), avatarMat)
+        head.position.set(12, 14, 0)
+        group.add(head)
+        const legGeo = new THREE.BoxGeometry(3, 8, 3)
+        for (let i = 0; i < 4; i++) {
+          const leg = new THREE.Mesh(legGeo, avatarMat)
+          const x = i < 2 ? -6 : 6
+          const z = (i % 2 === 0) ? -3 : 3
+          leg.position.set(x, 4, z)
+          group.add(leg)
+        }
+        const earGeo = new THREE.ConeGeometry(2, 4, 6)
+        const earL = new THREE.Mesh(earGeo, avatarMat)
+        earL.rotation.z = 0.3
+        earL.position.set(14, 18, -2)
+        group.add(earL)
+        const earR = earL.clone()
+        earR.position.set(14, 18, 2)
+        group.add(earR)
+        addLabel(character?.name || 'Player')
+      } else if (model === 'fireman' || model === 'chef' || model === 'doctor' || model === 'ninja' || model === 'detective') {
+        const head = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), avatarMat)
+        head.position.y = 34
+        group.add(head)
+        const body = new THREE.Mesh(new THREE.CapsuleGeometry(7, 18, 4, 8), avatarMat)
+        body.position.y = 14
+        group.add(body)
+        const armGeo = new THREE.CapsuleGeometry(3.5, 14, 4, 8)
+        const leftArm = new THREE.Mesh(armGeo, avatarMat)
+        leftArm.position.set(-12, 16, 0)
+        leftArm.rotation.z = Math.PI / 2.2
+        group.add(leftArm)
+        const rightArm = leftArm.clone()
+        rightArm.position.set(12, 16, 0)
+        rightArm.rotation.z = -Math.PI / 2.2
+        group.add(rightArm)
+        const legGeo = new THREE.CapsuleGeometry(3.5, 14, 4, 8)
+        const leftLeg = new THREE.Mesh(legGeo, avatarMat)
+        leftLeg.position.set(-5, 2, 0)
+        group.add(leftLeg)
+        const rightLeg = leftLeg.clone()
+        rightLeg.position.set(5, 2, 0)
+        group.add(rightLeg)
+        const hat = new THREE.Mesh(new THREE.CylinderGeometry(9, 9, 4, 12), avatarMat)
+        hat.position.y = 40
+        group.add(hat)
+        addLabel(character?.name || 'Player')
+      } else if (model === 'robot') {
+        const body = new THREE.Mesh(new THREE.BoxGeometry(16, 20, 10), avatarMat)
+        body.position.y = 16
+        group.add(body)
+        const head = new THREE.Mesh(new THREE.BoxGeometry(10, 10, 10), avatarMat)
+        head.position.y = 32
+        group.add(head)
+        const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 6), avatarMat)
+        antenna.position.set(0, 38, 0)
+        group.add(antenna)
+        addLabel(character?.name || 'Player')
+      } else if (model === 'unicorn' || model === 'fairy') {
+        const body = new THREE.Mesh(new THREE.BoxGeometry(20, 10, 8), avatarMat)
+        body.position.y = 8
+        group.add(body)
+        const head = new THREE.Mesh(new THREE.SphereGeometry(6, 12, 12), avatarMat)
+        head.position.set(10, 14, 0)
+        group.add(head)
+        const horn = new THREE.Mesh(new THREE.ConeGeometry(1.5, 6, 8), avatarMat)
+        horn.position.set(13, 18, 0)
+        horn.rotation.z = Math.PI / 2
+        group.add(horn)
+        addLabel(character?.name || 'Player')
+      } else {
+        const head = new THREE.Mesh(new THREE.IcosahedronGeometry(10, 4), avatarMat)
+        head.position.y = 34
+        group.add(head)
+        const body = new THREE.Mesh(new THREE.CapsuleGeometry(7, 18, 4, 8), avatarMat)
+        body.position.y = 14
+        group.add(body)
+        const armGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
+        const leftArm = new THREE.Mesh(armGeo, avatarMat)
+        leftArm.position.set(-13, 16, 0)
+        leftArm.rotation.z = Math.PI / 2.2
+        group.add(leftArm)
+        const rightArm = new THREE.Mesh(armGeo, avatarMat)
+        rightArm.position.set(13, 16, 0)
+        rightArm.rotation.z = -Math.PI / 2.2
+        group.add(rightArm)
+        const legGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
+        const leftLeg = new THREE.Mesh(legGeo, avatarMat)
+        leftLeg.position.set(-5, 2, 0)
+        group.add(leftLeg)
+        const rightLeg = new THREE.Mesh(legGeo, avatarMat)
+        rightLeg.position.set(5, 2, 0)
+        group.add(rightLeg)
+        addLabel(character?.name || 'Player')
+      }
+    } else {
+      const mat = new THREE.MeshStandardMaterial({ color: 0x00a8ff, roughness: 0.6 })
+      const box = new THREE.Mesh(new THREE.BoxGeometry(16, 16, 16), mat)
+      box.position.y = 8
+      group.add(box)
+      const marker = new THREE.Mesh(new THREE.BoxGeometry(6, 2, 6), new THREE.MeshStandardMaterial({ color: 0x005f9e }))
+      marker.position.y = 18
+      group.add(marker)
+    }
+
+    // Preserve last position if any or use initial
+    const prev = playerRef.current
+    const px = prev ? prev.position.x : (initialAvatarPos?.x ?? 0)
+    const pz = prev ? prev.position.z : (initialAvatarPos?.z ?? 0)
+    group.position.set(px, 0, pz)
+
+    scene.add(group)
+    playerRef.current = group
+  }, [avatarStyle, initialAvatarPos, character?.name])
+
   // load GLTF model when avatarStyle changes
   useEffect(() => {
     const modelUrl = avatarStyle?.model_url
