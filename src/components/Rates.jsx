@@ -465,7 +465,7 @@ export default function Rates({ globalCurrency }) {
           </div>
           <div className="text-right">
             <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
-            <div className="text-xs text-slate-500">{globalCurrency} per {selectedCrypto.code}</div>
+            <div className="text-xs text-slate-500">{baseCurrency} per {selectedCrypto.code}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
