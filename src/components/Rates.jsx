@@ -184,7 +184,7 @@ export default function Rates({ globalCurrency }) {
         const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 500, 8000)
         const cryptoData = cg || null
         if (cryptoData) {
-          const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+          const globalExchangeRate = exchangeRates[`USD_${baseCurrency}`] || 1
 
           const cryptoPricesInGlobalCurrency = {
             BTC: Math.round(((cryptoData.bitcoin?.usd) || defaultCryptoPrices.BTC) * globalExchangeRate * 100) / 100,
@@ -228,7 +228,7 @@ export default function Rates({ globalCurrency }) {
       )
 
       if (!data || !data.cryptoPrices) {
-        const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+        const globalExchangeRate = exchangeRates[`USD_${baseCurrency}`] || 1
         const defaults = {}
         Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
           defaults[key] = Math.round(value * globalExchangeRate * 100) / 100
@@ -237,7 +237,7 @@ export default function Rates({ globalCurrency }) {
         return
       }
 
-      const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+      const globalExchangeRate = exchangeRates[`USD_${baseCurrency}`] || 1
       const cryptoData = data.cryptoPrices
 
       const cryptoPricesInGlobalCurrency = {
@@ -260,7 +260,7 @@ export default function Rates({ globalCurrency }) {
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
       console.debug('Crypto prices API error, using default prices:', err?.message || err)
-      const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
+      const globalExchangeRate = exchangeRates[`USD_${baseCurrency}`] || 1
       const defaults = {}
       Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
         defaults[key] = Math.round(value * globalExchangeRate * 100) / 100
@@ -415,7 +415,7 @@ export default function Rates({ globalCurrency }) {
       return
     }
     const rate = getRate(globalCurrency, selectedFiat.code) // 1 global = rate selected
-    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1))
+    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1))
     if (!rate || !cryptoPrice) {
       setCryptoInput('')
       return
@@ -441,7 +441,7 @@ export default function Rates({ globalCurrency }) {
       return
     }
     const rate = getRate(globalCurrency, selectedFiat.code)
-    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1))
+    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1))
     if (!rate || !cryptoPrice) {
       setFiatInput('')
       return
@@ -455,7 +455,7 @@ export default function Rates({ globalCurrency }) {
 
   const renderCryptoCard = (isPrimary) => {
     if (!selectedCrypto) return null
-    const price = cryptoRates[selectedCrypto.code] || defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${globalCurrency}`] || 1)
+    const price = cryptoRates[selectedCrypto.code] || defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1)
     return (
       <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center justify-between">
@@ -565,7 +565,7 @@ export default function Rates({ globalCurrency }) {
                     {item.type === 'fiat' ? (
                       (() => { const r = getRate(globalCurrency, item.code); return r != null ? r.toFixed(4) : '—' })()
                     ) : (
-                      (() => { const p = cryptoRates[item.code] || defaultCryptoPrices[item.code] * (exchangeRates[`USD_${globalCurrency}`] || 1); return p ? p.toFixed(2) : '—' })()
+                      (() => { const p = cryptoRates[item.code] || defaultCryptoPrices[item.code] * (exchangeRates[`USD_${baseCurrency}`] || 1); return p ? p.toFixed(2) : '—' })()
                     )}
                   </div>
                 </div>
