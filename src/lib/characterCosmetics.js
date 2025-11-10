@@ -93,6 +93,11 @@ export const validateCosmetics = (cosmetics) => {
   if (!COSMETICS.outfits.find(o => o.id === validated.outfit)) {
     validated.outfit = DEFAULT_COSMETICS.outfit
   }
-  
+
+  // Ensure avatar object exists (color-only avatar)
+  if (!validated.avatar || typeof validated.avatar !== 'object') {
+    validated.avatar = DEFAULT_COSMETICS.avatar
+  }
+
   return validated
 }
