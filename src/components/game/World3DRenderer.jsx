@@ -303,7 +303,7 @@ export default function World3DRenderer({
     const cam = cameraRef.current
     if (!cam) return
     cam.position.set(0, 200, 400)
-    setZoom(1)
+    setZoom(3.5)
   }
 
   const zoomPercentage = Math.round(zoom * 100)
