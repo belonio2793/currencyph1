@@ -23,6 +23,17 @@ export default function PlayerIsometricView({
     worldRef.current = world
     if (typeof onWorldReady === 'function') onWorldReady(world)
 
+    // ensure container is focusable for keyboard input
+    try {
+      if (containerRef.current) {
+        containerRef.current.tabIndex = 0
+        const onDownFocus = () => { try { containerRef.current.focus() } catch(e){} }
+        containerRef.current.addEventListener('mousedown', onDownFocus)
+        // cleanup on destroy
+        world._onContainerFocusCleanup = () => { try { containerRef.current.removeEventListener('mousedown', onDownFocus) } catch(e){} }
+      }
+    } catch(e) {}
+
     // click handlers
     world.setTileClickHandler((grid) => {
       if (placingProperty) return
