@@ -443,6 +443,60 @@ export default function World3DRenderer({
     cameraFollowRef.current = cameraFollowEnabled
   }, [cameraFollowEnabled])
 
+  // load GLTF model when avatarStyle changes
+  useEffect(() => {
+    const modelUrl = avatarStyle?.model_url
+    const player = playerRef.current
+    const renderer = rendererRef.current
+    if (!player || !renderer) return
+
+    // remove previous
+    try { if (gltfModelRef.current) { player.remove(gltfModelRef.current); gltfModelRef.current = null } } catch(e){}
+
+    if (!modelUrl) return
+    if (!renderer._modelCache) renderer._modelCache = new Map()
+    const cache = renderer._modelCache
+    let cancelled = false
+
+    const load = async () => {
+      try {
+        if (cache.has(modelUrl)) {
+          const cached = cache.get(modelUrl)
+          const instance = cached.clone()
+          const scale = (avatarStyle && avatarStyle.model_scale) || 1
+          const off = (avatarStyle && avatarStyle.model_offset) || { x:0, y:0, z:0 }
+          instance.scale.set(scale, scale, scale)
+          instance.position.set(off.x || 0, off.y || 0, off.z || 0)
+          player.add(instance)
+          gltfModelRef.current = instance
+          return
+        }
+        const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader')
+        const loader = new GLTFLoader()
+        loader.load(modelUrl, (gltf) => {
+          if (cancelled) return
+          const sceneModel = gltf.scene || gltf.scenes?.[0]
+          if (!sceneModel) return
+          cache.set(modelUrl, sceneModel)
+          const instance = sceneModel.clone()
+          const scale = (avatarStyle && avatarStyle.model_scale) || 1
+          const off = (avatarStyle && avatarStyle.model_offset) || { x:0, y:0, z:0 }
+          instance.scale.set(scale, scale, scale)
+          instance.position.set(off.x || 0, off.y || 0, off.z || 0)
+          player.add(instance)
+          gltfModelRef.current = instance
+        }, undefined, (err) => { console.warn('GLTF load error', err) })
+      } catch (e) { console.warn('Failed to load GLTF', e) }
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+      try { if (gltfModelRef.current) { player.remove(gltfModelRef.current); gltfModelRef.current = null } } catch(e){}
+    }
+  }, [avatarStyle, character])
+
   // zoom controls exposed
   const zoomIn = () => {
     const cam = cameraRef.current
