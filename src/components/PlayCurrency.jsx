@@ -723,7 +723,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         current_location: char.current_location || null,
         home_city: char.home_city || null,
         // Persist in-memory character stats (strength/intelligence/etc) so UI and DB stay in sync
-        stats: (typeof characterStats !== 'undefined') ? characterStats : null
+        stats: (char && char.stats) ? char.stats : ((typeof characterStats !== 'undefined') ? characterStats : null)
       }, { onConflict: 'id' })
     } catch (e) {
       // ignore persistence errors but log
