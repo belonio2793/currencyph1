@@ -25,6 +25,12 @@ export class WorldIsometric {
     this.tileGroup = new THREE.Group()
     this.scene.add(this.tileGroup)
 
+    // Property system: placed properties and inventory
+    this.properties = new Map() // propertyId -> { id, type, x, z, level, mesh }
+    this.inventory = [] // available property blueprints
+    this._placementMode = false
+    this._placementPrototype = null
+
     this.raycaster = new THREE.Raycaster()
     this.mouse = new THREE.Vector2()
 
