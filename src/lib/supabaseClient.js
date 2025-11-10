@@ -46,23 +46,10 @@ function createDummyClient() {
 function initClient() {
   if (_client) return _client
   if (SUPABASE_URL && SUPABASE_ANON_KEY) {
-    // Provide a bound fetch implementation to supabase client to avoid environment fetch binding issues
-    const customFetch = async (input, init = {}) => {
-      try {
-        // Force CORS mode and sane defaults
-        const opts = Object.assign({ mode: 'cors' }, init)
-        const fetchImpl = (typeof globalThis !== 'undefined' && globalThis.fetch) ? globalThis.fetch : (typeof window !== 'undefined' && window.fetch) ? window.fetch : null
-        if (!fetchImpl) throw new Error('No fetch implementation available')
-        const res = await fetchImpl(input, opts)
-        return res
-      } catch (err) {
-        console.debug('[supabase-client] fetch failed for', input, err)
-        throw err
-      }
-    }
-
     try {
-      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { global: { fetch: customFetch } })
+      // Initialize with default global fetch - don't override to avoid interfering with runtime fetch behavior
+      console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
       _client = createDummyClient()
