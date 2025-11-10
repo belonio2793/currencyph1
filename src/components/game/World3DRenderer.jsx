@@ -32,8 +32,7 @@ export default function World3DRenderer({
     canvas.width = 512
     canvas.height = 128
     const ctx = canvas.getContext('2d')
-    ctx.fillStyle = '#000000'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.fillStyle = '#00d4ff'
     ctx.font = `bold ${fontSize}px Arial`
     ctx.textAlign = 'center'
