@@ -65,6 +65,28 @@ export class World3D {
     this.renderer.toneMappingExposure = 1.0
     this.container.appendChild(this.renderer.domElement)
 
+    // Postprocessing composer for improved visuals (bloom + FXAA)
+    try {
+      const pixelRatio = Math.min(window.devicePixelRatio, 2)
+      this.composer = new EffectComposer(this.renderer)
+      this.renderPass = new RenderPass(this.scene, this.camera)
+      this.composer.addPass(this.renderPass)
+
+      const bloomPass = new UnrealBloomPass(new THREE.Vector2(container.clientWidth * pixelRatio, container.clientHeight * pixelRatio), 0.6, 0.8, 0.1)
+      bloomPass.threshold = 0.15
+      bloomPass.strength = 0.6
+      bloomPass.radius = 0.2
+      this.composer.addPass(bloomPass)
+
+      const fxaa = new ShaderPass(FXAAShader)
+      fxaa.uniforms['resolution'].value.set(1 / (container.clientWidth * pixelRatio), 1 / (container.clientHeight * pixelRatio))
+      this.composer.addPass(fxaa)
+    } catch (e) {
+      // If postprocessing fails, fall back to plain renderer
+      console.warn('Postprocessing init failed', e)
+      this.composer = null
+    }
+
     // Scene setup
     this.setupLighting()
     this.setupEnvironment()
