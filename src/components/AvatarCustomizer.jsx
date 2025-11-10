@@ -68,13 +68,36 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
     })
   }
 
-  const applyPreview = (style) => {
+  const validateUrl = async (url) => {
+    if (!url) return true
+    try {
+      const controller = new AbortController()
+      const id = setTimeout(() => controller.abort(), 5000)
+      await fetch(url, { method: 'HEAD', signal: controller.signal })
+      clearTimeout(id)
+      return true
+    } catch (e) {
+      return false
+    }
+  }
+
+  const applyPreview = async (style) => {
+    const url = editFields.model_url || style.model_url
+    if (url) {
+      const ok = await validateUrl(url)
+      if (!ok) return alert('Model URL not reachable — please fix or remove it before previewing.')
+    }
     // merge edits into style and preview without closing
     const updated = { ...style, model_url: editFields.model_url || null, model_scale: Number(editFields.model_scale) || 1, model_offset: { x: Number(editFields.model_offset_x)||0, y: Number(editFields.model_offset_y)||0, z: Number(editFields.model_offset_z)||0 } }
     if (typeof onSelect === 'function') onSelect(updated, { close: false })
   }
 
-  const applySave = (style) => {
+  const applySave = async (style) => {
+    const url = editFields.model_url || style.model_url
+    if (url) {
+      const ok = await validateUrl(url)
+      if (!ok) return alert('Model URL not reachable — please fix or remove it before saving.')
+    }
     const updated = { ...style, model_url: editFields.model_url || null, model_scale: Number(editFields.model_scale) || 1, model_offset: { x: Number(editFields.model_offset_x)||0, y: Number(editFields.model_offset_y)||0, z: Number(editFields.model_offset_z)||0 } }
     if (typeof onSelect === 'function') onSelect(updated, { close: true })
   }
