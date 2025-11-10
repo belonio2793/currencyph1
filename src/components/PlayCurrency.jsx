@@ -1751,7 +1751,18 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       {avatarCustomizerOpen && (
         <AvatarCustomizer
           selectedStyle={selectedAvatarStyle}
-          onSelect={(style) => setSelectedAvatarStyle(style)}
+          onSelect={(style) => {
+            // update selected style in UI
+            setSelectedAvatarStyle(style)
+            // update character cosmetics and persist
+            setCharacter((c) => {
+              const updated = { ...c, cosmetics: { ...(c.cosmetics || {}), avatar: style } }
+              try { persistCharacterPartial(updated) } catch(e) { console.warn('persistCharacterPartial failed', e) }
+              if (userId) saveCharacterToDB(updated)
+              return updated
+            })
+            setAvatarCustomizerOpen(false)
+          }}
           onClose={() => setAvatarCustomizerOpen(false)}
         />
       )}
