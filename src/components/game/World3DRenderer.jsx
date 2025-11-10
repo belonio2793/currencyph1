@@ -431,6 +431,7 @@ export default function World3DRenderer({
       try { window.removeEventListener('keydown', handleKeyDown) } catch(e){}
       try { window.removeEventListener('keyup', handleKeyUp) } catch(e){}
       try { if (controlsRef.current) controlsRef.current.dispose() } catch(e){}
+      try { if (container && container.__removeModel) container.__removeModel() } catch(e){}
       try { renderer.dispose() } catch(e) {}
       try { container.removeChild(renderer.domElement) } catch(e) {}
       sceneRef.current = null
