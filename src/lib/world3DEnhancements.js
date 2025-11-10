@@ -222,28 +222,33 @@ export class PropertyMarkerEnhanced {
     canvas.height = 256
     const ctx = canvas.getContext('2d')
     
-    ctx.fillStyle = 'rgba(20,20,30,0.9)'
+    // Stylized dark panel with bold accent
+    ctx.fillStyle = 'rgba(18,24,31,0.96)'
     ctx.fillRect(0, 0, canvas.width, canvas.height)
-    
-    ctx.strokeStyle = color === 0xffd166 ? '#ffd166' : '#4caf50'
-    ctx.lineWidth = 3
-    ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10)
-    
+
+    // Bold header strip
+    ctx.fillStyle = color === 0xffd166 ? '#2b2b2b' : '#1f2d2b'
+    ctx.fillRect(0, 0, canvas.width, 60)
+
+    ctx.fillStyle = color === 0xffd166 ? '#ffd166' : '#4caf50'
+    ctx.fillRect(8, 8, 80, 44)
+
     ctx.fillStyle = '#ffffff'
-    ctx.font = 'bold 48px Arial'
-    ctx.textAlign = 'center'
+    ctx.font = 'bold 36px Arial'
+    ctx.textAlign = 'left'
     const displayName = property.name || property.property_type
-    ctx.fillText(displayName.substring(0, 15), canvas.width / 2, 80)
-    
+    ctx.fillText(displayName.substring(0, 20), 100, 40)
+
     ctx.fillStyle = '#ffd166'
-    ctx.font = 'bold 56px Arial'
+    ctx.font = 'bold 36px Arial'
     const priceText = `₱${Number(property.current_value || 0).toLocaleString()}`
-    ctx.fillText(priceText.substring(0, 12), canvas.width / 2, 160)
-    
-    ctx.fillStyle = '#4caf50'
-    ctx.font = '32px Arial'
+    ctx.textAlign = 'center'
+    ctx.fillText(priceText.substring(0, 14), canvas.width / 2, 120)
+
+    ctx.fillStyle = '#9ee6b3'
+    ctx.font = '22px Arial'
     const revenueText = `₱${Number(property.revenue_per_day || 0).toLocaleString()}/day`
-    ctx.fillText(revenueText.substring(0, 20), canvas.width / 2, 220)
+    ctx.fillText(revenueText.substring(0, 24), canvas.width / 2, 165)
     
     const texture = new THREE.CanvasTexture(canvas)
     const spriteMaterial = new THREE.SpriteMaterial({
