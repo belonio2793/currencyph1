@@ -79,6 +79,7 @@ export class WorldIsometric {
       this.canvas.height = this.height
       try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
       this.container.appendChild(this.canvas)
+      try { this.canvas.setAttribute('data-engine','three.js r156') } catch(e){}
       try { this.ctx = this.canvas.getContext('2d') } catch(e) { this.ctx = null }
     }
 
