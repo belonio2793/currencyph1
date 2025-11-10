@@ -1041,6 +1041,10 @@ export class World3D {
       this.container.removeChild(this.renderer.domElement)
     }
 
+    try {
+      if (this.composer && typeof this.composer.dispose === 'function') this.composer.dispose()
+    } catch(e) {}
+
     this.players.clear()
     this.npcs.clear()
     modelCache.clear()
