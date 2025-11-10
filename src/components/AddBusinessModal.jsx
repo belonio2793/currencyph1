@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react'
-import React, { useEffect, useState, useRef } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
