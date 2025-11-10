@@ -397,6 +397,13 @@ export default function PlayerIsometricView({
     <div className="w-full h-full relative bg-transparent">
       <div ref={containerRef} className="w-full h-full relative" style={{ minHeight: 200 }} onDragOver={handleDragOver} onDrop={handleDrop} />
 
+      {/* Zoom Controls Overlay */}
+      <div className="absolute right-4 top-4 z-50 flex flex-col gap-2">
+        <button onClick={zoomIn} aria-label="Zoom in" className="w-10 h-10 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white font-bold">+</button>
+        <button onClick={zoomOut} aria-label="Zoom out" className="w-10 h-10 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white font-bold">−</button>
+        <button onClick={zoomReset} aria-label="Reset zoom" className="w-10 h-8 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white text-xs">reset</button>
+      </div>
+
       {/* Property UI Overlay */}
       <div className="absolute left-4 bottom-4 z-40 w-64">
         <div className="bg-white/5 backdrop-blur p-3 rounded shadow border border-white/5">
