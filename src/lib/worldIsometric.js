@@ -349,7 +349,8 @@ export class WorldIsometric {
     this.camera.right = (viewSize * aspect) / 2
     this.camera.top = viewSize / 2
     this.camera.bottom = -viewSize / 2
-    this.camera.updateProjectionMatrix()
+    // keep existing zoom
+    try { this.camera.updateProjectionMatrix() } catch(e) {}
   }
 
   render() {
