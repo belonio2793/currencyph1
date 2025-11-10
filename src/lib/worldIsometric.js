@@ -1,11 +1,5 @@
 import * as THREE from 'three'
 
-// Lightweight isometric world renderer tailored for the Player View
-// - Orthographic isometric camera
-// - Tile grid rendering with instanced plane geometry
-// - Simple avatar meshes with overhead progress bars (canvas sprites)
-// - Click handling (tiles, avatars)
-
 import * as THREE from 'three'
 import { supabase } from './supabaseClient'
 
