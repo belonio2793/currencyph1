@@ -29,6 +29,9 @@ export default function World3DRenderer({
     const container = containerRef.current
     if (!container) return
 
+    // make container focusable for selection + keyboard
+    try { container.tabIndex = 0 } catch(e){}
+
     // renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
@@ -104,6 +107,32 @@ export default function World3DRenderer({
     }
     window.addEventListener('resize', onResize)
 
+    // focus/selection visuals
+    const onFocus = () => {
+      try { container.style.boxShadow = '0 0 0 3px rgba(255,213,79,0.95) inset' } catch(e){}
+    }
+    const onBlur = () => {
+      try { container.style.boxShadow = 'none' } catch(e){}
+    }
+    container.addEventListener('focus', onFocus)
+    container.addEventListener('blur', onBlur)
+
+    // keyboard movement
+    const keys = { current: {} }
+    const handleKeyDown = (e) => {
+      if (document.activeElement !== container) return
+      const k = e.key.toLowerCase()
+      if (['arrowup','arrowdown','arrowleft','arrowright'].includes(k)) e.preventDefault()
+      keys.current[k] = true
+    }
+    const handleKeyUp = (e) => {
+      if (document.activeElement !== container) return
+      const k = e.key.toLowerCase()
+      keys.current[k] = false
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keyup', handleKeyUp)
+
     // click handler for placing properties
     const onClick = async (e) => {
       const rect = renderer.domElement.getBoundingClientRect()
@@ -124,19 +153,50 @@ export default function World3DRenderer({
     }
     renderer.domElement.addEventListener('click', onClick)
 
-    // animation loop
+    // animation loop with movement
     let rafId = null
-    const animate = () => {
+    let prevTime = null
+    const speed = 200 // units per second
+    const animate = (time) => {
+      const now = time || performance.now()
+      const dt = prevTime ? Math.min(0.05, (now - prevTime) / 1000) : 0
+      prevTime = now
+
+      // movement only when container focused
+      try {
+        const player = playerRef.current
+        if (player && document.activeElement === container) {
+          let dx = 0, dz = 0
+          const k = keys.current
+          if (k['w'] || k['arrowup']) dz -= 1
+          if (k['s'] || k['arrowdown']) dz += 1
+          if (k['a'] || k['arrowleft']) dx -= 1
+          if (k['d'] || k['arrowright']) dx += 1
+          const len = Math.hypot(dx, dz)
+          if (len > 0) {
+            dx /= len; dz /= len
+            player.position.x += dx * speed * dt
+            player.position.z += dz * speed * dt
+            // rotate body to face movement
+            try { player.rotation.y = Math.atan2(dx, dz) } catch(e){}
+          }
+        }
+      } catch (e) { /* ignore movement errors */ }
+
       if (controlsRef.current) controlsRef.current.update()
       renderer.render(scene, camera)
       rafId = requestAnimationFrame(animate)
     }
-    animate()
+    rafId = requestAnimationFrame(animate)
 
     return () => {
       try { cancelAnimationFrame(rafId) } catch (e) {}
       try { renderer.domElement.removeEventListener('click', onClick) } catch (e) {}
       try { window.removeEventListener('resize', onResize) } catch (e) {}
+      try { container.removeEventListener('focus', onFocus) } catch(e){}
+      try { container.removeEventListener('blur', onBlur) } catch(e){}
+      try { window.removeEventListener('keydown', handleKeyDown) } catch(e){}
+      try { window.removeEventListener('keyup', handleKeyUp) } catch(e){}
       try { if (controlsRef.current) controlsRef.current.dispose() } catch(e){}
       try { renderer.dispose() } catch(e) {}
       try { container.removeChild(renderer.domElement) } catch(e) {}
