@@ -411,6 +411,120 @@ export class WorldIsometric {
   start() { if (!this.animationId) this.animate() }
   stop() { if (this.animationId) cancelAnimationFrame(this.animationId); this.animationId = null }
 
+  /* Property management API */
+  async loadPropertiesForOwner(ownerId) {
+    if (!ownerId) return []
+    try {
+      const { data, error } = await supabase.from('game_properties').select('*').eq('owner_id', ownerId)
+      if (error) throw error
+      // create meshes for each property
+      data.forEach(p => {
+        if (!this.properties.has(p.id)) {
+          const mesh = this._createPropertyMesh(p.type, p.level)
+          mesh.position.set(p.x || 0, 0, p.z || 0)
+          mesh.userData = { propertyId: p.id }
+          this.scene.add(mesh)
+          this.properties.set(p.id, Object.assign({}, p, { mesh }))
+        }
+      })
+      return data
+    } catch (err) {
+      console.warn('loadPropertiesForOwner failed', err)
+      return []
+    }
+  }
+
+  async saveProperty(property) {
+    try {
+      const payload = Object.assign({}, property)
+      delete payload.mesh
+      const { data, error } = await supabase.from('game_properties').upsert([payload]).select().single()
+      if (error) throw error
+      // update local map
+      if (this.properties.has(data.id)) {
+        const curr = this.properties.get(data.id)
+        Object.assign(curr, data)
+        this.properties.set(data.id, curr)
+      } else {
+        const mesh = this._createPropertyMesh(data.type, data.level)
+        mesh.position.set(data.x || 0, 0, data.z || 0)
+        mesh.userData = { propertyId: data.id }
+        this.scene.add(mesh)
+        this.properties.set(data.id, Object.assign({}, data, { mesh }))
+      }
+      return data
+    } catch (err) {
+      console.warn('saveProperty failed', err)
+      return null
+    }
+  }
+
+  addInventoryItem(item) {
+    // item: { type, label, baseCost }
+    this.inventory.push(item)
+  }
+
+  enablePlacementMode(item) {
+    // item: inventory item to place, e.g. {type:'house', label:'House'}
+    this._placementMode = Boolean(item)
+    this._placementPrototype = item || null
+    // create a ghost mesh to follow mouse
+    if (this._placementMode && this._placementPrototype) {
+      if (!this._placementGhost) this._placementGhost = this._createPropertyMesh(this._placementPrototype.type, 0, true)
+      this.scene.add(this._placementGhost)
+      const moveHandler = (e) => {
+        const rect = this.renderer.domElement.getBoundingClientRect()
+        const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1
+        const ny = -((e.clientY - rect.top) / rect.height) * 2 + 1
+        this.raycaster.setFromCamera(new THREE.Vector2(nx, ny), this.camera)
+        const pt = new THREE.Vector3()
+        this.raycaster.ray.intersectPlane(this._plane, pt)
+        if (pt) {
+          this._placementGhost.position.set(Math.round(pt.x), 0, Math.round(pt.z))
+        }
+      }
+      this._placementMoveHandler = moveHandler
+      window.addEventListener('pointermove', moveHandler)
+    } else {
+      try { if (this._placementGhost) this.scene.remove(this._placementGhost) } catch(e){}
+      try { if (this._placementMoveHandler) window.removeEventListener('pointermove', this._placementMoveHandler) } catch(e){}
+      this._placementGhost = null
+      this._placementMoveHandler = null
+    }
+  }
+
+  async placePropertyAt(point, ownerId = null) {
+    // point: { x, z } world coordinates
+    if (!this._placementMode || !this._placementPrototype) return null
+    const prop = {
+      owner_id: ownerId,
+      type: this._placementPrototype.type,
+      level: 0,
+      x: Math.round(point.x),
+      z: Math.round(point.z),
+      placed: true
+    }
+    const saved = await this.saveProperty(prop)
+    // turn off placement mode after placing
+    this.enablePlacementMode(null)
+    return saved
+  }
+
+  _createPropertyMesh(type = 'house', level = 0, ghost = false) {
+    // Simple stylized box for now
+    const colorMap = { house: 0xffcc77, shop: 0x77ccff, factory: 0xcc77ff }
+    const color = colorMap[type] || 0x88cc88
+    const geom = new THREE.BoxGeometry(20, 20 + level * 6, 20)
+    const mat = new THREE.MeshStandardMaterial({ color, transparent: ghost, opacity: ghost ? 0.6 : 1.0, roughness: 0.6, metalness: 0.1 })
+    const mesh = new THREE.Mesh(geom, mat)
+    mesh.position.y = (20 + level * 6) / 2
+    mesh.castShadow = true
+    mesh.receiveShadow = true
+    return mesh
+  }
+
+  /* End property management API */
+
   destroy() {
     this.stop()
     try { this.renderer.domElement.removeEventListener('click', this._onClick) } catch(e) {}
@@ -418,5 +532,8 @@ export class WorldIsometric {
     try { this.container.removeChild(this.renderer.domElement) } catch(e) {}
     try { if (this._inputCleanup) this._inputCleanup() } catch(e) {}
     this.players.clear()
+    // cleanup properties
+    try { this.properties.forEach(p => { if (p.mesh) this.scene.remove(p.mesh) }) } catch(e) {}
+    this.properties.clear()
   }
 }
