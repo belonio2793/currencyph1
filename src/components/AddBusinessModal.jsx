@@ -4,7 +4,20 @@ import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
+// Fix leaflet default icon paths (Vite + ESM)
+try {
+  delete L.Icon.Default.prototype._getIconUrl
+  L.Icon.Default.mergeOptions({
+    iconRetinaUrl: new URL('leaflet/dist/images/marker-icon-2x.png', import.meta.url).href,
+    iconUrl: new URL('leaflet/dist/images/marker-icon.png', import.meta.url).href,
+    shadowUrl: new URL('leaflet/dist/images/marker-shadow.png', import.meta.url).href
+  })
+} catch(e) {
+  // ignore in environments where leaflet isn't available
+}
 
 export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [currentPage, setCurrentPage] = useState(1)
