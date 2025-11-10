@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { WorldIsometric } from '../../lib/worldIsometric'
 
 export default function PlayerIsometricView({
