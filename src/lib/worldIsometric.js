@@ -73,18 +73,16 @@ export class WorldIsometric {
       return
     }
 
-    // lighting: toon-friendly hemisphere and directional (only meaningful for WebGL)
-    if (this.isWebGL) {
-      const hemi = new THREE.HemisphereLight(0x8899bb, 0x101820, 0.6)
-      this.scene.add(hemi)
-      const dir = new THREE.DirectionalLight(0xe6f3ff, 0.7)
-      dir.position.set(viewSize * 0.3, viewSize * 0.8, viewSize * 0.2)
-      dir.castShadow = false
-      this.scene.add(dir)
+    // lighting: toon-friendly hemisphere and directional
+    const hemi = new THREE.HemisphereLight(0x8899bb, 0x101820, 0.6)
+    this.scene.add(hemi)
+    const dir = new THREE.DirectionalLight(0xe6f3ff, 0.7)
+    dir.position.set(viewSize * 0.3, viewSize * 0.8, viewSize * 0.2)
+    dir.castShadow = false
+    this.scene.add(dir)
 
-      // subtle fog for depth
-      this.scene.fog = new THREE.FogExp2(0x071228, Math.max(0.00035, 0.00035 * (viewSize / 800)))
-    }
+    // subtle fog for depth
+    this.scene.fog = new THREE.FogExp2(0x071228, Math.max(0.00035, 0.00035 * (viewSize / 800)))
 
     // stylized ground and tiles
     this._createTiles({ cols, rows, tileSize })
