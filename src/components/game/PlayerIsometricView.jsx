@@ -250,7 +250,7 @@ export default function PlayerIsometricView({
 
   return (
     <div className="w-full h-full relative bg-transparent">
-      <div ref={containerRef} className="w-full h-full" onDragOver={handleDragOver} onDrop={handleDrop} />
+      <div ref={containerRef} className="w-full h-full relative" style={{ minHeight: 200 }} onDragOver={handleDragOver} onDrop={handleDrop} />
 
       {/* Property UI Overlay */}
       <div className="absolute left-4 bottom-4 z-40 w-64">
