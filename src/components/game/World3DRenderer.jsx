@@ -252,6 +252,57 @@ export default function World3DRenderer({
     const avatarZ = initialAvatarPos?.z ?? 0
     playerGroup.position.set(avatarX, 0, avatarZ)
 
+    // GLTF model support: if avatarStyle.model_url is provided, load and replace geometry
+    const modelUrl = avatarStyle && avatarStyle.model_url
+    let modelInstance = null
+    if (modelUrl) {
+      // cache map on rendererRef
+      if (!rendererRef.current._modelCache) rendererRef.current._modelCache = new Map()
+      const cache = rendererRef.current._modelCache
+      let cancelled = false
+      const loadModel = async () => {
+        try {
+          if (cache.has(modelUrl)) {
+            const cached = cache.get(modelUrl)
+            modelInstance = cached.clone()
+            modelInstance.position.set(0, 0, 0)
+            playerGroup.add(modelInstance)
+            gltfModelRef.current = modelInstance
+            return
+          }
+          const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader')
+          const loader = new GLTFLoader()
+          loader.load(modelUrl, (gltf) => {
+            if (cancelled) return
+            const sceneModel = gltf.scene || gltf.scenes?.[0]
+            if (!sceneModel) return
+            cache.set(modelUrl, sceneModel)
+            modelInstance = sceneModel.clone()
+            modelInstance.position.set(0, 0, 0)
+            playerGroup.add(modelInstance)
+            gltfModelRef.current = modelInstance
+          }, undefined, (err) => {
+            console.warn('GLTF load error', err)
+          })
+        } catch (e) {
+          console.warn('Failed to load GLTF', e)
+        }
+      }
+      loadModel()
+
+      // cleanup on re-render/unmount: remove model instance
+      const removeModel = () => {
+        try {
+          if (gltfModelRef.current) {
+            playerGroup.remove(gltfModelRef.current)
+            gltfModelRef.current = null
+          }
+        } catch (e) { }
+      }
+      // ensure model removed when avatarStyle changes or on unmount
+      container.__removeModel = removeModel
+    }
+
     // controls (orbit) - dynamic import to avoid build surprises
     let controls = null
     let controlsModule = null
