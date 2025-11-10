@@ -104,49 +104,49 @@ export default function World3DRenderer({
       emissiveIntensity: 0.3
     })
 
-    // Head - large golden sphere
+    // Head - large sphere
     const headGeo = new THREE.IcosahedronGeometry(10, 4)
-    const headMesh = new THREE.Mesh(headGeo, goldenMat)
+    const headMesh = new THREE.Mesh(headGeo, avatarMat)
     headMesh.position.y = 34
     playerGroup.add(headMesh)
 
     // Body/Torso - capsule-like shape (rounded cylinder)
     const bodyGeo = new THREE.CapsuleGeometry(7, 18, 4, 8)
-    const bodyMesh = new THREE.Mesh(bodyGeo, goldenMat)
+    const bodyMesh = new THREE.Mesh(bodyGeo, avatarMat)
     bodyMesh.position.y = 14
     playerGroup.add(bodyMesh)
 
     // Left arm - rounded capsule
     const armGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
-    const leftArm = new THREE.Mesh(armGeo, goldenMat)
+    const leftArm = new THREE.Mesh(armGeo, avatarMat)
     leftArm.position.set(-13, 16, 0)
     leftArm.rotation.z = Math.PI / 2.2
     playerGroup.add(leftArm)
 
     // Right arm - rounded capsule
-    const rightArm = new THREE.Mesh(armGeo, goldenMat)
+    const rightArm = new THREE.Mesh(armGeo, avatarMat)
     rightArm.position.set(13, 16, 0)
     rightArm.rotation.z = -Math.PI / 2.2
     playerGroup.add(rightArm)
 
     // Left leg - capsule
     const legGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
-    const leftLeg = new THREE.Mesh(legGeo, goldenMat)
+    const leftLeg = new THREE.Mesh(legGeo, avatarMat)
     leftLeg.position.set(-5, 2, 0)
     playerGroup.add(leftLeg)
 
     // Right leg - capsule
-    const rightLeg = new THREE.Mesh(legGeo, goldenMat)
+    const rightLeg = new THREE.Mesh(legGeo, avatarMat)
     rightLeg.position.set(5, 2, 0)
     playerGroup.add(rightLeg)
 
     // Shoulder balls for smooth shoulder transitions
     const shoulderGeo = new THREE.SphereGeometry(5, 16, 16)
-    const leftShoulder = new THREE.Mesh(shoulderGeo, goldenMat)
+    const leftShoulder = new THREE.Mesh(shoulderGeo, avatarMat)
     leftShoulder.position.set(-10, 24, 0)
     playerGroup.add(leftShoulder)
 
-    const rightShoulder = new THREE.Mesh(shoulderGeo, goldenMat)
+    const rightShoulder = new THREE.Mesh(shoulderGeo, avatarMat)
     rightShoulder.position.set(10, 24, 0)
     playerGroup.add(rightShoulder)
 
