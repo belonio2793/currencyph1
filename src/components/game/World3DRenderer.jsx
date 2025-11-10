@@ -26,6 +26,7 @@ export default function World3DRenderer({
   const playerRef = useRef(null)
   const playerLabelRef = useRef(null)
   const gltfModelRef = useRef(null)
+  const mixerRef = useRef(null)
   const markersRef = useRef(new Map())
   const [zoom, setZoom] = useState(3.5)
   const [cameraFollowEnabled, setCameraFollowEnabled] = useState(true)
@@ -384,6 +385,13 @@ export default function World3DRenderer({
         }
       } catch (e) { /* ignore camera follow errors */ }
 
+      // advance GLTF mixer if present
+      try {
+        if (mixerRef.current) {
+          mixerRef.current.update(dt)
+        }
+      } catch(e) {}
+
       renderer.render(scene, camera)
       rafId = requestAnimationFrame(animate)
     }
@@ -630,7 +638,7 @@ export default function World3DRenderer({
       try {
         if (cache.has(modelUrl)) {
           const cached = cache.get(modelUrl)
-          const instance = cached.clone()
+          const instance = (cached.scene || cached).clone()
           const scale = (avatarStyle && avatarStyle.model_scale) || 1
           const off = (avatarStyle && avatarStyle.model_offset) || { x:0, y:0, z:0 }
           instance.scale.set(scale, scale, scale)
@@ -641,6 +649,14 @@ export default function World3DRenderer({
           } catch(e) {}
           player.add(instance)
           gltfModelRef.current = instance
+          // setup mixer for cached animations if present
+          try {
+            const anims = cache.get(modelUrl).animations || []
+            if (anims && anims.length) {
+              mixerRef.current = new THREE.AnimationMixer(instance)
+              try { mixerRef.current.clipAction(anims[0], instance).play() } catch(e) {}
+            }
+          } catch(e) {}
           return
         }
         const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader')
@@ -649,7 +665,7 @@ export default function World3DRenderer({
           if (cancelled) return
           const sceneModel = gltf.scene || gltf.scenes?.[0]
           if (!sceneModel) return
-          cache.set(modelUrl, sceneModel)
+          cache.set(modelUrl, { scene: sceneModel, animations: gltf.animations || [] })
           const instance = sceneModel.clone()
           const scale = (avatarStyle && avatarStyle.model_scale) || 1
           const off = (avatarStyle && avatarStyle.model_offset) || { x:0, y:0, z:0 }
@@ -660,6 +676,13 @@ export default function World3DRenderer({
           } catch(e) {}
           player.add(instance)
           gltfModelRef.current = instance
+          // setup mixer if animations present
+          try {
+            if (gltf.animations && gltf.animations.length) {
+              mixerRef.current = new THREE.AnimationMixer(instance)
+              try { mixerRef.current.clipAction(gltf.animations[0], instance).play() } catch(e) {}
+            }
+          } catch(e) {}
         }, undefined, (err) => { console.warn('GLTF load error', err) })
       } catch (e) { console.warn('Failed to load GLTF', e) }
     }
