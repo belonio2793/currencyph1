@@ -18,8 +18,8 @@ const getEnv = (name) => {
   return undefined
 }
 
-const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
-const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || ''
+const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
+const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_PUBLISHABLE_KEY') || ''
 
 // Module-level lazy singleton: initialize Supabase client on first use without relying on globalThis
 let _client = null
