@@ -32,7 +32,8 @@ export default function Rates({ globalCurrency }) {
 
   useEffect(() => {
     loadRates()
-    const interval = setInterval(loadRates, 60000)
+    // Poll hourly in development to avoid excessive API calls
+    const interval = setInterval(loadRates, 60 * 60 * 1000)
 
     // Realtime subscription to Supabase currency_rates table (v2 realtime)
     const channel = supabase
