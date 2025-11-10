@@ -381,18 +381,34 @@ export default function Rates({ globalCurrency }) {
   const [selectedCrypto, setSelectedCrypto] = useState(null)
 
   useEffect(() => {
+    // ensure allCurrencies has sensible entries and PHP is first
+    const apiCurrencies = (currencyAPI && typeof currencyAPI.getCurrencies === 'function') ? currencyAPI.getCurrencies() : []
+    let merged = []
+    try {
+      merged = Array.isArray(apiCurrencies) && apiCurrencies.length ? apiCurrencies.slice() : []
+    } catch (e) { merged = [] }
+
+    // ensure fallback entries present
+    fallbackFiats.forEach(f => {
+      if (!merged.find(m => m.code === f.code)) merged.push(f)
+    })
+
+    // move PHP to the front
+    merged = merged.sort((a, b) => (a.code === baseCurrency ? -1 : b.code === baseCurrency ? 1 : 0))
+    setAllCurrencies(merged)
+
     // sensible defaults after rates load
     if (!loading) {
-      if (!selectedFiat && allCurrencies && allCurrencies.length) {
-        const php = allCurrencies.find(c => c.code === 'PHP')
-        const first = php || allCurrencies.find(c => c.code !== globalCurrency) || allCurrencies[0]
-        setSelectedFiat({ code: first.code, name: first.name })
+      if (!selectedFiat) {
+        // prefer PHP as default fiat
+        const php = merged.find(c => c.code === baseCurrency) || merged[0]
+        if (php) setSelectedFiat({ code: php.code, name: php.name })
       }
       if (!selectedCrypto) {
         setSelectedCrypto({ code: 'BTC', name: 'Bitcoin' })
       }
     }
-  }, [loading, allCurrencies, selectedFiat, selectedCrypto, globalCurrency])
+  }, [loading, /* intentionally not depending on allCurrencies */ selectedFiat, selectedCrypto, globalCurrency])
 
   const listItems = () => {
     if (viewMode === 'fiat') {
