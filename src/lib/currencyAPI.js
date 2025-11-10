@@ -205,26 +205,96 @@ export const currencyAPI = {
 
   // Convert amount from one currency to another
   async convert(amount, fromCurrency, toCurrency) {
-    const rates = await this.getGlobalRates()
-    
-    if (!rates[fromCurrency] || !rates[toCurrency]) {
-      throw new Error(`Currency not found: ${fromCurrency} or ${toCurrency}`)
+    // support converting between fiat (from getGlobalRates) and crypto (from getCryptoPrices)
+    const [rates, crypto] = await Promise.all([this.getGlobalRates(), this.getCryptoPrices()])
+
+    const isFromCrypto = crypto && (crypto[fromCurrency] || crypto[fromCurrency?.toLowerCase()])
+    const isToCrypto = crypto && (crypto[toCurrency] || crypto[toCurrency?.toLowerCase()])
+
+    const now = new Date()
+
+    // Helper to get USD price for crypto symbol
+    const getCryptoUsd = (symbol) => {
+      if (!crypto) return null
+      const s = crypto[symbol] || crypto[symbol?.toLowerCase()]
+      if (!s) return null
+      // crypto data may be stored as { prices: { usd: X } } or directly { usd: X }
+      return (s.prices && s.prices.usd) || (s.usd) || null
     }
 
-    const fromRate = rates[fromCurrency].rate
-    const toRate = rates[toCurrency].rate
-    
-    // Convert via USD
-    const usdAmount = amount / fromRate
-    const convertedAmount = usdAmount * toRate
-
-    return {
-      fromCurrency,
-      toCurrency,
-      originalAmount: amount,
-      convertedAmount: convertedAmount.toFixed(2),
-      rate: (toRate / fromRate).toFixed(6),
-      timestamp: new Date()
+    // Both fiat
+    if (!isFromCrypto && !isToCrypto) {
+      if (!rates[fromCurrency] || !rates[toCurrency]) {
+        throw new Error(`Currency not found: ${fromCurrency} or ${toCurrency}`)
+      }
+      const fromRate = rates[fromCurrency].rate
+      const toRate = rates[toCurrency].rate
+      const usdAmount = amount / fromRate
+      const convertedAmount = usdAmount * toRate
+      return {
+        fromCurrency,
+        toCurrency,
+        originalAmount: amount,
+        convertedAmount: Number(convertedAmount.toFixed(2)),
+        rate: Number((toRate / fromRate).toFixed(6)),
+        timestamp: now
+      }
     }
+
+    // Both crypto
+    if (isFromCrypto && isToCrypto) {
+      const fromUsd = getCryptoUsd(fromCurrency)
+      const toUsd = getCryptoUsd(toCurrency)
+      if (fromUsd == null || toUsd == null) throw new Error(`Crypto price not available for ${fromCurrency} or ${toCurrency}`)
+      const rate = toUsd / fromUsd // 1 FROM crypto = rate TO crypto
+      const convertedAmount = amount * rate
+      return {
+        fromCurrency,
+        toCurrency,
+        originalAmount: amount,
+        convertedAmount: Number(convertedAmount.toFixed(8)),
+        rate: Number(rate.toFixed(8)),
+        timestamp: now
+      }
+    }
+
+    // From crypto -> fiat
+    if (isFromCrypto && !isToCrypto) {
+      const fromUsd = getCryptoUsd(fromCurrency)
+      if (fromUsd == null) throw new Error(`Crypto price not available for ${fromCurrency}`)
+      if (!rates[toCurrency]) throw new Error(`Currency not found: ${toCurrency}`)
+      const usdToTarget = rates[toCurrency].rate // USD -> TARGET
+      const rate = fromUsd * usdToTarget // 1 FROM crypto = rate TARGET fiat
+      const convertedAmount = amount * rate
+      return {
+        fromCurrency,
+        toCurrency,
+        originalAmount: amount,
+        convertedAmount: Number(convertedAmount.toFixed(2)),
+        rate: Number(rate.toFixed(6)),
+        timestamp: now
+      }
+    }
+
+    // From fiat -> crypto
+    if (!isFromCrypto && isToCrypto) {
+      if (!rates[fromCurrency]) throw new Error(`Currency not found: ${fromCurrency}`)
+      const usdToFrom = rates[fromCurrency].rate // USD -> FROM
+      const toUsd = getCryptoUsd(toCurrency)
+      if (toUsd == null) throw new Error(`Crypto price not available for ${toCurrency}`)
+      // 1 FROM fiat = (1 / usdToFrom) USD. Then into crypto: (1 / usdToFrom) / toUsd
+      const rate = 1 / (usdToFrom * toUsd) // 1 FROM fiat = rate TO crypto
+      const convertedAmount = amount * rate
+      return {
+        fromCurrency,
+        toCurrency,
+        originalAmount: amount,
+        convertedAmount: Number(convertedAmount.toFixed(8)),
+        rate: Number(rate.toFixed(12)),
+        timestamp: now
+      }
+    }
+
+    throw new Error('Unsupported currency conversion')
   }
 }
