@@ -89,10 +89,12 @@ async function main() {
   // Prepare cryptocurrencies rows and usd price map
   const cryptos = []
   const usdPrices = {}
+  const usedCodes = new Set()
   for (const m of markets) {
     const id = m.id
     const symbol = (m.symbol || '').toUpperCase()
-    const code = chooseCode(symbol, counts, id)
+    const code = chooseCode(symbol, counts, id, usedCodes)
+    usedCodes.add(code)
     cryptos.push({ code, name: m.name, coingecko_id: id })
     usdPrices[code] = Number(m.current_price)
   }
