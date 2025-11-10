@@ -994,19 +994,29 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 // Apply stat boosts from job
                 const statBoost = getStatBoostFromJob(job)
-                setCharacterStats(prev => ({
-                  strength: prev.strength + statBoost.strength,
-                  intelligence: prev.intelligence + statBoost.intelligence,
-                  charisma: prev.charisma + statBoost.charisma,
-                  endurance: prev.endurance + statBoost.endurance,
-                  dexterity: prev.dexterity + statBoost.dexterity,
-                  luck: prev.luck + statBoost.luck
-                }))
 
-                // persist
+                // Compute new stats based on existing characterStats snapshot
+                const newStats = {
+                  strength: (characterStats?.strength || 0) + statBoost.strength,
+                  intelligence: (characterStats?.intelligence || 0) + statBoost.intelligence,
+                  charisma: (characterStats?.charisma || 0) + statBoost.charisma,
+                  endurance: (characterStats?.endurance || 0) + statBoost.endurance,
+                  dexterity: (characterStats?.dexterity || 0) + statBoost.dexterity,
+                  luck: (characterStats?.luck || 0) + statBoost.luck
+                }
+
+                // Update UI state immediately
+                setCharacterStats(() => newStats)
+
+                // persist character and stats
                 persistCharacterPartial(updated)
                 // Save using the updated object (avoid stale closure)
-                if (userId) saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
+                if (userId) {
+                  saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
+                  // Persist stats JSON column explicitly
+                  try { gameAPI.updateCharacterStats(updated.id, { stats: newStats }).catch(()=>{}) } catch(e) {}
+                }
+
                 // Check phase progression
                 checkAndUpdatePhases(updated)
                 return updated
