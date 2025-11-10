@@ -262,10 +262,10 @@ export default function World3DRenderer({
         }
       } catch (e) { /* ignore movement errors */ }
 
-      // camera follow: keep camera centered on player
+      // camera follow: keep camera centered on player (if enabled)
       try {
         const player = playerRef.current
-        if (player && camera) {
+        if (player && camera && cameraFollowRef.current) {
           const playerX = player.position.x
           const playerZ = player.position.z
           camera.position.x = playerX + cameraOffset.x
