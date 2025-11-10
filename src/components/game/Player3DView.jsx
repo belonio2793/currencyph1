@@ -152,7 +152,6 @@ export default function Player3DView({
   return (
     <div className="w-full h-full relative bg-slate-900">
       <div ref={containerRef} className="w-full h-full" />
-      {/* HUD could be added here if desired */}
     </div>
   )
 }
