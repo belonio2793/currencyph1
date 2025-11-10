@@ -156,7 +156,15 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   }
 
   const toggleVisibility = (id) => {
-    setVisibleMap(prev => ({ ...prev, [id]: !prev[id] }))
+    setVisibleMap(prev => {
+      const next = { ...prev, [id]: !prev[id] }
+      // if currently selected style is the one toggled, notify parent so it can persist visibility
+      if (selectedStyle && selectedStyle.id === id && typeof onSelect === 'function') {
+        const updated = { ...selectedStyle, visible: !!next[id] }
+        try { onSelect(updated, { close: false }) } catch(e) {}
+      }
+      return next
+    })
   }
 
   return (
