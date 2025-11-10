@@ -64,9 +64,9 @@ export default function World3DRenderer({
     scene.background = new THREE.Color(0x071228)
     sceneRef.current = scene
 
-    // camera
+    // camera (positioned for 350% default zoom)
     const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 10000)
-    camera.position.set(0, 200, 400)
+    camera.position.set(0, 57, 114)
     camera.lookAt(0, 0, 0)
     cameraRef.current = camera
 
