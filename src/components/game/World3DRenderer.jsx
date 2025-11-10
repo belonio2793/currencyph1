@@ -94,13 +94,13 @@ export default function World3DRenderer({
     ground.position.y = -0.5
     scene.add(ground)
 
-    // player marker - smooth golden avatar statue
+    // player marker - smooth avatar statue with customizable colors
     const playerGroup = new THREE.Group()
-    const goldenMat = new THREE.MeshStandardMaterial({
-      color: 0xd4a574,
+    const avatarMat = new THREE.MeshStandardMaterial({
+      color: avatarStyle.color || 0xd4a574,
       metalness: 0.8,
       roughness: 0.2,
-      emissive: 0x6b5a3a,
+      emissive: avatarStyle.emissive || 0x6b5a3a,
       emissiveIntensity: 0.3
     })
 
