@@ -143,9 +143,49 @@ export default function PlayerIsometricView({
     }
   }, [mapSettings, character])
 
+  // Drag-and-drop handlers for container
+  const handleDragOver = (e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy' }
+  const handleDrop = async (e) => {
+    e.preventDefault()
+    try {
+      const world = worldRef.current
+      if (!world) return
+      const payload = e.dataTransfer.getData('application/json')
+      if (!payload) return
+      const data = JSON.parse(payload)
+      const rect = containerRef.current.getBoundingClientRect()
+      const clientX = e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX)
+      const clientY = e.clientY || (e.touches && e.touches[0] && e.touches[0].clientY)
+      const pt = world._getMouseWorld(clientX, clientY)
+      if (pt) {
+        const uid = (character && character.id) || null
+        await world.placePropertyAt({ x: pt.x, z: pt.z }, uid)
+      }
+    } catch (err) { console.warn('drop failed', err) }
+  }
+
+  // helper for dragstart
+  const onDragStartItem = (e, type) => {
+    try {
+      e.dataTransfer.setData('application/json', JSON.stringify({ type }))
+      e.dataTransfer.effectAllowed = 'copy'
+      // enter placement preview
+      const world = worldRef.current
+      const uid = (character && character.id) || null
+      if (world) world.enablePlacementMode({ type }, uid)
+    } catch (err) { console.warn('dragstart failed', err) }
+  }
+
+  const onDragEndItem = (e) => {
+    try {
+      const world = worldRef.current
+      if (world) world.enablePlacementMode(null)
+    } catch (err) { console.warn('dragend failed', err) }
+  }
+
   return (
     <div className="w-full h-full relative bg-transparent">
-      <div ref={containerRef} className="w-full h-full" />
+      <div ref={containerRef} className="w-full h-full" onDragOver={handleDragOver} onDrop={handleDrop} />
 
       {/* Property UI Overlay */}
       <div className="absolute left-4 bottom-4 z-40 w-64">
@@ -157,6 +197,9 @@ export default function PlayerIsometricView({
                 <div className="text-xs text-white capitalize">{type}</div>
                 <div className="flex gap-2">
                   <button
+                    draggable
+                    onDragStart={(e) => onDragStartItem(e, type)}
+                    onDragEnd={onDragEndItem}
                     onClick={async () => {
                       try {
                         const world = worldRef.current
