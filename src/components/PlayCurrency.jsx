@@ -1751,7 +1751,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       {avatarCustomizerOpen && (
         <AvatarCustomizer
           selectedStyle={selectedAvatarStyle}
-          onSelect={(style) => {
+          onSelect={(style, opts) => {
             // update selected style in UI
             setSelectedAvatarStyle(style)
             // update character cosmetics and persist
@@ -1761,7 +1761,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
               if (userId) saveCharacterToDB(updated)
               return updated
             })
-            setAvatarCustomizerOpen(false)
+            // if caller asked to close the modal, close it. default: do not close
+            if (!opts || opts.close) setAvatarCustomizerOpen(false)
           }}
           onClose={() => setAvatarCustomizerOpen(false)}
         />
