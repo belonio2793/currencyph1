@@ -184,10 +184,16 @@ export default function Rates({ globalCurrency }) {
         const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 500, 8000)
         const cryptoData = cg || null
         if (cryptoData) {
-          const globalExchangeRate = exchangeRates[`USD_${baseCurrency}`] || 1
+          const usdToBase = (() => {
+            const direct = exchangeRates[`USD_${baseCurrency}`]
+            if (typeof direct === 'number' && direct > 0) return direct
+            const rev = exchangeRates[`${baseCurrency}_USD`]
+            if (typeof rev === 'number' && rev > 0) return 1 / rev
+            return 1
+          })()
 
           const cryptoPricesInGlobalCurrency = {
-            BTC: Math.round(((cryptoData.bitcoin?.usd) || defaultCryptoPrices.BTC) * globalExchangeRate * 100) / 100,
+            BTC: Math.round(((cryptoData.bitcoin?.usd) || defaultCryptoPrices.BTC) * usdToBase * 100) / 100,
             ETH: Math.round(((cryptoData.ethereum?.usd) || defaultCryptoPrices.ETH) * globalExchangeRate * 100) / 100,
             LTC: Math.round(((cryptoData.litecoin?.usd) || defaultCryptoPrices.LTC) * globalExchangeRate * 100) / 100,
             DOGE: Math.round(((cryptoData.dogecoin?.usd) || defaultCryptoPrices.DOGE) * globalExchangeRate * 100) / 100,
