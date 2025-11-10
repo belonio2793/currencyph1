@@ -50,17 +50,39 @@ function initClient() {
       // Initialize with default global fetch - don't override to avoid interfering with runtime fetch behavior
       console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
 
-      // Wrap fetch to handle network errors gracefully
+      // Wrap fetch to handle network errors gracefully and retry transient failures
       const originalFetch = globalThis.fetch
       const wrappedFetch = async (...args) => {
-        try {
-          return await originalFetch(...args)
-        } catch (err) {
-          if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-            console.warn('[supabase-client] Network error during fetch:', err.message)
-            throw err
+        const maxRetries = 2
+        for (let attempt = 0; attempt <= maxRetries; attempt++) {
+          try {
+            // If browser is offline, fail fast with clear message
+            if (typeof navigator !== 'undefined' && !navigator.onLine) {
+              const offlineErr = new Error('Network appears to be offline')
+              offlineErr.name = 'NetworkError'
+              throw offlineErr
+            }
+            return await originalFetch(...args)
+          } catch (err) {
+            // Abort errors should be propagated immediately
+            if (err && (err.name === 'AbortError' || err.name === 'DOMException')) throw err
+
+            // On last attempt, rethrow with more context
+            if (attempt === maxRetries) {
+              console.warn('[supabase-client] Network error during fetch (final):', err && err.message)
+              // attach URL for easier debugging when available
+              try {
+                const url = args && args[0]
+                if (url) console.debug('[supabase-client] failed URL:', url)
+              } catch (e) {}
+              throw err
+            }
+
+            // small backoff before retrying
+            const backoff = 150 * (attempt + 1)
+            await new Promise((res) => setTimeout(res, backoff))
+            // retry
           }
-          throw err
         }
       }
 
