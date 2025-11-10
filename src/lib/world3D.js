@@ -559,21 +559,30 @@ export class World3D {
     return group
   }
   
-  async addPlayer(userId, name, avatarUrl, x = 0, z = 0) {
+  async addPlayer(userId, name, avatarUrl, x = 0, z = 0, opts = {}) {
     try {
       let model = null
 
+      // Allow passing options in place of avatarUrl (backwards compatible)
+      let modelUrl = avatarUrl
+      let colorOverride = opts.color || null
+      if (avatarUrl && typeof avatarUrl === 'object' && !Array.isArray(avatarUrl)) {
+        const o = avatarUrl
+        modelUrl = o.model_url || o.url || null
+        colorOverride = o.color || o.colorHex || colorOverride
+      }
+
       // Try loading the avatar model if URL is provided
-      if (avatarUrl) {
+      if (modelUrl) {
         try {
-          model = await this.loadAvatarModel(avatarUrl)
+          model = await this.loadAvatarModel(modelUrl)
         } catch (e) {
           console.warn('Failed to load avatar, using fallback:', e)
-          model = this.createSimpleAvatar(name, 0x00a8ff)
+          model = this.createSimpleAvatar(name, colorOverride || 0x00a8ff)
         }
       } else {
         // Create a simple avatar if no URL
-        model = this.createSimpleAvatar(name, 0x00a8ff)
+        model = this.createSimpleAvatar(name, colorOverride || 0x00a8ff)
       }
 
       // Container for player (model + nameplate)
