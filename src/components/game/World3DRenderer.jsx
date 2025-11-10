@@ -11,7 +11,7 @@ export default function World3DRenderer({
   character = null,
   onPropertyPlace = null, // (worldPos) => Promise
   onPropertyClick = null,
-  initialAvatarPos = { x: 0, z: 0 },
+  initialAvatarPos,
   className = ''
 }) {
   const containerRef = useRef(null)
