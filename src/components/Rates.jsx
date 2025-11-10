@@ -487,7 +487,9 @@ export default function Rates({ globalCurrency }) {
 
   const renderCryptoCard = (isPrimary) => {
     if (!selectedCrypto) return null
-    const price = cryptoRates[selectedCrypto.code] || defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1)
+    const basePrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
+    const fiatMultiplier = selectedFiat ? (getRate(baseCurrency, selectedFiat.code) || null) : null
+    const price = (basePrice != null && fiatMultiplier != null) ? (basePrice * fiatMultiplier) : (fiatMultiplier == null ? basePrice : null)
     return (
       <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center justify-between">
@@ -496,8 +498,8 @@ export default function Rates({ globalCurrency }) {
             <p className="text-xs text-slate-500">{selectedCrypto.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-light text-orange-700">{price ? price.toFixed(2) : '—'}</div>
-            <div className="text-xs text-slate-500">{baseCurrency} per {selectedCrypto.code}</div>
+            <div className="text-2xl font-light text-orange-700">{price ? (typeof price === 'number' ? price.toFixed(2) : '—') : '—'}</div>
+            <div className="text-xs text-slate-500">{selectedFiat ? selectedFiat.code : baseCurrency} per {selectedCrypto.code}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
