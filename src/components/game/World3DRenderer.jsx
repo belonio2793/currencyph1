@@ -190,15 +190,7 @@ export default function World3DRenderer({
     }
     window.addEventListener('resize', onResize)
 
-    // focus/selection visuals
-    const onFocus = () => {
-      try { container.style.border = '4px solid #ffd133' } catch(e){}
-    }
-    const onBlur = () => {
-      try { container.style.border = 'none' } catch(e){}
-    }
-    container.addEventListener('focus', onFocus)
-    container.addEventListener('blur', onBlur)
+    // focus/selection visuals are always on via an overlay; no focus listeners needed
 
     // keyboard movement
     const keys = { current: {} }
