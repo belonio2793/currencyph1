@@ -272,10 +272,16 @@ export default function Rates({ globalCurrency }) {
       setCryptoRates(cryptoPricesInGlobalCurrency)
     } catch (err) {
       console.debug('Crypto prices API error, using default prices:', err?.message || err)
-      const globalExchangeRate = exchangeRates[`USD_${baseCurrency}`] || 1
+      const usdToBase = (() => {
+        const direct = exchangeRates[`USD_${baseCurrency}`]
+        if (typeof direct === 'number' && direct > 0) return direct
+        const rev = exchangeRates[`${baseCurrency}_USD`]
+        if (typeof rev === 'number' && rev > 0) return 1 / rev
+        return 1
+      })()
       const defaults = {}
       Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
-        defaults[key] = Math.round(value * globalExchangeRate * 100) / 100
+        defaults[key] = Math.round(value * usdToBase * 100) / 100
       })
       setCryptoRates(defaults)
     }
