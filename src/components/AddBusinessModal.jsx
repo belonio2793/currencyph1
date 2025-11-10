@@ -319,6 +319,7 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
         eventHandlers={eventHandlers}
         ref={(el) => { markerRef.current = el ? el : null }}
         position={pos}
+        icon={DEFAULT_LEAFLET_ICON}
       />
     ) : null
   }
