@@ -137,12 +137,44 @@ async function upsertPairs(pairs) {
   }
   const chunkSize = 500
   for (let i = 0; i < pairs.length; i += chunkSize) {
-    const chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p, updated_at: new Date().toISOString() }))
-    const { data, error } = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
-    if (error) {
-      console.error('Upsert error:', error)
-      throw error
+    let chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p, updated_at: new Date().toISOString() }))
+    let res
+    try {
+      res = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
+    } catch (err) {
+      // If updated_at doesn't exist in schema, retry without it
+      const msg = (err && err.message) || JSON.stringify(err)
+      if (msg && msg.includes('updated_at')) {
+        chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p }))
+        const { data, error } = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
+        if (error) {
+          console.error('Upsert error after retry without updated_at:', error)
+          throw error
+        }
+        console.log(`Upserted ${chunk.length} pairs (batch ${i / chunkSize + 1}) [no updated_at]`)
+        continue
+      }
+      throw err
     }
+
+    if (res && res.error) {
+      // check for missing column in schema cache
+      const errMsg = (res.error && res.error.message) || ''
+      if (errMsg.includes('updated_at')) {
+        // retry without updated_at
+        chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p }))
+        const { data, error } = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
+        if (error) {
+          console.error('Upsert error after retry without updated_at:', error)
+          throw error
+        }
+        console.log(`Upserted ${chunk.length} pairs (batch ${i / chunkSize + 1}) [no updated_at]`)
+        continue
+      }
+      console.error('Upsert error:', res.error)
+      throw res.error
+    }
+
     console.log(`Upserted ${chunk.length} pairs (batch ${i / chunkSize + 1})`)
   }
 }
