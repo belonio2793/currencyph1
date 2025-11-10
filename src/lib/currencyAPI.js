@@ -34,6 +34,30 @@ export const currencyAPI = {
   // Get all currency rates relative to USD via edge function
   async getGlobalRates() {
     try {
+      // Try public exchangerate.host API first (CORS-friendly)
+      try {
+        const resp = await fetch('https://api.exchangerate.host/latest?base=USD')
+        if (resp && resp.ok) {
+          const json = await resp.json()
+          const ratesData = json && json.rates ? json.rates : null
+          if (ratesData) {
+            const now = new Date()
+            const rates = {}
+            CURRENCIES.forEach(currency => {
+              if (currency.code === 'USD') {
+                rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
+                return
+              }
+              const rateVal = ratesData[currency.code]
+              rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
+            })
+            return rates
+          }
+        }
+      } catch (e) {
+        // ignore and fall through to edge function
+      }
+
       const { data, error } = await supabase.functions.invoke('fetch-rates', {
         method: 'GET'
       })
@@ -62,7 +86,7 @@ export const currencyAPI = {
 
       return rates
     } catch (err) {
-      console.warn('Failed to fetch rates from edge function:', err?.message)
+      console.warn('Failed to fetch rates from edge function and public API:', err?.message || err)
       return this.getFallbackRates()
     }
   },
