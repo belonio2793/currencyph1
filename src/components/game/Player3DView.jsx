@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from 'react'
-import React, { useEffect, useRef } from 'react'
 import { World3D } from '../../lib/world3D'
 
 export default function Player3DView({
