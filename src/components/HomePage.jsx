@@ -5,6 +5,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [wallets, setWallets] = useState([])
   const [loans, setLoans] = useState([])
   const [loading, setLoading] = useState(true)
+  const [totalBalanceConverted, setTotalBalanceConverted] = useState(null)
+  const [totalDebtConverted, setTotalDebtConverted] = useState(null)
 
   useEffect(() => {
     loadData()
