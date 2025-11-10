@@ -1782,7 +1782,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       properties={[...((character.properties || []).map(normalizeProperty)), ...((remoteAssets || []).map(normalizeProperty))].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i)}
                       character={character}
                       initialAvatarPos={initialAvatarPos}
-                      onCharacterMove={(pos) => setCharacterPosition(pos)}
+                      onCharacterMove={(pos) => handleWorldCharacterMove(pos)}
                       mapSettings={mapSettings}
                       placingProperty={placingAsset}
                       onConfirmPlace={(coords) => confirmPlacement(coords)}
