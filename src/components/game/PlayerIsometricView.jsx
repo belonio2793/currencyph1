@@ -229,6 +229,125 @@ export default function PlayerIsometricView({
     } catch (err) { console.warn('drop failed', err) }
   }
 
+  // If WebGL failed to mount inside WorldIsometric, create a simple 2D canvas renderer as a recreation
+  const fallbackCanvasRef = useRef(null)
+  useEffect(() => {
+    const world = worldRef.current
+    const container = containerRef.current
+    if (!container) return
+
+    // detect if three renderer is present
+    const hasThreeCanvas = world && world.renderer && world.renderer.domElement && world.renderer.domElement.parentNode
+    if (hasThreeCanvas) {
+      // ensure any previous fallback is removed
+      if (fallbackCanvasRef.current) {
+        try { container.removeChild(fallbackCanvasRef.current) } catch(e){}
+        fallbackCanvasRef.current = null
+      }
+      return
+    }
+
+    // create fallback canvas
+    const canvas = document.createElement('canvas')
+    canvas.style.width = '100%'
+    canvas.style.height = '100%'
+    canvas.style.display = 'block'
+    canvas.style.background = 'transparent'
+    canvas.className = 'fallback-isometric-canvas'
+    canvas.setAttribute('data-engine', 'fallback-isometric')
+    container.appendChild(canvas)
+    fallbackCanvasRef.current = canvas
+
+    const ctx = canvas.getContext('2d')
+    const dpr = window.devicePixelRatio || 1
+
+    const cols = (world && world.cols) || Math.max(80, Math.floor((mapSettings.sizeMultiplier || 10) * 8))
+    const rows = (world && world.rows) || Math.max(50, Math.floor((mapSettings.sizeMultiplier || 10) * 5))
+
+    const resize = () => {
+      const rect = container.getBoundingClientRect()
+      canvas.width = Math.max(1, Math.floor(rect.width * dpr))
+      canvas.height = Math.max(1, Math.floor(rect.height * dpr))
+      ctx.setTransform(dpr,0,0,dpr,0,0)
+      draw()
+    }
+
+    const draw = () => {
+      if (!ctx) return
+      const rect = canvas.getBoundingClientRect()
+      const w = rect.width
+      const h = rect.height
+      // background
+      ctx.clearRect(0,0,w,h)
+      ctx.fillStyle = '#071228'
+      ctx.fillRect(0,0,w,h)
+
+      // tile grid
+      const cellW = Math.max(6, Math.floor(w / cols))
+      const cellH = Math.max(6, Math.floor(h / rows))
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const x = c * cellW
+          const y = r * cellH
+          ctx.fillStyle = (c + r) % 2 === 0 ? '#5b6470' : '#53606f'
+          ctx.fillRect(x+1, y+1, cellW-2, cellH-2)
+        }
+      }
+
+      // roads
+      ctx.fillStyle = '#2b2b2b'
+      for (let r = 0; r <= rows; r++) if (r % 6 === 0) ctx.fillRect(0, r*cellH, w, Math.max(2, Math.floor(cellH*0.6)))
+      for (let c = 0; c <= cols; c++) if (c % 6 === 0) ctx.fillRect(c*cellW, 0, Math.max(2, Math.floor(cellW*0.6)), h)
+
+      // properties
+      try {
+        for (const p of properties || []) {
+          const gx = Math.max(0, Math.min(cols-1, Math.round((p.location_x || 0) / (300 / cols))))
+          const gy = Math.max(0, Math.min(rows-1, Math.round((p.location_y || 0) / (350 / rows))))
+          const x = gx * cellW + cellW/2
+          const y = gy * cellH + cellH/2
+          ctx.fillStyle = p.owner_id ? '#4caf50' : '#ffd166'
+          ctx.beginPath()
+          ctx.arc(x, y, Math.max(6, Math.min(cellW, cellH) * 0.28), 0, Math.PI*2)
+          ctx.fill()
+        }
+      } catch(e) {}
+
+      // player marker (approximate)
+      try {
+        const pid = playerIdRef.current
+        if (pid && world && world.players && world.players.has(pid)) {
+          const pl = world.players.get(pid)
+          const wx = pl.group.position.x
+          const wz = pl.group.position.z
+          const gx = Math.floor((wx + (cols* (world.tileSize || 36))/2) / (cols*(world.tileSize || 36)) * cols)
+          const gy = Math.floor((wz + (rows*(world.tileSize || 36))/2) / (rows*(world.tileSize || 36)) * rows)
+          const x = (gx+0.5) * cellW
+          const y = (gy+0.5) * cellH
+          ctx.fillStyle = '#00a8ff'
+          ctx.beginPath()
+          ctx.arc(x, y, Math.max(6, Math.min(cellW, cellH) * 0.35), 0, Math.PI*2)
+          ctx.fill()
+        }
+      } catch(e) {}
+    }
+
+    resize()
+    const ro = new ResizeObserver(resize)
+    ro.observe(container)
+
+    let rafId = null
+    const anim = () => { draw(); rafId = requestAnimationFrame(anim) }
+    rafId = requestAnimationFrame(anim)
+
+    return () => {
+      try { if (rafId) cancelAnimationFrame(rafId) } catch(e){}
+      try { ro.disconnect() } catch(e){}
+      try { if (fallbackCanvasRef.current) container.removeChild(fallbackCanvasRef.current) } catch(e){}
+      fallbackCanvasRef.current = null
+    }
+  }, [worldRef.current, properties, mapSettings, character])
+
   // helper for dragstart
   const onDragStartItem = (e, type) => {
     try {
