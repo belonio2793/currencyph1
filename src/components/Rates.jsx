@@ -665,9 +665,28 @@ export default function Rates({ globalCurrency }) {
                   </div>
                   <div className="text-sm text-slate-600">
                     {item.type === 'fiat' ? (
-                      (() => { const r = getRate(baseCurrency, item.code); return r != null ? r.toFixed(4) : '—' })()
+                      (() => {
+                        // Prefer USD -> CODE if present in currency_rates
+                        const usdPair = exchangeRates[`USD_${item.code}`]
+                        if (typeof usdPair === 'number') return usdPair.toFixed(6)
+                        // Try direct pair baseCurrency -> code
+                        const direct = getRate(baseCurrency, item.code)
+                        if (typeof direct === 'number') return direct.toFixed(6)
+                        // Try reverse (code -> baseCurrency)
+                        const reverse = exchangeRates[`${item.code}_${baseCurrency}`]
+                        if (typeof reverse === 'number' && reverse > 0) return (1 / reverse).toFixed(6)
+                        return '—'
+                      })()
                     ) : (
-                      (() => { const p = cryptoRates[item.code] || defaultCryptoPrices[item.code] * (exchangeRates[`USD_${baseCurrency}`] || 1); return p ? p.toFixed(2) : '—' })()
+                      (() => {
+                        // For crypto, show USD price if available (cryptoRates uses USD->price converted to baseCurrency earlier)
+                        const p = cryptoRates[item.code]
+                        if (typeof p === 'number') return p.toFixed(2)
+                        // fallback: show USD per unit if present in currency_rates as USD_BASE then compute
+                        const usdToBase = exchangeRates[`USD_${baseCurrency}`] || 1
+                        const defaultPrice = defaultCryptoPrices[item.code]
+                        return defaultPrice ? (defaultPrice * (usdToBase || 1)).toFixed(2) : '—'
+                      })()
                     )}
                   </div>
                 </div>
