@@ -135,6 +135,41 @@ export default function Rates({ globalCurrency }) {
 
       const ratesMap = {}
 
+      // 0) First, try calling the fetch-rates edge function to get freshest rates (client-side read only)
+      try {
+        const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
+        const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
+        const resp = await fetchWithRetries(
+          `${supabaseUrl}/functions/v1/fetch-rates`,
+          { headers: { 'Authorization': `Bearer ${anonKey}`, 'Content-Type': 'application/json' } },
+          1,
+          500,
+          10000
+        )
+        if (resp && (resp.rates || resp.exchangeRates || resp.currencyRates)) {
+          const list = resp.rates || resp.exchangeRates || resp.currencyRates
+          // accept array or object
+          if (Array.isArray(list)) {
+            list.forEach(r => {
+              if (r && (r.from_currency || r.from) && (r.to_currency || r.to) && r.rate != null) {
+                const from = r.from_currency || r.from
+                const to = r.to_currency || r.to
+                ratesMap[`${from}_${to}`] = Number(r.rate)
+              }
+            })
+          } else if (typeof list === 'object') {
+            Object.keys(list).forEach(k => { ratesMap[k] = Number(list[k]) })
+          }
+          if (Object.keys(ratesMap).length) {
+            setExchangeRates(ratesMap)
+            return
+          }
+        }
+      } catch (edgeErr) {
+        // ignore and continue to DB-backed fallbacks
+        console.debug('fetch-rates edge function call failed or returned no rates:', edgeErr)
+      }
+
       // 1) Prefer Supabase currency_rates table (real-time source)
       try {
         // select only expected columns to avoid schema mismatch
