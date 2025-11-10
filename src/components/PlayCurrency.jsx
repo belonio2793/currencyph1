@@ -1759,7 +1759,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     </div>
                     <div className="flex items-center gap-2">
                       <button onClick={() => { setCharacter(c); setProperties(c.properties || []); setAvatarCustomizerOpen(true) }} className="px-3 py-2 bg-purple-600 hover:bg-purple-700 rounded text-white">Change Outfit</button>
-                      <button onClick={async () => { await markCharacterPlayed(c); setCharacter(c); setProperties(c.properties || []) }} className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Play</button>
+                      <button onClick={async () => { await markCharacterPlayed(c); setCharacter(c); setProperties(c.properties || []); try { if (c.cosmetics && c.cosmetics.avatar) setSelectedAvatarStyle(c.cosmetics.avatar); else setSelectedAvatarStyle(null) } catch(e) {} }} className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white">Play</button>
                       <button onClick={() => { const newName = prompt('Rename character', c.name); if (newName) renameCharacter(c.id, newName) }} className="px-3 py-2 bg-yellow-600 hover:bg-yellow-700 rounded text-white">Rename</button>
                       <button onClick={() => { if (confirm('Delete character?')) deleteCharacter(c.id) }} className="px-3 py-2 bg-red-600 hover:bg-red-700 rounded text-white">Delete</button>
                     </div>
