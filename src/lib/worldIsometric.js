@@ -357,6 +357,18 @@ export class WorldIsometric {
     this.mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1
     // convert mouse to world by casting ray from camera
     this.raycaster.setFromCamera(this.mouse, this.camera)
+
+    // If placing a property, prefer plane intersection and place
+    if (this._placementMode) {
+      const pt = new THREE.Vector3()
+      this.raycaster.ray.intersectPlane(this._plane, pt)
+      if (pt) {
+        // Use stored owner id if available
+        try { this.placePropertyAt({ x: Math.round(pt.x), z: Math.round(pt.z) }, this._placementOwnerId) } catch(e) { console.warn('placePropertyAt failed', e) }
+      }
+      return
+    }
+
     const intersects = this.raycaster.intersectObjects(Array.from(this.players.values()).map(p => p.group).concat(this.tiles), true)
     if (intersects && intersects.length) {
       const hit = intersects[0].object
