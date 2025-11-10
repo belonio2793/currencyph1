@@ -239,6 +239,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const passiveTimerRef = useRef(null)
   const presenceChannelRef = useRef(null)
   const presenceTimerRef = useRef(null)
+  const presenceTableChannelRef = useRef(null)
   const assetsChannelRef = useRef(null)
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1, sizeMultiplier: 10 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
@@ -1277,6 +1278,35 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
       await channel.subscribe()
       presenceChannelRef.current = channel
+
+      // also subscribe to presence table changes (postgres_changes) to reflect DB-driven presence updates
+      try {
+        const tableChannel = supabase
+          .channel('public:game_presence_table')
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'game_presence' }, (payload) => {
+            try {
+              const ev = payload.eventType || payload.event
+              const rec = payload.new || payload.record || payload.new
+              if (!rec) return
+              setOnlinePlayers((prev) => {
+                const idx = prev.findIndex(x => x.user_id === (rec.user_id || rec.id || rec.user_id))
+                if (ev === 'INSERT' || ev === 'UPDATE') {
+                  if (idx === -1) return prev.concat({ user_id: rec.user_id || rec.id, name: rec.name || rec.user_name || 'Player', status: rec.status || 'online' })
+                  const copy = [...prev]
+                  copy[idx] = { ...copy[idx], user_id: rec.user_id || rec.id, name: rec.name || rec.user_name || copy[idx].name, status: rec.status || copy[idx].status }
+                  return copy
+                } else if (ev === 'DELETE') {
+                  return prev.filter(x => x.user_id !== (payload.old?.user_id || payload.old?.id))
+                }
+                return prev
+              })
+            } catch (e) { console.warn('presence table handler failed', e) }
+          })
+          .subscribe()
+        presenceTableChannelRef.current = tableChannel
+      } catch (e) {
+        console.warn('Could not subscribe to presence table channel', e)
+      }
 
       // broadcast join
       await updatePresence({ action: 'join', char: { id: character?.id, name: character?.name }, user_id: userId || character?.id })
