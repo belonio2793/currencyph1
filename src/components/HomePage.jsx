@@ -12,6 +12,52 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
     loadData()
   }, [userId])
 
+  // Recompute converted totals when display currency changes
+  useEffect(() => {
+    if (!loading) {
+      // run conversion in background
+      convertTotals(wallets, loans)
+    }
+  }, [globalCurrency])
+
+  const convertTotals = async (w = wallets, l = loans) => {
+    try {
+      // Total balance: sum wallet balances converted to globalCurrency
+      let balanceSum = 0
+      for (const wallet of (w || [])) {
+        const amt = Number(wallet.balance || 0)
+        if (amt === 0) continue
+        const fromCurrency = wallet.currency_code || globalCurrency
+        if (fromCurrency === globalCurrency) {
+          balanceSum += amt
+        } else {
+          const rate = await wisegcashAPI.getExchangeRate(fromCurrency, globalCurrency)
+          balanceSum += rate ? amt * Number(rate) : 0
+        }
+      }
+      setTotalBalanceConverted(Number(balanceSum).toFixed(2))
+
+      // Total debt: sum loan remaining_balance/total_owed converted to globalCurrency
+      let debtSum = 0
+      for (const loan of (l || [])) {
+        const amt = Number(loan.remaining_balance || loan.total_owed || 0)
+        if (amt === 0) continue
+        const loanCurrency = loan.currency || loan.currency_code || globalCurrency
+        if (loanCurrency === globalCurrency) {
+          debtSum += amt
+        } else {
+          const rate = await wisegcashAPI.getExchangeRate(loanCurrency, globalCurrency)
+          debtSum += rate ? amt * Number(rate) : 0
+        }
+      }
+      setTotalDebtConverted(Number(debtSum).toFixed(2))
+    } catch (convErr) {
+      console.warn('Failed to convert totals to display currency', convErr)
+      setTotalBalanceConverted(null)
+      setTotalDebtConverted(null)
+    }
+  }
+
   const loadData = async () => {
     try {
       if (userId && !userId.includes('guest-local')) {
@@ -24,41 +70,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         setWallets(w)
         setLoans(l)
 
-        // Convert totals to globalCurrency
-        try {
-          // Total balance: sum wallet balances converted to globalCurrency
-          let balanceSum = 0
-          for (const wallet of w) {
-            const amt = Number(wallet.balance || 0)
-            if (amt === 0) continue
-            if (!wallet.currency_code || wallet.currency_code === globalCurrency) {
-              balanceSum += amt
-            } else {
-              const rate = await wisegcashAPI.getExchangeRate(wallet.currency_code, globalCurrency)
-              balanceSum += rate ? amt * Number(rate) : 0
-            }
-          }
-          setTotalBalanceConverted(Number(balanceSum).toFixed(2))
-
-          // Total debt: sum loan remaining_balance/total_owed converted to globalCurrency
-          let debtSum = 0
-          for (const loan of l) {
-            const amt = Number(loan.remaining_balance || loan.total_owed || 0)
-            if (amt === 0) continue
-            const loanCurrency = loan.currency || loan.currency_code || globalCurrency
-            if (loanCurrency === globalCurrency) {
-              debtSum += amt
-            } else {
-              const rate = await wisegcashAPI.getExchangeRate(loanCurrency, globalCurrency)
-              debtSum += rate ? amt * Number(rate) : 0
-            }
-          }
-          setTotalDebtConverted(Number(debtSum).toFixed(2))
-        } catch (convErr) {
-          console.warn('Failed to convert totals to display currency', convErr)
-          setTotalBalanceConverted(null)
-          setTotalDebtConverted(null)
-        }
+        // compute converted totals
+        await convertTotals(w, l)
       }
     } catch (err) {
       console.error('Error loading data:', err)
