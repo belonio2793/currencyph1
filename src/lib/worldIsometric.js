@@ -59,8 +59,6 @@ export class WorldIsometric {
     this.camera.zoom = 1
     this.camera.updateProjectionMatrix()
 
-    // renderer: try WebGL first, fallback to 2D canvas if unavailable
-    this.isWebGL = true
     try {
       this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
       this.renderer.setSize(this.width, this.height)
@@ -71,16 +69,8 @@ export class WorldIsometric {
       this.container.appendChild(this.renderer.domElement)
       try { this.renderer.domElement.setAttribute('data-engine','three.js r156') } catch(e){}
     } catch (e) {
-      console.warn('WebGLRenderer failed, falling back to 2D canvas', e)
-      this.isWebGL = false
-      this.canvas = document.createElement('canvas')
-      this.canvas.style.display = 'block'
-      this.canvas.width = this.width
-      this.canvas.height = this.height
-      try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
-      this.container.appendChild(this.canvas)
-      try { this.canvas.setAttribute('data-engine','three.js r156') } catch(e){}
-      try { this.ctx = this.canvas.getContext('2d') } catch(e) { this.ctx = null }
+      console.error('Failed to initialize WebGLRenderer for WorldIsometric', e)
+      return
     }
 
     // lighting: toon-friendly hemisphere and directional (only meaningful for WebGL)
