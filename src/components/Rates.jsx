@@ -412,7 +412,7 @@ export default function Rates({ globalCurrency }) {
 
   const listItems = () => {
     if (viewMode === 'fiat') {
-      return allCurrencies.filter(c => c.code !== globalCurrency).map(c => ({ type: 'fiat', code: c.code, name: c.name }))
+      return (allCurrencies || []).map(c => ({ type: 'fiat', code: c.code, name: c.name }))
     }
     return cryptos.map(c => ({ type: 'crypto', code: c, name: c }))
   }
