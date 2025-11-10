@@ -761,8 +761,21 @@ export default function Rates({ globalCurrency }) {
                       })()
                     ) : (
                       (() => {
-                        // crypto: show price in selected fiat if available
-                        if (!selectedCrypto) return '—'
+                        // Crypto rows: behavior depends on viewMode
+                        if (viewMode === 'crypto') {
+                          // show pair rate between selectedCrypto and this crypto
+                          if (!selectedCrypto) return '—'
+                          if (selectedCrypto.code === item.code) return '—'
+                          const a = cryptoRates[selectedCrypto.code]
+                          const b = cryptoRates[item.code]
+                          if (typeof a === 'number' && typeof b === 'number' && a > 0) {
+                            const rate = b / a // item per selectedCrypto
+                            return isFinite(rate) ? rate.toFixed(6) : '—'
+                          }
+                          return '—'
+                        }
+
+                        // viewMode === 'fiat' -> show crypto price in selected fiat
                         if (!selectedFiat) return '—'
 
                         const cryptoPriceInBase = cryptoRates[item.code]
