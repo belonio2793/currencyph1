@@ -69,6 +69,7 @@ export class WorldIsometric {
       this.renderer.domElement.style.display = 'block'
       try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
       this.container.appendChild(this.renderer.domElement)
+      try { this.renderer.domElement.setAttribute('data-engine','three.js r156') } catch(e){}
     } catch (e) {
       console.warn('WebGLRenderer failed, falling back to 2D canvas', e)
       this.isWebGL = false
