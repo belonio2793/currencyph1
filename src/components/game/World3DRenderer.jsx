@@ -81,7 +81,9 @@ export default function World3DRenderer({
     playerGroup.add(bodyMesh)
     scene.add(playerGroup)
     playerRef.current = playerGroup
-    playerGroup.position.set(initialAvatarPos.x, 0, initialAvatarPos.z)
+    const avatarX = initialAvatarPos?.x ?? 0
+    const avatarZ = initialAvatarPos?.z ?? 0
+    playerGroup.position.set(avatarX, 0, avatarZ)
 
     // controls (orbit) - dynamic import to avoid build surprises
     let controls = null
