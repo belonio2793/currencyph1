@@ -210,18 +210,24 @@ export async function getOnlineUsers() {
 }
 
 export async function subscribeToOnlineUsers(callback) {
-  const channel = supabase
-    .channel('online_users')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'user_presence'
-    }, (payload) => {
-      callback(payload)
-    })
-    .subscribe()
+  try {
+    if (!supabase || typeof supabase.channel !== 'function') return () => {}
+    const channel = supabase
+      .channel('online_users')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'user_presence'
+      }, (payload) => {
+        try { callback(payload.new || payload) } catch (e) { console.error('online users callback', e) }
+      })
+      .subscribe()
 
-  return () => supabase.removeChannel(channel)
+    return () => { try { supabase.removeChannel(channel) } catch (e) { console.debug('Failed to remove online_users channel', e) } }
+  } catch (err) {
+    console.debug('subscribeToOnlineUsers not available', err)
+    return () => {}
+  }
 }
 
 export async function markMessagesAsRead(messageIds, readerId) {
