@@ -146,21 +146,22 @@ export class StreetGridRenderer {
   }
 
   createStreetGrid(gridSize = 6000, tileSize = 200) {
-    const material = new THREE.LineBasicMaterial({ color: 0x444444 })
-    
+    // Use a thicker, darker line for stylized crisp grid
+    const material = new THREE.LineBasicMaterial({ color: 0x222222, linewidth: 2 })
+
     for (let i = -gridSize / 2; i <= gridSize / 2; i += tileSize) {
       const points = [
-        new THREE.Vector3(i, 0.1, -gridSize / 2),
-        new THREE.Vector3(i, 0.1, gridSize / 2)
+        new THREE.Vector3(i + 0.5, 0.11, -gridSize / 2),
+        new THREE.Vector3(i + 0.5, 0.11, gridSize / 2)
       ]
       const geometry = new THREE.BufferGeometry().setFromPoints(points)
       const line = new THREE.Line(geometry, material)
       this.scene.add(line)
       this.streets.push(line)
-      
+
       const points2 = [
-        new THREE.Vector3(-gridSize / 2, 0.1, i),
-        new THREE.Vector3(gridSize / 2, 0.1, i)
+        new THREE.Vector3(-gridSize / 2, 0.11, i + 0.5),
+        new THREE.Vector3(gridSize / 2, 0.11, i + 0.5)
       ]
       const geometry2 = new THREE.BufferGeometry().setFromPoints(points2)
       const line2 = new THREE.Line(geometry2, material)
