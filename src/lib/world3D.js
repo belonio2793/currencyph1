@@ -49,8 +49,11 @@ export class World3D {
     this.renderer.setSize(container.clientWidth, container.clientHeight)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     this.renderer.shadowMap.enabled = true
-    this.renderer.shadowMap.type = THREE.PCFShadowShadowMap
-    this.renderer.shadowMap.resolution = 2048
+    // Use the correct constant name
+    if (THREE.PCFShadowMap !== undefined) this.renderer.shadowMap.type = THREE.PCFShadowMap
+    // shadowMap.resolution is not a standard property; keep mapSize on lights instead
+    // leave as-is for backwards compatibility but guard assignment
+    try { this.renderer.shadowMap.resolution = 2048 } catch(e) {}
     this.renderer.outputColorSpace = THREE.SRGBColorSpace
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping
     this.renderer.toneMappingExposure = 1.0
