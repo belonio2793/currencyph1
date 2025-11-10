@@ -348,6 +348,11 @@ export default function World3DRenderer({
     }
   }, [character])
 
+  // sync camera follow toggle to ref for use in animation loop
+  useEffect(() => {
+    cameraFollowRef.current = cameraFollowEnabled
+  }, [cameraFollowEnabled])
+
   // zoom controls exposed
   const zoomIn = () => {
     const cam = cameraRef.current
