@@ -1020,6 +1020,18 @@ export class World3D {
           }
         }
 
+        // Idle animation for all simple avatars (breathing / subtle turn)
+        try {
+          if (model) {
+            const tt = now / 1000
+            // subtle side-to-side turn
+            model.rotation.y = Math.sin(tt * 0.6 + (parseInt(uid, 36) % 10 || 0)) * 0.25
+            // head bob if present
+            const head = model.getObjectByName && model.getObjectByName('head')
+            if (head) head.rotation.x = Math.sin(tt * 1.2) * 0.05
+          }
+        } catch (e) {}
+
         // Finish job when complete: remove bar and mark inactive (cleanup handled by startPlayerJob)
         if (pct >= 1 && player.job && player.job.active === false) {
           try {
