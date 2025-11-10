@@ -92,13 +92,57 @@ export default function World3DRenderer({
     ground.position.y = -0.5
     scene.add(ground)
 
-    // player marker
+    // player marker - human-like avatar
     const playerGroup = new THREE.Group()
-    const playerMat = new THREE.MeshStandardMaterial({ color: 0x00a8ff })
-    const body = new THREE.BoxGeometry(20, 30, 12)
-    const bodyMesh = new THREE.Mesh(body, playerMat)
+
+    // Head
+    const headMat = new THREE.MeshStandardMaterial({ color: 0xfdbcb4 }) // skin color
+    const headGeo = new THREE.SphereGeometry(8, 16, 16)
+    const headMesh = new THREE.Mesh(headGeo, headMat)
+    headMesh.position.y = 30
+    playerGroup.add(headMesh)
+
+    // Body
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2563eb }) // blue shirt
+    const bodyGeo = new THREE.CylinderGeometry(7, 7, 18, 8)
+    const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat)
     bodyMesh.position.y = 15
     playerGroup.add(bodyMesh)
+
+    // Left arm
+    const armMat = new THREE.MeshStandardMaterial({ color: 0xfdbcb4 })
+    const armGeo = new THREE.CylinderGeometry(3, 3, 16, 8)
+    const leftArm = new THREE.Mesh(armGeo, armMat)
+    leftArm.position.set(-10, 18, 0)
+    leftArm.rotation.z = Math.PI / 2.5
+    playerGroup.add(leftArm)
+
+    const rightArm = new THREE.Mesh(armGeo, armMat)
+    rightArm.position.set(10, 18, 0)
+    rightArm.rotation.z = -Math.PI / 2.5
+    playerGroup.add(rightArm)
+
+    // Left leg
+    const legMat = new THREE.MeshStandardMaterial({ color: 0x1f2937 }) // dark pants
+    const legGeo = new THREE.CylinderGeometry(3.5, 3.5, 14, 8)
+    const leftLeg = new THREE.Mesh(legGeo, legMat)
+    leftLeg.position.set(-4, 4, 0)
+    playerGroup.add(leftLeg)
+
+    const rightLeg = new THREE.Mesh(legGeo, legMat)
+    rightLeg.position.set(4, 4, 0)
+    playerGroup.add(rightLeg)
+
+    // Eyes
+    const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000 })
+    const eyeGeo = new THREE.SphereGeometry(1.5, 8, 8)
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat)
+    leftEye.position.set(-3, 32, 7)
+    playerGroup.add(leftEye)
+
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat)
+    rightEye.position.set(3, 32, 7)
+    playerGroup.add(rightEye)
 
     // Add username label above player
     const labelTexture = createTextTexture('Player', 48)
