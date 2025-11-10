@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
 
 export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [currentPage, setCurrentPage] = useState(1)
@@ -23,6 +25,12 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [selectedFiles, setSelectedFiles] = useState([])
   const [filePreview, setFilePreview] = useState([])
   const [submitting, setSubmitting] = useState(false)
+  // categories for dropdown fetched from existing listings
+  const [categories, setCategories] = useState([])
+  const [categorySelect, setCategorySelect] = useState('')
+  const [customCategory, setCustomCategory] = useState('')
+  // map picker state
+  const [mapOpen, setMapOpen] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
@@ -39,6 +47,26 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
       }))
     }
   }, [location, detectedCity])
+
+  // load existing categories from DB to present in dropdown
+  useEffect(() => {
+    let cancelled = false
+    const load = async () => {
+      try {
+        const { data, error } = await supabase.from('nearby_listings').select('category').limit(1000)
+        if (error) {
+          console.warn('Failed to load categories', error)
+          return
+        }
+        const cats = Array.from(new Set((data || []).map(d => d.category).filter(Boolean))).sort()
+        if (!cancelled) setCategories(cats)
+      } catch (e) {
+        console.warn('Failed to load categories', e)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -294,15 +322,42 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                   
                   <div>
                     <label className="block text-sm font-medium mb-1">Category *</label>
-                    <input 
-                      name="category" 
-                      value={form.category} 
-                      onChange={handleChange} 
-                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      placeholder="Restaurant, Hotel, Attraction..." 
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        name="category_select"
+                        value={categorySelect}
+                        onChange={(e) => {
+                          const v = e.target.value
+                          setCategorySelect(v)
+                          if (v === '__other__') {
+                            setForm(prev => ({ ...prev, category: customCategory || '' }))
+                          } else {
+                            setForm(prev => ({ ...prev, category: v }))
+                          }
+                        }}
+                        className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select a category</option>
+                        {categories.map((c) => (
+                          <option key={c} value={c}>{c}</option>
+                        ))}
+                        <option value="__other__">Other...</option>
+                      </select>
+                      {categorySelect === '__other__' && (
+                        <input
+                          type="text"
+                          value={customCategory}
+                          onChange={(e) => {
+                            setCustomCategory(e.target.value)
+                            setForm(prev => ({ ...prev, category: e.target.value }))
+                          }}
+                          placeholder="Enter custom category"
+                          className="w-1/2 border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                      )}
+                    </div>
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium mb-1">City *</label>
                     <input 
@@ -347,23 +402,55 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                     />
                   </div>
                   
-                  <div className="md:col-span-2">
-                    <button 
-                      type="button" 
+                  <div className="md:col-span-2 flex items-center gap-4">
+                    <button
+                      type="button"
                       onClick={() => {
-                        if (location) setForm(prev => ({ 
-                          ...prev, 
-                          latitude: String(location.latitude), 
-                          longitude: String(location.longitude), 
-                          city: prev.city || detectedCity || prev.city 
+                        if (location) setForm(prev => ({
+                          ...prev,
+                          latitude: String(location.latitude),
+                          longitude: String(location.longitude),
+                          city: prev.city || detectedCity || prev.city
                         }))
-                      }} 
+                      }}
                       className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                     >
                       Use my current location
                     </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setMapOpen(true)}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Pick location on map
+                    </button>
+
+                    {mapOpen && (
+                      <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-xl shadow-xl w-full max-w-3xl h-[70vh] flex flex-col overflow-hidden">
+                          <div className="flex items-center justify-between p-4 border-b">
+                            <h3 className="text-lg font-semibold">Pick location on map</h3>
+                            <button onClick={() => setMapOpen(false)} className="text-slate-500 hover:text-slate-700">✕</button>
+                          </div>
+                          <div className="flex-1">
+                            <MapContainer center={[form.latitude ? parseFloat(form.latitude) : 14.5995, form.longitude ? parseFloat(form.longitude) : 120.9842]} zoom={13} className="w-full h-full">
+                              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+                              {
+                                // Marker that sets coordinates on map click
+                              }
+                              <LocationMarker />
+                            </MapContainer>
+                          </div>
+                          <div className="flex items-center justify-end gap-2 p-4 border-t">
+                            <button onClick={() => setMapOpen(false)} className="px-4 py-2 border rounded hover:bg-slate-50">Cancel</button>
+                            <button onClick={() => setMapOpen(false)} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Done</button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium mb-1">Phone</label>
                     <input 
