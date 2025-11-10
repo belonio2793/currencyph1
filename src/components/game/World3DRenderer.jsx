@@ -24,7 +24,7 @@ export default function World3DRenderer({
   const playerRef = useRef(null)
   const playerLabelRef = useRef(null)
   const markersRef = useRef(new Map())
-  const [zoom, setZoom] = useState(1)
+  const [zoom, setZoom] = useState(3.5)
 
   // Helper to create canvas texture for text
   const createTextTexture = (text, fontSize = 64) => {
