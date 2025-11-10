@@ -28,6 +28,7 @@ export default function World3DRenderer({
   const gltfModelRef = useRef(null)
   const mixerRef = useRef(null)
   const markersRef = useRef(new Map())
+  const buildingGroupRef = useRef(null)
   const [zoom, setZoom] = useState(3.5)
   const [cameraFollowEnabled, setCameraFollowEnabled] = useState(true)
   const cameraFollowRef = useRef(true)
@@ -84,19 +85,72 @@ export default function World3DRenderer({
     dir.position.set(200, 400, 100)
     scene.add(dir)
 
-    // ground plane
-    const gridSize = 2000
-    const divisions = 40
-    const grid = new THREE.GridHelper(gridSize, divisions, 0x2b3946, 0x111621)
-    grid.position.y = 0
-    scene.add(grid)
+    // ground plane + city grid
+    const gridSize = 1200
+    const blockSize = 40
+    const cols = Math.floor(gridSize / blockSize)
 
-    const groundMat = new THREE.MeshStandardMaterial({ color: 0x0c1420, roughness: 1 })
+    // flat ground
+    const groundMat = new THREE.MeshStandardMaterial({ color: 0x0b1320, roughness: 1 })
     const groundGeo = new THREE.PlaneGeometry(gridSize, gridSize)
     const ground = new THREE.Mesh(groundGeo, groundMat)
     ground.rotation.x = -Math.PI / 2
     ground.position.y = -0.5
     scene.add(ground)
+
+    // roads and sidewalks (every 3 blocks is a road)
+    const roadMat = new THREE.MeshStandardMaterial({ color: 0x071019, roughness: 1 })
+    const roadWidth = 10
+    for (let i = 0; i <= cols; i++) {
+      const x = -gridSize / 2 + i * blockSize
+      if (i % 3 === 0) {
+        const roadGeo = new THREE.PlaneGeometry(roadWidth, gridSize)
+        const road = new THREE.Mesh(roadGeo, roadMat)
+        road.rotation.x = -Math.PI / 2
+        road.position.set(x, -0.49, 0)
+        scene.add(road)
+      }
+      const z = -gridSize / 2 + i * blockSize
+      if (i % 3 === 0) {
+        const roadGeo2 = new THREE.PlaneGeometry(gridSize, roadWidth)
+        const road2 = new THREE.Mesh(roadGeo2, roadMat)
+        road2.rotation.x = -Math.PI / 2
+        road2.position.set(0, -0.49, z)
+        scene.add(road2)
+      }
+    }
+
+    // buildings group
+    const buildingGroup = new THREE.Group()
+    buildingGroup.position.set(-gridSize / 2, 0, -gridSize / 2)
+    buildingGroupRef.current = buildingGroup
+    scene.add(buildingGroup)
+
+    // populate city blocks with low-poly buildings
+    const buildingMat = new THREE.MeshStandardMaterial({ color: 0x15324a, roughness: 0.9 })
+    for (let ix = 0; ix < cols; ix++) {
+      for (let iz = 0; iz < cols; iz++) {
+        // skip road rows
+        if (ix % 3 === 0 || iz % 3 === 0) continue
+        const bx = ix * blockSize + blockSize / 2
+        const bz = iz * blockSize + blockSize / 2
+        // randomize building density
+        if (Math.random() < 0.65) {
+          const w = blockSize * 0.6 * (0.6 + Math.random() * 0.8)
+          const d = blockSize * 0.6 * (0.6 + Math.random() * 0.8)
+          const h = 10 + Math.floor(Math.random() * 6) * 8
+          const geo = new THREE.BoxGeometry(w, h, d)
+          const mat = buildingMat.clone()
+          // tint by random
+          mat.color = new THREE.Color(0x0f2433).offsetHSL(0, 0, (Math.random() - 0.5) * 0.1)
+          const mesh = new THREE.Mesh(geo, mat)
+          mesh.position.set(bx, h / 2, bz)
+          // minor variations
+          mesh.rotation.y = (Math.random() - 0.5) * 0.2
+          buildingGroup.add(mesh)
+        }
+      }
+    }
 
     // create player avatar group depending on selected model
     if (avatarStyle) {
@@ -368,6 +422,26 @@ export default function World3DRenderer({
           }
         }
       } catch (e) { /* ignore movement errors */ }
+
+      // subtle idle/move animation: bob and limb sway for primitive avatars
+      try {
+        const player = playerRef.current
+        if (player) {
+          const t = now / 300
+          const moving = (keys.current['w'] || keys.current['a'] || keys.current['s'] || keys.current['d'] || keys.current['arrowup'] || keys.current['arrowdown'] || keys.current['arrowleft'] || keys.current['arrowright'])
+          const bobAmp = moving ? 0.25 : 0.08
+          const swayAmp = moving ? 0.6 : 0.15
+          // apply small rotation to non-label children
+          player.children.forEach((ch, idx) => {
+            try {
+              if (ch.geometry && ch.geometry.type !== 'PlaneGeometry') {
+                ch.rotation.x = Math.sin(t + idx) * bobAmp
+                ch.rotation.z = Math.cos(t * 0.8 + idx) * (swayAmp * 0.08)
+              }
+            } catch (e) {}
+          })
+        }
+      } catch (e) {}
 
       // camera follow: keep camera centered on player (if enabled)
       try {
