@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
+import { World3D } from '../lib/world3D'
 
 // Avatar definitions with optional GLTF model URLs and default scale/offset
 const AVATAR_STYLES = [
@@ -31,6 +32,10 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   const [editing, setEditing] = useState(null)
   const [editFields, setEditFields] = useState({ model_url: '', model_scale: 1, model_offset_x: 0, model_offset_y: 0, model_offset_z: 0 })
   const [brokenMap, setBrokenMap] = useState({})
+  const [visibleMap, setVisibleMap] = useState(() => AVATAR_STYLES.reduce((m, s) => (m[s.id] = true, m), {}))
+  const previewRef = useRef(null)
+  const worldRef = useRef(null)
+  const previewPlayerId = 'avatar-preview'
 
   useEffect(() => {
     let active = true
@@ -55,6 +60,56 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
     check()
     return () => { active = false }
   }, [])
+
+  useEffect(() => {
+    // create small World3D preview when previewRef is available
+    if (!previewRef.current) return
+    const container = previewRef.current
+    const world = new World3D(container)
+    world.cameraConfig.mode = 'freecam'
+    world.camera.position.set(0, 120, 220)
+    world.camera.lookAt(0, 40, 0)
+    world.start()
+    worldRef.current = world
+
+    return () => {
+      try { world.destroy() } catch (e) {}
+      worldRef.current = null
+    }
+  }, [])
+
+  // Update preview when hovered or selected style changes
+  useEffect(() => {
+    const world = worldRef.current
+    if (!world) return
+    const style = AVATAR_STYLES.find(s => s.id === (hoveredId || (selectedStyle && selectedStyle.id)))
+    // clear previous
+    try { world.removePlayer(previewPlayerId) } catch (e) {}
+
+    if (!style) return
+
+    ;(async () => {
+      try {
+        const playerGroup = await world.addPlayer(previewPlayerId, style.name, style.model_url || null, 0, 0)
+        // apply scale and offset if model is present
+        try {
+          if (playerGroup && playerGroup.children && playerGroup.children[0]) {
+            const model = playerGroup.children[0]
+            const scale = (style.model_scale != null) ? style.model_scale : 1
+            model.scale.setScalar(scale)
+            const offset = style.model_offset || { x: 0, y: 0, z: 0 }
+            model.position.x = offset.x || 0
+            model.position.y = offset.y || 0
+            model.position.z = offset.z || 0
+          }
+        } catch (e) {
+          // ignore
+        }
+      } catch (e) {
+        // failed to load model for preview, fallback handled inside World3D
+      }
+    })()
+  }, [hoveredId, selectedStyle])
 
   const startEdit = (style) => {
     setEditing(style.id)
@@ -100,35 +155,45 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
     if (typeof onSelect === 'function') onSelect(updated, { close: true })
   }
 
+  const toggleVisibility = (id) => {
+    setVisibleMap(prev => ({ ...prev, [id]: !prev[id] }))
+  }
+
   return (
     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
-      <div className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex flex-col">
-        <div className="bg-slate-800 border-b border-slate-700 p-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-white">Choose Your Avatar Style</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white text-2xl font-bold">×</button>
-        </div>
+      <div className="w-full max-w-5xl max-h-[90vh] bg-slate-900 border border-slate-700 rounded-lg overflow-hidden flex">
 
-        <div className="overflow-y-auto flex-1 p-6">
+        <div className="w-3/5 overflow-y-auto p-6">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {AVATAR_STYLES.map((style) => (
-              <div key={style.id} className={`relative p-0 rounded-lg transition-all ${selectedStyle?.id === style.id ? 'ring-2 ring-emerald-400' : ''}`}>
+              <div key={style.id} className={`relative p-0 rounded-lg transition-all transform ${selectedStyle?.id === style.id ? 'ring-2 ring-emerald-400 scale-105' : hoveredId === style.id ? 'scale-102' : ''}`}>
                 <button
                   onClick={() => { setHoveredId(style.id); if (!editing) { const updated = style; if (typeof onSelect === 'function') onSelect(updated, { close: false }) } }}
                   onMouseEnter={() => setHoveredId(style.id)}
                   onMouseLeave={() => setHoveredId(null)}
-                  className={`w-full p-4 rounded-lg border-2 transition-all ${selectedStyle?.id === style.id ? 'border-emerald-500 bg-emerald-500/10' : hoveredId === style.id ? 'border-slate-500 bg-slate-700' : 'border-slate-700 bg-slate-800 hover:border-slate-500'}`}>
-                  <div className="w-full aspect-square rounded-lg mb-2 shadow-lg flex items-center justify-center text-4xl" style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06))' }}>
-                    <span>{(typeof AVATAR_PREVIEWS !== 'undefined' && AVATAR_PREVIEWS[style.id]) || '🙂'}</span>
+                  className={`w-full p-3 rounded-lg border-2 transition-all shadow-md hover:shadow-xl hover:scale-105 ${selectedStyle?.id === style.id ? 'border-emerald-500 bg-emerald-500/6' : hoveredId === style.id ? 'border-slate-500 bg-slate-700' : 'border-slate-700 bg-slate-800 hover:border-slate-500'}`}>
+
+                  <div className="w-full aspect-square rounded-lg mb-2 shadow-inner flex items-center justify-center text-4xl" style={{ background: `linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06)), conic-gradient(from 200deg, #0000 0%, #0000 100%)` }}>
+                    <div style={{ width: 64, height: 64, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: `#${(style.color || 0x666666).toString(16).padStart(6,'0')}`, boxShadow: 'inset 0 -6px 12px rgba(0,0,0,0.3)' }}>
+                      <span style={{ fontSize: 28 }}>{AVATAR_PREVIEWS[style.id] || '🙂'}</span>
+                    </div>
                   </div>
+
                   <div className="text-center">
-                    <p className="text-xs font-semibold text-slate-100 truncate">{style.name}</p>
+                    <p className="text-sm font-semibold text-slate-100 truncate">{style.name}</p>
                     <p className="text-xs text-slate-400">#{style.id}</p>
                   </div>
                 </button>
 
                 <button onClick={() => startEdit(style)} title="Edit model" className="absolute top-2 right-2 bg-slate-700/60 hover:bg-slate-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">✎</button>
+
+                <button onClick={() => toggleVisibility(style.id)} title={visibleMap[style.id] ? 'Hide in world' : 'Show in world'} className={`absolute top-2 left-2 rounded-full w-8 h-8 flex items-center justify-center text-sm ${visibleMap[style.id] ? 'bg-slate-800 text-emerald-400' : 'bg-slate-700 text-slate-300'}`}>
+                  {visibleMap[style.id] ? '👁️' : '🙈'}
+                </button>
+
                 {brokenMap[style.id] && <div title="Model URL unreachable" className="absolute top-2 right-11 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">!</div>}
-                {selectedStyle?.id === style.id && <div className="absolute top-2 left-2 bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">✓</div>}
+                {style.model_url && <div title="Has 3D model" className="absolute bottom-2 right-2 bg-slate-700 text-white rounded px-2 py-1 text-xs">3D</div>}
+                {selectedStyle?.id === style.id && <div className="absolute top-2 left-12 bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">✓</div>}
 
                 {editing === style.id && (
                   <div className="mt-2 p-3 bg-slate-800 border border-slate-700 rounded">
@@ -161,15 +226,23 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
                     </div>
                   </div>
                 )}
+
               </div>
             ))}
           </div>
         </div>
 
-        <div className="bg-slate-800 border-t border-slate-700 p-4 flex items-center justify-between">
-          <div className="text-sm text-slate-400">Selected: <span className="text-emerald-400 font-semibold">{selectedStyle?.name || 'None'}</span></div>
-          <button onClick={onClose} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white font-medium">Done</button>
+        <div className="w-2/5 border-l border-slate-700 p-4 flex flex-col">
+          <div className="text-white font-semibold mb-2">Preview</div>
+          <div ref={previewRef} className="flex-1 rounded bg-[#071022] shadow-inner" style={{ minHeight: 300 }} />
+          <div className="mt-3 text-xs text-slate-400">Hover a style to preview it in 3D. Use the edit button to attach a GLB/GLTF model for richer outfits. Visibility toggles will affect whether that outfit is visible in the game world.</div>
         </div>
+
+      </div>
+
+      <div className="fixed bottom-8 right-8 bg-slate-800 border border-slate-700 p-3 rounded shadow-lg flex items-center gap-3">
+        <div className="text-sm text-slate-300">Selected: <span className="text-emerald-400 font-semibold">{selectedStyle?.name || 'None'}</span></div>
+        <button onClick={onClose} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded text-white font-medium">Done</button>
       </div>
     </div>
   )
