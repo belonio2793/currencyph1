@@ -240,6 +240,27 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     }
   }
 
+  function LocationMarker() {
+    const [pos, setPos] = useState(
+      form.latitude && form.longitude ? [parseFloat(form.latitude), parseFloat(form.longitude)] : null
+    )
+    const map = useMapEvents({
+      click(e) {
+        const { lat, lng } = e.latlng
+        setPos([lat, lng])
+        setForm(prev => ({ ...prev, latitude: String(lat), longitude: String(lng) }))
+      }
+    })
+
+    useEffect(() => {
+      if (pos && map && map.setView) {
+        try { map.setView(pos, map.getZoom()) } catch(e){}
+      }
+    }, [pos])
+
+    return pos ? <Marker position={pos} /> : null
+  }
+
   if (pending) {
     return (
       <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
