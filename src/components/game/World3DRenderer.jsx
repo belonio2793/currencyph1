@@ -22,8 +22,28 @@ export default function World3DRenderer({
   const raycasterRef = useRef(new THREE.Raycaster())
   const mouseRef = useRef(new THREE.Vector2())
   const playerRef = useRef(null)
+  const playerLabelRef = useRef(null)
   const markersRef = useRef(new Map())
   const [zoom, setZoom] = useState(1)
+
+  // Helper to create canvas texture for text
+  const createTextTexture = (text, fontSize = 64) => {
+    const canvas = document.createElement('canvas')
+    canvas.width = 512
+    canvas.height = 128
+    const ctx = canvas.getContext('2d')
+    ctx.fillStyle = '#000000'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.fillStyle = '#00d4ff'
+    ctx.font = `bold ${fontSize}px Arial`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText(text, canvas.width / 2, canvas.height / 2)
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.minFilter = THREE.LinearFilter
+    texture.magFilter = THREE.LinearFilter
+    return texture
+  }
 
   useEffect(() => {
     const container = containerRef.current
