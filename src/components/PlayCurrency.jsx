@@ -955,6 +955,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     setWorkProgress(0)
     const start = Date.now()
     const duration = job.duration
+
+    // Open 3D job modal
+    try {
+      setJobModalInfo({ name: job.name, duration })
+      setJobModalOpen(true)
+    } catch (e) { console.warn('Failed to open job modal', e) }
+
     const tick = setInterval(() => {
       const elapsed = Date.now() - start
       const pct = Math.min(100, Math.floor((elapsed / duration) * 100))
