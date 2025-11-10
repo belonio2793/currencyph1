@@ -189,6 +189,7 @@ export default function World3DRenderer({
     let rafId = null
     let prevTime = null
     const speed = 200 // units per second
+    const cameraOffset = { x: 0, y: 57, z: 114 } // offset from player for 350% zoom
     const animate = (time) => {
       const now = time || performance.now()
       const dt = prevTime ? Math.min(0.05, (now - prevTime) / 1000) : 0
@@ -215,7 +216,22 @@ export default function World3DRenderer({
         }
       } catch (e) { /* ignore movement errors */ }
 
-      if (controlsRef.current) controlsRef.current.update()
+      // camera follow: keep camera centered on player
+      try {
+        const player = playerRef.current
+        if (player && camera) {
+          const playerX = player.position.x
+          const playerZ = player.position.z
+          camera.position.x = playerX + cameraOffset.x
+          camera.position.y = playerY + cameraOffset.y
+          camera.position.z = playerZ + cameraOffset.z
+          camera.lookAt(playerX, 0, playerZ)
+          if (controlsRef.current) {
+            controlsRef.current.target.set(playerX, 0, playerZ)
+          }
+        }
+      } catch (e) { /* ignore camera follow errors */ }
+
       renderer.render(scene, camera)
       rafId = requestAnimationFrame(animate)
     }
