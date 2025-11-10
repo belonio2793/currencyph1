@@ -57,6 +57,8 @@ export const DEFAULT_COSMETICS = {
   hairStyle: 'medium',
   hairColor: 'black',
   outfit: 'casual',
+  // default avatar style (color-only)
+  avatar: { id: 1, name: 'Doggo', color: 0xd4a574 },
   accessories: {
     head: 'none',
     eyes: 'none',
