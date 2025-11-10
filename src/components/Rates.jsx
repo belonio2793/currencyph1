@@ -447,7 +447,7 @@ export default function Rates({ globalCurrency }) {
       return
     }
     const rate = getRate(baseCurrency, selectedFiat.code) // 1 global = rate selected
-    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1))
+    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
     if (!rate || !cryptoPrice) {
       setCryptoInput('')
       return
@@ -473,7 +473,7 @@ export default function Rates({ globalCurrency }) {
       return
     }
     const rate = getRate(baseCurrency, selectedFiat.code)
-    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (exchangeRates[`USD_${baseCurrency}`] || 1))
+    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
     if (!rate || !cryptoPrice) {
       setFiatInput('')
       return
