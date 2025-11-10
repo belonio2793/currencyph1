@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Define avatar styles with optional GLTF model URLs
 const AVATAR_STYLES = [
