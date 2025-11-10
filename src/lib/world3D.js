@@ -129,26 +129,31 @@ export class World3D {
   }
   
   setupLighting() {
-    // Ambient light for overall illumination
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+    // Stylized ambient + key light setup for cel shading
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
     this.scene.add(ambientLight)
 
-    // Directional light (sun)
-    this.sunLight = new THREE.DirectionalLight(0xffffff, 1.2)
-    this.sunLight.position.set(1000, 1200, 800)
+    // Key directional light (warm)
+    this.sunLight = new THREE.DirectionalLight(0xfff1d6, 1.0)
+    this.sunLight.position.set(600, 900, 600)
     this.sunLight.castShadow = true
-    this.sunLight.shadow.mapSize.width = 4096
-    this.sunLight.shadow.mapSize.height = 4096
-    this.sunLight.shadow.camera.left = -3000
-    this.sunLight.shadow.camera.right = 3000
-    this.sunLight.shadow.camera.top = 3000
-    this.sunLight.shadow.camera.bottom = -3000
-    this.sunLight.shadow.camera.far = 5000
-    this.sunLight.shadow.bias = -0.0001
+    this.sunLight.shadow.mapSize.width = 2048
+    this.sunLight.shadow.mapSize.height = 2048
+    this.sunLight.shadow.camera.left = -1500
+    this.sunLight.shadow.camera.right = 1500
+    this.sunLight.shadow.camera.top = 1500
+    this.sunLight.shadow.camera.bottom = -1500
+    this.sunLight.shadow.camera.far = 3000
+    this.sunLight.shadow.bias = -0.0002
     this.scene.add(this.sunLight)
 
-    // Hemisphere light for better ambient
-    const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x1a1a2e, 0.4)
+    // Rim/back light to separate silhouettes (cool tint)
+    const rim = new THREE.DirectionalLight(0x99d6ff, 0.45)
+    rim.position.set(-400, 400, -800)
+    this.scene.add(rim)
+
+    // Slight hemisphere to soften shadows
+    const hemiLight = new THREE.HemisphereLight(0x8fbfff, 0x201a2b, 0.35)
     this.scene.add(hemiLight)
   }
 
