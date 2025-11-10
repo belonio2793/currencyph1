@@ -34,7 +34,58 @@ export const currencyAPI = {
   // Get all currency rates relative to USD via edge function
   async getGlobalRates() {
     try {
-      // Try public exchangerate.host API first (CORS-friendly)
+      // 1) Prefer Open Exchange Rates (hourly) when API key is configured
+      const OPEN_KEY = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_OPEN_EXCHANGE_RATES_API || import.meta.env.OPEN_EXCHANGE_RATES_API)) || (typeof process !== 'undefined' && (process.env.VITE_OPEN_EXCHANGE_RATES_API || process.env.OPEN_EXCHANGE_RATES_API)) || null
+      if (OPEN_KEY) {
+        try {
+          const url = `https://openexchangerates.org/api/latest.json?app_id=${OPEN_KEY}`
+          const resp = await fetch(url, { headers: { Accept: 'application/json' } })
+          if (resp && resp.ok) {
+            const json = await resp.json()
+            const ratesData = json && json.rates ? json.rates : null
+            if (ratesData) {
+              const now = new Date()
+              const rates = {}
+              CURRENCIES.forEach(currency => {
+                if (currency.code === 'USD') {
+                  rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
+                  return
+                }
+                const rateVal = ratesData[currency.code]
+                rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
+              })
+              return rates
+            }
+          } else {
+            console.warn('OpenExchangeRates responded with status', resp && resp.status)
+          }
+        } catch (e) {
+          console.warn('OpenExchangeRates fetch failed:', e && e.message)
+        }
+      }
+
+      // 2) Try edge function (cached rates)
+      try {
+        const { data, error } = await supabase.functions.invoke('fetch-rates', { method: 'GET' })
+        if (!error && data && data.exchangeRates) {
+          const now = new Date()
+          const rates = {}
+          CURRENCIES.forEach(currency => {
+            if (currency.code === 'USD') {
+              rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
+              return
+            }
+            const rateVal = data.exchangeRates[currency.code]
+            rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
+          })
+          return rates
+        }
+        if (error) console.warn('Edge function error:', error)
+      } catch (e) {
+        console.warn('Edge function invocation failed:', e && e.message)
+      }
+
+      // 3) Fallback to public exchangerate.host
       try {
         const resp = await fetch('https://api.exchangerate.host/latest?base=USD')
         if (resp && resp.ok) {
@@ -55,38 +106,14 @@ export const currencyAPI = {
           }
         }
       } catch (e) {
-        // ignore and fall through to edge function
+        // ignore and fall through
+        console.warn('Fallback exchangerate.host failed:', e && e.message)
       }
 
-      const { data, error } = await supabase.functions.invoke('fetch-rates', {
-        method: 'GET'
-      })
-
-      if (error) {
-        console.warn('Edge function error:', error)
-        return this.getFallbackRates()
-      }
-
-      if (!data || !data.exchangeRates) {
-        console.warn('No exchange rates returned from edge function')
-        return this.getFallbackRates()
-      }
-
-      const rates = {}
-      const now = new Date()
-
-      CURRENCIES.forEach(currency => {
-        if (currency.code === 'USD') {
-          rates[currency.code] = { ...currency, rate: 1, lastUpdated: now }
-          return
-        }
-        const rateVal = data.exchangeRates[currency.code]
-        rates[currency.code] = { ...currency, rate: typeof rateVal === 'number' ? rateVal : 0, lastUpdated: now }
-      })
-
-      return rates
+      // If all else fails, return fallback hard-coded rates
+      return this.getFallbackRates()
     } catch (err) {
-      console.warn('Failed to fetch rates from edge function and public API:', err?.message || err)
+      console.warn('Failed to fetch rates from primary and fallback sources:', err?.message || err)
       return this.getFallbackRates()
     }
   },
