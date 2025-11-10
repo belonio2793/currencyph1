@@ -223,7 +223,7 @@ export default function World3DRenderer({
           const playerX = player.position.x
           const playerZ = player.position.z
           camera.position.x = playerX + cameraOffset.x
-          camera.position.y = playerY + cameraOffset.y
+          camera.position.y = cameraOffset.y
           camera.position.z = playerZ + cameraOffset.z
           camera.lookAt(playerX, 0, playerZ)
           if (controlsRef.current) {
