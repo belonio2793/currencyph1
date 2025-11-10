@@ -256,8 +256,18 @@ export default function World3DRenderer({
       const avatarZ = initialAvatarPos?.z ?? 0
       playerGroup.position.set(avatarX, 0, avatarZ)
     } else {
-      // no avatar selected
-      playerRef.current = null
+      // no avatar selected — render simple blue block so players still see something
+      const fallbackGroup = new THREE.Group()
+      const mat = new THREE.MeshStandardMaterial({ color: 0x00a8ff, roughness: 0.6 })
+      const box = new THREE.Mesh(new THREE.BoxGeometry(16, 16, 16), mat)
+      box.position.y = 8
+      fallbackGroup.add(box)
+      // small marker on top
+      const marker = new THREE.Mesh(new THREE.BoxGeometry(6, 2, 6), new THREE.MeshStandardMaterial({ color: 0x005f9e }))
+      marker.position.y = 18
+      fallbackGroup.add(marker)
+      scene.add(fallbackGroup)
+      playerRef.current = fallbackGroup
     }
 
 
