@@ -1035,6 +1035,9 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 // Update UI state immediately
                 setCharacterStats(() => newStats)
 
+                // attach stats to updated character so persistence uses correct snapshot
+                updated.stats = newStats
+
                 // persist character and stats
                 persistCharacterPartial(updated)
                 // Save using the updated object (avoid stale closure)
