@@ -74,7 +74,7 @@ export default function CurrencyRates() {
             <p className="text-xs text-gray-500">
               Last updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Never'}
             </p>
-            <p className="text-xs text-gray-400">Auto-refreshes every 30s</p>
+            <p className="text-xs text-gray-400">Auto-refreshes hourly</p>
           </div>
         </div>
 
