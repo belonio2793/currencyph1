@@ -59,25 +59,40 @@ export class WorldIsometric {
     this.camera.zoom = 1
     this.camera.updateProjectionMatrix()
 
-    // renderer
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    this.renderer.setSize(this.width, this.height)
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
-    this.renderer.setClearColor(0x071228, 1)
-    this.renderer.domElement.style.display = 'block'
-    try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
-    this.container.appendChild(this.renderer.domElement)
+    // renderer: try WebGL first, fallback to 2D canvas if unavailable
+    this.isWebGL = true
+    try {
+      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+      this.renderer.setSize(this.width, this.height)
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+      this.renderer.setClearColor(0x071228, 1)
+      this.renderer.domElement.style.display = 'block'
+      try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
+      this.container.appendChild(this.renderer.domElement)
+    } catch (e) {
+      console.warn('WebGLRenderer failed, falling back to 2D canvas', e)
+      this.isWebGL = false
+      this.canvas = document.createElement('canvas')
+      this.canvas.style.display = 'block'
+      this.canvas.width = this.width
+      this.canvas.height = this.height
+      try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
+      this.container.appendChild(this.canvas)
+      try { this.ctx = this.canvas.getContext('2d') } catch(e) { this.ctx = null }
+    }
 
-    // lighting: toon-friendly hemisphere and directional
-    const hemi = new THREE.HemisphereLight(0x8899bb, 0x101820, 0.6)
-    this.scene.add(hemi)
-    const dir = new THREE.DirectionalLight(0xe6f3ff, 0.7)
-    dir.position.set(viewSize * 0.3, viewSize * 0.8, viewSize * 0.2)
-    dir.castShadow = false
-    this.scene.add(dir)
+    // lighting: toon-friendly hemisphere and directional (only meaningful for WebGL)
+    if (this.isWebGL) {
+      const hemi = new THREE.HemisphereLight(0x8899bb, 0x101820, 0.6)
+      this.scene.add(hemi)
+      const dir = new THREE.DirectionalLight(0xe6f3ff, 0.7)
+      dir.position.set(viewSize * 0.3, viewSize * 0.8, viewSize * 0.2)
+      dir.castShadow = false
+      this.scene.add(dir)
 
-    // subtle fog for depth
-    this.scene.fog = new THREE.FogExp2(0x071228, Math.max(0.00035, 0.00035 * (viewSize / 800)))
+      // subtle fog for depth
+      this.scene.fog = new THREE.FogExp2(0x071228, Math.max(0.00035, 0.00035 * (viewSize / 800)))
+    }
 
     // stylized ground and tiles
     this._createTiles({ cols, rows, tileSize })
@@ -85,7 +100,9 @@ export class WorldIsometric {
     // interactions
     this.resizeObserver = new ResizeObserver(() => this.handleResize())
     this.resizeObserver.observe(this.container)
-    this.renderer.domElement.addEventListener('click', (e) => this._onClick(e))
+
+    const domEl = this.isWebGL ? this.renderer.domElement : this.canvas
+    try { domEl.addEventListener('click', (e) => this._onClick(e)) } catch(e){}
 
     this._plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
     this._isDragging = false
@@ -94,55 +111,65 @@ export class WorldIsometric {
     this._dragStartTarget = new THREE.Vector3()
 
     this._getMouseWorld = (clientX, clientY) => {
-      const rect = this.renderer.domElement.getBoundingClientRect()
-      const nx = ((clientX - rect.left) / rect.width) * 2 - 1
-      const ny = -((clientY - rect.top) / rect.height) * 2 + 1
-      this.raycaster.setFromCamera(new THREE.Vector2(nx, ny), this.camera)
-      const pt = new THREE.Vector3()
-      this.raycaster.ray.intersectPlane(this._plane, pt)
-      return pt
+      try {
+        const rect = domEl.getBoundingClientRect()
+        const nx = ((clientX - rect.left) / rect.width) * 2 - 1
+        const ny = -((clientY - rect.top) / rect.height) * 2 + 1
+        this.raycaster.setFromCamera(new THREE.Vector2(nx, ny), this.camera)
+        const pt = new THREE.Vector3()
+        this.raycaster.ray.intersectPlane(this._plane, pt)
+        return pt
+      } catch (e) {
+        // fallback approximate world point using camera/projection when raycasting fails
+        const rect = domEl.getBoundingClientRect()
+        const x = ((clientX - rect.left) / rect.width) * (cols * tileSize) - (cols * tileSize) / 2
+        const z = ((clientY - rect.top) / rect.height) * (rows * tileSize) - (rows * tileSize) / 2
+        return new THREE.Vector3(x, 0, z)
+      }
     }
 
     const onPointerDown = (e) => {
       if (e.button !== 0) return
       this._isDragging = true
-      this._dragStartWorld.copy(this._getMouseWorld(e.clientX, e.clientY) || new THREE.Vector3())
-      this._dragStartCam.copy(this.camera.position)
-      this._dragStartTarget.copy(this.cameraTarget)
-      this.renderer.domElement.style.cursor = 'grabbing'
+      try { this._dragStartWorld.copy(this._getMouseWorld(e.clientX, e.clientY) || new THREE.Vector3()) } catch(e) { this._dragStartWorld.set(0,0,0) }
+      try { this._dragStartCam.copy(this.camera.position) } catch(e) {}
+      try { this._dragStartTarget.copy(this.cameraTarget) } catch(e) {}
+      try { domEl.style.cursor = 'grabbing' } catch(e){}
     }
     const onPointerMove = (e) => {
       if (!this._isDragging) return
-      const cur = this._getMouseWorld(e.clientX, e.clientY) || new THREE.Vector3()
-      const delta = new THREE.Vector3().subVectors(this._dragStartWorld, cur)
-      const newCam = new THREE.Vector3().addVectors(this._dragStartCam, delta)
-      const newTarget = new THREE.Vector3().addVectors(this._dragStartTarget, delta)
-      this.camera.position.copy(newCam)
-      this.cameraTarget.copy(newTarget)
-      this.camera.lookAt(this.cameraTarget)
+      try {
+        const cur = this._getMouseWorld(e.clientX, e.clientY) || new THREE.Vector3()
+        const delta = new THREE.Vector3().subVectors(this._dragStartWorld, cur)
+        const newCam = new THREE.Vector3().addVectors(this._dragStartCam, delta)
+        const newTarget = new THREE.Vector3().addVectors(this._dragStartTarget, delta)
+        try { this.camera.position.copy(newCam) } catch(e) {}
+        try { this.cameraTarget.copy(newTarget) } catch(e) {}
+        try { this.camera.lookAt(this.cameraTarget) } catch(e) {}
+      } catch(e) {}
     }
     const onPointerUp = (e) => {
       this._isDragging = false
-      this.renderer.domElement.style.cursor = 'default'
+      try { domEl.style.cursor = 'default' } catch(e){}
     }
     const onWheel = (e) => {
-      e.preventDefault()
+      try { e.preventDefault() } catch(e){}
       const delta = e.deltaY
       const factor = 1 + (delta > 0 ? 0.08 : -0.08)
-      this.camera.zoom = Math.max(0.3, Math.min(3, (this.camera.zoom || 1) * factor))
-      this.camera.updateProjectionMatrix()
+      try { this.camera.zoom = Math.max(0.3, Math.min(3, (this.camera.zoom || 1) * factor)) } catch(e) {}
+      try { this.camera.updateProjectionMatrix() } catch(e) {}
     }
 
-    this.renderer.domElement.addEventListener('pointerdown', onPointerDown)
-    window.addEventListener('pointermove', onPointerMove)
-    window.addEventListener('pointerup', onPointerUp)
-    this.renderer.domElement.addEventListener('wheel', onWheel, { passive: false })
+    try { domEl.addEventListener('pointerdown', onPointerDown) } catch(e){}
+    try { window.addEventListener('pointermove', onPointerMove) } catch(e){}
+    try { window.addEventListener('pointerup', onPointerUp) } catch(e){}
+    try { domEl.addEventListener('wheel', onWheel, { passive: false }) } catch(e){}
 
     this._inputCleanup = () => {
-      try { this.renderer.domElement.removeEventListener('pointerdown', onPointerDown) } catch(e){}
+      try { domEl.removeEventListener('pointerdown', onPointerDown) } catch(e){}
       try { window.removeEventListener('pointermove', onPointerMove) } catch(e){}
       try { window.removeEventListener('pointerup', onPointerUp) } catch(e){}
-      try { this.renderer.domElement.removeEventListener('wheel', onWheel) } catch(e){}
+      try { domEl.removeEventListener('wheel', onWheel) } catch(e){}
     }
 
     this.start()
