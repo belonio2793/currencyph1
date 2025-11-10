@@ -2046,6 +2046,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       <CharacterCustomizer
         isOpen={customizationOpen}
         onToggle={() => setCustomizationOpen(!customizationOpen)}
+        character={character}
       />
     </div>
   )
