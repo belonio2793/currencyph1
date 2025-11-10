@@ -442,6 +442,9 @@ export default function App() {
         userEmail={userEmail}
         userId={userId}
         totalBalancePHP={totalBalancePHP}
+        totalBalanceConverted={totalBalanceConverted}
+        totalDebtConverted={totalDebtConverted}
+        totalNet={totalNet}
         onShowAuth={(tab) => {
           setAuthInitialTab(tab || 'login')
           setShowAuth(true)
