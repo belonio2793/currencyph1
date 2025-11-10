@@ -17,6 +17,30 @@ export default function PlayerIsometricView({
   const worldRef = useRef(null)
   const playerIdRef = useRef(null)
 
+  const [zoom, setZoom] = useState(1)
+  const zoomRef = useRef(1)
+
+  const applyZoomToWorld = (z) => {
+    try {
+      const world = worldRef.current
+      if (!world || !world.camera) return
+      world.camera.zoom = Math.max(0.3, Math.min(3, z))
+      try { world.camera.updateProjectionMatrix() } catch(e){}
+      try { if (typeof world.handleResize === 'function') world.handleResize() } catch(e){}
+      try { if (typeof world.render === 'function') world.render() } catch(e){}
+    } catch (e) { console.warn('applyZoomToWorld failed', e) }
+  }
+
+  const setZoomLevel = (z) => {
+    zoomRef.current = z
+    setZoom(z)
+    applyZoomToWorld(z)
+  }
+
+  const zoomIn = () => setZoomLevel(Math.min(3, (zoomRef.current || 1) + 0.25))
+  const zoomOut = () => setZoomLevel(Math.max(0.3, (zoomRef.current || 1) - 0.25))
+  const zoomReset = () => setZoomLevel(1)
+
   useEffect(() => {
     if (!containerRef.current) return
 
