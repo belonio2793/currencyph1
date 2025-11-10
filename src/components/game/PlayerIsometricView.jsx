@@ -144,8 +144,8 @@ export default function PlayerIsometricView({
   }, [mapSettings, character])
 
   return (
-    <div className="w-full h-full relative bg-transparent">
-      <div ref={containerRef} className="w-full h-full" />
+    <div className="fixed inset-0 z-20 bg-gradient-to-b from-[#071228] to-[#0f1b2b]">
+      <div ref={containerRef} className="w-full h-full touch-none" />
     </div>
   )
 }
