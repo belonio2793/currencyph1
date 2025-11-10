@@ -93,7 +93,8 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
 
     ;(async () => {
       try {
-        const playerGroup = await world.addPlayer(previewPlayerId, style.name, style.model_url || null, 0, 0)
+        // Pass an options object so the preview uses the style color and model URL
+        const playerGroup = await world.addPlayer(previewPlayerId, style.name, { model_url: style.model_url || null, color: style.color || 0x00a8ff }, 0, 0)
         // apply scale and offset if model is present
         try {
           if (playerGroup && playerGroup.children && playerGroup.children[0]) {
