@@ -1882,7 +1882,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                     <div className="text-xs text-slate-400">Level {character.level} • XP {character.xp} {prestigeData.prestigeLevel > 0 && `• Prestige ${prestigeData.prestigeLevel}`}</div>
                   </div>
                   <div className="flex flex-col gap-2">
-                    <button onClick={() => setCustomizationOpen(true)} className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded">Customize</button>
+                    <button onClick={() => setCustomizationOpen(true)} className="px-2 py-1 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded">Inventory</button>
                     <button onClick={() => setCharacter(null)} className="px-2 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded">My Account</button>
                   </div>
                 </div>
