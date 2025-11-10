@@ -35,32 +35,53 @@ export class PropertyBuildingRenderer {
     const color = colors[type] || 0x00bcd4
     
     const geometry = new THREE.BoxGeometry(30, buildingHeight, 30)
-    const material = new THREE.MeshStandardMaterial({
+    // Use toon material for stylized look
+    const material = new THREE.MeshToonMaterial({
       color,
-      roughness: 0.7,
-      metalness: 0.1
+      flatShading: true,
+      metalness: 0.05,
+      roughness: 0.6
     })
-    
+
     const building = new THREE.Mesh(geometry, material)
     building.castShadow = true
     building.receiveShadow = true
     building.position.y = buildingHeight / 2
+
+    // Outline: create a slightly scaled back-face black mesh to simulate cel outline
+    try {
+      const outlineMat = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide })
+      const outlineMesh = new THREE.Mesh(geometry.clone(), outlineMat)
+      outlineMesh.scale.multiplyScalar(1.03)
+      outlineMesh.position.copy(building.position)
+      group.add(outlineMesh)
+    } catch(e) { /* ignore outline failures */ }
+
     group.add(building)
-    
+
     const roofGeometry = new THREE.ConeGeometry(22, 15, 4)
-    const roofMaterial = new THREE.MeshStandardMaterial({
+    const roofMaterial = new THREE.MeshToonMaterial({
       color: 0x8b4513,
-      roughness: 0.8
+      flatShading: true
     })
     const roof = new THREE.Mesh(roofGeometry, roofMaterial)
     roof.castShadow = true
     roof.receiveShadow = true
     roof.position.y = buildingHeight + 7.5
     roof.rotation.y = Math.PI / 4
+
+    // roof outline
+    try {
+      const rOutline = new THREE.Mesh(roofGeometry.clone(), new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.BackSide }))
+      rOutline.scale.multiplyScalar(1.02)
+      rOutline.position.copy(roof.position)
+      group.add(rOutline)
+    } catch(e) {}
+
     group.add(roof)
-    
+
     this.addWindowsToBuilding(building, buildingHeight)
-    
+
     return group
   }
 
