@@ -180,7 +180,7 @@ export default function App() {
     try {
       // supabase.auth.getUser() may return different shapes; handle defensively
     // Protect against it hanging by racing with a timeout
-    const timeoutMs = 8000
+    const timeoutMs = 0
     let res = null
     try {
       res = await Promise.race([
