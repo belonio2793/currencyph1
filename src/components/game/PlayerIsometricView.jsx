@@ -52,6 +52,7 @@ export default function PlayerIsometricView({
     try { world.addPlayer(id, (character && character.name) || 'Player', 0x00a8ff, startPos.x, startPos.z) } catch(e) {}
 
     return () => {
+      try { if (world && world._onContainerFocusCleanup) world._onContainerFocusCleanup() } catch(e) {}
       try { world.destroy() } catch(e) {}
       worldRef.current = null
     }
