@@ -9,7 +9,7 @@ const AVATAR_STYLES = [
   { id: 4, name: 'Waitress', model: 'waitress', model_url: null, color: 0xb87333, emissive: 0x5a3a1f },
   { id: 5, name: 'Angel', model: 'angel', model_url: null, color: 0xeaeaea, emissive: 0xb0b0b0 },
   { id: 6, name: 'Clown', model: 'clown', model_url: null, color: 0xe0115f, emissive: 0x7a0a39 },
-  { id: 7, name: 'Robot', model: 'robot', model_url: 'https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb', model_scale: 0.45, model_offset: { x: 0, y: -1, z: 0 }, color: 0x0f52ba, emissive: 0x072d5f },
+  { id: 7, name: 'Robot', model: 'robot', model_url: null, model_scale: 1, model_offset: { x: 0, y: 0, z: 0 }, color: 0x0f52ba, emissive: 0x072d5f },
   { id: 8, name: 'Superhero', model: 'superhero', model_url: null, color: 0x50c878, emissive: 0x2a6d48 },
   { id: 9, name: 'Wizard', model: 'wizard', model_url: null, color: 0x9966cc, emissive: 0x5a3e80 },
   { id: 10, name: 'Pirate', model: 'pirate', model_url: null, color: 0xffd700, emissive: 0xaa8c00 },
