@@ -16,22 +16,24 @@ export function initializePresence(userId) {
   currentUserId = userId
   if (!userId) return
 
-  updatePresence('online')
+  // Fire-and-forget but handle possible rejection to avoid unhandled promise errors
+  updatePresence('online').catch(err => console.debug('updatePresence initial failed (ignored):', err))
 
   presenceIntervalId = setInterval(() => {
-    updatePresence('online')
+    updatePresence('online').catch(err => console.debug('updatePresence interval failed (ignored):', err))
   }, PRESENCE_UPDATE_INTERVAL)
 
   window.addEventListener('beforeunload', () => {
-    updatePresence('offline')
+    // best-effort update; don't await in unload handlers
+    try { updatePresence('offline').catch(() => {}) } catch (e) {}
     clearInterval(presenceIntervalId)
   })
 
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-      updatePresence('away')
+      updatePresence('away').catch(() => {})
     } else {
-      updatePresence('online')
+      updatePresence('online').catch(() => {})
     }
   })
 }
