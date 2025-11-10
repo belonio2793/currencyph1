@@ -384,6 +384,17 @@ export default function World3DRenderer({
         </div>
         <button onClick={zoomOut} className="w-10 h-10 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white font-bold">−</button>
         <button onClick={zoomReset} className="w-10 h-8 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white text-xs">reset</button>
+        <button
+          onClick={() => setCameraFollowEnabled(!cameraFollowEnabled)}
+          className={`w-10 h-10 rounded flex items-center justify-center text-xs font-bold transition-colors ${
+            cameraFollowEnabled
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white'
+              : 'bg-white/6 hover:bg-white/10 text-white'
+          }`}
+          title={cameraFollowEnabled ? 'Camera follow enabled' : 'Camera follow disabled'}
+        >
+          📷
+        </button>
       </div>
     </div>
   )
