@@ -718,6 +718,31 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         stats: (char && char.stats) ? char.stats : ((typeof characterStats !== 'undefined') ? characterStats : null)
       }, { onConflict: 'id' })
     } catch (e) {
+      // If the error mentions cosmetics (schema mismatch), retry without cosmetics
+      try {
+        const msg = (e && (e.message || e.error_description || e.details || '')).toString().toLowerCase()
+        if (msg.includes('cosmetics') || msg.includes('column')) {
+          try {
+            await supabase.from('game_characters').upsert({
+              id: char.id,
+              user_id: userId,
+              name: char.name,
+              wealth: char.wealth,
+              income_rate: char.income_rate,
+              xp: char.xp,
+              level: char.level,
+              properties: char.properties || [],
+              last_daily: char.last_daily || null,
+              current_location: char.current_location || null,
+              home_city: char.home_city || null,
+              stats: (char && char.stats) ? char.stats : ((typeof characterStats !== 'undefined') ? characterStats : null)
+            }, { onConflict: 'id' })
+            return
+          } catch (e2) {
+            console.warn('Retry persistCharacterPartial without cosmetics failed', e2)
+          }
+        }
+      } catch (inner) {}
       // ignore persistence errors but log
       console.warn('persistCharacterPartial failed', e)
     }
