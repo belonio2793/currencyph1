@@ -424,6 +424,7 @@ export class World3D {
     const headGeometry = new THREE.SphereGeometry(10, 32, 32)
     const material = new THREE.MeshStandardMaterial({ color })
     const head = new THREE.Mesh(headGeometry, material)
+    head.name = 'head'
     head.position.y = 30
     head.castShadow = true
     head.receiveShadow = true
@@ -432,6 +433,7 @@ export class World3D {
     // Body
     const bodyGeometry = new THREE.BoxGeometry(8, 20, 8)
     const body = new THREE.Mesh(bodyGeometry, material)
+    body.name = 'body'
     body.position.y = 10
     body.castShadow = true
     body.receiveShadow = true
@@ -440,6 +442,7 @@ export class World3D {
     // Left arm
     const armGeometry = new THREE.BoxGeometry(4, 18, 4)
     const leftArm = new THREE.Mesh(armGeometry, material)
+    leftArm.name = 'leftArm'
     leftArm.position.set(-8, 12, 0)
     leftArm.castShadow = true
     leftArm.receiveShadow = true
@@ -447,6 +450,7 @@ export class World3D {
 
     // Right arm
     const rightArm = new THREE.Mesh(armGeometry, material)
+    rightArm.name = 'rightArm'
     rightArm.position.set(8, 12, 0)
     rightArm.castShadow = true
     rightArm.receiveShadow = true
@@ -455,12 +459,14 @@ export class World3D {
     // Legs
     const legGeometry = new THREE.BoxGeometry(4, 18, 4)
     const leftLeg = new THREE.Mesh(legGeometry, material)
+    leftLeg.name = 'leftLeg'
     leftLeg.position.set(-4, -8, 0)
     leftLeg.castShadow = true
     leftLeg.receiveShadow = true
     group.add(leftLeg)
 
     const rightLeg = new THREE.Mesh(legGeometry, material)
+    rightLeg.name = 'rightLeg'
     rightLeg.position.set(4, -8, 0)
     rightLeg.castShadow = true
     rightLeg.receiveShadow = true
@@ -722,6 +728,122 @@ export class World3D {
 
   setPropertyClickHandler(callback) {
     this.onPropertyClicked = callback
+  }
+
+  // Create a small overhead progress bar group that sits above a player's head
+  _createProgressBarGroup(width = 60, height = 8, color = 0x2aef7a) {
+    const group = new THREE.Group()
+    group.name = 'progressBar'
+
+    const bgGeom = new THREE.PlaneGeometry(width, height)
+    const bgMat = new THREE.MeshBasicMaterial({ color: 0x111827, transparent: true, opacity: 0.85 })
+    const bg = new THREE.Mesh(bgGeom, bgMat)
+    bg.position.set(0, 0, 0)
+    group.add(bg)
+
+    const fgGeom = new THREE.PlaneGeometry(width, height)
+    const fgMat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95 })
+    const fg = new THREE.Mesh(fgGeom, fgMat)
+    fg.position.set(-width/2 + (width/2), 0, 0.001)
+    fg.scale.set(1, 1, 1)
+    fg.name = 'fg'
+    group.add(fg)
+
+    // Add a small border outline
+    const borderGeom = new THREE.PlaneGeometry(width + 2, height + 2)
+    const borderMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.4 })
+    const border = new THREE.Mesh(borderGeom, borderMat)
+    border.position.set(0, 0, -0.002)
+    group.add(border)
+
+    // Label sprite (canvas texture)
+    const canvas = document.createElement('canvas')
+    canvas.width = 256
+    canvas.height = 64
+    const ctx = canvas.getContext('2d')
+    ctx.clearRect(0,0,canvas.width,canvas.height)
+    ctx.fillStyle = 'rgba(255,255,255,0.9)'
+    ctx.font = 'bold 18px Arial'
+    ctx.textAlign = 'center'
+    ctx.fillText('', canvas.width/2, 40)
+    const tex = new THREE.CanvasTexture(canvas)
+    const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true })
+    const sprite = new THREE.Sprite(spriteMat)
+    sprite.scale.set(width * 1.5, height * 3, 1)
+    sprite.position.set(0, -12, 0)
+    sprite.name = 'label'
+    group.add(sprite)
+
+    group.userData = { width, height, canvas, ctx, tex, fg, bg, sprite }
+    return group
+  }
+
+  startPlayerJob(userId, jobKey, duration = 3000, onProgress = null, onComplete = null) {
+    const player = this.players.get(userId)
+    if (!player) return
+
+    // If player already working, ignore
+    if (player.job && player.job.active) return
+
+    const startTime = performance.now()
+    const job = {
+      name: jobKey,
+      duration: Math.max(200, duration),
+      startTime,
+      active: true,
+      onProgress,
+      onComplete
+    }
+
+    // attach progress bar group to player
+    const bar = this._createProgressBarGroup(60, 8, 0x2aef7a)
+    bar.position.set(0, 100, 0)
+    player.group.add(bar)
+
+    // determine animation type heuristically from jobKey
+    const jk = (jobKey || '').toLowerCase()
+    if (jk.includes('dev') || jk.includes('program') || jk.includes('engineer') || jk.includes('coder') || jk.includes('data')) job.animType = 'typing'
+    else if (jk.includes('construction') || jk.includes('carpenter') || jk.includes('mason') || jk.includes('welder') || jk.includes('driver')) job.animType = 'hammer'
+    else if (jk.includes('grocery') || jk.includes('vendor') || jk.includes('waiter') || jk.includes('bartend') || jk.includes('vendor') || jk.includes('food')) job.animType = 'serve'
+    else job.animType = 'work'
+
+    player.job = { ...job, bar }
+
+    // Provide an internal ticker that calls onProgress periodically (render loop will also update visuals)
+    const tick = () => {
+      if (!player.job || !player.job.active) return
+      const now = performance.now()
+      const elapsed = now - player.job.startTime
+      const pct = Math.min(1, elapsed / player.job.duration)
+      if (typeof player.job.onProgress === 'function') {
+        try { player.job.onProgress(Math.floor(pct * 100)) } catch(e){}
+      }
+      if (pct >= 1) {
+        // finish
+        player.job.active = false
+        // cleanup bar after short delay in render loop
+        if (typeof player.job.onComplete === 'function') {
+          try { player.job.onComplete() } catch(e){}
+        }
+      } else {
+        // schedule next check
+        setTimeout(tick, 150)
+      }
+    }
+    setTimeout(tick, 150)
+
+    return player.job
+  }
+
+  stopPlayerJob(userId) {
+    const player = this.players.get(userId)
+    if (!player || !player.job) return
+    player.job.active = false
+    // remove bar if present
+    try {
+      if (player.job.bar) player.group.remove(player.job.bar)
+    } catch(e){}
+    delete player.job
   }
 
   render() {
