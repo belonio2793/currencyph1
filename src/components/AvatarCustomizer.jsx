@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
 
+import React, { useState, useEffect } from 'react'
+
 // Define avatar styles with optional GLTF model URLs
 const AVATAR_STYLES = [
   { id: 1, name: 'Doggo', model: 'dog', model_url: 'https://threejs.org/examples/models/gltf/Flamingo.glb', model_scale: 0.03, model_offset: { x:0, y:-2, z:0 }, color: 0xd4a574, emissive: 0x6b5a3a },
@@ -24,7 +26,7 @@ const AVATAR_STYLES = [
   { id: 20, name: 'Detective Dog', model: 'detective_dog', model_url: null, color: 0xcc00ff, emissive: 0x660080 },
 ]
 
-const AVATAR_PREVIEWS = {1:'🐶',2:'🐱',3:'👨‍🚒',4:'🧑‍🍳',5:'😇',6:'🤡',7:'🤖',8:'🦸',9:'🧙',10:'🏴‍☠️',11:'👽',12:'🥷',13:'🧚',14:'🕵️',15:'👩‍🍳',16:'🦄',17:'🛡️',18:'👩‍⚕️',19:'🧑‍🏫',20:'🐕‍🦺'}
+const AVATAR_PREVIEWS = {1:'🐶',2:'🐱',3:'👨‍🚒',4:'🧑��🍳',5:'😇',6:'🤡',7:'🤖',8:'🦸',9:'🧙',10:'🏴‍☠️',11:'👽',12:'🥷',13:'🧚',14:'🕵️',15:'👩‍🍳',16:'🦄',17:'🛡️',18:'👩‍⚕️',19:'🧑‍🏫',20:'🐕‍🦺'}
 
 export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   const [hoveredId, setHoveredId] = useState(null)
