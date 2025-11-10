@@ -432,10 +432,9 @@ export class WorldIsometric {
     const h = this.container.clientHeight
     if (w === 0 || h === 0) return
     this.width = w; this.height = h
-    if (this.isWebGL && this.renderer && typeof this.renderer.setSize === 'function') {
+    if (this.renderer && typeof this.renderer.setSize === 'function') {
       try { this.renderer.setSize(w, h) } catch(e) {}
-    } else if (this.canvas) {
-      try { this.canvas.width = w; this.canvas.height = h } catch(e) {}
+      try { this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)) } catch(e) {}
     }
 
     const aspect = Math.max(0.1, w / h)
@@ -455,62 +454,8 @@ export class WorldIsometric {
   }
 
   render() {
-    if (this.renderer && typeof this.renderer.render === 'function') {
-      try { this.renderer.render(this.scene, this.camera) } catch(e) { /* ignore webgl render errors */ }
-      return
-    }
-
-    // 2D fallback rendering
-    if (!this.canvas || !this.ctx) return
-    const ctx = this.ctx
-    const canvas = this.canvas
-    // Clear
-    try { ctx.setTransform(1,0,0,1,0,0) } catch(e){}
-    ctx.clearRect(0,0,canvas.width,canvas.height)
-
-    // simple background
-    ctx.fillStyle = '#071228'
-    ctx.fillRect(0,0,canvas.width,canvas.height)
-
-    // simple grid rendering based on cols/rows
-    const cols = this.cols || 30
-    const rows = this.rows || 20
-    const w = canvas.width
-    const h = canvas.height
-    const cellW = Math.max(1, Math.floor(w / cols))
-    const cellH = Math.max(1, Math.floor(h / rows))
-
-    for (let r = 0; r < rows; r++) {
-      for (let c = 0; c < cols; c++) {
-        const x = c * cellW
-        const y = r * cellH
-        ctx.fillStyle = (c + r) % 2 === 0 ? '#5b6470' : '#53606f'
-        ctx.fillRect(x+1, y+1, cellW-2, cellH-2)
-      }
-    }
-
-    // draw roads as darker strips every ~6 tiles
-    ctx.fillStyle = '#2b2b2b'
-    for (let r = 0; r <= rows; r++) {
-      if (r % 6 === 0) ctx.fillRect(0, r*cellH, w, Math.max(2, Math.floor(cellH*0.6)))
-    }
-    for (let c = 0; c <= cols; c++) {
-      if (c % 6 === 0) ctx.fillRect(c*cellW, 0, Math.max(2, Math.floor(cellW*0.6)), h)
-    }
-
-    // draw simple player markers
-    try {
-      for (const [id, p] of this.players.entries()) {
-        if (!p || !p.group) continue
-        // approximate position mapping from world coords to canvas
-        const px = Math.floor(((p.group.position.x + (cols*this.tileSize)/2) / (cols*this.tileSize)) * w)
-        const py = Math.floor(((p.group.position.z + (rows*this.tileSize)/2) / (rows*this.tileSize)) * h)
-        ctx.fillStyle = '#00a8ff'
-        ctx.beginPath()
-        ctx.arc(px, py, 6, 0, Math.PI*2)
-        ctx.fill()
-      }
-    } catch(e) {}
+    if (!this.renderer || typeof this.renderer.render !== 'function') return
+    try { this.renderer.render(this.scene, this.camera) } catch(e) { console.warn('Renderer render failed', e) }
   }
 
   animate() {
