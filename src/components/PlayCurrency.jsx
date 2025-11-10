@@ -718,7 +718,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         cosmetics: char.cosmetics || null,
         last_daily: char.last_daily || null,
         current_location: char.current_location || null,
-        home_city: char.home_city || null
+        home_city: char.home_city || null,
+        stats: (typeof characterStats !== 'undefined') ? characterStats : null
       }
       const { error: e } = await supabase.from('game_characters').upsert(payload, { onConflict: 'id' })
       if (e) throw e
