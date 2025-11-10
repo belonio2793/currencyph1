@@ -33,9 +33,14 @@ export class WorldIsometric {
   }
 
   _init() {
-    // orthographic camera sized for isometric styled view
+    // derive scene sizing based on map dimensions for a more expansive feel
+    const cols = this.opts.cols || 30
+    const rows = this.opts.rows || 20
+    const tileSize = this.opts.tileSize || 40
+    const maxDim = Math.max(cols * tileSize, rows * tileSize)
+    const viewSize = Math.max(800, Math.ceil(maxDim * 1.0))
+
     const aspect = Math.max(0.1, this.width / this.height)
-    const viewSize = 800
     this.camera = new THREE.OrthographicCamera(
       (-viewSize * aspect) / 2,
       (viewSize * aspect) / 2,
@@ -45,38 +50,43 @@ export class WorldIsometric {
       2000
     )
 
-    // rotate to approximate isometric angle
-    const angle = (35 * Math.PI) / 180
-    // position further away for larger maps
-    this.camera.position.set(1200, 1200, 1200)
+    // place camera at an isometric vantage that scales with scene size
+    this.camera.position.set(viewSize * 0.9, viewSize * 0.55, viewSize * 0.9)
     this.camera.up.set(0, 1, 0)
-    // camera target for panning
-    this.cameraTarget = new THREE.Vector3(0,0,0)
+    this.cameraTarget = new THREE.Vector3(0, 0, 0)
     this.camera.lookAt(this.cameraTarget)
+    this.camera.zoom = 1
     this.camera.updateProjectionMatrix()
 
+    // renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     this.renderer.setSize(this.width, this.height)
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    this.renderer.setClearColor(0x071228, 1)
+    this.renderer.domElement.style.display = 'block'
+    try { this.container.style.background = 'linear-gradient(180deg,#071228 0%,#0f1b2b 60%)' } catch(e){}
     this.container.appendChild(this.renderer.domElement)
 
-    // soft ambient + directional
-    const ambient = new THREE.AmbientLight(0xffffff, 0.8)
-    this.scene.add(ambient)
-    const dir = new THREE.DirectionalLight(0xffffff, 0.6)
-    dir.position.set(100, 200, 100)
+    // lighting: toon-friendly hemisphere and directional
+    const hemi = new THREE.HemisphereLight(0x8899bb, 0x101820, 0.6)
+    this.scene.add(hemi)
+    const dir = new THREE.DirectionalLight(0xe6f3ff, 0.7)
+    dir.position.set(viewSize * 0.3, viewSize * 0.8, viewSize * 0.2)
+    dir.castShadow = false
     this.scene.add(dir)
 
-    // create tile grid
-    this._createTiles({ cols: this.opts.cols || 30, rows: this.opts.rows || 20, tileSize: this.opts.tileSize || 40 })
+    // subtle fog for depth
+    this.scene.fog = new THREE.FogExp2(0x071228, Math.max(0.00035, 0.00035 * (viewSize / 800)))
 
-    // event listeners
+    // stylized ground and tiles
+    this._createTiles({ cols, rows, tileSize })
+
+    // interactions
     this.resizeObserver = new ResizeObserver(() => this.handleResize())
     this.resizeObserver.observe(this.container)
     this.renderer.domElement.addEventListener('click', (e) => this._onClick(e))
 
-    // prepare a plane for mouse-world intersections
-    this._plane = new THREE.Plane(new THREE.Vector3(0,1,0), 0)
+    this._plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
     this._isDragging = false
     this._dragStartWorld = new THREE.Vector3()
     this._dragStartCam = new THREE.Vector3()
@@ -117,9 +127,8 @@ export class WorldIsometric {
     const onWheel = (e) => {
       e.preventDefault()
       const delta = e.deltaY
-      // adjust camera zoom instead of moving camera for orthographic
       const factor = 1 + (delta > 0 ? 0.08 : -0.08)
-      this.camera.zoom = Math.max(0.2, Math.min(3, (this.camera.zoom || 1) * factor))
+      this.camera.zoom = Math.max(0.3, Math.min(3, (this.camera.zoom || 1) * factor))
       this.camera.updateProjectionMatrix()
     }
 
@@ -128,7 +137,6 @@ export class WorldIsometric {
     window.addEventListener('pointerup', onPointerUp)
     this.renderer.domElement.addEventListener('wheel', onWheel, { passive: false })
 
-    // store cleanup so destroy can remove them
     this._inputCleanup = () => {
       try { this.renderer.domElement.removeEventListener('pointerdown', onPointerDown) } catch(e){}
       try { window.removeEventListener('pointermove', onPointerMove) } catch(e){}
@@ -151,42 +159,68 @@ export class WorldIsometric {
     const halfW = (cols * tileSize) / 2
     const halfH = (rows * tileSize) / 2
 
+    // create a subtle patterned texture via canvas for tiles
+    const texCanvas = document.createElement('canvas')
+    texCanvas.width = 64
+    texCanvas.height = 64
+    const ctx = texCanvas.getContext('2d')
+    ctx.fillStyle = '#53606f'
+    ctx.fillRect(0,0,64,64)
+    ctx.fillStyle = 'rgba(255,255,255,0.02)'
+    for (let i=0;i<8;i++) { ctx.fillRect(i*8,0,4,64) }
+    const tileTexture = new THREE.CanvasTexture(texCanvas)
+    tileTexture.wrapS = tileTexture.wrapT = THREE.RepeatWrapping
+    tileTexture.repeat.set(1,1)
+
+    const baseMat = new THREE.MeshToonMaterial({ map: tileTexture, color: 0x5b6470 })
+
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         const x = c * tileSize - halfW + tileSize / 2
         const z = r * tileSize - halfH + tileSize / 2
 
-        const geo = new THREE.PlaneGeometry(tileSize - 2, tileSize - 2)
-        const mat = new THREE.MeshStandardMaterial({ color: 0x6b6b75, emissive: 0x000000, roughness: 0.8, metalness: 0 })
+        const geo = new THREE.PlaneGeometry(tileSize - 1.5, tileSize - 1.5)
+        const mat = baseMat.clone()
+        // subtle variation
+        const h = 0.9 + (Math.sin(c * 12.9898 + r * 78.233) * 43758.5453 % 0.1)
+        mat.color = mat.color.clone()
+        mat.color.setHex(mat.color.getHex() * 1)
         const plane = new THREE.Mesh(geo, mat)
         plane.rotation.x = -Math.PI / 2
         plane.position.set(x, 0, z)
         plane.userData = { type: 'tile', grid: { x: c, y: r } }
+        plane.receiveShadow = false
         this.tileGroup.add(plane)
         this.tiles.push(plane)
       }
     }
 
-    // add crisp grid lines using LineSegments
-    const lines = new THREE.Group()
-    const material = new THREE.LineBasicMaterial({ color: 0x111111 })
+    // soft grid lines using thin boxes for crispness
+    const gridGroup = new THREE.Group()
+    const lineMat = new THREE.MeshBasicMaterial({ color: 0x0f1620 })
     for (let r = 0; r <= rows; r++) {
-      const points = [
-        new THREE.Vector3(-halfW, 0.11, r * tileSize - halfH),
-        new THREE.Vector3(halfW, 0.11, r * tileSize - halfH)
-      ]
-      const geom = new THREE.BufferGeometry().setFromPoints(points)
-      lines.add(new THREE.Line(geom, material))
+      const z = r * tileSize - halfH
+      const geom = new THREE.BoxGeometry(cols * tileSize + 2, 0.2, 0.6)
+      const line = new THREE.Mesh(geom, lineMat)
+      line.position.set(0, 0.11, z)
+      gridGroup.add(line)
     }
     for (let c = 0; c <= cols; c++) {
-      const points = [
-        new THREE.Vector3(c * tileSize - halfW, 0.11, -halfH),
-        new THREE.Vector3(c * tileSize - halfW, 0.11, halfH)
-      ]
-      const geom = new THREE.BufferGeometry().setFromPoints(points)
-      lines.add(new THREE.Line(geom, material))
+      const x = c * tileSize - halfW
+      const geom = new THREE.BoxGeometry(0.6, 0.2, rows * tileSize + 2)
+      const line = new THREE.Mesh(geom, lineMat)
+      line.position.set(x, 0.11, 0)
+      gridGroup.add(line)
     }
-    this.scene.add(lines)
+    this.scene.add(gridGroup)
+
+    // slight ground plane fade at edges
+    const groundGeo = new THREE.PlaneGeometry(cols * tileSize * 2, rows * tileSize * 2)
+    const groundMat = new THREE.MeshBasicMaterial({ color: 0x0c1420, transparent: true, opacity: 0.9 })
+    const ground = new THREE.Mesh(groundGeo, groundMat)
+    ground.rotation.x = -Math.PI / 2
+    ground.position.y = -0.5
+    this.scene.add(ground)
   }
 
   addPlayer(id, name = 'Player', color = 0x00a8ff, x = 0, z = 0) {
@@ -344,7 +378,11 @@ export class WorldIsometric {
     this.width = w; this.height = h
     this.renderer.setSize(w, h)
     const aspect = Math.max(0.1, w / h)
-    const viewSize = 800
+    const cols = this.cols || (this.opts.cols || 30)
+    const rows = this.rows || (this.opts.rows || 20)
+    const tileSize = this.tileSize || (this.opts.tileSize || 40)
+    const maxDim = Math.max(cols * tileSize, rows * tileSize)
+    const viewSize = Math.max(800, Math.ceil(maxDim * 1.0))
     this.camera.left = (-viewSize * aspect) / 2
     this.camera.right = (viewSize * aspect) / 2
     this.camera.top = viewSize / 2
