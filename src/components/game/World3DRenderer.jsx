@@ -372,6 +372,8 @@ export default function World3DRenderer({
 
   return (
     <div ref={containerRef} className={`w-full h-full relative ${className}`}>
+      {/* Persistent highlight that fits the entire viewport */}
+      <div className="pointer-events-none absolute inset-0 border-2 border-yellow-400" />
       <div className="absolute right-4 top-4 z-50 flex flex-col gap-2">
         <button onClick={zoomIn} className="w-10 h-10 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white font-bold">+</button>
         <div className="px-2 py-1 bg-white/6 rounded flex items-center justify-center text-white text-xs font-semibold whitespace-nowrap">
