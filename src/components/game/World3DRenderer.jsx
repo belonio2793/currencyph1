@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from 'react'
 import * as THREE from 'three'
 
 // Lightweight self-contained 3D world renderer using three.js
