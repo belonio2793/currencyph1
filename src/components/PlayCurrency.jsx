@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { gameAPI } from '../lib/gameAPI'
 import IsometricGameMap from './game/IsometricGameMap'
 import Player3DView from './game/Player3DView'
 import DuelMatch from './game/DuelMatch'
