@@ -1645,7 +1645,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 <div className="border border-slate-700 rounded overflow-hidden" style={{ height: 520 }}>
                   {mapViewMode === 'isometric' ? (
-                    <PlayerView
+                    <Player3DView
                       properties={[...((character.properties || []).map(normalizeProperty)), ...((remoteAssets || []).map(normalizeProperty))].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i)}
                       character={character}
                       initialAvatarPos={initialAvatarPos}
@@ -1654,6 +1654,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                       placingProperty={placingAsset}
                       onConfirmPlace={(coords) => confirmPlacement(coords)}
                       onCancelPlace={() => setPlacingAsset(null)}
+                      onPropertyClick={(prop) => { setPropertyPanelOpen(true) }}
                     />
                   ) : (
                     <WorldMap
