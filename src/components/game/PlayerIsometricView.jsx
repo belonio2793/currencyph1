@@ -19,7 +19,8 @@ export default function PlayerIsometricView({
 
   useEffect(() => {
     if (!containerRef.current) return
-    const world = new WorldIsometric(containerRef.current, { cols: Math.max(20, Math.floor((mapSettings.sizeMultiplier || 10) * 3)), rows: Math.max(12, Math.floor((mapSettings.sizeMultiplier || 10) * 2)), tileSize: 48 })
+    // Significantly larger grid for expansive exploration
+    const world = new WorldIsometric(containerRef.current, { cols: Math.max(80, Math.floor((mapSettings.sizeMultiplier || 10) * 8)), rows: Math.max(50, Math.floor((mapSettings.sizeMultiplier || 10) * 5)), tileSize: 36 })
     worldRef.current = world
     if (typeof onWorldReady === 'function') onWorldReady(world)
 
