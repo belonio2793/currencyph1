@@ -11,6 +11,14 @@ export default function Rates({ globalCurrency }) {
   const [allCurrencies, setAllCurrencies] = useState([])
   const baseCurrency = 'PHP'
 
+  const resolveUsdToBase = () => {
+    const direct = exchangeRates && exchangeRates[`USD_${baseCurrency}`]
+    if (typeof direct === 'number' && direct > 0) return direct
+    const rev = exchangeRates && exchangeRates[`${baseCurrency}_USD`]
+    if (typeof rev === 'number' && rev > 0) return 1 / rev
+    return null
+  }
+
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
 
   const defaultCryptoPrices = {
