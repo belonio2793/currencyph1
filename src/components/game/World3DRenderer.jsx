@@ -93,57 +93,49 @@ export default function World3DRenderer({
     ground.position.y = -0.5
     scene.add(ground)
 
-    // player marker - human-like avatar
+    // player marker - golden Robloxian avatar statue
     const playerGroup = new THREE.Group()
+    const goldenMat = new THREE.MeshStandardMaterial({
+      color: 0xd4a574,
+      metalness: 0.8,
+      roughness: 0.2,
+      emissive: 0x6b5a3a,
+      emissiveIntensity: 0.3
+    })
 
-    // Head
-    const headMat = new THREE.MeshStandardMaterial({ color: 0xfdbcb4 }) // skin color
-    const headGeo = new THREE.SphereGeometry(8, 16, 16)
-    const headMesh = new THREE.Mesh(headGeo, headMat)
-    headMesh.position.y = 30
+    // Head - boxy golden cube
+    const headGeo = new THREE.BoxGeometry(12, 12, 12)
+    const headMesh = new THREE.Mesh(headGeo, goldenMat)
+    headMesh.position.y = 32
     playerGroup.add(headMesh)
 
-    // Body
-    const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2563eb }) // blue shirt
-    const bodyGeo = new THREE.CylinderGeometry(7, 7, 18, 8)
-    const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat)
-    bodyMesh.position.y = 15
+    // Body/Torso - large golden box
+    const bodyGeo = new THREE.BoxGeometry(14, 20, 10)
+    const bodyMesh = new THREE.Mesh(bodyGeo, goldenMat)
+    bodyMesh.position.y = 14
     playerGroup.add(bodyMesh)
 
-    // Left arm
-    const armMat = new THREE.MeshStandardMaterial({ color: 0xfdbcb4 })
-    const armGeo = new THREE.CylinderGeometry(3, 3, 16, 8)
-    const leftArm = new THREE.Mesh(armGeo, armMat)
-    leftArm.position.set(-10, 18, 0)
-    leftArm.rotation.z = Math.PI / 2.5
+    // Left arm - golden box
+    const armGeo = new THREE.BoxGeometry(8, 16, 8)
+    const leftArm = new THREE.Mesh(armGeo, goldenMat)
+    leftArm.position.set(-14, 16, 0)
     playerGroup.add(leftArm)
 
-    const rightArm = new THREE.Mesh(armGeo, armMat)
-    rightArm.position.set(10, 18, 0)
-    rightArm.rotation.z = -Math.PI / 2.5
+    // Right arm - golden box
+    const rightArm = new THREE.Mesh(armGeo, goldenMat)
+    rightArm.position.set(14, 16, 0)
     playerGroup.add(rightArm)
 
-    // Left leg
-    const legMat = new THREE.MeshStandardMaterial({ color: 0x1f2937 }) // dark pants
-    const legGeo = new THREE.CylinderGeometry(3.5, 3.5, 14, 8)
-    const leftLeg = new THREE.Mesh(legGeo, legMat)
-    leftLeg.position.set(-4, 4, 0)
+    // Left leg - golden box
+    const legGeo = new THREE.BoxGeometry(7, 16, 8)
+    const leftLeg = new THREE.Mesh(legGeo, goldenMat)
+    leftLeg.position.set(-5, 2, 0)
     playerGroup.add(leftLeg)
 
-    const rightLeg = new THREE.Mesh(legGeo, legMat)
-    rightLeg.position.set(4, 4, 0)
+    // Right leg - golden box
+    const rightLeg = new THREE.Mesh(legGeo, goldenMat)
+    rightLeg.position.set(5, 2, 0)
     playerGroup.add(rightLeg)
-
-    // Eyes
-    const eyeMat = new THREE.MeshStandardMaterial({ color: 0x000000 })
-    const eyeGeo = new THREE.SphereGeometry(1.5, 8, 8)
-    const leftEye = new THREE.Mesh(eyeGeo, eyeMat)
-    leftEye.position.set(-3, 32, 7)
-    playerGroup.add(leftEye)
-
-    const rightEye = new THREE.Mesh(eyeGeo, eyeMat)
-    rightEye.position.set(3, 32, 7)
-    playerGroup.add(rightEye)
 
     // Add username label above player
     const labelTexture = createTextTexture('Player', 48)
