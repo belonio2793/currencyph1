@@ -559,18 +559,6 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     markVisitedCity(cityName)
   }
 
-  // Update cosmetics and persist to character
-  const handleUpdateCosmetics = (newCosmetics) => {
-    const validated = validateCosmetics(newCosmetics)
-    setCosmetics(validated)
-
-    // Persist to character if loaded
-    if (character) {
-      const updated = { ...character, cosmetics: validated }
-      persistCharacterPartial(updated)
-      if (userId) saveCharacterToDB(updated)
-    }
-  }
 
   // Passive income adds character.income_rate to wealth every 10 seconds
   const startPassiveIncome = () => {
