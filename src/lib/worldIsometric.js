@@ -91,7 +91,7 @@ export class WorldIsometric {
     this.resizeObserver = new ResizeObserver(() => this.handleResize())
     this.resizeObserver.observe(this.container)
 
-    const domEl = this.isWebGL ? this.renderer.domElement : this.canvas
+    const domEl = this.renderer.domElement
     try { domEl.addEventListener('click', (e) => this._onClick(e)) } catch(e){}
 
     this._plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0)
