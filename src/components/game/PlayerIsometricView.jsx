@@ -19,42 +19,96 @@ export default function PlayerIsometricView({
 
   useEffect(() => {
     if (!containerRef.current) return
-    // Significantly larger grid for expansive exploration
-    const world = new WorldIsometric(containerRef.current, { cols: Math.max(80, Math.floor((mapSettings.sizeMultiplier || 10) * 8)), rows: Math.max(50, Math.floor((mapSettings.sizeMultiplier || 10) * 5)), tileSize: 36 })
-    worldRef.current = world
-    if (typeof onWorldReady === 'function') onWorldReady(world)
 
-    // ensure container is focusable for keyboard input
-    try {
-      if (containerRef.current) {
-        containerRef.current.tabIndex = 0
-        const onDownFocus = () => { try { containerRef.current.focus() } catch(e){} }
-        containerRef.current.addEventListener('mousedown', onDownFocus)
-        // cleanup on destroy
-        world._onContainerFocusCleanup = () => { try { containerRef.current.removeEventListener('mousedown', onDownFocus) } catch(e){} }
+    let mounted = true
+
+    // Wait for container to have a non-zero size (helps when parent uses flex or height is set later)
+    const waitForSize = () => new Promise((resolve) => {
+      const el = containerRef.current
+      if (!el) return resolve()
+      if (el.clientWidth > 0 && el.clientHeight > 0) return resolve()
+
+      // Use ResizeObserver when available
+      let ro = null
+      const timeout = setTimeout(() => {
+        try { if (ro) ro.disconnect() } catch(e){}
+        resolve()
+      }, 500)
+
+      try {
+        ro = new ResizeObserver(() => {
+          if (!el) return
+          if (el.clientWidth > 0 && el.clientHeight > 0) {
+            clearTimeout(timeout)
+            try { if (ro) ro.disconnect() } catch(e){}
+            resolve()
+          }
+        })
+        ro.observe(el)
+      } catch (e) {
+        // fallback: short delay
+        setTimeout(() => resolve(), 100)
       }
-    } catch(e) {}
-
-    // click handlers
-    world.setTileClickHandler((grid) => {
-      if (placingProperty) return
-      if (onPropertyClick) onPropertyClick({ grid })
     })
 
-    world.setPlayerClickHandler((pl) => {
-      if (placingProperty) return
-      if (onPropertyClick) onPropertyClick({ player: pl })
-    })
+    const init = async () => {
+      await waitForSize()
+      if (!mounted || !containerRef.current) return
 
-    // add player
-    const id = (character && character.id) || `guest-${Math.random().toString(36).slice(2,8)}`
-    playerIdRef.current = id
-    const startPos = initialAvatarPos ? { x: initialAvatarPos.x, z: initialAvatarPos.y } : { x: 0, z: 0 }
-    try { world.addPlayer(id, (character && character.name) || 'Player', 0x00a8ff, startPos.x, startPos.z) } catch(e) {}
+      // Significantly larger grid for expansive exploration
+      const world = new WorldIsometric(containerRef.current, { cols: Math.max(80, Math.floor((mapSettings.sizeMultiplier || 10) * 8)), rows: Math.max(50, Math.floor((mapSettings.sizeMultiplier || 10) * 5)), tileSize: 36 })
+      worldRef.current = world
+      try { if (typeof onWorldReady === 'function') onWorldReady(world) } catch(e){}
+
+      // ensure container is focusable for keyboard input
+      try {
+        if (containerRef.current) {
+          containerRef.current.tabIndex = 0
+          const onDownFocus = () => { try { containerRef.current.focus() } catch(e){} }
+          containerRef.current.addEventListener('mousedown', onDownFocus)
+          // cleanup on destroy
+          world._onContainerFocusCleanup = () => { try { containerRef.current.removeEventListener('mousedown', onDownFocus) } catch(e){} }
+        }
+      } catch(e) {}
+
+      // click handlers
+      try {
+        world.setTileClickHandler((grid) => {
+          if (placingProperty) return
+          if (onPropertyClick) onPropertyClick({ grid })
+        })
+
+        world.setPlayerClickHandler((pl) => {
+          if (placingProperty) return
+          if (onPropertyClick) onPropertyClick({ player: pl })
+        })
+      } catch(e) { console.warn('world handler setup failed', e) }
+
+      // add player
+      try {
+        const id = (character && character.id) || `guest-${Math.random().toString(36).slice(2,8)}`
+        playerIdRef.current = id
+        const startPos = initialAvatarPos ? { x: initialAvatarPos.x, z: initialAvatarPos.y } : { x: 0, z: 0 }
+        world.addPlayer(id, (character && character.name) || 'Player', 0x00a8ff, startPos.x, startPos.z)
+      } catch(e) { console.warn('addPlayer failed', e) }
+
+      // Trigger an initial resize to ensure renderer matches container
+      try { world.handleResize() } catch(e) {}
+
+      // expose cleanup
+      return
+    }
+
+    let cleanupPromise = null
+    init().then((res) => { cleanupPromise = res }).catch((e) => { console.warn('init world failed', e) })
 
     return () => {
-      try { if (world && world._onContainerFocusCleanup) world._onContainerFocusCleanup() } catch(e) {}
-      try { world.destroy() } catch(e) {}
+      mounted = false
+      try {
+        const world = worldRef.current
+        if (world && world._onContainerFocusCleanup) try { world._onContainerFocusCleanup() } catch(e){}
+        try { world && world.destroy() } catch(e) {}
+      } catch(e) {}
       worldRef.current = null
     }
   }, [])
