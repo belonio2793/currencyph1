@@ -1,6 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-export default function CharacterCustomizer({ isOpen, onToggle }) {
+export default function CharacterCustomizer({ isOpen, onToggle, character }) {
   const panelRef = useRef(null)
   const [position, setPosition] = useState({ x: 20, y: 20 })
   const [isDragging, setIsDragging] = useState(false)
@@ -33,14 +33,12 @@ export default function CharacterCustomizer({ isOpen, onToggle }) {
     }
   }, [isDragging, dragOffset])
 
-  if (!isOpen) {
-    return null
-  }
+  if (!isOpen) return null
 
-  const itemSlots = Array.from({ length: 12 }, (_, i) => ({
-    id: `slot-${i}`,
-    index: i
-  }))
+  const itemSlots = Array.from({ length: 12 }, (_, i) => ({ id: `slot-${i}`, index: i }))
+  const owned = (character && Array.isArray(character.properties)) ? character.properties : []
+
+  const formatCurrency = (n) => `₱${Number(n || 0).toLocaleString()}`
 
   return (
     <div
@@ -73,23 +71,31 @@ export default function CharacterCustomizer({ isOpen, onToggle }) {
 
       <div className="p-4 space-y-4 bg-slate-800/50">
         <div className="grid grid-cols-4 gap-3">
-          {itemSlots.map(slot => (
-            <div
-              key={slot.id}
-              className="relative aspect-square cursor-pointer group"
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-900 rounded border-2 border-slate-500 hover:border-teal-500 transition-all">
-                <div className="absolute inset-1 bg-gradient-to-br from-slate-700 via-slate-900 to-slate-950 rounded flex items-center justify-center text-slate-500 text-3xl hover:text-slate-400 transition-colors">
-                  <span className="opacity-40">📦</span>
+          {itemSlots.map((slot) => {
+            const item = owned[slot.index]
+            return (
+              <div key={slot.id} className="relative aspect-square cursor-pointer group">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-600 to-slate-900 rounded border-2 border-slate-500 hover:border-teal-500 transition-all flex items-center justify-center">
+                  {item ? (
+                    <div className="flex flex-col items-center justify-center text-slate-200 p-2">
+                      <div className="text-3xl">🏠</div>
+                      <div className="text-xs mt-1 text-center truncate w-full">{item.name}</div>
+                      <div className="text-xs text-amber-300 mt-1">{formatCurrency(item.current_value || item.price)}</div>
+                    </div>
+                  ) : (
+                    <div className="absolute inset-1 bg-gradient-to-br from-slate-700 via-slate-900 to-slate-950 rounded flex items-center justify-center text-slate-500 text-3xl transition-colors">
+                      <span className="opacity-40">📦</span>
+                    </div>
+                  )}
                 </div>
+                <div className="absolute inset-0 rounded opacity-0 group-hover:opacity-20 bg-teal-500 pointer-events-none transition-opacity"></div>
               </div>
-              <div className="absolute inset-0 rounded opacity-0 group-hover:opacity-20 bg-teal-500 pointer-events-none transition-opacity"></div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="pt-2 border-t border-slate-700 flex items-center justify-between">
-          <div className="text-xs font-medium text-slate-400">Gold: <span className="text-yellow-400 font-bold">0</span></div>
+          <div className="text-xs font-medium text-slate-400">Gold: <span className="text-yellow-400 font-bold">{formatCurrency(character?.wealth)}</span></div>
           <button
             onClick={onToggle}
             className="px-4 py-2 bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-500 hover:to-teal-600 rounded text-sm font-medium text-white transition-all shadow-lg"
