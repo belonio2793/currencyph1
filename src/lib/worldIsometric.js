@@ -47,9 +47,12 @@ export class WorldIsometric {
 
     // rotate to approximate isometric angle
     const angle = (35 * Math.PI) / 180
-    this.camera.position.set(600, 600, 600)
+    // position further away for larger maps
+    this.camera.position.set(1200, 1200, 1200)
     this.camera.up.set(0, 1, 0)
-    this.camera.lookAt(0, 0, 0)
+    // camera target for panning
+    this.cameraTarget = new THREE.Vector3(0,0,0)
+    this.camera.lookAt(this.cameraTarget)
     this.camera.updateProjectionMatrix()
 
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
