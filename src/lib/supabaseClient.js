@@ -49,7 +49,24 @@ function initClient() {
     try {
       // Initialize with default global fetch - don't override to avoid interfering with runtime fetch behavior
       console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
-      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+      // Wrap fetch to handle network errors gracefully
+      const originalFetch = globalThis.fetch
+      const wrappedFetch = async (...args) => {
+        try {
+          return await originalFetch(...args)
+        } catch (err) {
+          if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+            console.warn('[supabase-client] Network error during fetch:', err.message)
+            throw err
+          }
+          throw err
+        }
+      }
+
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        global: { fetch: wrappedFetch }
+      })
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
       _client = createDummyClient()
