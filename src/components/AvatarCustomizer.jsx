@@ -140,12 +140,8 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   }
 
   const applyPreview = async (style) => {
-    const url = editFields.model_url || style.model_url
-    if (url) {
-      const ok = await validateUrl(url)
-      if (!ok) return alert('Model URL not reachable — please fix or remove it before previewing.')
-    }
-    const updated = { ...style, model_url: editFields.model_url || null, model_scale: Number(editFields.model_scale) || 1, model_offset: { x: Number(editFields.model_offset_x) || 0, y: Number(editFields.model_offset_y) || 0, z: Number(editFields.model_offset_z) || 0 } }
+    // Force color-only preview: ignore any model_url entered
+    const updated = { ...style, model_url: null, model_scale: 1, model_offset: { x: 0, y: 0, z: 0 }, color: style.color || 0x00a8ff }
     if (typeof onSelect === 'function') onSelect(updated, { close: false })
   }
 
