@@ -306,10 +306,15 @@ export default function World3DRenderer({
     setZoom(1)
   }
 
+  const zoomPercentage = Math.round(zoom * 100)
+
   return (
     <div ref={containerRef} className={`w-full h-full relative ${className}`}>
       <div className="absolute right-4 top-4 z-50 flex flex-col gap-2">
         <button onClick={zoomIn} className="w-10 h-10 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white font-bold">+</button>
+        <div className="px-2 py-1 bg-white/6 rounded flex items-center justify-center text-white text-xs font-semibold whitespace-nowrap">
+          {zoomPercentage}%
+        </div>
         <button onClick={zoomOut} className="w-10 h-10 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white font-bold">−</button>
         <button onClick={zoomReset} className="w-10 h-8 bg-white/6 hover:bg-white/10 rounded flex items-center justify-center text-white text-xs">reset</button>
       </div>
