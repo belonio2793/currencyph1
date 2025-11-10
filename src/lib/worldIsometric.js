@@ -1,5 +1,7 @@
 import * as THREE from 'three'
 
+import * as THREE from 'three'
+
 // Lightweight isometric world renderer tailored for the Player View
 // - Orthographic isometric camera
 // - Tile grid rendering with instanced plane geometry
