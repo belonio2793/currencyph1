@@ -121,8 +121,19 @@ export default function PlayerIsometricView({
             dx /= len; dz /= len
             const nx = player.group.position.x + dx * speed * dt
             const nz = player.group.position.z + dz * speed * dt
+            // update position (smooth by delta time)
             player.group.position.x = nx
             player.group.position.z = nz
+
+            // smooth rotation to face movement direction (360°)
+            try {
+              const targetAngle = Math.atan2(dx, dz)
+              const cur = (player.group.rotation && player.group.rotation.y) || 0
+              const angleDiff = ((targetAngle - cur + Math.PI) % (Math.PI * 2)) - Math.PI
+              const rotSpeed = 8 // how quickly the avatar turns
+              player.group.rotation.y = cur + Math.sign(angleDiff) * Math.min(Math.abs(angleDiff), rotSpeed * dt)
+            } catch (e) { /* ignore rotation errors */ }
+
             // notify parent
             if (typeof onCharacterMove === 'function') {
               try { onCharacterMove({ x: nx, y: nz, city: character?.current_location || 'Manila' }) } catch(e) {}
