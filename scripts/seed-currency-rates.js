@@ -137,7 +137,15 @@ async function upsertPairs(pairs) {
   }
   const chunkSize = 500
   for (let i = 0; i < pairs.length; i += chunkSize) {
-    let chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p, updated_at: new Date().toISOString() }))
+    // Filter pairs to codes that are 3-letter uppercase (safest for fiat currency_rates schema)
+    const block = pairs.slice(i, i + chunkSize).filter(p => {
+      const a = typeof p.from_currency === 'string' && /^[A-Z]{3}$/.test(p.from_currency)
+      const b = typeof p.to_currency === 'string' && /^[A-Z]{3}$/.test(p.to_currency)
+      return a && b
+    })
+    if (block.length === 0) continue
+
+    let chunk = block.map(p => ({ ...p, updated_at: new Date().toISOString() }))
     let res
     try {
       res = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
@@ -145,7 +153,7 @@ async function upsertPairs(pairs) {
       // If updated_at doesn't exist in schema, retry without it
       const msg = (err && err.message) || JSON.stringify(err)
       if (msg && msg.includes('updated_at')) {
-        chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p }))
+        chunk = block.map(p => ({ ...p }))
         const { data, error } = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
         if (error) {
           console.error('Upsert error after retry without updated_at:', error)
@@ -162,7 +170,7 @@ async function upsertPairs(pairs) {
       const errMsg = (res.error && res.error.message) || ''
       if (errMsg.includes('updated_at')) {
         // retry without updated_at
-        chunk = pairs.slice(i, i + chunkSize).map(p => ({ ...p }))
+        chunk = block.map(p => ({ ...p }))
         const { data, error } = await supabase.from('currency_rates').upsert(chunk, { onConflict: ['from_currency', 'to_currency'] })
         if (error) {
           console.error('Upsert error after retry without updated_at:', error)
