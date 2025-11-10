@@ -9,6 +9,7 @@ export default function Rates({ globalCurrency }) {
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [allCurrencies, setAllCurrencies] = useState([])
+  const baseCurrency = 'PHP'
 
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
 
