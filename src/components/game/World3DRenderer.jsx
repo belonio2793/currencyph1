@@ -12,6 +12,7 @@ export default function World3DRenderer({
   onPropertyPlace = null, // (worldPos) => Promise
   onPropertyClick = null,
   initialAvatarPos,
+  avatarStyle = { id: 1, name: 'Golden Classic', color: 0xd4a574, emissive: 0x6b5a3a },
   className = ''
 }) {
   const containerRef = useRef(null)
