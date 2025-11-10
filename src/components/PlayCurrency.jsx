@@ -1783,17 +1783,17 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
 
                 <div className="border border-slate-700 rounded overflow-hidden" style={{ height: 520 }}>
                   {mapViewMode === 'isometric' ? (
-                    <PlayerIsometricView
+                    <World3DRenderer
                       properties={[...((character.properties || []).map(normalizeProperty)), ...((remoteAssets || []).map(normalizeProperty))].filter((v,i,a)=>a.findIndex(x=>x.id===v.id)===i)}
                       character={character}
                       initialAvatarPos={initialAvatarPos}
-                      onCharacterMove={(pos) => handleWorldCharacterMove(pos)}
-                      mapSettings={mapSettings}
-                      placingProperty={placingAsset}
-                      onConfirmPlace={(coords) => confirmPlacement(coords)}
-                      onCancelPlace={() => setPlacingAsset(null)}
+                      onPropertyPlace={async ({ x, z }) => {
+                        // reuse confirmPlacement API which expects { x, y, gridX, gridY }
+                        try {
+                          await confirmPlacement({ x, y: z, gridX: null, gridY: null })
+                        } catch(e) { console.warn('confirmPlacement failed', e) }
+                      }}
                       onPropertyClick={(prop) => { setPropertyPanelOpen(true) }}
-                      onWorldReady={(w) => { worldInstanceRef.current = w }}
                     />
                   ) : (
                     <WorldMap
