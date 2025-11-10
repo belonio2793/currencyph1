@@ -284,8 +284,6 @@ export default function World3DRenderer({
       try { cancelAnimationFrame(rafId) } catch (e) {}
       try { renderer.domElement.removeEventListener('click', onClick) } catch (e) {}
       try { window.removeEventListener('resize', onResize) } catch (e) {}
-      try { container.removeEventListener('focus', onFocus) } catch(e){}
-      try { container.removeEventListener('blur', onBlur) } catch(e){}
       try { window.removeEventListener('keydown', handleKeyDown) } catch(e){}
       try { window.removeEventListener('keyup', handleKeyUp) } catch(e){}
       try { if (controlsRef.current) controlsRef.current.dispose() } catch(e){}
