@@ -1016,6 +1016,7 @@ export class World3D {
     this.camera.aspect = width / height
     this.camera.updateProjectionMatrix()
     this.renderer.setSize(width, height)
+    try { if (this.composer && typeof this.composer.setSize === 'function') this.composer.setSize(width, height) } catch(e) {}
   }
 
   destroy() {
