@@ -148,6 +148,11 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
                 {/* Edit button */}
                 <button onClick={() => startEdit(style)} title="Edit model" className="absolute top-2 right-2 bg-slate-700/60 hover:bg-slate-700 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm">✎</button>
 
+                {/* Broken model badge */}
+                {brokenMap[style.id] && (
+                  <div title="Model URL unreachable" className="absolute top-2 right-11 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">!</div>
+                )}
+
                 {/* Selected indicator */}
                 {selectedStyle?.id === style.id && (
                   <div className="absolute top-2 left-2 bg-emerald-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">✓</div>
