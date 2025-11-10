@@ -442,17 +442,24 @@ export class WorldIsometric {
     const h = this.container.clientHeight
     if (w === 0 || h === 0) return
     this.width = w; this.height = h
-    this.renderer.setSize(w, h)
+    if (this.isWebGL && this.renderer && typeof this.renderer.setSize === 'function') {
+      try { this.renderer.setSize(w, h) } catch(e) {}
+    } else if (this.canvas) {
+      try { this.canvas.width = w; this.canvas.height = h } catch(e) {}
+    }
+
     const aspect = Math.max(0.1, w / h)
     const cols = this.cols || (this.opts.cols || 30)
     const rows = this.rows || (this.opts.rows || 20)
     const tileSize = this.tileSize || (this.opts.tileSize || 40)
     const maxDim = Math.max(cols * tileSize, rows * tileSize)
     const viewSize = Math.max(800, Math.ceil(maxDim * 1.0))
-    this.camera.left = (-viewSize * aspect) / 2
-    this.camera.right = (viewSize * aspect) / 2
-    this.camera.top = viewSize / 2
-    this.camera.bottom = -viewSize / 2
+    try {
+      this.camera.left = (-viewSize * aspect) / 2
+      this.camera.right = (viewSize * aspect) / 2
+      this.camera.top = viewSize / 2
+      this.camera.bottom = -viewSize / 2
+    } catch(e) {}
     // keep existing zoom
     try { this.camera.updateProjectionMatrix() } catch(e) {}
   }
