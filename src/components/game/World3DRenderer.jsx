@@ -115,9 +115,6 @@ export default function World3DRenderer({
     const avatarZ = initialAvatarPos?.z ?? 0
     playerGroup.position.set(avatarX, 0, avatarZ)
 
-    // Set initial zoom to 3.5 for camera positioning
-    setZoom(3.5)
-
     // controls (orbit) - dynamic import to avoid build surprises
     let controls = null
     let controlsModule = null
