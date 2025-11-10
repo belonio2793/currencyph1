@@ -230,6 +230,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const [isWorking, setIsWorking] = useState(false)
   const [workingJobId, setWorkingJobId] = useState(null)
   const [workProgress, setWorkProgress] = useState(0)
+  const [jobModalOpen, setJobModalOpen] = useState(false)
+  const [jobModalInfo, setJobModalInfo] = useState(null)
   const [properties, setProperties] = useState([])
   const [market, setMarket] = useState(STARTING_PROPERTIES)
   const [jobs, setJobs] = useState([])
