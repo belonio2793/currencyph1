@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import React, { useEffect, useState, useRef } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import { useGeolocation } from '../lib/useGeolocation'
