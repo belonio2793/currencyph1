@@ -985,7 +985,11 @@ export class World3D {
     }
 
     // Render scene
-    this.renderer.render(this.scene, this.camera)
+    if (this.composer && typeof this.composer.render === 'function') {
+      this.composer.render()
+    } else {
+      this.renderer.render(this.scene, this.camera)
+    }
   }
 
   animate() {
