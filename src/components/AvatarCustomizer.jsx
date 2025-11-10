@@ -26,10 +26,36 @@ const AVATAR_STYLES = [
 
 const AVATAR_PREVIEWS = {1:'🐶',2:'🐱',3:'👨‍🚒',4:'🧑‍🍳',5:'😇',6:'🤡',7:'🤖',8:'🦸',9:'🧙',10:'🏴‍☠️',11:'👽',12:'🥷',13:'🧚',14:'🕵️',15:'👩‍🍳',16:'🦄',17:'🛡️',18:'👩‍⚕️',19:'🧑‍🏫',20:'🐕‍🦺'}
 
+import { useEffect, useState } from 'react'
+
 export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   const [hoveredId, setHoveredId] = useState(null)
   const [editing, setEditing] = useState(null)
   const [editFields, setEditFields] = useState({ model_url: '', model_scale: 1, model_offset_x: 0, model_offset_y: 0, model_offset_z: 0 })
+  const [brokenMap, setBrokenMap] = useState({})
+
+  // validate model urls on mount
+  useEffect(() => {
+    let active = true
+    const check = async () => {
+      const map = {}
+      await Promise.all(AVATAR_STYLES.map(async (s) => {
+        if (!s.model_url) return
+        try {
+          const controller = new AbortController()
+          const id = setTimeout(() => controller.abort(), 5000)
+          await fetch(s.model_url, { method: 'HEAD', signal: controller.signal })
+          clearTimeout(id)
+          map[s.id] = false
+        } catch (e) {
+          map[s.id] = true
+        }
+      }))
+      if (active) setBrokenMap(map)
+    }
+    check()
+    return () => { active = false }
+  }, [])
 
   const startEdit = (style) => {
     setEditing(style.id)
