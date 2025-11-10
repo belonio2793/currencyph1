@@ -337,11 +337,17 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                   </div>
                 </div>
               )}
-              <div className="flex items-center justify-between border-t pt-4">
-                <div className="text-sm text-slate-700">Approval fee</div>
-                <div className="text-base font-semibold">₱{APPROVAL_FEE.toLocaleString()}</div>
+              <div className="grid grid-cols-2 gap-4 border-t pt-4">
+                <div>
+                  <div className="text-sm text-slate-700">Approval fee</div>
+                  <div className="text-base font-semibold">₱{APPROVAL_FEE.toLocaleString()}</div>
+                </div>
+                <div>
+                  <div className="text-sm text-slate-700">Coordinates</div>
+                  <div className="text-sm text-slate-600">{pending.latitude && pending.longitude ? `${pending.latitude}, ${pending.longitude}` : 'Not set'}</div>
+                </div>
               </div>
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-end gap-2 mt-4">
                 <button onClick={onClose} className="px-4 py-2 border rounded hover:bg-slate-50">Close</button>
                 <button onClick={handlePayFee} disabled={paying} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50 hover:bg-blue-700">
                   {paying ? 'Processing...' : 'Pay now'}
