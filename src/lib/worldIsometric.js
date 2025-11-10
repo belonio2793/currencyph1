@@ -1,6 +1,4 @@
 import * as THREE from 'three'
-
-import * as THREE from 'three'
 import { supabase } from './supabaseClient'
 
 export class WorldIsometric {
