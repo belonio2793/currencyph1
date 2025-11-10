@@ -9,7 +9,6 @@ export default function Rates({ globalCurrency }) {
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [allCurrencies, setAllCurrencies] = useState([])
-  const [rawRates, setRawRates] = useState([])
   const baseCurrency = 'PHP'
   // common fallback currency list in case external currencyAPI is unavailable
   const fallbackFiats = [
