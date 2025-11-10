@@ -187,10 +187,10 @@ export default function World3DRenderer({
 
     // focus/selection visuals
     const onFocus = () => {
-      try { container.style.boxShadow = '0 0 0 3px rgba(255,213,79,0.95) inset' } catch(e){}
+      try { container.style.border = '4px solid #ffd133' } catch(e){}
     }
     const onBlur = () => {
-      try { container.style.boxShadow = 'none' } catch(e){}
+      try { container.style.border = 'none' } catch(e){}
     }
     container.addEventListener('focus', onFocus)
     container.addEventListener('blur', onBlur)
