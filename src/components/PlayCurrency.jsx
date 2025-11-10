@@ -1120,6 +1120,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             luck: (characterStats?.luck || 0) + statBoost.luck
           }
           setCharacterStats(() => newStats)
+          // attach stats snapshot to updated character
+          updated.stats = newStats
           persistCharacterPartial(updated)
           if (userId) {
             saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
