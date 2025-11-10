@@ -341,7 +341,7 @@ export default function Profile({ userId, onSignOut }) {
   }
 
   const getPrivacyLabel = (visibility) => {
-    const labels = { everyone: '👥 Everyone', friends_only: '👫 Friends', only_me: '🔒 Only Me' }
+    const labels = { everyone: 'Everyone', friends_only: 'Friends', only_me: 'Only Me' }
     return labels[visibility] || 'Everyone'
   }
 

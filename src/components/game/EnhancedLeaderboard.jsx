@@ -6,17 +6,17 @@ export default function EnhancedLeaderboard({ leaderboard = [], currentUserId = 
   const [searchQuery, setSearchQuery] = useState('')
 
   const seasons = [
-    { id: 'all-time', label: 'All Time', icon: '🏆' },
-    { id: 'season-1', label: 'Season 1', icon: '🌟', dateRange: 'Jan-Mar 2024' },
-    { id: 'season-2', label: 'Season 2', icon: '⭐', dateRange: 'Apr-Jun 2024' },
-    { id: 'season-3', label: 'Season 3', icon: '✨', dateRange: 'Jul-Sep 2024' },
-    { id: 'monthly', label: 'This Month', icon: '📅' },
-    { id: 'weekly', label: 'This Week', icon: '📊' }
+    { id: 'all-time', label: 'All Time', icon: '' },
+    { id: 'season-1', label: 'Season 1', icon: '', dateRange: 'Jan-Mar 2024' },
+    { id: 'season-2', label: 'Season 2', icon: '', dateRange: 'Apr-Jun 2024' },
+    { id: 'season-3', label: 'Season 3', icon: '', dateRange: 'Jul-Sep 2024' },
+    { id: 'monthly', label: 'This Month', icon: '' },
+    { id: 'weekly', label: 'This Week', icon: '' }
   ]
 
   const categories = [
-    { id: 'wealth', label: 'Richest', icon: '💰', getValue: (p) => p.wealth || 0 },
-    { id: 'level', label: 'Highest Level', icon: '⭐', getValue: (p) => p.level || 1 },
+    { id: 'wealth', label: 'Richest', icon: '', getValue: (p) => p.wealth || 0 },
+    { id: 'level', label: 'Highest Level', icon: '', getValue: (p) => p.level || 1 },
     { id: 'properties', label: 'Most Properties', icon: '🏠', getValue: (p) => p.properties_count || 0 },
     { id: 'income', label: 'Highest Income', icon: '📈', getValue: (p) => p.daily_income || 0 },
     { id: 'jobs', label: 'Most Jobs', icon: '💼', getValue: (p) => p.jobs_completed || 0 },
@@ -36,9 +36,9 @@ export default function EnhancedLeaderboard({ leaderboard = [], currentUserId = 
     .slice(0, 100)
 
   const getMedalEmoji = (rank) => {
-    if (rank === 1) return '🥇'
-    if (rank === 2) return '🥈'
-    if (rank === 3) return '🥉'
+    if (rank === 1) return '1st'
+    if (rank === 2) return '2nd'
+    if (rank === 3) return '3rd'
     return `${rank}.`
   }
 
@@ -71,7 +71,7 @@ export default function EnhancedLeaderboard({ leaderboard = [], currentUserId = 
       {/* Header */}
       <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg p-6 border border-cyan-500/30">
         <h2 className="text-2xl font-bold text-cyan-300 flex items-center gap-2 mb-4">
-          🏆 Leaderboard
+          Leaderboard
         </h2>
 
         {/* Season selector */}

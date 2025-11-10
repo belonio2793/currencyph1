@@ -37,7 +37,7 @@ export default function AchievementsPanel({ achievements, stats = {} }) {
       <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg p-6 border border-cyan-500/30">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold text-cyan-300 flex items-center gap-2">
-            🏆 Achievements
+            Achievements
           </h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-cyan-300">
@@ -70,7 +70,7 @@ export default function AchievementsPanel({ achievements, stats = {} }) {
                 : 'bg-slate-700/50 border border-slate-600 text-slate-300 hover:bg-slate-700'
             }`}
           >
-            {cat.icon} {cat.label}
+            {cat.label}
           </button>
         ))}
       </div>
@@ -88,8 +88,7 @@ export default function AchievementsPanel({ achievements, stats = {} }) {
           >
             {/* Icon and locked indicator */}
             <div className="flex items-center justify-between mb-2">
-              <span className="text-3xl">{achievement.icon}</span>
-              {achievement.unlocked && (
+                            {achievement.unlocked && (
                 <span className="text-green-400 text-sm font-bold">✓ UNLOCKED</span>
               )}
             </div>

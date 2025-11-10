@@ -14,21 +14,21 @@ export default function AddFundsSection() {
     {
       id: 'gcash',
       name: 'GCash',
-      icon: '💳',
+      icon: '',
       description: 'Instant mobile payment',
       minAmount: 500
     },
     {
       id: 'maya',
       name: 'Maya',
-      icon: '📱',
+      icon: '',
       description: 'Digital wallet',
       minAmount: 500
     },
     {
       id: 'card',
       name: 'Bank Card',
-      icon: '🏦',
+      icon: '',
       description: 'Credit/Debit card',
       minAmount: 1000
     }
@@ -51,8 +51,7 @@ export default function AddFundsSection() {
                 : 'border-gray-200 hover:border-primary bg-white'
             }`}
           >
-            <div className="text-3xl mb-2">{method.icon}</div>
-            <h3 className="font-semibold text-gray-800">{method.name}</h3>
+                        <h3 className="font-semibold text-gray-800">{method.name}</h3>
             <p className="text-xs text-gray-500 mb-2">{method.description}</p>
             <p className="text-xs text-gray-600">Min: ₱{method.minAmount.toLocaleString()}</p>
           </button>

@@ -183,19 +183,19 @@ export default function EnrichmentMonitor() {
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700">📞 Phone Numbers</span>
+            <span className="text-gray-700">Phone Numbers</span>
             <span className={`font-semibold ${stats.phones === stats.total ? 'text-green-600' : 'text-gray-600'}`}>
               {stats.phones}/{stats.total}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700">🌐 Websites</span>
+            <span className="text-gray-700">Websites</span>
             <span className={`font-semibold ${stats.websites === stats.total ? 'text-green-600' : 'text-gray-600'}`}>
               {stats.websites}/{stats.total}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700">💬 Review Counts</span>
+            <span className="text-gray-700">Review Counts</span>
             <span className={`font-semibold ${stats.reviews === stats.total ? 'text-green-600' : 'text-gray-600'}`}>
               {stats.reviews}/{stats.total}
             </span>
@@ -206,7 +206,7 @@ export default function EnrichmentMonitor() {
       {/* Status */}
       {stats.enriched >= stats.total ? (
         <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg text-center">
-          <span className="text-green-700 font-semibold">✨ Enrichment Complete!</span>
+          <span className="text-green-700 font-semibold">Enrichment Complete!</span>
         </div>
       ) : (
         <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">

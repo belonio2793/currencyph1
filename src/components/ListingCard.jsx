@@ -300,7 +300,7 @@ export default function ListingCard({
               className="flex-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 text-center font-medium"
               title="Visit website"
             >
-              🌐 Website
+              Website
             </a>
           )}
           {listing.phone_number && (

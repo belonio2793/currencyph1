@@ -164,6 +164,11 @@ netlify deploy --prod
 
 ## 🔐 Security
 
+**Style guide — No emojis in code or UI**
+
+Please avoid using emoji characters in source files (components, docs, UI text). Emojis cause inconsistent rendering across platforms and complicate accessibility. Use icons, SVGs, or CSS classes for visual indicators instead.
+
+
 - **Authentication**: Supabase Auth (JWT) + MetaMask Web3 wallet
 - **Data Protection**: TLS 1.3 encryption, Row-Level Security (RLS) on database
 - **Smart Contracts**: ERC-1404 transfer restrictions, community-audited code

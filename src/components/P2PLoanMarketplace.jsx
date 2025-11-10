@@ -807,7 +807,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
             {/* P2P Loans Table Schema */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">📊 Loans Network Schema</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Loans Network</h3>
               <div className="overflow-x-auto border border-slate-200 rounded-lg bg-white">
                 <table className="w-full text-sm">
                   <thead className="bg-slate-100 border-b border-slate-200">
@@ -866,7 +866,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
 
             {/* User Profiles in Network */}
             <div className="mb-8">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">👥 Network User Profiles</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Network User Profiles</h3>
               <div className="p-6 border border-slate-200 rounded-lg bg-slate-50">
                 <div className="space-y-4">
                   {/* Current User Profile */}
@@ -910,7 +910,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
                       </div>
                       <div>
                         <p className="text-xs text-slate-600 uppercase font-semibold">Contact</p>
-                        <p className="text-sm font-medium text-blue-600">{myRequests?.[0]?.phone_number || 'Not provided'}</p>
+                        <p className="text-sm font-medium text-slate-600">Not shared publicly</p>
                       </div>
                     </div>
                   </div>
@@ -941,7 +941,7 @@ export default function P2PLoanMarketplace({ userId, userEmail, onTabChange }) {
             {/* Network Transparency Info */}
             <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-900 mb-2">
-                <strong>🔗 Network Transparency:</strong>
+                <strong>Network Transparency:</strong>
               </p>
               <ul className="text-sm text-blue-800 space-y-1 ml-4 list-disc">
                 <li>All loans are recorded in the network ledger</li>

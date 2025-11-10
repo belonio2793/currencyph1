@@ -279,10 +279,10 @@ export default function LoanProgressTracker({ loanId, userId, onClose }) {
               </p>
               <div className="flex gap-2">
                 <button className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm">
-                  💳 Make Payment
+                  Make Payment
                 </button>
                 <button className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm">
-                  💬 Message Lender
+                  Message Lender
                 </button>
               </div>
             </div>

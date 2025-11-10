@@ -429,7 +429,7 @@ export default function MyBusiness({ userId }) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">💳</span>
+
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Integration</h3>
                     <p className="text-sm text-slate-600 mb-4">Connect GCash, PayMaya, and more</p>
