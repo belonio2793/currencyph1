@@ -1028,6 +1028,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
       setWorkingJobId(null)
       setWorkProgress(0)
       setPhases(prev => { const next = { ...prev, didJob: true }; savePhases(next); return next })
+      try { setJobModalOpen(false); setJobModalInfo(null) } catch(e){}
       await loadLeaderboard()
     }, duration + 200)
   }
