@@ -370,7 +370,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
                 setProperties(selected.properties || [])
                 // Load cosmetics from character or use defaults
                 if (selected.cosmetics) {
-                  setCosmetics(validateCosmetics(selected.cosmetics))
+                  const validated = validateCosmetics(selected.cosmetics)
+                  setCosmetics(validated)
+                  // If an avatar outfit/style was previously saved, reflect it in the UI preview
+                  try {
+                    if (validated && validated.avatar) setSelectedAvatarStyle(validated.avatar)
+                    else if (selected.cosmetics && selected.cosmetics.avatar) setSelectedAvatarStyle(selected.cosmetics.avatar)
+                  } catch (e) { /* ignore */ }
                 }
                 // Load saved stats if present
                 if (selected.stats && typeof selected.stats === 'object') {
@@ -401,6 +407,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
           }
           setCharacter(guestChar)
           setCosmetics(DEFAULT_COSMETICS)
+          // No saved avatar for guests by default
+          try { setSelectedAvatarStyle(null) } catch (e) { /* ignore */ }
         }
 
         // Load market (could be dynamic from DB later)
