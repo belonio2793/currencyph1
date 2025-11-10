@@ -66,9 +66,12 @@ export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
     if (!previewRef.current) return
     const container = previewRef.current
     const world = new World3D(container)
-    world.cameraConfig.mode = 'freecam'
-    world.camera.position.set(0, 120, 220)
-    world.camera.lookAt(0, 40, 0)
+    // align preview camera with main world view for accurate preview
+    try {
+      world.cameraConfig.mode = 'freecam'
+      world.camera.position.set(0, 57, 114)
+      world.camera.lookAt(0, 0, 0)
+    } catch(e) {}
     world.start()
     worldRef.current = world
 
