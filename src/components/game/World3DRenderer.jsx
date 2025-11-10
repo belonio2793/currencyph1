@@ -305,7 +305,7 @@ export default function World3DRenderer({
   const zoomReset = () => {
     const cam = cameraRef.current
     if (!cam) return
-    cam.position.set(0, 200, 400)
+    cam.position.set(0, 57, 114)
     setZoom(3.5)
   }
 
