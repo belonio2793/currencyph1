@@ -75,6 +75,67 @@ export class WorldIsometric {
     this.resizeObserver.observe(this.container)
     this.renderer.domElement.addEventListener('click', (e) => this._onClick(e))
 
+    // prepare a plane for mouse-world intersections
+    this._plane = new THREE.Plane(new THREE.Vector3(0,1,0), 0)
+    this._isDragging = false
+    this._dragStartWorld = new THREE.Vector3()
+    this._dragStartCam = new THREE.Vector3()
+    this._dragStartTarget = new THREE.Vector3()
+
+    this._getMouseWorld = (clientX, clientY) => {
+      const rect = this.renderer.domElement.getBoundingClientRect()
+      const nx = ((clientX - rect.left) / rect.width) * 2 - 1
+      const ny = -((clientY - rect.top) / rect.height) * 2 + 1
+      this.raycaster.setFromCamera(new THREE.Vector2(nx, ny), this.camera)
+      const pt = new THREE.Vector3()
+      this.raycaster.ray.intersectPlane(this._plane, pt)
+      return pt
+    }
+
+    const onPointerDown = (e) => {
+      if (e.button !== 0) return
+      this._isDragging = true
+      this._dragStartWorld.copy(this._getMouseWorld(e.clientX, e.clientY) || new THREE.Vector3())
+      this._dragStartCam.copy(this.camera.position)
+      this._dragStartTarget.copy(this.cameraTarget)
+      this.renderer.domElement.style.cursor = 'grabbing'
+    }
+    const onPointerMove = (e) => {
+      if (!this._isDragging) return
+      const cur = this._getMouseWorld(e.clientX, e.clientY) || new THREE.Vector3()
+      const delta = new THREE.Vector3().subVectors(this._dragStartWorld, cur)
+      const newCam = new THREE.Vector3().addVectors(this._dragStartCam, delta)
+      const newTarget = new THREE.Vector3().addVectors(this._dragStartTarget, delta)
+      this.camera.position.copy(newCam)
+      this.cameraTarget.copy(newTarget)
+      this.camera.lookAt(this.cameraTarget)
+    }
+    const onPointerUp = (e) => {
+      this._isDragging = false
+      this.renderer.domElement.style.cursor = 'default'
+    }
+    const onWheel = (e) => {
+      e.preventDefault()
+      const delta = e.deltaY
+      // adjust camera zoom instead of moving camera for orthographic
+      const factor = 1 + (delta > 0 ? 0.08 : -0.08)
+      this.camera.zoom = Math.max(0.2, Math.min(3, (this.camera.zoom || 1) * factor))
+      this.camera.updateProjectionMatrix()
+    }
+
+    this.renderer.domElement.addEventListener('pointerdown', onPointerDown)
+    window.addEventListener('pointermove', onPointerMove)
+    window.addEventListener('pointerup', onPointerUp)
+    this.renderer.domElement.addEventListener('wheel', onWheel, { passive: false })
+
+    // store cleanup so destroy can remove them
+    this._inputCleanup = () => {
+      try { this.renderer.domElement.removeEventListener('pointerdown', onPointerDown) } catch(e){}
+      try { window.removeEventListener('pointermove', onPointerMove) } catch(e){}
+      try { window.removeEventListener('pointerup', onPointerUp) } catch(e){}
+      try { this.renderer.domElement.removeEventListener('wheel', onWheel) } catch(e){}
+    }
+
     this.start()
   }
 
