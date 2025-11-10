@@ -3,11 +3,18 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
 
-// Handle unhandled promise rejections from network errors
+// Handle unhandled promise rejections from network errors and other noisy external failures
 window.addEventListener('unhandledrejection', (event) => {
-  if (event.reason && event.reason.message === 'Failed to fetch') {
-    console.warn('[App] Network connectivity issue detected, continuing with fallback')
-    event.preventDefault()
+  try {
+    const reason = event && event.reason
+    const msg = reason && (reason.message || reason.toString && reason.toString())
+    if (typeof msg === 'string' && (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('IFrame evaluation timeout'))) {
+      console.debug('[App] Suppressed noisy network/iframe error:', msg)
+      // Prevent the error from surfacing as an uncaught promise rejection
+      event.preventDefault()
+    }
+  } catch (e) {
+    // ignore
   }
 })
 
