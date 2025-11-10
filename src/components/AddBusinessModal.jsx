@@ -249,6 +249,7 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     const [pos, setPos] = useState(
       form.latitude && form.longitude ? [parseFloat(form.latitude), parseFloat(form.longitude)] : null
     )
+    const markerRef = useRef(null)
     const map = useMapEvents({
       click(e) {
         const { lat, lng } = e.latlng
@@ -257,13 +258,38 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
       }
     })
 
+    // when form coordinates change externally, update marker position
+    useEffect(() => {
+      if (form.latitude && form.longitude) {
+        const lat = parseFloat(form.latitude)
+        const lng = parseFloat(form.longitude)
+        if (!isNaN(lat) && !isNaN(lng)) {
+          setPos([lat, lng])
+          try { map.setView([lat, lng], map.getZoom()) } catch(e){}
+        }
+      }
+    }, [form.latitude, form.longitude])
+
     useEffect(() => {
       if (pos && map && map.setView) {
         try { map.setView(pos, map.getZoom()) } catch(e){}
       }
     }, [pos])
 
-    return pos ? <Marker position={pos} /> : null
+    const eventHandlers = {
+      dragend() {
+        const marker = markerRef.current
+        if (marker) {
+          const latlng = marker.getLatLng()
+          const lat = latlng.lat
+          const lng = latlng.lng
+          setPos([lat, lng])
+          setForm(prev => ({ ...prev, latitude: String(lat), longitude: String(lng) }))
+        }
+      }
+    }
+
+    return pos ? <Marker draggable={true} eventHandlers={eventHandlers} ref={markerRef} position={pos} /> : null
   }
 
   if (pending) {
