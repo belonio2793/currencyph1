@@ -146,6 +146,32 @@ export default function PlayerIsometricView({
   return (
     <div className="w-full h-full relative bg-transparent">
       <div ref={containerRef} className="w-full h-full" />
+
+      {/* Property UI Overlay */}
+      <div className="absolute left-4 bottom-4 z-40 w-64">
+        <div className="bg-white/5 backdrop-blur p-3 rounded shadow border border-white/5">
+          <div className="text-sm font-semibold text-white mb-2">Properties</div>
+          <div className="flex flex-col gap-2">
+            {['house','shop','factory'].map(type => (
+              <div key={type} className="flex items-center justify-between bg-white/3 p-2 rounded">
+                <div className="text-xs text-white capitalize">{type}</div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const world = worldRef.current
+                        const uid = (character && character.id) || null
+                        if (world) world.enablePlacementMode({ type }, uid)
+                      } catch (e) { console.warn('enter placement failed', e) }
+                    }}
+                    className="px-2 py-1 bg-blue-600 text-white text-xs rounded"
+                  >Place</button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
