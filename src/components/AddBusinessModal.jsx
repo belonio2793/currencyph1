@@ -119,10 +119,14 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   }
 
   const validatePage1 = () => {
-    if (!form.name || !form.category || !form.city) {
-      setError('Please fill in Business Name, Category, and City')
+    const required = ['name', 'category', 'city']
+    const missing = required.filter((k) => !form[k] || String(form[k]).trim() === '')
+    if (missing.length > 0) {
+      setMissingFields(missing)
+      setError('Please fill in all of the required fields.')
       return false
     }
+    setMissingFields([])
     if (form.latitude && isNaN(parseFloat(form.latitude))) {
       setError('Latitude must be a valid number')
       return false
