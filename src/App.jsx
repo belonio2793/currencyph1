@@ -179,11 +179,19 @@ export default function App() {
   const initializeUser = async () => {
     try {
       // supabase.auth.getUser() may return different shapes; handle defensively
-      const res = await supabase.auth.getUser().catch(err => { throw err })
-      let user = null
-      if (res && res.data && res.data.user) user = res.data.user
-      else if (res && res.user) user = res.user
-      else user = null
+    // Protect against it hanging by racing with a timeout
+    const timeoutMs = 8000
+    let res = null
+    try {
+      res = await Promise.race([
+        supabase.auth.getUser(),
+        new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs))
+      ])
+    } catch (err) { throw err }
+    let user = null
+    if (res && res.data && res.data.user) user = res.data.user
+    else if (res && res.user) user = res.user
+    else user = null
 
       const path = typeof window !== 'undefined' ? window.location.pathname : '/'
 
