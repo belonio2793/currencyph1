@@ -56,7 +56,7 @@ function initClient() {
         const res = await fetchImpl(input, opts)
         return res
       } catch (err) {
-        console.error('[supabase-client] fetch failed for', input, err)
+        console.debug('[supabase-client] fetch failed for', input, err)
         throw err
       }
     }
