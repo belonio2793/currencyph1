@@ -307,8 +307,10 @@ export default function PlayerIsometricView({
       ctx.fillRect(0,0,w,h)
 
       // tile grid
-      const cellW = Math.max(6, Math.floor(w / cols))
-      const cellH = Math.max(6, Math.floor(h / rows))
+      const baseCellW = Math.max(6, Math.floor(w / cols))
+      const baseCellH = Math.max(6, Math.floor(h / rows))
+      const cellW = Math.max(4, Math.floor(baseCellW * (zoomRef.current || 1)))
+      const cellH = Math.max(4, Math.floor(baseCellH * (zoomRef.current || 1)))
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
           const x = c * cellW
