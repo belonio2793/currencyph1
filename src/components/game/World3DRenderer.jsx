@@ -281,6 +281,7 @@ export default function World3DRenderer({
     if (character && character.name && labelMesh) {
       const newTexture = createTextTexture(character.name, 48)
       labelMesh.material.map = newTexture
+      labelMesh.material.transparent = true
       labelMesh.material.needsUpdate = true
     }
   }, [character])
