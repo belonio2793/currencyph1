@@ -43,7 +43,7 @@ export function stopPresence() {
     clearInterval(presenceIntervalId)
   }
   if (currentUserId) {
-    updatePresence('offline')
+    updatePresence('offline').catch(() => {})
   }
 }
 
