@@ -101,49 +101,86 @@ export default function Rates({ globalCurrency }) {
       const currencies = currencyAPI.getCurrencies()
       setAllCurrencies(currencies)
 
-      const rates = await wisegcashAPI.getAllExchangeRates()
       const ratesMap = {}
 
-      if (rates && rates.length > 0) {
-        rates.forEach(r => {
-          ratesMap[`${r.from_currency}_${r.to_currency}`] = r.rate
-        })
-        setExchangeRates(ratesMap)
-      } else {
-        // If DB has no rates, fetch from external currency API and build pairs
-        try {
-          const globalRates = await currencyAPI.getGlobalRates()
-          if (!globalRates || typeof globalRates !== 'object') {
-            console.debug('Invalid rates format, using empty rates')
-            setExchangeRates(ratesMap)
-            return
-          }
-          // globalRates: { CODE: { rate: <number> } } where rate is USD -> CODE
-          const codes = Object.keys(globalRates)
-          codes.forEach(code => {
-            const rateObj = globalRates[code]
-            const rate = rateObj?.rate || 0
-            if (rate > 0) {
-              // USD -> CODE
-              ratesMap[`USD_${code}`] = rate
+      // 1) Prefer Supabase currency_rates table (real-time source)
+      try {
+        const { data, error } = await supabase.from('currency_rates').select('from_currency,to_currency,rate,updated_at')
+        if (!error && data && data.length) {
+          data.forEach(r => {
+            if (r && r.from_currency && r.to_currency && r.rate != null) {
+              ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
             }
           })
-          // Build pairwise rates: from A to B = (USD->B) / (USD->A)
-          codes.forEach(from => {
-            codes.forEach(to => {
-              if (from === to) return
-              const rateFrom = globalRates[from]?.rate || 0
-              const rateTo = globalRates[to]?.rate || 0
-              if (rateFrom > 0 && rateTo > 0) {
-                ratesMap[`${from}_${to}`] = rateTo / rateFrom
-              }
-            })
+          setExchangeRates(ratesMap)
+          return
+        }
+      } catch (supErr) {
+        console.debug('Could not read currency_rates from Supabase:', supErr)
+      }
+
+      // 2) Fallback: try cached_rates table (if your SQL populated it)
+      try {
+        const { data: cached, error: cachedErr } = await supabase.from('cached_rates').select('from_currency,to_currency,rate,updated_at')
+        if (!cachedErr && cached && cached.length) {
+          cached.forEach(r => {
+            if (r && r.from_currency && r.to_currency && r.rate != null) {
+              ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
+            }
           })
           setExchangeRates(ratesMap)
-        } catch (apiErr) {
-          console.debug('External currency API unavailable, using empty rates:', apiErr)
-          setExchangeRates(ratesMap)
+          return
         }
+      } catch (cachedReadErr) {
+        console.debug('Could not read cached_rates from Supabase:', cachedReadErr)
+      }
+
+      // 3) Next fallback: legacy wisegcashAPI (DB-backed) if available
+      try {
+        const rates = await wisegcashAPI.getAllExchangeRates()
+        if (rates && rates.length > 0) {
+          rates.forEach(r => {
+            if (r && r.from_currency && r.to_currency && r.rate != null) {
+              ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
+            }
+          })
+          setExchangeRates(ratesMap)
+          return
+        }
+      } catch (legacyErr) {
+        console.debug('wisegcashAPI.getAllExchangeRates failed:', legacyErr)
+      }
+
+      // 4) Last-resort: external currency API to build pairwise rates
+      try {
+        const globalRates = await currencyAPI.getGlobalRates()
+        if (!globalRates || typeof globalRates !== 'object') {
+          console.debug('Invalid rates format from external API, using empty rates')
+          setExchangeRates(ratesMap)
+          return
+        }
+        const codes = Object.keys(globalRates)
+        codes.forEach(code => {
+          const rateObj = globalRates[code]
+          const rate = rateObj?.rate || 0
+          if (rate > 0) {
+            ratesMap[`USD_${code}`] = rate
+          }
+        })
+        codes.forEach(from => {
+          codes.forEach(to => {
+            if (from === to) return
+            const rateFrom = globalRates[from]?.rate || 0
+            const rateTo = globalRates[to]?.rate || 0
+            if (rateFrom > 0 && rateTo > 0) {
+              ratesMap[`${from}_${to}`] = rateTo / rateFrom
+            }
+          })
+        })
+        setExchangeRates(ratesMap)
+      } catch (apiErr) {
+        console.debug('External currency API unavailable, using empty rates:', apiErr)
+        setExchangeRates(ratesMap)
       }
     } catch (err) {
       console.debug('Error loading exchange rates, continuing with fallback:', err)
