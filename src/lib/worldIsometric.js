@@ -6,6 +6,7 @@ import * as THREE from 'three'
 // - Simple avatar meshes with overhead progress bars (canvas sprites)
 // - Click handling (tiles, avatars)
 
+import * as THREE from 'three'
 import { supabase } from './supabaseClient'
 
 export class WorldIsometric {
