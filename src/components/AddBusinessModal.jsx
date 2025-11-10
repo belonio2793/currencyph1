@@ -386,46 +386,56 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
 
                   <div>
                     <label className="block text-sm font-medium mb-1">City *</label>
-                    <input 
-                      name="city" 
-                      value={form.city} 
-                      onChange={handleChange} 
-                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      placeholder="City" 
+                    <input
+                      name="city"
+                      value={form.city}
+                      onChange={(e) => {
+                        handleChange(e)
+                        setMissingFields(prev => prev.filter(f => f !== 'city'))
+                      }}
+                      className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${missingFields.includes('city') ? 'border-red-500 ring-1 ring-red-200' : ''}`}
+                      placeholder="City"
                     />
+                    {missingFields.includes('city') && <p className="text-xs text-red-600 mt-1">City is required</p>}
                   </div>
-                  
+
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium mb-1">Address</label>
-                    <input 
-                      name="address" 
-                      value={form.address} 
-                      onChange={handleChange} 
-                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      placeholder="Street, Barangay, City" 
+                    <input
+                      name="address"
+                      value={form.address}
+                      onChange={handleChange}
+                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Street, Barangay, City"
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium mb-1">Latitude</label>
-                    <input 
-                      name="latitude" 
-                      value={form.latitude} 
-                      onChange={handleChange} 
-                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      placeholder="14.5995" 
+                    <input
+                      name="latitude"
+                      value={form.latitude}
+                      onChange={(e) => {
+                        handleChange(e)
+                        // update marker by updating form (LocationMarker listens to form changes)
+                        setMissingFields(prev => prev.filter(f => f !== 'latitude'))
+                      }}
+                      className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${error && form.latitude && isNaN(parseFloat(form.latitude)) ? 'border-red-500 ring-1 ring-red-200' : ''}`}
+                      placeholder="14.5995"
                     />
+                    {error && form.latitude && isNaN(parseFloat(form.latitude)) && <p className="text-xs text-red-600 mt-1">Latitude must be a valid number</p>}
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium mb-1">Longitude</label>
-                    <input 
-                      name="longitude" 
-                      value={form.longitude} 
-                      onChange={handleChange} 
-                      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                      placeholder="120.9842" 
+                    <input
+                      name="longitude"
+                      value={form.longitude}
+                      onChange={(e) => { handleChange(e); setMissingFields(prev => prev.filter(f => f !== 'longitude')) }}
+                      className={`w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${error && form.longitude && isNaN(parseFloat(form.longitude)) ? 'border-red-500 ring-1 ring-red-200' : ''}`}
+                      placeholder="120.9842"
                     />
+                    {error && form.longitude && isNaN(parseFloat(form.longitude)) && <p className="text-xs text-red-600 mt-1">Longitude must be a valid number</p>}
                   </div>
                   
                   <div className="md:col-span-2 flex items-center gap-4">
