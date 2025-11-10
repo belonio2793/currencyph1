@@ -74,15 +74,23 @@ function initClient() {
             // Abort errors should be propagated immediately
             if (err && (err.name === 'AbortError' || err.name === 'DOMException')) throw err
 
-            // On last attempt, rethrow with more context
+            // On last attempt, instead of throwing a raw TypeError which causes noisy console traces
+            // return a synthetic Response with 503 status so callers receive a proper response object.
             if (attempt === maxRetries) {
               console.warn('[supabase-client] Network error during fetch (final):', err && err.message)
-              // attach URL for easier debugging when available
               try {
                 const url = args && args[0]
                 if (url) console.debug('[supabase-client] failed URL:', url)
               } catch (e) {}
-              throw err
+
+              try {
+                // create a simple Response-like fallback
+                const body = JSON.stringify({ error: 'network_error', message: err && err.message })
+                return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
+              } catch (e) {
+                // If Response isn't available, just throw the original error as a last resort
+                throw err
+              }
             }
 
             // small backoff before retrying
