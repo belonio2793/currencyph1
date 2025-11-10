@@ -635,6 +635,10 @@ export default function World3DRenderer({
           const off = (avatarStyle && avatarStyle.model_offset) || { x:0, y:0, z:0 }
           instance.scale.set(scale, scale, scale)
           instance.position.set(off.x || 0, off.y || 0, off.z || 0)
+          // hide primitive children (fallback) when attaching GLTF
+          try {
+            player.children.forEach((ch) => { if (ch !== instance) ch.visible = false })
+          } catch(e) {}
           player.add(instance)
           gltfModelRef.current = instance
           return
@@ -651,6 +655,9 @@ export default function World3DRenderer({
           const off = (avatarStyle && avatarStyle.model_offset) || { x:0, y:0, z:0 }
           instance.scale.set(scale, scale, scale)
           instance.position.set(off.x || 0, off.y || 0, off.z || 0)
+          try {
+            player.children.forEach((ch) => { if (ch !== instance) ch.visible = false })
+          } catch(e) {}
           player.add(instance)
           gltfModelRef.current = instance
         }, undefined, (err) => { console.warn('GLTF load error', err) })
