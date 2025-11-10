@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { nearbyUtils } from '../lib/nearbyUtils'
 import StarRating from './StarRating'
+import MapEmbed from './MapEmbed'
 
 export default function Business({ businessId, onBack, userId }) {
   const [loading, setLoading] = useState(true)
