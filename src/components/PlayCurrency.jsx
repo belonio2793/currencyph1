@@ -742,7 +742,8 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
             properties: char.properties || [],
             last_daily: char.last_daily || null,
             current_location: char.current_location || null,
-            home_city: char.home_city || null
+            home_city: char.home_city || null,
+            stats: (typeof characterStats !== 'undefined') ? characterStats : null
           }, { onConflict: 'id' })
           if (!e2) {
             await supabase.from('game_leaderboard').upsert({ user_id: userId, name: char.name, wealth: char.wealth }, { onConflict: 'user_id' }).catch(() => {})
