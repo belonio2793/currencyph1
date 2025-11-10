@@ -73,6 +73,8 @@ const AVATAR_STYLES = [
   { id: 50, name: 'Prismatic', color: 0x00ff7f, emissive: 0xff007f },
 ]
 
+const AVATAR_PREVIEWS = {1:'🐶',2:'🐱',3:'👨‍🚒',4:'🧑‍🍳',5:'😇',6:'🤡',7:'🤖',8:'🦸',9:'🧙',10:'🏴‍☠️',11:'👽',12:'🥷',13:'🧚',14:'🕵️',15:'👩‍🍳',16:'🦄',17:'🛡️',18:'👩‍⚕️',19:'🧑‍🏫',20:'🐕‍🦺'}
+
 export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   const [hoveredId, setHoveredId] = useState(null)
 
