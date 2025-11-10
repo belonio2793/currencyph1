@@ -1748,6 +1748,13 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100 p-6">
       <Player3DModal open={jobModalOpen} info={jobModalInfo} onClose={() => { setJobModalOpen(false); setJobModalInfo(null) }} />
+      {avatarCustomizerOpen && (
+        <AvatarCustomizer
+          selectedStyle={selectedAvatarStyle}
+          onSelect={(style) => setSelectedAvatarStyle(style)}
+          onClose={() => setAvatarCustomizerOpen(false)}
+        />
+      )}
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main world area */}
