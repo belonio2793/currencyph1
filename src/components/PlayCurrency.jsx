@@ -244,6 +244,7 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
   const presenceTimerRef = useRef(null)
   const presenceTableChannelRef = useRef(null)
   const assetsChannelRef = useRef(null)
+  const worldInstanceRef = useRef(null)
   const [mapSettings, setMapSettings] = useState({ avatarSpeed: 2, cameraSpeed: 1, zoomLevel: 1, sizeMultiplier: 10 })
   const [characterPosition, setCharacterPosition] = useState({ x: 0, y: 0, city: 'Manila' })
   const [matchRequests, setMatchRequests] = useState([])
