@@ -1376,6 +1376,28 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         }
       })
 
+      // handle incoming player position broadcasts so world can render other players
+      channel.on('broadcast', { event: 'player_position' }, (payload) => {
+        try {
+          const p = payload?.payload
+          if (!p || !p.user_id) return
+          // ignore our own
+          if (p.user_id === (userId || character?.id)) return
+          const w = worldInstanceRef.current
+          if (!w) return
+          const uid = p.user_id
+          const px = Number(p.x || 0)
+          const pz = Number(p.y || p.z || 0)
+          const name = p.name || p.display_name || `Player-${uid}`
+          // add or move player in world
+          if (w.players && w.players.has(uid)) {
+            try { w.updatePlayerPosition(uid, px, pz) } catch(e) {}
+          } else {
+            try { w.addPlayer(uid, name, null, px, pz) } catch(e) {}
+          }
+        } catch(e) { console.warn('player_position handler failed', e) }
+      })
+
       await channel.subscribe()
       presenceChannelRef.current = channel
 
