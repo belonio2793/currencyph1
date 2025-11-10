@@ -93,7 +93,7 @@ export default function World3DRenderer({
     ground.position.y = -0.5
     scene.add(ground)
 
-    // player marker - golden Robloxian avatar statue
+    // player marker - smooth golden avatar statue
     const playerGroup = new THREE.Group()
     const goldenMat = new THREE.MeshStandardMaterial({
       color: 0xd4a574,
@@ -103,39 +103,51 @@ export default function World3DRenderer({
       emissiveIntensity: 0.3
     })
 
-    // Head - boxy golden cube
-    const headGeo = new THREE.BoxGeometry(12, 12, 12)
+    // Head - large golden sphere
+    const headGeo = new THREE.IcosahedronGeometry(10, 4)
     const headMesh = new THREE.Mesh(headGeo, goldenMat)
-    headMesh.position.y = 32
+    headMesh.position.y = 34
     playerGroup.add(headMesh)
 
-    // Body/Torso - large golden box
-    const bodyGeo = new THREE.BoxGeometry(14, 20, 10)
+    // Body/Torso - capsule-like shape (rounded cylinder)
+    const bodyGeo = new THREE.CapsuleGeometry(7, 18, 4, 8)
     const bodyMesh = new THREE.Mesh(bodyGeo, goldenMat)
     bodyMesh.position.y = 14
     playerGroup.add(bodyMesh)
 
-    // Left arm - golden box
-    const armGeo = new THREE.BoxGeometry(8, 16, 8)
+    // Left arm - rounded capsule
+    const armGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
     const leftArm = new THREE.Mesh(armGeo, goldenMat)
-    leftArm.position.set(-14, 16, 0)
+    leftArm.position.set(-13, 16, 0)
+    leftArm.rotation.z = Math.PI / 2.2
     playerGroup.add(leftArm)
 
-    // Right arm - golden box
+    // Right arm - rounded capsule
     const rightArm = new THREE.Mesh(armGeo, goldenMat)
-    rightArm.position.set(14, 16, 0)
+    rightArm.position.set(13, 16, 0)
+    rightArm.rotation.z = -Math.PI / 2.2
     playerGroup.add(rightArm)
 
-    // Left leg - golden box
-    const legGeo = new THREE.BoxGeometry(7, 16, 8)
+    // Left leg - capsule
+    const legGeo = new THREE.CapsuleGeometry(4, 16, 4, 8)
     const leftLeg = new THREE.Mesh(legGeo, goldenMat)
     leftLeg.position.set(-5, 2, 0)
     playerGroup.add(leftLeg)
 
-    // Right leg - golden box
+    // Right leg - capsule
     const rightLeg = new THREE.Mesh(legGeo, goldenMat)
     rightLeg.position.set(5, 2, 0)
     playerGroup.add(rightLeg)
+
+    // Shoulder balls for smooth shoulder transitions
+    const shoulderGeo = new THREE.SphereGeometry(5, 16, 16)
+    const leftShoulder = new THREE.Mesh(shoulderGeo, goldenMat)
+    leftShoulder.position.set(-10, 24, 0)
+    playerGroup.add(leftShoulder)
+
+    const rightShoulder = new THREE.Mesh(shoulderGeo, goldenMat)
+    rightShoulder.position.set(10, 24, 0)
+    playerGroup.add(rightShoulder)
 
     // Add username label above player
     const labelTexture = createTextTexture('Player', 48)
