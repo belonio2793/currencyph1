@@ -164,20 +164,62 @@ export class World3D {
 
     // Create fallback texture while loading Google Maps
     const fallbackCanvas = document.createElement('canvas')
-    fallbackCanvas.width = 256
-    fallbackCanvas.height = 256
+    fallbackCanvas.width = 1024
+    fallbackCanvas.height = 1024
     const ctx = fallbackCanvas.getContext('2d')
-    ctx.fillStyle = '#2a8c4a'
-    ctx.fillRect(0, 0, 256, 256)
+
+    // Base color
+    ctx.fillStyle = '#6b6b75'
+    ctx.fillRect(0, 0, fallbackCanvas.width, fallbackCanvas.height)
+
+    // Draw subtle grid tiles
+    const tile = 64
+    ctx.strokeStyle = 'rgba(0,0,0,0.18)'
+    ctx.lineWidth = 2
+    for (let x = 0; x < fallbackCanvas.width; x += tile) {
+      ctx.beginPath()
+      ctx.moveTo(x + 0.5, 0)
+      ctx.lineTo(x + 0.5, fallbackCanvas.height)
+      ctx.stroke()
+    }
+    for (let y = 0; y < fallbackCanvas.height; y += tile) {
+      ctx.beginPath()
+      ctx.moveTo(0, y + 0.5)
+      ctx.lineTo(fallbackCanvas.width, y + 0.5)
+      ctx.stroke()
+    }
+
+    // Add random colored accents like properties
+    for (let i = 0; i < 200; i++) {
+      const rx = Math.floor(Math.random() * (fallbackCanvas.width / tile)) * tile + 8
+      const ry = Math.floor(Math.random() * (fallbackCanvas.height / tile)) * tile + 8
+      const w = Math.random() * (tile - 16) + 8
+      const h = Math.random() * (tile - 16) + 8
+      ctx.fillStyle = `rgba(${Math.floor(30 + Math.random()*200)}, ${Math.floor(30 + Math.random()*200)}, ${Math.floor(30 + Math.random()*200)}, ${0.6 + Math.random()*0.4})`
+      ctx.fillRect(rx, ry, w, h)
+    }
+
+    // Slight noise overlay
+    const imageData = ctx.getImageData(0,0,fallbackCanvas.width,fallbackCanvas.height)
+    for (let i = 0; i < imageData.data.length; i += 4) {
+      const v = (Math.random() - 0.5) * 10
+      imageData.data[i] = Math.max(0, Math.min(255, imageData.data[i] + v))
+      imageData.data[i+1] = Math.max(0, Math.min(255, imageData.data[i+1] + v))
+      imageData.data[i+2] = Math.max(0, Math.min(255, imageData.data[i+2] + v))
+    }
+    ctx.putImageData(imageData, 0,0)
 
     const fallbackTexture = new THREE.CanvasTexture(fallbackCanvas)
+    fallbackTexture.wrapS = THREE.RepeatWrapping
+    fallbackTexture.wrapT = THREE.RepeatWrapping
+    fallbackTexture.repeat.set(6,6)
     fallbackTexture.magFilter = THREE.LinearFilter
     fallbackTexture.minFilter = THREE.LinearMipmapLinearFilter
 
     const groundMaterial = new THREE.MeshStandardMaterial({
       map: fallbackTexture,
-      roughness: 0.8,
-      metalness: 0.0
+      roughness: 0.9,
+      metalness: 0.05
     })
 
     const ground = new THREE.Mesh(groundGeometry, groundMaterial)
