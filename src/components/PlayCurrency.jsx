@@ -954,84 +954,148 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
     setIsWorking(true)
     setWorkingJobId(job.name)
     setWorkProgress(0)
-    const start = Date.now()
+
     const duration = job.duration
 
-    // Open 3D job modal
-    try {
-      setJobModalInfo({ name: job.name, duration })
-      setJobModalOpen(true)
-    } catch (e) { console.warn('Failed to open job modal', e) }
+    // If world instance available, trigger in-world job animation/progress
+    const world = worldInstanceRef.current
+    if (world && world.startPlayerJob) {
+      try {
+        world.startPlayerJob(character.id || character.user_id || 'guest', job.name, duration,
+          (pct) => { // onProgress
+            setWorkProgress(pct)
+          },
+          async () => { // onComplete
+            try {
+              // reward with skill scaling based on difficulty and character level
+              setCharacter((c) => {
+                if (!c) return c
+                const charLevel = c.level || 1
+                const difficultyMultiplier = 0.8 + (job.difficulty * 0.1) // Higher difficulty = higher base reward
+                const levelMultiplier = 1 + (charLevel * 0.15) // Higher level = higher rewards (scales 15% per level)
+                const cityBonus = getCityBonus(job, cityFocus) // City-specific bonuses (5-18%)
+                const prestigeBonus = prestigeData.prestigeMultiplier || 1.0 // Prestige multiplier
 
-    const tick = setInterval(() => {
-      const elapsed = Date.now() - start
-      const pct = Math.min(100, Math.floor((elapsed / duration) * 100))
-      setWorkProgress(pct)
-      if (pct >= 100) {
-        clearInterval(tick)
-      }
-    }, 100)
+                // Scale reward and XP based on character level, city bonus, and prestige
+                const baseReward = job.reward * levelMultiplier * (1 + cityBonus) * prestigeBonus
+                const scaledReward = Math.floor(baseReward)
+                const scaledXP = Math.floor(job.xp * levelMultiplier * (1 + cityBonus * 0.5) * prestigeBonus)
 
-    setTimeout(async () => {
-      // reward with skill scaling based on difficulty and character level
-      setCharacter((c) => {
-        if (!c) return c
-        const charLevel = c.level || 1
-        const difficultyMultiplier = 0.8 + (job.difficulty * 0.1) // Higher difficulty = higher base reward
-        const levelMultiplier = 1 + (charLevel * 0.15) // Higher level = higher rewards (scales 15% per level)
-        const cityBonus = getCityBonus(job, cityFocus) // City-specific bonuses (5-18%)
-        const prestigeBonus = prestigeData.prestigeMultiplier || 1.0 // Prestige multiplier
+                const updated = { ...c, wealth: Number(c.wealth || 0) + scaledReward, xp: Number(c.xp || 0) + scaledXP }
 
-        // Scale reward and XP based on character level, city bonus, and prestige
-        const baseReward = job.reward * levelMultiplier * (1 + cityBonus) * prestigeBonus
-        const scaledReward = Math.floor(baseReward)
-        const scaledXP = Math.floor(job.xp * levelMultiplier * (1 + cityBonus * 0.5) * prestigeBonus)
+                // level up logic (every 100 xp = 1 level)
+                const newLevel = Math.max(1, Math.floor((updated.xp || 0) / 100) + 1)
+                if (newLevel !== updated.level) updated.level = newLevel
 
-        const updated = { ...c, wealth: Number(c.wealth || 0) + scaledReward, xp: Number(c.xp || 0) + scaledXP }
+                // Apply stat boosts from job
+                const statBoost = getStatBoostFromJob(job)
+                setCharacterStats(prev => ({
+                  strength: prev.strength + statBoost.strength,
+                  intelligence: prev.intelligence + statBoost.intelligence,
+                  charisma: prev.charisma + statBoost.charisma,
+                  endurance: prev.endurance + statBoost.endurance,
+                  dexterity: prev.dexterity + statBoost.dexterity,
+                  luck: prev.luck + statBoost.luck
+                }))
 
-        // level up logic (every 100 xp = 1 level)
-        const newLevel = Math.max(1, Math.floor((updated.xp || 0) / 100) + 1)
-        if (newLevel !== updated.level) updated.level = newLevel
+                // persist
+                persistCharacterPartial(updated)
+                // Save using the updated object (avoid stale closure)
+                if (userId) saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
+                // Check phase progression
+                checkAndUpdatePhases(updated)
+                return updated
+              })
 
-        // Apply stat boosts from job
-        const statBoost = getStatBoostFromJob(job)
-        setCharacterStats(prev => ({
-          strength: prev.strength + statBoost.strength,
-          intelligence: prev.intelligence + statBoost.intelligence,
-          charisma: prev.charisma + statBoost.charisma,
-          endurance: prev.endurance + statBoost.endurance,
-          dexterity: prev.dexterity + statBoost.dexterity,
-          luck: prev.luck + statBoost.luck
-        }))
+              // Update city stats
+              setCityStats((prev) => {
+                const scaledReward = Math.floor(job.reward * (1 + ((character && character.level) ? character.level * 0.15 : 0)))
+                return {
+                  ...prev,
+                  [cityFocus]: {
+                    jobsCompleted: (prev[cityFocus]?.jobsCompleted || 0) + 1,
+                    moneyEarned: (prev[cityFocus]?.moneyEarned || 0) + scaledReward
+                  }
+                }
+              })
 
-        // persist
-        persistCharacterPartial(updated)
-        // Save using the updated object (avoid stale closure)
-        if (userId) saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
-        // Check phase progression
-        checkAndUpdatePhases(updated)
-        return updated
-      })
-
-      // Update city stats
-      setCityStats((prev) => {
-        const scaledReward = Math.floor(job.reward * (1 + ((character && character.level) ? character.level * 0.15 : 0)))
-        return {
-          ...prev,
-          [cityFocus]: {
-            jobsCompleted: (prev[cityFocus]?.jobsCompleted || 0) + 1,
-            moneyEarned: (prev[cityFocus]?.moneyEarned || 0) + scaledReward
+              setIsWorking(false)
+              setWorkingJobId(null)
+              setWorkProgress(0)
+              setPhases(prev => { const next = { ...prev, didJob: true }; savePhases(next); return next })
+              await loadLeaderboard()
+            } catch(e) {
+              console.warn('Job completion handler failed', e)
+              setIsWorking(false)
+              setWorkingJobId(null)
+              setWorkProgress(0)
+            }
           }
+        )
+      } catch (e) {
+        console.warn('Failed to start in-world job', e)
+        setIsWorking(false)
+        setWorkingJobId(null)
+        setWorkProgress(0)
+      }
+    } else {
+      // fallback to local modal-based job (if world not ready)
+      const start = Date.now()
+      const tick = setInterval(() => {
+        const elapsed = Date.now() - start
+        const pct = Math.min(100, Math.floor((elapsed / duration) * 100))
+        setWorkProgress(pct)
+        if (pct >= 100) {
+          clearInterval(tick)
         }
-      })
+      }, 100)
 
-      setIsWorking(false)
-      setWorkingJobId(null)
-      setWorkProgress(0)
-      setPhases(prev => { const next = { ...prev, didJob: true }; savePhases(next); return next })
-      try { setJobModalOpen(false); setJobModalInfo(null) } catch(e){}
-      await loadLeaderboard()
-    }, duration + 200)
+      setTimeout(async () => {
+        // fallback reward handling (same as above)
+        setCharacter((c) => {
+          if (!c) return c
+          const charLevel = c.level || 1
+          const difficultyMultiplier = 0.8 + (job.difficulty * 0.1)
+          const levelMultiplier = 1 + (charLevel * 0.15)
+          const cityBonus = getCityBonus(job, cityFocus)
+          const prestigeBonus = prestigeData.prestigeMultiplier || 1.0
+          const baseReward = job.reward * levelMultiplier * (1 + cityBonus) * prestigeBonus
+          const scaledReward = Math.floor(baseReward)
+          const scaledXP = Math.floor(job.xp * levelMultiplier * (1 + cityBonus * 0.5) * prestigeBonus)
+          const updated = { ...c, wealth: Number(c.wealth || 0) + scaledReward, xp: Number(c.xp || 0) + scaledXP }
+          const newLevel = Math.max(1, Math.floor((updated.xp || 0) / 100) + 1)
+          if (newLevel !== updated.level) updated.level = newLevel
+          const statBoost = getStatBoostFromJob(job)
+          setCharacterStats(prev => ({
+            strength: prev.strength + statBoost.strength,
+            intelligence: prev.intelligence + statBoost.intelligence,
+            charisma: prev.charisma + statBoost.charisma,
+            endurance: prev.endurance + statBoost.endurance,
+            dexterity: prev.dexterity + statBoost.dexterity,
+            luck: prev.luck + statBoost.luck
+          }))
+          persistCharacterPartial(updated)
+          if (userId) saveCharacterToDB(updated).catch((e)=>{console.warn('saveCharacterToDB after job failed', e)})
+          checkAndUpdatePhases(updated)
+          return updated
+        })
+        setCityStats((prev) => {
+          const scaledReward = Math.floor(job.reward * (1 + ((character && character.level) ? character.level * 0.15 : 0)))
+          return {
+            ...prev,
+            [cityFocus]: {
+              jobsCompleted: (prev[cityFocus]?.jobsCompleted || 0) + 1,
+              moneyEarned: (prev[cityFocus]?.moneyEarned || 0) + scaledReward
+            }
+          }
+        })
+        setIsWorking(false)
+        setWorkingJobId(null)
+        setWorkProgress(0)
+        setPhases(prev => { const next = { ...prev, didJob: true }; savePhases(next); return next })
+        await loadLeaderboard()
+      }, duration + 200)
+    }
   }
 
   const buyProperty = async (asset) => {
