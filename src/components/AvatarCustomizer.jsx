@@ -26,8 +26,6 @@ const AVATAR_STYLES = [
 
 const AVATAR_PREVIEWS = {1:'🐶',2:'🐱',3:'👨‍🚒',4:'🧑‍🍳',5:'😇',6:'🤡',7:'🤖',8:'🦸',9:'🧙',10:'🏴‍☠️',11:'👽',12:'🥷',13:'🧚',14:'🕵️',15:'👩‍🍳',16:'🦄',17:'🛡️',18:'👩‍⚕️',19:'🧑‍🏫',20:'🐕‍🦺'}
 
-import { useEffect, useState } from 'react'
-
 export default function AvatarCustomizer({ selectedStyle, onSelect, onClose }) {
   const [hoveredId, setHoveredId] = useState(null)
   const [editing, setEditing] = useState(null)
