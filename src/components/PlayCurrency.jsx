@@ -1786,13 +1786,20 @@ export default function PlayCurrency({ userId, userEmail, onShowAuth }) {
         <AvatarCustomizer
           selectedStyle={selectedAvatarStyle}
           onSelect={(style, opts) => {
-            // normalize style object to only include id, name and color
-            const normalized = style ? { id: style.id, name: style.name, color: (style.color || (style.avatar && style.avatar.color) || 0x00a8ff) } : null
+            // preserve full style (including model_url, model_scale, offsets)
+            const selected = style ? {
+              id: style.id,
+              name: style.name,
+              color: style.color || (style.avatar && style.avatar.color) || 0x00a8ff,
+              model_url: style.model_url || (style.avatar && style.avatar.model_url) || null,
+              model_scale: style.model_scale || (style.avatar && style.avatar.model_scale) || 1,
+              model_offset: style.model_offset || (style.avatar && style.avatar.model_offset) || { x:0, y:0, z:0 }
+            } : null
             // update selected style in UI
-            setSelectedAvatarStyle(normalized)
+            setSelectedAvatarStyle(selected)
             // update character cosmetics and persist
             setCharacter((c) => {
-              const updated = { ...c, cosmetics: { ...(c.cosmetics || {}), avatar: normalized } }
+              const updated = { ...c, cosmetics: { ...(c.cosmetics || {}), avatar: selected } }
               try { persistCharacterPartial(updated) } catch(e) { console.warn('persistCharacterPartial failed', e) }
               if (userId) saveCharacterToDB(updated)
               return updated
