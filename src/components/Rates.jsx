@@ -722,6 +722,38 @@ export default function Rates({ globalCurrency }) {
           </div>
         </div>
       </div>
+
+      {/* Debug: Raw currency_rates table (from Supabase) */}
+      <div className="mt-6 bg-white rounded-lg border border-slate-100 p-4">
+        <h4 className="text-sm font-medium text-slate-800 mb-3">Raw currency_rates (from Supabase)</h4>
+        {rawRates && rawRates.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-slate-50 border-b">
+                <tr>
+                  <th className="px-3 py-2 text-left">From</th>
+                  <th className="px-3 py-2 text-left">To</th>
+                  <th className="px-3 py-2 text-right">Rate</th>
+                  <th className="px-3 py-2 text-left">Updated</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {rawRates.map((r, idx) => (
+                  <tr key={`${r.from_currency}-${r.to_currency}-${idx}`} className="hover:bg-slate-50">
+                    <td className="px-3 py-2">{r.from_currency}</td>
+                    <td className="px-3 py-2">{r.to_currency}</td>
+                    <td className="px-3 py-2 text-right">{typeof r.rate === 'number' ? Number(r.rate).toFixed(8) : r.rate}</td>
+                    <td className="px-3 py-2">{r.updated_at ? new Date(r.updated_at).toLocaleString() : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <div className="text-sm text-slate-500">No rates in currency_rates table yet.</div>
+        )}
+      </div>
+
     </div>
   )
 }
