@@ -104,7 +104,7 @@ export default function World3DRenderer({
     const labelMat = new THREE.MeshStandardMaterial({ map: labelTexture, emissive: 0x00d4ff, emissiveIntensity: 0.3, transparent: true })
     const labelGeo = new THREE.PlaneGeometry(60, 20)
     const labelMesh = new THREE.Mesh(labelGeo, labelMat)
-    labelMesh.position.y = 60
+    labelMesh.position.y = 35
     labelMesh.rotation.x = 0
     playerGroup.add(labelMesh)
     playerLabelRef.current = labelMesh
