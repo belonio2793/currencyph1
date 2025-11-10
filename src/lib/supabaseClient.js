@@ -63,11 +63,16 @@ function initClient() {
         const maxRetries = 2
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
           try {
-            // If browser is offline, fail fast with clear message
+            // If browser is offline, fail fast with a synthetic Response to avoid noisy "Failed to fetch" TypeErrors
             if (typeof navigator !== 'undefined' && !navigator.onLine) {
-              const offlineErr = new Error('Network appears to be offline')
-              offlineErr.name = 'NetworkError'
-              throw offlineErr
+              try {
+                const body = JSON.stringify({ error: 'offline', message: 'Network appears to be offline' })
+                return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
+              } catch (e) {
+                const offlineErr = new Error('Network appears to be offline')
+                offlineErr.name = 'NetworkError'
+                throw offlineErr
+              }
             }
             return await originalFetch(...args)
           } catch (err) {
