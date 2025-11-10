@@ -649,13 +649,19 @@ export class WorldIsometric {
 
   destroy() {
     this.stop()
-    try { this.renderer.domElement.removeEventListener('click', this._onClick) } catch(e) {}
-    try { this.resizeObserver.disconnect() } catch(e) {}
-    try { this.container.removeChild(this.renderer.domElement) } catch(e) {}
+    try {
+      if (this.isWebGL && this.renderer && this.renderer.domElement) this.renderer.domElement.removeEventListener('click', this._onClick)
+      else if (this.canvas) this.canvas.removeEventListener('click', this._onClick)
+    } catch(e) {}
+    try { if (this.resizeObserver) this.resizeObserver.disconnect() } catch(e) {}
+    try {
+      if (this.isWebGL && this.renderer && this.renderer.domElement) this.container.removeChild(this.renderer.domElement)
+      else if (this.canvas) this.container.removeChild(this.canvas)
+    } catch(e) {}
     try { if (this._inputCleanup) this._inputCleanup() } catch(e) {}
     this.players.clear()
     // cleanup properties
-    try { this.properties.forEach(p => { if (p.mesh) this.scene.remove(p.mesh) }) } catch(e) {}
+    try { this.properties.forEach(p => { if (p.mesh && this.scene) this.scene.remove(p.mesh) }) } catch(e) {}
     this.properties.clear()
   }
 }
