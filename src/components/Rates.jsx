@@ -10,6 +10,20 @@ export default function Rates({ globalCurrency }) {
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [allCurrencies, setAllCurrencies] = useState([])
   const baseCurrency = 'PHP'
+  // common fallback currency list in case external currencyAPI is unavailable
+  const fallbackFiats = [
+    { code: 'PHP', name: 'Philippine Peso' },
+    { code: 'USD', name: 'US Dollar' },
+    { code: 'EUR', name: 'Euro' },
+    { code: 'GBP', name: 'British Pound' },
+    { code: 'JPY', name: 'Japanese Yen' },
+    { code: 'CNY', name: 'Chinese Yuan' },
+    { code: 'SGD', name: 'Singapore Dollar' },
+    { code: 'AUD', name: 'Australian Dollar' },
+    { code: 'HKD', name: 'Hong Kong Dollar' },
+    { code: 'KRW', name: 'South Korean Won' },
+    { code: 'INR', name: 'Indian Rupee' }
+  ]
 
   const resolveUsdToBase = () => {
     const direct = exchangeRates && exchangeRates[`USD_${baseCurrency}`]
