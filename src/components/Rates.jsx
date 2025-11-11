@@ -43,7 +43,8 @@ export default function Rates() {
         supabase
           .from('pairs')
           .select('from_currency,to_currency,rate,updated_at')
-          .eq('source_table', 'cryptocurrency_rates'),
+          .eq('source_table', 'cryptocurrency_rates')
+          .or('from_currency.eq.PHP,to_currency.eq.PHP'),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
