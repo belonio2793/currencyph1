@@ -123,11 +123,9 @@ export function useGeolocation() {
           }
 
           // Execute reverse geocoding without letting errors bubble up
-          Promise.resolve().then(reverseGeocode).catch(() => {
-            // Catch any errors that somehow escape
-            if (isMountedRef.current) {
-              setLoading(false)
-            }
+          Promise.resolve().then(reverseGeocode).catch((err) => {
+            // Silently catch any errors that somehow escape, including AbortError
+            // Suppress all console output
           })
         },
         (err) => {
