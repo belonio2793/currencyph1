@@ -363,13 +363,12 @@ export default function MyBusiness({ userId }) {
                   
                   {/* BIR Integration */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group opacity-75">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
                         <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0A5 5 0 017 12z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">📋</span>
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">BIR Integration</h3>
                     <p className="text-sm text-slate-600 mb-4">File taxes and access tax documents instantly</p>
@@ -378,13 +377,12 @@ export default function MyBusiness({ userId }) {
 
                   {/* Employee Management */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group opacity-75">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
                         <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">👨‍💼</span>
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Employees & Payroll</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage employees, payroll, and compensation</p>
@@ -393,13 +391,12 @@ export default function MyBusiness({ userId }) {
 
                   {/* Merchant Tools */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group opacity-75">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
                         <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">🏪</span>
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Merchant Tools</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage sales, inventory, and transactions</p>
@@ -408,13 +405,12 @@ export default function MyBusiness({ userId }) {
 
                   {/* Digital Receipts */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group opacity-75">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
                         <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">🧾</span>
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Digital Receipts</h3>
                     <p className="text-sm text-slate-600 mb-4">Track and manage all digital receipts</p>
@@ -423,13 +419,12 @@ export default function MyBusiness({ userId }) {
 
                   {/* Payment Integrations */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group opacity-75">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-pink-100 group-hover:bg-pink-200 transition-colors">
                         <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
-
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Integration</h3>
                     <p className="text-sm text-slate-600 mb-4">Connect GCash, PayMaya, and more</p>
@@ -438,13 +433,12 @@ export default function MyBusiness({ userId }) {
 
                   {/* Shareholders */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group opacity-75">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-yellow-100 group-hover:bg-yellow-200 transition-colors">
                         <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
-                      <span className="text-2xl">🤝</span>
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Shareholders</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
@@ -754,13 +748,12 @@ export default function MyBusiness({ userId }) {
 
               {/* BIR Integration */}
               <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0A5 5 0 017 12z" />
                     </svg>
                   </div>
-                  <span className="text-2xl">📋</span>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">BIR Integration</h3>
                 <p className="text-sm text-slate-600 mb-4">File taxes and access tax documents instantly</p>
@@ -769,13 +762,12 @@ export default function MyBusiness({ userId }) {
 
               {/* Employee Management */}
               <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
                     </svg>
                   </div>
-                  <span className="text-2xl">👨‍💼</span>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Employees & Payroll</h3>
                 <p className="text-sm text-slate-600 mb-4">Manage employees, payroll, and compensation</p>
@@ -784,13 +776,12 @@ export default function MyBusiness({ userId }) {
 
               {/* Merchant Tools */}
               <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
                     <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
                     </svg>
                   </div>
-                  <span className="text-2xl">🏪</span>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Merchant Tools</h3>
                 <p className="text-sm text-slate-600 mb-4">Manage sales, inventory, and transactions</p>
@@ -799,13 +790,12 @@ export default function MyBusiness({ userId }) {
 
               {/* Digital Receipts */}
               <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
                     <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <span className="text-2xl">🧾</span>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Digital Receipts</h3>
                 <p className="text-sm text-slate-600 mb-4">Track and manage all digital receipts</p>
@@ -814,13 +804,12 @@ export default function MyBusiness({ userId }) {
 
               {/* Payment Integrations */}
               <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-pink-100 group-hover:bg-pink-200 transition-colors">
                     <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <span className="text-2xl">💳</span>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Integration</h3>
                 <p className="text-sm text-slate-600 mb-4">Connect GCash, PayMaya, and more</p>
@@ -829,13 +818,12 @@ export default function MyBusiness({ userId }) {
 
               {/* Shareholders */}
               <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-yellow-100 group-hover:bg-yellow-200 transition-colors">
                     <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </div>
-                  <span className="text-2xl">🤝</span>
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Shareholders</h3>
                 <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
