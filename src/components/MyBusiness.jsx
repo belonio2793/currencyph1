@@ -1003,6 +1003,54 @@ export default function MyBusiness({ userId }) {
           )}
         </div>
         )}
+
+        {showRegistrationForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-8 py-6">
+                <h2 className="text-2xl font-semibold text-white mb-1">{formMode === 'create' ? 'Create New Business' : 'Add Existing Business'}</h2>
+                <p className="text-blue-100 text-sm">{formMode === 'create' ? 'Register a new business' : 'Link an existing business'}</p>
+              </div>
+              <div className="p-8 space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">Business Name <span className="text-red-500">*</span></label>
+                  <input type="text" placeholder="Enter your business name" value={formData.businessName} onChange={(e) => handleBusinessNameChange(e.target.value)} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-3">Registration Type <span className="text-red-500">*</span></label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {['sole', 'partnership', 'corporation', 'cooperative'].map(type => <button key={type} onClick={() => handleRegistrationTypeChange(type)} className={`px-4 py-3 rounded-lg border-2 font-medium capitalize ${formData.registrationType === type ? 'bg-blue-50 border-blue-600 text-blue-600' : 'border-slate-200'}`}>{type}</button>)}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">City of Registration <span className="text-red-500">*</span></label>
+                  <input type="text" placeholder="Search cities..." value={citySearch} onChange={(e) => { setCitySearch(e.target.value); setShowCityDropdown(true); }} onFocus={() => setShowCityDropdown(true)} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-blue-600" />
+                  {formData.cityOfRegistration && <p className="mt-2 text-sm text-green-600">Selected: {formData.cityOfRegistration}</p>}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 rounded-lg">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2">TIN</label>
+                    <input type="text" placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : ''} value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} readOnly={formMode === 'create'} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2">Certificate</label>
+                    <input type="text" placeholder={formMode === 'existing' ? 'Enter certificate' : ''} value={formData.certificateOfIncorporation} onChange={(e) => setFormData({ ...formData, certificateOfIncorporation: e.target.value })} readOnly={formMode === 'create'} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg" />
+                  </div>
+                </div>
+                {formMode === 'existing' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">Registration Date <span className="text-red-500">*</span></label>
+                    <input type="date" value={formData.registrationDate} onChange={(e) => setFormData({ ...formData, registrationDate: e.target.value })} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg" />
+                  </div>
+                )}
+                <div className="flex gap-3 pt-6 border-t border-slate-200">
+                  <button onClick={handleAddBusiness} disabled={formMode === 'create' ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate} className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold">{formMode === 'create' ? 'Create Business' : 'Add Business'}</button>
+                  <button onClick={() => { setShowRegistrationForm(false); setFormMode(null); }} className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
