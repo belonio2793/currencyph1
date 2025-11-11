@@ -42,9 +42,9 @@ export function useGeolocation() {
                   const timeoutId = setTimeout(() => {
                     timedOut = true
                     try {
-                      controller.abort?.()
+                      if (controller?.abort) controller.abort()
                     } catch (e) {
-                      // ignore abort errors
+                      // Silently ignore all abort errors
                     }
                   }, 3000)
 
@@ -81,9 +81,9 @@ export function useGeolocation() {
                 const timeoutId = setTimeout(() => {
                   timedOut = true
                   try {
-                    controller.abort?.()
+                    if (controller?.abort) controller.abort()
                   } catch (e) {
-                    // ignore abort errors
+                    // Silently ignore all abort errors
                   }
                 }, 3000)
 
