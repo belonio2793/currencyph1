@@ -599,21 +599,26 @@ export default function Profile({ userId, onSignOut }) {
             <div className="space-y-4">
               {/* Current Verification Status */}
               {verificationStatus ? (
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className={`p-4 border rounded-lg ${verificationStatus.status === 'approved' ? 'bg-green-50 border-green-200' : verificationStatus.status === 'pending' ? 'bg-yellow-50 border-yellow-200' : 'bg-red-50 border-red-200'}`}>
                   <div className="flex items-start justify-between">
                     <div>
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-3">
                         <span className={`w-3 h-3 rounded-full ${verificationStatus.status === 'approved' ? 'bg-green-500' : verificationStatus.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
                         <p className="font-medium text-slate-900">
-                          {verificationStatus.status === 'approved' ? '✓ Verified' : verificationStatus.status === 'pending' ? '⏳ Pending Review' : '✗ Rejected'}
+                          {verificationStatus.status === 'approved' ? '✓ Identity Verified' : verificationStatus.status === 'pending' ? '⏳ Verification Pending' : '✗ Verification Rejected'}
                         </p>
                       </div>
-                      <p className="text-sm text-slate-700 mb-2">ID Type: <span className="font-medium">{getIdTypeLabel(verificationStatus.id_type)}</span></p>
-                      {verificationStatus.verified_at && (
-                        <p className="text-xs text-slate-600">Verified on: {new Date(verificationStatus.verified_at).toLocaleDateString()}</p>
+                      {verificationStatus.document_type && (
+                        <p className="text-sm text-slate-700 mb-2">Document: <span className="font-medium">{verificationStatus.document_type}</span></p>
                       )}
-                      {verificationStatus.verification_notes && (
-                        <p className="text-xs text-slate-600 mt-1">Notes: {verificationStatus.verification_notes}</p>
+                      {verificationStatus.didit_verified_at && (
+                        <p className="text-xs text-slate-600">Verified on: {new Date(verificationStatus.didit_verified_at).toLocaleDateString()}</p>
+                      )}
+                      {verificationStatus.is_public && verificationStatus.status === 'approved' && (
+                        <p className="text-xs text-green-600 mt-2">🌐 Your verification is publicly visible</p>
+                      )}
+                      {!verificationStatus.is_public && verificationStatus.status === 'approved' && (
+                        <p className="text-xs text-slate-600 mt-2">🔒 Your verification is private</p>
                       )}
                     </div>
                   </div>
