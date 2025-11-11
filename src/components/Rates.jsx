@@ -12,34 +12,11 @@ export default function Rates({ globalCurrency }) {
   const baseCurrency = 'PHP'
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
 
-  // common fallback currency list in case Supabase is unavailable
-  const fallbackFiats = [
-    { code: 'PHP', name: 'Philippine Peso' },
-    { code: 'USD', name: 'US Dollar' },
-    { code: 'EUR', name: 'Euro' },
-    { code: 'GBP', name: 'British Pound' },
-    { code: 'JPY', name: 'Japanese Yen' },
-    { code: 'CNY', name: 'Chinese Yuan' },
-    { code: 'SGD', name: 'Singapore Dollar' },
-    { code: 'AUD', name: 'Australian Dollar' },
-    { code: 'HKD', name: 'Hong Kong Dollar' },
-    { code: 'KRW', name: 'South Korean Won' },
-    { code: 'INR', name: 'Indian Rupee' }
-  ]
-
   // Helper to get currency name from code
   const getCurrencyName = (code) => {
-    const found = fallbackFiats.find(c => c.code === code)
-    if (found) return found.name
-
-    // Try to get from currencyAPI
-    const currencies = currencyAPI.getCurrencies()
-    if (Array.isArray(currencies)) {
-      const apiFound = currencies.find(c => c.code === code)
-      if (apiFound) return apiFound.name
-    }
-
-    return code
+    const currencies = allCurrencies || []
+    const found = currencies.find(c => c.code === code)
+    return found ? found.name : code
   }
 
   const resolveUsdToBase = () => {
