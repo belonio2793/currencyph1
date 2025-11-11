@@ -86,6 +86,19 @@ export default function HeaderMap({ userId: headerUserId }) {
   }, [displayLocation.latitude, displayLocation.longitude])
 
   useEffect(() => {
+    const handler = (e) => {
+      try {
+        const d = e && e.detail
+        if (d && typeof d.latitude === 'number' && typeof d.longitude === 'number') {
+          setMarkerPos({ latitude: d.latitude, longitude: d.longitude })
+        }
+      } catch (err) {}
+    }
+    window.addEventListener('headermap:marker-move', handler)
+    return () => window.removeEventListener('headermap:marker-move', handler)
+  }, [])
+
+  useEffect(() => {
     // Load preference from localStorage (preferencesManager)
     try {
       const prefs = preferencesManager.getAllPreferences(headerUserId)
