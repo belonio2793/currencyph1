@@ -48,4 +48,4 @@ async function investigate() {
   }
 }
 
-investigate();
+investigate().catch(console.error);
