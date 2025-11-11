@@ -2,47 +2,38 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Rates({ globalCurrency }) {
-  const [ratesMap, setRatesMap] = useState({})
+  const [fiatRates, setFiatRates] = useState([])
+  const [cryptoRates, setCryptoRates] = useState([])
   const [currenciesMetadata, setCurrenciesMetadata] = useState({})
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
-  const [allCurrencies, setAllCurrencies] = useState([])
   
   const baseCurrency = 'PHP'
-  const [displayCurrency, setDisplayCurrency] = useState('PHP')
 
-  // Load currencies metadata and exchange rates
+  // Load all data on mount
   useEffect(() => {
     loadData()
     const interval = setInterval(loadData, 60 * 60 * 1000)
 
-    const handleRateChange = (payload) => {
-      if (payload.new) {
-        if (payload.new.from_currency === 'USD') {
-          setRatesMap(prev => ({
-            ...prev,
-            [payload.new.to_currency]: Number(payload.new.rate)
-          }))
-        } else if (payload.new.from_currency === 'PHP') {
-          setRatesMap(prev => ({
-            ...prev,
-            ['PHP_' + payload.new.to_currency]: Number(payload.new.rate)
-          }))
-        }
-        setLastUpdated(new Date())
-      }
-    }
+    // Subscribe to fiat rate changes
+    const fiatChannel = supabase
+      .channel('public:currency_rates')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'currency_rates' }, () => loadData())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'currency_rates' }, () => loadData())
+      .subscribe()
 
-    const channel = supabase
-      .channel('public:pairs')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pairs' }, handleRateChange)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'pairs' }, handleRateChange)
+    // Subscribe to crypto rate changes
+    const cryptoChannel = supabase
+      .channel('public:cryptocurrency_rates')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cryptocurrency_rates' }, () => loadData())
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cryptocurrency_rates' }, () => loadData())
       .subscribe()
 
     return () => {
       clearInterval(interval)
       try {
-        supabase.removeChannel(channel)
+        supabase.removeChannel(fiatChannel)
+        supabase.removeChannel(cryptoChannel)
       } catch (e) {}
     }
   }, [])
@@ -52,12 +43,12 @@ export default function Rates({ globalCurrency }) {
       setLoading(true)
 
       // Load currencies metadata
-      const { data: currencies, error: currError } = await supabase
+      const { data: currencies } = await supabase
         .from('currencies')
         .select('code,name,type,symbol,decimals,is_default')
         .eq('active', true)
 
-      if (!currError && currencies) {
+      if (currencies) {
         const metadata = {}
         currencies.forEach(c => {
           metadata[c.code] = c
@@ -65,20 +56,35 @@ export default function Rates({ globalCurrency }) {
         setCurrenciesMetadata(metadata)
       }
 
-      // Load pairs where PHP is source (PHP-based rates)
-      const { data: phpPairs, error: phpError } = await supabase
-        .from('pairs')
+      // Load fiat rates from currency_rates where from_currency = PHP
+      const { data: fiatData } = await supabase
+        .from('currency_rates')
         .select('from_currency,to_currency,rate')
         .eq('from_currency', 'PHP')
 
-      if (!phpError && phpPairs && Array.isArray(phpPairs)) {
-        const map = {}
-        const currencies_list = []
-        const processedCodes = new Set()
+      if (fiatData && Array.isArray(fiatData)) {
+        const fiat_list = fiatData
+          .map(p => {
+            const rate = Number(p.rate)
+            if (!isFinite(rate) || rate <= 0) return null
+            
+            const metadata = currencies?.find(c => c.code === p.to_currency) || 
+              { code: p.to_currency, name: p.to_currency, type: 'fiat', decimals: 2 }
+            
+            return {
+              code: p.to_currency,
+              rate,
+              name: metadata.name || p.to_currency,
+              type: 'fiat',
+              symbol: metadata.symbol || '',
+              decimals: metadata.decimals || 2
+            }
+          })
+          .filter(r => r !== null)
+          .sort((a, b) => a.code.localeCompare(b.code))
 
-        // Always include PHP first
-        map['PHP'] = 1
-        currencies_list.push({
+        // Always include PHP as 1.00
+        fiat_list.unshift({
           code: 'PHP',
           rate: 1,
           name: 'Philippine Peso',
@@ -86,57 +92,59 @@ export default function Rates({ globalCurrency }) {
           symbol: '₱',
           decimals: 2
         })
-        processedCodes.add('PHP')
 
-        // Add other currencies from pairs
-        phpPairs.forEach(p => {
-          if (p.to_currency && p.rate != null && !processedCodes.has(p.to_currency)) {
-            const rate = Number(p.rate)
-            if (isFinite(rate) && rate > 0) {
-              map[p.to_currency] = rate
-              const metadata = currenciesMetadata[p.to_currency] ||
-                { code: p.to_currency, name: p.to_currency, type: 'unknown', decimals: 2 }
-              currencies_list.push({
-                code: p.to_currency,
-                rate,
-                name: metadata.name || p.to_currency,
-                type: metadata.type || 'unknown',
-                symbol: metadata.symbol || '',
-                decimals: metadata.decimals || 2
-              })
-              processedCodes.add(p.to_currency)
-            }
-          }
-        })
-
-        setRatesMap(map)
-        setAllCurrencies(currencies_list.sort((a, b) => {
-          if (a.code === 'PHP') return -1
-          if (b.code === 'PHP') return 1
-          return a.code.localeCompare(b.code)
-        }))
-        setLastUpdated(new Date())
+        setFiatRates(fiat_list)
       }
+
+      // Load crypto rates from cryptocurrency_rates where from_currency = PHP
+      const { data: cryptoData } = await supabase
+        .from('cryptocurrency_rates')
+        .select('from_currency,to_currency,rate')
+        .eq('from_currency', 'PHP')
+
+      if (cryptoData && Array.isArray(cryptoData)) {
+        const crypto_list = cryptoData
+          .map(p => {
+            const rate = Number(p.rate)
+            if (!isFinite(rate) || rate <= 0) return null
+            
+            const metadata = currencies?.find(c => c.code === p.to_currency) || 
+              { code: p.to_currency, name: p.to_currency, type: 'crypto', decimals: 8 }
+            
+            return {
+              code: p.to_currency,
+              rate,
+              name: metadata.name || p.to_currency,
+              type: 'crypto',
+              symbol: metadata.symbol || '',
+              decimals: metadata.decimals || 8
+            }
+          })
+          .filter(r => r !== null)
+          .sort((a, b) => a.code.localeCompare(b.code))
+
+        setCryptoRates(crypto_list)
+      }
+
+      setLastUpdated(new Date())
     } catch (err) {
       console.error('Error loading exchange rates:', err)
-      setRatesMap({})
-      setAllCurrencies([])
+      setFiatRates([])
+      setCryptoRates([])
     } finally {
       setLoading(false)
     }
   }
 
-  const getRate = (from, to) => {
+  const getRate = (from, to, allRates) => {
     if (from === to) return 1
     
-    const fromRate = ratesMap[from]
-    const toRate = ratesMap[to]
+    const fromCurr = allRates.find(c => c.code === from)
+    const toCurr = allRates.find(c => c.code === to)
     
-    if (fromRate === undefined || toRate === undefined) return null
-    if (fromRate === 0 || toRate === 0) return null
+    if (!fromCurr || !toCurr || fromCurr.rate <= 0 || toCurr.rate <= 0) return null
     
-    // Both have PHP-based rates
-    return toRate / fromRate
+    return toCurr.rate / fromCurr.rate
   }
 
   const [selectedCurrency, setSelectedCurrency] = useState(null)
@@ -144,25 +152,24 @@ export default function Rates({ globalCurrency }) {
   const [amount1, setAmount1] = useState('')
   const [amount2, setAmount2] = useState('')
   const [search, setSearch] = useState('')
-  const [typeFilter, setTypeFilter] = useState('all') // 'all', 'fiat', 'crypto'
+  const [typeFilter, setTypeFilter] = useState('all')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'BTC', 'EUR'])
 
   // Initialize selections
   useEffect(() => {
-    if (!loading && allCurrencies.length > 0) {
-      if (!selectedCurrency) {
-        const php = allCurrencies.find(c => c.code === 'PHP')
-        setSelectedCurrency(php || allCurrencies[0])
+    if (!loading) {
+      if (!selectedCurrency && fiatRates.length > 0) {
+        setSelectedCurrency(fiatRates[0])
       }
-      if (!selectedCrypto) {
-        const btc = allCurrencies.find(c => c.code === 'BTC')
-        setSelectedCrypto(btc || allCurrencies.find(c => c.code !== 'PHP'))
+      if (!selectedCrypto && cryptoRates.length > 0) {
+        setSelectedCrypto(cryptoRates[0])
       }
     }
-  }, [loading, allCurrencies, selectedCurrency, selectedCrypto])
+  }, [loading, fiatRates, cryptoRates, selectedCurrency, selectedCrypto])
 
   const handleAmount1Change = (val) => {
     setAmount1(val)
+    const allRates = [...fiatRates, ...cryptoRates]
     if (!selectedCrypto || !val) {
       setAmount2('')
       return
@@ -172,7 +179,7 @@ export default function Rates({ globalCurrency }) {
       setAmount2('')
       return
     }
-    const rate = getRate(selectedCurrency.code, selectedCrypto.code)
+    const rate = getRate(selectedCurrency.code, selectedCrypto.code, allRates)
     if (rate !== null) {
       const decimals = selectedCrypto.decimals || 2
       setAmount2((num * rate).toFixed(decimals))
@@ -181,6 +188,7 @@ export default function Rates({ globalCurrency }) {
 
   const handleAmount2Change = (val) => {
     setAmount2(val)
+    const allRates = [...fiatRates, ...cryptoRates]
     if (!selectedCurrency || !val) {
       setAmount1('')
       return
@@ -190,7 +198,7 @@ export default function Rates({ globalCurrency }) {
       setAmount1('')
       return
     }
-    const rate = getRate(selectedCrypto.code, selectedCurrency.code)
+    const rate = getRate(selectedCrypto.code, selectedCurrency.code, allRates)
     if (rate !== null) {
       const decimals = selectedCurrency.decimals || 2
       setAmount1((num * rate).toFixed(decimals))
@@ -205,15 +213,17 @@ export default function Rates({ globalCurrency }) {
     )
   }
 
+  const allCurrencies = [...fiatRates, ...cryptoRates]
+
   const filtered = allCurrencies.filter(c => {
     // Filter by type
     if (typeFilter !== 'all' && c.type !== typeFilter) {
       return false
     }
-
+    
     // Filter by search
     if (!search) return true
-    return c.code.toLowerCase().includes(search.toLowerCase()) ||
+    return c.code.toLowerCase().includes(search.toLowerCase()) || 
            c.name.toLowerCase().includes(search.toLowerCase())
   })
 
@@ -224,16 +234,13 @@ export default function Rates({ globalCurrency }) {
     const n = Number(num)
     if (!isFinite(n)) return '—'
 
-    // For PHP (low-value currency), ensure we show enough decimals for small numbers
     let minDecimals = 0
     let maxDecimals = decimals
 
     if (n < 1 && n > 0) {
-      // For numbers < 1, show at least 4 decimals to maintain precision
       minDecimals = Math.max(4, decimals)
       maxDecimals = Math.max(6, decimals)
     } else if (n >= 1) {
-      // For numbers >= 1, use standard formatting
       minDecimals = decimals === 0 ? 0 : 2
       maxDecimals = decimals
     }
@@ -256,9 +263,11 @@ export default function Rates({ globalCurrency }) {
     return <div className="bg-white rounded-2xl shadow-lg p-6 text-slate-500">Loading exchange rates...</div>
   }
 
-  if (allCurrencies.length === 0) {
+  if (fiatRates.length === 0 && cryptoRates.length === 0) {
     return <div className="bg-white rounded-2xl shadow-lg p-6 text-slate-500">No rates available</div>
   }
+
+  const allRates = [...fiatRates, ...cryptoRates]
 
   return (
     <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
@@ -301,7 +310,7 @@ export default function Rates({ globalCurrency }) {
           )}
 
           {/* Secondary card - Compare with another currency */}
-          {selectedCrypto && selectedCrypto.code !== selectedCurrency.code && (
+          {selectedCrypto && selectedCrypto.code !== selectedCurrency?.code && (
             <div className={`rounded-lg p-6 border relative group ${getCurrencyColor(selectedCrypto.type)}`}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -332,7 +341,7 @@ export default function Rates({ globalCurrency }) {
             <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
               <h4 className="text-sm font-semibold text-slate-700 mb-3">Quick Converter</h4>
               <p className="text-xs text-slate-600 mb-3">
-                1 {selectedCurrency.code} = {formatNumber(getRate(selectedCurrency.code, selectedCrypto.code), selectedCrypto.decimals)} {selectedCrypto.code}
+                1 {selectedCurrency.code} = {formatNumber(getRate(selectedCurrency.code, selectedCrypto.code, allRates), selectedCrypto.decimals)} {selectedCrypto.code}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -411,35 +420,35 @@ export default function Rates({ globalCurrency }) {
           </div>
 
           <div className="flex gap-2 mb-4">
-            <button
+            <button 
               onClick={() => setTypeFilter('all')}
               className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{
+              style={{ 
                 backgroundColor: typeFilter === 'all' ? '#3b82f6' : '#e2e8f0',
                 color: typeFilter === 'all' ? 'white' : '#475569'
               }}
             >
               All ({allCurrencies.length})
             </button>
-            <button
+            <button 
               onClick={() => setTypeFilter('fiat')}
               className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{
+              style={{ 
                 backgroundColor: typeFilter === 'fiat' ? '#3b82f6' : '#e2e8f0',
                 color: typeFilter === 'fiat' ? 'white' : '#475569'
               }}
             >
-              Fiat ({allCurrencies.filter(c => c.type === 'fiat').length})
+              Fiat ({fiatRates.length})
             </button>
-            <button
+            <button 
               onClick={() => setTypeFilter('crypto')}
               className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{
+              style={{ 
                 backgroundColor: typeFilter === 'crypto' ? '#3b82f6' : '#e2e8f0',
                 color: typeFilter === 'crypto' ? 'white' : '#475569'
               }}
             >
-              Crypto ({allCurrencies.filter(c => c.type === 'crypto').length})
+              Crypto ({cryptoRates.length})
             </button>
           </div>
 
