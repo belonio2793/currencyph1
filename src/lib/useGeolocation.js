@@ -115,10 +115,8 @@ export function useGeolocation() {
                 // Silently fail - any network error is acceptable
               }
             } catch (e) {
-              // Outer catch for any errors in the entire reverseGeocode function
-              if (isMountedRef.current) {
-                setLoading(false)
-              }
+              // Outer catch for any uncaught errors
+              // Silently fail
             } finally {
               try {
                 if (isMountedRef.current) {
