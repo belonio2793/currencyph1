@@ -8,9 +8,14 @@ window.addEventListener('unhandledrejection', (event) => {
   try {
     const reason = event && event.reason
     const msg = reason && (reason.message || reason.toString && reason.toString())
-    if (typeof msg === 'string' && (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('IFrame evaluation timeout'))) {
-      console.debug('[App] Suppressed noisy network/iframe error:', msg)
-      // Prevent the error from surfacing as an uncaught promise rejection
+    // Suppress noisy network and abort-related errors which are expected when cancelling requests
+    if (reason && (reason.name === 'AbortError')) {
+      console.debug('[App] Suppressed AbortError unhandled rejection:', msg)
+      event.preventDefault()
+      return
+    }
+    if (typeof msg === 'string' && (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('IFrame evaluation timeout') || msg.toLowerCase().includes('abort') || msg.toLowerCase().includes('signal is aborted'))) {
+      console.debug('[App] Suppressed noisy network/abort error:', msg)
       event.preventDefault()
     }
   } catch (e) {
