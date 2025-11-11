@@ -66,53 +66,51 @@ export default function Rates() {
 
       setCurrencies(currencyMap)
 
-      const processedRates = []
+      const ratesByCode = {}
 
       fiatPairsRes.data?.forEach(pair => {
-        const metadata = currencyMap[pair.to_currency] || {
-          code: pair.to_currency,
-          name: pair.to_currency,
-          type: 'fiat',
-          symbol: '',
-          decimals: 2
-        }
+        if (!ratesByCode[pair.to_currency]) {
+          const metadata = currencyMap[pair.to_currency] || {
+            code: pair.to_currency,
+            name: pair.to_currency,
+            type: 'fiat',
+            symbol: '',
+            decimals: 2
+          }
 
-        processedRates.push({
-          code: pair.to_currency,
-          rate: Number(pair.rate),
-          metadata: metadata,
-          source: 'currency_rates',
-          updatedAt: pair.updated_at || new Date().toISOString()
-        })
+          ratesByCode[pair.to_currency] = {
+            code: pair.to_currency,
+            rate: Number(pair.rate),
+            metadata: metadata,
+            source: 'currency_rates',
+            updatedAt: pair.updated_at || new Date().toISOString()
+          }
+        }
       })
 
       cryptoPairsRes.data?.forEach(pair => {
-        const cryptoMetadata = cryptoMetadataMap[pair.to_currency]
-        const metadata = {
-          code: pair.to_currency,
-          name: cryptoMetadata?.name || pair.to_currency,
-          type: 'crypto',
-          symbol: '',
-          decimals: 8
-        }
+        if (!ratesByCode[pair.to_currency]) {
+          const cryptoMetadata = cryptoMetadataMap[pair.to_currency]
+          const metadata = {
+            code: pair.to_currency,
+            name: cryptoMetadata?.name || pair.to_currency,
+            type: 'crypto',
+            symbol: '',
+            decimals: 8
+          }
 
-        processedRates.push({
-          code: pair.to_currency,
-          rate: Number(pair.rate),
-          metadata: metadata,
-          source: 'cryptocurrency_rates',
-          updatedAt: pair.updated_at || new Date().toISOString()
-        })
+          ratesByCode[pair.to_currency] = {
+            code: pair.to_currency,
+            rate: Number(pair.rate),
+            metadata: metadata,
+            source: 'cryptocurrency_rates',
+            updatedAt: pair.updated_at || new Date().toISOString()
+          }
+        }
       })
 
-      const seenCodes = new Set()
-      const validRates = processedRates
-        .filter(r => {
-          if (seenCodes.has(r.code)) return false
-          if (!isFinite(r.rate) || r.rate <= 0) return false
-          seenCodes.add(r.code)
-          return true
-        })
+      const validRates = Object.values(ratesByCode)
+        .filter(r => isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
       const phpExists = validRates.some(r => r.code === 'PHP')
