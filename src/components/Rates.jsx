@@ -142,11 +142,6 @@ export default function Rates() {
       filtered = filtered.filter(r => r.metadata?.type === typeFilter)
     }
 
-    if (decimalFilter !== 'all') {
-      const decimals = parseInt(decimalFilter)
-      filtered = filtered.filter(r => r.metadata?.decimals === decimals)
-    }
-
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
       filtered = filtered.filter(r =>
