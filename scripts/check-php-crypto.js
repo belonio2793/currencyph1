@@ -30,10 +30,15 @@ async function check() {
       console.log('✗ NO PHP-to-Crypto rates found');
       console.log('\nLet me check all crypto pairs to understand the structure...\n');
 
-      const { data: allCrypto } = await supabase
+      const { data: allCrypto, error: allErr } = await supabase
         .from('pairs')
-        .select('from_currency, to_currency, count')
+        .select('from_currency, to_currency')
         .eq('source_table', 'cryptocurrency_rates');
+
+      if (!allCrypto) {
+        console.log('No crypto data returned');
+        return;
+      }
 
       const uniqueFroms = new Set(allCrypto.map(p => p.from_currency));
       const uniqueTos = new Set(allCrypto.map(p => p.to_currency));
