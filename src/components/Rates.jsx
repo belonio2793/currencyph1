@@ -536,7 +536,8 @@ export default function Rates({ globalCurrency }) {
   const renderFiatCard = (isPrimary) => {
     if (!selectedFiat) return null
     // Show selected fiat price in baseCurrency (e.g. 1 USD = 58.97 PHP)
-    const displayPrice = (selectedFiat.code === baseCurrency) ? null : getPairRate(selectedFiat.code, baseCurrency)
+    const isBase = selectedFiat.code === baseCurrency
+    const displayPrice = isBase ? 1 : getPairRate(selectedFiat.code, baseCurrency)
     return (
       <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'}`}>
         <div className="flex items-center justify-between">
@@ -545,8 +546,8 @@ export default function Rates({ globalCurrency }) {
             <p className="text-xs text-slate-500">{selectedFiat.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-light text-slate-900">{displayPrice != null ? (typeof displayPrice === 'number' ? displayPrice.toFixed(2) : '—') : '—'}</div>
-            <div className="text-xs text-slate-500">{displayPrice != null ? `1 ${selectedFiat.code} = ${baseCurrency}` : (selectedFiat.code === baseCurrency ? '' : '')}</div>
+            <div className="text-2xl font-light text-slate-900">{typeof displayPrice === 'number' ? (displayPrice === 1 && isBase ? '1' : displayPrice.toFixed(2)) : '—'}</div>
+            <div className="text-xs text-slate-500">{isBase ? `1 ${selectedFiat.code}` : `1 ${selectedFiat.code} = ${baseCurrency}`}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
@@ -786,11 +787,11 @@ export default function Rates({ globalCurrency }) {
                   <div className="text-sm text-slate-600">
                     {item.type === 'fiat' ? (
                       (() => {
-                        // If selectedFiat is set, compute item -> selectedFiat (show how many selectedFiat per 1 item)
+                        // If selectedFiat is set, compute selectedFiat -> item (show how many item per 1 selectedFiat)
                         if (!selectedFiat) return '—'
-                        if (selectedFiat.code === item.code) return '—'
+                        if (selectedFiat.code === item.code) return (1).toFixed(2)
 
-                        const pair = getPairRate(item.code, selectedFiat.code)
+                        const pair = getPairRate(selectedFiat.code, item.code)
                         return (typeof pair === 'number' ? pair.toFixed(2) : '—')
                       })()
                     ) : (
