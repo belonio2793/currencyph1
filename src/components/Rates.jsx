@@ -263,14 +263,14 @@ export default function Rates() {
   return (
     <div className="space-y-6">
       {/* Header Section */}
-      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-xl p-8 text-white">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-4xl font-bold">Exchange Rates</h1>
-          <div className="text-sm text-slate-300">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white py-6 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h1 className="text-2xl font-bold mb-2 text-white">Exchange Rates</h1>
+          <p className="text-white text-lg mb-6">Real-time currency and cryptocurrency exchange rates from PHP</p>
+          <div className="text-sm text-white/80">
             Last updated: {lastUpdated.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
-        <p className="text-slate-300 text-lg">Real-time currency and cryptocurrency exchange rates from PHP</p>
       </div>
 
       {/* Main Grid */}
