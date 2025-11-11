@@ -1,97 +1,52 @@
 import { supabase } from './supabaseClient'
-import { encryptString, generateSymmetricKey, exportKeyToBase64 } from './crypto'
 
 const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY
-const DIDIT_APP_ID = import.meta.env.VITE_DIDIT_APP_ID
-const DIDIT_API_BASE = 'https://api.didit.me/api/v1'
+const DIDIT_API_BASE = 'https://verification.didit.me/v2'
 
-// Store encryption key in localStorage for consistent encryption/decryption
-const ENCRYPTION_KEY_NAME = 'didit_encryption_key'
-
-async function getOrCreateEncryptionKey() {
-  const stored = localStorage.getItem(ENCRYPTION_KEY_NAME)
-  
-  if (stored) {
-    // Import the stored key
-    const binary = Uint8Array.from(atob(stored), c => c.charCodeAt(0))
-    return await window.crypto.subtle.importKey(
-      'raw',
-      binary,
-      { name: 'AES-GCM', length: 256 },
-      true,
-      ['encrypt', 'decrypt']
-    )
-  }
-  
-  // Generate new key and store it
-  const key = await generateSymmetricKey()
-  const exported = await exportKeyToBase64(key)
-  localStorage.setItem(ENCRYPTION_KEY_NAME, exported)
-  return key
-}
-
-async function encryptSensitiveData(data) {
-  try {
-    const key = await getOrCreateEncryptionKey()
-    const encrypted = await encryptString(key, JSON.stringify(data))
-    return encrypted
-  } catch (error) {
-    console.warn('Encryption failed, storing unencrypted:', error)
-    return null
-  }
-}
+// Your workflow_id from DIDIT Business Console
+// This should be configured via environment variable in production
+const DIDIT_WORKFLOW_ID = import.meta.env.VITE_DIDIT_WORKFLOW_ID || 'default-workflow'
 
 export const diditService = {
-  async submitVerification(userId, idType, idNumber, idImageUrl) {
+  /**
+   * Create a DIDIT verification session and return the session URL for users to visit
+   */
+  async createVerificationSession(userId) {
     try {
-      if (!DIDIT_API_KEY || !DIDIT_APP_ID) {
+      if (!DIDIT_API_KEY) {
         throw new Error('DIDIT API credentials not configured')
       }
 
-      // Call DIDIT API to submit ID for verification
-      const diditResponse = await fetch(`${DIDIT_API_BASE}/verification`, {
+      // Create session with DIDIT
+      const sessionResponse = await fetch(`${DIDIT_API_BASE}/session/`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${DIDIT_API_KEY}`,
-          'Content-Type': 'application/json',
-          'X-App-Id': DIDIT_APP_ID
+          'x-api-key': DIDIT_API_KEY,
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          id_type: idType,
-          id_number: idNumber,
-          id_image_url: idImageUrl || null
+          workflow_id: DIDIT_WORKFLOW_ID
         })
       })
 
-      if (!diditResponse.ok) {
-        const errorData = await diditResponse.json()
-        throw new Error(`DIDIT API error: ${errorData.message || diditResponse.statusText}`)
+      if (!sessionResponse.ok) {
+        const errorData = await sessionResponse.json()
+        throw new Error(`DIDIT API error: ${errorData.message || sessionResponse.statusText}`)
       }
 
-      const diditResult = await diditResponse.json()
+      const sessionData = await sessionResponse.json()
+      const { session_id, url: sessionUrl } = sessionData
 
-      // Encrypt sensitive data before storing
-      const sensitiveData = {
-        id_number: idNumber,
-        id_image_url: idImageUrl
-      }
-      const encrypted = await encryptSensitiveData(sensitiveData)
-
-      // Store verification in database
+      // Store the session in database
       const { data, error } = await supabase
         .from('user_verifications')
         .upsert({
           user_id: userId,
-          id_type: idType,
-          id_number: encrypted ? encrypted.ciphertext : idNumber,
-          id_image_url: encrypted ? `encrypted:${encrypted.iv}` : idImageUrl,
-          status: diditResult.status || 'pending',
-          verification_notes: JSON.stringify({
-            didit_id: diditResult.id,
-            didit_status: diditResult.status,
-            confidence_score: diditResult.confidence_score,
-            message: diditResult.message
-          }),
+          didit_workflow_id: DIDIT_WORKFLOW_ID,
+          didit_session_id: session_id,
+          didit_session_url: sessionUrl,
+          status: 'pending',
+          verification_method: 'didit',
           submitted_at: new Date(),
           updated_at: new Date()
         }, { onConflict: 'user_id' })
@@ -102,20 +57,50 @@ export const diditService = {
 
       return {
         success: true,
-        data,
-        diditResult: {
-          id: diditResult.id,
-          status: diditResult.status,
-          confidence_score: diditResult.confidence_score,
-          message: diditResult.message
-        }
+        sessionUrl: sessionUrl,
+        sessionId: session_id,
+        data
       }
     } catch (error) {
-      console.error('Error submitting verification to DIDIT:', error)
+      console.error('Error creating DIDIT verification session:', error)
       throw error
     }
   },
 
+  /**
+   * Check the status of a DIDIT verification session
+   * Usually called periodically or via webhook
+   */
+  async checkSessionStatus(diditSessionId) {
+    try {
+      if (!DIDIT_API_KEY) {
+        throw new Error('DIDIT API credentials not configured')
+      }
+
+      const response = await fetch(`${DIDIT_API_BASE}/session/${diditSessionId}/decision/`, {
+        method: 'GET',
+        headers: {
+          'x-api-key': DIDIT_API_KEY
+        }
+      })
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          return { status: 'not_found', decision: null }
+        }
+        throw new Error(`DIDIT API error: ${response.statusText}`)
+      }
+
+      return await response.json()
+    } catch (error) {
+      console.error('Error checking DIDIT session status:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Get verification status from database
+   */
   async getVerificationStatus(userId) {
     try {
       const { data, error } = await supabase
@@ -126,49 +111,76 @@ export const diditService = {
 
       if (error && error.code !== 'PGRST116' && error.code !== '42P01') throw error
 
-      if (!data) return null
-
-      // Parse verification notes from DIDIT
-      let diditInfo = null
-      if (data.verification_notes) {
-        try {
-          diditInfo = JSON.parse(data.verification_notes)
-        } catch (e) {
-          console.warn('Failed to parse verification notes:', e)
-        }
-      }
-
-      return {
-        ...data,
-        diditInfo
-      }
+      return data || null
     } catch (error) {
       console.warn('Error fetching verification status:', error)
       return null
     }
   },
 
-  async checkVerificationStatus(diditVerificationId) {
+  /**
+   * Update verification from DIDIT webhook callback
+   * Called by edge function when DIDIT sends webhook notification
+   */
+  async updateVerificationFromWebhook(diditSessionId, status, decision) {
     try {
-      if (!DIDIT_API_KEY || !DIDIT_APP_ID) {
-        throw new Error('DIDIT API credentials not configured')
-      }
+      // Call the database function to update verification
+      const { data, error } = await supabase
+        .rpc('update_verification_from_didit', {
+          p_didit_session_id: diditSessionId,
+          p_status: status,
+          p_decision: decision
+        })
 
-      const response = await fetch(`${DIDIT_API_BASE}/verification/${diditVerificationId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${DIDIT_API_KEY}`,
-          'X-App-Id': DIDIT_APP_ID
-        }
-      })
+      if (error) throw error
 
-      if (!response.ok) {
-        throw new Error(`DIDIT API error: ${response.statusText}`)
-      }
-
-      return await response.json()
+      console.log('Verification updated from DIDIT webhook:', data)
+      return { success: true, data }
     } catch (error) {
-      console.error('Error checking DIDIT verification status:', error)
+      console.error('Error updating verification from webhook:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Mark verification status as public
+   * Allows other users to see that this user is verified
+   */
+  async makeVerificationPublic(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('user_verifications')
+        .update({ is_public: true, updated_at: new Date() })
+        .eq('user_id', userId)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      return { success: true, data }
+    } catch (error) {
+      console.error('Error making verification public:', error)
+      throw error
+    }
+  },
+
+  /**
+   * Hide verification status from public view
+   */
+  async makeVerificationPrivate(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('user_verifications')
+        .update({ is_public: false, updated_at: new Date() })
+        .eq('user_id', userId)
+        .select()
+        .single()
+
+      if (error) throw error
+
+      return { success: true, data }
+    } catch (error) {
+      console.error('Error making verification private:', error)
       throw error
     }
   }
