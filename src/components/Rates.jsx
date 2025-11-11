@@ -166,6 +166,14 @@ export default function Rates({ globalCurrency }) {
       return phpToTo / phpToFrom
     }
 
+    if (from === 'USD' || to === 'USD') {
+      console.warn(`Could not find rate for ${from}_${to}`, {
+        direct: exchangeRates[`${from}_${to}`],
+        reverse: exchangeRates[`${to}_${from}`],
+        usdToFrom: exchangeRates[`USD_${from}`],
+        usdToTo: exchangeRates[`USD_${to}`]
+      })
+    }
     return null
   }
 
