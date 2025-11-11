@@ -26,7 +26,7 @@ const COUNTRIES = [
   { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
   { code: 'CN', name: 'China', flag: '🇨🇳' },
   { code: 'IN', name: 'India', flag: '🇮🇳' },
-  { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+  { code: 'BR', name: 'Brazil', flag: '🇧����' },
   { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
   { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
   { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
@@ -106,13 +106,7 @@ export default function Profile({ userId, onSignOut }) {
     }
   }
 
-  const handleSubmitVerification = async (e) => {
-    e.preventDefault()
-    if (!idFormData.idNumber || !idFormData.idType) {
-      setError('Please fill in all verification fields')
-      return
-    }
-
+  const handleStartVerification = async () => {
     if (isGuestAccount || !isValidUUID(userId)) {
       setError('Guest accounts cannot submit verification. Please create an account first.')
       return
@@ -122,30 +116,34 @@ export default function Profile({ userId, onSignOut }) {
       setVerifyingId(true)
       setError('')
 
-      // Use DIDIT for identity verification
-      const result = await diditService.submitVerification(
-        userId,
-        idFormData.idType,
-        idFormData.idNumber,
-        idFormData.idImageUrl
-      )
+      // Create a DIDIT verification session
+      const result = await diditService.createVerificationSession(userId)
 
-      if (result.success) {
-        const statusMessage = result.diditResult?.status === 'approved'
-          ? 'Verification approved! Your identity has been verified.'
-          : 'Verification submitted! Our system is processing your ID.'
-
-        setSuccess(statusMessage)
-        setShowIdForm(false)
-        setIdFormData({ idType: 'national_id', idNumber: '', idImageUrl: '' })
-        loadVerificationStatus()
-        setTimeout(() => setSuccess(''), 5000)
+      if (result.success && result.sessionUrl) {
+        setSuccess('Redirecting to verification...')
+        // Redirect user to DIDIT verification URL
+        window.location.href = result.sessionUrl
       }
     } catch (err) {
       console.error('Verification error:', err)
-      setError('Failed to submit verification: ' + (err?.message || 'Please check your internet connection and try again.'))
-    } finally {
+      setError('Failed to start verification: ' + (err?.message || 'Please check your internet connection and try again.'))
       setVerifyingId(false)
+    }
+  }
+
+  const toggleVerificationPrivacy = async () => {
+    try {
+      if (verificationStatus?.is_public) {
+        await diditService.makeVerificationPrivate(userId)
+      } else {
+        await diditService.makeVerificationPublic(userId)
+      }
+      loadVerificationStatus()
+      setSuccess(`Verification is now ${verificationStatus?.is_public ? 'private' : 'public'}.`)
+      setTimeout(() => setSuccess(''), 3000)
+    } catch (err) {
+      console.error('Privacy toggle error:', err)
+      setError('Failed to update visibility: ' + (err?.message || 'Please try again.'))
     }
   }
 
