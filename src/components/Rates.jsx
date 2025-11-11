@@ -417,10 +417,46 @@ export default function Rates() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-slate-200">
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Currency</th>
-                    <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Name</th>
+                    <th
+                      onClick={() => {
+                        if (sortBy === 'code') {
+                          setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                        } else {
+                          setSortBy('code')
+                          setSortDirection('asc')
+                        }
+                      }}
+                      className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                    >
+                      Currency {sortBy === 'code' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th
+                      onClick={() => {
+                        if (sortBy === 'name') {
+                          setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                        } else {
+                          setSortBy('name')
+                          setSortDirection('asc')
+                        }
+                      }}
+                      className="text-left py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                    >
+                      Name {sortBy === 'name' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Type</th>
-                    <th className="text-right py-3 px-4 font-semibold text-slate-700 text-sm">Rate (per 1 PHP)</th>
+                    <th
+                      onClick={() => {
+                        if (sortBy === 'rate') {
+                          setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+                        } else {
+                          setSortBy('rate')
+                          setSortDirection('desc')
+                        }
+                      }}
+                      className="text-right py-3 px-4 font-semibold text-slate-700 text-sm cursor-pointer hover:bg-slate-100 transition select-none"
+                    >
+                      Rate (per 1 PHP) {sortBy === 'rate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
                   </tr>
                 </thead>
