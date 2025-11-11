@@ -130,7 +130,8 @@ export function useGeolocation() {
         },
         (err) => {
           if (isMountedRef.current) {
-            setError(err.message)
+            console.debug('Geolocation error:', err?.message || 'Unknown error')
+            setError(err?.message || 'Location not available')
             setLoading(false)
           }
         },
