@@ -89,22 +89,30 @@ export default function Rates({ globalCurrency }) {
 
       pairs.forEach(r => {
         if (r && r.from_currency && r.to_currency && r.rate != null) {
-          ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
+          const rate = Number(r.rate)
+          const isFromCrypto = commonCryptos.has(r.from_currency)
+          const isToCrypto = commonCryptos.has(r.to_currency)
 
-          // Classify currencies based on source table and common crypto list
-          if (r.source_table === 'cryptocurrency_rates') {
-            cryptoSet.add(r.from_currency)
-          } else if (commonCryptos.has(r.from_currency)) {
+          // Detect and fix inverted crypto rates
+          // If crypto_to_usd is very small (< 0.01), it's likely inverted
+          if (isFromCrypto && r.to_currency === 'USD' && rate < 0.01 && rate > 0) {
+            // Store the inverted rate as USD_crypto instead
+            ratesMap[`USD_${r.from_currency}`] = rate
+            ratesMap[`${r.from_currency}_USD`] = 1 / rate
+          } else {
+            ratesMap[`${r.from_currency}_${r.to_currency}`] = rate
+          }
+
+          // Classify currencies
+          if (commonCryptos.has(r.from_currency)) {
             cryptoSet.add(r.from_currency)
           } else {
             currencySet.add(r.from_currency)
           }
 
-          if (r.source_table === 'cryptocurrency_rates') {
-            // Don't add destination if it's from crypto table (likely a fiat target)
-          } else if (commonCryptos.has(r.to_currency)) {
+          if (commonCryptos.has(r.to_currency)) {
             cryptoSet.add(r.to_currency)
-          } else {
+          } else if (r.to_currency !== 'USD') {
             currencySet.add(r.to_currency)
           }
         }
