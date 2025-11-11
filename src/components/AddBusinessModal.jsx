@@ -67,16 +67,22 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
 
   // Initialize form with user's location when modal opens and geolocation data is available
   useEffect(() => {
-    if (location && !locationInitialized) {
-      setForm(prev => ({
-        ...prev,
-        latitude: String(location.latitude),
-        longitude: String(location.longitude),
-        city: detectedCity || prev.city
-      }))
-      setLocationInitialized(true)
+    if (location) {
+      if (!locationInitialized) {
+        setForm(prev => ({
+          ...prev,
+          latitude: String(location.latitude),
+          longitude: String(location.longitude),
+          city: detectedCity || prev.city
+        }))
+        setLocationInitialized(true)
+      }
+      // Clear requesting state when location arrives
+      if (requestingLocation) {
+        setRequestingLocation(false)
+      }
     }
-  }, [location, detectedCity, locationInitialized])
+  }, [location, detectedCity, locationInitialized, requestingLocation])
 
   // load existing categories from DB to present in dropdown
   useEffect(() => {
