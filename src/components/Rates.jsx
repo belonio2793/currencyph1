@@ -441,7 +441,7 @@ export default function Rates({ globalCurrency }) {
   const [viewMode, setViewMode] = useState('fiat') // controls the right-side list
   const [search, setSearch] = useState('')
   const [selectedFiat, setSelectedFiat] = useState(() => {
-    return fallbackFiats.find(f => f.code === baseCurrency) || { code: baseCurrency, name: baseCurrency }
+    return { code: baseCurrency, name: baseCurrency }
   })
   const [selectedCrypto, setSelectedCrypto] = useState(() => ({ code: 'BTC', name: 'Bitcoin' }))
 
