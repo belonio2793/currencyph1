@@ -77,20 +77,45 @@ async function decryptPayload(ciphertextB64, ivB64) {
 }
 
 export async function sendLocationMessage({ senderId, recipientId, location, city, mapLink }) {
-  // Build payload
-  const payload = { type: 'location', location, city, mapLink }
-  const { ciphertext, iv } = await encryptPayload(payload)
-  const { data, error } = await supabase.from('messages').insert([
-    {
-      sender_id: senderId,
-      recipient_id: recipientId,
-      ciphertext,
-      iv,
-      metadata: { type: 'location', city },
-    },
-  ])
-  if (error) throw error
-  return data && data[0]
+  try {
+    if (!senderId || !recipientId) {
+      throw new Error('Sender and recipient IDs are required')
+    }
+    if (!location || typeof location.latitude !== 'number' || typeof location.longitude !== 'number') {
+      throw new Error('Valid location with latitude and longitude is required')
+    }
+
+    // Build payload
+    const payload = { type: 'location', location, city, mapLink }
+    const { ciphertext, iv } = await encryptPayload(payload)
+
+    const { data, error } = await supabase
+      .from('messages')
+      .insert([
+        {
+          sender_id: senderId,
+          recipient_id: recipientId,
+          ciphertext,
+          iv,
+          metadata: { type: 'location', city },
+        },
+      ])
+      .select()
+
+    if (error) {
+      console.error('Message insert error:', error)
+      throw new Error(`Failed to send location: ${error.message}`)
+    }
+
+    if (!data || data.length === 0) {
+      throw new Error('No data returned from message insert')
+    }
+
+    return data[0]
+  } catch (err) {
+    console.error('sendLocationMessage exception:', err)
+    throw err
+  }
 }
 
 export async function deleteMessage(messageId) {
