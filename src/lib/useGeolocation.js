@@ -169,20 +169,17 @@ export function useGeolocation() {
       } catch (e) {
         // ignore clearWatch errors
       }
-      // Abort all pending fetch requests
-      try {
-        controllersRef.current.forEach(controller => {
-          try {
-            if (controller && controller.signal && !controller.signal.aborted) {
-              controller.abort()
-            }
-          } catch (e) {
-            // ignore individual abort errors
+      // Abort all pending fetch requests safely
+      const controllers = controllersRef.current || []
+      controllers.forEach(controller => {
+        try {
+          if (controller?.signal && !controller.signal.aborted) {
+            controller.abort()
           }
-        })
-      } catch (e) {
-        // ignore overall abort errors
-      }
+        } catch (e) {
+          // ignore individual abort errors
+        }
+      })
       controllersRef.current = []
       window.removeEventListener('geolocation:refresh', handler)
     }
