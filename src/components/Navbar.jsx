@@ -86,7 +86,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
             {/* Desktop main navigation in the topmost header */}
             <div className="hidden md:flex items-center gap-1 ml-4">
-              {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail)).map(btn => (
+              {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail) && !['home','nearby','rates'].includes(btn.id)).map(btn => (
                 <button
                   key={btn.id}
                   onClick={() => { onTabChange(btn.id); setMobileMenuOpen(false) }}
