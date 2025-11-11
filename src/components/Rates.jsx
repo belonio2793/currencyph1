@@ -29,41 +29,29 @@ export default function Rates({ globalCurrency }) {
 
   // Fetch all fiat currencies from currency_rates table
   const fetchFiatsFromDatabase = async () => {
-    try {
-      const { data: rates, error } = await supabase
-        .from('currency_rates')
-        .select('from_currency,to_currency')
+    const { data: rates, error } = await supabase
+      .from('currency_rates')
+      .select('from_currency,to_currency')
 
-      if (error) {
-        console.debug('Error fetching currency pairs from Supabase:', error)
-        return null
-      }
-
-      if (!Array.isArray(rates) || rates.length === 0) {
-        return null
-      }
-
-      // Extract unique currency codes
-      const currencySet = new Set()
-      rates.forEach(r => {
-        if (r.from_currency && !cryptos.includes(r.from_currency)) {
-          currencySet.add(r.from_currency)
-        }
-        if (r.to_currency && !cryptos.includes(r.to_currency)) {
-          currencySet.add(r.to_currency)
-        }
-      })
-
-      // Convert to array of currency objects
-      const currencies = Array.from(currencySet)
-        .map(code => ({ code, name: getCurrencyName(code) }))
-        .sort((a, b) => a.code.localeCompare(b.code))
-
-      return currencies.length > 0 ? currencies : null
-    } catch (err) {
-      console.debug('Failed to fetch fiat currencies from database:', err)
-      return null
+    if (error || !Array.isArray(rates) || rates.length === 0) {
+      return []
     }
+
+    // Extract unique currency codes
+    const currencySet = new Set()
+    rates.forEach(r => {
+      if (r.from_currency && !cryptos.includes(r.from_currency)) {
+        currencySet.add(r.from_currency)
+      }
+      if (r.to_currency && !cryptos.includes(r.to_currency)) {
+        currencySet.add(r.to_currency)
+      }
+    })
+
+    // Convert to array of currency objects
+    return Array.from(currencySet)
+      .map(code => ({ code, name: code }))
+      .sort((a, b) => a.code.localeCompare(b.code))
   }
 
   const defaultCryptoPrices = {
