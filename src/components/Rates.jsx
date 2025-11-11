@@ -66,7 +66,8 @@ export default function Rates() {
         .filter(r => isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
-      if (currencyMap['PHP']) {
+      const phpExists = processedRates.some(r => r.code === 'PHP')
+      if (currencyMap['PHP'] && !phpExists) {
         processedRates.unshift({
           code: 'PHP',
           rate: 1,
