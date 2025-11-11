@@ -144,6 +144,7 @@ export default function Rates({ globalCurrency }) {
   const [amount1, setAmount1] = useState('')
   const [amount2, setAmount2] = useState('')
   const [search, setSearch] = useState('')
+  const [typeFilter, setTypeFilter] = useState('all') // 'all', 'fiat', 'crypto'
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'BTC', 'EUR'])
 
   // Initialize selections
