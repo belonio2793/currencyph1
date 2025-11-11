@@ -106,8 +106,9 @@ export default function Rates({ globalCurrency }) {
         }
       })
 
-      console.debug(`Loaded ${Object.keys(ratesMap).length} exchange rate pairs from currency_rates`)
-      
+      console.debug(`Loaded ${Object.keys(ratesMap).length} exchange rate pairs from currency_rates table`)
+      console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 5)))
+
       setExchangeRates(ratesMap)
       
       // Convert to array of currency objects, ensure PHP is first
