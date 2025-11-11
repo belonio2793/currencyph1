@@ -108,9 +108,9 @@ export default function Rates() {
         .filter(r => isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
-      const phpExists = processedRates.some(r => r.code === 'PHP')
+      const phpExists = validRates.some(r => r.code === 'PHP')
       if (currencyMap['PHP'] && !phpExists) {
-        processedRates.unshift({
+        validRates.unshift({
           code: 'PHP',
           rate: 1,
           metadata: currencyMap['PHP'],
@@ -119,7 +119,7 @@ export default function Rates() {
         })
       }
 
-      setRates(processedRates)
+      setRates(validRates)
       setLastUpdated(new Date())
     } catch (err) {
       console.error('Error loading rates:', err)
