@@ -446,40 +446,21 @@ export default function Rates({ globalCurrency }) {
   const [selectedCrypto, setSelectedCrypto] = useState(() => ({ code: 'BTC', name: 'Bitcoin' }))
 
   useEffect(() => {
-    // If allCurrencies was populated from database, just ensure PHP is first
+    // Ensure PHP is first in the list
     if (allCurrencies && allCurrencies.length > 0) {
       let sorted = [...allCurrencies]
-      // move PHP to the front if it exists
       const phpIndex = sorted.findIndex(c => c.code === baseCurrency)
       if (phpIndex > 0) {
         const php = sorted.splice(phpIndex, 1)[0]
         sorted.unshift(php)
         setAllCurrencies(sorted)
       }
-    } else {
-      // Fallback: build from API + hardcoded fallbacks
-      const apiCurrencies = (currencyAPI && typeof currencyAPI.getCurrencies === 'function') ? currencyAPI.getCurrencies() : []
-      let merged = []
-      try {
-        merged = Array.isArray(apiCurrencies) && apiCurrencies.length ? apiCurrencies.slice() : []
-      } catch (e) { merged = [] }
-
-      // ensure fallback entries present
-      fallbackFiats.forEach(f => {
-        if (!merged.find(m => m.code === f.code)) merged.push(f)
-      })
-
-      // move PHP to the front
-      merged = merged.sort((a, b) => (a.code === baseCurrency ? -1 : b.code === baseCurrency ? 1 : 0))
-      setAllCurrencies(merged)
     }
 
-    // sensible defaults after rates load
+    // Set sensible defaults after rates load
     if (!loading) {
-      if (!selectedFiat) {
-        // prefer PHP as default fiat
-        const currencies = allCurrencies && allCurrencies.length > 0 ? allCurrencies : fallbackFiats
-        const php = currencies.find(c => c.code === baseCurrency) || currencies[0]
+      if (!selectedFiat && allCurrencies && allCurrencies.length > 0) {
+        const php = allCurrencies.find(c => c.code === baseCurrency) || allCurrencies[0]
         if (php) setSelectedFiat({ code: php.code, name: php.name })
       }
       if (!selectedCrypto) {
