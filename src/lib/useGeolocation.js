@@ -112,7 +112,12 @@ export function useGeolocation() {
                   }
                 }
               } catch (e) {
-                // Silently fail
+                // Silently fail - any network error is acceptable
+              }
+            } catch (e) {
+              // Outer catch for any errors in the entire reverseGeocode function
+              if (isMountedRef.current) {
+                setLoading(false)
               }
             } finally {
               try {
