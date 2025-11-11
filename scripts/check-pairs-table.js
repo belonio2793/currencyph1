@@ -11,8 +11,7 @@ async function check() {
     const { data: cryptos, error: err1 } = await supabase
       .from('pairs')
       .select('from_currency')
-      .eq('source_table', 'cryptocurrency_rates')
-      .distinct();
+      .eq('source_table', 'cryptocurrency_rates');
 
     if (err1) {
       console.error('Error:', err1);
