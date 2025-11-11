@@ -553,12 +553,40 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                       <button
                         type="button"
                         onClick={() => {
-                          if (location) setForm(prev => ({
-                            ...prev,
-                            latitude: String(location.latitude),
-                            longitude: String(location.longitude),
-                            city: prev.city || detectedCity || prev.city
-                          }))
+                          if (navigator.geolocation) {
+                            navigator.geolocation.getCurrentPosition(
+                              async (position) => {
+                                const { latitude, longitude } = position.coords
+                                let city = ''
+
+                                try {
+                                  const response = await fetch(
+                                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                                    { headers: { 'Accept-Language': 'en' } }
+                                  )
+                                  if (response.ok) {
+                                    const data = await response.json()
+                                    city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || ''
+                                  }
+                                } catch (e) {
+                                  console.debug('Reverse geocoding failed:', e)
+                                }
+
+                                setForm(prev => ({
+                                  ...prev,
+                                  latitude: String(latitude),
+                                  longitude: String(longitude),
+                                  city: city || prev.city
+                                }))
+                              },
+                              (err) => {
+                                setError(`Location error: ${err.message}`)
+                              },
+                              { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                            )
+                          } else {
+                            setError('Geolocation is not supported by your browser')
+                          }
                         }}
                         className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                       >
