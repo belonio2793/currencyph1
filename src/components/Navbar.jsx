@@ -83,29 +83,23 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 )}
               </div>
             )}
+
+            {/* Desktop main navigation in the topmost header */}
+            <div className="hidden md:flex items-center gap-1 ml-4">
+              {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail)).map(btn => (
+                <button
+                  key={btn.id}
+                  onClick={() => { onTabChange(btn.id); setMobileMenuOpen(false) }}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === btn.id ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
+            </div>
           </div>
           <div className="hidden md:flex items-center gap-3">
-            {/* Quick actions moved to header row */}
-            {(userEmail) && (
-              <>
-                <button
-                  onClick={() => onTabChange('online-users')}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                    activeTab === 'online-users' ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  Online Users
-                </button>
-                <button
-                  onClick={() => onTabChange('deposit')}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                    activeTab === 'deposit' ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  Deposit
-                </button>
-              </>
-            )}
             <HeaderMap userId={userId} />
           </div>
         </div>
