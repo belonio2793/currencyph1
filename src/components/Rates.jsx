@@ -167,8 +167,15 @@ export default function Rates({ globalCurrency }) {
 
   const loadExchangeRates = async () => {
     try {
-      const currencies = currencyAPI.getCurrencies()
-      setAllCurrencies(currencies)
+      // First, try to get currencies from the database
+      const dbCurrencies = await fetchFiatsFromDatabase()
+      if (dbCurrencies && dbCurrencies.length > 0) {
+        setAllCurrencies(dbCurrencies)
+      } else {
+        // Fallback to currencyAPI
+        const currencies = currencyAPI.getCurrencies()
+        setAllCurrencies(currencies)
+      }
 
       const ratesMap = {}
 
