@@ -50,7 +50,44 @@ export default function Rates({ globalCurrency }) {
     return null
   }
 
-  const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
+  // Fetch all fiat currencies from currency_rates table
+  const fetchFiatsFromDatabase = async () => {
+    try {
+      const { data: rates, error } = await supabase
+        .from('currency_rates')
+        .select('from_currency,to_currency')
+
+      if (error) {
+        console.debug('Error fetching currency pairs from Supabase:', error)
+        return null
+      }
+
+      if (!Array.isArray(rates) || rates.length === 0) {
+        return null
+      }
+
+      // Extract unique currency codes
+      const currencySet = new Set()
+      rates.forEach(r => {
+        if (r.from_currency && !cryptos.includes(r.from_currency)) {
+          currencySet.add(r.from_currency)
+        }
+        if (r.to_currency && !cryptos.includes(r.to_currency)) {
+          currencySet.add(r.to_currency)
+        }
+      })
+
+      // Convert to array of currency objects
+      const currencies = Array.from(currencySet)
+        .map(code => ({ code, name: getCurrencyName(code) }))
+        .sort((a, b) => a.code.localeCompare(b.code))
+
+      return currencies.length > 0 ? currencies : null
+    } catch (err) {
+      console.debug('Failed to fetch fiat currencies from database:', err)
+      return null
+    }
+  }
 
   const defaultCryptoPrices = {
     BTC: 4200000,
