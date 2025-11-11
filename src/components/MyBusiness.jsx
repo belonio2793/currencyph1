@@ -141,6 +141,7 @@ const generateAndDownloadPDF = (documentType, business) => {
 
 export default function MyBusiness({ userId }) {
   const [activeTab, setActiveTab] = useState('overview')
+  const [merchantTab, setMerchantTab] = useState('main')
   const [businesses, setBusinesses] = useState([])
   const [selectedBusiness, setSelectedBusiness] = useState(null)
   const [showRegistrationForm, setShowRegistrationForm] = useState(false)
@@ -843,9 +844,7 @@ export default function MyBusiness({ userId }) {
               { id: 'registration', label: 'Business Registration' },
               { id: 'shareholders', label: 'Shareholders' },
               { id: 'employees', label: 'Employees & Payroll' },
-              { id: 'merchant', label: 'Merchant Tools' },
-              { id: 'receipts', label: 'Receipts' },
-              { id: 'payments', label: 'Payment Integrations' }
+              { id: 'merchant', label: 'Merchant Tools' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -968,7 +967,36 @@ export default function MyBusiness({ userId }) {
             </div>
           )}
 
-          {activeTab !== 'overview' && activeTab !== 'documents' && (
+          {activeTab === 'merchant' && (
+            <div>
+              <div className="border-b border-slate-200 mb-6">
+                <div className="flex gap-4">
+                  {[
+                    { id: 'main', label: 'Merchant Tools' },
+                    { id: 'receipts', label: 'Receipts' },
+                    { id: 'payments', label: 'Payment Integrations' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setMerchantTab(tab.id)}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        merchantTab === tab.id
+                          ? 'text-blue-600 border-blue-600'
+                          : 'text-slate-600 border-transparent hover:text-slate-900'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="text-center py-12">
+                <p className="text-slate-500">Tab content for merchant {merchantTab} coming soon...</p>
+              </div>
+            </div>
+          )}
+
+          {activeTab !== 'overview' && activeTab !== 'documents' && activeTab !== 'merchant' && (
             <div className="text-center py-12">
               <p className="text-slate-500">Tab content for {activeTab} coming soon...</p>
             </div>
