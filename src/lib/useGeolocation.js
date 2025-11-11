@@ -168,14 +168,6 @@ export function useGeolocation() {
     const handler = () => { requestLocation() }
     window.addEventListener('geolocation:refresh', handler)
 
-    // Suppress unhandled AbortError from fetch operations
-    const errorHandler = (event) => {
-      if (event.message && event.message.includes('signal is aborted')) {
-        event.preventDefault?.()
-      }
-    }
-    window.addEventListener('error', errorHandler)
-
     return () => {
       isMountedRef.current = false
       try {
@@ -196,7 +188,6 @@ export function useGeolocation() {
       })
       controllersRef.current = []
       window.removeEventListener('geolocation:refresh', handler)
-      window.removeEventListener('error', errorHandler)
     }
   }, [])
 
