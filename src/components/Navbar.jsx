@@ -55,7 +55,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             )}
             {/* Borrow Money Dropdown - Next to Total Balance */}
             {userEmail && (
-              <div className="relative hidden sm:block">
+              <div className="relative hidden sm:block ml-4">
                 {(() => {
                   const isLoansActive = loansOptions.some(o => o.id === activeTab) || activeTab === 'loans'
                   return (
