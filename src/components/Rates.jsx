@@ -216,7 +216,22 @@ export default function Rates({ globalCurrency }) {
     if (num == null) return '—'
     const n = Number(num)
     if (!isFinite(n)) return '—'
-    return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: decimals })
+
+    // For PHP (low-value currency), ensure we show enough decimals for small numbers
+    let minDecimals = 0
+    let maxDecimals = decimals
+
+    if (n < 1 && n > 0) {
+      // For numbers < 1, show at least 4 decimals to maintain precision
+      minDecimals = Math.max(4, decimals)
+      maxDecimals = Math.max(6, decimals)
+    } else if (n >= 1) {
+      // For numbers >= 1, use standard formatting
+      minDecimals = decimals === 0 ? 0 : 2
+      maxDecimals = decimals
+    }
+
+    return n.toLocaleString(undefined, { minimumFractionDigits: minDecimals, maximumFractionDigits: maxDecimals })
   }
 
   const getCurrencyColor = (type) => {
