@@ -91,7 +91,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   key={btn.id}
                   onClick={() => { onTabChange(btn.id); setMobileMenuOpen(false) }}
                   className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                    activeTab === btn.id ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
+                    activeTab === btn.id ? 'text-slate-900 bg-slate-50' : 'text-slate-700 hover:text-slate-900'
                   }`}
                 >
                   {btn.label}
