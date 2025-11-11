@@ -37,12 +37,14 @@ export function useGeolocation() {
                   const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
                   const controller = new AbortController()
                   controllersRef.current.push(controller)
+                  let timedOut = false
 
                   const timeoutId = setTimeout(() => {
+                    timedOut = true
                     try {
-                      if (controller && controller.signal && !controller.signal.aborted) controller.abort()
+                      controller.abort()
                     } catch (e) {
-                      // ignore
+                      // ignore abort errors
                     }
                   }, 5000)
 
@@ -60,7 +62,10 @@ export function useGeolocation() {
                     }
                   } catch (e) {
                     clearTimeout(timeoutId)
-                    // Silently fail - network error
+                    // Only log non-abort errors
+                    if (e.name !== 'AbortError' && !timedOut) {
+                      console.debug('MapTiler geocoding failed:', e.message)
+                    }
                   }
                 } catch (e) {
                   // Silently fail
@@ -71,12 +76,14 @@ export function useGeolocation() {
               try {
                 const controller = new AbortController()
                 controllersRef.current.push(controller)
+                let timedOut = false
 
                 const timeoutId = setTimeout(() => {
+                  timedOut = true
                   try {
-                    if (controller && controller.signal && !controller.signal.aborted) controller.abort()
+                    controller.abort()
                   } catch (e) {
-                    // ignore
+                    // ignore abort errors
                   }
                 }, 5000)
 
@@ -95,7 +102,10 @@ export function useGeolocation() {
                   }
                 } catch (e) {
                   clearTimeout(timeoutId)
-                  // Silently fail - network error
+                  // Only log non-abort errors
+                  if (e.name !== 'AbortError' && !timedOut) {
+                    console.debug('Nominatim geocoding failed:', e.message)
+                  }
                 }
               } catch (e) {
                 // Silently fail
