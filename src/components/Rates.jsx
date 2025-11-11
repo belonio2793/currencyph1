@@ -143,6 +143,11 @@ export default function Rates() {
       filtered = filtered.filter(r => r.metadata?.type === typeFilter)
     }
 
+    if (decimalFilter !== 'all') {
+      const decimals = parseInt(decimalFilter)
+      filtered = filtered.filter(r => r.metadata?.decimals === decimals)
+    }
+
     if (searchTerm) {
       const search = searchTerm.toLowerCase()
       filtered = filtered.filter(r =>
@@ -152,22 +157,30 @@ export default function Rates() {
     }
 
     const sorted = [...filtered].sort((a, b) => {
+      let comparison = 0
+
       switch (sortBy) {
         case 'code':
-          return a.code.localeCompare(b.code)
+          comparison = a.code.localeCompare(b.code)
+          break
         case 'name':
-          return (a.metadata?.name || '').localeCompare(b.metadata?.name || '')
+          comparison = (a.metadata?.name || '').localeCompare(b.metadata?.name || '')
+          break
         case 'rate':
-          return b.rate - a.rate
+          comparison = a.rate - b.rate
+          break
         case 'recent':
-          return new Date(b.updatedAt) - new Date(a.updatedAt)
+          comparison = new Date(b.updatedAt) - new Date(a.updatedAt)
+          break
         default:
-          return 0
+          comparison = 0
       }
+
+      return sortDirection === 'asc' ? comparison : -comparison
     })
 
     return sorted
-  }, [rates, typeFilter, searchTerm, sortBy])
+  }, [rates, typeFilter, searchTerm, sortBy, sortDirection, decimalFilter])
 
   const favoriteRates = useMemo(() => {
     return rates.filter(r => favorites.includes(r.code))
