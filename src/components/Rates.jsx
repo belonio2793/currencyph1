@@ -29,27 +29,28 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const [currenciesRes, fiatRatesRes, cryptoRatesRes, cryptoMetadataRes] = await Promise.all([
+      const [currenciesRes, fiatPairsRes, cryptoPairsRes, cryptoMetadataRes] = await Promise.all([
         supabase
           .from('currencies')
           .select('code,name,type,symbol,decimals,is_default,active')
           .eq('active', true),
         supabase
-          .from('currency_rates')
-          .select('from_currency,to_currency,rate,last_updated')
-          .eq('from_currency', 'PHP'),
-        supabase
-          .from('cryptocurrency_rates')
+          .from('pairs')
           .select('from_currency,to_currency,rate,updated_at')
-          .eq('from_currency', 'PHP'),
+          .eq('from_currency', 'PHP')
+          .eq('source_table', 'currency_rates'),
+        supabase
+          .from('pairs')
+          .select('from_currency,to_currency,rate,updated_at')
+          .eq('source_table', 'cryptocurrency_rates'),
         supabase
           .from('cryptocurrencies')
           .select('code,name,coingecko_id')
       ])
 
       if (currenciesRes.error) throw currenciesRes.error
-      if (fiatRatesRes.error) throw fiatRatesRes.error
-      if (cryptoRatesRes.error) throw cryptoRatesRes.error
+      if (fiatPairsRes.error) throw fiatPairsRes.error
+      if (cryptoPairsRes.error) throw cryptoPairsRes.error
       if (cryptoMetadataRes.error) throw cryptoMetadataRes.error
 
       const currencyMap = {}
@@ -67,7 +68,7 @@ export default function Rates() {
 
       const processedRates = []
 
-      fiatRatesRes.data?.forEach(pair => {
+      fiatPairsRes.data?.forEach(pair => {
         const metadata = currencyMap[pair.to_currency] || {
           code: pair.to_currency,
           name: pair.to_currency,
@@ -81,11 +82,11 @@ export default function Rates() {
           rate: Number(pair.rate),
           metadata: metadata,
           source: 'currency_rates',
-          updatedAt: pair.last_updated || new Date().toISOString()
+          updatedAt: pair.updated_at || new Date().toISOString()
         })
       })
 
-      cryptoRatesRes.data?.forEach(pair => {
+      cryptoPairsRes.data?.forEach(pair => {
         const cryptoMetadata = cryptoMetadataMap[pair.to_currency]
         const metadata = {
           code: pair.to_currency,
