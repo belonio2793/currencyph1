@@ -2,53 +2,41 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 export default function Rates({ globalCurrency }) {
-  const [exchangeRates, setExchangeRates] = useState({})
+  const [ratesMap, setRatesMap] = useState({}) // USD_XXX rates only
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [allCurrencies, setAllCurrencies] = useState([])
-  const [allCryptos, setAllCryptos] = useState([])
   
-  const baseCurrency = 'PHP'
+  const baseCurrency = 'USD'
+  const displayCurrency = 'PHP'
 
-  // Load all rates from currency_rates table only
+  // Load all rates from pairs table
   useEffect(() => {
     loadRates()
-    // Poll hourly to avoid excessive calls
     const interval = setInterval(loadRates, 60 * 60 * 1000)
 
-    // Realtime subscription to pairs table
+    // Realtime subscription
     const handleRateChange = (payload) => {
-      if (payload.new) {
-        setExchangeRates(prev => ({
+      if (payload.new && payload.new.from_currency === 'USD') {
+        setRatesMap(prev => ({
           ...prev,
-          [`${payload.new.from_currency}_${payload.new.to_currency}`]: Number(payload.new.rate)
+          [payload.new.to_currency]: Number(payload.new.rate)
         }))
+        setLastUpdated(new Date())
       }
-      if (payload.old) {
-        setExchangeRates(prev => {
-          const copy = { ...prev }
-          delete copy[`${payload.old.from_currency}_${payload.old.to_currency}`]
-          return copy
-        })
-      }
-      setLastUpdated(new Date())
     }
 
     const channel = supabase
       .channel('public:pairs')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pairs' }, handleRateChange)
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'pairs' }, handleRateChange)
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'pairs' }, handleRateChange)
-
-    channel.subscribe()
+      .subscribe()
 
     return () => {
       clearInterval(interval)
       try {
         supabase.removeChannel(channel)
-      } catch (e) {
-        // ignore
-      }
+      } catch (e) {}
     }
   }, [])
 
@@ -56,311 +44,142 @@ export default function Rates({ globalCurrency }) {
     try {
       setLoading(true)
 
-      // Load all pairs from unified pairs table
+      // Load only USD_XXX pairs (base rates)
       const { data: pairs, error } = await supabase
         .from('pairs')
-        .select('from_currency,to_currency,rate,source_table')
-
-      console.debug('Pairs table query:', { rowCount: pairs?.length, error })
+        .select('from_currency,to_currency,rate')
+        .eq('from_currency', 'USD')
 
       if (error) {
-        console.error('Error loading pairs from pairs table:', error)
-        setExchangeRates({})
+        console.error('Error loading pairs:', error)
+        setRatesMap({})
         setAllCurrencies([])
-        setAllCryptos([])
         return
       }
 
       if (!Array.isArray(pairs) || pairs.length === 0) {
-        console.warn('pairs table is empty')
-        setExchangeRates({})
+        console.warn('No USD pairs found in pairs table')
+        setRatesMap({})
         setAllCurrencies([])
-        setAllCryptos([])
         return
       }
 
-      // Build rates map and discover currencies
-      const ratesMap = {}
-      const currencySet = new Set()
-      const cryptoSet = new Set()
+      // Build map: currency -> rate (1 USD = X currency)
+      const map = {}
+      const currencies = []
 
-      // Common crypto codes to identify cryptos
-      const commonCryptos = new Set(['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT'])
-
-      pairs.forEach(r => {
-        if (r && r.from_currency && r.to_currency && r.rate != null) {
-          const rate = Number(r.rate)
-          const isFromCrypto = commonCryptos.has(r.from_currency)
-          const isToCrypto = commonCryptos.has(r.to_currency)
-
-          // Detect and fix inverted crypto rates
-          // If crypto_to_usd is very small (< 0.01), it's likely inverted
-          if (isFromCrypto && r.to_currency === 'USD' && rate < 0.01 && rate > 0) {
-            // Store the inverted rate as USD_crypto instead
-            ratesMap[`USD_${r.from_currency}`] = rate
-            ratesMap[`${r.from_currency}_USD`] = 1 / rate
-          } else {
-            ratesMap[`${r.from_currency}_${r.to_currency}`] = rate
-          }
-
-          // Classify currencies
-          if (commonCryptos.has(r.from_currency)) {
-            cryptoSet.add(r.from_currency)
-          } else {
-            currencySet.add(r.from_currency)
-          }
-
-          if (commonCryptos.has(r.to_currency)) {
-            cryptoSet.add(r.to_currency)
-          } else if (r.to_currency !== 'USD') {
-            currencySet.add(r.to_currency)
+      pairs.forEach(p => {
+        if (p.to_currency && p.rate != null) {
+          const rate = Number(p.rate)
+          if (isFinite(rate) && rate > 0) {
+            map[p.to_currency] = rate
+            currencies.push({ code: p.to_currency, rate })
           }
         }
       })
 
-      const pairCount = Object.keys(ratesMap).length
-      console.debug(`Loaded ${pairCount} exchange rate pairs from pairs table`)
-      console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 15)))
-
-      setExchangeRates(ratesMap)
-
-      // Convert to array of currency objects, ensure PHP is first
-      const fiatCurrencies = Array.from(currencySet)
-        .map(code => ({ code, name: code }))
-        .sort((a, b) => {
-          if (a.code === baseCurrency) return -1
-          if (b.code === baseCurrency) return 1
-          return a.code.localeCompare(b.code)
-        })
-
-      const cryptoCurrencies = Array.from(cryptoSet)
-        .map(code => ({ code, name: code }))
-        .sort((a, b) => a.code.localeCompare(b.code))
-
-      setAllCurrencies(fiatCurrencies)
-      setAllCryptos(cryptoCurrencies)
+      console.debug(`Loaded ${Object.keys(map).length} USD exchange rates`)
+      
+      setRatesMap(map)
+      setAllCurrencies(currencies.sort((a, b) => a.code.localeCompare(b.code)))
       setLastUpdated(new Date())
-
-      console.debug(`Discovered ${fiatCurrencies.length} fiat currencies and ${cryptoCurrencies.length} cryptocurrencies`)
     } catch (err) {
       console.error('Error loading exchange rates:', err)
-      setExchangeRates({})
+      setRatesMap({})
       setAllCurrencies([])
-      setAllCryptos([])
     } finally {
       setLoading(false)
     }
   }
 
-  // Get rate between two currencies with multiple fallback strategies
   const getRate = (from, to) => {
-    if (!from || !to) return null
     if (from === to) return 1
-
-    // Try direct pair first
-    let rate = exchangeRates[`${from}_${to}`]
-    if (typeof rate === 'number' && isFinite(rate) && rate > 0) return rate
-
-    // Try reverse pair and invert
-    rate = exchangeRates[`${to}_${from}`]
-    if (typeof rate === 'number' && rate > 0) return 1 / rate
-
-    // Try compute via USD if both have USD pairs
-    const usdToFrom = exchangeRates[`USD_${from}`]
-    const usdToTo = exchangeRates[`USD_${to}`]
-    if (typeof usdToFrom === 'number' && typeof usdToTo === 'number' && usdToFrom > 0) {
-      return usdToTo / usdToFrom
-    }
-
-    // Try compute via PHP if both have PHP pairs
-    const phpToFrom = exchangeRates[`${baseCurrency}_${from}`]
-    const phpToTo = exchangeRates[`${baseCurrency}_${to}`]
-    if (typeof phpToFrom === 'number' && typeof phpToTo === 'number' && phpToFrom > 0) {
-      return phpToTo / phpToFrom
-    }
-
-    return null
+    
+    const fromRate = ratesMap[from]
+    const toRate = ratesMap[to]
+    
+    if (!fromRate || !toRate) return null
+    
+    // If from and to both have USD rates:
+    // 1 USD = fromRate from
+    // 1 USD = toRate to
+    // Therefore: from_to = toRate / fromRate
+    return toRate / fromRate
   }
 
-  // UI state
-  const [viewMode, setViewMode] = useState('fiat')
-  const [search, setSearch] = useState('')
-  const [selectedFiat, setSelectedFiat] = useState(null)
+  const [selectedCurrency, setSelectedCurrency] = useState(null)
   const [selectedCrypto, setSelectedCrypto] = useState(null)
-  const [fiatInput, setFiatInput] = useState('')
-  const [cryptoInput, setCryptoInput] = useState('')
+  const [amount1, setAmount1] = useState('')
+  const [amount2, setAmount2] = useState('')
+  const [search, setSearch] = useState('')
+  const [viewMode, setViewMode] = useState('all')
 
-  // Initialize selections after loading
+  // Initialize selections
   useEffect(() => {
-    if (!loading && allCurrencies.length > 0 && !selectedFiat) {
-      const php = allCurrencies.find(c => c.code === baseCurrency) || allCurrencies[0]
-      setSelectedFiat(php)
+    if (!loading && allCurrencies.length > 0) {
+      if (!selectedCurrency) {
+        const php = allCurrencies.find(c => c.code === displayCurrency)
+        setSelectedCurrency(php || allCurrencies[0])
+      }
+      if (!selectedCrypto) {
+        const btc = allCurrencies.find(c => c.code === 'BTC')
+        setSelectedCrypto(btc || allCurrencies.find(c => c.code !== displayCurrency))
+      }
     }
-  }, [loading, allCurrencies, selectedFiat])
+  }, [loading, allCurrencies, selectedCurrency, selectedCrypto])
 
-  useEffect(() => {
-    if (!loading && allCryptos.length > 0 && !selectedCrypto) {
-      setSelectedCrypto(allCryptos[0])
+  const handleAmount1Change = (val) => {
+    setAmount1(val)
+    if (!selectedCrypto || !val) {
+      setAmount2('')
+      return
     }
-  }, [loading, allCryptos, selectedCrypto])
-
-  const formatNumber = (v, decimals = 2) => {
-    if (v == null || Number.isNaN(Number(v))) return '—'
-    try {
-      return Number(v).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: decimals })
-    } catch (e) {
-      return Number(v).toFixed(decimals)
+    const num = parseFloat(val)
+    if (isNaN(num)) {
+      setAmount2('')
+      return
+    }
+    const rate = getRate(selectedCurrency.code, selectedCrypto.code)
+    if (rate) {
+      setAmount2((num * rate).toFixed(8))
     }
   }
 
-  const listItems = () => {
-    if (viewMode === 'fiat') {
-      return (allCurrencies || []).map(c => ({ type: 'fiat', code: c.code, name: c.name }))
+  const handleAmount2Change = (val) => {
+    setAmount2(val)
+    if (!selectedCurrency || !val) {
+      setAmount1('')
+      return
     }
-    return (allCryptos || []).map(c => ({ type: 'crypto', code: c.code, name: c.name }))
+    const num = parseFloat(val)
+    if (isNaN(num)) {
+      setAmount1('')
+      return
+    }
+    const rate = getRate(selectedCrypto.code, selectedCurrency.code)
+    if (rate) {
+      setAmount1((num * rate).toFixed(2))
+    }
   }
 
-  const filtered = listItems().filter(item => {
+  const filtered = allCurrencies.filter(c => {
     if (!search) return true
-    const s = search.toLowerCase()
-    return item.code.toLowerCase().includes(s) || item.name.toLowerCase().includes(s)
+    return c.code.toLowerCase().includes(search.toLowerCase())
   })
 
-  const onSelect = (item) => {
-    if (item.type === 'fiat') setSelectedFiat({ code: item.code, name: item.name })
-    else setSelectedCrypto({ code: item.code, name: item.name })
+  const formatNumber = (num, decimals = 2) => {
+    if (num == null) return '—'
+    const n = Number(num)
+    if (!isFinite(n)) return '—'
+    return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: decimals })
   }
 
-  const navigate = (type, direction) => {
-    const items = type === 'fiat' ? allCurrencies : allCryptos
-    if (!items || items.length === 0) return
-
-    const selected = type === 'fiat' ? selectedFiat : selectedCrypto
-    if (!selected) return
-
-    const idx = items.findIndex(i => i.code === selected.code)
-    const nextIdx = direction === 'next' 
-      ? (idx + 1) % items.length 
-      : (idx - 1 + items.length) % items.length
-
-    if (type === 'fiat') {
-      setSelectedFiat(items[nextIdx])
-    } else {
-      setSelectedCrypto(items[nextIdx])
-    }
+  if (loading) {
+    return <div className="bg-white rounded-2xl shadow-lg p-6 text-slate-500">Loading rates...</div>
   }
 
-  const onChangeFiat = (val) => {
-    if (val === '' || val === null) {
-      setFiatInput('')
-      setCryptoInput('')
-      return
-    }
-
-    setFiatInput(val)
-    const num = parseFloat(val)
-    if (isNaN(num) || !selectedFiat || !selectedCrypto) {
-      setCryptoInput('')
-      return
-    }
-
-    const rate = getRate(selectedFiat.code, selectedCrypto.code)
-    if (!rate) {
-      setCryptoInput('')
-      return
-    }
-
-    const cryptoAmount = num / rate
-    setCryptoInput(isFinite(cryptoAmount) ? Number(cryptoAmount).toFixed(8) : '')
-  }
-
-  const onChangeCrypto = (val) => {
-    if (val === '' || val === null) {
-      setCryptoInput('')
-      setFiatInput('')
-      return
-    }
-
-    setCryptoInput(val)
-    const num = parseFloat(val)
-    if (isNaN(num) || !selectedFiat || !selectedCrypto) {
-      setFiatInput('')
-      return
-    }
-
-    const rate = getRate(selectedFiat.code, selectedCrypto.code)
-    if (!rate) {
-      setFiatInput('')
-      return
-    }
-
-    const fiatAmount = num * rate
-    setFiatInput(isFinite(fiatAmount) ? Number(fiatAmount).toFixed(2) : '')
-  }
-
-  const renderFiatCard = (isPrimary) => {
-    if (!selectedFiat) return null
-    const isBase = selectedFiat.code === baseCurrency
-    const displayPrice = isBase ? 1 : getRate(selectedFiat.code, baseCurrency)
-    const pairKey = isBase ? `${baseCurrency}_${baseCurrency}` : `${selectedFiat.code}_${baseCurrency}`
-
-    return (
-      <div
-        className={`rounded-lg p-6 border w-full relative group ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'}`}
-        title={`Pair: ${pairKey}`}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-xl font-medium">{selectedFiat.code}</h3>
-            <p className="text-xs text-slate-500">{selectedFiat.name}</p>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-light text-slate-900">{typeof displayPrice === 'number' ? (displayPrice === 1 && isBase ? '1' : displayPrice.toFixed(2)) : '—'}</div>
-            <div className="text-xs text-slate-500">{isBase ? `1 ${baseCurrency}` : `1 ${selectedFiat.code} = ${displayPrice ? displayPrice.toFixed(2) : '—'} ${baseCurrency}`}</div>
-          </div>
-        </div>
-        <div className="flex gap-2 mt-4">
-          <button onClick={() => navigate('fiat', 'prev')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Prev</button>
-          <button onClick={() => navigate('fiat', 'next')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Next</button>
-        </div>
-
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
-          {isBase ? `Base currency (1 ${baseCurrency} = 1 ${baseCurrency})` : `1 ${selectedFiat.code} = ${displayPrice ? displayPrice.toFixed(2) : '?'} ${baseCurrency}`}
-        </div>
-      </div>
-    )
-  }
-
-  const renderCryptoCard = (isPrimary) => {
-    if (!selectedCrypto || !selectedFiat) return null
-    const price = getRate(selectedCrypto.code, selectedFiat.code)
-    const pairKey = `${selectedCrypto.code}_${selectedFiat.code}`
-
-    return (
-      <div
-        className={`rounded-lg p-6 border w-full relative group ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}
-        title={`Pair: ${pairKey}`}
-      >
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-xl font-medium">{selectedCrypto.code}</h3>
-            <p className="text-xs text-slate-500">{selectedCrypto.name}</p>
-          </div>
-          <div className="text-right">
-            <div className="text-2xl font-light text-orange-700">{price ? (typeof price === 'number' ? formatNumber(price, 2) : '—') : '—'}</div>
-            <div className="text-xs text-slate-500">{selectedFiat.code} per {selectedCrypto.code}</div>
-          </div>
-        </div>
-        <div className="flex gap-2 mt-4">
-          <button onClick={() => navigate('crypto', 'prev')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Prev</button>
-          <button onClick={() => navigate('crypto', 'next')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Next</button>
-        </div>
-
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
-          1 {selectedCrypto.code} = {price ? formatNumber(price, 2) : '?'} {selectedFiat.code}
-        </div>
-      </div>
-    )
+  if (allCurrencies.length === 0) {
+    return <div className="bg-white rounded-2xl shadow-lg p-6 text-slate-500">No rates available</div>
   }
 
   return (
@@ -371,109 +190,122 @@ export default function Rates({ globalCurrency }) {
       </div>
 
       <div className="flex gap-6">
-        <div className="flex-1">
-          {loading ? (
-            <div className="text-slate-500">Loading...</div>
-          ) : allCurrencies.length === 0 ? (
-            <div className="text-slate-500 text-sm">No exchange rates available. Please ensure currency_rates table is populated.</div>
-          ) : (
-            <div className="space-y-4">
-              {renderFiatCard(true)}
-              {allCryptos.length > 0 && renderCryptoCard(false)}
+        <div className="flex-1 space-y-4">
+          {/* Primary card */}
+          {selectedCurrency && (
+            <div className="rounded-lg p-6 border bg-slate-50 border-slate-200 relative group">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-medium">{selectedCurrency.code}</h3>
+                  <p className="text-xs text-slate-500">{selectedCurrency.code}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-light">1</div>
+                  <div className="text-xs text-slate-500">1 {baseCurrency}</div>
+                </div>
+              </div>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                1 {baseCurrency} = {formatNumber(selectedCurrency.rate)} {selectedCurrency.code}
+              </div>
+            </div>
+          )}
 
-              <div className="bg-white rounded-lg p-4 border border-slate-100 w-full mt-4">
-                <h4 className="text-sm font-medium text-slate-700 mb-2">Quick Converter</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs text-slate-500">{selectedFiat ? selectedFiat.code : 'Fiat'} amount</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={fiatInput}
-                      onChange={(e) => onChangeFiat(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded"
-                      placeholder="0.00"
-                      disabled={!selectedFiat || !selectedCrypto || !getRate(selectedFiat.code, selectedCrypto.code)}
-                    />
-                    <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '—'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
-                    {cryptoInput !== '' && (
-                      <p className="text-xs text-slate-400 mt-1">= {formatNumber(cryptoInput, 8)} {selectedCrypto.code}</p>
-                    )}
+          {/* Secondary card */}
+          {selectedCrypto && (
+            <div className="rounded-lg p-6 border bg-orange-50 border-orange-200 relative group">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-xl font-medium">{selectedCrypto.code}</h3>
+                  <p className="text-xs text-slate-500">{selectedCrypto.code}</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-light text-orange-700">
+                    {formatNumber(selectedCrypto.rate, 8)}
                   </div>
+                  <div className="text-xs text-slate-500">{selectedCrypto.code} per {baseCurrency}</div>
+                </div>
+              </div>
+              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                1 {baseCurrency} = {formatNumber(selectedCrypto.rate, 8)} {selectedCrypto.code}
+              </div>
+            </div>
+          )}
 
-                  <div>
-                    <label className="text-xs text-slate-500">{selectedCrypto ? selectedCrypto.code : 'Crypto'} amount</label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={cryptoInput}
-                      onChange={(e) => onChangeCrypto(e.target.value)}
-                      className="w-full mt-1 px-3 py-2 border rounded"
-                      placeholder="0.00"
-                      disabled={!selectedFiat || !selectedCrypto || !getRate(selectedFiat.code, selectedCrypto.code)}
-                    />
-                    <p className="text-xs text-slate-400 mt-1">Convert {selectedCrypto ? selectedCrypto.code : '—'} → {selectedFiat ? selectedFiat.code : '—'}</p>
-                    {fiatInput !== '' && (
-                      <p className="text-xs text-slate-400 mt-1">= {formatNumber(fiatInput, 2)} {selectedFiat.code}</p>
-                    )}
-                  </div>
+          {/* Converter */}
+          {selectedCurrency && selectedCrypto && (
+            <div className="bg-white rounded-lg p-4 border border-slate-100">
+              <h4 className="text-sm font-medium text-slate-700 mb-3">Quick Converter</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-slate-500">{selectedCurrency.code} amount</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={amount1}
+                    onChange={(e) => handleAmount1Change(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                    placeholder="0.00"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">Convert {selectedCurrency.code} → {selectedCrypto.code}</p>
+                </div>
+                <div>
+                  <label className="text-xs text-slate-500">{selectedCrypto.code} amount</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={amount2}
+                    onChange={(e) => handleAmount2Change(e.target.value)}
+                    className="w-full mt-1 px-3 py-2 border rounded"
+                    placeholder="0.00"
+                  />
+                  <p className="text-xs text-slate-400 mt-1">Convert {selectedCrypto.code} → {selectedCurrency.code}</p>
                 </div>
               </div>
             </div>
           )}
         </div>
 
-        <div className="w-full sm:w-80 border border-slate-100 rounded-lg p-3">
+        {/* Sidebar with rates list */}
+        <div className="w-80 border border-slate-100 rounded-lg p-3">
           <div className="flex gap-2 mb-3">
-            <button onClick={() => setViewMode('fiat')} className={`flex-1 py-2 rounded ${viewMode === 'fiat' ? 'bg-blue-600 text-white' : 'bg-white border'}`}>Fiat</button>
-            <button onClick={() => setViewMode('crypto')} className={`flex-1 py-2 rounded ${viewMode === 'crypto' ? 'bg-blue-600 text-white' : 'bg-white border'}`}>Crypto</button>
+            <button 
+              onClick={() => setViewMode('all')} 
+              className={`flex-1 py-2 rounded text-sm ${viewMode === 'all' ? 'bg-blue-600 text-white' : 'bg-white border'}`}
+            >
+              All
+            </button>
           </div>
 
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search code or name"
+            placeholder="Search code"
             className="w-full px-3 py-2 border rounded mb-3 text-sm"
           />
 
-          <div className="h-72 overflow-auto">
+          <div className="h-96 overflow-auto space-y-1">
             {filtered.length === 0 ? (
               <div className="text-sm text-slate-500">No results</div>
             ) : (
-              filtered.map(item => {
-                const rate = viewMode === 'fiat'
-                  ? selectedFiat && getRate(selectedFiat.code, item.code)
-                  : selectedCrypto && getRate(selectedCrypto.code, item.code)
-
-                return (
-                  <div
-                    key={`${item.type}-${item.code}`}
-                    onClick={() => onSelect(item)}
-                    className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between relative group ${
-                      viewMode === 'fiat'
-                        ? selectedFiat?.code === item.code ? 'bg-slate-100' : ''
-                        : selectedCrypto?.code === item.code ? 'bg-slate-100' : ''
-                    }`}
-                  >
-                    <div>
-                      <div className="font-medium">{item.code}</div>
-                      <div className="text-xs text-slate-500">{item.name}</div>
-                    </div>
-                    <div className="text-sm text-slate-600">
-                      {rate ? formatNumber(rate, viewMode === 'crypto' ? 6 : 2) : '—'}
-                    </div>
-
-                    {rate && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
-                        {viewMode === 'fiat'
-                          ? `1 ${selectedFiat?.code || '?'} = ${formatNumber(rate, 2)} ${item.code}`
-                          : `1 ${selectedCrypto?.code || '?'} = ${formatNumber(rate, 6)} ${item.code}`
-                        }
-                      </div>
-                    )}
+              filtered.map(currency => (
+                <div
+                  key={currency.code}
+                  onClick={() => setSelectedCurrency(currency)}
+                  className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between transition relative group ${
+                    selectedCurrency?.code === currency.code ? 'bg-slate-100' : ''
+                  }`}
+                >
+                  <div>
+                    <div className="font-medium text-sm">{currency.code}</div>
                   </div>
-                )
-              })
+                  <div className="text-xs text-slate-600">
+                    {formatNumber(currency.rate, 6)}
+                  </div>
+                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
+                    1 {baseCurrency} = {formatNumber(currency.rate, 8)} {currency.code}
+                  </div>
+                </div>
+              ))
             )}
           </div>
         </div>
