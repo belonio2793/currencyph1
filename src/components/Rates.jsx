@@ -760,7 +760,7 @@ export default function Rates({ globalCurrency }) {
                         if (selectedFiat.code === item.code) return '—'
 
                         const pair = getPairRate(item.code, selectedFiat.code)
-                        return (typeof pair === 'number' ? pair.toFixed(4) : '—')
+                        return (typeof pair === 'number' ? pair.toFixed(2) : '—')
                       })()
                     ) : (
                       (() => {
