@@ -707,8 +707,8 @@ export default function Rates({ globalCurrency }) {
         </div>
 
         {/* Hover tooltip */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
-          Pair: {pairKey}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
+          1 {selectedCrypto.code} = {price ? formatNumber(price, 2) : '?'} {selectedFiatCode}
         </div>
       </div>
     )
