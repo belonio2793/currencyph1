@@ -46,7 +46,7 @@ export function useGeolocation() {
                     } catch (e) {
                       // ignore abort errors
                     }
-                  }, 5000)
+                  }, 3000)
 
                   try {
                     const resp = await fetch(url, { signal: controller.signal })
@@ -62,13 +62,10 @@ export function useGeolocation() {
                     }
                   } catch (e) {
                     clearTimeout(timeoutId)
-                    // Only log non-abort errors
-                    if (e.name !== 'AbortError' && !timedOut) {
-                      console.debug('MapTiler geocoding failed:', e.message)
-                    }
+                    // Silently fail - try fallback
                   }
                 } catch (e) {
-                  // Silently fail
+                  // Silently fail - try fallback
                 }
               }
 
