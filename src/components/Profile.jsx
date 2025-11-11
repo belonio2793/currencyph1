@@ -57,12 +57,6 @@ export default function Profile({ userId, onSignOut }) {
   const [deviceInfo, setDeviceInfo] = useState(null)
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [verifyingId, setVerifyingId] = useState(false)
-  const [showIdForm, setShowIdForm] = useState(false)
-  const [idFormData, setIdFormData] = useState({
-    idType: 'national_id',
-    idNumber: '',
-    idImageUrl: ''
-  })
 
   const isValidUUID = (id) => {
     return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
