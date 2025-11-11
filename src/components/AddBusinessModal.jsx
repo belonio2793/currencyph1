@@ -61,18 +61,20 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
   const [paying, setPaying] = useState(false)
+  const [locationInitialized, setLocationInitialized] = useState(false)
   const APPROVAL_FEE = 1000
 
   useEffect(() => {
-    if (location) {
+    if (location && !locationInitialized) {
       setForm(prev => ({
         ...prev,
-        latitude: prev.latitude || String(location.latitude),
-        longitude: prev.longitude || String(location.longitude),
-        city: prev.city || detectedCity || prev.city
+        latitude: String(location.latitude),
+        longitude: String(location.longitude),
+        city: detectedCity || prev.city
       }))
+      setLocationInitialized(true)
     }
-  }, [location, detectedCity])
+  }, [location, detectedCity, locationInitialized])
 
   // load existing categories from DB to present in dropdown
   useEffect(() => {
