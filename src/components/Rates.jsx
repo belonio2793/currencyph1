@@ -59,59 +59,62 @@ export default function Rates({ globalCurrency }) {
     try {
       setLoading(true)
 
-      // Load both fiat and crypto rates in parallel
-      const [{ data: fiatRates, error: fiatError }, { data: cryptoRates, error: cryptoError }] = await Promise.all([
-        supabase.from('currency_rates').select('from_currency,to_currency,rate'),
-        supabase.from('cryptocurrency_rates').select('from_currency,to_currency,rate')
-      ])
+      // Load all pairs from unified pairs table
+      const { data: pairs, error } = await supabase
+        .from('pairs')
+        .select('from_currency,to_currency,rate,source_table')
 
-      console.debug('Fiat rates query:', { rowCount: fiatRates?.length, error: fiatError })
-      console.debug('Crypto rates query:', { rowCount: cryptoRates?.length, error: cryptoError })
+      console.debug('Pairs table query:', { rowCount: pairs?.length, error })
 
-      if (fiatError) {
-        console.error('Error loading fiat rates from currency_rates:', fiatError)
-      }
-      if (cryptoError) {
-        console.error('Error loading crypto rates from cryptocurrency_rates:', cryptoError)
-      }
-
-      // Build rates map
-      const ratesMap = {}
-      const currencySet = new Set()
-      const cryptoSet = new Set()
-
-      // Process fiat rates
-      if (Array.isArray(fiatRates)) {
-        fiatRates.forEach(r => {
-          if (r && r.from_currency && r.to_currency && r.rate != null) {
-            ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
-            currencySet.add(r.from_currency)
-            currencySet.add(r.to_currency)
-          }
-        })
-      }
-
-      // Process crypto rates
-      if (Array.isArray(cryptoRates)) {
-        cryptoRates.forEach(r => {
-          if (r && r.from_currency && r.to_currency && r.rate != null) {
-            ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
-            cryptoSet.add(r.from_currency)
-            // Don't add crypto to currency set; keep them separate
-          }
-        })
-      }
-
-      if (Object.keys(ratesMap).length === 0) {
-        console.warn('No rates found in either currency_rates or cryptocurrency_rates tables')
+      if (error) {
+        console.error('Error loading pairs from pairs table:', error)
         setExchangeRates({})
         setAllCurrencies([])
         setAllCryptos([])
         return
       }
 
+      if (!Array.isArray(pairs) || pairs.length === 0) {
+        console.warn('pairs table is empty')
+        setExchangeRates({})
+        setAllCurrencies([])
+        setAllCryptos([])
+        return
+      }
+
+      // Build rates map and discover currencies
+      const ratesMap = {}
+      const currencySet = new Set()
+      const cryptoSet = new Set()
+
+      // Common crypto codes to identify cryptos
+      const commonCryptos = new Set(['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT'])
+
+      pairs.forEach(r => {
+        if (r && r.from_currency && r.to_currency && r.rate != null) {
+          ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
+
+          // Classify currencies based on source table and common crypto list
+          if (r.source_table === 'cryptocurrency_rates') {
+            cryptoSet.add(r.from_currency)
+          } else if (commonCryptos.has(r.from_currency)) {
+            cryptoSet.add(r.from_currency)
+          } else {
+            currencySet.add(r.from_currency)
+          }
+
+          if (r.source_table === 'cryptocurrency_rates') {
+            // Don't add destination if it's from crypto table (likely a fiat target)
+          } else if (commonCryptos.has(r.to_currency)) {
+            cryptoSet.add(r.to_currency)
+          } else {
+            currencySet.add(r.to_currency)
+          }
+        }
+      })
+
       const pairCount = Object.keys(ratesMap).length
-      console.debug(`Loaded ${pairCount} total exchange rate pairs`)
+      console.debug(`Loaded ${pairCount} exchange rate pairs from pairs table`)
       console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 15)))
 
       setExchangeRates(ratesMap)
