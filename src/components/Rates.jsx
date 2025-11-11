@@ -762,7 +762,7 @@ export default function Rates({ globalCurrency }) {
                       onChange={(e) => onChangeCrypto(e.target.value)}
                       className="w-full mt-1 px-3 py-2 border rounded"
                       placeholder="0.00"
-                      disabled={!selectedFiat || !selectedCrypto || cryptoRates[selectedCrypto ? selectedCrypto.code : ''] == null}
+                      disabled={!selectedFiat || !selectedCrypto || cryptoRatesUSD[selectedCrypto ? selectedCrypto.code : ''] == null}
                     />
                     <p className="text-xs text-slate-400 mt-1">Convert {selectedCrypto ? selectedCrypto.code : '—'} → {selectedFiat ? selectedFiat.code : '—'}</p>
                     {fiatInput !== '' && (
