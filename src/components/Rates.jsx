@@ -74,35 +74,39 @@ export default function Rates({ globalCurrency }) {
       if (!phpError && phpPairs && Array.isArray(phpPairs)) {
         const map = {}
         const currencies_list = []
+        const processedCodes = new Set()
 
-        phpPairs.forEach(p => {
-          if (p.to_currency && p.rate != null) {
-            const rate = Number(p.rate)
-            if (isFinite(rate) && rate > 0) {
-              map[p.to_currency] = rate
-              const metadata = currenciesMetadata[p.to_currency] || 
-                { code: p.to_currency, name: p.to_currency, type: 'unknown', decimals: 2 }
-              currencies_list.push({ 
-                code: p.to_currency, 
-                rate,
-                name: metadata.name || p.to_currency,
-                type: metadata.type || 'unknown',
-                symbol: metadata.symbol || '',
-                decimals: metadata.decimals || 2
-              })
-            }
-          }
-        })
-
-        // Always include PHP
+        // Always include PHP first
         map['PHP'] = 1
-        currencies_list.unshift({
+        currencies_list.push({
           code: 'PHP',
           rate: 1,
           name: 'Philippine Peso',
           type: 'fiat',
           symbol: '₱',
           decimals: 2
+        })
+        processedCodes.add('PHP')
+
+        // Add other currencies from pairs
+        phpPairs.forEach(p => {
+          if (p.to_currency && p.rate != null && !processedCodes.has(p.to_currency)) {
+            const rate = Number(p.rate)
+            if (isFinite(rate) && rate > 0) {
+              map[p.to_currency] = rate
+              const metadata = currenciesMetadata[p.to_currency] ||
+                { code: p.to_currency, name: p.to_currency, type: 'unknown', decimals: 2 }
+              currencies_list.push({
+                code: p.to_currency,
+                rate,
+                name: metadata.name || p.to_currency,
+                type: metadata.type || 'unknown',
+                symbol: metadata.symbol || '',
+                decimals: metadata.decimals || 2
+              })
+              processedCodes.add(p.to_currency)
+            }
+          }
         })
 
         setRatesMap(map)
