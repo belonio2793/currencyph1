@@ -66,6 +66,8 @@ export default function OnlineUsers({ userId, userEmail }) {
   const [loading, setLoading] = useState(true)
   const [selectedUser, setSelectedUser] = useState(null)
   const [pendingRequests, setPendingRequests] = useState({})
+  const [loadError, setLoadError] = useState(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   // Load friends list
   useEffect(() => {
@@ -91,11 +93,17 @@ export default function OnlineUsers({ userId, userEmail }) {
     loadFriends()
   }, [userId])
 
-  // Load online users with real-time updates
+  // Load online users with real-time updates and a timeout/retry
   useEffect(() => {
+    let isMounted = true
+    let unsubscribe
+    let timeoutId
+
     const loadOnlineUsers = async () => {
+      setLoadError(null)
       try {
         const users = await getOnlineUsers()
+        if (!isMounted) return
         setOnlineUsers(users)
 
         // Load user profiles for online users
@@ -109,31 +117,44 @@ export default function OnlineUsers({ userId, userEmail }) {
                 .eq('id', user.user_id)
                 .single()
 
-              if (!error && data) {
-                profiles[user.user_id] = data
-              }
+              if (!error && data) profiles[user.user_id] = data
             } catch (err) {
               console.warn(`Failed to load profile for user ${user.user_id}:`, err)
             }
           }
         }
-        setUserProfiles(prev => ({ ...prev, ...profiles }))
+
+        if (isMounted) setUserProfiles(prev => ({ ...prev, ...profiles }))
       } catch (err) {
         console.warn('Failed to load online users:', err)
+        if (isMounted) setLoadError(err?.message || 'Failed to load online users')
       } finally {
-        setLoading(false)
+        if (isMounted) setLoading(false)
+        clearTimeout(timeoutId)
       }
     }
 
+    // Start a timeout to fail gracefully if loading takes too long
+    timeoutId = setTimeout(() => {
+      if (isMounted && loading) {
+        setLoading(false)
+        setLoadError('Unable to load online users. Please try again later.')
+      }
+    }, 8000)
+
+    setLoading(true)
     loadOnlineUsers()
 
     // Subscribe to real-time updates
-    let unsubscribe
     try {
       subscribeToOnlineUsers(async (payload) => {
-        // Refresh the list when there are changes
-        const users = await getOnlineUsers()
-        setOnlineUsers(users)
+        try {
+          const users = await getOnlineUsers()
+          if (!isMounted) return
+          setOnlineUsers(users)
+        } catch (e) {
+          console.warn('Realtime refresh failed:', e)
+        }
       }).then(unsub => {
         unsubscribe = unsub
       })
@@ -142,9 +163,11 @@ export default function OnlineUsers({ userId, userEmail }) {
     }
 
     return () => {
+      isMounted = false
+      clearTimeout(timeoutId)
       if (unsubscribe) unsubscribe()
     }
-  }, [])
+  }, [retryCount])
 
   // Filter users based on friends/all selection
   const filteredUsers = filter === 'friends'
@@ -244,16 +267,28 @@ export default function OnlineUsers({ userId, userEmail }) {
         {/* Map */}
         <div className="flex-1 min-h-[500px] bg-white rounded-lg shadow overflow-hidden relative">
           {loading ? (
-            <div className="h-full flex items-center justify-center bg-slate-100">
-              <div className="text-center">
-                <div className="animate-spin mb-4">
-                  <svg className="w-8 h-8 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
+            loadError ? (
+              <div className="h-full flex items-center justify-center bg-slate-100 p-6">
+                <div className="text-center">
+                  <p className="text-red-600 font-medium mb-2">{loadError}</p>
+                  <p className="text-slate-500 text-sm mb-4">If this persists, check your connection or try again.</p>
+                  <div className="flex justify-center">
+                    <button onClick={() => { setRetryCount(c => c + 1); setLoading(true); setLoadError(null) }} className="px-4 py-2 bg-blue-600 text-white rounded-md">Retry</button>
+                  </div>
                 </div>
-                <p className="text-slate-600 font-medium">Fetching online users...</p>
               </div>
-            </div>
+            ) : (
+              <div className="h-full flex items-center justify-center bg-slate-100">
+                <div className="text-center">
+                  <div className="animate-spin mb-4">
+                    <svg className="w-8 h-8 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <p className="text-slate-600 font-medium">Fetching online users...</p>
+                </div>
+              </div>
+            )
           ) : filteredUsers.length > 0 ? (
             <MapContainer
               center={[12.5, 121.5]}
@@ -319,16 +354,25 @@ export default function OnlineUsers({ userId, userEmail }) {
         {/* Users List */}
         <div className="w-80 min-h-[500px] bg-white rounded-lg shadow overflow-y-auto flex flex-col">
           {loading ? (
-            <div className="flex-1 flex items-center justify-center p-4">
-              <div className="text-center">
-                <div className="animate-spin mb-2">
-                  <svg className="w-6 h-6 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
+            loadError ? (
+              <div className="flex-1 flex items-center justify-center p-4">
+                <div className="text-center">
+                  <p className="text-red-600 font-medium mb-2">{loadError}</p>
+                  <button onClick={() => { setRetryCount(c => c + 1); setLoading(true); setLoadError(null) }} className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm">Retry</button>
                 </div>
-                <p className="text-slate-600 font-medium text-sm">Fetching users...</p>
               </div>
-            </div>
+            ) : (
+              <div className="flex-1 flex items-center justify-center p-4">
+                <div className="text-center">
+                  <div className="animate-spin mb-2">
+                    <svg className="w-6 h-6 text-blue-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <p className="text-slate-600 font-medium text-sm">Fetching users...</p>
+                </div>
+              </div>
+            )
           ) : filteredUsers.length === 0 ? (
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center">
