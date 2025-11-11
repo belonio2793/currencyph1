@@ -1,5 +1,7 @@
 import { supabase } from './supabaseClient'
 
+import { supabase } from './supabaseClient'
+
 // Basic user search for typeahead
 export async function searchUsers(query, limit = 10) {
   if (!query) return []
