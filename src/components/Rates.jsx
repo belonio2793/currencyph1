@@ -14,8 +14,10 @@ export default function Rates() {
   const [result, setResult] = useState(null)
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [sortBy, setSortBy] = useState('code')
+  const [typeFilter, setTypeFilter] = useState('fiat')
+  const [sortBy, setSortBy] = useState('rate')
+  const [sortDirection, setSortDirection] = useState('desc')
+  const [decimalFilter, setDecimalFilter] = useState('all')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
 
   useEffect(() => {
