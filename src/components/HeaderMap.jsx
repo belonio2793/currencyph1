@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import { useGeolocation } from '../lib/useGeolocation'
