@@ -789,9 +789,15 @@ export default function Rates({ globalCurrency }) {
                       (() => {
                         // If selectedFiat is set, compute selectedFiat -> item (show how many item per 1 selectedFiat)
                         if (!selectedFiat) return '—'
-                        if (selectedFiat.code === item.code) return (1).toFixed(2)
-
-                        const pair = getPairRate(selectedFiat.code, item.code)
+                        const from = selectedFiat.code
+                        let pair = null
+                        if (from === item.code) {
+                          // for self, show selected -> baseCurrency (e.g. 1 USD = 58.97 PHP), unless base is the selected (1)
+                          if (from === baseCurrency) return (1).toFixed(2)
+                          pair = getPairRate(from, baseCurrency)
+                        } else {
+                          pair = getPairRate(from, item.code)
+                        }
                         return (typeof pair === 'number' ? pair.toFixed(2) : '—')
                       })()
                     ) : (
