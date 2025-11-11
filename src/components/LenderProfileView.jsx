@@ -100,7 +100,12 @@ export default function LenderProfileView({ userId, lenderId, onClose }) {
               <h3 className="text-xl font-bold text-slate-900">{lenderProfile.email}</h3>
               <p className="text-sm text-slate-600 mt-1">{lenderProfile.bio || 'No bio provided'}</p>
               <div className="mt-3">
-                {getVerificationBadge(lenderProfile.verification_status)}
+                <VerificationBadge
+                  isVerified={isVerified}
+                  documentType={verificationData?.documentType}
+                  verifiedDate={verificationData?.verifiedDate}
+                  size="md"
+                />
               </div>
             </div>
           </div>
