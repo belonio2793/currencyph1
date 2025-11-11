@@ -8,16 +8,15 @@ export function useGeolocation() {
   const isMountedRef = useRef(true)
   const controllersRef = useRef([])
 
-  useEffect(() => {
-    isMountedRef.current = true
+  const requestLocation = () => {
+    try {
+      if (!navigator.geolocation) {
+        setError('Geolocation not supported')
+        setLoading(false)
+        return
+      }
 
-    if (!navigator.geolocation) {
-      setError('Geolocation not supported')
-      setLoading(false)
-      return
-    }
-
-    const requestLocation = () => {
+      setLoading(true)
       navigator.geolocation.getCurrentPosition(
         (position) => {
           if (!isMountedRef.current) return
@@ -124,7 +123,14 @@ export function useGeolocation() {
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       )
+    } catch (e) {
+      setError(e.message)
+      setLoading(false)
     }
+  }
+
+  useEffect(() => {
+    isMountedRef.current = true
 
     requestLocation()
 
@@ -141,6 +147,10 @@ export function useGeolocation() {
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     )
+
+    // listen for external refresh requests
+    const handler = () => { requestLocation() }
+    window.addEventListener('geolocation:refresh', handler)
 
     return () => {
       isMountedRef.current = false
@@ -164,6 +174,7 @@ export function useGeolocation() {
         // ignore overall abort errors
       }
       controllersRef.current = []
+      window.removeEventListener('geolocation:refresh', handler)
     }
   }, [])
 
