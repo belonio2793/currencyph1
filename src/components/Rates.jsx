@@ -218,62 +218,12 @@ export default function Rates({ globalCurrency }) {
         console.debug('wisegcashAPI.getAllExchangeRates failed:', legacyErr)
       }
 
-      // 4) Last-resort: external currency API to build pairwise rates
-      try {
-        const globalRates = await currencyAPI.getGlobalRates()
-        if (globalRates && typeof globalRates === 'object') {
-          // globalRates is a map of code -> { rate: X } where rate is USD->CODE
-          const codes = Object.keys(globalRates)
-          codes.forEach(a => {
-            codes.forEach(b => {
-              if (a === b) return
-              const aRate = globalRates[a] && globalRates[a].rate
-              const bRate = globalRates[b] && globalRates[b].rate
-              if (typeof aRate === 'number' && typeof bRate === 'number' && aRate > 0) {
-                // compute a -> b: (USD->b) / (USD->a)
-                ratesMap[`${a}_${b}`] = bRate / aRate
-              }
-            })
-          })
-          if (Object.keys(ratesMap).length) {
-            setExchangeRates(ratesMap)
-            return
-          }
-        }
-      } catch (apiErr) {
-        console.debug('currencyAPI.getGlobalRates fallback failed:', apiErr)
-      }
-
-      // If we reach here, we couldn't build rates
-      try {
-        const globalRates = await currencyAPI.getGlobalRates()
-        if (!globalRates || typeof globalRates !== 'object') {
-          console.debug('Invalid rates format from external API, using empty rates')
-          setExchangeRates(ratesMap)
-          return
-        }
-        const codes = Object.keys(globalRates)
-        codes.forEach(code => {
-          const rateObj = globalRates[code]
-          const rate = rateObj?.rate || 0
-          if (rate > 0) {
-            ratesMap[`USD_${code}`] = rate
-          }
-        })
-        codes.forEach(from => {
-          codes.forEach(to => {
-            if (from === to) return
-            const rateFrom = globalRates[from]?.rate || 0
-            const rateTo = globalRates[to]?.rate || 0
-            if (rateFrom > 0 && rateTo > 0) {
-              ratesMap[`${from}_${to}`] = rateTo / rateFrom
-            }
-          })
-        })
+      // No external fallback: rely only on DB tables (currency_rates, cached_rates, legacy) populated by backend jobs.
+      // If we've reached here and ratesMap is still empty, set empty rates so UI shows missing values rather than calling external services.
+      if (Object.keys(ratesMap).length === 0) {
+        console.debug('No fiat pairs found in DB tables; exchangeRates will be empty. Ensure currency_rates table is populated.')
         setExchangeRates(ratesMap)
-      } catch (apiErr) {
-        console.debug('External currency API unavailable, using empty rates:', apiErr)
-        setExchangeRates(ratesMap)
+        return
       }
     } catch (err) {
       console.debug('Error loading exchange rates, continuing with fallback:', err)
