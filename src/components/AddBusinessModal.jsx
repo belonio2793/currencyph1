@@ -522,7 +522,7 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                     </div>
 
                     <div className="w-full h-64 border rounded overflow-hidden">
-                      <MapContainer center={[form.latitude ? parseFloat(form.latitude) : 14.5995, form.longitude ? parseFloat(form.longitude) : 120.9842]} zoom={13} className="w-full h-full">
+                      <MapContainer attributionControl={false} center={[form.latitude ? parseFloat(form.latitude) : 14.5995, form.longitude ? parseFloat(form.longitude) : 120.9842]} zoom={13} className="w-full h-full">
                         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
                         <LocationMarker />
                       </MapContainer>
