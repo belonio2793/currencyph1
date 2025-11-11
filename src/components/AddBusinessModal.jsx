@@ -89,15 +89,25 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     let cancelled = false
     const load = async () => {
       try {
-        const { data, error } = await supabase.from('nearby_listings').select('category').limit(1000)
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 5000)
+
+        const { data, error } = await supabase
+          .from('nearby_listings')
+          .select('category')
+          .limit(1000)
+
+        clearTimeout(timeoutId)
+
         if (error) {
-          console.warn('Failed to load categories', error)
+          console.debug('Failed to load categories:', error.message)
           return
         }
         const cats = Array.from(new Set((data || []).map(d => d.category).filter(Boolean))).sort()
         if (!cancelled) setCategories(cats)
       } catch (e) {
-        console.warn('Failed to load categories', e)
+        console.debug('Failed to load categories:', e.message)
+        // Silently fail - categories are optional
       }
     }
     load()
