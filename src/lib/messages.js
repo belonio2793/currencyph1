@@ -2,18 +2,34 @@ import { supabase } from './supabaseClient'
 
 // Basic user search for typeahead
 export async function searchUsers(query, limit = 10) {
-  if (!query) return []
-  const q = `%${query}%`
-  const { data, error } = await supabase
-    .from('users')
-    .select('id,full_name,email')
-    .or(`full_name.ilike.${q},email.ilike.${q}`)
-    .limit(limit)
-  if (error) {
-    console.warn('User search error', error)
+  if (!query || query.trim().length === 0) return []
+
+  const trimmedQuery = query.trim().toLowerCase()
+
+  try {
+    // Try searching in both full_name and email fields
+    const { data, error } = await supabase
+      .from('users')
+      .select('id,full_name,email')
+      .or(`full_name.ilike.%${trimmedQuery}%,email.ilike.%${trimmedQuery}%`)
+      .limit(limit)
+
+    if (error) {
+      console.warn('User search error:', error)
+      return []
+    }
+
+    // Filter out duplicates by id
+    const seen = new Set()
+    return (data || []).filter(u => {
+      if (seen.has(u.id)) return false
+      seen.add(u.id)
+      return true
+    })
+  } catch (err) {
+    console.error('Search users exception:', err)
     return []
   }
-  return data || []
 }
 
 // Client-side key stored in localStorage to allow basic encryption
