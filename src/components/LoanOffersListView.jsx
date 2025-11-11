@@ -195,7 +195,7 @@ export default function LoanOffersListView({ userId, loanRequest, onOfferAccepte
                               )}
                             </div>
                             <div>
-                              {getVerificationBadge(lenderProfile?.is_verified)}
+                              <LenderVerificationDisplay lenderId={offer.lender_id} variant="chip" />
                             </div>
                           </div>
                         </div>
