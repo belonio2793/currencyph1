@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
 import { nearbyUtils } from '../lib/nearbyUtils'
-import { useGeolocation } from '../lib/useGeolocation'
 import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
