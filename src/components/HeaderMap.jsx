@@ -304,6 +304,14 @@ export default function HeaderMap({ userId: headerUserId }) {
                 <input readOnly value={markerPos.latitude?.toFixed ? markerPos.latitude.toFixed(6) : String(markerPos.latitude)} className="px-3 py-2 border rounded text-sm bg-white/90 text-slate-800" />
                 <input readOnly value={markerPos.longitude?.toFixed ? markerPos.longitude.toFixed(6) : String(markerPos.longitude)} className="px-3 py-2 border rounded text-sm bg-white/90 text-slate-800" />
                 <div className="flex items-center gap-2 justify-end">
+                  <button
+                    onClick={() => {
+                      try { window.dispatchEvent(new Event('geolocation:refresh')) } catch(e) {}
+                    }}
+                    className="px-3 py-2 bg-white border rounded text-sm hover:bg-slate-50"
+                  >
+                    Refresh
+                  </button>
                   <SendLocationButton location={markerPos} city={city} userId={headerUserId} shareEnabled={shareEnabled} />
                 </div>
               </div>
