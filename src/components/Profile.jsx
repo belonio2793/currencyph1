@@ -4,6 +4,7 @@ import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { deviceFingerprint } from '../lib/deviceFingerprint'
 import { p2pLoanService } from '../lib/p2pLoanService'
+import { diditService } from '../lib/diditService'
 
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
