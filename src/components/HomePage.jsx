@@ -136,7 +136,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             onClick={() => onTabChange('deposit')}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group"
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex justify-center mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -153,7 +153,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             onClick={() => onTabChange('nearby')}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group"
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex justify-center mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
                 <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -171,7 +171,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             onClick={() => onTabChange('inbox')}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group"
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex justify-center mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -188,7 +188,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             onClick={() => onTabChange('p2p-loans')}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group col-span-2"
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex justify-center mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -205,7 +205,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             onClick={() => onTabChange('poker')}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-rose-300 transition-all group"
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex justify-center mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-rose-100 group-hover:bg-rose-200 transition-colors">
                 <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172C5.26 9.083 5 11.622 5 15c0 4.418 2.612 8 5 8s5-3.582 5-8c0-3.378-.26-5.917-2.172-7.828m5.656 5.656a4 4 0 010 5.656M9.172 9.172L12 6m0 0l2.828 2.828M12 6v6m0 0l-2.828-2.828M12 12l2.828 2.828" />
