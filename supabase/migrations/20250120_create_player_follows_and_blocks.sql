@@ -1,1 +1,0 @@
--- removed: player follows and blocks

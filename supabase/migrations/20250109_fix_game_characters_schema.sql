@@ -1,1 +1,0 @@
--- removed: fix game characters schema
