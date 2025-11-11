@@ -60,8 +60,9 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
   const [paying, setPaying] = useState(false)
-  const { location, city: detectedCity } = useGeolocation()
+  const { location, city: detectedCity, loading: geoLoading } = useGeolocation()
   const [locationInitialized, setLocationInitialized] = useState(false)
+  const [requestingLocation, setRequestingLocation] = useState(false)
   const APPROVAL_FEE = 1000
 
   // Initialize form with user's location when modal opens and geolocation data is available
