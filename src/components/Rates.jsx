@@ -16,12 +16,12 @@ export default function Rates({ globalCurrency }) {
     // Poll hourly to avoid excessive calls
     const interval = setInterval(loadRates, 60 * 60 * 1000)
 
-    // Realtime subscription to both currency_rates and cryptocurrency_rates tables
+    // Realtime subscription to pairs table
     const handleRateChange = (payload) => {
       if (payload.new) {
         setExchangeRates(prev => ({
           ...prev,
-          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+          [`${payload.new.from_currency}_${payload.new.to_currency}`]: Number(payload.new.rate)
         }))
       }
       if (payload.old) {
@@ -35,13 +35,10 @@ export default function Rates({ globalCurrency }) {
     }
 
     const channel = supabase
-      .channel('public:currency_rates:and:cryptocurrency_rates')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'currency_rates' }, handleRateChange)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'currency_rates' }, handleRateChange)
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'currency_rates' }, handleRateChange)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cryptocurrency_rates' }, handleRateChange)
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cryptocurrency_rates' }, handleRateChange)
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'cryptocurrency_rates' }, handleRateChange)
+      .channel('public:pairs')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'pairs' }, handleRateChange)
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'pairs' }, handleRateChange)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'pairs' }, handleRateChange)
 
     channel.subscribe()
 
