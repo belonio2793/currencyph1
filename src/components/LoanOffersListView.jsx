@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import LenderProfileView from './LenderProfileView'
+import { VerificationIndicator } from './VerificationBadge'
+import { useUserVerificationStatus } from '../lib/usePublicUserProfile'
 
 export default function LoanOffersListView({ userId, loanRequest, onOfferAccepted, onClose }) {
   const [offers, setOffers] = useState([])
