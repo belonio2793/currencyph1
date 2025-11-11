@@ -54,19 +54,20 @@ export function useGeolocation() {
                     clearTimeout(timeoutId)
 
                     if (resp.ok && isMountedRef.current) {
-                      const data = await resp.json()
-                      if (data?.features?.[0]?.properties) {
-                        const props = data.features[0].properties
-                        setCity(props.city || props.town || props.village || props.county || props.state || null)
-                        return true
+                      try {
+                        const data = await resp.json()
+                        if (data?.features?.[0]?.properties) {
+                          const props = data.features[0].properties
+                          setCity(props.city || props.town || props.village || props.county || props.state || null)
+                          return true
+                        }
+                      } catch (parseErr) {
+                        // JSON parse error - silently ignore
                       }
                     }
-                  } catch (e) {
+                  } catch (fetchErr) {
                     clearTimeout(timeoutId)
-                    // Silently fail on any error (network, abort, timeout, etc.) - try fallback
-                    if (isMountedRef.current) {
-                      // Swallow the error
-                    }
+                    // Silently ignore all fetch errors including AbortError
                   }
                 } catch (e) {
                   // Silently fail - try fallback
