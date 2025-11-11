@@ -283,6 +283,24 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
       }
     })
 
+    // If no explicit coords provided, initialize marker at map center so users can drag immediately
+    useEffect(() => {
+      try {
+        if (!pos && map && map.getCenter) {
+          const c = map.getCenter()
+          if (c && typeof c.lat === 'number' && typeof c.lng === 'number') {
+            setPos([c.lat, c.lng])
+            // do not overwrite form if user hasn't provided coords yet
+            if (!form.latitude && !form.longitude) {
+              setForm(prev => ({ ...prev, latitude: String(c.lat), longitude: String(c.lng) }))
+            }
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }, [map])
+
     // when form coordinates change externally, update marker position
     useEffect(() => {
       if (form.latitude && form.longitude) {
