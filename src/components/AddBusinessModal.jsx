@@ -536,13 +536,21 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
                               longitude: String(location.longitude),
                               city: detectedCity || prev.city
                             }))
-                          } else {
-                            setError('Waiting for location... please allow location access in your browser')
+                            setRequestingLocation(false)
+                          } else if (!geoLoading && !requestingLocation) {
+                            setRequestingLocation(true)
+                            // Trigger geolocation refresh
+                            try {
+                              window.dispatchEvent(new Event('geolocation:refresh'))
+                            } catch (e) {
+                              console.debug('Failed to trigger geolocation refresh:', e)
+                            }
                           }
                         }}
-                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                        disabled={geoLoading || requestingLocation}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:text-slate-400 disabled:cursor-not-allowed"
                       >
-                        Use my current location
+                        {geoLoading || requestingLocation ? 'Getting location...' : 'Use my current location'}
                       </button>
                       <div className="text-sm text-slate-500">Or pick a location on the map below</div>
                     </div>
