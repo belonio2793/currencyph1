@@ -80,7 +80,9 @@ export function useGeolocation() {
                 const timeoutId = setTimeout(() => {
                   timedOut = true
                   try {
-                    controller.abort()
+                    if (!controller.signal.aborted) {
+                      controller.abort()
+                    }
                   } catch (e) {
                     // ignore abort errors
                   }
