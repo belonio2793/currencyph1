@@ -537,7 +537,7 @@ export default function Rates({ globalCurrency }) {
 
         {/* Hover tooltip */}
         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
-          1 {selectedCrypto.code} = {price ? formatNumber(price, 2) : '?'} {selectedFiatCode}
+          {isBase ? `Base currency (1 ${baseCurrency} = 1 ${baseCurrency})` : `1 ${selectedFiat.code} = ${displayPrice ? displayPrice.toFixed(2) : '?'} ${baseCurrency}`}
         </div>
       </div>
     )
