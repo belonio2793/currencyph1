@@ -678,16 +678,16 @@ export default function Rates({ globalCurrency }) {
       setCryptoInput('')
       return
     }
-    const rate = getRate(baseCurrency, selectedFiat.code) // 1 global = rate selected
-    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
-    if (!rate || !cryptoPrice) {
+
+    // Get direct rate from database or compute
+    const cryptoToFiat = getCryptoFiatRate(selectedCrypto.code, selectedFiat.code)
+    if (!cryptoToFiat) {
       setCryptoInput('')
       return
     }
-    // selected -> global: global = selected / rate
-    const globalAmount = num / rate
-    const cryptoAmount = globalAmount / cryptoPrice
-    // set formatted value with sensible precision for crypto
+
+    // fiat amount / crypto price per fiat = crypto amount
+    const cryptoAmount = num / cryptoToFiat
     setCryptoInput(isFinite(cryptoAmount) ? Number(cryptoAmount).toFixed(8) : '')
   }
 
