@@ -1,499 +1,481 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-export default function Rates({ globalCurrency }) {
-  const [fiatRates, setFiatRates] = useState([])
-  const [cryptoRates, setCryptoRates] = useState([])
-  const [currenciesMetadata, setCurrenciesMetadata] = useState({})
+export default function Rates() {
+  const [currencies, setCurrencies] = useState({})
+  const [rates, setRates] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [lastUpdated, setLastUpdated] = useState(new Date())
-  
-  const baseCurrency = 'PHP'
 
-  // Load all data on mount
+  const [selectedFrom, setSelectedFrom] = useState('PHP')
+  const [selectedTo, setSelectedTo] = useState('USD')
+  const [amount, setAmount] = useState('1')
+  const [result, setResult] = useState(null)
+
+  const [searchTerm, setSearchTerm] = useState('')
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [sortBy, setSortBy] = useState('code')
+  const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
+
   useEffect(() => {
     loadData()
-    const interval = setInterval(loadData, 60 * 60 * 1000)
-
-    // Subscribe to fiat rate changes
-    const fiatChannel = supabase
-      .channel('public:currency_rates')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'currency_rates' }, () => loadData())
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'currency_rates' }, () => loadData())
-      .subscribe()
-
-    // Subscribe to crypto rate changes
-    const cryptoChannel = supabase
-      .channel('public:cryptocurrency_rates')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'cryptocurrency_rates' }, () => loadData())
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'cryptocurrency_rates' }, () => loadData())
-      .subscribe()
-
-    return () => {
-      clearInterval(interval)
-      try {
-        supabase.removeChannel(fiatChannel)
-        supabase.removeChannel(cryptoChannel)
-      } catch (e) {}
-    }
+    const interval = setInterval(loadData, 5 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const loadData = async () => {
     try {
       setLoading(true)
+      setError(null)
 
-      // Load currencies metadata
-      const { data: currencies } = await supabase
-        .from('currencies')
-        .select('code,name,type,symbol,decimals,is_default')
-        .eq('active', true)
+      const [currenciesRes, pairsRes] = await Promise.all([
+        supabase
+          .from('currencies')
+          .select('code,name,type,symbol,decimals,is_default,active')
+          .eq('active', true),
+        supabase
+          .from('pairs')
+          .select('from_currency,to_currency,rate,source_table,updated_at')
+          .eq('from_currency', 'PHP')
+      ])
 
-      if (currencies) {
-        const metadata = {}
-        currencies.forEach(c => {
-          metadata[c.code] = c
-        })
-        setCurrenciesMetadata(metadata)
-      }
+      if (currenciesRes.error) throw currenciesRes.error
+      if (pairsRes.error) throw pairsRes.error
 
-      // Load fiat rates from currency_rates where from_currency = PHP
-      const { data: fiatData } = await supabase
-        .from('currency_rates')
-        .select('from_currency,to_currency,rate')
-        .eq('from_currency', 'PHP')
+      const currencyMap = {}
+      currenciesRes.data?.forEach(c => {
+        currencyMap[c.code] = c
+      })
+      setCurrencies(currencyMap)
 
-      if (fiatData && Array.isArray(fiatData)) {
-        const fiat_list = fiatData
-          .map(p => {
-            const rate = Number(p.rate)
-            if (!isFinite(rate) || rate <= 0) return null
-            
-            const metadata = currencies?.find(c => c.code === p.to_currency) || 
-              { code: p.to_currency, name: p.to_currency, type: 'fiat', decimals: 2 }
-            
-            return {
-              code: p.to_currency,
-              rate,
-              name: metadata.name || p.to_currency,
-              type: 'fiat',
-              symbol: metadata.symbol || '',
-              decimals: metadata.decimals || 2
-            }
-          })
-          .filter(r => r !== null)
-          .sort((a, b) => a.code.localeCompare(b.code))
+      const processedRates = (pairsRes.data || [])
+        .map(pair => ({
+          code: pair.to_currency,
+          rate: Number(pair.rate),
+          metadata: currencyMap[pair.to_currency] || {
+            code: pair.to_currency,
+            name: pair.to_currency,
+            type: pair.source_table === 'cryptocurrency_rates' ? 'crypto' : 'fiat',
+            symbol: '',
+            decimals: pair.source_table === 'cryptocurrency_rates' ? 8 : 2
+          },
+          source: pair.source_table,
+          updatedAt: pair.updated_at
+        }))
+        .filter(r => isFinite(r.rate) && r.rate > 0)
+        .sort((a, b) => a.code.localeCompare(b.code))
 
-        // Always include PHP as 1.00
-        fiat_list.unshift({
+      if (currencyMap['PHP']) {
+        processedRates.unshift({
           code: 'PHP',
           rate: 1,
-          name: 'Philippine Peso',
-          type: 'fiat',
-          symbol: '₱',
-          decimals: 2
+          metadata: currencyMap['PHP'],
+          source: 'base',
+          updatedAt: new Date().toISOString()
         })
-
-        setFiatRates(fiat_list)
       }
 
-      // Load crypto rates from cryptocurrency_rates where from_currency = PHP
-      const { data: cryptoData } = await supabase
-        .from('cryptocurrency_rates')
-        .select('from_currency,to_currency,rate')
-        .eq('from_currency', 'PHP')
-
-      if (cryptoData && Array.isArray(cryptoData)) {
-        const crypto_list = cryptoData
-          .map(p => {
-            const rate = Number(p.rate)
-            if (!isFinite(rate) || rate <= 0) return null
-            
-            const metadata = currencies?.find(c => c.code === p.to_currency) || 
-              { code: p.to_currency, name: p.to_currency, type: 'crypto', decimals: 8 }
-            
-            return {
-              code: p.to_currency,
-              rate,
-              name: metadata.name || p.to_currency,
-              type: 'crypto',
-              symbol: metadata.symbol || '',
-              decimals: metadata.decimals || 8
-            }
-          })
-          .filter(r => r !== null)
-          .sort((a, b) => a.code.localeCompare(b.code))
-
-        setCryptoRates(crypto_list)
-      }
-
+      setRates(processedRates)
       setLastUpdated(new Date())
     } catch (err) {
-      console.error('Error loading exchange rates:', err)
-      setFiatRates([])
-      setCryptoRates([])
+      console.error('Error loading rates:', err)
+      setError('Failed to load exchange rates. Please try again.')
     } finally {
       setLoading(false)
     }
   }
 
-  const getRate = (from, to, allRates) => {
-    if (from === to) return 1
-    
-    const fromCurr = allRates.find(c => c.code === from)
-    const toCurr = allRates.find(c => c.code === to)
-    
-    if (!fromCurr || !toCurr || fromCurr.rate <= 0 || toCurr.rate <= 0) return null
-    
-    return toCurr.rate / fromCurr.rate
+  const filteredRates = useMemo(() => {
+    let filtered = rates
+
+    if (typeFilter !== 'all') {
+      filtered = filtered.filter(r => r.metadata?.type === typeFilter)
+    }
+
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase()
+      filtered = filtered.filter(r =>
+        r.code.toLowerCase().includes(search) ||
+        r.metadata?.name?.toLowerCase().includes(search)
+      )
+    }
+
+    const sorted = [...filtered].sort((a, b) => {
+      switch (sortBy) {
+        case 'code':
+          return a.code.localeCompare(b.code)
+        case 'name':
+          return (a.metadata?.name || '').localeCompare(b.metadata?.name || '')
+        case 'rate':
+          return b.rate - a.rate
+        case 'recent':
+          return new Date(b.updatedAt) - new Date(a.updatedAt)
+        default:
+          return 0
+      }
+    })
+
+    return sorted
+  }, [rates, typeFilter, searchTerm, sortBy])
+
+  const favoriteRates = useMemo(() => {
+    return rates.filter(r => favorites.includes(r.code))
+  }, [rates, favorites])
+
+  const calculateConversion = () => {
+    const numAmount = parseFloat(amount)
+    if (!isNaN(numAmount) && numAmount > 0) {
+      const fromRate = rates.find(r => r.code === selectedFrom)
+      const toRate = rates.find(r => r.code === selectedTo)
+
+      if (fromRate && toRate && fromRate.rate > 0 && toRate.rate > 0) {
+        const convertedAmount = (numAmount * toRate.rate) / fromRate.rate
+        const toDecimals = toRate.metadata?.decimals || 2
+        setResult({
+          amount: convertedAmount.toFixed(toDecimals),
+          decimals: toDecimals,
+          rate: toRate.rate / fromRate.rate
+        })
+      } else {
+        setResult(null)
+      }
+    } else {
+      setResult(null)
+    }
   }
 
-  const [selectedCurrency, setSelectedCurrency] = useState(null)
-  const [selectedCrypto, setSelectedCrypto] = useState(null)
-  const [amount1, setAmount1] = useState('')
-  const [amount2, setAmount2] = useState('')
-  const [search, setSearch] = useState('')
-  const [typeFilter, setTypeFilter] = useState('all')
-  const [favorites, setFavorites] = useState(['PHP', 'USD', 'BTC', 'EUR'])
-
-  // Initialize selections
   useEffect(() => {
-    if (!loading) {
-      if (!selectedCurrency && fiatRates.length > 0) {
-        setSelectedCurrency(fiatRates[0])
-      }
-      if (!selectedCrypto && cryptoRates.length > 0) {
-        setSelectedCrypto(cryptoRates[0])
-      }
-    }
-  }, [loading, fiatRates, cryptoRates, selectedCurrency, selectedCrypto])
-
-  const handleAmount1Change = (val) => {
-    setAmount1(val)
-    const allRates = [...fiatRates, ...cryptoRates]
-    if (!selectedCrypto || !val) {
-      setAmount2('')
-      return
-    }
-    const num = parseFloat(val)
-    if (isNaN(num)) {
-      setAmount2('')
-      return
-    }
-    const rate = getRate(selectedCurrency.code, selectedCrypto.code, allRates)
-    if (rate !== null) {
-      const decimals = selectedCrypto.decimals || 2
-      setAmount2((num * rate).toFixed(decimals))
-    }
-  }
-
-  const handleAmount2Change = (val) => {
-    setAmount2(val)
-    const allRates = [...fiatRates, ...cryptoRates]
-    if (!selectedCurrency || !val) {
-      setAmount1('')
-      return
-    }
-    const num = parseFloat(val)
-    if (isNaN(num)) {
-      setAmount1('')
-      return
-    }
-    const rate = getRate(selectedCrypto.code, selectedCurrency.code, allRates)
-    if (rate !== null) {
-      const decimals = selectedCurrency.decimals || 2
-      setAmount1((num * rate).toFixed(decimals))
-    }
-  }
+    calculateConversion()
+  }, [amount, selectedFrom, selectedTo, rates])
 
   const toggleFavorite = (code) => {
-    setFavorites(prev => 
-      prev.includes(code) 
+    setFavorites(prev =>
+      prev.includes(code)
         ? prev.filter(c => c !== code)
         : [...prev, code]
     )
   }
 
-  const allCurrencies = [...fiatRates, ...cryptoRates]
-
-  const filtered = allCurrencies.filter(c => {
-    // Filter by type
-    if (typeFilter !== 'all' && c.type !== typeFilter) {
-      return false
-    }
-    
-    // Filter by search
-    if (!search) return true
-    return c.code.toLowerCase().includes(search.toLowerCase()) || 
-           c.name.toLowerCase().includes(search.toLowerCase())
-  })
-
-  const favoritesCurrencies = allCurrencies.filter(c => favorites.includes(c.code))
-
   const formatNumber = (num, decimals = 2) => {
-    if (num == null) return '—'
-    const n = Number(num)
-    if (!isFinite(n)) return '—'
-
-    let minDecimals = 0
-    let maxDecimals = decimals
-
-    if (n < 1 && n > 0) {
-      minDecimals = Math.max(4, decimals)
-      maxDecimals = Math.max(6, decimals)
-    } else if (n >= 1) {
-      minDecimals = decimals === 0 ? 0 : 2
-      maxDecimals = decimals
-    }
-
-    return n.toLocaleString(undefined, { minimumFractionDigits: minDecimals, maximumFractionDigits: maxDecimals })
+    if (num == null || !isFinite(num)) return '—'
+    return Number(num).toLocaleString(undefined, {
+      minimumFractionDigits: Math.min(decimals, 2),
+      maximumFractionDigits: Math.max(decimals, 6)
+    })
   }
 
-  const getCurrencyColor = (type) => {
-    if (type === 'crypto') return 'bg-orange-50 border-orange-200'
-    if (type === 'fiat') return 'bg-slate-50 border-slate-200'
-    return 'bg-slate-50 border-slate-200'
-  }
-
-  const getCurrencyTypeIcon = (type) => {
-    if (type === 'crypto') return '₿'
-    return '$'
+  const getCurrencyIcon = (type) => {
+    return type === 'crypto' ? '₿' : '$'
   }
 
   if (loading) {
-    return <div className="bg-white rounded-2xl shadow-lg p-6 text-slate-500">Loading exchange rates...</div>
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+        <p className="text-slate-500 text-lg">Loading exchange rates...</p>
+      </div>
+    )
   }
 
-  if (fiatRates.length === 0 && cryptoRates.length === 0) {
-    return <div className="bg-white rounded-2xl shadow-lg p-6 text-slate-500">No rates available</div>
+  if (error) {
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-12 border border-red-200">
+        <p className="text-red-600 text-center text-lg font-medium">{error}</p>
+        <button
+          onClick={loadData}
+          className="mt-4 mx-auto px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Try Again
+        </button>
+      </div>
+    )
   }
 
-  const allRates = [...fiatRates, ...cryptoRates]
+  if (rates.length === 0) {
+    return (
+      <div className="bg-white rounded-2xl shadow-lg p-12 text-center">
+        <p className="text-slate-500 text-lg">No exchange rates available</p>
+      </div>
+    )
+  }
+
+  const fromCurrency = rates.find(r => r.code === selectedFrom)
+  const toCurrency = rates.find(r => r.code === selectedTo)
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-3xl font-light text-slate-900">Exchange Rates</h2>
-          <p className="text-sm text-slate-500 mt-1">Base currency: <span className="font-semibold text-slate-700">Philippine Peso (₱)</span></p>
+    <div className="space-y-6">
+      {/* Header Section */}
+      <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-2xl shadow-xl p-8 text-white">
+        <div className="flex items-center justify-between mb-2">
+          <h1 className="text-4xl font-bold">Exchange Rates</h1>
+          <div className="text-sm text-slate-300">
+            Last updated: {lastUpdated.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
-        <div className="text-xs text-slate-500">Last updated: {lastUpdated.toLocaleTimeString()}</div>
+        <p className="text-slate-300 text-lg">Real-time currency and cryptocurrency exchange rates from PHP</p>
       </div>
 
-      <div className="flex gap-6">
-        <div className="flex-1 space-y-4">
-          {/* Primary card - Display selected currency */}
-          {selectedCurrency && (
-            <div className={`rounded-lg p-6 border relative group ${getCurrencyColor(selectedCurrency.type)}`}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{selectedCurrency.symbol || getCurrencyTypeIcon(selectedCurrency.type)}</div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-slate-900">{selectedCurrency.code}</h3>
-                    <p className="text-xs text-slate-600">{selectedCurrency.name}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">
-                      {selectedCurrency.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-light text-slate-900">
-                    {formatNumber(selectedCurrency.rate, selectedCurrency.decimals)}
-                  </div>
-                  <div className="text-xs text-slate-500 mt-2">per 1 {baseCurrency}</div>
-                </div>
+      {/* Main Grid */}
+      <div className="grid grid-cols-3 gap-6">
+        {/* Left Column - Converter */}
+        <div className="col-span-2 space-y-6">
+          {/* Converter Card */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">Currency Converter</h2>
+
+            <div className="space-y-6">
+              {/* From Currency */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">From</label>
+                <select
+                  value={selectedFrom}
+                  onChange={(e) => setSelectedFrom(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {rates.map(r => (
+                    <option key={r.code} value={r.code}>
+                      {r.code} - {r.metadata?.name || r.code}
+                    </option>
+                  ))}
+                </select>
               </div>
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                1 {baseCurrency} = {formatNumber(selectedCurrency.rate, selectedCurrency.decimals)} {selectedCurrency.code}
+
+              {/* Amount Input */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+                  placeholder="0.00"
+                />
+              </div>
+
+              {/* To Currency */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">To</label>
+                <select
+                  value={selectedTo}
+                  onChange={(e) => setSelectedTo(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {rates.map(r => (
+                    <option key={r.code} value={r.code}>
+                      {r.code} - {r.metadata?.name || r.code}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Result */}
+              {result && (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-200">
+                  <p className="text-sm text-slate-600 mb-2">Result</p>
+                  <div className="text-4xl font-bold text-blue-600 mb-2">
+                    {result.amount} {selectedTo}
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    1 {selectedFrom} = {formatNumber(result.rate, toCurrency?.metadata?.decimals || 2)} {selectedTo}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Rates Table */}
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-slate-900">All Rates</h2>
+              <div className="text-sm text-slate-500">
+                {filteredRates.length} currency pair{filteredRates.length !== 1 ? 's' : ''}
               </div>
             </div>
-          )}
 
-          {/* Secondary card - Compare with another currency */}
-          {selectedCrypto && selectedCrypto.code !== selectedCurrency?.code && (
-            <div className={`rounded-lg p-6 border relative group ${getCurrencyColor(selectedCrypto.type)}`}>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-3xl">{selectedCrypto.symbol || getCurrencyTypeIcon(selectedCrypto.type)}</div>
-                  <div>
-                    <h3 className="text-xl font-semibold text-slate-900">{selectedCrypto.code}</h3>
-                    <p className="text-xs text-slate-600">{selectedCrypto.name}</p>
-                    <span className="inline-block mt-1 px-2 py-0.5 bg-slate-200 text-slate-700 text-xs rounded">
-                      {selectedCrypto.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-light text-slate-900">
-                    {formatNumber(selectedCrypto.rate, selectedCrypto.decimals)}
-                  </div>
-                  <div className="text-xs text-slate-500 mt-2">per 1 {baseCurrency}</div>
-                </div>
-              </div>
-              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                1 {baseCurrency} = {formatNumber(selectedCrypto.rate, selectedCrypto.decimals)} {selectedCrypto.code}
-              </div>
-            </div>
-          )}
+            {/* Controls */}
+            <div className="mb-6 space-y-4">
+              {/* Search */}
+              <input
+                type="text"
+                placeholder="Search by currency code or name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              />
 
-          {/* Quick Converter */}
-          {selectedCurrency && selectedCrypto && selectedCrypto.code !== selectedCurrency.code && (
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
-              <h4 className="text-sm font-semibold text-slate-700 mb-3">Quick Converter</h4>
-              <p className="text-xs text-slate-600 mb-3">
-                1 {selectedCurrency.code} = {formatNumber(getRate(selectedCurrency.code, selectedCrypto.code, allRates), selectedCrypto.decimals)} {selectedCrypto.code}
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-slate-600 font-medium">{selectedCurrency.code} amount</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={amount1}
-                    onChange={(e) => handleAmount1Change(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
-                    placeholder="0.00"
-                  />
-                  <p className="text-xs text-slate-500 mt-2">≈ {amount2 || '0'} {selectedCrypto.code}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-slate-600 font-medium">{selectedCrypto.code} amount</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={amount2}
-                    onChange={(e) => handleAmount2Change(e.target.value)}
-                    className="w-full mt-2 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
-                    placeholder="0.00"
-                  />
-                  <p className="text-xs text-slate-500 mt-2">≈ {amount1 || '0'} {selectedCurrency.code}</p>
-                </div>
+              {/* Filters and Sort */}
+              <div className="flex flex-wrap gap-3">
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="all">All Types</option>
+                  <option value="fiat">Fiat Only</option>
+                  <option value="crypto">Crypto Only</option>
+                </select>
+
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="code">Sort by Code</option>
+                  <option value="name">Sort by Name</option>
+                  <option value="rate">Sort by Rate</option>
+                  <option value="recent">Recently Updated</option>
+                </select>
               </div>
             </div>
-          )}
 
-          {/* Favorites section */}
-          {favoritesCurrencies.length > 0 && (
-            <div>
-              <h4 className="text-sm font-semibold text-slate-700 mb-2">Favorite Rates</h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {favoritesCurrencies.map(curr => (
-                  <div 
+            {/* Rates List */}
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-slate-200">
+                    <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Currency</th>
+                    <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Name</th>
+                    <th className="text-left py-3 px-4 font-semibold text-slate-700 text-sm">Type</th>
+                    <th className="text-right py-3 px-4 font-semibold text-slate-700 text-sm">Rate (per 1 PHP)</th>
+                    <th className="text-center py-3 px-4 font-semibold text-slate-700 text-sm">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredRates.map(currency => (
+                    <tr key={currency.code} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">{currency.metadata?.symbol || getCurrencyIcon(currency.metadata?.type)}</span>
+                          <span className="font-semibold text-slate-900">{currency.code}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-slate-600">{currency.metadata?.name || currency.code}</td>
+                      <td className="py-3 px-4">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
+                          currency.metadata?.type === 'crypto'
+                            ? 'bg-orange-100 text-orange-700'
+                            : 'bg-blue-100 text-blue-700'
+                        }`}>
+                          {currency.metadata?.type === 'crypto' ? 'Cryptocurrency' : 'Fiat'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right font-mono text-slate-900">
+                        {formatNumber(currency.rate, currency.metadata?.decimals || 2)}
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <button
+                          onClick={() => toggleFavorite(currency.code)}
+                          className={`text-xl transition ${
+                            favorites.includes(currency.code)
+                              ? 'text-yellow-400 hover:text-yellow-500'
+                              : 'text-slate-300 hover:text-yellow-400'
+                          }`}
+                        >
+                          ★
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Favorites and Info */}
+        <div className="space-y-6">
+          {/* Favorites Card */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Favorite Rates</h3>
+            <div className="space-y-3">
+              {favoriteRates.length > 0 ? (
+                favoriteRates.map(curr => (
+                  <div
                     key={curr.code}
-                    className="p-3 rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition cursor-pointer"
-                    onClick={() => setSelectedCurrency(curr)}
+                    className="p-4 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition cursor-pointer"
+                    onClick={() => setSelectedFrom(curr.code)}
                   >
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-2">
                       <div>
-                        <div className="font-medium text-sm text-slate-900">{curr.code}</div>
-                        <div className="text-xs text-slate-500">{curr.name}</div>
+                        <div className="font-semibold text-slate-900">{curr.code}</div>
+                        <div className="text-xs text-slate-500">{curr.metadata?.name}</div>
                       </div>
                       <button
                         onClick={(e) => {
                           e.stopPropagation()
                           toggleFavorite(curr.code)
                         }}
-                        className="text-yellow-400 hover:text-yellow-500"
+                        className="text-yellow-400 hover:text-yellow-500 text-lg"
                       >
                         ★
                       </button>
                     </div>
-                    <div className="text-sm font-semibold text-slate-900 mt-2">
-                      {formatNumber(curr.rate, curr.decimals)}
+                    <div className="text-sm font-mono text-slate-900">
+                      {formatNumber(curr.rate, curr.metadata?.decimals || 2)}
                     </div>
                   </div>
-                ))}
+                ))
+              ) : (
+                <p className="text-sm text-slate-500 text-center py-6">Add currencies to favorites</p>
+              )}
+            </div>
+          </div>
+
+          {/* Info Card */}
+          <div className="bg-slate-50 rounded-2xl shadow-lg p-6 border border-slate-200 space-y-4">
+            <h3 className="text-lg font-semibold text-slate-900">Information</h3>
+
+            {fromCurrency && (
+              <div className="pb-4 border-b border-slate-200">
+                <p className="text-xs text-slate-600 font-medium mb-1">Base Currency</p>
+                <p className="text-sm font-semibold text-slate-900">{fromCurrency.metadata?.name}</p>
+                <p className="text-xs text-slate-500 mt-1">{fromCurrency.code}</p>
+              </div>
+            )}
+
+            {toCurrency && (
+              <div className="pb-4 border-b border-slate-200">
+                <p className="text-xs text-slate-600 font-medium mb-1">Target Currency</p>
+                <p className="text-sm font-semibold text-slate-900">{toCurrency.metadata?.name}</p>
+                <p className="text-xs text-slate-500 mt-1">{toCurrency.code}</p>
+              </div>
+            )}
+
+            <div>
+              <p className="text-xs text-slate-600 font-medium mb-1">Data Source</p>
+              <p className="text-xs text-slate-500">
+                Real-time rates from fiat and cryptocurrency markets
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs text-slate-600 font-medium mb-1">Coverage</p>
+              <p className="text-xs text-slate-500">
+                {rates.length} currencies tracked
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-slate-200">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Quick Stats</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-600">Total Currencies</span>
+                <span className="text-lg font-semibold text-slate-900">{rates.length}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-600">Fiat Currencies</span>
+                <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'fiat').length}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-slate-600">Cryptocurrencies</span>
+                <span className="text-lg font-semibold text-slate-900">{rates.filter(r => r.metadata?.type === 'crypto').length}</span>
               </div>
             </div>
-          )}
-        </div>
-
-        {/* Sidebar with currency list */}
-        <div className="w-80 border border-slate-100 rounded-lg p-4 bg-slate-50">
-          <div className="mb-4">
-            <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder="Search by code or name..."
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
-            />
-          </div>
-
-          <div className="flex gap-2 mb-4">
-            <button 
-              onClick={() => setTypeFilter('all')}
-              className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{ 
-                backgroundColor: typeFilter === 'all' ? '#3b82f6' : '#e2e8f0',
-                color: typeFilter === 'all' ? 'white' : '#475569'
-              }}
-            >
-              All ({allCurrencies.length})
-            </button>
-            <button 
-              onClick={() => setTypeFilter('fiat')}
-              className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{ 
-                backgroundColor: typeFilter === 'fiat' ? '#3b82f6' : '#e2e8f0',
-                color: typeFilter === 'fiat' ? 'white' : '#475569'
-              }}
-            >
-              Fiat ({fiatRates.length})
-            </button>
-            <button 
-              onClick={() => setTypeFilter('crypto')}
-              className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{ 
-                backgroundColor: typeFilter === 'crypto' ? '#3b82f6' : '#e2e8f0',
-                color: typeFilter === 'crypto' ? 'white' : '#475569'
-              }}
-            >
-              Crypto ({cryptoRates.length})
-            </button>
-          </div>
-
-          <div className="h-96 overflow-y-auto space-y-1">
-            {filtered.length === 0 ? (
-              <div className="text-sm text-slate-500 p-4 text-center">No results</div>
-            ) : (
-              filtered.map(currency => (
-                <div
-                  key={currency.code}
-                  onClick={() => setSelectedCurrency(currency)}
-                  className={`p-3 rounded-lg cursor-pointer hover:bg-white transition relative group ${
-                    selectedCurrency?.code === currency.code ? 'bg-white border border-blue-300 shadow-sm' : 'border border-transparent'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="font-medium text-sm text-slate-900">{currency.code}</div>
-                      <div className="text-xs text-slate-600">{currency.name}</div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        {currency.type === 'crypto' ? '₿ Crypto' : '$ Fiat'}
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs font-semibold text-slate-900">
-                        {formatNumber(currency.rate, currency.decimals)}
-                      </div>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleFavorite(currency.code)
-                        }}
-                        className="text-sm mt-1"
-                        style={{ color: favorites.includes(currency.code) ? '#facc15' : '#cbd5e1' }}
-                      >
-                        ★
-                      </button>
-                    </div>
-                  </div>
-                  <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity z-10 whitespace-nowrap">
-                    1 {baseCurrency} = {formatNumber(currency.rate, currency.decimals)} {currency.code}
-                  </div>
-                </div>
-              ))
-            )}
           </div>
         </div>
       </div>
