@@ -704,17 +704,17 @@ export default function Rates({ globalCurrency }) {
       setFiatInput('')
       return
     }
-    const rate = getRate(baseCurrency, selectedFiat.code)
-    const cryptoPrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
-    if (!rate || !cryptoPrice) {
+
+    // Get direct rate from database or compute
+    const cryptoToFiat = getCryptoFiatRate(selectedCrypto.code, selectedFiat.code)
+    if (!cryptoToFiat) {
       setFiatInput('')
       return
     }
-    // crypto -> global
-    const globalAmount = num * cryptoPrice
-    // global -> selected: selected = global * rate
-    const selectedAmount = globalAmount * rate
-    setFiatInput(isFinite(selectedAmount) ? Number(selectedAmount).toFixed(2) : '')
+
+    // crypto amount * crypto price per fiat = fiat amount
+    const fiatAmount = num * cryptoToFiat
+    setFiatInput(isFinite(fiatAmount) ? Number(fiatAmount).toFixed(2) : '')
   }
 
   const renderCryptoCard = (isPrimary) => {
