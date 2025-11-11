@@ -82,7 +82,7 @@ export function useGeolocation() {
                   } catch (e) {
                     // ignore abort errors
                   }
-                }, 5000)
+                }, 3000)
 
                 try {
                   const response = await fetch(
@@ -99,10 +99,7 @@ export function useGeolocation() {
                   }
                 } catch (e) {
                   clearTimeout(timeoutId)
-                  // Only log non-abort errors
-                  if (e.name !== 'AbortError' && !timedOut) {
-                    console.debug('Nominatim geocoding failed:', e.message)
-                  }
+                  // Silently fail - no city is acceptable
                 }
               } catch (e) {
                 // Silently fail
