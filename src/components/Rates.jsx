@@ -170,8 +170,13 @@ export default function Rates({ globalCurrency }) {
               ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
             }
           })
+          console.debug(`Loaded ${Object.keys(ratesMap).length} exchange rate pairs from currency_rates table`)
           setExchangeRates(ratesMap)
           return
+        } else if (dbErr) {
+          console.debug('Error reading currency_rates from Supabase:', dbErr)
+        } else if (!dbRates || dbRates.length === 0) {
+          console.debug('currency_rates table is empty or returned no results')
         }
       } catch (dbReadErr) {
         console.debug('Could not read currency_rates from Supabase (initial attempt):', dbReadErr)
