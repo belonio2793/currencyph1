@@ -104,7 +104,8 @@ export default function Rates() {
         })
       })
 
-      processedRates.filter(r => isFinite(r.rate) && r.rate > 0)
+      const validRates = processedRates
+        .filter(r => isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
       const phpExists = processedRates.some(r => r.code === 'PHP')
