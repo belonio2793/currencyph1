@@ -29,19 +29,11 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const [currenciesRes, fiatRatesRes, cryptoRatesRes, pairsRes] = await Promise.all([
+      const [currenciesRes, pairsRes] = await Promise.all([
         supabase
           .from('currencies')
           .select('code,name,type,symbol,decimals,is_default,active')
           .eq('active', true),
-        supabase
-          .from('currency_rates')
-          .select('from_currency,to_currency,rate')
-          .eq('from_currency', 'PHP'),
-        supabase
-          .from('cryptocurrency_rates')
-          .select('from_currency,to_currency,rate')
-          .eq('from_currency', 'PHP'),
         supabase
           .from('pairs')
           .select('from_currency,to_currency,rate,source_table,updated_at')
@@ -49,18 +41,21 @@ export default function Rates() {
       ])
 
       if (currenciesRes.error) throw currenciesRes.error
-      if (fiatRatesRes.error) throw fiatRatesRes.error
-      if (cryptoRatesRes.error) throw cryptoRatesRes.error
       if (pairsRes.error) throw pairsRes.error
 
       const currencyMap = {}
+      const fiatCodes = new Set()
+      const cryptoCodes = new Set()
+
       currenciesRes.data?.forEach(c => {
         currencyMap[c.code] = c
+        if (c.type === 'fiat') {
+          fiatCodes.add(c.code)
+        } else if (c.type === 'crypto') {
+          cryptoCodes.add(c.code)
+        }
       })
       setCurrencies(currencyMap)
-
-      const fiatCodes = new Set((fiatRatesRes.data || []).map(r => r.to_currency))
-      const cryptoCodes = new Set((cryptoRatesRes.data || []).map(r => r.to_currency))
 
       const processedRates = (pairsRes.data || [])
         .map(pair => {
