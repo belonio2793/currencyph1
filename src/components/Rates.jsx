@@ -536,8 +536,8 @@ export default function Rates({ globalCurrency }) {
         </div>
 
         {/* Hover tooltip */}
-        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
-          Pair: {pairKey}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
+          1 {selectedCrypto.code} = {price ? formatNumber(price, 2) : '?'} {selectedFiatCode}
         </div>
       </div>
     )
@@ -858,8 +858,23 @@ export default function Rates({ globalCurrency }) {
                     </div>
 
                     {pairKey && (
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
-                        Pair: {pairKey}
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10 max-w-xs">
+                        {item.type === 'fiat' ? (
+                          selectedFiat && selectedFiat.code === item.code
+                            ? `Base pair (1 ${selectedFiat.code} = 1 ${baseCurrency})`
+                            : `1 ${selectedFiat?.code || '?'} = ? ${item.code}`
+                        ) : (
+                          viewMode === 'crypto'
+                            ? `1 ${selectedCrypto?.code || '?'} = ? ${item.code}`
+                            : `1 ${item.code} = ${(() => {
+                                const cryptoPriceUSD = cryptoRatesUSD[item.code]
+                                const usdToSelected = getPairRate('USD', selectedFiat?.code)
+                                if (typeof cryptoPriceUSD === 'number' && typeof usdToSelected === 'number') {
+                                  return (cryptoPriceUSD * usdToSelected).toFixed(2)
+                                }
+                                return '?'
+                              })()} ${selectedFiat?.code || '?'}`
+                        )}
                       </div>
                     )}
                   </div>
