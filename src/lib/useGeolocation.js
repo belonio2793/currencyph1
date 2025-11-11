@@ -204,6 +204,7 @@ export function useGeolocation() {
       })
       controllersRef.current = []
       window.removeEventListener('geolocation:refresh', handler)
+      window.removeEventListener('unhandledrejection', unhandledRejectionHandler)
     }
   }, [])
 
