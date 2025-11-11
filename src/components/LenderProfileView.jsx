@@ -70,15 +70,6 @@ export default function LenderProfileView({ userId, lenderId, onClose }) {
     )
   }
 
-  const getVerificationBadge = (status) => {
-    if (status === 'approved') {
-      return <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-full text-xs font-semibold">✓ Verified</span>
-    }
-    if (status === 'pending') {
-      return <span className="inline-flex items-center gap-1 px-3 py-1 bg-yellow-50 text-yellow-700 rounded-full text-xs font-semibold">⏳ Pending</span>
-    }
-    return <span className="inline-flex items-center gap-1 px-3 py-1 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold">Unverified</span>
-  }
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
