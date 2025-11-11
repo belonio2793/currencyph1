@@ -105,8 +105,14 @@ export default function Rates() {
         })
       })
 
+      const seenCodes = new Set()
       const validRates = processedRates
-        .filter(r => isFinite(r.rate) && r.rate > 0)
+        .filter(r => {
+          if (seenCodes.has(r.code)) return false
+          if (!isFinite(r.rate) || r.rate <= 0) return false
+          seenCodes.add(r.code)
+          return true
+        })
         .sort((a, b) => a.code.localeCompare(b.code))
 
       const phpExists = validRates.some(r => r.code === 'PHP')
