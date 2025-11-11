@@ -151,7 +151,17 @@ export default function Rates({ globalCurrency }) {
 
     // Try direct pair first
     const direct = exchangeRates[`${from}_${to}`]
-    if (typeof direct === 'number' && isFinite(direct)) return direct
+    if (typeof direct === 'number' && isFinite(direct) && direct > 0) {
+      // Check if this looks like an inverted crypto rate (very small number like 0.0000001)
+      if (direct < 0.01 && from !== 'USD' && from !== baseCurrency) {
+        // Might be inverted, try the reverse
+        const reverse = exchangeRates[`${to}_${from}`]
+        if (typeof reverse === 'number' && isFinite(reverse) && reverse > 0.01) {
+          return 1 / reverse
+        }
+      }
+      return direct
+    }
 
     // Try reverse pair and invert
     const reverse = exchangeRates[`${to}_${from}`]
@@ -171,14 +181,6 @@ export default function Rates({ globalCurrency }) {
       return phpToTo / phpToFrom
     }
 
-    if (from === 'USD' || to === 'USD') {
-      console.warn(`Could not find rate for ${from}_${to}`, {
-        direct: exchangeRates[`${from}_${to}`],
-        reverse: exchangeRates[`${to}_${from}`],
-        usdToFrom: exchangeRates[`USD_${from}`],
-        usdToTo: exchangeRates[`USD_${to}`]
-      })
-    }
     return null
   }
 
