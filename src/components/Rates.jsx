@@ -29,55 +29,82 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const [currenciesRes, pairsRes] = await Promise.all([
+      const [currenciesRes, fiatRatesRes, cryptoRatesRes, cryptoMetadataRes] = await Promise.all([
         supabase
           .from('currencies')
           .select('code,name,type,symbol,decimals,is_default,active')
           .eq('active', true),
         supabase
-          .from('pairs')
-          .select('from_currency,to_currency,rate,source_table,updated_at')
-          .eq('from_currency', 'PHP')
+          .from('currency_rates')
+          .select('from_currency,to_currency,rate,last_updated')
+          .eq('from_currency', 'PHP'),
+        supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency,to_currency,rate,updated_at')
+          .eq('from_currency', 'PHP'),
+        supabase
+          .from('cryptocurrencies')
+          .select('code,name,coingecko_id')
       ])
 
       if (currenciesRes.error) throw currenciesRes.error
-      if (pairsRes.error) throw pairsRes.error
+      if (fiatRatesRes.error) throw fiatRatesRes.error
+      if (cryptoRatesRes.error) throw cryptoRatesRes.error
+      if (cryptoMetadataRes.error) throw cryptoMetadataRes.error
 
       const currencyMap = {}
-      const fiatCodes = new Set()
-      const cryptoCodes = new Set()
+      const cryptoMetadataMap = {}
 
       currenciesRes.data?.forEach(c => {
         currencyMap[c.code] = c
-        if (c.type === 'fiat') {
-          fiatCodes.add(c.code)
-        } else if (c.type === 'crypto') {
-          cryptoCodes.add(c.code)
-        }
       })
+
+      cryptoMetadataRes.data?.forEach(c => {
+        cryptoMetadataMap[c.code] = c
+      })
+
       setCurrencies(currencyMap)
 
-      const processedRates = (pairsRes.data || [])
-        .map(pair => {
-          const isFromFiat = fiatCodes.has(pair.to_currency)
-          const isFromCrypto = cryptoCodes.has(pair.to_currency)
-          const type = isFromCrypto ? 'crypto' : isFromFiat ? 'fiat' : (pair.source_table === 'cryptocurrency_rates' ? 'crypto' : 'fiat')
+      const processedRates = []
 
-          return {
-            code: pair.to_currency,
-            rate: Number(pair.rate),
-            metadata: currencyMap[pair.to_currency] || {
-              code: pair.to_currency,
-              name: pair.to_currency,
-              type: type,
-              symbol: '',
-              decimals: type === 'crypto' ? 8 : 2
-            },
-            source: pair.source_table,
-            updatedAt: pair.updated_at
-          }
+      fiatRatesRes.data?.forEach(pair => {
+        const metadata = currencyMap[pair.to_currency] || {
+          code: pair.to_currency,
+          name: pair.to_currency,
+          type: 'fiat',
+          symbol: '',
+          decimals: 2
+        }
+
+        processedRates.push({
+          code: pair.to_currency,
+          rate: Number(pair.rate),
+          metadata: metadata,
+          source: 'currency_rates',
+          updatedAt: pair.last_updated || new Date().toISOString()
         })
-        .filter(r => isFinite(r.rate) && r.rate > 0)
+      })
+
+      cryptoRatesRes.data?.forEach(pair => {
+        const cryptoMetadata = cryptoMetadataMap[pair.to_currency]
+        const metadata = {
+          code: pair.to_currency,
+          name: cryptoMetadata?.name || pair.to_currency,
+          type: 'crypto',
+          symbol: '',
+          decimals: 8
+        }
+
+        processedRates.push({
+          code: pair.to_currency,
+          rate: Number(pair.rate),
+          metadata: metadata,
+          source: 'cryptocurrency_rates',
+          updatedAt: pair.updated_at || new Date().toISOString()
+        })
+      })
+
+      processedRates.filter(r => isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
       const phpExists = processedRates.some(r => r.code === 'PHP')
