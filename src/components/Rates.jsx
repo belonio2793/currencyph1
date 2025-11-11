@@ -118,7 +118,23 @@ export default function Rates({ globalCurrency }) {
 
       const ratesMap = {}
 
-      // 0) First, try calling the fetch-rates edge function to get freshest rates (client-side read only)
+      // 0) Prefer Supabase currency_rates first (fast and authoritative). If not available, fall back to edge function and external APIs.
+      try {
+        const { data: dbRates, error: dbErr } = await supabase.from('currency_rates').select('from_currency,to_currency,rate')
+        if (!dbErr && Array.isArray(dbRates) && dbRates.length) {
+          dbRates.forEach(r => {
+            if (r && r.from_currency && r.to_currency && r.rate != null) {
+              ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
+            }
+          })
+          setExchangeRates(ratesMap)
+          return
+        }
+      } catch (dbReadErr) {
+        console.debug('Could not read currency_rates from Supabase (initial attempt):', dbReadErr)
+      }
+
+      // If DB had no data, fall back to fetch-rates edge function (proxy to trusted sources)
       try {
         const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
         const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || ''
@@ -126,8 +142,8 @@ export default function Rates({ globalCurrency }) {
           `${supabaseUrl}/functions/v1/fetch-rates`,
           { headers: { 'Authorization': `Bearer ${anonKey}`, 'Content-Type': 'application/json' } },
           1,
-          500,
-          10000
+          300,
+          4000
         )
         if (resp && (resp.rates || resp.exchangeRates || resp.currencyRates)) {
           const list = resp.rates || resp.exchangeRates || resp.currencyRates
@@ -149,7 +165,7 @@ export default function Rates({ globalCurrency }) {
           }
         }
       } catch (edgeErr) {
-        // ignore and continue to DB-backed fallbacks
+        // ignore and continue to other fallbacks
         console.debug('fetch-rates edge function call failed or returned no rates:', edgeErr)
       }
 
