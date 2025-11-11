@@ -676,23 +676,34 @@ export default function Rates({ globalCurrency }) {
   const renderCryptoCard = (isPrimary) => {
     if (!selectedCrypto) return null
     const basePrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
+    const selectedFiatCode = selectedFiat ? selectedFiat.code : baseCurrency
     const fiatMultiplier = selectedFiat ? (getRate(baseCurrency, selectedFiat.code) || null) : null
     const price = (basePrice != null && fiatMultiplier != null) ? (basePrice * fiatMultiplier) : (fiatMultiplier == null ? basePrice : null)
+    const pairKey = `${selectedCrypto.code}_${selectedFiatCode}`
+
     return (
-      <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}>
+      <div
+        className={`rounded-lg p-6 border w-full relative group ${isPrimary ? 'bg-orange-50 border-orange-200' : 'bg-white border-slate-100'}`}
+        title={`Pair: ${pairKey}`}
+      >
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-medium">{selectedCrypto.code}</h3>
             <p className="text-xs text-slate-500">{selectedCrypto.name}</p>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-light text-orange-700">{price ? (typeof price === 'number' ? price.toFixed(2) : '—') : '—'}</div>
-            <div className="text-xs text-slate-500">{selectedFiat ? selectedFiat.code : baseCurrency} per {selectedCrypto.code}</div>
+            <div className="text-2xl font-light text-orange-700">{price ? (typeof price === 'number' ? formatNumber(price, 2) : '—') : '—'}</div>
+            <div className="text-xs text-slate-500">{selectedFiatCode} per {selectedCrypto.code}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <button onClick={() => prev('crypto')} className="px-3 py-2 bg-white border rounded">Prev</button>
-          <button onClick={() => next('crypto')} className="px-3 py-2 bg-white border rounded">Next</button>
+          <button onClick={() => prev('crypto')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Prev</button>
+          <button onClick={() => next('crypto')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Next</button>
+        </div>
+
+        {/* Hover tooltip */}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
+          Pair: {pairKey}
         </div>
       </div>
     )
@@ -731,7 +742,7 @@ export default function Rates({ globalCurrency }) {
                       placeholder="0.00"
                       disabled={!selectedFiat || !selectedCrypto || getRate(baseCurrency, selectedFiat ? selectedFiat.code : '') == null}
                     />
-                    <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '��'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
+                    <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '—'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
                     {cryptoInput !== '' && (
                       <p className="text-xs text-slate-400 mt-1">= {formatNumber(cryptoInput, 8)} {selectedCrypto.code}</p>
                     )}
