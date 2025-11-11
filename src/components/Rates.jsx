@@ -19,6 +19,29 @@ export default function Rates({ globalCurrency }) {
     return found ? found.name : code
   }
 
+  // Helper: Get crypto-fiat rate directly from currency_rates table, or compute if needed
+  const getCryptoFiatRate = (cryptoCode, fiatCode) => {
+    if (!cryptoCode || !fiatCode) return null
+
+    // Try direct pair first (e.g., BTC_PHP)
+    const direct = exchangeRates[`${cryptoCode}_${fiatCode}`]
+    if (typeof direct === 'number' && isFinite(direct)) return direct
+
+    // Try reverse pair (e.g., PHP_BTC) and invert
+    const reverse = exchangeRates[`${fiatCode}_${cryptoCode}`]
+    if (typeof reverse === 'number' && reverse > 0) return 1 / reverse
+
+    // Fallback: compute via base currency or USD
+    const cryptoPriceInBase = cryptoRates[cryptoCode]
+    if (typeof cryptoPriceInBase === 'number' && cryptoPriceInBase > 0) {
+      if (fiatCode === baseCurrency) return cryptoPriceInBase
+      const baseToFiat = getPairRate(baseCurrency, fiatCode)
+      if (typeof baseToFiat === 'number') return cryptoPriceInBase * baseToFiat
+    }
+
+    return null
+  }
+
   const resolveUsdToBase = () => {
     const direct = exchangeRates && exchangeRates[`USD_${baseCurrency}`]
     if (typeof direct === 'number' && direct > 0) return direct
