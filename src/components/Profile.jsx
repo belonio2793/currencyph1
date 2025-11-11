@@ -9,7 +9,7 @@ import { diditService } from '../lib/diditService'
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
   { code: 'US', name: 'United States', flag: '🇺🇸' },
-  { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+  { code: 'CA', name: 'Canada', flag: '🇨��' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
   { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
@@ -121,17 +121,29 @@ export default function Profile({ userId, onSignOut }) {
     try {
       setVerifyingId(true)
       setError('')
-      const result = await p2pLoanService.submitVerification(userId, idFormData.idType, idFormData.idNumber, idFormData.idImageUrl)
+
+      // Use DIDIT for identity verification
+      const result = await diditService.submitVerification(
+        userId,
+        idFormData.idType,
+        idFormData.idNumber,
+        idFormData.idImageUrl
+      )
+
       if (result.success) {
-        setSuccess('Verification submitted! Awaiting review.')
+        const statusMessage = result.diditResult?.status === 'approved'
+          ? 'Verification approved! Your identity has been verified.'
+          : 'Verification submitted! Our system is processing your ID.'
+
+        setSuccess(statusMessage)
         setShowIdForm(false)
         setIdFormData({ idType: 'national_id', idNumber: '', idImageUrl: '' })
         loadVerificationStatus()
-        setTimeout(() => setSuccess(''), 3000)
+        setTimeout(() => setSuccess(''), 5000)
       }
     } catch (err) {
       console.error('Verification error:', err)
-      setError('Failed to submit verification: ' + (err?.message || 'Database table may not be initialized yet. Please try again later.'))
+      setError('Failed to submit verification: ' + (err?.message || 'Please check your internet connection and try again.'))
     } finally {
       setVerifyingId(false)
     }
