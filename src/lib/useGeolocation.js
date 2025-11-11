@@ -64,7 +64,10 @@ export function useGeolocation() {
                     }
                   } catch (e) {
                     clearTimeout(timeoutId)
-                    // Silently fail - try fallback
+                    // Silently fail on any error (network, abort, timeout, etc.) - try fallback
+                    if (isMountedRef.current) {
+                      // Swallow the error
+                    }
                   }
                 } catch (e) {
                   // Silently fail - try fallback
