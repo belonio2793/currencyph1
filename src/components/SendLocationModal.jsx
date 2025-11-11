@@ -172,6 +172,37 @@ export default function SendLocationModal({ open, onClose, location, city, sende
             </div>
           </div>
 
+          {/* Map Preview */}
+          {location && (
+            <div className="mb-4 border border-slate-200 rounded-lg overflow-hidden">
+              <div className="h-48 bg-slate-100">
+                <MapContainer
+                  center={[location.latitude, location.longitude]}
+                  zoom={14}
+                  style={{ height: '100%', width: '100%' }}
+                  attributionControl={false}
+                  keyboard={false}
+                  dragging={false}
+                  doubleClickZoom={false}
+                  scrollWheelZoom={false}
+                >
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; OpenStreetMap'
+                  />
+                  <Marker position={[location.latitude, location.longitude]}>
+                    <Popup>
+                      <div className="text-xs">
+                        <p className="font-semibold">{city || 'Your Location'}</p>
+                        <p className="text-slate-600">{location.latitude.toFixed(6)}, {location.longitude.toFixed(6)}</p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                </MapContainer>
+              </div>
+            </div>
+          )}
+
           {/* Error Message */}
           {error && (
             <div className="p-3 bg-red-100 border-l-4 border-red-500 rounded-lg mb-4">
