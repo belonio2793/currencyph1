@@ -583,7 +583,7 @@ export default function Profile({ userId, onSignOut }) {
           </div>
 
           <div className="bg-white border border-slate-200 rounded-xl p-6 mt-4">
-            <h3 className="text-lg font-medium text-slate-900 mb-3">Identity Verification (for P2P Loans)</h3>
+            <h3 className="text-lg font-medium text-slate-900 mb-3">Identity Verification</h3>
 
             <div className="space-y-4">
               {/* Current Verification Status */}
