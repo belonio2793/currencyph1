@@ -69,19 +69,35 @@ export default function Rates() {
 
       const ratesByCode = {}
 
+      // Normalize fiat pairs: accept rates stored either as PHP->X (units of X per PHP)
+      // or X->PHP (PHP per X) and convert to a consistent representation: units of currency per PHP
       fiatPairsRes.data?.forEach(pair => {
-        if (!ratesByCode[pair.to_currency]) {
-          const metadata = currencyMap[pair.to_currency] || {
-            code: pair.to_currency,
-            name: pair.to_currency,
+        // Determine target code and compute normalized rate as "units of target currency per 1 PHP"
+        let targetCode = null
+        let normalizedRate = null
+
+        if (pair.from_currency === 'PHP') {
+          // stored as PHP -> TARGET (units of TARGET per 1 PHP)
+          targetCode = pair.to_currency
+          normalizedRate = Number(pair.rate)
+        } else if (pair.to_currency === 'PHP') {
+          // stored as SOURCE -> PHP (PHP per 1 SOURCE) => normalized rate for SOURCE = 1 / (PHP per SOURCE)
+          targetCode = pair.from_currency
+          normalizedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
+        }
+
+        if (targetCode && !ratesByCode[targetCode]) {
+          const metadata = currencyMap[targetCode] || {
+            code: targetCode,
+            name: targetCode,
             type: 'fiat',
             symbol: '',
             decimals: 2
           }
 
-          ratesByCode[pair.to_currency] = {
-            code: pair.to_currency,
-            rate: Number(pair.rate),
+          ratesByCode[targetCode] = {
+            code: targetCode,
+            rate: normalizedRate,
             metadata: metadata,
             source: 'currency_rates',
             updatedAt: pair.updated_at || new Date().toISOString()
@@ -89,23 +105,34 @@ export default function Rates() {
         }
       })
 
+      // Normalize crypto pairs similarly. Accept both directions and convert to units of crypto per 1 PHP
       cryptoPairsRes.data?.forEach(pair => {
-        if (!ratesByCode[pair.to_currency]) {
-          const cryptoMetadata = cryptoMetadataMap[pair.to_currency]
+        let targetCode = null
+        let normalizedRate = null
+
+        if (pair.from_currency === 'PHP') {
+          // stored as PHP -> CRYPTO (units of CRYPTO per 1 PHP)
+          targetCode = pair.to_currency
+          normalizedRate = Number(pair.rate)
+        } else if (pair.to_currency === 'PHP') {
+          // stored as CRYPTO -> PHP (PHP per 1 CRYPTO) => convert to CRYPTO per 1 PHP
+          targetCode = pair.from_currency
+          normalizedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
+        }
+
+        if (targetCode && !ratesByCode[targetCode]) {
+          const cryptoMetadata = cryptoMetadataMap[targetCode]
           const metadata = {
-            code: pair.to_currency,
-            name: cryptoMetadata?.name || pair.to_currency,
+            code: targetCode,
+            name: cryptoMetadata?.name || targetCode,
             type: 'crypto',
             symbol: '',
             decimals: 8
           }
 
-          // Invert crypto rates since they're stored as PHP/crypto but should display as crypto/PHP
-          const invertedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
-
-          ratesByCode[pair.to_currency] = {
-            code: pair.to_currency,
-            rate: invertedRate,
+          ratesByCode[targetCode] = {
+            code: targetCode,
+            rate: normalizedRate,
             metadata: metadata,
             source: 'cryptocurrency_rates',
             updatedAt: pair.updated_at || new Date().toISOString()
