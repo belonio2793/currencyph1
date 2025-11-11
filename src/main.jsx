@@ -23,6 +23,20 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 })
 
+// Intercept global errors early to prevent Vite overlay serialization failures
+window.addEventListener('error', (event) => {
+  try {
+    const err = event && event.error
+    const msg = (err && (err.message || err.toString && err.toString())) || (event && event.message) || ''
+    // Known Vite overlay internal stack traces that fail when serializing DOM nodes
+    if (msg && (msg.includes('domNodeToElement') || msg.includes('getDefaultStylesForTag') || msg.toLowerCase().includes('frame'))) {
+      console.debug('[App] Suppressed dev-overlay serialization error:', msg)
+      event.preventDefault()
+      return true
+    }
+  } catch (e) { /* ignore */ }
+}, true)
+
 // Monkey-patch localStorage.setItem to avoid uncaught QuotaExceededError
 try {
   if (typeof window !== 'undefined' && window.localStorage) {
