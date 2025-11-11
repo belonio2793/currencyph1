@@ -78,12 +78,6 @@ export default function LoanOffersListView({ userId, loanRequest, onOfferAccepte
     )
   }
 
-  const getVerificationBadge = (verified) => {
-    if (verified) {
-      return <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 text-green-700 rounded text-xs font-semibold">✓ Verified</span>
-    }
-    return <span className="inline-flex items-center gap-1 px-2 py-1 bg-slate-100 text-slate-600 rounded text-xs font-semibold">Unverified</span>
-  }
 
   if (selectedLenderId) {
     return (
