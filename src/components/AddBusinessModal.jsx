@@ -47,7 +47,6 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
     primary_image_url: ''
   })
   const [photoUrls, setPhotoUrls] = useState('')
-  const { location, city: detectedCity } = useGeolocation()
   const [selectedFiles, setSelectedFiles] = useState([])
   const [filePreview, setFilePreview] = useState([])
   const [submitting, setSubmitting] = useState(false)
@@ -61,20 +60,48 @@ export default function AddBusinessModal({ userId, onClose, onSubmitted }) {
   const [error, setError] = useState('')
   const [pending, setPending] = useState(null)
   const [paying, setPaying] = useState(false)
-  const [locationInitialized, setLocationInitialized] = useState(false)
   const APPROVAL_FEE = 1000
 
+  // Initialize location on modal open
   useEffect(() => {
-    if (location && !locationInitialized) {
-      setForm(prev => ({
-        ...prev,
-        latitude: String(location.latitude),
-        longitude: String(location.longitude),
-        city: detectedCity || prev.city
-      }))
-      setLocationInitialized(true)
+    const initializeLocation = async () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords
+            let city = ''
+
+            // Try to get city name via reverse geocoding
+            try {
+              const response = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                { headers: { 'Accept-Language': 'en' } }
+              )
+              if (response.ok) {
+                const data = await response.json()
+                city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || ''
+              }
+            } catch (e) {
+              console.debug('Reverse geocoding failed:', e)
+            }
+
+            setForm(prev => ({
+              ...prev,
+              latitude: String(latitude),
+              longitude: String(longitude),
+              city: city || prev.city
+            }))
+          },
+          (err) => {
+            console.debug('Geolocation error:', err)
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        )
+      }
     }
-  }, [location, detectedCity, locationInitialized])
+
+    initializeLocation()
+  }, [])
 
   // load existing categories from DB to present in dropdown
   useEffect(() => {
