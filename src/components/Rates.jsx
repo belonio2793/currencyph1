@@ -288,6 +288,21 @@ export default function Rates({ globalCurrency }) {
 
   const loadCryptoPrices = async () => {
     try {
+      // First: try reading cached cryptocurrency_rates from Supabase to avoid external calls
+      try {
+        const { data: dbCrypto, error: dbCryptoErr } = await supabase.from('cryptocurrency_rates').select('currency_code,rate')
+        if (!dbCryptoErr && Array.isArray(dbCrypto) && dbCrypto.length) {
+          const map = {}
+          dbCrypto.forEach(r => { if (r && r.currency_code && r.rate != null) map[r.currency_code.toUpperCase()] = Number(r.rate) })
+          if (Object.keys(map).length) {
+            setCryptoRates(map)
+            return
+          }
+        }
+      } catch (dbErr) {
+        console.debug('Could not read cryptocurrency_rates from Supabase (initial):', dbErr)
+      }
+
       // Try CoinGecko first (public, CORS-friendly). If that fails, fall back to supabase edge function.
       try {
         const ids = [
