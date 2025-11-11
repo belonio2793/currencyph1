@@ -115,8 +115,12 @@ export function useGeolocation() {
                 // Silently fail
               }
             } finally {
-              if (isMountedRef.current) {
-                setLoading(false)
+              try {
+                if (isMountedRef.current) {
+                  setLoading(false)
+                }
+              } catch (e) {
+                // ignore any state-setting errors
               }
             }
           }
