@@ -106,8 +106,10 @@ export default function Rates({ globalCurrency }) {
         }
       })
 
-      console.debug(`Loaded ${Object.keys(ratesMap).length} exchange rate pairs from currency_rates table`)
-      console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 5)))
+      const pairCount = Object.keys(ratesMap).length
+      console.debug(`Loaded ${pairCount} exchange rate pairs from currency_rates table`)
+      console.debug('All pairs:', Object.keys(ratesMap).sort())
+      console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 10)))
 
       setExchangeRates(ratesMap)
       
