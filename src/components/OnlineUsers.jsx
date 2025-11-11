@@ -304,12 +304,12 @@ export default function OnlineUsers({ userId, userEmail }) {
             <div className="h-full flex items-center justify-center bg-slate-100">
               <div className="text-center">
                 <p className="text-slate-600 font-medium">
-                  {filter === 'friends' ? 'No friends online' : 'No users online.'}
+                  {filter === 'friends' ? 'None of your friends are online right now.' : 'No users are currently online.'}
                 </p>
                 <p className="text-slate-500 text-sm mt-2">
                   {filter === 'friends'
-                    ? 'Add friends to see them here when they come online'
-                    : 'Check back soon or share your location to be discovered'}
+                    ? 'Invite friends to connect — they\'ll appear here when they come online.'
+                    : 'There are no users online at the moment. Try again later or share your profile so others can find you.'}
                 </p>
               </div>
             </div>
@@ -333,7 +333,7 @@ export default function OnlineUsers({ userId, userEmail }) {
             <div className="flex-1 flex items-center justify-center p-4">
               <div className="text-center">
                 <p className="text-slate-600 font-medium text-sm">
-                  {filter === 'friends' ? 'No friends online' : 'No users online.'}
+                  {filter === 'friends' ? 'None of your friends are online right now.' : 'No users are currently online.'}
                 </p>
               </div>
             </div>
