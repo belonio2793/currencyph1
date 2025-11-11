@@ -221,6 +221,32 @@ export default function Rates({ globalCurrency }) {
       // 4) Last-resort: external currency API to build pairwise rates
       try {
         const globalRates = await currencyAPI.getGlobalRates()
+        if (globalRates && typeof globalRates === 'object') {
+          // globalRates is a map of code -> { rate: X } where rate is USD->CODE
+          const codes = Object.keys(globalRates)
+          codes.forEach(a => {
+            codes.forEach(b => {
+              if (a === b) return
+              const aRate = globalRates[a] && globalRates[a].rate
+              const bRate = globalRates[b] && globalRates[b].rate
+              if (typeof aRate === 'number' && typeof bRate === 'number' && aRate > 0) {
+                // compute a -> b: (USD->b) / (USD->a)
+                ratesMap[`${a}_${b}`] = bRate / aRate
+              }
+            })
+          })
+          if (Object.keys(ratesMap).length) {
+            setExchangeRates(ratesMap)
+            return
+          }
+        }
+      } catch (apiErr) {
+        console.debug('currencyAPI.getGlobalRates fallback failed:', apiErr)
+      }
+
+      // If we reach here, we couldn't build rates
+      try {
+        const globalRates = await currencyAPI.getGlobalRates()
         if (!globalRates || typeof globalRates !== 'object') {
           console.debug('Invalid rates format from external API, using empty rates')
           setExchangeRates(ratesMap)
