@@ -174,7 +174,7 @@ export default function Rates() {
     })
 
     return sorted
-  }, [rates, typeFilter, searchTerm, sortBy, sortDirection, decimalFilter])
+  }, [rates, typeFilter, searchTerm, sortBy, sortDirection])
 
   const favoriteRates = useMemo(() => {
     return rates.filter(r => favorites.includes(r.code))
