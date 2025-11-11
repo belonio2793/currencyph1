@@ -206,8 +206,14 @@ export default function Rates({ globalCurrency }) {
   }
 
   const filtered = allCurrencies.filter(c => {
+    // Filter by type
+    if (typeFilter !== 'all' && c.type !== typeFilter) {
+      return false
+    }
+
+    // Filter by search
     if (!search) return true
-    return c.code.toLowerCase().includes(search.toLowerCase()) || 
+    return c.code.toLowerCase().includes(search.toLowerCase()) ||
            c.name.toLowerCase().includes(search.toLowerCase())
   })
 
