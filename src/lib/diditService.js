@@ -1,8 +1,8 @@
 import { supabase } from './supabaseClient'
 import { encryptString, generateSymmetricKey, exportKeyToBase64 } from './crypto'
 
-const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY || process.env.DIDIT_API_KEY
-const DIDIT_APP_ID = import.meta.env.VITE_DIDIT_APP_ID || process.env.DIDIT_APP_ID
+const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY
+const DIDIT_APP_ID = import.meta.env.VITE_DIDIT_APP_ID
 const DIDIT_API_BASE = 'https://api.didit.me/api/v1'
 
 // Store encryption key in localStorage for consistent encryption/decryption
