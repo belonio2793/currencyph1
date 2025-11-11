@@ -719,10 +719,8 @@ export default function Rates({ globalCurrency }) {
 
   const renderCryptoCard = (isPrimary) => {
     if (!selectedCrypto) return null
-    const basePrice = cryptoRates[selectedCrypto.code] || (defaultCryptoPrices[selectedCrypto.code] * (resolveUsdToBase() || 1))
     const selectedFiatCode = selectedFiat ? selectedFiat.code : baseCurrency
-    const fiatMultiplier = selectedFiat ? (getRate(baseCurrency, selectedFiat.code) || null) : null
-    const price = (basePrice != null && fiatMultiplier != null) ? (basePrice * fiatMultiplier) : (fiatMultiplier == null ? basePrice : null)
+    const price = getCryptoFiatRate(selectedCrypto.code, selectedFiatCode)
     const pairKey = `${selectedCrypto.code}_${selectedFiatCode}`
 
     return (
