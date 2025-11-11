@@ -100,9 +100,12 @@ export default function Rates() {
             decimals: 8
           }
 
+          // Invert crypto rates since they're stored as crypto/PHP but should display as PHP/crypto
+          const invertedRate = pair.rate > 0 ? 1 / Number(pair.rate) : 0
+
           ratesByCode[pair.to_currency] = {
             code: pair.to_currency,
-            rate: Number(pair.rate),
+            rate: invertedRate,
             metadata: metadata,
             source: 'cryptocurrency_rates',
             updatedAt: pair.updated_at || new Date().toISOString()
