@@ -158,22 +158,12 @@ export default function Rates({ globalCurrency }) {
     if (from === to) return 1
 
     // Try direct pair first
-    const direct = exchangeRates[`${from}_${to}`]
-    if (typeof direct === 'number' && isFinite(direct) && direct > 0) {
-      // Check if this looks like an inverted crypto rate (very small number like 0.0000001)
-      if (direct < 0.01 && from !== 'USD' && from !== baseCurrency) {
-        // Might be inverted, try the reverse
-        const reverse = exchangeRates[`${to}_${from}`]
-        if (typeof reverse === 'number' && isFinite(reverse) && reverse > 0.01) {
-          return 1 / reverse
-        }
-      }
-      return direct
-    }
+    let rate = exchangeRates[`${from}_${to}`]
+    if (typeof rate === 'number' && isFinite(rate) && rate > 0) return rate
 
     // Try reverse pair and invert
-    const reverse = exchangeRates[`${to}_${from}`]
-    if (typeof reverse === 'number' && reverse > 0) return 1 / reverse
+    rate = exchangeRates[`${to}_${from}`]
+    if (typeof rate === 'number' && rate > 0) return 1 / rate
 
     // Try compute via USD if both have USD pairs
     const usdToFrom = exchangeRates[`USD_${from}`]
@@ -182,7 +172,7 @@ export default function Rates({ globalCurrency }) {
       return usdToTo / usdToFrom
     }
 
-    // Try compute via PHP (base currency) if both have PHP pairs
+    // Try compute via PHP if both have PHP pairs
     const phpToFrom = exchangeRates[`${baseCurrency}_${from}`]
     const phpToTo = exchangeRates[`${baseCurrency}_${to}`]
     if (typeof phpToFrom === 'number' && typeof phpToTo === 'number' && phpToFrom > 0) {
