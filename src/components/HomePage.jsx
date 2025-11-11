@@ -222,7 +222,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             onClick={() => onTabChange('network-balances')}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-teal-300 transition-all group"
           >
-            <div className="flex items-start justify-between mb-4">
+            <div className="flex justify-center mb-4">
               <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-teal-100 group-hover:bg-teal-200 transition-colors">
                 <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
