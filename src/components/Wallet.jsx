@@ -790,35 +790,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
           <button onClick={() => setShowPreferencesFiat(true)} className="text-sm px-3 py-1 bg-slate-100 rounded">Customize</button>
         </div>
 
-        {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length === 0 ? (
-          <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
-            <p className="text-slate-500 mb-4">No fiat wallets created yet</p>
-            <button
-              onClick={async () => {
-                try {
-                  setError('')
-                  setSuccess('')
-                  // create a default fiat wallet (PHP)
-                  await supabase.from('wallets_fiat').insert([{
-                    user_id: userId,
-                    currency: 'PHP',
-                    balance: 0,
-                    provider: 'manual',
-                    provider_account_id: null
-                  }])
-                  setSuccess('Fiat wallet created')
-                  await loadWallets()
-                } catch (e) {
-                  console.error('Failed to create fiat wallet', e)
-                  setError('Failed to create fiat wallet')
-                }
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-            >
-              Create Fiat Wallet
-            </button>
-          </div>
-        ) : (
+        {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
