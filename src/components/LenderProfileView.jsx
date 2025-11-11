@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { p2pLoanService } from '../lib/p2pLoanService'
+import { VerificationBadge } from './VerificationBadge'
+import { useUserVerificationStatus } from '../lib/usePublicUserProfile'
 
 export default function LenderProfileView({ userId, lenderId, onClose }) {
   const [lenderProfile, setLenderProfile] = useState(null)
