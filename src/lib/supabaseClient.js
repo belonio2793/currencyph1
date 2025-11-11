@@ -76,8 +76,16 @@ function initClient() {
             }
             return await originalFetch(...args)
           } catch (err) {
-            // Abort errors should be propagated immediately
-            if (err && err.name === 'AbortError') throw err
+            // Abort errors: return a synthetic Response so callers receive a proper response object instead of an uncaught exception
+            if (err && err.name === 'AbortError') {
+              console.debug('[supabase-client] fetch aborted:', err && err.message)
+              try {
+                const body = JSON.stringify({ error: 'aborted', message: err && err.message })
+                return new Response(body, { status: 499, headers: { 'Content-Type': 'application/json' } })
+              } catch (e) {
+                throw err
+              }
+            }
 
             // On last attempt, instead of throwing a raw TypeError which causes noisy console traces
             // return a synthetic Response with 503 status so callers receive a proper response object.
