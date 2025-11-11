@@ -98,15 +98,18 @@ export function useGeolocation() {
                   clearTimeout(timeoutId)
 
                   if (response.ok && isMountedRef.current) {
-                    const nom = await response.json()
-                    setCity(
-                      nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
-                    )
+                    try {
+                      const nom = await response.json()
+                      setCity(
+                        nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
+                      )
+                    } catch (parseErr) {
+                      // JSON parse error - silently ignore
+                    }
                   }
-                } catch (e) {
+                } catch (fetchErr) {
                   clearTimeout(timeoutId)
-                  // Silently fail on any error including AbortError (network, abort, timeout, etc.)
-                  // Do not re-throw, just swallow all errors
+                  // Silently ignore all fetch errors including AbortError
                 }
               } catch (e) {
                 // Silently fail - any network error is acceptable
