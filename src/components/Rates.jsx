@@ -411,32 +411,32 @@ export default function Rates({ globalCurrency }) {
           </div>
 
           <div className="flex gap-2 mb-4">
-            <button 
-              onClick={() => setSearch('')}
+            <button
+              onClick={() => setTypeFilter('all')}
               className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{ 
-                backgroundColor: search === '' ? '#3b82f6' : '#e2e8f0',
-                color: search === '' ? 'white' : '#475569'
+              style={{
+                backgroundColor: typeFilter === 'all' ? '#3b82f6' : '#e2e8f0',
+                color: typeFilter === 'all' ? 'white' : '#475569'
               }}
             >
               All ({allCurrencies.length})
             </button>
-            <button 
-              onClick={() => setSearch('')}
+            <button
+              onClick={() => setTypeFilter('fiat')}
               className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{ 
-                backgroundColor: search === '' ? '#e2e8f0' : '#e2e8f0',
-                color: '#475569'
+              style={{
+                backgroundColor: typeFilter === 'fiat' ? '#3b82f6' : '#e2e8f0',
+                color: typeFilter === 'fiat' ? 'white' : '#475569'
               }}
             >
               Fiat ({allCurrencies.filter(c => c.type === 'fiat').length})
             </button>
-            <button 
-              onClick={() => setSearch('')}
+            <button
+              onClick={() => setTypeFilter('crypto')}
               className="flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-colors"
-              style={{ 
-                backgroundColor: search === '' ? '#e2e8f0' : '#e2e8f0',
-                color: '#475569'
+              style={{
+                backgroundColor: typeFilter === 'crypto' ? '#3b82f6' : '#e2e8f0',
+                color: typeFilter === 'crypto' ? 'white' : '#475569'
               }}
             >
               Crypto ({allCurrencies.filter(c => c.type === 'crypto').length})
