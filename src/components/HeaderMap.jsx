@@ -179,6 +179,7 @@ export default function HeaderMap({ userId: headerUserId }) {
 
             <div className="h-96 bg-slate-100 relative">
               <MapContainer
+                attributionControl={false}
                 center={[displayLocation.latitude, displayLocation.longitude]}
                 zoom={13}
                 keyboard={false}
@@ -189,20 +190,10 @@ export default function HeaderMap({ userId: headerUserId }) {
                   attribution='&copy; OpenStreetMap contributors'
                 />
 
-                {/* Show marker only if we have a live location and sharing is enabled */}
-                {location && shareEnabled && (
-                  <Marker position={[location.latitude, location.longitude]}>
-                    <Popup>
-                      <div className="text-sm">
-                        <div className="font-semibold">Your Location</div>
-                        <div className="text-xs text-slate-600 mt-1">
-                          {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
-                        </div>
-                        {city && <div className="text-xs font-medium text-slate-700 mt-1">{city}</div>}
-                      </div>
-                    </Popup>
-                  </Marker>
-                )}
+                {/* Always show a draggable marker at the current markerPos (falls back to displayLocation) */}
+                <DraggableMarker initialPos={displayLocation} onChange={(lat, lng) => {
+                  // update local state below via setMarkerPos - handled in component
+                }} />
 
                 {/* Center button control - uses map instance via useMap */}
                 <CenterButton location={location && shareEnabled ? location : null} fallback={displayLocation} />
