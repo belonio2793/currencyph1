@@ -40,9 +40,10 @@ export function useGeolocation() {
                   let timedOut = false
 
                   const timeoutId = setTimeout(() => {
+                    if (timedOut) return // Already timed out, skip
                     timedOut = true
                     try {
-                      if (controller?.abort) controller.abort()
+                      controller?.abort?.()
                     } catch (e) {
                       // Silently ignore all abort errors
                     }
