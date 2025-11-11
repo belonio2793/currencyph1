@@ -809,64 +809,78 @@ export default function Rates({ globalCurrency }) {
             {filtered.length === 0 ? (
               <div className="text-sm text-slate-500">No results</div>
             ) : (
-              filtered.map(item => (
-                <div key={`${item.type}-${item.code}`} onClick={() => onSelect(item)} className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between ${item.type === 'fiat' ? (selectedFiat && selectedFiat.code === item.code ? 'bg-slate-100' : '') : (selectedCrypto && selectedCrypto.code === item.code ? 'bg-slate-100' : '')}`}>
-                  <div>
-                    <div className="font-medium">{item.code}</div>
-                    <div className="text-xs text-slate-500">{item.name}</div>
-                  </div>
-                  <div className="text-sm text-slate-600">
-                    {item.type === 'fiat' ? (
-                      (() => {
-                        // If selectedFiat is set, compute selectedFiat -> item (show how many item per 1 selectedFiat)
-                        if (!selectedFiat) return '—'
-                        const from = selectedFiat.code
-                        let pair = null
-                        if (from === item.code) {
-                          // for self, show selected -> baseCurrency (e.g. 1 USD = 58.97 PHP), unless base is the selected (1)
-                          if (from === baseCurrency) return (1).toFixed(2)
-                          pair = getPairRate(from, baseCurrency)
-                        } else {
-                          pair = getPairRate(from, item.code)
-                        }
-                        return (typeof pair === 'number' ? pair.toFixed(2) : '—')
-                      })()
-                    ) : (
-                      (() => {
-                        // Crypto rows: behavior depends on viewMode
-                        if (viewMode === 'crypto') {
-                          // show pair rate between selectedCrypto and this crypto
-                          if (!selectedCrypto) return '—'
-                          if (selectedCrypto.code === item.code) return '—'
-                          const a = cryptoRates[selectedCrypto.code]
-                          const b = cryptoRates[item.code]
-                          if (typeof a === 'number' && typeof b === 'number' && a > 0) {
-                            const rate = b / a // item per selectedCrypto
-                            return isFinite(rate) ? rate.toFixed(6) : '—'
+              filtered.map(item => {
+                const pairKey = getListItemPair(item)
+                return (
+                  <div
+                    key={`${item.type}-${item.code}`}
+                    onClick={() => onSelect(item)}
+                    className={`p-2 rounded cursor-pointer hover:bg-slate-50 flex items-center justify-between relative group ${item.type === 'fiat' ? (selectedFiat && selectedFiat.code === item.code ? 'bg-slate-100' : '') : (selectedCrypto && selectedCrypto.code === item.code ? 'bg-slate-100' : '')}`}
+                    title={pairKey ? `Pair: ${pairKey}` : undefined}
+                  >
+                    <div>
+                      <div className="font-medium">{item.code}</div>
+                      <div className="text-xs text-slate-500">{item.name}</div>
+                    </div>
+                    <div className="text-sm text-slate-600">
+                      {item.type === 'fiat' ? (
+                        (() => {
+                          // If selectedFiat is set, compute selectedFiat -> item (show how many item per 1 selectedFiat)
+                          if (!selectedFiat) return '—'
+                          const from = selectedFiat.code
+                          let pair = null
+                          if (from === item.code) {
+                            // for self, show selected -> baseCurrency (e.g. 1 USD = 58.97 PHP), unless base is the selected (1)
+                            if (from === baseCurrency) return (1).toFixed(2)
+                            pair = getPairRate(from, baseCurrency)
+                          } else {
+                            pair = getPairRate(from, item.code)
                           }
+                          return (typeof pair === 'number' ? pair.toFixed(2) : '—')
+                        })()
+                      ) : (
+                        (() => {
+                          // Crypto rows: behavior depends on viewMode
+                          if (viewMode === 'crypto') {
+                            // show pair rate between selectedCrypto and this crypto
+                            if (!selectedCrypto) return '—'
+                            if (selectedCrypto.code === item.code) return '—'
+                            const a = cryptoRates[selectedCrypto.code]
+                            const b = cryptoRates[item.code]
+                            if (typeof a === 'number' && typeof b === 'number' && a > 0) {
+                              const rate = b / a // item per selectedCrypto
+                              return isFinite(rate) ? rate.toFixed(6) : '—'
+                            }
+                            return '—'
+                          }
+
+                          // viewMode === 'fiat' -> show crypto price in selected fiat
+                          if (!selectedFiat) return '—'
+
+                          const cryptoPriceInBase = cryptoRates[item.code]
+                          if (typeof cryptoPriceInBase === 'number') {
+                            const baseToSelected = getPairRate(baseCurrency, selectedFiat.code) || getRate(baseCurrency, selectedFiat.code)
+                            if (typeof baseToSelected === 'number') return (cryptoPriceInBase * baseToSelected).toFixed(2)
+                          }
+
+                          // fallback: attempt to compute via USD
+                          const usdToSelected = getPairRate('USD', selectedFiat.code)
+                          const cgUsd = cryptoUsdFallback(item.code)
+                          if (typeof cgUsd === 'number' && typeof usdToSelected === 'number') return (cgUsd * usdToSelected).toFixed(2)
+
                           return '—'
-                        }
+                        })()
+                      )}
+                    </div>
 
-                        // viewMode === 'fiat' -> show crypto price in selected fiat
-                        if (!selectedFiat) return '—'
-
-                        const cryptoPriceInBase = cryptoRates[item.code]
-                        if (typeof cryptoPriceInBase === 'number') {
-                          const baseToSelected = getPairRate(baseCurrency, selectedFiat.code) || getRate(baseCurrency, selectedFiat.code)
-                          if (typeof baseToSelected === 'number') return (cryptoPriceInBase * baseToSelected).toFixed(2)
-                        }
-
-                        // fallback: attempt to compute via USD
-                        const usdToSelected = getPairRate('USD', selectedFiat.code)
-                        const cgUsd = cryptoUsdFallback(item.code)
-                        if (typeof cgUsd === 'number' && typeof usdToSelected === 'number') return (cgUsd * usdToSelected).toFixed(2)
-
-                        return '—'
-                      })()
+                    {pairKey && (
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
+                        Pair: {pairKey}
+                      </div>
                     )}
                   </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         </div>
