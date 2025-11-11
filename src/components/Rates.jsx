@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabaseClient'
 
 export default function Rates({ globalCurrency }) {
   const [exchangeRates, setExchangeRates] = useState({})
-  const [cryptoRates, setCryptoRates] = useState({})
+  const [cryptoRatesUSD, setCryptoRatesUSD] = useState({})
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState(new Date())
   const [allCurrencies, setAllCurrencies] = useState([])
@@ -31,12 +31,12 @@ export default function Rates({ globalCurrency }) {
     const reverse = exchangeRates[`${fiatCode}_${cryptoCode}`]
     if (typeof reverse === 'number' && reverse > 0) return 1 / reverse
 
-    // Fallback: compute via base currency or USD
-    const cryptoPriceInBase = cryptoRates[cryptoCode]
-    if (typeof cryptoPriceInBase === 'number' && cryptoPriceInBase > 0) {
-      if (fiatCode === baseCurrency) return cryptoPriceInBase
-      const baseToFiat = getPairRate(baseCurrency, fiatCode)
-      if (typeof baseToFiat === 'number') return cryptoPriceInBase * baseToFiat
+    // Fallback: compute from crypto USD price via fiat
+    const cryptoPriceUSD = cryptoRatesUSD[cryptoCode]
+    if (typeof cryptoPriceUSD === 'number' && cryptoPriceUSD > 0) {
+      if (fiatCode === 'USD') return cryptoPriceUSD
+      const usdToFiat = getPairRate('USD', fiatCode)
+      if (typeof usdToFiat === 'number') return cryptoPriceUSD * usdToFiat
     }
 
     return null
@@ -314,7 +314,7 @@ export default function Rates({ globalCurrency }) {
           const map = {}
           dbCrypto.forEach(r => { if (r && r.currency_code && r.rate != null) map[r.currency_code.toUpperCase()] = Number(r.rate) })
           if (Object.keys(map).length) {
-            setCryptoRates(map)
+            setCryptoRatesUSD(map)
             return
           }
         }
@@ -330,32 +330,24 @@ export default function Rates({ globalCurrency }) {
         const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 500, 8000)
         const cryptoData = cg || null
         if (cryptoData) {
-          const usdToBase = (() => {
-            const direct = exchangeRates[`USD_${baseCurrency}`]
-            if (typeof direct === 'number' && direct > 0) return direct
-            const rev = exchangeRates[`${baseCurrency}_USD`]
-            if (typeof rev === 'number' && rev > 0) return 1 / rev
-            return 1
-          })()
-
-          const cryptoPricesInGlobalCurrency = {
-            BTC: Math.round(((cryptoData.bitcoin?.usd) || defaultCryptoPrices.BTC) * usdToBase * 100) / 100,
-            ETH: Math.round(((cryptoData.ethereum?.usd) || defaultCryptoPrices.ETH) * usdToBase * 100) / 100,
-            LTC: Math.round(((cryptoData.litecoin?.usd) || defaultCryptoPrices.LTC) * usdToBase * 100) / 100,
-            DOGE: Math.round(((cryptoData.dogecoin?.usd) || defaultCryptoPrices.DOGE) * usdToBase * 100) / 100,
-            XRP: Math.round(((cryptoData.ripple?.usd) || defaultCryptoPrices.XRP) * usdToBase * 100) / 100,
-            ADA: Math.round(((cryptoData.cardano?.usd) || defaultCryptoPrices.ADA) * usdToBase * 100) / 100,
-            SOL: Math.round(((cryptoData.solana?.usd) || defaultCryptoPrices.SOL) * usdToBase * 100) / 100,
-            AVAX: Math.round(((cryptoData['avalanche-2']?.usd) || defaultCryptoPrices.AVAX) * usdToBase * 100) / 100,
-            MATIC: Math.round(((cryptoData['matic-network']?.usd) || defaultCryptoPrices.MATIC) * usdToBase * 100) / 100,
-            DOT: Math.round(((cryptoData.polkadot?.usd) || defaultCryptoPrices.DOT) * usdToBase * 100) / 100,
-            LINK: Math.round(((cryptoData.chainlink?.usd) || defaultCryptoPrices.LINK) * usdToBase * 100) / 100,
-            UNI: Math.round(((cryptoData.uniswap?.usd) || defaultCryptoPrices.UNI) * usdToBase * 100) / 100,
-            AAVE: Math.round(((cryptoData.aave?.usd) || defaultCryptoPrices.AAVE) * usdToBase * 100) / 100,
-            USDC: Math.round(((cryptoData['usd-coin']?.usd) || defaultCryptoPrices.USDC) * usdToBase * 100) / 100,
-            USDT: Math.round(((cryptoData.tether?.usd) || defaultCryptoPrices.USDT) * usdToBase * 100) / 100
+          const cryptoPricesUSD = {
+            BTC: ((cryptoData.bitcoin?.usd) || defaultCryptoPrices.BTC),
+            ETH: ((cryptoData.ethereum?.usd) || defaultCryptoPrices.ETH),
+            LTC: ((cryptoData.litecoin?.usd) || defaultCryptoPrices.LTC),
+            DOGE: ((cryptoData.dogecoin?.usd) || defaultCryptoPrices.DOGE),
+            XRP: ((cryptoData.ripple?.usd) || defaultCryptoPrices.XRP),
+            ADA: ((cryptoData.cardano?.usd) || defaultCryptoPrices.ADA),
+            SOL: ((cryptoData.solana?.usd) || defaultCryptoPrices.SOL),
+            AVAX: ((cryptoData['avalanche-2']?.usd) || defaultCryptoPrices.AVAX),
+            MATIC: ((cryptoData['matic-network']?.usd) || defaultCryptoPrices.MATIC),
+            DOT: ((cryptoData.polkadot?.usd) || defaultCryptoPrices.DOT),
+            LINK: ((cryptoData.chainlink?.usd) || defaultCryptoPrices.LINK),
+            UNI: ((cryptoData.uniswap?.usd) || defaultCryptoPrices.UNI),
+            AAVE: ((cryptoData.aave?.usd) || defaultCryptoPrices.AAVE),
+            USDC: ((cryptoData['usd-coin']?.usd) || defaultCryptoPrices.USDC),
+            USDT: ((cryptoData.tether?.usd) || defaultCryptoPrices.USDT)
           }
-          setCryptoRates(cryptoPricesInGlobalCurrency)
+          setCryptoRatesUSD(cryptoPricesUSD)
           return
         }
       } catch (cgErr) {
@@ -380,62 +372,33 @@ export default function Rates({ globalCurrency }) {
       )
 
       if (!data || !data.cryptoPrices) {
-        const usdToBase = (() => {
-          const direct = exchangeRates[`USD_${baseCurrency}`]
-          if (typeof direct === 'number' && direct > 0) return direct
-          const rev = exchangeRates[`${baseCurrency}_USD`]
-          if (typeof rev === 'number' && rev > 0) return 1 / rev
-          return 1
-        })()
-        const defaults = {}
-        Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
-          defaults[key] = Math.round(value * usdToBase * 100) / 100
-        })
-        setCryptoRates(defaults)
+        setCryptoRatesUSD(defaultCryptoPrices)
         return
       }
 
-      const usdToBase = (() => {
-        const direct = exchangeRates[`USD_${baseCurrency}`]
-        if (typeof direct === 'number' && direct > 0) return direct
-        const rev = exchangeRates[`${baseCurrency}_USD`]
-        if (typeof rev === 'number' && rev > 0) return 1 / rev
-        return 1
-      })()
       const cryptoData = data.cryptoPrices
 
-      const cryptoPricesInGlobalCurrency = {
-        BTC: Math.round((cryptoData.bitcoin?.usd || defaultCryptoPrices.BTC) * usdToBase * 100) / 100,
-        ETH: Math.round((cryptoData.ethereum?.usd || defaultCryptoPrices.ETH) * usdToBase * 100) / 100,
-        LTC: Math.round((cryptoData.litecoin?.usd || defaultCryptoPrices.LTC) * usdToBase * 100) / 100,
-        DOGE: Math.round((cryptoData.dogecoin?.usd || defaultCryptoPrices.DOGE) * usdToBase * 100) / 100,
-        XRP: Math.round((cryptoData.ripple?.usd || defaultCryptoPrices.XRP) * usdToBase * 100) / 100,
-        ADA: Math.round((cryptoData.cardano?.usd || defaultCryptoPrices.ADA) * usdToBase * 100) / 100,
-        SOL: Math.round((cryptoData.solana?.usd || defaultCryptoPrices.SOL) * usdToBase * 100) / 100,
-        AVAX: Math.round((cryptoData['avalanche-2']?.usd || defaultCryptoPrices.AVAX) * usdToBase * 100) / 100,
-        MATIC: Math.round((cryptoData['matic-network']?.usd || defaultCryptoPrices.MATIC) * usdToBase * 100) / 100,
-        DOT: Math.round((cryptoData.polkadot?.usd || defaultCryptoPrices.DOT) * usdToBase * 100) / 100,
-        LINK: Math.round((cryptoData.chainlink?.usd || defaultCryptoPrices.LINK) * usdToBase * 100) / 100,
-        UNI: Math.round((cryptoData.uniswap?.usd || defaultCryptoPrices.UNI) * usdToBase * 100) / 100,
-        AAVE: Math.round((cryptoData.aave?.usd || defaultCryptoPrices.AAVE) * usdToBase * 100) / 100,
-        USDC: Math.round((cryptoData['usd-coin']?.usd || defaultCryptoPrices.USDC) * usdToBase * 100) / 100,
-        USDT: Math.round((cryptoData.tether?.usd || defaultCryptoPrices.USDT) * usdToBase * 100) / 100
+      const cryptoPricesUSD = {
+        BTC: (cryptoData.bitcoin?.usd || defaultCryptoPrices.BTC),
+        ETH: (cryptoData.ethereum?.usd || defaultCryptoPrices.ETH),
+        LTC: (cryptoData.litecoin?.usd || defaultCryptoPrices.LTC),
+        DOGE: (cryptoData.dogecoin?.usd || defaultCryptoPrices.DOGE),
+        XRP: (cryptoData.ripple?.usd || defaultCryptoPrices.XRP),
+        ADA: (cryptoData.cardano?.usd || defaultCryptoPrices.ADA),
+        SOL: (cryptoData.solana?.usd || defaultCryptoPrices.SOL),
+        AVAX: (cryptoData['avalanche-2']?.usd || defaultCryptoPrices.AVAX),
+        MATIC: (cryptoData['matic-network']?.usd || defaultCryptoPrices.MATIC),
+        DOT: (cryptoData.polkadot?.usd || defaultCryptoPrices.DOT),
+        LINK: (cryptoData.chainlink?.usd || defaultCryptoPrices.LINK),
+        UNI: (cryptoData.uniswap?.usd || defaultCryptoPrices.UNI),
+        AAVE: (cryptoData.aave?.usd || defaultCryptoPrices.AAVE),
+        USDC: (cryptoData['usd-coin']?.usd || defaultCryptoPrices.USDC),
+        USDT: (cryptoData.tether?.usd || defaultCryptoPrices.USDT)
       }
-      setCryptoRates(cryptoPricesInGlobalCurrency)
+      setCryptoRatesUSD(cryptoPricesUSD)
     } catch (err) {
       console.debug('Crypto prices API error, using default prices:', err?.message || err)
-      const usdToBase = (() => {
-        const direct = exchangeRates[`USD_${baseCurrency}`]
-        if (typeof direct === 'number' && direct > 0) return direct
-        const rev = exchangeRates[`${baseCurrency}_USD`]
-        if (typeof rev === 'number' && rev > 0) return 1 / rev
-        return 1
-      })()
-      const defaults = {}
-      Object.entries(defaultCryptoPrices).forEach(([key, value]) => {
-        defaults[key] = Math.round(value * usdToBase * 100) / 100
-      })
-      setCryptoRates(defaults)
+      setCryptoRatesUSD(defaultCryptoPrices)
     }
   }
 
@@ -866,8 +829,8 @@ export default function Rates({ globalCurrency }) {
                             // show pair rate between selectedCrypto and this crypto
                             if (!selectedCrypto) return '—'
                             if (selectedCrypto.code === item.code) return '—'
-                            const a = cryptoRates[selectedCrypto.code]
-                            const b = cryptoRates[item.code]
+                            const a = cryptoRatesUSD[selectedCrypto.code]
+                            const b = cryptoRatesUSD[item.code]
                             if (typeof a === 'number' && typeof b === 'number' && a > 0) {
                               const rate = b / a // item per selectedCrypto
                               return isFinite(rate) ? rate.toFixed(6) : '—'
@@ -878,10 +841,10 @@ export default function Rates({ globalCurrency }) {
                           // viewMode === 'fiat' -> show crypto price in selected fiat
                           if (!selectedFiat) return '—'
 
-                          const cryptoPriceInBase = cryptoRates[item.code]
-                          if (typeof cryptoPriceInBase === 'number') {
-                            const baseToSelected = getPairRate(baseCurrency, selectedFiat.code) || getRate(baseCurrency, selectedFiat.code)
-                            if (typeof baseToSelected === 'number') return (cryptoPriceInBase * baseToSelected).toFixed(2)
+                          const cryptoPriceUSD = cryptoRatesUSD[item.code]
+                          if (typeof cryptoPriceUSD === 'number') {
+                            const usdToSelected = getPairRate('USD', selectedFiat.code) || getRate('USD', selectedFiat.code)
+                            if (typeof usdToSelected === 'number') return (cryptoPriceUSD * usdToSelected).toFixed(2)
                           }
 
                           // fallback: attempt to compute via USD
