@@ -58,7 +58,7 @@ function initClient() {
       console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
 
       // Wrap fetch to handle network errors gracefully and retry transient failures
-      const originalFetch = globalThis.fetch
+      const originalFetch = (typeof globalThis !== 'undefined' && globalThis.fetch) || (typeof window !== 'undefined' && window.fetch) || null
       const wrappedFetch = async (...args) => {
         const maxRetries = 2
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
@@ -74,7 +74,16 @@ function initClient() {
                 throw offlineErr
               }
             }
-            return await originalFetch(...args)
+
+            if (!originalFetch) {
+              // No fetch available in this runtime - return synthetic response
+              const body = JSON.stringify({ error: 'no_fetch', message: 'Fetch API not available' })
+              return new Response(body, { status: 500, headers: { 'Content-Type': 'application/json' } })
+            }
+
+            // ensure we await and capture errors
+            const resp = await originalFetch(...args)
+            return resp
           } catch (err) {
             // Abort errors: return a synthetic Response so callers receive a proper response object instead of an uncaught exception
             if (err && err.name === 'AbortError') {
@@ -83,7 +92,9 @@ function initClient() {
                 const body = JSON.stringify({ error: 'aborted', message: err && err.message })
                 return new Response(body, { status: 499, headers: { 'Content-Type': 'application/json' } })
               } catch (e) {
-                throw err
+                // can't construct Response - break loop and return null
+                console.warn('[supabase-client] could not construct aborted response fallback', e)
+                return null
               }
             }
 
@@ -101,8 +112,9 @@ function initClient() {
                 const body = JSON.stringify({ error: 'network_error', message: err && err.message })
                 return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
               } catch (e) {
-                // If Response isn't available, just throw the original error as a last resort
-                throw err
+                // If Response isn't available, return null to avoid throwing
+                console.warn('[supabase-client] could not construct response fallback', e)
+                return null
               }
             }
 
@@ -112,6 +124,7 @@ function initClient() {
             // retry
           }
         }
+        return null
       }
 
       _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
