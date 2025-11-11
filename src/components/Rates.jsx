@@ -525,11 +525,15 @@ export default function Rates({ globalCurrency }) {
 
   const renderFiatCard = (isPrimary) => {
     if (!selectedFiat) return null
-    // Show selected fiat price in baseCurrency (e.g. 1 USD = 58.97 PHP)
     const isBase = selectedFiat.code === baseCurrency
     const displayPrice = isBase ? 1 : getPairRate(selectedFiat.code, baseCurrency)
+    const pairKey = isBase ? `${baseCurrency}_${baseCurrency}` : `${selectedFiat.code}_${baseCurrency}`
+
     return (
-      <div className={`rounded-lg p-6 border w-full ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'}`}>
+      <div
+        className={`rounded-lg p-6 border w-full relative group ${isPrimary ? 'bg-slate-50 border-slate-200' : 'bg-white border-slate-100'}`}
+        title={`Pair: ${pairKey}`}
+      >
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-xl font-medium">{selectedFiat.code}</h3>
@@ -537,12 +541,17 @@ export default function Rates({ globalCurrency }) {
           </div>
           <div className="text-right">
             <div className="text-2xl font-light text-slate-900">{typeof displayPrice === 'number' ? (displayPrice === 1 && isBase ? '1' : displayPrice.toFixed(2)) : '—'}</div>
-            <div className="text-xs text-slate-500">{isBase ? `1 ${selectedFiat.code}` : `1 ${selectedFiat.code} = ${baseCurrency}`}</div>
+            <div className="text-xs text-slate-500">{isBase ? `1 ${baseCurrency}` : `1 ${selectedFiat.code} = ${displayPrice ? displayPrice.toFixed(2) : '—'} ${baseCurrency}`}</div>
           </div>
         </div>
         <div className="flex gap-2 mt-4">
-          <button onClick={() => prev('fiat')} className="px-3 py-2 bg-white border rounded">Prev</button>
-          <button onClick={() => next('fiat')} className="px-3 py-2 bg-white border rounded">Next</button>
+          <button onClick={() => prev('fiat')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Prev</button>
+          <button onClick={() => next('fiat')} className="px-3 py-2 bg-white border rounded hover:bg-slate-100">Next</button>
+        </div>
+
+        {/* Hover tooltip */}
+        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-slate-900 text-white text-xs rounded whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity z-10">
+          Pair: {pairKey}
         </div>
       </div>
     )
@@ -722,7 +731,7 @@ export default function Rates({ globalCurrency }) {
                       placeholder="0.00"
                       disabled={!selectedFiat || !selectedCrypto || getRate(baseCurrency, selectedFiat ? selectedFiat.code : '') == null}
                     />
-                    <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '—'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
+                    <p className="text-xs text-slate-400 mt-1">Convert {selectedFiat ? selectedFiat.code : '��'} → {selectedCrypto ? selectedCrypto.code : '—'}</p>
                     {cryptoInput !== '' && (
                       <p className="text-xs text-slate-400 mt-1">= {formatNumber(cryptoInput, 8)} {selectedCrypto.code}</p>
                     )}
