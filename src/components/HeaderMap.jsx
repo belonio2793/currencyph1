@@ -362,30 +362,67 @@ function SendLocationButton({ location, city, userId: userIdProp, shareEnabled =
   const [loading, setLoading] = useState(!userIdProp)
 
   useEffect(() => {
-    if (userIdProp) return
+    if (userIdProp) {
+      setUserId(userIdProp)
+      setLoading(false)
+      return
+    }
+
     const fetchUser = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
-        if (user) setUserId(user.id)
+        if (user) {
+          setUserId(user.id)
+        }
       } catch (e) {
         console.warn('Failed to fetch user ID:', e)
       } finally {
         setLoading(false)
       }
     }
+
     fetchUser()
   }, [userIdProp])
+
+  const handleClick = () => {
+    if (!shareEnabled) {
+      alert('Please enable location sharing first to send your location')
+      return
+    }
+    if (!location) {
+      alert('Location not available yet. Please allow location access')
+      return
+    }
+    setOpen(true)
+  }
+
+  const buttonText = (() => {
+    if (loading) return 'Loading...'
+    if (!userId) return 'Login to share'
+    if (!shareEnabled) return 'Enable location sharing'
+    if (!location) return 'Getting location...'
+    return 'Send Location'
+  })()
 
   return (
     <>
       <button
-        onClick={() => setOpen(true)}
-        disabled={loading || !userId || !shareEnabled}
-        className="px-3 py-2 bg-white border rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        onClick={handleClick}
+        disabled={loading || !userId || !shareEnabled || !location}
+        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm font-medium disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+        title={!userId ? 'You must log in to send location' : !shareEnabled ? 'Enable location sharing first' : 'Send your location to a friend'}
       >
-        {loading ? 'Loading...' : !userId ? 'Login to share' : !shareEnabled ? 'Location sharing disabled' : 'Send Location'}
+        {buttonText}
       </button>
-      {open && userId && shareEnabled && <SendLocationModal open={open} onClose={() => setOpen(false)} location={location} city={city} senderId={userId} />}
+      {open && userId && shareEnabled && location && (
+        <SendLocationModal
+          open={open}
+          onClose={() => setOpen(false)}
+          location={location}
+          city={city}
+          senderId={userId}
+        />
+      )}
     </>
   )
 }
