@@ -84,7 +84,28 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
               </div>
             )}
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-3">
+            {/* Quick actions moved to header row */}
+            {(userEmail) && (
+              <>
+                <button
+                  onClick={() => onTabChange('online-users')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === 'online-users' ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  Online Users
+                </button>
+                <button
+                  onClick={() => onTabChange('deposit')}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === 'deposit' ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  Deposit
+                </button>
+              </>
+            )}
             <HeaderMap userId={userId} />
           </div>
         </div>
@@ -115,40 +136,43 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 <option value="SEK">SEK - Swedish Krona</option>
                 <option value="NZD">NZD - New Zealand Dollar</option>
                 <option value="SGD">SGD - Singapore Dollar</option>
-                <option value="HKD">HKD - Hong Kong Dollar</option>
-                <option value="IDR">IDR - Indonesian Rupiah</option>
-                <option value="MYR">MYR - Malaysian Ringgit</option>
-                <option value="THB">THB - Thai Baht</option>
-                <option value="VND">VND - Vietnamese Dong</option>
-                <option value="KRW">KRW - South Korean Won</option>
-                <option value="ZAR">ZAR - South African Rand</option>
-                <option value="BRL">BRL - Brazilian Real</option>
-                <option value="MXN">MXN - Mexican Peso</option>
-                <option value="NOK">NOK - Norwegian Krone</option>
-                <option value="DKK">DKK - Danish Krone</option>
-                <option value="AED">AED - UAE Dirham</option>
+                <option value="HKD">Hong Kong Dollar</option>
+                <option value="IDR">Indonesian Rupiah</option>
+                <option value="MYR">Malaysian Ringgit</option>
+                <option value="THB">Thai Baht</option>
+                <option value="VND">Vietnamese Dong</option>
+                <option value="KRW">South Korean Won</option>
+                <option value="ZAR">South African Rand</option>
+                <option value="BRL">Brazilian Real</option>
+                <option value="MXN">Mexican Peso</option>
+                <option value="NOK">Norwegian Krone</option>
+                <option value="DKK">Danish Krone</option>
+                <option value="AED">UAE Dirham</option>
               </select>
             </div>
           )}
 
           {/* Desktop navigation */}
           <div className="hidden md:flex flex-wrap items-center gap-1">
-            {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail)).map(btn => (
-              <button
-                key={btn.id}
-                onClick={() => {
-                  onTabChange(btn.id)
-                  setMobileMenuOpen(false)
-                }}
-                className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                  activeTab === btn.id
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                {btn.label}
-              </button>
-            ))}
+            {mainNav
+              .filter(btn => (btn.public || (!btn.auth) || userEmail))
+              .filter(btn => btn.id !== 'online-users' && btn.id !== 'deposit')
+              .map(btn => (
+                <button
+                  key={btn.id}
+                  onClick={() => {
+                    onTabChange(btn.id)
+                    setMobileMenuOpen(false)
+                  }}
+                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
+                    activeTab === btn.id
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  {btn.label}
+                </button>
+              ))}
 
             {/* Auth controls will be rendered in the investments row */}
           </div>
