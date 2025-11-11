@@ -78,6 +78,12 @@ export default function HeaderMap({ userId: headerUserId }) {
   // Default to Philippines center
   const defaultLocation = { latitude: 12.5, longitude: 121.5 }
   const displayLocation = location || defaultLocation
+  const [markerPos, setMarkerPos] = useState({ latitude: displayLocation.latitude, longitude: displayLocation.longitude })
+
+  useEffect(() => {
+    // keep markerPos in sync when displayLocation updates (e.g., geolocation resolves)
+    setMarkerPos({ latitude: displayLocation.latitude, longitude: displayLocation.longitude })
+  }, [displayLocation.latitude, displayLocation.longitude])
 
   useEffect(() => {
     // Load preference from localStorage (preferencesManager)
@@ -274,16 +280,57 @@ export default function HeaderMap({ userId: headerUserId }) {
                 </div>
               </div>
             </div>
-            <div className="p-4 border-t border-slate-200 flex items-center justify-between">
-              <div className="text-xs text-slate-600">Share your location with a user</div>
-              <div>
-                <SendLocationButton location={displayLocation} city={city} userId={headerUserId} shareEnabled={shareEnabled} />
+
+            {/* Coordinates display (read-only) and share controls */}
+            <div className="p-4 border-t border-slate-200">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-center">
+                <div className="text-xs text-slate-600">Latitude</div>
+                <div className="text-xs text-slate-600">Longitude</div>
+                <div className="text-xs text-slate-600">Actions</div>
+
+                <input readOnly value={markerPos.latitude?.toFixed ? markerPos.latitude.toFixed(6) : String(markerPos.latitude)} className="px-3 py-2 border rounded text-sm bg-white/90 text-slate-800" />
+                <input readOnly value={markerPos.longitude?.toFixed ? markerPos.longitude.toFixed(6) : String(markerPos.longitude)} className="px-3 py-2 border rounded text-sm bg-white/90 text-slate-800" />
+                <div className="flex items-center gap-2 justify-end">
+                  <SendLocationButton location={markerPos} city={city} userId={headerUserId} shareEnabled={shareEnabled} />
+                </div>
               </div>
             </div>
           </div>
         </div>
       )}
     </div>
+  )
+}
+
+
+function DraggableMarker({ initialPos, onChange }) {
+  const map = useMap()
+  const [pos, setPos] = useState([initialPos.latitude, initialPos.longitude])
+  const markerRef = useRef(null)
+
+  useEffect(() => {
+    if (initialPos && initialPos.latitude && initialPos.longitude) {
+      setPos([initialPos.latitude, initialPos.longitude])
+      try { map.setView([initialPos.latitude, initialPos.longitude], map.getZoom()) } catch(e){}
+    }
+  }, [initialPos, map])
+
+  const eventHandlers = useMemo(() => ({
+    dragend() {
+      const m = markerRef.current
+      if (!m) return
+      const latlng = m.getLatLng()
+      const lat = latlng.lat
+      const lng = latlng.lng
+      setPos([lat, lng])
+      // update parent state via global event: we'll dispatch a custom event on window
+      try { window.dispatchEvent(new CustomEvent('headermap:marker-move', { detail: { latitude: lat, longitude: lng } })) } catch(e){}
+      if (onChange) onChange(lat, lng)
+    }
+  }), [onChange])
+
+  return (
+    <Marker draggable={true} eventHandlers={eventHandlers} ref={markerRef} position={pos} />
   )
 }
 
