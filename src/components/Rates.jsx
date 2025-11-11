@@ -598,7 +598,6 @@ export default function Rates({ globalCurrency }) {
 
   // helper: fallback crypto USD price from default map
   const cryptoUsdFallback = (code) => {
-    // try approximate mapping
     const mapping = {
       BTC: defaultCryptoPrices.BTC,
       ETH: defaultCryptoPrices.ETH,
@@ -617,6 +616,28 @@ export default function Rates({ globalCurrency }) {
       USDT: defaultCryptoPrices.USDT
     }
     return mapping[code] || null
+  }
+
+  // Helper: get pair key for list items
+  const getListItemPair = (item) => {
+    if (item.type === 'fiat') {
+      if (!selectedFiat) return null
+      const from = selectedFiat.code
+      if (from === item.code) {
+        return from === baseCurrency ? `${baseCurrency}_${baseCurrency}` : `${from}_${baseCurrency}`
+      }
+      return `${from}_${item.code}`
+    } else {
+      // crypto item
+      if (viewMode === 'crypto') {
+        if (!selectedCrypto) return null
+        if (selectedCrypto.code === item.code) return null
+        return `${selectedCrypto.code}_${item.code}`
+      }
+      // fiat mode
+      const selectedFiatCode = selectedFiat ? selectedFiat.code : baseCurrency
+      return `${item.code}_${selectedFiatCode}`
+    }
   }
 
   const onChangeFiat = (val) => {
