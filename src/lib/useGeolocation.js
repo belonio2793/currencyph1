@@ -155,6 +155,15 @@ export function useGeolocation() {
   useEffect(() => {
     isMountedRef.current = true
 
+    // Suppress unhandled AbortError rejections from geolocation operations
+    const unhandledRejectionHandler = (event) => {
+      if (event?.reason?.name === 'AbortError' ||
+          event?.message?.includes?.('signal is aborted')) {
+        event.preventDefault?.()
+      }
+    }
+    window.addEventListener('unhandledrejection', unhandledRejectionHandler)
+
     requestLocation()
 
     // Watch position for continuous updates
