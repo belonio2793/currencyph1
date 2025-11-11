@@ -79,7 +79,10 @@
     "ml-orchestrator": "node scripts/ml/orchestrator.js",
     "backup-bucket": "node scripts/backup-bucket-simple.js",
     "delete-bucket": "node scripts/delete-bucket.js",
-    "test": "vitest"
+    "test": "vitest",
+    "seed-currency-rates": "node scripts/seed-currency-rates.js",
+    "populate-cryptos-and-rates": "node scripts/populate-cryptos-and-rates.js",
+    "seed-all-rates": "npm run seed-currency-rates && npm run populate-cryptos-and-rates"
     },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
