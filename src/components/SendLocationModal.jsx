@@ -68,8 +68,16 @@ export default function SendLocationModal({ open, onClose, location, city, sende
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow-lg max-w-lg w-full max-h-[80vh] overflow-hidden flex flex-col" onClick={e => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 overflow-auto"
+      onClick={onClose}
+      style={{ pointerEvents: 'auto' }}
+    >
+      <div
+        className="bg-white rounded-lg shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden flex flex-col my-auto"
+        onClick={e => e.stopPropagation()}
+        style={{ pointerEvents: 'auto' }}
+      >
         {/* Header */}
         <div className="p-4 border-b border-slate-200 flex items-center justify-between flex-shrink-0">
           <h3 className="text-lg font-semibold text-slate-900">Send Location</h3>
