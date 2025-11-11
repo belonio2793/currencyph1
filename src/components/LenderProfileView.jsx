@@ -9,6 +9,7 @@ export default function LenderProfileView({ userId, lenderId, onClose }) {
   const [ratings, setRatings] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const { isVerified, verificationData } = useUserVerificationStatus(lenderId)
 
   useEffect(() => {
     loadLenderProfile()
