@@ -102,10 +102,8 @@ export function useGeolocation() {
                   }
                 } catch (e) {
                   clearTimeout(timeoutId)
-                  // Silently fail on any error (network, abort, timeout, etc.) - no city is acceptable
-                  if (isMountedRef.current) {
-                    // Swallow the error
-                  }
+                  // Silently fail on any error including AbortError (network, abort, timeout, etc.)
+                  // Do not re-throw, just swallow all errors
                 }
               } catch (e) {
                 // Silently fail - any network error is acceptable
