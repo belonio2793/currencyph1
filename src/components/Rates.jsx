@@ -29,11 +29,19 @@ export default function Rates() {
       setLoading(true)
       setError(null)
 
-      const [currenciesRes, pairsRes] = await Promise.all([
+      const [currenciesRes, fiatRatesRes, cryptoRatesRes, pairsRes] = await Promise.all([
         supabase
           .from('currencies')
           .select('code,name,type,symbol,decimals,is_default,active')
           .eq('active', true),
+        supabase
+          .from('currency_rates')
+          .select('from_currency,to_currency,rate')
+          .eq('from_currency', 'PHP'),
+        supabase
+          .from('cryptocurrency_rates')
+          .select('from_currency,to_currency,rate')
+          .eq('from_currency', 'PHP'),
         supabase
           .from('pairs')
           .select('from_currency,to_currency,rate,source_table,updated_at')
@@ -41,6 +49,8 @@ export default function Rates() {
       ])
 
       if (currenciesRes.error) throw currenciesRes.error
+      if (fiatRatesRes.error) throw fiatRatesRes.error
+      if (cryptoRatesRes.error) throw cryptoRatesRes.error
       if (pairsRes.error) throw pairsRes.error
 
       const currencyMap = {}
@@ -49,20 +59,29 @@ export default function Rates() {
       })
       setCurrencies(currencyMap)
 
+      const fiatCodes = new Set((fiatRatesRes.data || []).map(r => r.to_currency))
+      const cryptoCodes = new Set((cryptoRatesRes.data || []).map(r => r.to_currency))
+
       const processedRates = (pairsRes.data || [])
-        .map(pair => ({
-          code: pair.to_currency,
-          rate: Number(pair.rate),
-          metadata: currencyMap[pair.to_currency] || {
+        .map(pair => {
+          const isFromFiat = fiatCodes.has(pair.to_currency)
+          const isFromCrypto = cryptoCodes.has(pair.to_currency)
+          const type = isFromCrypto ? 'crypto' : isFromFiat ? 'fiat' : (pair.source_table === 'cryptocurrency_rates' ? 'crypto' : 'fiat')
+
+          return {
             code: pair.to_currency,
-            name: pair.to_currency,
-            type: pair.source_table === 'cryptocurrency_rates' ? 'crypto' : 'fiat',
-            symbol: '',
-            decimals: pair.source_table === 'cryptocurrency_rates' ? 8 : 2
-          },
-          source: pair.source_table,
-          updatedAt: pair.updated_at
-        }))
+            rate: Number(pair.rate),
+            metadata: currencyMap[pair.to_currency] || {
+              code: pair.to_currency,
+              name: pair.to_currency,
+              type: type,
+              symbol: '',
+              decimals: type === 'crypto' ? 8 : 2
+            },
+            source: pair.source_table,
+            updatedAt: pair.updated_at
+          }
+        })
         .filter(r => isFinite(r.rate) && r.rate > 0)
         .sort((a, b) => a.code.localeCompare(b.code))
 
