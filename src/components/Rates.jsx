@@ -57,9 +57,11 @@ export default function Rates({ globalCurrency }) {
   const loadRates = async () => {
     try {
       setLoading(true)
-      const { data: rates, error } = await supabase
+      const { data: rates, error, status, statusText } = await supabase
         .from('currency_rates')
         .select('from_currency,to_currency,rate')
+
+      console.debug('Currency rates query:', { status, statusText, rowCount: rates?.length })
 
       if (error) {
         console.error('Error loading currency rates:', error)
@@ -70,7 +72,7 @@ export default function Rates({ globalCurrency }) {
       }
 
       if (!Array.isArray(rates) || rates.length === 0) {
-        console.warn('currency_rates table is empty')
+        console.warn('currency_rates table returned 0 rows')
         setExchangeRates({})
         setAllCurrencies([])
         setAllCryptos([])
