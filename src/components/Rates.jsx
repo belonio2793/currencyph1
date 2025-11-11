@@ -57,62 +57,64 @@ export default function Rates({ globalCurrency }) {
   const loadRates = async () => {
     try {
       setLoading(true)
-      const { data: rates, error, status, statusText } = await supabase
-        .from('currency_rates')
-        .select('from_currency,to_currency,rate')
 
-      console.debug('Currency rates query:', { status, statusText, rowCount: rates?.length })
+      // Load both fiat and crypto rates in parallel
+      const [{ data: fiatRates, error: fiatError }, { data: cryptoRates, error: cryptoError }] = await Promise.all([
+        supabase.from('currency_rates').select('from_currency,to_currency,rate'),
+        supabase.from('cryptocurrency_rates').select('from_currency,to_currency,rate')
+      ])
 
-      if (error) {
-        console.error('Error loading currency rates:', error)
-        setExchangeRates({})
-        setAllCurrencies([])
-        setAllCryptos([])
-        return
+      console.debug('Fiat rates query:', { rowCount: fiatRates?.length, error: fiatError })
+      console.debug('Crypto rates query:', { rowCount: cryptoRates?.length, error: cryptoError })
+
+      if (fiatError) {
+        console.error('Error loading fiat rates from currency_rates:', fiatError)
+      }
+      if (cryptoError) {
+        console.error('Error loading crypto rates from cryptocurrency_rates:', cryptoError)
       }
 
-      if (!Array.isArray(rates) || rates.length === 0) {
-        console.warn('currency_rates table returned 0 rows')
-        setExchangeRates({})
-        setAllCurrencies([])
-        setAllCryptos([])
-        return
-      }
-
-      // Build rates map and discover currencies
+      // Build rates map
       const ratesMap = {}
       const currencySet = new Set()
       const cryptoSet = new Set()
-      
-      // Common crypto codes to identify cryptos
-      const commonCryptos = new Set(['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT'])
 
-      rates.forEach(r => {
-        if (r && r.from_currency && r.to_currency && r.rate != null) {
-          ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
-          
-          // Classify currencies
-          if (commonCryptos.has(r.from_currency)) {
-            cryptoSet.add(r.from_currency)
-          } else {
+      // Process fiat rates
+      if (Array.isArray(fiatRates)) {
+        fiatRates.forEach(r => {
+          if (r && r.from_currency && r.to_currency && r.rate != null) {
+            ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
             currencySet.add(r.from_currency)
-          }
-          
-          if (commonCryptos.has(r.to_currency)) {
-            cryptoSet.add(r.to_currency)
-          } else {
             currencySet.add(r.to_currency)
           }
-        }
-      })
+        })
+      }
+
+      // Process crypto rates
+      if (Array.isArray(cryptoRates)) {
+        cryptoRates.forEach(r => {
+          if (r && r.from_currency && r.to_currency && r.rate != null) {
+            ratesMap[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)
+            cryptoSet.add(r.from_currency)
+            // Don't add crypto to currency set; keep them separate
+          }
+        })
+      }
+
+      if (Object.keys(ratesMap).length === 0) {
+        console.warn('No rates found in either currency_rates or cryptocurrency_rates tables')
+        setExchangeRates({})
+        setAllCurrencies([])
+        setAllCryptos([])
+        return
+      }
 
       const pairCount = Object.keys(ratesMap).length
-      console.debug(`Loaded ${pairCount} exchange rate pairs from currency_rates table`)
-      console.debug('All pairs:', Object.keys(ratesMap).sort())
-      console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 10)))
+      console.debug(`Loaded ${pairCount} total exchange rate pairs`)
+      console.debug('Sample rates:', Object.fromEntries(Object.entries(ratesMap).slice(0, 15)))
 
       setExchangeRates(ratesMap)
-      
+
       // Convert to array of currency objects, ensure PHP is first
       const fiatCurrencies = Array.from(currencySet)
         .map(code => ({ code, name: code }))
@@ -121,14 +123,16 @@ export default function Rates({ globalCurrency }) {
           if (b.code === baseCurrency) return 1
           return a.code.localeCompare(b.code)
         })
-      
+
       const cryptoCurrencies = Array.from(cryptoSet)
         .map(code => ({ code, name: code }))
         .sort((a, b) => a.code.localeCompare(b.code))
-      
+
       setAllCurrencies(fiatCurrencies)
       setAllCryptos(cryptoCurrencies)
       setLastUpdated(new Date())
+
+      console.debug(`Discovered ${fiatCurrencies.length} fiat currencies and ${cryptoCurrencies.length} cryptocurrencies`)
     } catch (err) {
       console.error('Error loading exchange rates:', err)
       setExchangeRates({})
