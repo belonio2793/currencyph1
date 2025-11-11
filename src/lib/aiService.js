@@ -115,11 +115,6 @@ class AIService {
 
   getFallbackResponse(context) {
     const fallbacks = {
-      'npc_greeting': 'Hello there! Nice to meet you.',
-      'npc_trade': 'I have some goods for sale if you\'re interested.',
-      'npc_chat': 'What brings you to town?',
-      'world_event': 'Something interesting happened in town.',
-      'character_action': 'You did something interesting.',
       'market_price': 'The market prices are stable today.',
       'weather': 'The weather is clear and pleasant.'
     }
@@ -157,23 +152,6 @@ class ConversationMemory {
 
 // Context-specific prompt builders
 export const PromptBuilders = {
-  npcGreeting: (npcName, npcRole, city) => ({
-    system: `You are ${npcName}, a ${npcRole} in ${city}, Philippines. Be friendly and natural. Keep response under 2 sentences.`,
-    context: 'npc_greeting'
-  }),
-
-  npcTrade: (npcName, npcRole, inventory) => ({
-    system: `You are ${npcName}, a ${npcRole}. You have these items: ${inventory.join(', ')}. 
-    Suggest a trade or offer. Be realistic about prices in Philippines context. Keep under 2 sentences.`,
-    context: 'npc_trade'
-  }),
-
-  npcChat: (npcName, npcRole, mood = 'friendly') => ({
-    system: `You are ${npcName}, a ${npcRole}. You are in a ${mood} mood. 
-    Have a natural conversation about local business, weather, or life. Keep response under 3 sentences.`,
-    context: 'npc_chat'
-  }),
-
   marketPricing: (item, city, season) => ({
     system: `You are a market analyst for ${city}. Calculate realistic price for "${item}" in ${season}.
     Consider local supply/demand. Return ONLY: "₱[price]" with brief reason.`,
@@ -181,27 +159,9 @@ export const PromptBuilders = {
   }),
 
   weatherEvent: (city) => ({
-    system: `Generate a realistic weather description for ${city}, Philippines today. 
+    system: `Generate a realistic weather description for ${city}, Philippines today.
     Keep it 1 sentence. No flowery language.`,
     context: 'weather'
-  }),
-
-  questGeneration: (city, difficulty) => ({
-    system: `Generate a random quest for an adventurer in ${city}. ${difficulty} difficulty.
-    Format: "QUEST: [title]\\nREWARD: ₱[amount]\\nDESC: [2 sentences]"`,
-    context: 'quest'
-  }),
-
-  newSituation: (location, timeOfDay, weather) => ({
-    system: `Describe something interesting happening at ${location} in the ${timeOfDay}. It's ${weather}.
-    1-2 sentences, immersive, realistic.`,
-    context: 'world_event'
-  }),
-
-  jobOffer: (city, playerLevel) => ({
-    system: `Generate a job offer in ${city} for someone at level ${playerLevel}.
-    Format: "JOB: [title]\\nPAY: ₱[amount]/hour\\nDESC: [task description]"`,
-    context: 'job_offer'
   })
 }
 
