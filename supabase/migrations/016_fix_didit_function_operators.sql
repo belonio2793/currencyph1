@@ -37,15 +37,22 @@ BEGIN
   
   -- Update the verification record (FIXED: using correct ->> operators)
   UPDATE user_verifications
-  SET 
+  SET
     status = p_status,
     didit_decision = p_decision,
     didit_verified_at = NOW(),
+    id_type = CASE
+      WHEN p_decision->>'document_type' = 'passport' THEN 'passport'
+      WHEN p_decision->>'document_type' = 'driver_license' OR p_decision->>'document_type' = 'drivers_license' THEN 'drivers_license'
+      WHEN p_decision->>'document_type' IS NOT NULL THEN 'national_id'
+      ELSE id_type
+    END,
+    id_number = COALESCE(p_decision->>'document_number', p_decision->>'personal_number', id_number),
     document_type = p_decision->>'document_type',
-    expires_at = CASE 
-      WHEN p_decision->>'expiration_date' IS NOT NULL 
-      THEN (p_decision->>'expiration_date')::TIMESTAMP 
-      ELSE NULL 
+    expires_at = CASE
+      WHEN p_decision->>'expiration_date' IS NOT NULL
+      THEN (p_decision->>'expiration_date')::TIMESTAMP
+      ELSE NULL
     END,
     updated_at = NOW()
   WHERE id = v_id;
