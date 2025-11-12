@@ -14,7 +14,7 @@ const COUNTRIES = [
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
   { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
-  { code: 'SG', name: 'Singapore', flag: '���🇬' },
+  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
   { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
   { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
   { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
@@ -26,7 +26,7 @@ const COUNTRIES = [
   { code: 'JP', name: 'Japan', flag: '🇯🇵' },
   { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
   { code: 'CN', name: 'China', flag: '🇨🇳' },
-  { code: 'IN', name: 'India', flag: '🇮🇳' },
+  { code: 'IN', name: 'India', flag: '���🇳' },
   { code: 'BR', name: 'Brazil', flag: '🇧����' },
   { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
   { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
@@ -58,6 +58,7 @@ export default function Profile({ userId, onSignOut }) {
   const [deviceInfo, setDeviceInfo] = useState(null)
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [verifyingId, setVerifyingId] = useState(false)
+  const [showDiditModal, setShowDiditModal] = useState(false)
 
   const isValidUUID = (id) => {
     return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
