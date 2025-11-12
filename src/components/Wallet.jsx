@@ -836,7 +836,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
-                  <span className="text-sm font-medium">{wallet.currency_code}</span>
+                  <span className="text-sm font-medium">{CURRENCY_SYMBOLS[globalCurrency] || globalCurrency}</span>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
