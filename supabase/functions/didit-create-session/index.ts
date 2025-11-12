@@ -25,13 +25,34 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { userId } = (await req.json()) as RequestBody;
+    let body: any;
+    try {
+      body = await req.json();
+    } catch (parseError) {
+      console.error("Failed to parse request body:", parseError);
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON in request body" }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    const userId = body?.userId;
 
     if (!userId) {
-      return new Response(JSON.stringify({ error: "userId is required" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      console.error("userId missing from request body. Received:", body);
+      return new Response(
+        JSON.stringify({
+          error: "userId is required",
+          receivedBody: body
+        }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
     }
 
     // Get credentials from environment
