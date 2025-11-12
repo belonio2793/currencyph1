@@ -1093,7 +1093,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               return true
             })
             .map((chain, idx) => {
-              const existing = cryptoWallets.find(w => Number(w.chain_id) === Number(chain.chainId) || (w.chain && w.chain.toLowerCase() === chain.name.toLowerCase()))
+              // Try to find an existing wallet for this chain in either wallets_crypto (supabase) or internal wallets
+              const existing = (cryptoWallets || []).find(w => Number(w.chain_id) === Number(chain.chainId) || (w.chain && w.chain.toLowerCase() === chain.name.toLowerCase())) ||
+                (internalWallets || []).find(w => (w.currency_code && w.currency_code.toLowerCase() === (chain.symbol || '').toLowerCase()) || (w.chain && w.chain.toLowerCase() === chain.name.toLowerCase()))
+
               const isFav = favoriteCrypto.includes(String(chain.chainId)) || favoriteCrypto.map(String).includes(chain.name.toLowerCase())
               return (
                 <div key={chain.chainId} className={`flex items-center justify-between p-4 ${idx < Object.values(SUPPORTED_CHAINS).length-1 ? 'border-b border-slate-200' : ''}`}>
@@ -1108,7 +1111,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                         saveFavoriteCrypto(newFav)
                       }
                     }} className={`p-2 rounded ${isFav ? 'bg-amber-400 text-white' : 'bg-slate-100 text-slate-600'} transition-colors`}>
-                      {isFav ? '��' : '☆'}
+                      {isFav ? '★' : '☆'}
                     </button>
 
                     <div>
@@ -1120,7 +1123,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <div className="flex items-center gap-3">
                     {existing && (
                       <>
-                        <div className="text-sm text-slate-700 font-mono mr-2">{Number(existing.balance || 0).toFixed(6)}</div>
+                        <div className="text-sm text-slate-700 font-mono mr-2">{formatNumber(Number(existing.balance || 0))} {existing.currency_code || existing.chain || chain.symbol}</div>
+                        {currencyRates[(existing.currency_code || chain.symbol) || ''] && Number(existing.balance || 0) !== 0 && (
+                          <div className="text-xs text-slate-400 mr-2">≈ {formatNumber(Number(existing.balance || 0) * (currencyRates[existing.currency_code || chain.symbol] || 1))} {globalCurrency}</div>
+                        )}
                         <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Send</button>
                         <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Receive</button>
                       </>
