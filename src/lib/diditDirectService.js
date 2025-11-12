@@ -74,7 +74,7 @@ export const diditDirectService = {
   },
 
   /**
-   * Check DIDIT session status via backend API
+   * Check DIDIT session status via Supabase edge function
    */
   async checkSessionStatus(sessionId) {
     try {
@@ -82,22 +82,19 @@ export const diditDirectService = {
         throw new Error('sessionId is required')
       }
 
-      const response = await fetch(
-        `/api/didit/session-status/${encodeURIComponent(sessionId)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      const { data, error } = await supabase.functions.invoke('didit-check-status', {
+        method: 'POST',
+        body: JSON.stringify({ sessionId }),
+      })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(`API error: ${response.status} - ${errorData.error || 'Unknown'}`)
+      if (error) {
+        throw new Error(error.message || 'Failed to check session status')
       }
 
-      const data = await response.json()
+      if (data?.error) {
+        throw new Error(data.error)
+      }
+
       return data
     } catch (error) {
       console.error('Error checking DIDIT session status:', error)
