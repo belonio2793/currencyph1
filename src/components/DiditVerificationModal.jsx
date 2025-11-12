@@ -1,87 +1,115 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { diditDirectService } from '../lib/diditDirectService'
+
+// Hardcoded default DIDIT session URL for all users
+const DEFAULT_DIDIT_SESSION_URL = 'https://verify.didit.me/session/0YcwjP8Jj41H'
 
 export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [sessionUrl, setSessionUrl] = useState(null)
-  const [sessionId, setSessionId] = useState(null)
   const [verificationStatus, setVerificationStatus] = useState(null)
-  const [isVerifying, setIsVerifying] = useState(false)
-  const [pollCount, setPollCount] = useState(0)
-  const iframeRef = useRef(null)
-  const pollIntervalRef = useRef(null)
+  const [statusCheckCount, setStatusCheckCount] = useState(0)
 
   useEffect(() => {
     initializeSession()
   }, [userId])
+
+  // Check verification status periodically
+  useEffect(() => {
+    if (!userId || error) return
+
+    const checkStatus = async () => {
+      try {
+        const { data, error: fetchErr } = await supabase
+          .from('user_verifications')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle()
+
+        if (!fetchErr && data) {
+          setVerificationStatus(data)
+
+          // If status changed to approved, trigger success callback
+          if (data.status === 'approved') {
+            setTimeout(() => {
+              if (onSuccess) onSuccess()
+            }, 1000)
+          }
+        }
+      } catch (err) {
+        console.warn('Error checking verification status:', err)
+      }
+    }
+
+    // Check status every 2 seconds
+    checkStatus()
+    const interval = setInterval(() => {
+      checkStatus()
+      setStatusCheckCount(c => c + 1)
+    }, 2000)
+
+    return () => clearInterval(interval)
+  }, [userId, error])
 
   const initializeSession = async () => {
     try {
       setError('')
       setLoading(true)
 
-      // Check if user already has a pending or approved verification
-      const existingStatus = await diditDirectService.getVerificationStatus(userId)
+      // Check if user already has a verification record
+      const { data: existingStatus, error: fetchErr } = await supabase
+        .from('user_verifications')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle()
 
-      if (existingStatus?.status === 'approved') {
+      if (!fetchErr && existingStatus) {
         setVerificationStatus(existingStatus)
-        setLoading(false)
-        return
-      }
 
-      // If pending and has session URL, reuse it
-      if (existingStatus?.status === 'pending' && existingStatus?.didit_session_url) {
-        setSessionUrl(existingStatus.didit_session_url)
-        setSessionId(existingStatus.didit_session_id)
-        setIsVerifying(true)
-        setLoading(false)
-        startPolling(existingStatus.didit_session_id)
-        return
-      }
-
-      // Create new session
-      try {
-        const result = await diditDirectService.createVerificationSession(userId)
-
-        if (!result.success || !result.sessionUrl) {
-          throw new Error('Failed to create verification session')
-        }
-
-        setSessionUrl(result.sessionUrl)
-        setSessionId(result.sessionId)
-        setIsVerifying(true)
-        setLoading(false)
-
-        // Start polling for status changes
-        startPolling(result.sessionId)
-      } catch (createErr) {
-        console.warn('Failed to create session via API:', createErr)
-
-        // Fallback: try using environment variable for default session or hardcoded link
-        const defaultSessionUrl = import.meta.env.VITE_DIDIT_DEFAULT_SESSION_URL ||
-                                 'https://verify.didit.me/session/0YcwjP8Jj41H'
-
-        if (defaultSessionUrl) {
-          console.warn('Falling back to default session URL')
-          await diditDirectService.registerExternalSession(userId, defaultSessionUrl)
-
-          const sessionIdMatch = defaultSessionUrl.match(/session\/([A-Za-z0-9_-]+)/i)
-          const fallbackSessionId = sessionIdMatch ? sessionIdMatch[1] : null
-
-          setSessionUrl(defaultSessionUrl)
-          setSessionId(fallbackSessionId)
-          setIsVerifying(true)
+        // If already approved, show success
+        if (existingStatus.status === 'approved') {
           setLoading(false)
+          return
+        }
 
-          if (fallbackSessionId) {
-            startPolling(fallbackSessionId)
-          }
-        } else {
-          throw createErr
+        // If already pending, show the session URL
+        if (existingStatus.status === 'pending') {
+          setLoading(false)
+          return
         }
       }
+
+      // Register the default session URL for this user
+      const sessionIdMatch = DEFAULT_DIDIT_SESSION_URL.match(/session\/([A-Za-z0-9_-]+)/i)
+      const sessionId = sessionIdMatch ? sessionIdMatch[1] : 'session-unknown'
+
+      const { error: insertErr } = await supabase
+        .from('user_verifications')
+        .upsert(
+          {
+            user_id: userId,
+            didit_session_id: sessionId,
+            didit_session_url: DEFAULT_DIDIT_SESSION_URL,
+            status: 'pending',
+            verification_method: 'didit',
+            submitted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        )
+
+      if (insertErr) {
+        throw new Error(`Failed to register session: ${insertErr.message}`)
+      }
+
+      setVerificationStatus({
+        user_id: userId,
+        status: 'pending',
+        didit_session_id: sessionId,
+        didit_session_url: DEFAULT_DIDIT_SESSION_URL,
+      })
+
+      setLoading(false)
     } catch (err) {
       console.error('Error initializing DIDIT session:', err)
       setError(err?.message || 'Failed to initialize verification. Please try again.')
@@ -89,114 +117,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
     }
   }
 
-  const startPolling = (sessionId) => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current)
-    }
-
-    // Poll every 1 second for status changes (up to 2 minutes)
-    // Faster polling since we check DIDIT API directly now
-    let count = 0
-    const maxPolls = 120
-
-    const checkStatus = async () => {
-      try {
-        count++
-        setPollCount(count)
-
-        // First check DIDIT API directly for real-time status
-        if (sessionId) {
-          try {
-            const diditStatus = await diditDirectService.checkSessionStatus(sessionId)
-
-            // Check if verification is complete
-            if (diditStatus?.status === 'Approved') {
-              setVerificationStatus({ status: 'approved', ...diditStatus })
-              clearInterval(pollIntervalRef.current)
-              setIsVerifying(false)
-
-              // Also update database
-              try {
-                await supabase
-                  .from('user_verifications')
-                  .update({
-                    status: 'approved',
-                    didit_verified_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                  })
-                  .eq('user_id', userId)
-              } catch (updateErr) {
-                console.warn('Could not update database:', updateErr)
-              }
-
-              setTimeout(() => {
-                if (onSuccess) onSuccess()
-              }, 1000)
-              return
-            } else if (diditStatus?.status === 'Declined') {
-              setVerificationStatus({ status: 'rejected', ...diditStatus })
-              clearInterval(pollIntervalRef.current)
-              setIsVerifying(false)
-              setError('Your verification was declined. Please try again or contact support.')
-              return
-            } else if (diditStatus?.status === 'Expired') {
-              setVerificationStatus({ status: 'rejected', ...diditStatus })
-              clearInterval(pollIntervalRef.current)
-              setIsVerifying(false)
-              setError('Your verification session has expired. Please start over.')
-              return
-            }
-          } catch (diditErr) {
-            // DIDIT check failed, fall back to database check
-            console.warn('Could not check DIDIT status:', diditErr)
-          }
-        }
-
-        // Fallback: check database for webhook updates
-        const status = await diditDirectService.getVerificationStatus(userId)
-
-        if (status?.status === 'approved') {
-          setVerificationStatus(status)
-          clearInterval(pollIntervalRef.current)
-          setIsVerifying(false)
-
-          setTimeout(() => {
-            if (onSuccess) onSuccess()
-          }, 1000)
-        } else if (status?.status === 'rejected') {
-          setVerificationStatus(status)
-          clearInterval(pollIntervalRef.current)
-          setIsVerifying(false)
-          setError('Your verification was declined. Please try again or contact support.')
-        } else if (count >= maxPolls) {
-          // Stop polling after 2 minutes
-          clearInterval(pollIntervalRef.current)
-          setIsVerifying(false)
-        }
-      } catch (err) {
-        console.warn('Error polling verification status:', err)
-      }
-    }
-
-    // Check immediately
-    checkStatus()
-
-    // Then poll every 1 second (faster now that we check DIDIT API directly)
-    pollIntervalRef.current = setInterval(checkStatus, 1000)
-  }
-
-  useEffect(() => {
-    return () => {
-      if (pollIntervalRef.current) {
-        clearInterval(pollIntervalRef.current)
-      }
-    }
-  }, [])
-
   const handleClose = () => {
-    if (pollIntervalRef.current) {
-      clearInterval(pollIntervalRef.current)
-    }
     onClose()
   }
 
@@ -283,7 +204,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
   }
 
   // Show error state
-  if (error && !sessionUrl) {
+  if (error) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
         <div className="bg-white rounded-lg p-8 max-w-md w-full">
@@ -308,7 +229,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
     )
   }
 
-  // Show DIDIT verification iframe
+  // Show verification in progress with iframe
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg overflow-hidden flex flex-col w-full max-w-2xl max-h-[90vh]">
@@ -317,33 +238,24 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
           <h2 className="text-xl font-bold text-slate-900">Identity Verification</h2>
           <button
             onClick={handleClose}
-            disabled={isVerifying}
-            className="text-slate-400 hover:text-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={isVerifying ? 'Verification in progress' : 'Close'}
+            className="text-slate-400 hover:text-slate-600"
+            title="Close"
           >
             ✕
           </button>
         </div>
 
-        {/* Error message */}
-        {error && sessionUrl && (
-          <div className="p-4 bg-yellow-50 border-b border-yellow-200">
-            <p className="text-sm text-yellow-700">{error}</p>
-          </div>
-        )}
-
         {/* Iframe container */}
         <div className="flex-1 overflow-hidden relative bg-slate-50 min-h-[500px]">
-          {isVerifying && pollCount > 0 && (
+          {statusCheckCount > 0 && (
             <div className="absolute top-4 right-4 z-10 text-xs text-slate-500 bg-white px-3 py-1.5 rounded border border-slate-200">
-              Syncing... ({pollCount}s)
+              Syncing... ({statusCheckCount * 2}s)
             </div>
           )}
-          
-          {sessionUrl ? (
+
+          {verificationStatus?.didit_session_url ? (
             <iframe
-              ref={iframeRef}
-              src={sessionUrl}
+              src={verificationStatus.didit_session_url}
               title="DIDIT Verification"
               className="w-full h-full border-0"
               allow="camera; microphone"
@@ -359,13 +271,11 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
         </div>
 
         {/* Footer */}
-        {isVerifying && (
-          <div className="p-4 border-t border-slate-200 bg-slate-50">
-            <p className="text-xs text-slate-600 text-center">
-              Complete the verification process in the window above. Changes will be synced automatically.
-            </p>
-          </div>
-        )}
+        <div className="p-4 border-t border-slate-200 bg-slate-50">
+          <p className="text-xs text-slate-600 text-center">
+            Complete the verification process in the window above. Status updates automatically every 2 seconds.
+          </p>
+        </div>
       </div>
     </div>
   )
