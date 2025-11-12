@@ -1,11 +1,9 @@
 import { supabase } from './supabaseClient'
 
 const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY
+const DIDIT_APP_ID = import.meta.env.VITE_DIDIT_APP_ID
 const DIDIT_API_BASE = 'https://verification.didit.me/v2'
-
-// Your workflow_id from DIDIT Business Console
-// This should be configured via environment variable in production
-const DIDIT_WORKFLOW_ID = import.meta.env.VITE_DIDIT_WORKFLOW_ID || 'default-workflow'
+const DIDIT_WORKFLOW_ID = import.meta.env.VITE_DIDIT_WORKFLOW_ID
 
 export const diditService = {
   /**
