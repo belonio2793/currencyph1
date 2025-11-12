@@ -5,6 +5,7 @@ import { preferencesManager } from '../lib/preferencesManager'
 import { deviceFingerprint } from '../lib/deviceFingerprint'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import { diditService } from '../lib/diditService'
+import DiditVerificationModal from './DiditVerificationModal'
 
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
@@ -13,7 +14,7 @@ const COUNTRIES = [
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
   { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
-  { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+  { code: 'SG', name: 'Singapore', flag: '���🇬' },
   { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
   { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
   { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
