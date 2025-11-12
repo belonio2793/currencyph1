@@ -271,12 +271,6 @@ export default function MultiWalletPanel({ userId, onWalletChange }) {
         </div>
       )}
 
-      {/* Info Section */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-        <p className="text-xs text-blue-900">
-          <span className="font-semibold">💡 Tip:</span> Connect multiple wallets to manage your crypto across different providers. Each wallet is stored securely in your session.
-        </p>
-      </div>
     </div>
   )
 }
