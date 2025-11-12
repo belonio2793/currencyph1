@@ -117,7 +117,7 @@ Deno.serve(async (req) => {
 
     const { data: upserted, error: upsertErr } = await supabase
       .from('wallets_crypto')
-      .upsert([
+      .insert([
         {
           user_id,
           chain: (chainConfig.name || '').toUpperCase(),
@@ -128,7 +128,7 @@ Deno.serve(async (req) => {
           metadata,
           updated_at: new Date().toISOString()
         }
-      ], { onConflict: 'user_id,chain,address' })
+      ])
       .select()
       .single()
 
