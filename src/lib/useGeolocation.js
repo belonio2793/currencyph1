@@ -50,10 +50,10 @@ export function useGeolocation() {
                   }, 3000)
 
                   try {
-                    const resp = await fetch(url, { signal: controller.signal })
+                    const resp = await fetch(url, { signal: controller.signal }).catch(() => null) // Suppress fetch errors
                     clearTimeout(timeoutId)
 
-                    if (resp.ok && isMountedRef.current) {
+                    if (resp?.ok && isMountedRef.current) {
                       try {
                         const data = await resp.json()
                         if (data?.features?.[0]?.properties) {
