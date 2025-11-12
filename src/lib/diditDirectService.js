@@ -107,21 +107,33 @@ export const diditDirectService = {
       if (!userId) throw new Error('userId is required')
       if (!sessionUrl) throw new Error('sessionUrl is required')
 
-      const response = await fetch('/api/didit/register-external', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId, sessionUrl }),
-      })
+      // Extract session ID from URL
+      const sessionIdMatch = sessionUrl.match(/session\/([A-Za-z0-9_-]+)/i)
+      const sessionId = sessionIdMatch ? sessionIdMatch[1] : null
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || 'Failed to register external session')
+      // Store directly in Supabase
+      const { data, error } = await supabase
+        .from('user_verifications')
+        .upsert(
+          {
+            user_id: userId,
+            didit_session_id: sessionId,
+            didit_session_url: sessionUrl,
+            status: 'pending',
+            verification_method: 'didit',
+            submitted_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        )
+        .select()
+        .single()
+
+      if (error) {
+        throw new Error(error.message || 'Failed to register external session')
       }
 
-      const data = await response.json()
-      return { success: true, data: data.data }
+      return { success: true, data }
     } catch (err) {
       console.error('Error registering external DIDIT session:', err)
       throw err
