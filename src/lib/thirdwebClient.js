@@ -150,6 +150,10 @@ export async function connectSolana() {
 
 // Generic connector that picks the best available provider
 export async function connectAnyWallet() {
+  if (isTrustWalletBrowser()) {
+    throw new Error('Trust Wallet in-app browser has limitations with dApp connections. Please use WalletConnect or open this dApp in an external browser like Chrome or Safari.')
+  }
+
   // Prefer Solana provider when present (so Phantom users get Solana compatibility automatically)
   if (hasSolanaProvider()) {
     try {
