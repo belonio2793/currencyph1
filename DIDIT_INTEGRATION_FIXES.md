@@ -185,9 +185,31 @@ SUPABASE_* credentials
 
 1. ✅ `supabase/functions/didit-create-session/index.ts` - Added placeholder values
 2. ✅ `supabase/functions/didit-initiate/index.ts` - Fixed id_type values
-3. ✅ `supabase/migrations/015_add_didit_verification.sql` - Extract ID data from DIDIT
-4. ✅ `supabase/migrations/016_fix_didit_function_operators.sql` - Same as 015 update
-5. ✅ `server.js` - Added placeholder values to backend endpoints
+3. ✅ `supabase/migrations/010_p2p_loan_marketplace.sql` - Removed hardcoded id_type constraint
+4. ✅ `supabase/migrations/015_add_didit_verification.sql` - Extract ID data from DIDIT
+5. ✅ `supabase/migrations/016_fix_didit_function_operators.sql` - Same as 015 update
+6. ✅ `supabase/migrations/020_flexible_id_type_constraint.sql` - New: Flexible constraint for document types
+7. ✅ `server.js` - Added placeholder values to backend endpoints
+
+## Constraint Update
+
+**Migration Applied**: `020_flexible_id_type_constraint.sql`
+
+Changed from:
+```sql
+CHECK (id_type IN ('passport', 'drivers_license', 'national_id'))
+```
+
+To:
+```sql
+CHECK (char_length(trim(id_type)) > 0)
+```
+
+**Why**: DIDIT returns various document types that may not be in our hardcoded list. The flexible constraint allows:
+- Regional variations (ID types vary by country)
+- Future document types DIDIT adds
+- Custom document types from workflows
+- Better maintainability
 
 ## Next Steps
 
