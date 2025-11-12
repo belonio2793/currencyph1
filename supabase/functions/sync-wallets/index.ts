@@ -43,6 +43,27 @@ async function fetchEthBalance(rpcUrl: string, address: string) {
   }
 }
 
+// Fetch ERC20 token balance via eth_call balanceOf
+const ERC20_BALANCE_OF_DATA_PREFIX = '0x70a08231'
+async function fetchErc20Balance(rpcUrl: string, tokenAddress: string, ownerAddress: string) {
+  try {
+    const addr = ownerAddress.replace(/^0x/i, '').padStart(64, '0')
+    const data = ERC20_BALANCE_OF_DATA_PREFIX + addr
+    const body = { jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ to: tokenAddress, data }, 'latest'] }
+    const resp = await fetch(rpcUrl, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } })
+    if (!resp.ok) throw new Error('RPC error')
+    const j = await resp.json()
+    if (j && j.result) {
+      const val = BigInt(j.result)
+      return val.toString()
+    }
+    return '0'
+  } catch (e) {
+    console.warn('fetchErc20Balance failed', e?.message || e)
+    return null
+  }
+}
+
 addEventListener('fetch', (event) => {
   event.respondWith(handle(event.request))
 })
