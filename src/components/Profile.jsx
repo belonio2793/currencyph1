@@ -13,7 +13,7 @@ const COUNTRIES = [
   { code: 'CA', name: 'Canada', flag: '🇨��' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'NZ', name: 'New Zealand', flag: '��🇿' },
   { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
   { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
   { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
@@ -628,10 +628,9 @@ export default function Profile({ userId, onSignOut }) {
               <div className="flex gap-2">
                 <button
                   onClick={handleStartVerification}
-                  disabled={verifyingId}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium text-sm"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
                 >
-                  {verifyingId ? 'Starting...' : (verificationStatus ? 'Update Verification' : 'Start Verification')}
+                  {verificationStatus ? 'Update Verification' : 'Start Verification'}
                 </button>
                 {verificationStatus?.status === 'approved' && (
                   <button
