@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { ethers } from 'ethers'
 import { supabase } from './supabaseClient'
 import { getProviderByName, getAvailableProviders, WALLET_PROVIDERS } from './walletProviders'
 
