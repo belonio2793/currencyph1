@@ -59,6 +59,45 @@ export const diditService = {
     }
   },
 
+  // Register an externally-provided DIDIT session URL for a user (upserts a pending verification row)
+  async registerExternalSession(userId, sessionUrl) {
+    try {
+      if (!userId) throw new Error('userId is required')
+      if (!sessionUrl) throw new Error('sessionUrl is required')
+
+      // Build headers: prefer current session access token, fall back to anon key
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': userId }
+      try {
+        const sessionResp = await supabase.auth.getSession()
+        const accessToken = sessionResp?.data?.session?.access_token || sessionResp?.data?.access_token || null
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
+      } catch (e) {
+        // ignore
+      }
+
+      if (!headers['Authorization']) {
+        const anonKey = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY)) || (typeof process !== 'undefined' && (process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY)) || null
+        if (anonKey) headers['Authorization'] = `Bearer ${anonKey}`
+      }
+
+      const body = JSON.stringify({ userId, sessionUrl })
+      const { data, error } = await supabase.functions.invoke('didit-initiate', { method: 'POST', headers, body })
+
+      if (error) {
+        console.error('diditService.registerExternalSession: invoke error', error)
+        throw new Error(error.message || 'Failed to register external session')
+      }
+
+      if (data && data.error) {
+        throw new Error(data.error)
+      }
+
+      return { success: true, data }
+    } catch (err) {
+      console.error('Error registering external DIDIT session:', err)
+      throw err
+    }
+  },
 
   /**
    * Get verification status from database
