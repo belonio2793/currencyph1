@@ -1,63 +1,29 @@
 import { supabase } from './supabaseClient'
 
-const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY
-const DIDIT_APP_ID = import.meta.env.VITE_DIDIT_APP_ID
-const DIDIT_API_BASE = 'https://verification.didit.me/v2'
-const DIDIT_WORKFLOW_ID = import.meta.env.VITE_DIDIT_WORKFLOW_ID
-
 export const diditService = {
   /**
-   * Create a DIDIT verification session and return the session URL for users to visit
+   * Create a DIDIT verification session via edge function (avoids CORS issues)
    */
   async createVerificationSession(userId) {
     try {
-      if (!DIDIT_API_KEY) {
-        throw new Error('DIDIT API credentials not configured')
-      }
-
-      // Create session with DIDIT
-      const sessionResponse = await fetch(`${DIDIT_API_BASE}/session/`, {
-        method: 'POST',
-        headers: {
-          'x-api-key': DIDIT_API_KEY,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          workflow_id: DIDIT_WORKFLOW_ID
-        })
+      // Call Supabase edge function to create session (server-to-server, no CORS)
+      const { data, error } = await supabase.functions.invoke('didit-create-session', {
+        body: { userId }
       })
 
-      if (!sessionResponse.ok) {
-        const errorData = await sessionResponse.json()
-        throw new Error(`DIDIT API error: ${errorData.message || sessionResponse.statusText}`)
+      if (error) {
+        throw new Error(error.message || 'Failed to create verification session')
       }
 
-      const sessionData = await sessionResponse.json()
-      const { session_id, url: sessionUrl } = sessionData
-
-      // Store the session in database
-      const { data, error } = await supabase
-        .from('user_verifications')
-        .upsert({
-          user_id: userId,
-          didit_workflow_id: DIDIT_WORKFLOW_ID,
-          didit_session_id: session_id,
-          didit_session_url: sessionUrl,
-          status: 'pending',
-          verification_method: 'didit',
-          submitted_at: new Date(),
-          updated_at: new Date()
-        }, { onConflict: 'user_id' })
-        .select()
-        .single()
-
-      if (error) throw error
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to create verification session')
+      }
 
       return {
         success: true,
-        sessionUrl: sessionUrl,
-        sessionId: session_id,
-        data
+        sessionUrl: data.sessionUrl,
+        sessionId: data.sessionId,
+        data: data.data
       }
     } catch (error) {
       console.error('Error creating DIDIT verification session:', error)
