@@ -39,6 +39,13 @@ export const CHAIN_IDS = Object.values(SUPPORTED_CHAINS).reduce((acc, chain) => 
   return acc
 }, {})
 
+// Check if running in Trust Wallet's in-app browser
+function isTrustWalletBrowser() {
+  if (typeof window === 'undefined') return false
+  const userAgent = window.navigator.userAgent || ''
+  return userAgent.includes('TrustWalletBrowser') || userAgent.includes('Trust Wallet') || (window.trustwallet !== undefined)
+}
+
 // Check if browser has Web3 wallet support (EVM)
 function hasWeb3Provider() {
   return typeof window !== 'undefined' && window.ethereum !== undefined
