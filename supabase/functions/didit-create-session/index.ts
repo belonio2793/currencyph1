@@ -173,7 +173,19 @@ Deno.serve(async (req) => {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Store session in database
-    const { data, error } = await supabase.from("user_verifications").upsert({ user_id: userId, didit_workflow_id: DIDIT_WORKFLOW_ID, didit_session_id: session_id, didit_session_url: sessionUrl, status: "pending", verification_method: "didit", submitted_at: new Date(), updated_at: new Date() }, { onConflict: "user_id" }).select().single();
+    // Include placeholder values for required fields (id_type, id_number) - will be updated from DIDIT response
+    const { data, error } = await supabase.from("user_verifications").upsert({
+      user_id: userId,
+      id_type: "national_id",  // Placeholder - will be updated from DIDIT webhook with actual document type
+      id_number: session_id,   // Placeholder - will be updated from DIDIT webhook with actual ID number
+      didit_workflow_id: DIDIT_WORKFLOW_ID,
+      didit_session_id: session_id,
+      didit_session_url: sessionUrl,
+      status: "pending",
+      verification_method: "didit",
+      submitted_at: new Date(),
+      updated_at: new Date()
+    }, { onConflict: "user_id" }).select().single();
 
     if (error) {
       console.error("didit-create-session: Database error:", error);
