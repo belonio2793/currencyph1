@@ -83,7 +83,7 @@ export const diditDirectService = {
       }
 
       const response = await fetch(
-        `${API_BASE_URL}/api/didit/session-status/${encodeURIComponent(sessionId)}`,
+        `/api/didit/session-status/${encodeURIComponent(sessionId)}`,
         {
           method: 'GET',
           headers: {
