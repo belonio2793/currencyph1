@@ -112,6 +112,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [thirdwebConnecting, setThirdwebConnecting] = useState(false)
   const [walletAvailable, setWalletAvailable] = useState(true)
   const [noWalletDetected, setNoWalletDetected] = useState(false)
+  const [showProviderList, setShowProviderList] = useState(false)
 
   // Manual wallet creation state
   const [showCreateManualWalletModal, setShowCreateManualWalletModal] = useState(false)
