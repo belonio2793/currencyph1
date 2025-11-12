@@ -72,7 +72,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
 
     const checkStatus = async () => {
       try {
-        const status = await diditService.getVerificationStatus(userId)
+        const status = await diditDirectService.getVerificationStatus(userId)
         count++
         setPollCount(count)
 
