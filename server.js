@@ -207,6 +207,8 @@ app.post('/api/didit/register-external', async (req, res) => {
       .upsert(
         {
           user_id: userId,
+          id_type: 'national_id',  // Placeholder - will be updated from DIDIT webhook with actual document type
+          id_number: sessionId || 'pending',  // Placeholder - will be updated from DIDIT webhook with actual ID number
           didit_session_id: sessionId,
           didit_session_url: sessionUrl,
           status: 'pending',
