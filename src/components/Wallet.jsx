@@ -1216,14 +1216,66 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   </div>
                 )}
 
-                <button
-                  onClick={handleConnectWallet}
-                  disabled={thirdwebConnecting}
-                  className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  {thirdwebConnecting ? 'Connecting...' : 'Connect Wallet'}
-                </button>
-                <p className="text-xs text-slate-500 text-center">Compatible with: MetaMask • Phantom • Rainbow • Coinbase Wallet • Trust Wallet • Exodus</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <button
+                    onClick={async () => {
+                      setThirdwebConnecting(true); setError('')
+                      try {
+                        const w = await connectWallet()
+                        const info = await getWalletInfo(w)
+                        setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
+                      } catch (e) { setError(fmtErr(e) || 'Failed to connect MetaMask') }
+                      finally { setThirdwebConnecting(false) }
+                    }}
+                    disabled={thirdwebConnecting}
+                    className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    {thirdwebConnecting ? 'Connecting...' : 'MetaMask'}
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      setThirdwebConnecting(true); setError('')
+                      try {
+                        const { connectViaWeb3Modal } = await import('../lib/web3modalClient')
+                        const w = await connectViaWeb3Modal()
+                        const info = await getWalletInfo(w)
+                        setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
+                      } catch (e) { setError(fmtErr(e) || 'Failed to connect WalletConnect/Coinbase') }
+                      finally { setThirdwebConnecting(false) }
+                    }}
+                    disabled={thirdwebConnecting}
+                    className="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    WalletConnect / Coinbase
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      setThirdwebConnecting(true); setError('')
+                      try {
+                        const w = await connectSolana()
+                        const info = await getWalletInfo(w)
+                        setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
+                      } catch (e) { setError(fmtErr(e) || 'Failed to connect Phantom') }
+                      finally { setThirdwebConnecting(false) }
+                    }}
+                    disabled={thirdwebConnecting}
+                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    Phantom (Solana)
+                  </button>
+
+                  <button
+                    onClick={handleConnectWallet}
+                    disabled={thirdwebConnecting}
+                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    {thirdwebConnecting ? 'Connecting...' : 'Connect Any'}
+                  </button>
+                </div>
+
+                <p className="text-xs text-slate-500 text-center mt-2">Supported: MetaMask • WalletConnect • Coinbase Wallet • Phantom • Rainbow • Trust Wallet • Exodus • Ledger • Trezor</p>
               </div>
             ) : (
               <div className="space-y-3">
