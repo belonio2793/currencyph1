@@ -1175,7 +1175,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                 >
                   {thirdwebConnecting ? 'Connecting...' : 'Connect Wallet'}
                 </button>
-                <p className="text-xs text-slate-500 text-center">Compatible with: MetaMask • Phantom • Rainbow • Coinbase Wallet</p>
+                <p className="text-xs text-slate-500 text-center">Compatible with: MetaMask • Phantom • Rainbow • Coinbase Wallet • Trust Wallet • Exodus</p>
               </div>
             ) : (
               <div className="space-y-3">
