@@ -751,76 +751,100 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     try { window.location.reload() } catch(e) { /* ignore */ }
   }
 
-  // Auto-detect provider disconnects and reset connection state
-  useEffect(() => {
-    if (!connectedWallet || !connectedWallet.provider) return
-    const provider = connectedWallet.provider
-    let handled = false
-
-    const handleDisconnect = async () => {
-      if (handled) return
-      handled = true
-      try {
-        await disconnectWallet()
-      } catch (e) {
-        console.warn('Error during auto disconnect handling:', e)
-      }
+  // Disconnect a single connected external wallet (do not sign out global session)
+  const disconnectSingleWallet = async (walletInfo) => {
+    if (!walletInfo) return
+    try {
+      const p = walletInfo.provider
+      try { if (p && p.disconnect && typeof p.disconnect === 'function') await p.disconnect() } catch(e) { /* ignore */ }
+      try { if (p && p.close && typeof p.close === 'function') await p.close() } catch(e) { /* ignore */ }
+      try { if (p && p.provider && p.provider.disconnect && typeof p.provider.disconnect === 'function') await p.provider.disconnect() } catch(e) { /* ignore */ }
+      try { if (p && p.request && typeof p.request === 'function') { p.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] }).catch(()=>{}) } } catch(e) { /* ignore */ }
+    } catch (e) {
+      console.warn('Error disconnecting provider', e)
     }
 
     try {
-      // EVM (window.ethereum / injected providers)
-      if (connectedWallet.providerType === 'evm') {
-        if (provider && provider.on) {
-          provider.on('accountsChanged', (accounts) => {
-            if (!accounts || accounts.length === 0) handleDisconnect()
-            else if (accounts[0] && accounts[0].toString().toLowerCase() !== (connectedWallet.address || '').toString().toLowerCase()) {
-              // If user switched accounts or closed the wallet session, reset
-              handleDisconnect()
-            }
-          })
-          provider.on('disconnect', handleDisconnect)
-          // Some providers emit 'close' or 'session_update'/'session_delete' for WalletConnect
-          provider.on('close', handleDisconnect)
-          provider.on && provider.on('chainChanged', () => { /* no-op: chain changes handled elsewhere if needed */ })
-        }
+      // remove from connected list
+      setConnectedWallets(prev => prev.filter(p => !(p.address && walletInfo.address && p.address.toLowerCase() === walletInfo.address.toLowerCase() && p.providerName === walletInfo.providerName)))
+      // if the removed wallet was the active one, clear it
+      setConnectedWallet(prev => (prev && prev.address && walletInfo.address && prev.address.toLowerCase() === walletInfo.address.toLowerCase() ? null : prev))
+      setSelectedChainId(prev => (prev === walletInfo.chainId ? null : prev))
+      setSuccess('Wallet disconnected')
+    } catch (e) {
+      console.warn('Error removing wallet from state', e)
+    }
 
-        // also attach to global ethereum if different instance
-        if (typeof window !== 'undefined' && window.ethereum && window.ethereum.on && window.ethereum !== provider) {
-          window.ethereum.on('accountsChanged', (accounts) => { if (!accounts || accounts.length === 0) handleDisconnect() })
-        }
-      } else if (connectedWallet.providerType === 'solana') {
-        // Phantom and Solana providers
-        if (provider && provider.on) {
-          provider.on('disconnect', handleDisconnect)
-          // Phantom may emit 'accountChanged' or 'accountDisconnected'
-          provider.on('accountChanged', (pubKey) => { if (!pubKey) handleDisconnect() })
-        }
-      } else {
-        // Generic provider best-effort
-        if (provider && provider.on) {
-          provider.on('disconnect', handleDisconnect)
+    // Optionally inform server about disconnect (best-effort)
+    try {
+      await supabase.functions.invoke('save-connected-wallet', { body: { user_id: userId, chain_id: walletInfo.chainId, address: walletInfo.address, provider: walletInfo.providerName, disconnected: true } }).catch(()=>{})
+    } catch (e) {}
+  }
+
+  // Auto-detect provider disconnects for multiple connected wallets
+  useEffect(() => {
+    if (!connectedWallets || connectedWallets.length === 0) return
+    const listeners = []
+
+    connectedWallets.forEach((w) => {
+      const provider = w.provider
+      if (!provider || !provider.on) return
+      let handled = false
+      const handleDisconnect = async () => {
+        if (handled) return
+        handled = true
+        try {
+          await disconnectSingleWallet(w)
+        } catch (e) {
+          console.warn('Error during auto disconnect handling for wallet', w, e)
         }
       }
-    } catch (e) {
-      console.warn('Failed to attach wallet event listeners', e)
-    }
+
+      try {
+        if (w.providerType === 'evm') {
+          provider.on('accountsChanged', (accounts) => {
+            if (!accounts || accounts.length === 0) handleDisconnect()
+            else if (accounts[0] && accounts[0].toString().toLowerCase() !== (w.address || '').toString().toLowerCase()) handleDisconnect()
+          })
+          provider.on('disconnect', handleDisconnect)
+          provider.on('close', handleDisconnect)
+          provider.on && provider.on('chainChanged', () => { /* no-op */ })
+
+          if (typeof window !== 'undefined' && window.ethereum && window.ethereum.on && window.ethereum !== provider) {
+            window.ethereum.on('accountsChanged', (accounts) => { if (!accounts || accounts.length === 0) handleDisconnect() })
+          }
+        } else if (w.providerType === 'solana') {
+          provider.on('disconnect', handleDisconnect)
+          provider.on('accountChanged', (pubKey) => { if (!pubKey) handleDisconnect() })
+        } else {
+          provider.on('disconnect', handleDisconnect)
+        }
+
+        listeners.push({ provider, handleDisconnect })
+      } catch (e) {
+        console.warn('Failed to attach wallet event listeners for', w, e)
+      }
+    })
 
     return () => {
       try {
-        if (provider && provider.removeListener) {
-          provider.removeListener('accountsChanged', handleDisconnect)
-          provider.removeListener('disconnect', handleDisconnect)
-          provider.removeListener('close', handleDisconnect)
-          provider.removeListener('accountChanged', handleDisconnect)
-        }
-        if (typeof window !== 'undefined' && window.ethereum && window.ethereum.removeListener && window.ethereum !== provider) {
-          window.ethereum.removeListener('accountsChanged', handleDisconnect)
-        }
-      } catch (e) {
-        // ignore cleanup errors
-      }
+        listeners.forEach(({ provider, handleDisconnect }) => {
+          if (!provider) return
+          try {
+            if (provider.removeListener) {
+              provider.removeListener('accountsChanged', handleDisconnect)
+              provider.removeListener('disconnect', handleDisconnect)
+              provider.removeListener('close', handleDisconnect)
+              provider.removeListener('accountChanged', handleDisconnect)
+            }
+            if (typeof window !== 'undefined' && window.ethereum && window.ethereum.removeListener && window.ethereum !== provider) {
+              window.ethereum.removeListener('accountsChanged', handleDisconnect)
+            }
+          } catch (e) { /* ignore */ }
+        })
+      } catch (e) {}
     }
-  }, [connectedWallet])
+  }, [connectedWallets])
 
   // Helper to attempt a wallet connection with a UI timeout and reset
   const attemptConnect = async (connectFn, label = 'wallet') => {
@@ -840,10 +864,37 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       if (timedOut) return null
       clearTimeout(timer)
       const info = await getWalletInfo(w)
+      // append to connectedWallets for multi-wallet UX
+      setConnectedWallets(prev => {
+        const exists = prev.find(p => p.address && info.address && p.address.toLowerCase() === info.address.toLowerCase() && p.providerName === info.providerName)
+        if (exists) return prev
+        return [...prev, info]
+      })
       setConnectedWallet(info)
       setSelectedChainId(info.chainId)
       setSuccess(`Connected to ${info.chainName}`)
       setNoWalletDetected(false)
+
+      // Persist and trigger server sync for this wallet
+      try {
+        if (userId && !userId.includes('guest-local')) {
+          const payload = {
+            user_id: userId,
+            chain_id: info.chainId,
+            address: info.address,
+            provider: info.providerName || info.providerType,
+            chainName: info.chainName,
+            metadata: { chainName: info.chainName, chainSymbol: info.chainSymbol, providerName: info.providerName }
+          }
+          const { data: fnData, error: fnError } = await supabase.functions.invoke('save-connected-wallet', { body: payload })
+          if (!fnError && fnData && fnData.ok) {
+            supabase.functions.invoke('sync-wallets', { body: { addresses: [{ address: info.address, chain_id: info.chainId, wallet_id: fnData.wallet && fnData.wallet.id }] } }).catch(e => console.warn('sync-wallets error', e))
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to persist connected wallet:', e)
+      }
+
       return info
     } catch (e) {
       clearTimeout(timer)
