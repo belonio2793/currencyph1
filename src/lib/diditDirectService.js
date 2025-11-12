@@ -1,13 +1,14 @@
 import { supabase } from './supabaseClient'
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
 /**
- * Direct DIDIT service that calls DIDIT API without edge functions
- * Stores session data directly in Supabase
+ * Direct DIDIT service that calls backend API to create sessions
+ * Backend API acts as proxy to DIDIT for CORS compliance
  */
 export const diditDirectService = {
   /**
-   * Create a DIDIT verification session directly via DIDIT API
-   * Then store session data in Supabase
+   * Create a DIDIT verification session via backend API
    */
   async createVerificationSession(userId) {
     try {
@@ -15,96 +16,38 @@ export const diditDirectService = {
         throw new Error('userId is required')
       }
 
-      const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY || process.env.DIDIT_API_KEY
-      const DIDIT_WORKFLOW_ID = import.meta.env.VITE_DIDIT_WORKFLOW_ID || process.env.DIDIT_WORKFLOW_ID
-      const DIDIT_APP_ID = import.meta.env.VITE_DIDIT_APP_ID || process.env.DIDIT_APP_ID
-
-      if (!DIDIT_API_KEY) {
-        throw new Error('VITE_DIDIT_API_KEY environment variable is not set')
-      }
-
-      if (!DIDIT_WORKFLOW_ID) {
-        throw new Error('VITE_DIDIT_WORKFLOW_ID environment variable is not set')
-      }
-
-      // Call DIDIT API directly to create a session
-      const diditBody = { workflow_id: DIDIT_WORKFLOW_ID }
-      if (DIDIT_APP_ID) {
-        diditBody.app_id = DIDIT_APP_ID
-      }
-
-      const diditResponse = await fetch('https://verification.didit.me/v2/session/', {
+      // Call backend API endpoint to create session
+      const response = await fetch(`${API_BASE_URL}/api/didit/create-session`, {
         method: 'POST',
         headers: {
-          'x-api-key': DIDIT_API_KEY,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(diditBody),
+        body: JSON.stringify({ userId }),
       })
 
-      if (!diditResponse.ok) {
-        const errorText = await diditResponse.text()
-        console.error('DIDIT API error:', diditResponse.status, errorText)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('API error:', response.status, errorData)
         throw new Error(
-          `DIDIT API returned ${diditResponse.status}: ${errorText.slice(0, 200)}`
+          `API returned ${response.status}: ${errorData.error || 'Unknown error'}`
         )
       }
 
-      const sessionData = await diditResponse.json()
-      const { session_id, url: sessionUrl } = sessionData
+      const data = await response.json()
 
-      if (!session_id || !sessionUrl) {
-        throw new Error('Invalid DIDIT session response: missing session_id or url')
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to create verification session')
       }
 
-      // Store session in Supabase database
-      try {
-        const { data, error } = await supabase
-          .from('user_verifications')
-          .upsert(
-            {
-              user_id: userId,
-              didit_workflow_id: DIDIT_WORKFLOW_ID,
-              didit_session_id: session_id,
-              didit_session_url: sessionUrl,
-              status: 'pending',
-              verification_method: 'didit',
-              submitted_at: new Date().toISOString(),
-              updated_at: new Date().toISOString(),
-            },
-            { onConflict: 'user_id' }
-          )
-          .select()
-          .single()
+      if (!data.sessionUrl || !data.sessionId) {
+        throw new Error('Invalid response: missing sessionUrl or sessionId')
+      }
 
-        if (error) {
-          console.error('Error storing DIDIT session in database:', error)
-          // Session was created in DIDIT, but we couldn't store it - still return it
-          return {
-            success: true,
-            sessionUrl: sessionUrl,
-            sessionId: session_id,
-            data: null,
-            storageWarning: 'Session created but database storage failed',
-          }
-        }
-
-        return {
-          success: true,
-          sessionUrl: sessionUrl,
-          sessionId: session_id,
-          data: data,
-        }
-      } catch (dbErr) {
-        console.error('Database error when storing session:', dbErr)
-        // Still return the session even if database storage fails
-        return {
-          success: true,
-          sessionUrl: sessionUrl,
-          sessionId: session_id,
-          data: null,
-          storageWarning: 'Session created but database storage failed',
-        }
+      return {
+        success: true,
+        sessionUrl: data.sessionUrl,
+        sessionId: data.sessionId,
+        data: data.data,
       }
     } catch (error) {
       console.error('Error creating DIDIT verification session:', error)
