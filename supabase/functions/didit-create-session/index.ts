@@ -57,19 +57,6 @@ Deno.serve(async (req) => {
     const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid');
     if (headerUserId && !userId) userId = headerUserId;
 
-    // Try query params
-    try {
-      const url = new URL(req.url);
-      const q = url.searchParams.get('userId') || url.searchParams.get('user_id');
-      if (q && !userId) userId = q;
-    } catch (e) {
-      // ignore
-    }
-
-    // Try common headers
-    const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid');
-    if (headerUserId && !userId) userId = headerUserId;
-
     // If still missing, try to decode Authorization Bearer JWT (best-effort without verification)
     if (!userId) {
       try {
