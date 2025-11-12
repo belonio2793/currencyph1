@@ -67,9 +67,10 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       clearInterval(pollIntervalRef.current)
     }
 
-    // Poll every 2 seconds for status changes (up to 2 minutes)
+    // Poll every 1 second for status changes (up to 2 minutes)
+    // Faster polling since we check DIDIT API directly now
     let count = 0
-    const maxPolls = 60
+    const maxPolls = 120
 
     const checkStatus = async () => {
       try {
