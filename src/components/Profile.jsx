@@ -13,7 +13,7 @@ const COUNTRIES = [
   { code: 'CA', name: 'Canada', flag: '🇨��' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'NZ', name: 'New Zealand', flag: '��🇿' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
   { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
   { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
   { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
@@ -693,6 +693,14 @@ export default function Profile({ userId, onSignOut }) {
           </div>
         </div>
       </div>
+
+      {showDiditModal && (
+        <DiditVerificationModal
+          userId={userId}
+          onClose={handleDiditModalClose}
+          onSuccess={handleDiditVerificationSuccess}
+        />
+      )}
     </div>
   )
 }
