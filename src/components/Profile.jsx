@@ -26,7 +26,7 @@ const COUNTRIES = [
   { code: 'JP', name: 'Japan', flag: '🇯🇵' },
   { code: 'KR', name: 'South Korea', flag: '🇰🇷' },
   { code: 'CN', name: 'China', flag: '🇨🇳' },
-  { code: 'IN', name: 'India', flag: '���🇳' },
+  { code: 'IN', name: 'India', flag: '🇮🇳' },
   { code: 'BR', name: 'Brazil', flag: '🇧����' },
   { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
   { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
@@ -102,39 +102,27 @@ export default function Profile({ userId, onSignOut }) {
     }
   }
 
-  const handleStartVerification = async () => {
+  const handleStartVerification = () => {
     if (isGuestAccount || !isValidUUID(userId)) {
       setError('Guest accounts cannot submit verification. Please create an account first.')
       return
     }
 
-    try {
-      setVerifyingId(true)
-      setError('')
+    setError('')
+    setShowDiditModal(true)
+  }
 
-      // If an external DIDIT session URL is provided via VITE env, register it and redirect
-      const externalLink = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_DIDIT_EXTERNAL_SESSION_URL || import.meta.env.VITE_DIDIT_SESSION_URL)) || null
-      if (externalLink) {
-        // register pending verification in our DB so didit-sync/webhook can pick it up
-        await diditService.registerExternalSession(userId, externalLink)
-        setSuccess('Redirecting to verification...')
-        window.location.href = externalLink
-        return
-      }
+  const handleDiditModalClose = () => {
+    setShowDiditModal(false)
+  }
 
-      // Fallback: create a DIDIT verification session via edge function
-      const result = await diditService.createVerificationSession(userId)
-
-      if (result.success && result.sessionUrl) {
-        setSuccess('Redirecting to verification...')
-        // Redirect user to DIDIT verification URL
-        window.location.href = result.sessionUrl
-      }
-    } catch (err) {
-      console.error('Verification error:', err)
-      setError('Failed to start verification: ' + (err?.message || 'Please check your internet connection and try again.'))
-      setVerifyingId(false)
-    }
+  const handleDiditVerificationSuccess = async () => {
+    setShowDiditModal(false)
+    setSuccess('Verification submitted successfully! We will review your submission shortly.')
+    setTimeout(() => {
+      setSuccess('')
+      loadVerificationStatus()
+    }, 3000)
   }
 
   const toggleVerificationPrivacy = async () => {
