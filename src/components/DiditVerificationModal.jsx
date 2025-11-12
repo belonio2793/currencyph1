@@ -41,7 +41,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       }
 
       // Create new session
-      const result = await diditService.createVerificationSession(userId)
+      const result = await diditDirectService.createVerificationSession(userId)
       
       if (!result.success || !result.sessionUrl) {
         throw new Error('Failed to create verification session')
