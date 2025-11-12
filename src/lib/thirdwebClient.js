@@ -82,6 +82,10 @@ export function clearWalletCache() {
 
 // Request wallet connection via MetaMask/WalletConnect (EVM)
 export async function connectWallet() {
+  if (isTrustWalletBrowser()) {
+    throw new Error('Trust Wallet in-app browser has limitations with dApp connections. Please use WalletConnect or open this dApp in an external browser like Chrome or Safari.')
+  }
+
   if (!hasWeb3Provider()) {
     throw new Error('No Web3 wallet provider found. Please install MetaMask or use WalletConnect.')
   }
@@ -108,6 +112,10 @@ export async function connectWallet() {
     return result
   } catch (error) {
     console.error('Wallet connection error:', error)
+    const errorMsg = error.message || ''
+    if (errorMsg.includes('dapp.frames-disallowed') || errorMsg.includes('frames-disallowed')) {
+      throw new Error('Trust Wallet in-app browser does not support this connection method. Please use WalletConnect or open this dApp in an external browser.')
+    }
     throw new Error(`Failed to connect wallet: ${error.message}`)
   }
 }
