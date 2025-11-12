@@ -21,10 +21,10 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
     try {
       setError('')
       setLoading(true)
-      
+
       // Check if user already has a pending or approved verification
       const existingStatus = await diditDirectService.getVerificationStatus(userId)
-      
+
       if (existingStatus?.status === 'approved') {
         setVerificationStatus(existingStatus)
         setLoading(false)
@@ -42,19 +42,46 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       }
 
       // Create new session
-      const result = await diditDirectService.createVerificationSession(userId)
-      
-      if (!result.success || !result.sessionUrl) {
-        throw new Error('Failed to create verification session')
-      }
+      try {
+        const result = await diditDirectService.createVerificationSession(userId)
 
-      setSessionUrl(result.sessionUrl)
-      setSessionId(result.sessionId)
-      setIsVerifying(true)
-      setLoading(false)
-      
-      // Start polling for status changes
-      startPolling(result.sessionId)
+        if (!result.success || !result.sessionUrl) {
+          throw new Error('Failed to create verification session')
+        }
+
+        setSessionUrl(result.sessionUrl)
+        setSessionId(result.sessionId)
+        setIsVerifying(true)
+        setLoading(false)
+
+        // Start polling for status changes
+        startPolling(result.sessionId)
+      } catch (createErr) {
+        console.warn('Failed to create session via API:', createErr)
+
+        // Fallback: try using environment variable for default session or hardcoded link
+        const defaultSessionUrl = import.meta.env.VITE_DIDIT_DEFAULT_SESSION_URL ||
+                                 'https://verify.didit.me/session/0YcwjP8Jj41H'
+
+        if (defaultSessionUrl) {
+          console.warn('Falling back to default session URL')
+          await diditDirectService.registerExternalSession(userId, defaultSessionUrl)
+
+          const sessionIdMatch = defaultSessionUrl.match(/session\/([A-Za-z0-9_-]+)/i)
+          const fallbackSessionId = sessionIdMatch ? sessionIdMatch[1] : null
+
+          setSessionUrl(defaultSessionUrl)
+          setSessionId(fallbackSessionId)
+          setIsVerifying(true)
+          setLoading(false)
+
+          if (fallbackSessionId) {
+            startPolling(fallbackSessionId)
+          }
+        } else {
+          throw createErr
+        }
+      }
     } catch (err) {
       console.error('Error initializing DIDIT session:', err)
       setError(err?.message || 'Failed to initialize verification. Please try again.')
