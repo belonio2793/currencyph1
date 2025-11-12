@@ -50,8 +50,9 @@ Deno.serve(async (req) => {
       didit_session_id: sessionId,
       didit_session_url: sessionUrl,
       // required fields in your schema: id_type and id_number are NOT NULL
-      id_type: body.id_type || 'external',
-      id_number: body.id_number || '',
+      // Use placeholder values - will be updated from DIDIT webhook with actual document type
+      id_type: body.id_type || 'national_id',
+      id_number: body.id_number || sessionId || 'pending',
       id_image_url: body.id_image_url || null,
       status: 'pending',
       verification_method: 'didit',
