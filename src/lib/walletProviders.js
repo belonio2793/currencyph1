@@ -282,7 +282,7 @@ export const VenlyProvider = {
 // Export all providers
 export const WALLET_PROVIDERS = {
   metamask: MetaMaskProvider,
-  walletconnect: WalletConnectProvider,
+  walletconnect: WalletConnectProviderAdapter,
   coinbase: CoinbaseWalletProvider,
   phantom: PhantomProvider,
   venly: VenlyProvider
