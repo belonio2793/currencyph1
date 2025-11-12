@@ -6,6 +6,9 @@ export const diditService = {
    */
   async createVerificationSession(userId) {
     try {
+      if (!userId || (typeof userId === 'string' && userId.trim() === '')) {
+        throw new Error('userId is required')
+      }
       // Call Supabase edge function to create session (server-to-server, no CORS)
       // Build headers: prefer current session access token, fall back to anon key
       const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': userId }
