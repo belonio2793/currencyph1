@@ -92,6 +92,8 @@
     "@solana/web3.js": "^1.75.3",
     "@supabase/supabase-js": "^2.38.0",
     "@thirdweb-dev/sdk": "^4.0.99",
+    "@reown/appkit": "^1.0.0",
+    "@reown/appkit-adapter-ethers": "^1.0.0",
     "bs58": "^6.0.0",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
@@ -104,9 +106,7 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "three": "^0.156.0",
-    "ethers": "^5.7.2",
-    "web3modal": "^1.9.8",
-    "@walletconnect/web3-provider": "^1.7.8"
+    "ethers": "^5.7.2"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
