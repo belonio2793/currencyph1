@@ -70,6 +70,35 @@ Deno.serve(async (req) => {
     const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid');
     if (headerUserId && !userId) userId = headerUserId;
 
+    // If still missing, try to decode Authorization Bearer JWT (best-effort without verification)
+    if (!userId) {
+      try {
+        const auth = req.headers.get('authorization') || req.headers.get('Authorization') || '';
+        const match = auth.match(/^Bearer\s+(.+)$/i);
+        if (match) {
+          const token = match[1];
+          const parts = token.split('.');
+          if (parts.length >= 2) {
+            const payload = parts[1];
+            // Add padding if needed
+            const pad = payload.length % 4 === 0 ? '' : '='.repeat(4 - (payload.length % 4));
+            const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/') + pad);
+            try {
+              const obj = JSON.parse(decoded);
+              if (obj && (obj.sub || obj.user_id || obj.id)) {
+                userId = obj.sub || obj.user_id || obj.id;
+                console.debug('didit-create-session: extracted userId from JWT payload', userId);
+              }
+            } catch (e) {
+              // ignore JSON parse errors
+            }
+          }
+        }
+      } catch (e) {
+        console.debug('didit-create-session: failed to decode Authorization token', e && e.message);
+      }
+    }
+
     if (!userId) {
       // Log everything helpful for debugging
       try {
@@ -82,7 +111,7 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({
           error: "userId is required",
-          message: "No userId found in request body, query params, or headers",
+          message: "No userId found in request body, query params, headers, or Authorization token",
           rawBody: rawText
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
