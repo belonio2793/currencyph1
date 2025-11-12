@@ -785,10 +785,6 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
       {/* Fiat wallets from wallets_fiat */}
       <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xl font-light">Fiat Wallets</h3>
-          <button onClick={() => setShowPreferencesFiat(true)} className="text-sm px-3 py-1 bg-slate-100 rounded">Customize</button>
-        </div>
 
         {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
