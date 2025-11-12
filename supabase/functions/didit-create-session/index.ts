@@ -43,23 +43,58 @@ Deno.serve(async (req) => {
       console.debug('didit-create-session: failed to read request body text:', e && e.message);
     }
 
-    // Extract userId flexibly: from parsed JSON body, query param, or headers
-    let userId = body?.userId || body?.user_id;
+    // Extract userId flexibly: deep search parsed JSON body, query param, headers, or JWT
+    let userId = null
 
-    // Try query params
-    try {
-      const url = new URL(req.url);
-      const q = url.searchParams.get('userId') || url.searchParams.get('user_id');
-      if (q && !userId) userId = q;
-    } catch (e) {
-      // ignore
+    const trySet = (val) => {
+      if (!userId && val) userId = val
     }
 
-    // Try common headers
-    const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid');
-    if (headerUserId && !userId) userId = headerUserId;
+    // shallow checks first
+    trySet(body?.userId)
+    trySet(body?.user_id)
 
-    // If still missing, try to decode Authorization Bearer JWT (best-effort without verification)
+    try {
+      const url = new URL(req.url)
+      const q = url.searchParams.get('userId') || url.searchParams.get('user_id')
+      trySet(q)
+    } catch (e) {}
+
+    const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid')
+    trySet(headerUserId)
+
+    // If not found, attempt deep search through parsed body object for any key that looks like userId
+    const deepFindUserId = (obj) => {
+      if (!obj) return null
+      if (typeof obj === 'string') {
+        // if it's a JSON string, try parse
+        try { const parsed = JSON.parse(obj); return deepFindUserId(parsed) } catch (e) {}
+        return null
+      }
+      if (typeof obj !== 'object') return null
+      const keys = Object.keys(obj || {})
+      for (const k of keys) {
+        const v = obj[k]
+        if (['userId','user_id','userid','id','sub'].includes(k.toLowerCase())) {
+          if (typeof v === 'string' && v.trim()) return v
+        }
+        // if value is string and contains a JSON payload, attempt parse and search
+        if (typeof v === 'string') {
+          try { const parsed = JSON.parse(v); const r = deepFindUserId(parsed); if (r) return r } catch (e) {}
+        }
+        if (typeof v === 'object') {
+          const r = deepFindUserId(v)
+          if (r) return r
+        }
+      }
+      return null
+    }
+
+    if (!userId) {
+      trySet(deepFindUserId(body))
+    }
+
+    // Try to decode Authorization Bearer JWT (best-effort without verification)
     if (!userId) {
       try {
         const auth = req.headers.get('authorization') || req.headers.get('Authorization') || '';
@@ -69,14 +104,13 @@ Deno.serve(async (req) => {
           const parts = token.split('.');
           if (parts.length >= 2) {
             const payload = parts[1];
-            // Add padding if needed
             const pad = payload.length % 4 === 0 ? '' : '='.repeat(4 - (payload.length % 4));
             const decoded = atob(payload.replace(/-/g, '+').replace(/_/g, '/') + pad);
             try {
               const obj = JSON.parse(decoded);
-              if (obj && (obj.sub || obj.user_id || obj.id)) {
-                userId = obj.sub || obj.user_id || obj.id;
-                console.debug('didit-create-session: extracted userId from JWT payload', userId);
+              trySet(obj.sub || obj.user_id || obj.id)
+              if (obj?.role === 'service_role') {
+                console.debug('didit-create-session: Service role token detected; userId must be provided explicitly in body/query/headers');
               }
             } catch (e) {
               // ignore JSON parse errors
@@ -86,6 +120,14 @@ Deno.serve(async (req) => {
       } catch (e) {
         console.debug('didit-create-session: failed to decode Authorization token', e && e.message);
       }
+    }
+
+    // As a last effort, scan rawText for a userId-like substring (uuid pattern)
+    if (!userId && rawText) {
+      try {
+        const uuidMatch = rawText.match(/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}/i)
+        if (uuidMatch) trySet(uuidMatch[0])
+      } catch (e) {}
     }
 
     if (!userId) {
