@@ -339,10 +339,26 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
       console.warn('Failed to subscribe to supabase channel:', e)
     }
 
+    // suppress noisy unhandledrejection logs for expected AbortErrors from fetch timeouts
+    const unhandledRejectionHandler = (evt) => {
+      try {
+        const reason = evt && (evt.reason || evt.detail || null)
+        const msg = (reason && (reason.message || reason.toString && reason.toString())) || ''
+        if (typeof msg === 'string' && /abort|aborted|AbortError/i.test(msg)) {
+          evt.preventDefault && evt.preventDefault()
+          console.debug('Ignored aborted promise:', msg)
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+    try { window.addEventListener('unhandledrejection', unhandledRejectionHandler) } catch (e) {}
+
     return () => {
       try {
         supabase.removeChannel(channel)
       } catch (e) {}
+      try { window.removeEventListener('unhandledrejection', unhandledRejectionHandler) } catch (e) {}
     }
   }, [userId])
 
