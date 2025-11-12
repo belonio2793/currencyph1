@@ -1,5 +1,4 @@
 import { ethers } from 'ethers'
-import WalletConnectProvider from '@walletconnect/web3-provider'
 
 // MetaMask Provider Adapter
 export const MetaMaskProvider = {
