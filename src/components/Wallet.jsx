@@ -744,7 +744,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
       {/* Internal Wallets row (public.wallets) */}
       <div className="mb-6">
-        <h3 className="text-xl font-light mb-3">Internal Wallets</h3>
+        <h3 className="text-xl font-light mb-3">Wallets</h3>
         {internalWallets.length === 0 ? (
           <div className="bg-white border border-slate-200 rounded-xl p-6 text-center">
             <p className="text-slate-500 mb-4">No internal wallets created yet</p>
@@ -760,7 +760,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             {internalWallets.filter(w => enabledInternal.includes(w.currency_code)).map(wallet => (
               <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{wallet.currency_code}</p>
+                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">CRYPTOCURRENCY</p>
                   <span className="text-2xl">{CURRENCY_SYMBOLS[wallet.currency_code] || '$'}</span>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
@@ -791,7 +791,7 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => (
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
+                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
                   <p className="text-sm text-slate-500">{w.provider}</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
