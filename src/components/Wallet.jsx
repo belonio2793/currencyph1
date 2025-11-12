@@ -697,6 +697,13 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
       const upserted = fnData.wallet
 
+      // Trigger immediate sync for this wallet to populate balances and tokens
+      try {
+        await supabase.functions.invoke('sync-wallets', { body: { addresses: [{ address: connectedWallet.address, chain_id: selectedChainId, wallet_id: upserted.id }] } })
+      } catch (syncErr) {
+        console.warn('Immediate sync failed', syncErr)
+      }
+
       setSuccess(`Wallet connected and saved (${formatWalletAddress(connectedWallet.address)})`)
       setShowThirdwebModal(false)
       setConnectedWallet(null)
