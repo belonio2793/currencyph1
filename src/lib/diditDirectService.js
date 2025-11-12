@@ -6,7 +6,7 @@ import { supabase } from './supabaseClient'
  */
 export const diditDirectService = {
   /**
-   * Create a DIDIT verification session via backend API
+   * Create a DIDIT verification session via Supabase edge function
    */
   async createVerificationSession(userId) {
     try {
@@ -14,30 +14,27 @@ export const diditDirectService = {
         throw new Error('userId is required')
       }
 
-      // Call backend API endpoint to create session
-      const response = await fetch('/api/didit/create-session', {
+      // Call Supabase edge function to create session
+      const { data, error } = await supabase.functions.invoke('didit-create-session', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ userId }),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        console.error('API error:', response.status, errorData)
-        throw new Error(
-          `API returned ${response.status}: ${errorData.error || 'Unknown error'}`
-        )
+      if (error) {
+        console.error('Edge function invoke error:', error)
+        throw new Error(error.message || 'Failed to create verification session')
       }
 
-      const data = await response.json()
-
-      if (!data.success) {
+      if (data?.error) {
+        console.error('Edge function returned error:', data)
         throw new Error(data.error || 'Failed to create verification session')
       }
 
-      if (!data.sessionUrl || !data.sessionId) {
+      if (!data?.success) {
+        throw new Error(data?.error || 'Failed to create verification session')
+      }
+
+      if (!data?.sessionUrl || !data?.sessionId) {
         throw new Error('Invalid response: missing sessionUrl or sessionId')
       }
 
