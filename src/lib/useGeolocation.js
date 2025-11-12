@@ -102,10 +102,15 @@ export function useGeolocation() {
                 }, 3000)
 
                 try {
-                  const response = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                    { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
-                  ).catch(() => null) // Suppress fetch errors
+                  let response = null
+                  try {
+                    response = await fetch(
+                      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                      { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
+                    )
+                  } catch (fetchErr) {
+                    response = null
+                  }
 
                   clearTimeout(timeoutId)
 
@@ -119,9 +124,12 @@ export function useGeolocation() {
                       // JSON parse error - silently ignore
                     }
                   }
-                } catch (fetchErr) {
-                  clearTimeout(timeoutId)
-                  // Silently ignore all fetch errors including AbortError
+                } finally {
+                  // Ensure controller is cleaned up from the list
+                  try {
+                    const idx = controllersRef.current.indexOf(controller)
+                    if (idx !== -1) controllersRef.current.splice(idx, 1)
+                  } catch (e) {}
                 }
               } catch (e) {
                 // Silently fail - any network error is acceptable
