@@ -1187,7 +1187,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-slate-900">Web3 Wallet Connection</h3>
+              <h3 className="text-xl font-semibold text-slate-900">Connect Wallet</h3>
               <button onClick={() => { setShowThirdwebModal(false); setNoWalletDetected(false); setError('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
             </div>
 
