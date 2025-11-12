@@ -22,7 +22,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
       setLoading(true)
       
       // Check if user already has a pending or approved verification
-      const existingStatus = await diditService.getVerificationStatus(userId)
+      const existingStatus = await diditDirectService.getVerificationStatus(userId)
       
       if (existingStatus?.status === 'approved') {
         setVerificationStatus(existingStatus)
