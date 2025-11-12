@@ -128,9 +128,9 @@ export default function Profile({ userId, onSignOut }) {
   const toggleVerificationPrivacy = async () => {
     try {
       if (verificationStatus?.is_public) {
-        await diditService.makeVerificationPrivate(userId)
+        await diditDirectService.makeVerificationPrivate(userId)
       } else {
-        await diditService.makeVerificationPublic(userId)
+        await diditDirectService.makeVerificationPublic(userId)
       }
       loadVerificationStatus()
       setSuccess(`Verification is now ${verificationStatus?.is_public ? 'private' : 'public'}.`)
