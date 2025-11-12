@@ -25,36 +25,37 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Try to parse JSON body if possible, but be tolerant to various formats
+    // Read raw request body first, then parse JSON from it to avoid stream consumption issues
     let body: any = null;
+    let rawText = '';
     try {
-      // Attempt to parse as JSON first
-      body = await req.json();
-    } catch (parseError) {
-      // We'll attempt fallbacks below; do not return yet because some runtimes send body differently
-      console.debug("didit-create-session: JSON.parse failed on req.json():", parseError && parseError.message);
-    }
-
-    // Extract userId flexibly: from parsed JSON body, raw text parsed as JSON, query param, or headers
-    let userId = body?.userId;
-
-    // If body didn't yield userId, try reading raw text and parsing JSON
-    if (!userId) {
-      try {
-        const rawText = await req.text();
-        if (rawText) {
-          try {
-            const parsed = JSON.parse(rawText);
-            if (parsed && parsed.userId) userId = parsed.userId;
-          } catch (e) {
-            // not JSON — ignore
-            console.debug("didit-create-session: raw text not JSON or no userId found in raw text");
-          }
+      rawText = await req.text();
+      if (rawText) {
+        try {
+          body = JSON.parse(rawText);
+        } catch (e) {
+          console.debug('didit-create-session: request body is not valid JSON:', e && e.message);
         }
-      } catch (e) {
-        // ignore
       }
+    } catch (e) {
+      console.debug('didit-create-session: failed to read request body text:', e && e.message);
     }
+
+    // Extract userId flexibly: from parsed JSON body, query param, or headers
+    let userId = body?.userId || body?.user_id;
+
+    // Try query params
+    try {
+      const url = new URL(req.url);
+      const q = url.searchParams.get('userId') || url.searchParams.get('user_id');
+      if (q && !userId) userId = q;
+    } catch (e) {
+      // ignore
+    }
+
+    // Try common headers
+    const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid');
+    if (headerUserId && !userId) userId = headerUserId;
 
     // Try query params
     try {
