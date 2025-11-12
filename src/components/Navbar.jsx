@@ -291,7 +291,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   <>
                     <button onClick={() => { onShowAuth && onShowAuth('login'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200">Login</button>
                     <button onClick={() => { onShowAuth && onShowAuth('register'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">Register</button>
-                    <button onClick={() => { onShowAuth && onShowAuth('login'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-slate-50">Guest: guest/guest</button>
                   </>
                 )}
               </div>
