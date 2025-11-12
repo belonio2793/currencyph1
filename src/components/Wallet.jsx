@@ -1017,40 +1017,66 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         </div>
 
         <div className="mb-4 flex flex-wrap gap-3 items-center">
-          {connectedWallet ? (
-            <div className="relative">
-              <button
-                onClick={() => setShowConnectedMenu(prev => !prev)}
-                className="px-4 py-2 text-sm font-medium rounded-lg cursor-pointer text-slate-700/70 hover:text-slate-900/90 bg-transparent border border-transparent hover:bg-white/5 transition-colors flex items-center gap-3"
-                aria-expanded={showConnectedMenu}
-              >
-                <span className="font-semibold text-sm">{(connectedWallet.providerName || connectedWallet.providerType || 'WALLET').toString().toUpperCase()}</span>
-                <span className="text-xs text-slate-500">{formatWalletAddress(connectedWallet.address)}</span>
-              </button>
+          <div className="relative">
+            <button
+              onClick={() => setShowConnectedMenu(prev => !prev)}
+              className="px-4 py-2 text-sm font-medium rounded-lg cursor-pointer text-slate-700/70 hover:text-slate-900/90 bg-transparent border border-transparent hover:bg-white/5 transition-colors flex items-center gap-3"
+              aria-expanded={showConnectedMenu}
+            >
+              <span className="font-semibold text-sm">{connectedWallets.length > 0 ? 'CONNECTED' : 'NOT CONNECTED'}</span>
+              <span className="text-xs text-slate-500">{connectedWallets.length > 0 ? `${connectedWallets.length} wallets` : 'No wallets'}</span>
+            </button>
 
-              {showConnectedMenu && (
-                <div className="mt-2 p-3 bg-white/95 border border-slate-100 rounded-lg shadow-sm w-64">
-                  <div className="flex flex-col gap-2">
-                    <button onClick={async () => { try { await handleSaveConnectedWallet(); setShowConnectedMenu(false) } catch(e){ console.warn(e); setShowConnectedMenu(false) } }} className="px-3 py-2 bg-indigo-600 text-white rounded">Save Connection</button>
-                    <button onClick={async () => { try { await disconnectWallet(); setShowConnectedMenu(false) } catch(e){ console.warn(e); setShowConnectedMenu(false) } }} className="px-3 py-2 bg-gray-100 rounded">Disconnect</button>
-                    <button onClick={async () => { try { if (connectedWallet && connectedWallet.provider) { if (connectedWallet.provider.disconnect) await connectedWallet.provider.disconnect(); else if (connectedWallet.provider.close) await connectedWallet.provider.close(); } } catch(e){ console.warn(e) } try { clearWalletCache() } catch(e){} setConnectedWallet(null); setSelectedChainId(null); setShowConnectedMenu(false); setSuccess('Connection reset') }} className="px-3 py-2 bg-red-500 text-white rounded">Reset Connection</button>
+            {showConnectedMenu && (
+              <div className="mt-2 p-3 bg-white/95 border border-slate-100 rounded-lg shadow-sm w-80">
+                <div className="flex flex-col gap-3">
+                  {connectedWallets.length === 0 && (
+                    <div className="text-xs text-slate-500">No connected wallets. Click "Connect Wallet" to add one.</div>
+                  )}
+
+                  {connectedWallets.map((w, idx) => (
+                    <div key={`${w.providerName}-${w.address}-${idx}`} className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-sm font-medium">{(w.providerName || w.providerType || 'WALLET').toString().toUpperCase()}</div>
+                        <div className="text-xs text-slate-500">{formatWalletAddress(w.address)} • {w.chainName || ''}</div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button onClick={async () => {
+                          try {
+                            setThirdwebConnecting(true); setError('')
+                            if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) { setError('Please sign in to save wallet connection'); return }
+                            const payload = {
+                              user_id: userId,
+                              chain_id: w.chainId,
+                              address: w.address,
+                              provider: w.providerName || w.providerType,
+                              chainName: w.chainName,
+                              metadata: { chainName: w.chainName, chainSymbol: w.chainSymbol, providerName: w.providerName }
+                            }
+                            const { data: fnData, error: fnError } = await supabase.functions.invoke('save-connected-wallet', { body: payload })
+                            if (fnError) throw fnError
+                            if (!fnData || !fnData.ok) throw new Error(fnData?.error || 'Failed saving connected wallet')
+                            // trigger sync
+                            supabase.functions.invoke('sync-wallets', { body: { addresses: [{ address: w.address, chain_id: w.chainId, wallet_id: fnData.wallet && fnData.wallet.id }] } }).catch(e => console.warn('sync-wallets error', e))
+                            setSuccess(`Wallet saved (${formatWalletAddress(w.address)})`)
+                          } catch (e) {
+                            setError(fmtErr(e) || 'Failed to save wallet')
+                          } finally { setThirdwebConnecting(false); setShowConnectedMenu(false) }
+                        }} className="px-3 py-1 bg-indigo-600 text-white rounded text-xs">Save</button>
+
+                        <button onClick={() => { disconnectSingleWallet(w); setShowConnectedMenu(false) }} className="px-3 py-1 bg-gray-100 text-xs rounded">Disconnect</button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="flex items-center gap-2 mt-2">
+                    <button onClick={() => { setShowThirdwebModal(true); setShowConnectedMenu(false); setError('') }} className="px-3 py-2 bg-black text-white rounded text-sm">Connect Wallet</button>
+                    <button onClick={() => setShowCreateManualWalletModal(true)} className="px-3 py-2 bg-slate-600 text-white rounded text-sm">Create Wallet</button>
                   </div>
                 </div>
-              )}
-            </div>
-          ) : (
-            <button
-              onClick={() => {
-                setShowThirdwebModal(true)
-                setNoWalletDetected(false)
-                setError('')
-                setWalletAvailable(checkWalletAvailability())
-              }}
-              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm"
-            >
-              Connect Wallet
-            </button>
-          )}
+              </div>
+            )}
+          </div>
 
           <button
             onClick={() => setShowCreateManualWalletModal(true)}
