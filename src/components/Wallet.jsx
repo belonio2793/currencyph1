@@ -866,12 +866,26 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-                <p className="text-3xl font-light text-slate-900 mb-2">{formatNumber(Number(wallet.balance || 0))} {globalCurrency}</p>
+                <p className="text-3xl font-light text-slate-900 mb-2">{formatNumber(Number(wallet.balance || 0))} {wallet.currency_code}</p>
                 {currencyRates[wallet.currency_code] && Number(wallet.balance || 0) !== 0 && (
-                  <p className="text-xs text-slate-400 mb-4">≈ {formatNumber(Number(wallet.balance || 0) * currencyRates[wallet.currency_code])} {globalCurrency}</p>
+                  <p className="text-xs text-slate-400 mb-2">≈ {formatNumber(Number(wallet.balance || 0) * currencyRates[wallet.currency_code])} {globalCurrency}</p>
                 )}
                 {wallet.account_number && (
-                  <p className="text-xs text-slate-500 mb-4">Acct: {wallet.account_number}</p>
+                  <p className="text-xs text-slate-500 mb-2">Acct: {wallet.account_number}</p>
+                )}
+                {wallet.tokens && wallet.tokens.length > 0 && (
+                  <div className="mb-3">
+                    <div className="text-xs text-slate-500 mb-1">Tokens</div>
+                    <div className="flex flex-col gap-1 text-xs text-slate-600">
+                      {wallet.tokens.slice(0,3).map(t => (
+                        <div key={t.token_address} className="flex items-center justify-between">
+                          <div className="truncate">{t.metadata?.symbol || t.token_address.slice(0,6)}</div>
+                          <div className="font-mono">{formatNumber(Number(t.balance || 0))}</div>
+                        </div>
+                      ))}
+                      {wallet.tokens.length > 3 && <div className="text-xs text-slate-400">+{wallet.tokens.length - 3} more</div>}
+                    </div>
+                  </div>
                 )}
                 <button
                   onClick={() => {
