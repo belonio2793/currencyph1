@@ -31,15 +31,35 @@ export const diditService = {
         body: JSON.stringify({ userId })
       })
 
+      // If invoke returned a transport-level error
       if (error) {
         console.error('diditService.createVerificationSession: invoke error', error)
-        throw new Error(error.message || 'Failed to create verification session')
+        // Try fallback: if an external session URL is configured, register it and return it
+        const externalLink = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_DIDIT_EXTERNAL_SESSION_URL || import.meta.env.VITE_DIDIT_SESSION_URL)) || null
+        if (externalLink) {
+          console.info('diditService: using external DIDIT session URL fallback')
+          await this.registerExternalSession(userId, externalLink)
+          return { success: true, sessionUrl: externalLink, sessionId: (externalLink.match(/session\/([A-Za-z0-9_-]+)/i) || [null, null])[1], data: null }
+        }
+
+        // Provide as much detail as possible in the thrown error
+        const errMsg = (error && (error.message || JSON.stringify(error))) || 'Failed to create verification session (invoke error)'
+        throw new Error(errMsg)
       }
 
       // Edge function may return non-2xx payload with details in data
       if (data && data.error) {
         const details = data.details || data.preview || ''
         console.error('diditService.createVerificationSession: function returned error', data)
+
+        // fallback to external link if configured
+        const externalLink = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_DIDIT_EXTERNAL_SESSION_URL || import.meta.env.VITE_DIDIT_SESSION_URL)) || null
+        if (externalLink) {
+          console.info('diditService: using external DIDIT session URL fallback after function error')
+          await this.registerExternalSession(userId, externalLink)
+          return { success: true, sessionUrl: externalLink, sessionId: (externalLink.match(/session\/([A-Za-z0-9_-]+)/i) || [null, null])[1], data: null }
+        }
+
         throw new Error(`${data.error}${details ? ': ' + details : ''}`)
       }
 
