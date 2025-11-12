@@ -50,13 +50,14 @@ export const MetaMaskProvider = {
 }
 
 // WalletConnect Provider Adapter
-export const WalletConnectProvider = {
+export const WalletConnectProviderAdapter = {
   name: 'WalletConnect',
   detectable: false,
   detect: () => false,
   async connect() {
     try {
-      const wcProvider = new (await import('@walletconnect/web3-provider')).default({
+      const { default: WalletConnectProvider } = await import('@walletconnect/web3-provider')
+      const wcProvider = new WalletConnectProvider({
         rpc: {
           1: process.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com',
           137: 'https://polygon.rpc.thirdweb.com'
