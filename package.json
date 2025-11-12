@@ -106,7 +106,7 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "three": "^0.156.0",
-    "ethers": "^5.7.2"
+    "ethers": "^6.11.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.2.0",
