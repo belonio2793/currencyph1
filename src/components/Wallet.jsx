@@ -1216,7 +1216,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   </div>
                 )}
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="flex flex-col gap-3">
                   <button
                     onClick={async () => {
                       setThirdwebConnecting(true); setError('')
@@ -1228,7 +1228,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       finally { setThirdwebConnecting(false) }
                     }}
                     disabled={thirdwebConnecting}
-                    className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     {thirdwebConnecting ? 'Connecting...' : 'MetaMask'}
                   </button>
@@ -1245,7 +1245,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       finally { setThirdwebConnecting(false) }
                     }}
                     disabled={thirdwebConnecting}
-                    className="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     WalletConnect / Coinbase
                   </button>
@@ -1261,7 +1261,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       finally { setThirdwebConnecting(false) }
                     }}
                     disabled={thirdwebConnecting}
-                    className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     Phantom (Solana)
                   </button>
@@ -1269,7 +1269,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <button
                     onClick={handleConnectWallet}
                     disabled={thirdwebConnecting}
-                    className="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     {thirdwebConnecting ? 'Connecting...' : 'Connect Any'}
                   </button>
