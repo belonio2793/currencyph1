@@ -1131,7 +1131,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   ))}
 
                   <div className="flex items-center gap-2 mt-2">
-                    <button onClick={() => { setShowThirdwebModal(true); setShowConnectedMenu(false); setError('') }} className="px-3 py-2 bg-black text-white rounded text-sm">Connect Wallet</button>
                     <button onClick={() => setShowCreateManualWalletModal(true)} className="px-3 py-2 bg-slate-600 text-white rounded text-sm">Create Wallet</button>
                   </div>
                 </div>
