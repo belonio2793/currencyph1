@@ -50,25 +50,36 @@ export function useGeolocation() {
                   }, 3000)
 
                   try {
-                    const resp = await fetch(url, { signal: controller.signal }).catch(() => null) // Suppress fetch errors
-                    clearTimeout(timeoutId)
-
-                    if (resp?.ok && isMountedRef.current) {
-                      try {
-                        const data = await resp.json()
-                        if (data?.features?.[0]?.properties) {
-                          const props = data.features[0].properties
-                          setCity(props.city || props.town || props.village || props.county || props.state || null)
-                          return true
-                        }
-                      } catch (parseErr) {
-                        // JSON parse error - silently ignore
-                      }
-                    }
+                  let resp = null
+                  try {
+                    resp = await fetch(url, { signal: controller.signal })
                   } catch (fetchErr) {
-                    clearTimeout(timeoutId)
-                    // Silently ignore all fetch errors including AbortError
+                    // fetch may reject on abort or network errors — treat as null response
+                    resp = null
                   }
+
+                  // Clear the timeout once fetch finished or failed
+                  clearTimeout(timeoutId)
+
+                  if (resp?.ok && isMountedRef.current) {
+                    try {
+                      const data = await resp.json()
+                      if (data?.features?.[0]?.properties) {
+                        const props = data.features[0].properties
+                        setCity(props.city || props.town || props.village || props.county || props.state || null)
+                        return true
+                      }
+                    } catch (parseErr) {
+                      // JSON parse error - silently ignore
+                    }
+                  }
+                } finally {
+                  // Ensure controller is cleaned up from the list
+                  try {
+                    const idx = controllersRef.current.indexOf(controller)
+                    if (idx !== -1) controllersRef.current.splice(idx, 1)
+                  } catch (e) {}
+                }
                 } catch (e) {
                   // Silently fail - try fallback
                 }
