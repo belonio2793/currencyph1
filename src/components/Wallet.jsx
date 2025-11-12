@@ -767,14 +767,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           <p className="text-xs text-slate-500 mt-1">Total value ({globalCurrency}): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
         </div>
 
-        <div>
-          <button
-            onClick={() => setShowPreferencesInternal(true)}
-            className="px-4 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors font-medium"
-          >
-            Customize
-          </button>
-        </div>
       </div>
 
       {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
