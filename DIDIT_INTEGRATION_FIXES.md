@@ -101,7 +101,9 @@ The DIDIT identity verification integration had a database schema constraint iss
 ```sql
 id UUID PRIMARY KEY
 user_id UUID NOT NULL UNIQUE (foreign key to users)
-id_type VARCHAR(50) NOT NULL CHECK ('passport', 'drivers_license', 'national_id')
+id_type VARCHAR(50) NOT NULL CHECK (char_length(trim(id_type)) > 0)
+  -- Flexible constraint allows any document type string
+  -- DIDIT returns: passport, national_id, drivers_license, etc.
 id_number VARCHAR(255) NOT NULL
 status VARCHAR(50) DEFAULT 'pending' CHECK ('pending', 'approved', 'rejected')
 ```
