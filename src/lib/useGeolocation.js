@@ -94,10 +94,11 @@ export function useGeolocation() {
                   const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
                     { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
-                  )
+                  ).catch(() => null) // Suppress fetch errors
+
                   clearTimeout(timeoutId)
 
-                  if (response.ok && isMountedRef.current) {
+                  if (response?.ok && isMountedRef.current) {
                     try {
                       const nom = await response.json()
                       setCity(
