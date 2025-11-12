@@ -312,8 +312,25 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           address: r.address,
           provider: r.provider,
           chain: r.chain,
-          source: 'crypto'
+          source: 'crypto',
+          tokens: []
         }))
+        // Fetch token balances for these wallets in bulk
+        try {
+          const walletIds = cryptoMapped.map(w => w.id).filter(Boolean)
+          if (walletIds.length > 0) {
+            const { data: tokensData } = await supabase.from('wallets_tokens').select('*').in('wallet_id', walletIds)
+            const tokensByWallet = {}
+            ;(tokensData || []).forEach(t => {
+              if (!tokensByWallet[t.wallet_id]) tokensByWallet[t.wallet_id] = []
+              tokensByWallet[t.wallet_id].push({ token_address: t.token_address, balance: t.balance, metadata: t.metadata })
+            })
+            cryptoMapped = cryptoMapped.map(w => ({ ...w, tokens: tokensByWallet[w.id] || [] }))
+          }
+        } catch (tokErr) {
+          console.warn('Failed loading wallets_tokens:', tokErr)
+        }
+
         setCryptoWallets(cryptoMapped)
       } catch (e) {
         console.warn('Error loading wallets_crypto from Supabase:', e)
