@@ -51,7 +51,7 @@ const CURRENCY_SYMBOLS = {
   'AVAX': 'AVAX', 'DOT': 'DOT'
 }
 
-export default function Wallet({ userId, totalBalancePHP = 0 }) {
+export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
   const [internalWallets, setInternalWallets] = useState([])
   const [fiatWallets, setFiatWallets] = useState([])
@@ -119,6 +119,31 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
 
   // Network wallets (house) UI state
   const [showNetworkPanel, setShowNetworkPanel] = useState(false)
+
+  // Currency exchange rates cache (rate to globalCurrency)
+  const [currencyRates, setCurrencyRates] = useState({})
+
+  // Fetch exchange rates for displayed wallets when wallets or globalCurrency change
+  useEffect(() => {
+    const codes = new Set()
+    internalWallets.forEach(w => { if (w && w.currency_code) codes.add(w.currency_code) })
+    fiatWallets.forEach(w => { if (w && w.currency_code) codes.add(w.currency_code) })
+    const toFetch = Array.from(codes).filter(c => c && c !== globalCurrency && !currencyRates[c])
+    if (toFetch.length === 0) return
+    let mounted = true
+    ;(async () => {
+      const results = {}
+      await Promise.all(toFetch.map(async (code) => {
+        try {
+          const rate = await wisegcashAPI.getExchangeRate(code, globalCurrency)
+          if (rate != null) results[code] = Number(rate)
+        } catch(e) { /* ignore */ }
+      }))
+      if (!mounted) return
+      setCurrencyRates(prev => ({ ...prev, ...results }))
+    })()
+    return () => { mounted = false }
+  }, [internalWallets, fiatWallets, globalCurrency])
   const [networkWallets, setNetworkWallets] = useState([])
   const [generatingNetwork, setGeneratingNetwork] = useState(false)
   // transaction UI state
@@ -760,11 +785,14 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
             {internalWallets.filter(w => enabledInternal.includes(w.currency_code)).map(wallet => (
               <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">CRYPTOCURRENCY</p>
-                  <span className="text-2xl">{CURRENCY_SYMBOLS[wallet.currency_code] || '$'}</span>
+                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
+                  <span className="text-sm font-medium">{wallet.currency_code}</span>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
+                {currencyRates[wallet.currency_code] && Number(wallet.balance || 0) !== 0 && (
+                  <p className="text-xs text-slate-400 mb-4">≈ {formatNumber(Number(wallet.balance || 0) * currencyRates[wallet.currency_code])} {globalCurrency}</p>
+                )}
                 {wallet.account_number && (
                   <p className="text-xs text-slate-500 mb-4">Acct: {wallet.account_number}</p>
                 )}
@@ -792,10 +820,13 @@ export default function Wallet({ userId, totalBalancePHP = 0 }) {
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
-                  <p className="text-sm text-slate-500">{w.provider}</p>
+                  <p className="text-sm font-medium">{w.currency_code}</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(2)}</p>
+                {currencyRates[w.currency_code] && Number(w.balance || 0) !== 0 && (
+                  <p className="text-xs text-slate-400 mb-4">≈ {formatNumber(Number(w.balance || 0) * currencyRates[w.currency_code])} {globalCurrency}</p>
+                )}
                 {w.account_number && <p className="text-xs text-slate-500 mb-4">Acct: {w.account_number}</p>}
                 <button
                   onClick={() => { setSelectedFiatWallet(w); setFiatAction('deposit'); setFiatAmount(''); setShowFiatModal(true) }}
