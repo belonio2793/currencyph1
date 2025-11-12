@@ -49,6 +49,10 @@ Deno.serve(async (req) => {
       user_id: userId,
       didit_session_id: sessionId,
       didit_session_url: sessionUrl,
+      // required fields in your schema: id_type and id_number are NOT NULL
+      id_type: body.id_type || 'external',
+      id_number: body.id_number || '',
+      id_image_url: body.id_image_url || null,
       status: 'pending',
       verification_method: 'didit',
       submitted_at: new Date(),
