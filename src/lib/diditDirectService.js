@@ -1,55 +1,10 @@
 import { supabase } from './supabaseClient'
 
 /**
- * Direct DIDIT service that calls backend API to create sessions
- * Backend API acts as proxy to DIDIT for CORS compliance
+ * Simplified DIDIT service using didit-sync edge function for verification polling
+ * This service only handles database operations and delegates to didit-sync for DIDIT API calls
  */
 export const diditDirectService = {
-  /**
-   * Create a DIDIT verification session via Supabase edge function
-   */
-  async createVerificationSession(userId) {
-    try {
-      if (!userId || (typeof userId === 'string' && userId.trim() === '')) {
-        throw new Error('userId is required')
-      }
-
-      // Call Supabase edge function to create session
-      const { data, error } = await supabase.functions.invoke('didit-create-session', {
-        method: 'POST',
-        body: JSON.stringify({ userId }),
-      })
-
-      if (error) {
-        console.error('Edge function invoke error:', error)
-        throw new Error(error.message || 'Failed to create verification session')
-      }
-
-      if (data?.error) {
-        console.error('Edge function returned error:', data)
-        throw new Error(data.error || 'Failed to create verification session')
-      }
-
-      if (!data?.success) {
-        throw new Error(data?.error || 'Failed to create verification session')
-      }
-
-      if (!data?.sessionUrl || !data?.sessionId) {
-        throw new Error('Invalid response: missing sessionUrl or sessionId')
-      }
-
-      return {
-        success: true,
-        sessionUrl: data.sessionUrl,
-        sessionId: data.sessionId,
-        data: data.data,
-      }
-    } catch (error) {
-      console.error('Error creating DIDIT verification session:', error)
-      throw error
-    }
-  },
-
   /**
    * Get verification status from database
    */
@@ -71,36 +26,7 @@ export const diditDirectService = {
   },
 
   /**
-   * Check DIDIT session status via Supabase edge function
-   */
-  async checkSessionStatus(sessionId) {
-    try {
-      if (!sessionId) {
-        throw new Error('sessionId is required')
-      }
-
-      const { data, error } = await supabase.functions.invoke('didit-check-status', {
-        method: 'POST',
-        body: JSON.stringify({ sessionId }),
-      })
-
-      if (error) {
-        throw new Error(error.message || 'Failed to check session status')
-      }
-
-      if (data?.error) {
-        throw new Error(data.error)
-      }
-
-      return data
-    } catch (error) {
-      console.error('Error checking DIDIT session status:', error)
-      throw error
-    }
-  },
-
-  /**
-   * Register an externally-provided DIDIT session URL for a user
+   * Register external DIDIT session URL for a user
    */
   async registerExternalSession(userId, sessionUrl) {
     try {
@@ -109,9 +35,9 @@ export const diditDirectService = {
 
       // Extract session ID from URL
       const sessionIdMatch = sessionUrl.match(/session\/([A-Za-z0-9_-]+)/i)
-      const sessionId = sessionIdMatch ? sessionIdMatch[1] : null
+      const sessionId = sessionIdMatch ? sessionIdMatch[1] : 'unknown'
 
-      // Store directly in Supabase
+      // Store in Supabase
       const { data, error } = await supabase
         .from('user_verifications')
         .upsert(
@@ -183,23 +109,31 @@ export const diditDirectService = {
   },
 
   /**
-   * Update verification from DIDIT webhook callback
+   * Trigger didit-sync to check all pending verifications
+   * Call this periodically to sync with DIDIT API
    */
-  async updateVerificationFromWebhook(diditSessionId, status, decision) {
+  async triggerSync() {
     try {
-      const { data, error } = await supabase.rpc('update_verification_from_didit', {
-        p_didit_session_id: diditSessionId,
-        p_status: status,
-        p_decision: decision,
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_PROJECT_URL}/functions/v1/didit-sync`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${supabase.auth.session()?.access_token || ''}`,
+          },
+        }
+      )
 
-      if (error) throw error
+      if (!response.ok) {
+        console.warn('didit-sync returned:', response.status)
+        return null
+      }
 
-      console.log('Verification updated from DIDIT webhook:', data)
-      return { success: true, data }
+      return await response.json()
     } catch (error) {
-      console.error('Error updating verification from webhook:', error)
-      throw error
+      console.warn('Error triggering didit-sync:', error)
+      return null
     }
   },
 }
