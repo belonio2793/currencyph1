@@ -40,7 +40,7 @@ const CRYPTO_CURRENCIES = [
 const ALL_CURRENCIES = [...FIAT_CURRENCIES, ...CRYPTO_CURRENCIES]
 
 const CURRENCY_SYMBOLS = {
-  'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+  'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '��',
   'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
   'MYR': 'RM', 'THB': 'THB', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
@@ -764,7 +764,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-3xl font-light text-slate-900 tracking-tight">My Wallets</h2>
-          <p className="text-xs text-slate-500 mt-1">Total value (PHP): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
+          <p className="text-xs text-slate-500 mt-1">Total value ({globalCurrency}): <span className="font-mono text-sm">{formatNumber(totalBalancePHP)}</span></p>
         </div>
 
         <div>
