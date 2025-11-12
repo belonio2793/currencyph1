@@ -822,6 +822,38 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
   }, [connectedWallet])
 
+  // Helper to attempt a wallet connection with a UI timeout and reset
+  const attemptConnect = async (connectFn, label = 'wallet') => {
+    setError('')
+    const timeoutMs = 8000
+    setThirdwebConnecting(true)
+    let timedOut = false
+    const timer = setTimeout(() => {
+      timedOut = true
+      setThirdwebConnecting(false)
+      setError(`${label} connection timed out. Please try again.`)
+      try { clearWalletCache() } catch (e) { /* ignore */ }
+    }, timeoutMs)
+
+    try {
+      const w = await connectFn()
+      if (timedOut) return null
+      clearTimeout(timer)
+      const info = await getWalletInfo(w)
+      setConnectedWallet(info)
+      setSelectedChainId(info.chainId)
+      setSuccess(`Connected to ${info.chainName}`)
+      setNoWalletDetected(false)
+      return info
+    } catch (e) {
+      clearTimeout(timer)
+      if (!timedOut) setError(fmtErr(e) || `Failed to connect ${label}`)
+      return null
+    } finally {
+      if (!timedOut) setThirdwebConnecting(false)
+    }
+  }
+
   const handleCreateManualWallet = async () => {
     if (!selectedManualChainId) {
       setError('Please select a blockchain')
@@ -1291,13 +1323,9 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={async () => {
-                      setThirdwebConnecting(true); setError('')
-                      try {
-                        const w = await connectWallet()
-                        const info = await getWalletInfo(w)
-                        setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
-                      } catch (e) { setError(fmtErr(e) || 'Failed to connect MetaMask') }
-                      finally { setThirdwebConnecting(false) }
+                      await attemptConnect(async () => {
+                        return await connectWallet()
+                      }, 'MetaMask')
                     }}
                     disabled={thirdwebConnecting}
                     className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
@@ -1307,19 +1335,14 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
                   <button
                     onClick={async () => {
-                      setThirdwebConnecting(true); setError('')
-                      try {
+                      await attemptConnect(async () => {
                         const { connectWithWalletConnect, connectWithCoinbase, connectViaWeb3Modal } = await import('../lib/web3modalClient')
-                        let w
                         try {
-                          w = await connectWithWalletConnect()
+                          return await connectWithWalletConnect()
                         } catch (wcErr) {
-                          try { w = await connectWithCoinbase() } catch (cbErr) { w = await connectViaWeb3Modal() }
+                          try { return await connectWithCoinbase() } catch (cbErr) { return await connectViaWeb3Modal() }
                         }
-                        const info = await getWalletInfo(w)
-                        setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
-                      } catch (e) { setError(fmtErr(e) || 'Failed to connect WalletConnect/Coinbase') }
-                      finally { setThirdwebConnecting(false) }
+                      }, 'WalletConnect / Coinbase')
                     }}
                     disabled={thirdwebConnecting}
                     className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
@@ -1329,13 +1352,9 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
                   <button
                     onClick={async () => {
-                      setThirdwebConnecting(true); setError('')
-                      try {
-                        const w = await connectSolana()
-                        const info = await getWalletInfo(w)
-                        setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
-                      } catch (e) { setError(fmtErr(e) || 'Failed to connect Phantom') }
-                      finally { setThirdwebConnecting(false) }
+                      await attemptConnect(async () => {
+                        return await connectSolana()
+                      }, 'Phantom')
                     }}
                     disabled={thirdwebConnecting}
                     className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
@@ -1354,12 +1373,12 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
                     {showProviderList && (
                       <div className="mt-2 p-2 bg-white border rounded-lg shadow-md space-y-2 absolute left-0 right-0 z-40">
-                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); setThirdwebConnecting(true); try { const w = await connectWallet(); const info = await getWalletInfo(w); setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); } catch(e) { setError(fmtErr(e)) } finally { setThirdwebConnecting(false) } }}>MetaMask (Injected)</button>
-                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); setThirdwebConnecting(true); try { const { connectWithWalletConnect } = await import('../lib/web3modalClient'); const w = await connectWithWalletConnect(); const info = await getWalletInfo(w); setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); } catch(e) { setError(fmtErr(e)) } finally { setThirdwebConnecting(false) } }}>WalletConnect</button>
-                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); setThirdwebConnecting(true); try { const { connectWithCoinbase } = await import('../lib/web3modalClient'); const w = await connectWithCoinbase(); const info = await getWalletInfo(w); setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); } catch(e) { setError(fmtErr(e)) } finally { setThirdwebConnecting(false) } }}>Coinbase Wallet</button>
-                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); setThirdwebConnecting(true); try { const w = await connectSolana(); const info = await getWalletInfo(w); setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); } catch(e) { setError(fmtErr(e)) } finally { setThirdwebConnecting(false) } }}>Phantom (Solana)</button>
-                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); setThirdwebConnecting(true); try { const { connectViaWeb3Modal } = await import('../lib/web3modalClient'); const w = await connectViaWeb3Modal(); const info = await getWalletInfo(w); setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); } catch(e) { setError(fmtErr(e)) } finally { setThirdwebConnecting(false) } }}>Rainbow / Trust / Exodus</button>
-                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); setThirdwebConnecting(true); try { const { connectViaWeb3Modal } = await import('../lib/web3modalClient'); const w = await connectViaWeb3Modal(); const info = await getWalletInfo(w); setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); } catch(e) { setError(fmtErr(e)) } finally { setThirdwebConnecting(false) } }}>Ledger / Trezor (Hardware)</button>
+                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); await attemptConnect(async () => { return await connectWallet() }, 'MetaMask') }}>MetaMask (Injected)</button>
+                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); await attemptConnect(async () => { const { connectWithWalletConnect } = await import('../lib/web3modalClient'); return await connectWithWalletConnect() }, 'WalletConnect') }}>WalletConnect</button>
+                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); await attemptConnect(async () => { const { connectWithCoinbase } = await import('../lib/web3modalClient'); return await connectWithCoinbase() }, 'Coinbase') }}>Coinbase Wallet</button>
+                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); await attemptConnect(async () => { return await connectSolana() }, 'Phantom') }}>Phantom (Solana)</button>
+                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); await attemptConnect(async () => { const { connectViaWeb3Modal } = await import('../lib/web3modalClient'); return await connectViaWeb3Modal() }, 'Wallet') }}>Rainbow / Trust / Exodus</button>
+                        <button className="w-full text-left px-3 py-2 rounded hover:bg-slate-50" onClick={async () => { setShowProviderList(false); await attemptConnect(async () => { const { connectViaWeb3Modal } = await import('../lib/web3modalClient'); return await connectViaWeb3Modal() }, 'Wallet') }}>Ledger / Trezor (Hardware)</button>
                       </div>
                     )}
                   </div>
