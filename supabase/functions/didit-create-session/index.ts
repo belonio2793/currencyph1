@@ -74,7 +74,7 @@ Deno.serve(async (req) => {
       // Log everything helpful for debugging
       try {
         const headersObj = Object.fromEntries(req.headers);
-        console.error("didit-create-session: userId missing. headers:", headersObj);
+        console.error("didit-create-session: userId missing. headers:", headersObj, "rawBody:", rawText);
       } catch (e) {
         console.error("didit-create-session: userId missing and failed to stringify headers", e);
       }
@@ -82,7 +82,8 @@ Deno.serve(async (req) => {
       return new Response(
         JSON.stringify({
           error: "userId is required",
-          message: "No userId found in request body, query params, or headers"
+          message: "No userId found in request body, query params, or headers",
+          rawBody: rawText
         }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
