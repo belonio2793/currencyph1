@@ -116,6 +116,41 @@ async function handle(req: Request) {
         }
 
         results.push({ address, chainId, balance: nativeBalance })
+
+        // If TOKEN_LIST_{chainId} env var exists, fetch token balances and upsert into wallets_tokens
+        try {
+          const tokenListRaw = Deno.env.get(`TOKEN_LIST_${chainId}`) || ''
+          const tokens = tokenListRaw.split(',').map(s => s.trim()).filter(Boolean)
+          if (tokens.length > 0) {
+            for (const tokenAddr of tokens) {
+              try {
+                const tokenBalRaw = await fetchErc20Balance(rpc, tokenAddr, address)
+                if (tokenBalRaw === null) continue
+                // Persist into wallets_tokens table
+                const tokenBalanceNum = tokenBalRaw // keep as string to avoid precision issues
+                // determine wallet id
+                let targetWalletId = walletId
+                if (!targetWalletId) {
+                  const existingCrypto = await supabase.from('wallets_crypto').select('id').eq('address', address).eq('chain_id', chainId).limit(1)
+                  if (existingCrypto && existingCrypto.data && existingCrypto.data.length > 0) targetWalletId = existingCrypto.data[0].id
+                }
+                if (targetWalletId) {
+                  const existing = await supabase.from('wallets_tokens').select('id').eq('wallet_id', targetWalletId).eq('token_address', tokenAddr).limit(1)
+                  if (existing && existing.data && existing.data.length > 0) {
+                    await supabase.from('wallets_tokens').update({ balance: tokenBalanceNum, updated_at: new Date().toISOString() }).eq('id', existing.data[0].id)
+                  } else {
+                    await supabase.from('wallets_tokens').insert([{ wallet_id: targetWalletId, token_address: tokenAddr, balance: tokenBalanceNum }])
+                  }
+                }
+              } catch (te) {
+                console.warn('token fetch/persist failed for', tokenAddr, te)
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Token sync failed', e)
+        }
+
       } catch (e) {
         console.warn('Supabase write failed', e)
         results.push({ address, chainId, error: 'Failed to persist' })
