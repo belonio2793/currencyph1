@@ -76,34 +76,27 @@ export const diditDirectService = {
   },
 
   /**
-   * Check DIDIT session status directly via DIDIT API
+   * Check DIDIT session status via backend API
    */
   async checkSessionStatus(sessionId) {
     try {
-      const DIDIT_API_KEY = import.meta.env.VITE_DIDIT_API_KEY || process.env.DIDIT_API_KEY
-
-      if (!DIDIT_API_KEY) {
-        throw new Error('DIDIT_API_KEY not configured')
-      }
-
       if (!sessionId) {
         throw new Error('sessionId is required')
       }
 
       const response = await fetch(
-        `https://verification.didit.me/v2/session/${encodeURIComponent(sessionId)}`,
+        `${API_BASE_URL}/api/didit/session-status/${encodeURIComponent(sessionId)}`,
         {
           method: 'GET',
           headers: {
-            'x-api-key': DIDIT_API_KEY,
             'Content-Type': 'application/json',
           },
         }
       )
 
       if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`DIDIT API error: ${response.status} - ${errorText}`)
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(`API error: ${response.status} - ${errorData.error || 'Unknown'}`)
       }
 
       const data = await response.json()
