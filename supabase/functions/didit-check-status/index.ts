@@ -98,6 +98,9 @@ Deno.serve(async (req) => {
           else if (data.status === "Declined") mappedStatus = "rejected";
           else if (data.status === "Expired") mappedStatus = "rejected";
 
+          // Extract decision data from DIDIT response
+          const decision = data.decision || {};
+
           // Try to find and update the verification record
           const { data: records, error: fetchErr } = await supabase
             .from("user_verifications")
@@ -107,14 +110,29 @@ Deno.serve(async (req) => {
 
           if (!fetchErr && records && records.length > 0) {
             const userId = records[0].user_id;
-            await supabase
-              .from("user_verifications")
-              .update({
-                status: mappedStatus,
-                didit_verified_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-              })
-              .eq("user_id", userId);
+
+            // Call the RPC function to update verification with decision data
+            const { error: rpcErr } = await supabase.rpc(
+              "update_verification_from_didit",
+              {
+                p_didit_session_id: sessionId,
+                p_status: mappedStatus,
+                p_decision: decision,
+              }
+            );
+
+            if (rpcErr) {
+              // Fallback: direct update without decision data
+              console.warn("didit-check-status: RPC failed, using fallback update:", rpcErr);
+              await supabase
+                .from("user_verifications")
+                .update({
+                  status: mappedStatus,
+                  didit_verified_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("user_id", userId);
+            }
           }
         }
       } catch (dbErr) {
