@@ -154,8 +154,8 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
     // Check immediately
     checkStatus()
 
-    // Then poll every 2 seconds
-    pollIntervalRef.current = setInterval(checkStatus, 2000)
+    // Then poll every 1 second (faster now that we check DIDIT API directly)
+    pollIntervalRef.current = setInterval(checkStatus, 1000)
   }
 
   useEffect(() => {
