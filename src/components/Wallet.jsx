@@ -684,20 +684,33 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     try {
       if (connectedWallet && connectedWallet.provider) {
         const p = connectedWallet.provider
-        if (p.disconnect && typeof p.disconnect === 'function') {
-          try { await p.disconnect() } catch(e) { /* ignore */ }
-        } else if (p.close && typeof p.close === 'function') {
-          try { await p.close() } catch(e) { /* ignore */ }
-        }
+        // Try common disconnect/close methods used by connectors
+        try { if (p.disconnect && typeof p.disconnect === 'function') await p.disconnect() } catch(e) { /* ignore */ }
+        try { if (p.close && typeof p.close === 'function') await p.close() } catch(e) { /* ignore */ }
+        try { if (p.provider && p.provider.disconnect && typeof p.provider.disconnect === 'function') await p.provider.disconnect() } catch(e) { /* ignore */ }
+        // Try EIP-1193 style request to clear permissions (best-effort)
+        try { if (p.request && typeof p.request === 'function') { p.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] }).catch(()=>{}) } } catch(e) { /* ignore */ }
       }
     } catch (e) {
       console.warn('Error disconnecting provider', e)
     }
 
     try { clearWalletCache() } catch(e) {}
+
+    // Also sign out the authenticated session so the app state resets
+    try {
+      await supabase.auth.signOut()
+    } catch(e) {
+      console.warn('Error signing out from Supabase during wallet disconnect', e)
+    }
+
+    // Clear local connected state and refresh to ensure app-level state resets
     setConnectedWallet(null)
     setSelectedChainId(null)
     setSuccess('Wallet disconnected')
+
+    // Reload the app so the top-level App can re-evaluate auth state and clear user session
+    try { window.location.reload() } catch(e) { /* ignore */ }
   }
 
   const handleCreateManualWallet = async () => {
