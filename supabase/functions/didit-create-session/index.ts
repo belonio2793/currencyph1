@@ -37,11 +37,23 @@ Deno.serve(async (req) => {
     // Get credentials from environment
     const DIDIT_API_KEY = Deno.env.get("DIDIT_API_KEY");
     const DIDIT_WORKFLOW_ID = Deno.env.get("DIDIT_WORKFLOW_ID");
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
 
-    if (!DIDIT_API_KEY || !DIDIT_WORKFLOW_ID) {
-      console.error("Missing DIDIT credentials in environment");
+    // Check all required environment variables
+    const missingVars = [];
+    if (!DIDIT_API_KEY) missingVars.push("DIDIT_API_KEY");
+    if (!DIDIT_WORKFLOW_ID) missingVars.push("DIDIT_WORKFLOW_ID");
+    if (!SUPABASE_URL) missingVars.push("SUPABASE_URL");
+    if (!SUPABASE_SERVICE_ROLE_KEY) missingVars.push("SUPABASE_SERVICE_ROLE_KEY");
+
+    if (missingVars.length > 0) {
+      console.error("Missing environment variables:", missingVars);
       return new Response(
-        JSON.stringify({ error: "DIDIT credentials not configured" }),
+        JSON.stringify({
+          error: "Missing required environment variables",
+          missing: missingVars
+        }),
         {
           status: 500,
           headers: { "Content-Type": "application/json" },
