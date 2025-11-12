@@ -751,6 +751,77 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     try { window.location.reload() } catch(e) { /* ignore */ }
   }
 
+  // Auto-detect provider disconnects and reset connection state
+  useEffect(() => {
+    if (!connectedWallet || !connectedWallet.provider) return
+    const provider = connectedWallet.provider
+    let handled = false
+
+    const handleDisconnect = async () => {
+      if (handled) return
+      handled = true
+      try {
+        await disconnectWallet()
+      } catch (e) {
+        console.warn('Error during auto disconnect handling:', e)
+      }
+    }
+
+    try {
+      // EVM (window.ethereum / injected providers)
+      if (connectedWallet.providerType === 'evm') {
+        if (provider && provider.on) {
+          provider.on('accountsChanged', (accounts) => {
+            if (!accounts || accounts.length === 0) handleDisconnect()
+            else if (accounts[0] && accounts[0].toString().toLowerCase() !== (connectedWallet.address || '').toString().toLowerCase()) {
+              // If user switched accounts or closed the wallet session, reset
+              handleDisconnect()
+            }
+          })
+          provider.on('disconnect', handleDisconnect)
+          // Some providers emit 'close' or 'session_update'/'session_delete' for WalletConnect
+          provider.on('close', handleDisconnect)
+          provider.on && provider.on('chainChanged', () => { /* no-op: chain changes handled elsewhere if needed */ })
+        }
+
+        // also attach to global ethereum if different instance
+        if (typeof window !== 'undefined' && window.ethereum && window.ethereum.on && window.ethereum !== provider) {
+          window.ethereum.on('accountsChanged', (accounts) => { if (!accounts || accounts.length === 0) handleDisconnect() })
+        }
+      } else if (connectedWallet.providerType === 'solana') {
+        // Phantom and Solana providers
+        if (provider && provider.on) {
+          provider.on('disconnect', handleDisconnect)
+          // Phantom may emit 'accountChanged' or 'accountDisconnected'
+          provider.on('accountChanged', (pubKey) => { if (!pubKey) handleDisconnect() })
+        }
+      } else {
+        // Generic provider best-effort
+        if (provider && provider.on) {
+          provider.on('disconnect', handleDisconnect)
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to attach wallet event listeners', e)
+    }
+
+    return () => {
+      try {
+        if (provider && provider.removeListener) {
+          provider.removeListener('accountsChanged', handleDisconnect)
+          provider.removeListener('disconnect', handleDisconnect)
+          provider.removeListener('close', handleDisconnect)
+          provider.removeListener('accountChanged', handleDisconnect)
+        }
+        if (typeof window !== 'undefined' && window.ethereum && window.ethereum.removeListener && window.ethereum !== provider) {
+          window.ethereum.removeListener('accountsChanged', handleDisconnect)
+        }
+      } catch (e) {
+        // ignore cleanup errors
+      }
+    }
+  }, [connectedWallet])
+
   const handleCreateManualWallet = async () => {
     if (!selectedManualChainId) {
       setError('Please select a blockchain')
@@ -943,7 +1014,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                 setError('')
                 setWalletAvailable(checkWalletAvailability())
               }}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium text-sm"
+              className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm"
             >
               Connect Wallet
             </button>
@@ -1229,7 +1300,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       finally { setThirdwebConnecting(false) }
                     }}
                     disabled={thirdwebConnecting}
-                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     {thirdwebConnecting ? 'Connecting...' : 'MetaMask'}
                   </button>
@@ -1246,7 +1317,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       finally { setThirdwebConnecting(false) }
                     }}
                     disabled={thirdwebConnecting}
-                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     WalletConnect / Coinbase
                   </button>
@@ -1262,7 +1333,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       finally { setThirdwebConnecting(false) }
                     }}
                     disabled={thirdwebConnecting}
-                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     Phantom (Solana)
                   </button>
@@ -1271,7 +1342,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                     <button
                       onClick={() => setShowProviderList(prev => !prev)}
                       disabled={thirdwebConnecting}
-                      className="w-full h-12 flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                      className="w-full h-12 flex items-center justify-center px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                     >
                       {thirdwebConnecting ? 'Connecting...' : 'Choose provider'}
                     </button>
