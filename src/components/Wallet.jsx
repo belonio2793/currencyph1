@@ -1068,6 +1068,14 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           </div>
         </div>
 
+        {/* Multi-Wallet Management Panel */}
+        <div className="mb-6 bg-gradient-to-r from-indigo-50 to-blue-50 rounded-lg p-4 border border-indigo-100">
+          <MultiWalletPanel userId={userId} onWalletChange={(wallets) => {
+            // Handle wallet changes - can sync data or update parent state
+            console.log('Wallets updated:', wallets)
+          }} />
+        </div>
+
         <div className="mb-4 flex flex-wrap gap-3 items-center">
           <div className="relative">
             <button
