@@ -789,7 +789,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
-                  <p className="text-sm font-medium">{w.currency_code}</p>
+                  <p className="text-sm font-medium">{CURRENCY_SYMBOLS[globalCurrency] || globalCurrency}</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(2)}</p>
