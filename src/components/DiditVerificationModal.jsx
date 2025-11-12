@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import { diditDirectService } from '../lib/diditDirectService'
 
 export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
