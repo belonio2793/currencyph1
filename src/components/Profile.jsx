@@ -110,7 +110,17 @@ export default function Profile({ userId, onSignOut }) {
       setVerifyingId(true)
       setError('')
 
-      // Create a DIDIT verification session
+      // If an external DIDIT session URL is provided via VITE env, register it and redirect
+      const externalLink = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_DIDIT_EXTERNAL_SESSION_URL || import.meta.env.VITE_DIDIT_SESSION_URL)) || null
+      if (externalLink) {
+        // register pending verification in our DB so didit-sync/webhook can pick it up
+        await diditService.registerExternalSession(userId, externalLink)
+        setSuccess('Redirecting to verification...')
+        window.location.href = externalLink
+        return
+      }
+
+      // Fallback: create a DIDIT verification session via edge function
       const result = await diditService.createVerificationSession(userId)
 
       if (result.success && result.sessionUrl) {
