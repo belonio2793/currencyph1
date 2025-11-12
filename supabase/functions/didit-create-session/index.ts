@@ -133,10 +133,12 @@ Deno.serve(async (req) => {
     if (!diditResponse.ok) {
       const errorText = await diditResponse.text();
       console.error("didit-create-session: DIDIT API error:", diditResponse.status, errorText);
+      // include text and truncated preview to help client debugging
       return new Response(
         JSON.stringify({
           error: `DIDIT API error: ${diditResponse.status}`,
           details: errorText,
+          preview: (typeof errorText === 'string' && errorText.slice(0, 200)) || null
         }),
         { status: diditResponse.status, headers: { "Content-Type": "application/json" } }
       );
