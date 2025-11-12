@@ -72,16 +72,65 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
 
     const checkStatus = async () => {
       try {
-        const status = await diditDirectService.getVerificationStatus(userId)
         count++
         setPollCount(count)
+
+        // First check DIDIT API directly for real-time status
+        if (sessionId) {
+          try {
+            const diditStatus = await diditDirectService.checkSessionStatus(sessionId)
+
+            // Check if verification is complete
+            if (diditStatus?.status === 'Approved') {
+              setVerificationStatus({ status: 'approved', ...diditStatus })
+              clearInterval(pollIntervalRef.current)
+              setIsVerifying(false)
+
+              // Also update database
+              try {
+                await supabase
+                  .from('user_verifications')
+                  .update({
+                    status: 'approved',
+                    didit_verified_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq('user_id', userId)
+              } catch (updateErr) {
+                console.warn('Could not update database:', updateErr)
+              }
+
+              setTimeout(() => {
+                if (onSuccess) onSuccess()
+              }, 1000)
+              return
+            } else if (diditStatus?.status === 'Declined') {
+              setVerificationStatus({ status: 'rejected', ...diditStatus })
+              clearInterval(pollIntervalRef.current)
+              setIsVerifying(false)
+              setError('Your verification was declined. Please try again or contact support.')
+              return
+            } else if (diditStatus?.status === 'Expired') {
+              setVerificationStatus({ status: 'rejected', ...diditStatus })
+              clearInterval(pollIntervalRef.current)
+              setIsVerifying(false)
+              setError('Your verification session has expired. Please start over.')
+              return
+            }
+          } catch (diditErr) {
+            // DIDIT check failed, fall back to database check
+            console.warn('Could not check DIDIT status:', diditErr)
+          }
+        }
+
+        // Fallback: check database for webhook updates
+        const status = await diditDirectService.getVerificationStatus(userId)
 
         if (status?.status === 'approved') {
           setVerificationStatus(status)
           clearInterval(pollIntervalRef.current)
           setIsVerifying(false)
-          
-          // Show success briefly before calling onSuccess
+
           setTimeout(() => {
             if (onSuccess) onSuccess()
           }, 1000)
@@ -90,7 +139,7 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
           clearInterval(pollIntervalRef.current)
           setIsVerifying(false)
           setError('Your verification was declined. Please try again or contact support.')
-        } else if (status?.status === 'pending' && count >= maxPolls) {
+        } else if (count >= maxPolls) {
           // Stop polling after 2 minutes
           clearInterval(pollIntervalRef.current)
           setIsVerifying(false)
