@@ -86,6 +86,8 @@ app.post('/api/didit/create-session', async (req, res) => {
         .upsert(
           {
             user_id: userId,
+            id_type: 'national_id',  // Placeholder - will be updated from DIDIT webhook with actual document type
+            id_number: session_id,   // Placeholder - will be updated from DIDIT webhook with actual ID number
             didit_workflow_id: DIDIT_WORKFLOW_ID,
             didit_session_id: session_id,
             didit_session_url: sessionUrl,
