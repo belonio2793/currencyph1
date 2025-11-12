@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "node server.js & vite",
+    "dev:frontend": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "node scripts/deploy.js",
