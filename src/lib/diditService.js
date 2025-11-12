@@ -8,7 +8,7 @@ export const diditService = {
     try {
       // Call Supabase edge function to create session (server-to-server, no CORS)
       const { data, error } = await supabase.functions.invoke('didit-create-session', {
-        body: { userId }
+        body: JSON.stringify({ userId })
       })
 
       if (error) {
