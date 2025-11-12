@@ -1309,8 +1309,13 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                     onClick={async () => {
                       setThirdwebConnecting(true); setError('')
                       try {
-                        const { connectViaWeb3Modal } = await import('../lib/web3modalClient')
-                        const w = await connectViaWeb3Modal()
+                        const { connectWithWalletConnect, connectWithCoinbase, connectViaWeb3Modal } = await import('../lib/web3modalClient')
+                        let w
+                        try {
+                          w = await connectWithWalletConnect()
+                        } catch (wcErr) {
+                          try { w = await connectWithCoinbase() } catch (cbErr) { w = await connectViaWeb3Modal() }
+                        }
                         const info = await getWalletInfo(w)
                         setConnectedWallet(info); setSelectedChainId(info.chainId); setSuccess(`Connected to ${info.chainName}`); setNoWalletDetected(false)
                       } catch (e) { setError(fmtErr(e) || 'Failed to connect WalletConnect/Coinbase') }
