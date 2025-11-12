@@ -55,18 +55,20 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get credentials from environment
+    // Get credentials from environment (support multiple env var names used in different deploy contexts)
     const DIDIT_API_KEY = Deno.env.get("DIDIT_API_KEY");
     const DIDIT_WORKFLOW_ID = Deno.env.get("DIDIT_WORKFLOW_ID");
-    const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    // Support SUPABASE_URL, PROJECT_URL, or VITE_PROJECT_URL depending on environment
+    const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || Deno.env.get("PROJECT_URL") || Deno.env.get("VITE_PROJECT_URL");
+    // Support SUPABASE_SERVICE_ROLE_KEY or VITE_SUPABASE_SERVICE_ROLE_KEY
+    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || Deno.env.get("VITE_SUPABASE_SERVICE_ROLE_KEY");
 
     // Check all required environment variables
     const missingVars = [];
     if (!DIDIT_API_KEY) missingVars.push("DIDIT_API_KEY");
     if (!DIDIT_WORKFLOW_ID) missingVars.push("DIDIT_WORKFLOW_ID");
-    if (!SUPABASE_URL) missingVars.push("SUPABASE_URL");
-    if (!SUPABASE_SERVICE_ROLE_KEY) missingVars.push("SUPABASE_SERVICE_ROLE_KEY");
+    if (!SUPABASE_URL) missingVars.push("SUPABASE_URL (or PROJECT_URL / VITE_PROJECT_URL)");
+    if (!SUPABASE_SERVICE_ROLE_KEY) missingVars.push("SUPABASE_SERVICE_ROLE_KEY (or VITE_SUPABASE_SERVICE_ROLE_KEY)");
 
     if (missingVars.length > 0) {
       console.error("Missing environment variables:", missingVars);
