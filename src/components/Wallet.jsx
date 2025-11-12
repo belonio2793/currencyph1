@@ -4,6 +4,7 @@ import { wisegcashAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
 import { connectAnyWallet, connectWallet, connectSolana, getWalletInfo, clearWalletCache, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress, sendCryptoTransaction } from '../lib/thirdwebClient'
+import { ethers } from 'ethers'
 
 // Explorer helper (re-used in UI)
 function getExplorerUrl(networkOrCurrency, address) {
