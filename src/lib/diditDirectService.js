@@ -15,7 +15,7 @@ export const diditDirectService = {
       }
 
       // Call backend API endpoint to create session
-      const response = await fetch(`${API_BASE_URL}/api/didit/create-session`, {
+      const response = await fetch('/api/didit/create-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
