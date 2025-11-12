@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { diditService } from '../lib/diditService'
+import { diditDirectService } from '../lib/diditDirectService'
 
 export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
   const [loading, setLoading] = useState(true)
