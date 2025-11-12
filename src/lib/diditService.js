@@ -7,9 +7,24 @@ export const diditService = {
   async createVerificationSession(userId) {
     try {
       // Call Supabase edge function to create session (server-to-server, no CORS)
+      // Build headers: prefer current session access token, fall back to anon key
+      const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': userId }
+      try {
+        const sessionResp = await supabase.auth.getSession()
+        const accessToken = sessionResp?.data?.session?.access_token || sessionResp?.data?.access_token || null
+        if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
+      } catch (e) {
+        // ignore
+      }
+
+      if (!headers['Authorization']) {
+        const anonKey = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_SUPABASE_ANON_KEY || import.meta.env.SUPABASE_ANON_KEY)) || (typeof process !== 'undefined' && (process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY)) || null
+        if (anonKey) headers['Authorization'] = `Bearer ${anonKey}`
+      }
+
       const { data, error } = await supabase.functions.invoke('didit-create-session', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': userId },
+        headers,
         body: JSON.stringify({ userId })
       })
 
