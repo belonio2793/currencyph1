@@ -811,7 +811,15 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {internalWallets.filter(w => enabledInternal.includes(w.currency_code)).map(wallet => (
+            {internalWallets
+              .filter(w => enabledInternal.includes(w.currency_code))
+              .sort((a, b) => {
+                const aIsFiat = FIAT_CURRENCIES.includes(a.currency_code)
+                const bIsFiat = FIAT_CURRENCIES.includes(b.currency_code)
+                if (aIsFiat === bIsFiat) return 0
+                return aIsFiat ? -1 : 1
+              })
+              .map(wallet => (
               <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
