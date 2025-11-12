@@ -14,7 +14,15 @@ export const diditService = {
       })
 
       if (error) {
+        console.error('diditService.createVerificationSession: invoke error', error)
         throw new Error(error.message || 'Failed to create verification session')
+      }
+
+      // Edge function may return non-2xx payload with details in data
+      if (data && data.error) {
+        const details = data.details || data.preview || ''
+        console.error('diditService.createVerificationSession: function returned error', data)
+        throw new Error(`${data.error}${details ? ': ' + details : ''}`)
       }
 
       if (!data?.success) {
