@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS user_verifications (
   user_id UUID NOT NULL UNIQUE REFERENCES users(id) ON DELETE CASCADE,
   
   -- ID Information
-  id_type VARCHAR(50) NOT NULL CHECK (id_type IN ('passport', 'drivers_license', 'national_id')),
+  id_type VARCHAR(50) NOT NULL,
   id_number VARCHAR(255) NOT NULL,
   id_image_url VARCHAR(500),
   
