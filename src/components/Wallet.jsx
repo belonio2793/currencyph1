@@ -590,7 +590,19 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         return
       }
 
-      const wallet = await connectAnyWallet()
+      let wallet
+      try {
+        wallet = await connectAnyWallet()
+      } catch (e) {
+        // fallback to web3modal if available
+        try {
+          const { connectViaWeb3Modal } = await import('../lib/web3modalClient')
+          wallet = await connectViaWeb3Modal()
+        } catch (ex) {
+          throw e
+        }
+      }
+
       const walletInfo = await getWalletInfo(wallet)
       setConnectedWallet(walletInfo)
       setSelectedChainId(walletInfo.chainId)
