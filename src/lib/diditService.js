@@ -31,36 +31,6 @@ export const diditService = {
     }
   },
 
-  /**
-   * Check the status of a DIDIT verification session
-   * Usually called periodically or via webhook
-   */
-  async checkSessionStatus(diditSessionId) {
-    try {
-      if (!DIDIT_API_KEY) {
-        throw new Error('DIDIT API credentials not configured')
-      }
-
-      const response = await fetch(`${DIDIT_API_BASE}/session/${diditSessionId}/decision/`, {
-        method: 'GET',
-        headers: {
-          'x-api-key': DIDIT_API_KEY
-        }
-      })
-
-      if (!response.ok) {
-        if (response.status === 404) {
-          return { status: 'not_found', decision: null }
-        }
-        throw new Error(`DIDIT API error: ${response.statusText}`)
-      }
-
-      return await response.json()
-    } catch (error) {
-      console.error('Error checking DIDIT session status:', error)
-      throw error
-    }
-  },
 
   /**
    * Get verification status from database
