@@ -294,30 +294,50 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     const channel = supabase
       .channel('public:currency_rates')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'currency_rates' }, payload => {
-        setExchangeRates(prev => ({
-          ...prev,
-          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
-        }))
-        setTimeout(() => loadCryptoPrices(), 50)
+        try {
+          setExchangeRates(prev => ({
+            ...prev,
+            [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+          }))
+          setTimeout(() => loadCryptoPrices(), 50)
+        } catch (e) {
+          console.warn('currency_rates INSERT handler error:', e)
+        }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'currency_rates' }, payload => {
-        setExchangeRates(prev => ({
-          ...prev,
-          [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
-        }))
-        setTimeout(() => loadCryptoPrices(), 50)
+        try {
+          setExchangeRates(prev => ({
+            ...prev,
+            [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
+          }))
+          setTimeout(() => loadCryptoPrices(), 50)
+        } catch (e) {
+          console.warn('currency_rates UPDATE handler error:', e)
+        }
       })
       .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'currency_rates' }, payload => {
-        setExchangeRates(prev => {
-          const copy = { ...prev }
-          const key = `${payload.old.from_currency}_${payload.old.to_currency}`
-          delete copy[key]
-          return copy
-        })
-        setTimeout(() => loadCryptoPrices(), 50)
+        try {
+          setExchangeRates(prev => {
+            const copy = { ...prev }
+            const key = `${payload.old.from_currency}_${payload.old.to_currency}`
+            delete copy[key]
+            return copy
+          })
+          setTimeout(() => loadCryptoPrices(), 50)
+        } catch (e) {
+          console.warn('currency_rates DELETE handler error:', e)
+        }
       })
 
-    channel.subscribe()
+    // subscribe and guard against promise rejections
+    try {
+      const sub = channel.subscribe()
+      if (sub && typeof sub.then === 'function') {
+        sub.catch(err => console.warn('supabase channel subscribe rejected:', err))
+      }
+    } catch (e) {
+      console.warn('Failed to subscribe to supabase channel:', e)
+    }
 
     return () => {
       try {
