@@ -10,8 +10,8 @@ Deno.serve(async (req) => {
     return new Response("ok", {
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "POST",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-User-Id",
       },
     });
   }
@@ -25,33 +25,65 @@ Deno.serve(async (req) => {
   }
 
   try {
-    let body: any;
+    // Try to parse JSON body if possible, but be tolerant to various formats
+    let body: any = null;
     try {
+      // Attempt to parse as JSON first
       body = await req.json();
     } catch (parseError) {
-      console.error("Failed to parse request body:", parseError);
-      return new Response(
-        JSON.stringify({ error: "Invalid JSON in request body" }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      // We'll attempt fallbacks below; do not return yet because some runtimes send body differently
+      console.debug("didit-create-session: JSON.parse failed on req.json():", parseError && parseError.message);
     }
 
-    const userId = body?.userId;
+    // Extract userId flexibly: from parsed JSON body, raw text parsed as JSON, query param, or headers
+    let userId = body?.userId;
+
+    // If body didn't yield userId, try reading raw text and parsing JSON
+    if (!userId) {
+      try {
+        const rawText = await req.text();
+        if (rawText) {
+          try {
+            const parsed = JSON.parse(rawText);
+            if (parsed && parsed.userId) userId = parsed.userId;
+          } catch (e) {
+            // not JSON — ignore
+            console.debug("didit-create-session: raw text not JSON or no userId found in raw text");
+          }
+        }
+      } catch (e) {
+        // ignore
+      }
+    }
+
+    // Try query params
+    try {
+      const url = new URL(req.url);
+      const q = url.searchParams.get('userId') || url.searchParams.get('user_id');
+      if (q && !userId) userId = q;
+    } catch (e) {
+      // ignore
+    }
+
+    // Try common headers
+    const headerUserId = req.headers.get('x-user-id') || req.headers.get('user-id') || req.headers.get('x-userid');
+    if (headerUserId && !userId) userId = headerUserId;
 
     if (!userId) {
-      console.error("userId missing from request body. Received:", body);
+      // Log everything helpful for debugging
+      try {
+        const headersObj = Object.fromEntries(req.headers);
+        console.error("didit-create-session: userId missing. headers:", headersObj);
+      } catch (e) {
+        console.error("didit-create-session: userId missing and failed to stringify headers", e);
+      }
+
       return new Response(
         JSON.stringify({
           error: "userId is required",
-          receivedBody: body
+          message: "No userId found in request body, query params, or headers"
         }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -71,16 +103,13 @@ Deno.serve(async (req) => {
     if (!SUPABASE_SERVICE_ROLE_KEY) missingVars.push("SUPABASE_SERVICE_ROLE_KEY (or VITE_SUPABASE_SERVICE_ROLE_KEY)");
 
     if (missingVars.length > 0) {
-      console.error("Missing environment variables:", missingVars);
+      console.error("didit-create-session: Missing environment variables:", missingVars);
       return new Response(
         JSON.stringify({
           error: "Missing required environment variables",
           missing: missingVars
         }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -101,16 +130,13 @@ Deno.serve(async (req) => {
 
     if (!diditResponse.ok) {
       const errorText = await diditResponse.text();
-      console.error("DIDIT API error:", diditResponse.status, errorText);
+      console.error("didit-create-session: DIDIT API error:", diditResponse.status, errorText);
       return new Response(
         JSON.stringify({
           error: `DIDIT API error: ${diditResponse.status}`,
           details: errorText,
         }),
-        {
-          status: diditResponse.status,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: diditResponse.status, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -137,16 +163,13 @@ Deno.serve(async (req) => {
       .single();
 
     if (error) {
-      console.error("Database error:", error);
+      console.error("didit-create-session: Database error:", error);
       return new Response(
         JSON.stringify({
           error: "Failed to store session in database",
           details: error.message,
         }),
-        {
-          status: 500,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 500, headers: { "Content-Type": "application/json" } }
       );
     }
 
@@ -159,11 +182,11 @@ Deno.serve(async (req) => {
       }),
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       }
     );
   } catch (error) {
-    console.error("Edge function error:", error);
+    console.error("didit-create-session: Edge function error:", error);
     return new Response(
       JSON.stringify({
         error: "Internal server error",
