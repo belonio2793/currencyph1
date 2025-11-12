@@ -258,7 +258,8 @@ export default function DiditVerificationModal({ userId, onClose, onSuccess }) {
               src={verificationStatus.didit_session_url}
               title="DIDIT Verification"
               className="w-full h-full border-0"
-              allow="camera; microphone"
+              sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals allow-presentation"
+              allow="camera; microphone; payment"
             />
           ) : (
             <div className="flex items-center justify-center h-full">
