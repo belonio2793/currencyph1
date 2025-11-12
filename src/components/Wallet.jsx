@@ -108,6 +108,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
   // Thirdweb integration state
   const [connectedWallet, setConnectedWallet] = useState(null)
+  const [connectedWallets, setConnectedWallets] = useState([])
   const [selectedChainId, setSelectedChainId] = useState(null)
   const [showThirdwebModal, setShowThirdwebModal] = useState(false)
   const [thirdwebConnecting, setThirdwebConnecting] = useState(false)
