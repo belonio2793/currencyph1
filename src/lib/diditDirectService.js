@@ -113,7 +113,7 @@ export const diditDirectService = {
       if (!userId) throw new Error('userId is required')
       if (!sessionUrl) throw new Error('sessionUrl is required')
 
-      const response = await fetch(`${API_BASE_URL}/api/didit/register-external`, {
+      const response = await fetch('/api/didit/register-external', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
