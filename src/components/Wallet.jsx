@@ -44,7 +44,7 @@ const CURRENCY_SYMBOLS = {
   'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
   'MYR': 'RM', 'THB': 'THB', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
-  'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ',
+  'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': '��.إ',
   'BTC': 'BTC', 'ETH': 'ETH', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
   'DOGE': 'DOGE', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'LTC', 'BCH': 'BCH',
   'USDT': 'USDT', 'USDC': 'USDC', 'BUSD': 'BUSD', 'SHIB': 'SHIB',
@@ -789,7 +789,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
                 <div className="flex items-center justify-between mb-2">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
-                  <p className="text-sm font-medium">{CURRENCY_SYMBOLS[globalCurrency] || globalCurrency}</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(2)}</p>
@@ -836,7 +835,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
-                  <span className="text-sm font-medium">{CURRENCY_SYMBOLS[globalCurrency] || globalCurrency}</span>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
                 <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
@@ -867,6 +865,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           <div>
             <h3 className="text-xl font-light">Cryptocurrency Wallets</h3>
             <p className="text-xs text-slate-500 mt-1">Manage your on-chain wallets. Connect a Web3 wallet or create a manual wallet for any supported chain.</p>
+            <p className="text-xs text-slate-500 mt-1 font-medium">Display Currency: {globalCurrency}</p>
           </div>
         </div>
 
