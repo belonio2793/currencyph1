@@ -1,6 +1,8 @@
 import { supabase } from './supabaseClient'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost'
+  ? 'http://localhost:5000'
+  : (import.meta.env.VITE_API_URL || '/api')
 
 /**
  * Direct DIDIT service that calls backend API to create sessions
