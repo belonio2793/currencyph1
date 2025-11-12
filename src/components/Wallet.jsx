@@ -40,7 +40,7 @@ const CRYPTO_CURRENCIES = [
 const ALL_CURRENCIES = [...FIAT_CURRENCIES, ...CRYPTO_CURRENCIES]
 
 const CURRENCY_SYMBOLS = {
-  'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '��',
+  'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
   'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
   'MYR': 'RM', 'THB': 'THB', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
@@ -791,7 +791,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-                <p className="text-2xl font-light text-slate-900 mb-2">{Number(w.balance || 0).toFixed(2)}</p>
+                <p className="text-2xl font-light text-slate-900 mb-2">{formatNumber(Number(w.balance || 0))} {globalCurrency}</p>
                 {currencyRates[w.currency_code] && Number(w.balance || 0) !== 0 && (
                   <p className="text-xs text-slate-400 mb-4">≈ {formatNumber(Number(w.balance || 0) * currencyRates[w.currency_code])} {globalCurrency}</p>
                 )}
@@ -837,7 +837,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
                 </div>
                 <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-                <p className="text-3xl font-light text-slate-900 mb-2">{Number(wallet.balance || 0).toFixed(2)}</p>
+                <p className="text-3xl font-light text-slate-900 mb-2">{formatNumber(Number(wallet.balance || 0))} {globalCurrency}</p>
                 {currencyRates[wallet.currency_code] && Number(wallet.balance || 0) !== 0 && (
                   <p className="text-xs text-slate-400 mb-4">≈ {formatNumber(Number(wallet.balance || 0) * currencyRates[wallet.currency_code])} {globalCurrency}</p>
                 )}
