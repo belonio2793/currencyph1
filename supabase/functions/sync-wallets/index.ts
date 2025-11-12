@@ -76,13 +76,20 @@ async function handle(req: Request) {
       // Persist to Supabase wallets table (match by walletId or address+chain)
       try {
         if (walletId) {
+          // try updating wallets_crypto first (frontend reads wallets_crypto)
+          await supabase.from('wallets_crypto').update({ balance: nativeBalance, last_synced_at: new Date().toISOString() }).eq('id', walletId)
+          // also update generic wallets table for compatibility
           await supabase.from('wallets').update({ balance: nativeBalance, last_synced_at: new Date().toISOString() }).eq('id', walletId)
         } else {
-          // upsert by address + chain
-          const existing = await supabase.from('wallets').select('id').eq('address', address).eq('chain_id', chainId).limit(1)
-          if (existing && existing.data && existing.data.length > 0) {
-            await supabase.from('wallets').update({ balance: nativeBalance, last_synced_at: new Date().toISOString() }).eq('id', existing.data[0].id)
+          // upsert by address + chain into wallets_crypto (preferred)
+          const existingCrypto = await supabase.from('wallets_crypto').select('id').eq('address', address).eq('chain_id', chainId).limit(1)
+          if (existingCrypto && existingCrypto.data && existingCrypto.data.length > 0) {
+            await supabase.from('wallets_crypto').update({ balance: nativeBalance, last_synced_at: new Date().toISOString() }).eq('id', existingCrypto.data[0].id)
+            // also update wallets if present
+            await supabase.from('wallets').update({ balance: nativeBalance, last_synced_at: new Date().toISOString() }).eq('address', address).eq('chain_id', chainId)
           } else {
+            // insert into wallets_crypto and also into wallets for backwards compatibility
+            await supabase.from('wallets_crypto').insert([{ address, chain_id: chainId, balance: nativeBalance, last_synced_at: new Date().toISOString() }])
             await supabase.from('wallets').insert([{ address, chain_id: chainId, balance: nativeBalance, last_synced_at: new Date().toISOString() }])
           }
         }
