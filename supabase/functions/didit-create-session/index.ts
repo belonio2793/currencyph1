@@ -149,10 +149,15 @@ Deno.serve(async (req) => {
     }
 
     // Call DIDIT API server-to-server
+    const DIDIT_APP_ID = Deno.env.get("DIDIT_APP_ID") || Deno.env.get("VITE_DIDIT_APP_ID") || null
+
+    const diditBody: any = { workflow_id: DIDIT_WORKFLOW_ID }
+    if (DIDIT_APP_ID) diditBody.app_id = DIDIT_APP_ID
+
     const diditResponse = await fetch("https://verification.didit.me/v2/session/", {
       method: "POST",
       headers: { "x-api-key": DIDIT_API_KEY, "Content-Type": "application/json" },
-      body: JSON.stringify({ workflow_id: DIDIT_WORKFLOW_ID }),
+      body: JSON.stringify(diditBody),
     });
 
     if (!diditResponse.ok) {
