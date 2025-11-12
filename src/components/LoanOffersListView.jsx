@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import { useState, useEffect } from 'react'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import LenderProfileView from './LenderProfileView'
