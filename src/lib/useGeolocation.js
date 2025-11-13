@@ -52,7 +52,12 @@ export function useGeolocation() {
                   try {
                   let resp = null
                   try {
-                    resp = await fetch(url, { signal: controller.signal })
+                    if (controller.signal.aborted) {
+                      // Signal already aborted, skip fetch
+                      resp = null
+                    } else {
+                      resp = await fetch(url, { signal: controller.signal })
+                    }
                   } catch (fetchErr) {
                     // fetch may reject on abort or network errors — treat as null response
                     resp = null
