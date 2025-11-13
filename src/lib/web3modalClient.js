@@ -1,67 +1,68 @@
-import { getAccount, disconnect, watchAccount } from '@wagmi/core'
-import { createConfig, http } from '@wagmi/core'
-import { mainnet, polygon, sepolia } from '@wagmi/core/chains'
-import { injected, walletConnect } from '@wagmi/connectors'
+import { EthereumProvider } from '@walletconnect/ethereum-provider'
 import { ethers } from 'ethers'
 
-const chains = [mainnet, polygon, sepolia]
+const rpcUrl = process.env.VITE_RPC_URL_1 || process.env.RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
 const projectId = process.env.VITE_WALLETCONNECT_PROJECT_ID || 'f7b2a1c3e8d4b9f2c5e8a1d4'
-
-export const wagmiConfig = createConfig({
-  chains,
-  connectors: [
-    injected(),
-    walletConnect({ projectId })
-  ],
-  transports: {
-    [mainnet.id]: http(),
-    [polygon.id]: http(),
-    [sepolia.id]: http()
-  }
-})
 
 export async function connectViaWeb3Modal() {
   try {
-    const account = getAccount(wagmiConfig)
-    
-    if (account.isConnected && account.address) {
-      const provider = new ethers.BrowserProvider(window.ethereum)
-      const signer = await provider.getSigner()
-      const network = await provider.getNetwork()
-      
-      return {
-        address: account.address,
-        provider: window.ethereum,
-        connected: true,
-        providerType: 'evm',
-        providerName: account.connector?.name || 'wallet',
-        chainId: Number(network.chainId)
-      }
+    if (window.ethereum?.isMetaMask) {
+      return await connectViaMetaMask()
     }
     
-    throw new Error('No account connected')
-  } catch (error) {
-    throw new Error(`Web3Modal connection failed: ${error.message}`)
+    return await connectWithWalletConnect()
+  } catch (e) {
+    throw new Error(`Web3Modal connection failed: ${e.message}`)
+  }
+}
+
+async function connectViaMetaMask() {
+  const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+  
+  if (!accounts || accounts.length === 0) {
+    throw new Error('No accounts returned from MetaMask')
+  }
+  
+  const provider = new ethers.BrowserProvider(window.ethereum)
+  const signer = await provider.getSigner()
+  const network = await provider.getNetwork()
+  
+  return {
+    address: accounts[0],
+    provider: window.ethereum,
+    connected: true,
+    providerType: 'evm',
+    providerName: 'metamask',
+    chainId: Number(network.chainId)
   }
 }
 
 export async function connectWithWalletConnect() {
   try {
-    const { getConnectorClient } = await import('@wagmi/core')
-    const client = await getConnectorClient(wagmiConfig)
+    const wcProvider = await EthereumProvider.init({
+      projectId,
+      chains: [1, 137, 8453],
+      showQrModal: true,
+      rpcMap: {
+        1: rpcUrl,
+        137: 'https://polygon.rpc.thirdweb.com',
+        8453: 'https://base.rpc.thirdweb.com'
+      }
+    })
     
-    if (!client) {
-      throw new Error('Failed to get connector client')
+    const accounts = await wcProvider.request({ method: 'eth_requestAccounts' })
+    
+    if (!accounts || accounts.length === 0) {
+      throw new Error('No accounts returned from WalletConnect')
     }
     
-    const provider = new ethers.BrowserProvider(client.transport.request)
+    const provider = new ethers.BrowserProvider(wcProvider)
     const signer = await provider.getSigner()
     const network = await provider.getNetwork()
-    const account = getAccount(wagmiConfig)
     
     return {
-      address: account.address,
-      provider: client.transport.request,
+      address: accounts[0],
+      provider: wcProvider,
       connected: true,
       providerType: 'evm',
       providerName: 'walletconnect',
@@ -84,14 +85,14 @@ export async function connectWithCoinbase() {
       appName: 'Currency PH'
     })
     
-    const rpcUrl = process.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
     const ethereum = coinbase.makeWeb3Provider(rpcUrl, 1)
     const provider = new ethers.BrowserProvider(ethereum)
     const signer = await provider.getSigner()
     const network = await provider.getNetwork()
+    const address = await signer.getAddress()
     
     return {
-      address: await signer.getAddress(),
+      address,
       provider: ethereum,
       connected: true,
       providerType: 'evm',
@@ -103,9 +104,11 @@ export async function connectWithCoinbase() {
   }
 }
 
-export async function disconnectWallet() {
+export async function disconnectWallet(provider) {
   try {
-    await disconnect(wagmiConfig)
+    if (provider && typeof provider.disconnect === 'function') {
+      await provider.disconnect()
+    }
   } catch (error) {
     console.debug('Disconnect error:', error.message)
   }
