@@ -1236,89 +1236,99 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
             </div>
 
             <div className="space-y-3">
-              {networkWallets && networkWallets.length > 0 ? networkWallets.map((nw) => (
-                <div key={nw.id || nw.network} className="bg-white border border-slate-100 rounded-lg">
-                  <div className="p-3">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <div className="text-sm font-semibold text-slate-700">{nw.network || nw.currency}</div>
-                        <div className="text-xs text-slate-500">{nw.currency}</div>
+              {networkWallets && networkWallets.length > 0 ? networkWallets.map((nw) => {
+                const currencyCode = nw.currency || nw.network
+                const balanceInGlobalCurrency = convertBalance(nw.balance, currencyCode)
+                const isSameCurrency = currencyCode === globalCurrency
+                return (
+                  <div key={nw.id || nw.network} className="bg-white border border-slate-100 rounded-lg">
+                    <div className="p-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-semibold text-slate-700">{nw.network || nw.currency}</div>
+                          <div className="text-xs text-slate-500">{nw.currency}</div>
+                        </div>
+                        <div>
+                          <div className="text-sm font-mono text-slate-600">{formatNumber(balanceInGlobalCurrency)} {globalCurrency}</div>
+                          {!isSameCurrency && Number(nw.balance || 0) !== 0 && (
+                            <div className="text-xs text-slate-400 text-right">{Number(nw.balance || 0).toFixed(6)} {currencyCode}</div>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-sm font-mono text-slate-600">{Number(nw.balance || 0).toFixed(6)}</div>
-                    </div>
-                    <div className="mt-2 text-xs text-slate-500 break-all">Address: {nw.metadata?.address || nw.address || '—'}</div>
-                    {nw?.metadata?.public_key && (
-                      <div className="mt-1 text-xs text-slate-500 break-all">Public Key: {nw.metadata.public_key}</div>
-                    )}
-                    <div className="mt-2 text-xs text-slate-400">Wallet ID: <span className="font-mono">{nw.id}</span></div>
-                    {nw.updated_at && <div className="text-xs text-slate-400">Updated: {new Date(nw.updated_at).toLocaleString()}</div> }
-                  </div>
-
-                  <div className="border-t border-slate-100 px-3 py-2">
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={async () => {
-                          const id = nw.id
-                          setNetworkTxOpen(prev => ({ ...prev, [id]: !prev[id] }))
-                          if (!networkTxs[id]) {
-                            try {
-                              // Prefer network_transactions for house/network wallets
-                              const { data: txs, error } = await supabase.from('network_transactions')
-                                .select('id, wallet_house_id, chain_id, tx_hash, from_address, to_address, value, raw, created_at')
-                                .eq('wallet_house_id', nw.id)
-                                .order('created_at', { ascending: false })
-                                .limit(50)
-                              if (error) throw error
-                              // Normalize to expected shape for the UI
-                              const normalized = (txs || []).map(t => ({
-                                id: t.id,
-                                type: 'onchain',
-                                amount: Number(t.value || 0),
-                                currency_code: nw.currency,
-                                description: t.tx_hash || JSON.stringify(t.raw || {}),
-                                created_at: t.created_at
-                              }))
-                              setNetworkTxs(prev => ({ ...prev, [id]: normalized || [] }))
-                            } catch (e) {
-                              console.error('Failed loading transactions for', nw.currency, e)
-                              setNetworkTxs(prev => ({ ...prev, [id]: [] }))
-                            }
-                          }
-                        }}
-                        className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                        {networkTxOpen[nw.id] ? '▼ Hide Transactions' : '▶ Show Transactions'}
-                      </button>
-
-                      {nw && (nw.address || nw.metadata?.address) && (
-                        <a href={getExplorerUrl(nw.network || nw.currency, nw.address || nw.metadata?.address)} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:text-blue-700 font-medium">View on explorer</a>
+                      <div className="mt-2 text-xs text-slate-500 break-all">Address: {nw.metadata?.address || nw.address || '—'}</div>
+                      {nw?.metadata?.public_key && (
+                        <div className="mt-1 text-xs text-slate-500 break-all">Public Key: {nw.metadata.public_key}</div>
                       )}
+                      <div className="mt-2 text-xs text-slate-400">Wallet ID: <span className="font-mono">{nw.id}</span></div>
+                      {nw.updated_at && <div className="text-xs text-slate-400">Updated: {new Date(nw.updated_at).toLocaleString()}</div> }
                     </div>
 
-                    {networkTxOpen[nw.id] && (
-                      <div className="mt-3">
-                        {(networkTxs[nw.id] && networkTxs[nw.id].length > 0) ? (
-                          <div className="space-y-2">
-                            {networkTxs[nw.id].map(tx => (
-                              <div key={tx.id} className="p-2 bg-slate-50 border border-slate-100 rounded text-sm">
-                                <div className="flex items-start justify-between gap-2">
-                                  <div className="flex-1">
-                                    <div className="font-mono text-xs text-slate-600">{tx.type} • {tx.currency_code}</div>
-                                    <div className="text-slate-800 font-semibold">{Number(tx.amount || 0)}</div>
-                                    <div className="text-xs text-slate-500">{tx.description}</div>
-                                  </div>
-                                  <div className="text-xs text-slate-400 whitespace-nowrap">{new Date(tx.created_at).toLocaleString()}</div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-xs text-slate-500">No recent transactions.</div>
+                    <div className="border-t border-slate-100 px-3 py-2">
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={async () => {
+                            const id = nw.id
+                            setNetworkTxOpen(prev => ({ ...prev, [id]: !prev[id] }))
+                            if (!networkTxs[id]) {
+                              try {
+                                // Prefer network_transactions for house/network wallets
+                                const { data: txs, error } = await supabase.from('network_transactions')
+                                  .select('id, wallet_house_id, chain_id, tx_hash, from_address, to_address, value, raw, created_at')
+                                  .eq('wallet_house_id', nw.id)
+                                  .order('created_at', { ascending: false })
+                                  .limit(50)
+                                if (error) throw error
+                                // Normalize to expected shape for the UI
+                                const normalized = (txs || []).map(t => ({
+                                  id: t.id,
+                                  type: 'onchain',
+                                  amount: Number(t.value || 0),
+                                  currency_code: nw.currency,
+                                  description: t.tx_hash || JSON.stringify(t.raw || {}),
+                                  created_at: t.created_at
+                                }))
+                                setNetworkTxs(prev => ({ ...prev, [id]: normalized || [] }))
+                              } catch (e) {
+                                console.error('Failed loading transactions for', nw.currency, e)
+                                setNetworkTxs(prev => ({ ...prev, [id]: [] }))
+                              }
+                            }
+                          }}
+                          className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                          {networkTxOpen[nw.id] ? '▼ Hide Transactions' : '▶ Show Transactions'}
+                        </button>
+
+                        {nw && (nw.address || nw.metadata?.address) && (
+                          <a href={getExplorerUrl(nw.network || nw.currency, nw.address || nw.metadata?.address)} target="_blank" rel="noreferrer" className="text-sm text-blue-600 hover:text-blue-700 font-medium">View on explorer</a>
                         )}
                       </div>
-                    )}
+
+                      {networkTxOpen[nw.id] && (
+                        <div className="mt-3">
+                          {(networkTxs[nw.id] && networkTxs[nw.id].length > 0) ? (
+                            <div className="space-y-2">
+                              {networkTxs[nw.id].map(tx => (
+                                <div key={tx.id} className="p-2 bg-slate-50 border border-slate-100 rounded text-sm">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <div className="flex-1">
+                                      <div className="font-mono text-xs text-slate-600">{tx.type} • {tx.currency_code}</div>
+                                      <div className="text-slate-800 font-semibold">{Number(tx.amount || 0)}</div>
+                                      <div className="text-xs text-slate-500">{tx.description}</div>
+                                    </div>
+                                    <div className="text-xs text-slate-400 whitespace-nowrap">{new Date(tx.created_at).toLocaleString()}</div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-xs text-slate-500">No recent transactions.</div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              )) : (
+                )
+              }) : (
                 <div className="p-4 text-sm text-slate-500 bg-white border border-slate-100 rounded-lg">No network wallets found.</div>
               )}
             </div>
