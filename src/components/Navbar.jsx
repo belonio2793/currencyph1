@@ -17,7 +17,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'investments', label: 'Community Projects' }
   ]
 
-  // Buttons that should appear under the Manage Investments row
+  // Buttons that should appear under the Community Projects row
   const investmentsRowButtons = [
     { id: 'wallet', label: 'Wallets', auth: true },
     { id: 'send', label: 'Send', auth: true },
