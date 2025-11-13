@@ -55,25 +55,30 @@ export const WalletConnectProviderAdapter = {
   detect: () => false,
   async connect() {
     try {
-      const { default: WalletConnectProvider } = await import('@walletconnect/web3-provider')
-      const wcProvider = new WalletConnectProvider({
-        rpc: {
+      const { EthereumProvider } = await import('@walletconnect/ethereum-provider')
+      const projectId = process.env.VITE_WALLETCONNECT_PROJECT_ID || 'f7b2a1c3e8d4b9f2c5e8a1d4'
+
+      const wcProvider = await EthereumProvider.init({
+        projectId,
+        chains: [1, 137, 8453],
+        showQrModal: true,
+        rpcMap: {
           1: process.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com',
-          137: 'https://polygon.rpc.thirdweb.com'
-        },
-        chainId: 1
+          137: 'https://polygon.rpc.thirdweb.com',
+          8453: 'https://base.rpc.thirdweb.com'
+        }
       })
-      
-      const accounts = await wcProvider.enable()
-      
+
+      const accounts = await wcProvider.request({ method: 'eth_requestAccounts' })
+
       if (!accounts || accounts.length === 0) {
         throw new Error('No accounts returned from WalletConnect')
       }
-      
-      const ethersProvider = new ethers.providers.Web3Provider(wcProvider)
-      const signer = ethersProvider.getSigner()
+
+      const ethersProvider = new ethers.BrowserProvider(wcProvider)
+      const signer = await ethersProvider.getSigner()
       const network = await ethersProvider.getNetwork()
-      
+
       return {
         providerName: 'WalletConnect',
         providerType: 'evm',
