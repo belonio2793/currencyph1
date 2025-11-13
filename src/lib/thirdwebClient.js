@@ -138,11 +138,22 @@ export async function connectWallet() {
 
 // Connect to Phantom / Solana
 export async function connectSolana() {
-  if (!hasSolanaProvider()) {
-    throw new Error('No Solana wallet (Phantom) found')
-  }
-
   try {
+    // Try to use the new wallet connection system for Phantom (EVM mode)
+    const { connectToWallet } = await import('./walletConnections')
+
+    try {
+      // Try Phantom in EVM mode first
+      return await connectToWallet('phantom')
+    } catch (phantomErr) {
+      console.debug('Phantom EVM connection failed:', phantomErr.message)
+    }
+
+    // Fall back to Solana mode
+    if (!hasSolanaProvider()) {
+      throw new Error('No Solana wallet (Phantom) found')
+    }
+
     const provider = window.solana
     // connect returns { publicKey }
     const resp = await provider.connect()
@@ -153,7 +164,10 @@ export async function connectSolana() {
       provider,
       connected: true,
       providerType: 'solana',
-      providerName: provider.isPhantom ? 'phantom' : 'solana'
+      providerName: provider.isPhantom ? 'phantom' : 'solana',
+      chainId: 245022926,
+      chainName: 'Solana',
+      chainSymbol: 'SOL'
     }
 
     persistWalletCache(result)
