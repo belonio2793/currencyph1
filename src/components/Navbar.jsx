@@ -180,7 +180,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             {/* Auth controls will be rendered in the investments row */}
           </div>
 
-          {/* Secondary row for Manage Investments (desktop) */}
+          {/* Secondary row for Community Projects (desktop) */}
           <div className="hidden md:flex w-full mt-2 pt-2 border-t border-slate-100">
             <div className="w-full px-4 flex items-center">
               <div className="flex items-center gap-2">
