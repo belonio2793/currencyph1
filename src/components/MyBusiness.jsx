@@ -1051,16 +1051,24 @@ export default function MyBusiness({ userId }) {
                   <input type="text" placeholder="Search cities..." value={citySearch} onChange={(e) => { setCitySearch(e.target.value); setShowCityDropdown(true); }} onFocus={() => setShowCityDropdown(true)} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:border-blue-600" />
                   {formData.cityOfRegistration && <p className="mt-2 text-sm text-green-600">Selected: {formData.cityOfRegistration}</p>}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-slate-50 rounded-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white border border-slate-300 rounded-lg">
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 uppercase mb-2">TIN</label>
-                    <input type="text" placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : ''} value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} readOnly={formMode === 'create'} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg" />
+                    <input type="text" placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : 'Optional - Add manually if available'} value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
+                    {formMode === 'create' && <p className="text-xs text-slate-500 mt-1">BIR Certificate must be manually inserted later.</p>}
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 uppercase mb-2">Certificate</label>
-                    <input type="text" placeholder={formMode === 'existing' ? 'Enter certificate' : ''} value={formData.certificateOfIncorporation} onChange={(e) => setFormData({ ...formData, certificateOfIncorporation: e.target.value })} readOnly={formMode === 'create'} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg" />
+                    <input type="text" placeholder={formMode === 'existing' ? 'Enter certificate' : 'Optional - Add manually if available'} value={formData.certificateOfIncorporation} onChange={(e) => setFormData({ ...formData, certificateOfIncorporation: e.target.value })} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
                   </div>
                 </div>
+                {formMode === 'create' && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <label className="block text-xs font-semibold text-blue-900 uppercase mb-2">Currency Registration Number (Auto-Generated)</label>
+                    <input type="text" value={formData.currencyRegistrationNumber} readOnly={true} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed" />
+                    <p className="text-xs text-blue-700 mt-2">✓ Your unique Currency Registration Number for currency.ph</p>
+                  </div>
+                )}
                 {formMode === 'existing' && (
                   <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-2">Registration Date <span className="text-red-500">*</span></label>
@@ -1068,7 +1076,7 @@ export default function MyBusiness({ userId }) {
                   </div>
                 )}
                 <div className="flex gap-3 pt-6 border-t border-slate-200">
-                  <button onClick={handleAddBusiness} disabled={formMode === 'create' ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate} className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold">{formMode === 'create' ? 'Create Business' : 'Add Business'}</button>
+                  <button onClick={handleAddBusiness} disabled={formMode === 'create' ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationNumber : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate} className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold">{formMode === 'create' ? 'Create Business' : 'Add Business'}</button>
                   <button onClick={() => { setShowRegistrationForm(false); setFormMode(null); }} className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
                 </div>
               </div>
