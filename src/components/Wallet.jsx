@@ -1030,44 +1030,48 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                 if (aIsFiat === bIsFiat) return 0
                 return aIsFiat ? -1 : 1
               })
-              .map(wallet => (
-              <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                <div className="flex items-center justify-between mb-4">
-                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
-                </div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-                <p className="text-3xl font-light text-slate-900 mb-2">{formatNumber(Number(wallet.balance || 0))} {wallet.currency_code}</p>
-                {currencyRates[wallet.currency_code] && Number(wallet.balance || 0) !== 0 && (
-                  <p className="text-xs text-slate-400 mb-2">≈ {formatNumber(Number(wallet.balance || 0) * currencyRates[wallet.currency_code])} {globalCurrency}</p>
-                )}
-                {wallet.account_number && (
-                  <p className="text-xs text-slate-500 mb-2">Acct: {wallet.account_number}</p>
-                )}
-                {wallet.tokens && wallet.tokens.length > 0 && (
-                  <div className="mb-3">
-                    <div className="text-xs text-slate-500 mb-1">Tokens</div>
-                    <div className="flex flex-col gap-1 text-xs text-slate-600">
-                      {wallet.tokens.slice(0,3).map(t => (
-                        <div key={t.token_address} className="flex items-center justify-between">
-                          <div className="truncate">{t.metadata?.symbol || t.token_address.slice(0,6)}</div>
-                          <div className="font-mono">{formatNumber(Number(t.balance || 0))}</div>
-                        </div>
-                      ))}
-                      {wallet.tokens.length > 3 && <div className="text-xs text-slate-400">+{wallet.tokens.length - 3} more</div>}
+              .map(wallet => {
+                const balanceInGlobalCurrency = convertBalance(wallet.balance, wallet.currency_code)
+                const isSameCurrency = wallet.currency_code === globalCurrency
+                return (
+                  <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between mb-4">
+                      <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{CRYPTO_CURRENCIES.includes(wallet.currency_code) ? 'CRYPTOCURRENCY' : 'FIAT'}</p>
                     </div>
+                    <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance ({globalCurrency})</p>
+                    <p className="text-3xl font-light text-slate-900 mb-2">{formatNumber(balanceInGlobalCurrency)}</p>
+                    {!isSameCurrency && Number(wallet.balance || 0) !== 0 && (
+                      <p className="text-xs text-slate-400 mb-2">({formatNumber(Number(wallet.balance || 0))} {wallet.currency_code})</p>
+                    )}
+                    {wallet.account_number && (
+                      <p className="text-xs text-slate-500 mb-2">Acct: {wallet.account_number}</p>
+                    )}
+                    {wallet.tokens && wallet.tokens.length > 0 && (
+                      <div className="mb-3">
+                        <div className="text-xs text-slate-500 mb-1">Tokens</div>
+                        <div className="flex flex-col gap-1 text-xs text-slate-600">
+                          {wallet.tokens.slice(0,3).map(t => (
+                            <div key={t.token_address} className="flex items-center justify-between">
+                              <div className="truncate">{t.metadata?.symbol || t.token_address.slice(0,6)}</div>
+                              <div className="font-mono">{formatNumber(Number(t.balance || 0))}</div>
+                            </div>
+                          ))}
+                          {wallet.tokens.length > 3 && <div className="text-xs text-slate-400">+{wallet.tokens.length - 3} more</div>}
+                        </div>
+                      </div>
+                    )}
+                    <button
+                      onClick={() => {
+                        setSelectedWallet(wallet)
+                        setShowAddFunds(true)
+                      }}
+                      className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                    >
+                      Add Funds
+                    </button>
                   </div>
-                )}
-                <button
-                  onClick={() => {
-                    setSelectedWallet(wallet)
-                    setShowAddFunds(true)
-                  }}
-                  className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
-                >
-                  Add Funds
-                </button>
-              </div>
-            ))}
+                )
+              })}
           </div>
         )}
       </div>
