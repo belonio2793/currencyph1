@@ -114,23 +114,23 @@ export const CoinbaseWalletProvider = {
   name: 'Coinbase Wallet',
   detectable: true,
   detect: () => {
-    return typeof window !== 'undefined' && 
-           window.ethereum && 
+    return typeof window !== 'undefined' &&
+           window.ethereum &&
            (window.ethereum.isCoinbaseWallet === true || window.ethereum.providerMap?.get?.('CoinbaseWallet'))
   },
   async connect() {
     if (window.ethereum && window.ethereum.isCoinbaseWallet) {
       const provider = window.ethereum
       const accounts = await provider.request({ method: 'eth_requestAccounts' })
-      
+
       if (!accounts || accounts.length === 0) {
         throw new Error('No accounts returned from Coinbase Wallet')
       }
-      
+
       const ethersProvider = new ethers.BrowserProvider(provider)
-    const signer = await ethersProvider.getSigner()
-    const network = await ethersProvider.getNetwork()
-      
+      const signer = await ethersProvider.getSigner()
+      const network = await ethersProvider.getNetwork()
+
       return {
         providerName: 'Coinbase Wallet',
         providerType: 'evm',
@@ -143,7 +143,7 @@ export const CoinbaseWalletProvider = {
         connected: true
       }
     }
-    
+
     // Fallback: Try to initialize Coinbase SDK
     try {
       const { default: CoinbaseWalletSDK } = await import('@coinbase/wallet-sdk')
@@ -151,8 +151,8 @@ export const CoinbaseWalletProvider = {
         appName: 'Currency PH',
         appLogoUrl: '/logo.png'
       })
-      
-      const rpcUrl = process.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
+
+      const rpcUrl = import.meta.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
       const ethereum = coinbase.makeWeb3Provider(rpcUrl, 1)
       
       const accounts = await ethereum.request({ method: 'eth_requestAccounts' })
