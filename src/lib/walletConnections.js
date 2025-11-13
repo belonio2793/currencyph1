@@ -320,11 +320,15 @@ export const venlyConnection = {
   name: 'Venly',
   icon: '✨',
   isAvailable: () => {
-    return typeof window !== 'undefined' && 
+    return typeof window !== 'undefined' &&
            window.ethereum?.providerMap?.get?.('Venly')
   },
 
   async connect() {
+    if (isRunningInIframe()) {
+      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    }
+
     try {
       // Venly is available via injected provider
       if (window.ethereum?.providerMap?.get?.('Venly')) {
