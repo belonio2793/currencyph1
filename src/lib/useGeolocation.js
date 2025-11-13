@@ -109,10 +109,15 @@ export function useGeolocation() {
                 try {
                   let response = null
                   try {
-                    response = await fetch(
-                      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                      { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
-                    )
+                    if (controller.signal.aborted) {
+                      // Signal already aborted, skip fetch
+                      response = null
+                    } else {
+                      response = await fetch(
+                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                        { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
+                      )
+                    }
                   } catch (fetchErr) {
                     response = null
                   }
