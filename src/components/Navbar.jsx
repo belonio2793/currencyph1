@@ -9,7 +9,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'home', label: 'Home', public: true },
     { id: 'nearby', label: 'Nearby', public: true },
     { id: 'online-users', label: 'Online Users', auth: true },
-    { id: 'super-trading', label: 'Super Trading', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
     { id: 'rates', label: 'Rates', public: true }
   ]
@@ -160,7 +159,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
           <div className="hidden md:flex flex-wrap items-center gap-1">
             {mainNav
               .filter(btn => (btn.public || (!btn.auth) || userEmail))
-              .filter(btn => btn.id !== 'online-users' && btn.id !== 'deposit' && btn.id !== 'super-trading')
+              .filter(btn => btn.id !== 'online-users' && btn.id !== 'deposit')
               .map(btn => (
                 <button
                   key={btn.id}
