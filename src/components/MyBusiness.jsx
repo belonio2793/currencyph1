@@ -259,6 +259,69 @@ export default function MyBusiness({ userId }) {
     setFormData({ ...formData, registrationType: value })
   }
 
+  // Check for duplicate TIN or BIR Certification
+  const checkForDuplicateCredentials = async () => {
+    try {
+      const conditions = []
+      const values = []
+
+      if (formData.tin) {
+        conditions.push('tin')
+        values.push(formData.tin)
+      }
+
+      if (formData.certificateOfIncorporation) {
+        conditions.push('certificate_of_incorporation')
+        values.push(formData.certificateOfIncorporation)
+      }
+
+      if (conditions.length === 0) {
+        return { isDuplicate: false }
+      }
+
+      // Check TIN if provided
+      if (formData.tin) {
+        const { data: tinData, error: tinError } = await supabase
+          .from('businesses')
+          .select('id, business_name')
+          .eq('tin', formData.tin)
+          .limit(1)
+
+        if (tinError) throw tinError
+        if (tinData && tinData.length > 0) {
+          return {
+            isDuplicate: true,
+            duplicateField: 'TIN',
+            existingBusiness: tinData[0].business_name
+          }
+        }
+      }
+
+      // Check BIR Certification if provided
+      if (formData.certificateOfIncorporation) {
+        const { data: birData, error: birError } = await supabase
+          .from('businesses')
+          .select('id, business_name')
+          .eq('certificate_of_incorporation', formData.certificateOfIncorporation)
+          .limit(1)
+
+        if (birError) throw birError
+        if (birData && birData.length > 0) {
+          return {
+            isDuplicate: true,
+            duplicateField: 'BIR Certification',
+            existingBusiness: birData[0].business_name
+          }
+        }
+      }
+
+      return { isDuplicate: false }
+    } catch (err) {
+      console.error('Error checking for duplicates:', err)
+      throw err
+    }
+  }
+
   const handleAddBusiness = async () => {
     // Validate common fields
     if (!formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available) {
@@ -269,12 +332,19 @@ export default function MyBusiness({ userId }) {
     // Additional validation for existing business mode
     if (formMode === 'existing') {
       if (!formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate) {
-        alert('Please fill all required fields: Business Name, Type, City, TIN, Certificate, and Registration Date')
+        alert('Please fill all required fields: Business Name, Type, City, TIN, BIR Certification, and Registration Date')
         return
       }
     }
 
     try {
+      // Check for duplicate TIN or BIR Certification
+      const duplicateCheck = await checkForDuplicateCredentials()
+      if (duplicateCheck.isDuplicate) {
+        alert(`The ${duplicateCheck.duplicateField} you entered is already associated with "${duplicateCheck.existingBusiness}".\n\nIf you believe this is a mistake, please contact support@currency.ph`)
+        return
+      }
+
       const { data, error } = await supabase
         .from('businesses')
         .insert([{
@@ -323,7 +393,7 @@ export default function MyBusiness({ userId }) {
       registrationType: 'sole',
       tin: '',
       certificateOfIncorporation: '',
-      currencyRegistrationNumber: mode === 'create' ? generateCurrencyRegistrationNumber() : '',
+      currencyRegistrationNumber: generateCurrencyRegistrationNumber(),
       cityOfRegistration: '',
       registrationDate: mode === 'create' ? getCurrentManillaDate() : ''
     })
@@ -1066,7 +1136,7 @@ export default function MyBusiness({ userId }) {
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <label className="block text-xs font-semibold text-blue-900 uppercase mb-2">Currency Registration Number (Auto-Generated)</label>
                     <input type="text" value={formData.currencyRegistrationNumber} readOnly={true} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed" />
-                    <p className="text-xs text-blue-700 mt-2">✓ Your unique Currency Registration Number for currency.ph</p>
+                    <p className="text-xs text-blue-700 mt-2">�� Your unique Currency Registration Number for currency.ph</p>
                   </div>
                 )}
                 {formMode === 'existing' && (
