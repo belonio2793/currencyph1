@@ -1135,7 +1135,6 @@ export default function MyBusiness({ userId }) {
                     <input type="text" value={formData.currencyRegistrationNumber} readOnly={true} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed" />
                     <p className="text-xs text-blue-700 mt-2">�� Your unique Currency Registration Number for currency.ph</p>
                   </div>
-                )}
                 {formMode === 'existing' && (
                   <div>
                     <label className="block text-sm font-semibold text-slate-900 mb-2">Registration Date <span className="text-red-500">*</span></label>
