@@ -980,25 +980,29 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
         {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => (
-              <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
+            {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => {
+              const balanceInGlobalCurrency = convertBalance(w.balance, w.currency_code)
+              const isSameCurrency = w.currency_code === globalCurrency
+              return (
+                <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
+                  </div>
+                  <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance ({globalCurrency})</p>
+                  <p className="text-2xl font-light text-slate-900 mb-2">{formatNumber(balanceInGlobalCurrency)}</p>
+                  {!isSameCurrency && Number(w.balance || 0) !== 0 && (
+                    <p className="text-xs text-slate-400 mb-4">({formatNumber(Number(w.balance || 0))} {w.currency_code})</p>
+                  )}
+                  {w.account_number && <p className="text-xs text-slate-500 mb-4">Acct: {w.account_number}</p>}
+                  <button
+                    onClick={() => { setSelectedFiatWallet(w); setFiatAction('deposit'); setFiatAmount(''); setShowFiatModal(true) }}
+                    className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                  >
+                    Deposit / Pay
+                  </button>
                 </div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance</p>
-                <p className="text-2xl font-light text-slate-900 mb-2">{formatNumber(Number(w.balance || 0))} {globalCurrency}</p>
-                {currencyRates[w.currency_code] && Number(w.balance || 0) !== 0 && (
-                  <p className="text-xs text-slate-400 mb-4">≈ {formatNumber(Number(w.balance || 0) * currencyRates[w.currency_code])} {globalCurrency}</p>
-                )}
-                {w.account_number && <p className="text-xs text-slate-500 mb-4">Acct: {w.account_number}</p>}
-                <button
-                  onClick={() => { setSelectedFiatWallet(w); setFiatAction('deposit'); setFiatAmount(''); setShowFiatModal(true) }}
-                  className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
-                >
-                  Deposit / Pay
-                </button>
-              </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>
