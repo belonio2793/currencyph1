@@ -127,11 +127,20 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   // Currency exchange rates cache (rate to globalCurrency)
   const [currencyRates, setCurrencyRates] = useState({})
 
+  // Helper function to convert balance to globalCurrency
+  const convertBalance = (balance, fromCurrency) => {
+    if (!fromCurrency || fromCurrency === globalCurrency) return Number(balance || 0)
+    const rate = currencyRates[fromCurrency]
+    if (!rate) return Number(balance || 0)
+    return Number(balance || 0) * rate
+  }
+
   // Fetch exchange rates for displayed wallets when wallets or globalCurrency change
   useEffect(() => {
     const codes = new Set()
     internalWallets.forEach(w => { if (w && w.currency_code) codes.add(w.currency_code) })
     fiatWallets.forEach(w => { if (w && w.currency_code) codes.add(w.currency_code) })
+    cryptoWallets.forEach(w => { if (w && w.currency_code) codes.add(w.currency_code) })
     const toFetch = Array.from(codes).filter(c => c && c !== globalCurrency && !currencyRates[c])
     if (toFetch.length === 0) return
     let mounted = true
@@ -147,7 +156,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       setCurrencyRates(prev => ({ ...prev, ...results }))
     })()
     return () => { mounted = false }
-  }, [internalWallets, fiatWallets, globalCurrency])
+  }, [internalWallets, fiatWallets, cryptoWallets, globalCurrency])
   const [networkWallets, setNetworkWallets] = useState([])
   const [generatingNetwork, setGeneratingNetwork] = useState(false)
   // transaction UI state
