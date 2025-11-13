@@ -56,14 +56,18 @@ export const WalletConnectProviderAdapter = {
   async connect() {
     try {
       const { EthereumProvider } = await import('@walletconnect/ethereum-provider')
-      const projectId = process.env.VITE_WALLETCONNECT_PROJECT_ID || 'f7b2a1c3e8d4b9f2c5e8a1d4'
+      const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '339554ddb2542610ff4a0f53fc511981'
+
+      if (!projectId || projectId.length < 32) {
+        throw new Error('WalletConnect Project ID is not configured. Please set VITE_WALLETCONNECT_PROJECT_ID in your environment.')
+      }
 
       const wcProvider = await EthereumProvider.init({
         projectId,
         chains: [1, 137, 8453],
         showQrModal: true,
         rpcMap: {
-          1: process.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com',
+          1: import.meta.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com',
           137: 'https://polygon.rpc.thirdweb.com',
           8453: 'https://base.rpc.thirdweb.com'
         }
