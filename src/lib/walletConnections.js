@@ -156,11 +156,15 @@ export const coinbaseConnection = {
   name: 'Coinbase Wallet',
   icon: '🪙',
   isAvailable: () => {
-    return typeof window !== 'undefined' && 
+    return typeof window !== 'undefined' &&
            (window.ethereum?.isCoinbaseWallet === true || window.ethereum?.providerMap?.get?.('CoinbaseWallet'))
   },
 
   async connect() {
+    if (isRunningInIframe()) {
+      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    }
+
     try {
       // Try to detect injected Coinbase provider first
       if (window.ethereum?.isCoinbaseWallet) {
