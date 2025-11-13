@@ -21,8 +21,8 @@ export const MetaMaskProvider = {
       throw new Error('No accounts returned from MetaMask')
     }
     
-    const ethersProvider = new ethers.providers.Web3Provider(provider)
-    const signer = ethersProvider.getSigner()
+    const ethersProvider = new ethers.BrowserProvider(provider)
+    const signer = await ethersProvider.getSigner()
     const network = await ethersProvider.getNetwork()
     
     return {
@@ -123,9 +123,9 @@ export const CoinbaseWalletProvider = {
         throw new Error('No accounts returned from Coinbase Wallet')
       }
       
-      const ethersProvider = new ethers.providers.Web3Provider(provider)
-      const signer = ethersProvider.getSigner()
-      const network = await ethersProvider.getNetwork()
+      const ethersProvider = new ethers.BrowserProvider(provider)
+    const signer = await ethersProvider.getSigner()
+    const network = await ethersProvider.getNetwork()
       
       return {
         providerName: 'Coinbase Wallet',
@@ -253,9 +253,9 @@ export const VenlyProvider = {
         throw new Error('No accounts returned from Venly')
       }
       
-      const ethersProvider = new ethers.providers.Web3Provider(provider)
-      const signer = ethersProvider.getSigner()
-      const network = await ethersProvider.getNetwork()
+      const ethersProvider = new ethers.BrowserProvider(provider)
+    const signer = await ethersProvider.getSigner()
+    const network = await ethersProvider.getNetwork()
       
       return {
         providerName: 'Venly',
