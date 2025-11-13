@@ -1373,10 +1373,20 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <div className="flex items-center gap-3">
                     {existing && (
                       <>
-                        <div className="text-sm text-slate-700 font-mono mr-2">{formatNumber(Number(existing.balance || 0))} {existing.currency_code || existing.chain || chain.symbol}</div>
-                        {currencyRates[(existing.currency_code || chain.symbol) || ''] && Number(existing.balance || 0) !== 0 && (
-                          <div className="text-xs text-slate-400 mr-2">≈ {formatNumber(Number(existing.balance || 0) * (currencyRates[existing.currency_code || chain.symbol] || 1))} {globalCurrency}</div>
-                        )}
+                        {(() => {
+                          const currencyCode = existing.currency_code || existing.chain || chain.symbol
+                          const balanceInGlobalCurrency = convertBalance(existing.balance, currencyCode)
+                          const isSameCurrency = currencyCode === globalCurrency
+                          return (
+                            <>
+                              <div className="text-sm text-slate-700 font-mono mr-2">{formatNumber(balanceInGlobalCurrency)}</div>
+                              {!isSameCurrency && Number(existing.balance || 0) !== 0 && (
+                                <div className="text-xs text-slate-400 mr-2">({formatNumber(Number(existing.balance || 0))} {currencyCode})</div>
+                              )}
+                              <div className="text-xs text-slate-400 mr-2">{globalCurrency}</div>
+                            </>
+                          )
+                        })()}
                         <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('send'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">Send</button>
                         <button onClick={() => { setSelectedCryptoWallet(existing); setCryptoAction('receive'); setCryptoAmount(''); setRecipientAddress(''); setShowCryptoModal(true) }} className="px-3 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 transition-colors">Receive</button>
                       </>
