@@ -4,21 +4,33 @@ const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '339554ddb254
 const rpcUrl = import.meta.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
 
 /**
+ * Check if running in iframe
+ */
+function isRunningInIframe() {
+  if (typeof window === 'undefined') return false
+  return window.self !== window.top
+}
+
+/**
  * MetaMask Connection Handler
  */
 export const metamaskConnection = {
   name: 'MetaMask',
   icon: '🦊',
   isAvailable: () => typeof window !== 'undefined' && window.ethereum?.isMetaMask === true,
-  
+
   async connect() {
     if (!window.ethereum?.isMetaMask) {
       throw new Error('MetaMask is not installed. Please install the MetaMask extension.')
     }
 
+    if (isRunningInIframe()) {
+      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    }
+
     try {
-      const accounts = await window.ethereum.request({ 
-        method: 'eth_requestAccounts' 
+      const accounts = await window.ethereum.request({
+        method: 'eth_requestAccounts'
       })
 
       if (!accounts || accounts.length === 0) {
@@ -43,6 +55,9 @@ export const metamaskConnection = {
     } catch (error) {
       if (error.code === 4001) {
         throw new Error('MetaMask connection was rejected by the user')
+      }
+      if (error.message?.includes('iframe')) {
+        throw error
       }
       throw new Error(`MetaMask connection failed: ${error.message}`)
     }
