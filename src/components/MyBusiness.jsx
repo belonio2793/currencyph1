@@ -1121,7 +1121,7 @@ export default function MyBusiness({ userId }) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-white border border-slate-300 rounded-lg">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2">TIN</label>
+                    <label className="block text-xs font-semibold text-slate-600 uppercase mb-2">TIN {formMode === 'existing' && <span className="text-red-500">*</span>}</label>
                     <input type="text" placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : 'Optional - Add manually if available'} value={formData.tin} onChange={(e) => setFormData({ ...formData, tin: e.target.value })} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
                     {formMode === 'create' && <p className="text-xs text-slate-500 mt-1">BIR Certificate must be manually inserted later.</p>}
                   </div>
