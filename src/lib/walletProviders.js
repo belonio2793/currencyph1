@@ -26,11 +26,14 @@ export const WALLET_PROVIDERS = {
 
 // Get all available providers
 export function getAvailableProviders() {
-  return getAvailableWalletsFromConnections().map(w => ({
-    key: w.key,
-    name: w.name,
-    icon: w.icon,
-    detectable: w.isAvailable
+  return Object.entries(WALLET_PROVIDERS).map(([key, provider]) => ({
+    key,
+    name: provider.name,
+    icon: provider.icon,
+    detectable: true,
+    detect: provider.isAvailable || (() => false),
+    connect: provider.connect,
+    disconnect: provider.disconnect
   }))
 }
 
