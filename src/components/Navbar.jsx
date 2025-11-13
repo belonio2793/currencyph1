@@ -196,7 +196,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   </button>
                 ))}
 
-                {/* Buttons moved into the Manage Investments row */}
+                {/* Buttons moved into the Community Projects row */}
                 <div className="ml-2 flex items-center gap-2">
                   {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
                     <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm rounded-md ${activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
