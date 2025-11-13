@@ -1133,7 +1133,7 @@ export default function MyBusiness({ userId }) {
                 <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <label className="block text-xs font-semibold text-blue-900 uppercase mb-2">Currency Registration Number (Auto-Generated)</label>
                     <input type="text" value={formData.currencyRegistrationNumber} readOnly={true} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed" />
-                    <p className="text-xs text-blue-700 mt-2"<p className="text-xs text-blue-700 mt-2">Your unique Currency Registration Number for currency.ph</p>
+                    <p className="text-xs text-blue-700 mt-2">Your unique Currency Registration Number for currency.ph</p>
                   </div>
                 {formMode === 'existing' && (
                   <div>
