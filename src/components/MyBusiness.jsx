@@ -572,27 +572,21 @@ export default function MyBusiness({ userId }) {
                 </div>
 
                 {/* TIN & Certificate Fields */}
-                <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 rounded-lg border ${
-                  formMode === 'create'
-                    ? 'bg-slate-50 border-slate-200'
-                    : 'bg-white border-slate-300'
-                }`}>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6 p-4 rounded-lg border bg-white border-slate-300">
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 uppercase mb-2 tracking-wide">
                       Tax Identification Number (TIN) {formMode === 'existing' && <span className="text-red-500">*</span>}
                     </label>
                     <input
                       type="text"
-                      placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : ''}
+                      placeholder={formMode === 'existing' ? 'XXX-XXX-XXX-XXX' : 'Optional - Add manually if available'}
                       value={formData.tin}
-                      onChange={(e) => formMode === 'existing' && setFormData({ ...formData, tin: e.target.value })}
-                      readOnly={formMode === 'create'}
-                      className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-sm font-semibold transition-colors ${
-                        formMode === 'create'
-                          ? 'border-slate-200 bg-white text-slate-900 cursor-not-allowed'
-                          : 'border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-blue-600'
-                      }`}
+                      onChange={(e) => setFormData({ ...formData, tin: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg font-mono text-sm font-semibold transition-colors bg-white text-slate-900 focus:outline-none focus:border-blue-600"
                     />
+                    {formMode === 'create' && (
+                      <p className="text-xs text-slate-500 mt-2">Leave blank to add manually later. A Currency Registration Number will be auto-generated.</p>
+                    )}
                   </div>
 
                   <div>
@@ -601,18 +595,34 @@ export default function MyBusiness({ userId }) {
                     </label>
                     <input
                       type="text"
-                      placeholder={formMode === 'existing' ? 'Enter certificate number' : ''}
+                      placeholder={formMode === 'existing' ? 'Enter certificate number' : 'Optional - Add manually if available'}
                       value={formData.certificateOfIncorporation}
-                      onChange={(e) => formMode === 'existing' && setFormData({ ...formData, certificateOfIncorporation: e.target.value })}
-                      readOnly={formMode === 'create'}
-                      className={`w-full px-4 py-3 border-2 rounded-lg font-mono text-sm font-semibold transition-colors ${
-                        formMode === 'create'
-                          ? 'border-slate-200 bg-white text-slate-900 cursor-not-allowed'
-                          : 'border-slate-300 bg-white text-slate-900 focus:outline-none focus:border-blue-600'
-                      }`}
+                      onChange={(e) => setFormData({ ...formData, certificateOfIncorporation: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg font-mono text-sm font-semibold transition-colors bg-white text-slate-900 focus:outline-none focus:border-blue-600"
                     />
+                    {formMode === 'create' && (
+                      <p className="text-xs text-slate-500 mt-2">BIR Certificate must be manually inserted after registration.</p>
+                    )}
                   </div>
                 </div>
+
+                {/* Currency Registration Number Field - Auto-generated, Read-only */}
+                {formMode === 'create' && (
+                  <div className="mb-6 p-4 rounded-lg bg-blue-50 border border-blue-200">
+                    <label className="block text-xs font-semibold text-blue-900 uppercase mb-2 tracking-wide">
+                      Currency Registration Number (Auto-Generated)
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.currencyRegistrationNumber}
+                      readOnly={true}
+                      className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed"
+                    />
+                    <p className="text-xs text-blue-700 mt-2">
+                      ✓ Your unique Currency Registration Number. This cannot be changed and will be displayed on your currency.ph profile.
+                    </p>
+                  </div>
+                )}
 
                 {/* Registration Date */}
                 <div className="mb-8">
@@ -638,7 +648,7 @@ export default function MyBusiness({ userId }) {
                     onClick={handleAddBusiness}
                     disabled={
                       formMode === 'create'
-                        ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available
+                        ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationNumber
                         : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !businessNameAvailability?.available
                     }
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors"
