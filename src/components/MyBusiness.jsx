@@ -1130,8 +1130,7 @@ export default function MyBusiness({ userId }) {
                     <input type="text" placeholder={formMode === 'existing' ? 'Enter BIR certification number' : 'Optional - Add manually if available'} value={formData.certificateOfIncorporation} onChange={(e) => setFormData({ ...formData, certificateOfIncorporation: e.target.value })} className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600" />
                   </div>
                 </div>
-                {formMode === 'create' && (
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <label className="block text-xs font-semibold text-blue-900 uppercase mb-2">Currency Registration Number (Auto-Generated)</label>
                     <input type="text" value={formData.currencyRegistrationNumber} readOnly={true} className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed" />
                     <p className="text-xs text-blue-700 mt-2">�� Your unique Currency Registration Number for currency.ph</p>
