@@ -31,7 +31,7 @@ export function getAvailableProviders() {
     name: provider.name,
     icon: provider.icon,
     detectable: true,
-    detect: provider.isAvailable || (() => false),
+    detect: typeof provider.isAvailable === 'function' ? provider.isAvailable : () => false,
     connect: provider.connect,
     disconnect: provider.disconnect
   }))
