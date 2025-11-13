@@ -1206,7 +1206,16 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <div key={chain.chainId} className="px-3 py-2 bg-white/80 border border-slate-200 rounded-lg text-sm flex items-center gap-3">
                     <div className="font-semibold">{chain.symbol}</div>
                     <div className="text-xs text-slate-500">{chain.name}</div>
-                    {existing && <div className="text-xs text-slate-400 ml-2">• {Number(existing.balance || 0).toFixed(6)}</div>}
+                    {existing && (() => {
+                      const currencyCode = existing.currency_code || chain.symbol
+                      const balanceInGlobalCurrency = convertBalance(existing.balance, currencyCode)
+                      const isSameCurrency = currencyCode === globalCurrency
+                      return (
+                        <div className="text-xs text-slate-400 ml-2">
+                          • {formatNumber(balanceInGlobalCurrency)} {globalCurrency} {!isSameCurrency && `(${Number(existing.balance || 0).toFixed(6)})`}
+                        </div>
+                      )
+                    })()}
                   </div>
                 )
               })}
