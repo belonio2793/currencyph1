@@ -206,6 +206,19 @@ export async function getWalletInfo(wallet) {
   if (!wallet || !wallet.provider) return null
 
   try {
+    // If wallet already has chainInfo from new connection system, use it
+    if (wallet.chainId && wallet.chainName) {
+      return {
+        address: wallet.address,
+        chainId: wallet.chainId,
+        chainName: wallet.chainName,
+        chainSymbol: wallet.chainSymbol || 'UNKNOWN',
+        providerType: wallet.providerType || 'evm',
+        providerName: wallet.providerName || 'wallet',
+        provider: wallet.provider
+      }
+    }
+
     const provider = wallet.provider
 
     // Solana provider
