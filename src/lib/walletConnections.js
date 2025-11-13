@@ -82,11 +82,8 @@ export const walletconnectConnection = {
       throw new Error('WalletConnect is not configured. Missing project ID.')
     }
 
-    // Check if running in iframe (Builder.io preview)
-    const isInIframe = typeof window !== 'undefined' && window.self !== window.top
-
-    if (isInIframe) {
-      throw new Error('WalletConnect requires opening the app in a new tab/window. Click "Open Preview" to test wallet connections.')
+    if (isRunningInIframe()) {
+      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
     }
 
     try {
