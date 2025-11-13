@@ -9,6 +9,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'home', label: 'Home', public: true },
     { id: 'nearby', label: 'Nearby', public: true },
     { id: 'online-users', label: 'Online Users', auth: true },
+    { id: 'super-trading', label: 'Super Trading', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
     { id: 'rates', label: 'Rates', public: true }
   ]
