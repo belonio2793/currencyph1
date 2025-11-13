@@ -253,11 +253,15 @@ export const phantomConnection = {
   name: 'Phantom',
   icon: '👻',
   isAvailable: () => {
-    return typeof window !== 'undefined' && 
+    return typeof window !== 'undefined' &&
            (window.phantom?.ethereum?.isPhantom === true || window.ethereum?.isPhantom === true)
   },
 
   async connect() {
+    if (isRunningInIframe()) {
+      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    }
+
     try {
       const phantomProvider = window.phantom?.ethereum || window.ethereum
 
