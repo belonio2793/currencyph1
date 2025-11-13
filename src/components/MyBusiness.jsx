@@ -1144,7 +1144,7 @@ export default function MyBusiness({ userId }) {
                   </div>
                 )}
                 <div className="flex gap-3 pt-6 border-t border-slate-200">
-                  <button onClick={handleAddBusiness} disabled={formMode === 'create' ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationNumber : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate} className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold">{formMode === 'create' ? 'Create Business' : 'Add Business'}</button>
+                  <button onClick={handleAddBusiness} disabled={formMode === 'create' ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationNumber : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !formData.currencyRegistrationNumber} className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold">{formMode === 'create' ? 'Create Business' : 'Add Business'}</button>
                   <button onClick={() => { setShowRegistrationForm(false); setFormMode(null); }} className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
                 </div>
               </div>
