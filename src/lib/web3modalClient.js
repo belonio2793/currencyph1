@@ -1,8 +1,13 @@
 import { EthereumProvider } from '@walletconnect/ethereum-provider'
 import { ethers } from 'ethers'
 
-const rpcUrl = process.env.VITE_RPC_URL_1 || process.env.RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
-const projectId = process.env.VITE_WALLETCONNECT_PROJECT_ID || 'f7b2a1c3e8d4b9f2c5e8a1d4'
+const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '339554ddb2542610ff4a0f53fc511981'
+const rpcUrl = import.meta.env.VITE_RPC_URL_1 || import.meta.env.VITE_RPC_URL || 'https://eth.rpc.thirdweb.com'
+
+// Validate project ID
+if (!projectId || projectId.length < 32) {
+  console.warn('⚠️ WalletConnect Project ID is missing or invalid. Wallet connections may fail.')
+}
 
 export async function connectViaWeb3Modal() {
   try {
