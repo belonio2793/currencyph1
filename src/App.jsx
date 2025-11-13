@@ -35,7 +35,6 @@ import Inbox from './components/Inbox'
 import ChatBar from './components/ChatBar'
 import PokerPage from './components/PokerPage'
 import ChessPage from './components/ChessPage'
-import WalletTestPage from './components/WalletTestPage'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
