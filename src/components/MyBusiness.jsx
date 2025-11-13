@@ -157,6 +157,7 @@ export default function MyBusiness({ userId }) {
     registrationType: 'sole',
     tin: '',
     certificateOfIncorporation: '',
+    currencyRegistrationNumber: '',
     cityOfRegistration: '',
     registrationDate: ''
   })
@@ -173,6 +174,16 @@ export default function MyBusiness({ userId }) {
     const month = String(new Date().getMonth() + 1).padStart(2, '0')
     const random = Array.from({ length: 6 }, () => Math.floor(Math.random() * 10)).join('')
     return `BIR-${year}-${month}-${random}`
+  }
+
+  // Generate Currency Registration Number (random string of alphanumeric characters)
+  const generateCurrencyRegistrationNumber = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+    let result = 'CRN-'
+    for (let i = 0; i < 16; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    return result
   }
 
   // Get current date in Manila timezone
@@ -270,8 +281,9 @@ export default function MyBusiness({ userId }) {
           user_id: userId,
           business_name: formData.businessName,
           registration_type: formData.registrationType,
-          tin: formData.tin,
-          certificate_of_incorporation: formData.certificateOfIncorporation,
+          tin: formData.tin || null,
+          certificate_of_incorporation: formData.certificateOfIncorporation || null,
+          currency_registration_number: formData.currencyRegistrationNumber,
           city_of_registration: formData.cityOfRegistration,
           registration_date: formData.registrationDate,
           status: 'active'
@@ -292,6 +304,7 @@ export default function MyBusiness({ userId }) {
         registrationType: 'sole',
         tin: '',
         certificateOfIncorporation: '',
+        currencyRegistrationNumber: '',
         cityOfRegistration: '',
         registrationDate: ''
       })
@@ -308,8 +321,9 @@ export default function MyBusiness({ userId }) {
     setFormData({
       businessName: '',
       registrationType: 'sole',
-      tin: mode === 'create' ? generateTIN() : '',
-      certificateOfIncorporation: mode === 'create' ? generateCertificate() : '',
+      tin: '',
+      certificateOfIncorporation: '',
+      currencyRegistrationNumber: mode === 'create' ? generateCurrencyRegistrationNumber() : '',
       cityOfRegistration: '',
       registrationDate: mode === 'create' ? getCurrentManillaDate() : ''
     })
