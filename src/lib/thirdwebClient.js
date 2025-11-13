@@ -86,30 +86,46 @@ export async function connectWallet() {
     throw new Error('Trust Wallet in-app browser has limitations with dApp connections. Please use WalletConnect or open this dApp in an external browser like Chrome or Safari.')
   }
 
-  if (!hasWeb3Provider()) {
-    throw new Error('No Web3 wallet provider found. Please install MetaMask or use WalletConnect.')
-  }
-
   try {
-    const provider = window.ethereum
-    const accounts = await provider.request({
-      method: 'eth_requestAccounts'
-    })
+    // Try to use the new wallet connection system
+    const { connectToWallet } = await import('./walletConnections')
 
-    if (!accounts || accounts.length === 0) {
-      throw new Error('No accounts returned from wallet')
+    try {
+      // Try MetaMask first if available
+      if (hasWeb3Provider() && window.ethereum?.isMetaMask) {
+        return await connectToWallet('metamask')
+      }
+    } catch (mmErr) {
+      console.debug('MetaMask connection failed:', mmErr.message)
     }
 
-    const result = {
-      address: accounts[0],
-      provider: provider,
-      connected: true,
-      providerType: 'evm',
-      providerName: provider.isMetaMask ? 'metamask' : 'evm'
+    // Fall back to any available EVM wallet
+    if (hasWeb3Provider()) {
+      const provider = window.ethereum
+      const accounts = await provider.request({
+        method: 'eth_requestAccounts'
+      })
+
+      if (!accounts || accounts.length === 0) {
+        throw new Error('No accounts returned from wallet')
+      }
+
+      const result = {
+        address: accounts[0],
+        provider: provider,
+        connected: true,
+        providerType: 'evm',
+        providerName: provider.isMetaMask ? 'metamask' : 'evm',
+        chainId: 1,
+        chainName: 'Ethereum',
+        chainSymbol: 'ETH'
+      }
+
+      persistWalletCache(result)
+      return result
     }
 
-    persistWalletCache(result)
-    return result
+    throw new Error('No Web3 wallet provider found')
   } catch (error) {
     console.error('Wallet connection error:', error)
     const errorMsg = error.message || ''
