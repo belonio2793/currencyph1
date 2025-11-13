@@ -688,7 +688,7 @@ export default function MyBusiness({ userId }) {
                     className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed"
                   />
                   <p className="text-xs text-blue-700 mt-2">
-                    ✓ Your unique Currency Registration Number. This cannot be changed and will be displayed on your currency.ph profile.
+                    Your unique Currency Registration Number. This cannot be changed and will be displayed on your currency.ph profile.
                   </p>
                 </div>
 
