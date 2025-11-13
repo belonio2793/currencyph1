@@ -67,9 +67,16 @@ export const walletconnectConnection = {
       throw new Error('WalletConnect is not configured. Missing project ID.')
     }
 
+    // Check if running in iframe (Builder.io preview)
+    const isInIframe = typeof window !== 'undefined' && window.self !== window.top
+
+    if (isInIframe) {
+      throw new Error('WalletConnect requires opening the app in a new tab/window. Click "Open Preview" to test wallet connections.')
+    }
+
     try {
       const { EthereumProvider } = await import('@walletconnect/ethereum-provider')
-      
+
       const wcProvider = await EthereumProvider.init({
         projectId,
         chains: [1, 137, 8453, 42161, 10, 43114],
@@ -85,8 +92,8 @@ export const walletconnectConnection = {
         }
       })
 
-      const accounts = await wcProvider.request({ 
-        method: 'eth_requestAccounts' 
+      const accounts = await wcProvider.request({
+        method: 'eth_requestAccounts'
       })
 
       if (!accounts || accounts.length === 0) {
@@ -109,8 +116,9 @@ export const walletconnectConnection = {
         connected: true
       }
     } catch (error) {
-      if (error.message?.includes('frames-disallowed')) {
-        throw new Error('WalletConnect cannot be used in an iframe. Try opening this page in a new tab.')
+      const errorMsg = error.message || ''
+      if (errorMsg.includes('frames-disallowed') || errorMsg.includes('iframe')) {
+        throw new Error('Wallet connection blocked: This app is running in an iframe. Click "Open Preview" to test wallet connections in a full browser window.')
       }
       throw new Error(`WalletConnect connection failed: ${error.message}`)
     }
