@@ -247,12 +247,19 @@ export const receiptService = {
       if (!receiptId) throw new Error('Receipt ID is required')
       if (!userEmail) throw new Error('User email is required')
 
+      // Get current user from session
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError || !user?.id) {
+        throw new Error('You must be logged in to share receipts')
+      }
+
       const { data, error } = await supabase
         .from('receipt_shares')
         .insert([
           {
             receipt_id: receiptId,
             shared_with_email: userEmail,
+            shared_by_user_id: user.id,
             shared_at: new Date().toISOString()
           }
         ])
