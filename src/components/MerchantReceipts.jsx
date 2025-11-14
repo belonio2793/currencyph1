@@ -274,6 +274,15 @@ export default function MerchantReceipts({ business, userId }) {
     setCreatedReceiptId(null)
   }
 
+  const loadSharedUsers = async (receiptId) => {
+    try {
+      const shares = await receiptService.getReceiptShares(receiptId)
+      setSharedUsers(shares)
+    } catch (err) {
+      console.error('Error loading shared users:', err)
+    }
+  }
+
   const handleShareReceipt = async () => {
     if (!selectedReceipt?.id) {
       setError('Receipt ID is missing')
@@ -291,10 +300,96 @@ export default function MerchantReceipts({ business, userId }) {
       setSuccess(`Receipt shared with ${shareEmail}!`)
       setTimeout(() => setSuccess(''), 3000)
       setShareEmail('')
+      await loadSharedUsers(selectedReceipt.id)
       setShowShareModal(false)
     } catch (err) {
       console.error('Error sharing receipt:', err)
       setError(err.message || 'Failed to share receipt')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleAddShareEmail = () => {
+    if (!shareEmail.trim()) {
+      setError('Please enter an email address')
+      return
+    }
+    if (shareEmails.includes(shareEmail.trim())) {
+      setError('This email is already added')
+      return
+    }
+    setShareEmails([...shareEmails, shareEmail.trim()])
+    setShareEmail('')
+  }
+
+  const handleRemoveShareEmail = (email) => {
+    setShareEmails(shareEmails.filter(e => e !== email))
+  }
+
+  const handleShareMultiple = async () => {
+    if (shareEmails.length === 0) {
+      setError('Please add at least one email address')
+      return
+    }
+
+    setLoading(true)
+    try {
+      for (const email of shareEmails) {
+        await receiptService.shareReceiptWithUser(selectedReceipt.id, email)
+      }
+      setSuccess(`Receipt shared with ${shareEmails.length} user(s)!`)
+      setTimeout(() => setSuccess(''), 3000)
+      setShareEmails([])
+      setShowShareModal(false)
+      await loadSharedUsers(selectedReceipt.id)
+    } catch (err) {
+      console.error('Error sharing receipt:', err)
+      setError(err.message || 'Failed to share receipt')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRemoveShare = async (shareId) => {
+    if (!confirm('Are you sure you want to remove this share?')) return
+
+    setLoading(true)
+    try {
+      await receiptService.removeReceiptShare(shareId)
+      setSuccess('Share removed successfully!')
+      setTimeout(() => setSuccess(''), 3000)
+      await loadSharedUsers(selectedReceipt.id)
+    } catch (err) {
+      console.error('Error removing share:', err)
+      setError(err.message || 'Failed to remove share')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSaveReceiptEdit = async () => {
+    if (!editedReceipt?.id) return
+
+    setLoading(true)
+    try {
+      const updates = {
+        customer_name: editedReceipt.customer_name,
+        customer_email: editedReceipt.customer_email,
+        customer_phone: editedReceipt.customer_phone,
+        items: editedReceipt.items,
+        notes: editedReceipt.notes,
+        payment_method: editedReceipt.payment_method
+      }
+      await receiptService.updateReceipt(editedReceipt.id, updates)
+      setSelectedReceipt(editedReceipt)
+      setIsEditMode(false)
+      setSuccess('Receipt updated successfully!')
+      setTimeout(() => setSuccess(''), 3000)
+      await loadReceipts()
+    } catch (err) {
+      console.error('Error updating receipt:', err)
+      setError(err.message || 'Failed to update receipt')
     } finally {
       setLoading(false)
     }
