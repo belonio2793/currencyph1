@@ -1070,20 +1070,6 @@ export default function MyBusiness({ userId }) {
                 <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">Access feature →</div>
               </button>
 
-              {/* Employee Management */}
-              <button onClick={() => setSelectedFeatureModal('employees')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
-                <div className="flex justify-center mb-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Employees & Payroll</h3>
-                <p className="text-sm text-slate-600 mb-4">Manage employees, payroll, and compensation</p>
-                <div className="text-sm font-medium text-green-600 group-hover:text-green-700">Access feature →</div>
-              </button>
-
               {/* Merchant Tools */}
               <button onClick={() => setSelectedFeatureModal('merchant')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -1688,54 +1674,6 @@ export default function MyBusiness({ userId }) {
               )}
 
               {/* Employees & Payroll Modal */}
-              {selectedFeatureModal === 'employees' && (
-                <div>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-green-100">
-                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-slate-900">Employees & Payroll</h2>
-                      <p className="text-slate-600">Manage your workforce and compensation</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-6">
-                    <p className="text-slate-700">Handle all aspects of employee management, payroll processing, and compensation planning.</p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Employee Directory</h3>
-                        <p className="text-sm text-slate-600">Add, manage, and organize all employee information and records.</p>
-                      </div>
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Payroll Processing</h3>
-                        <p className="text-sm text-slate-600">Process salaries, deductions, and benefits with automated calculations.</p>
-                      </div>
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Attendance Tracking</h3>
-                        <p className="text-sm text-slate-600">Monitor employee attendance and time-off requests.</p>
-                      </div>
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Payslips & Reports</h3>
-                        <p className="text-sm text-slate-600">Generate payslips, tax documents, and compliance reports.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-slate-200">
-                    <button className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition-colors">
-                      View Employees
-                    </button>
-                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
-                      Process Payroll
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* Merchant Tools Modal */}
               {selectedFeatureModal === 'merchant' && (
                 <div>
