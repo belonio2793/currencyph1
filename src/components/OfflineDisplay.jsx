@@ -7,19 +7,19 @@ const FEATURE_ROWS = [
       {
         title: 'Digital Wallet',
         description: 'Send and receive money securely with crypto and fiat',
-        icon: '💳',
+        icon: 'W',
         color: 'bg-blue-50 border-blue-200'
       },
       {
         title: 'Payments',
         description: 'Connect GCash, PayMaya, and other payment methods',
-        icon: '💰',
+        icon: 'P',
         color: 'bg-pink-50 border-pink-200'
       },
       {
         title: 'Network Balances',
         description: 'Track your balances across multiple networks',
-        icon: '🌐',
+        icon: 'N',
         color: 'bg-teal-50 border-teal-200'
       }
     ]
@@ -30,19 +30,19 @@ const FEATURE_ROWS = [
       {
         title: 'Find Nearby',
         description: 'Discover local businesses and services near you',
-        icon: '📍',
+        icon: 'F',
         color: 'bg-green-50 border-green-200'
       },
       {
         title: 'Messages',
         description: 'Stay connected with direct messaging',
-        icon: '💬',
+        icon: 'M',
         color: 'bg-purple-50 border-purple-200'
       },
       {
         title: 'P2P Loans',
         description: 'Browse loans and submit lending offers',
-        icon: '🤝',
+        icon: 'L',
         color: 'bg-indigo-50 border-indigo-200'
       }
     ]
@@ -53,19 +53,24 @@ const FEATURE_ROWS = [
       {
         title: 'Digital Receipts',
         description: 'Create and manage digital receipts for transactions',
-        icon: '📄',
+        icon: 'R',
         color: 'bg-amber-50 border-amber-200'
       },
       {
         title: 'My Business',
         description: 'Manage your businesses and employee information',
-        icon: '🏢',
+        icon: 'B',
         color: 'bg-indigo-50 border-indigo-200'
-      },
+      }
+    ]
+  },
+  {
+    category: 'Games',
+    features: [
       {
-        title: 'Poker Games',
+        title: 'Poker',
         description: 'Play poker and earn rewards',
-        icon: '🃏',
+        icon: 'PK',
         color: 'bg-rose-50 border-rose-200'
       }
     ]
