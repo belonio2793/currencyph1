@@ -524,40 +524,50 @@ export default function App() {
 
       {/* Main Content */}
       <main>
-        {(activeTab === 'home' || showAuth) && (
+        {!userId ? (
           <>
-            {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+            {offlineTab === 'home' && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setOfflineTab} onShowAuth={(tab) => { setOfflineTab(tab || 'login') }} />}
+            {offlineTab === 'login' && <Auth initialTab="login" onAuthSuccess={handleAuthSuccess} />}
+            {offlineTab === 'register' && <Auth initialTab="register" onAuthSuccess={handleAuthSuccess} />}
           </>
-        )}
-        {showAuth ? (
-          <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
         ) : (
           <>
-            {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
-            {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
-            {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
-            {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
-            {activeTab === 'send' && <SendMoney userId={userId} />}
-            {activeTab === 'investments' && <Investments userId={userId} />}
-            {activeTab === 'bills' && <BillPayments userId={userId} />}
-            {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
-            {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
-            {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
-            {activeTab === 'my-business' && <MyBusiness userId={userId} />}
-            {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-            {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-            {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
-            {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
-              setActiveTab('nearby')
-              setCurrentListingSlug(null)
-              window.history.pushState(null, '', '/nearby')
-            }} /> }
-            {activeTab === 'network' && <Network userId={userId} />}
-            {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
-            {activeTab === 'p2p-loans' && <P2PLoanMarketplace userId={userId} userEmail={userEmail} onTabChange={setActiveTab} />}
-            {activeTab === 'about' && <About />}
-            {activeTab === 'inbox' && <Inbox userId={userId} />}
-            {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
+            {(activeTab === 'home' || showAuth) && (
+              <>
+                {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+              </>
+            )}
+            {showAuth ? (
+              <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
+            ) : (
+              <>
+                {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
+                {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
+                {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
+                {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
+                {activeTab === 'send' && <SendMoney userId={userId} />}
+                {activeTab === 'investments' && <Investments userId={userId} />}
+                {activeTab === 'bills' && <BillPayments userId={userId} />}
+                {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
+                {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
+                {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
+                {activeTab === 'my-business' && <MyBusiness userId={userId} />}
+                {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
+                {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
+                  setActiveTab('nearby')
+                  setCurrentListingSlug(null)
+                  window.history.pushState(null, '', '/nearby')
+                }} /> }
+                {activeTab === 'network' && <Network userId={userId} />}
+                {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
+                {activeTab === 'p2p-loans' && <P2PLoanMarketplace userId={userId} userEmail={userEmail} onTabChange={setActiveTab} />}
+                {activeTab === 'about' && <About />}
+                {activeTab === 'inbox' && <Inbox userId={userId} />}
+                {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
+              </>
+            )}
           </>
         )}
       </main>
