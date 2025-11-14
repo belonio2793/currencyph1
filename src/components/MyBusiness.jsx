@@ -1623,6 +1623,318 @@ export default function MyBusiness({ userId }) {
           </div>
         )}
 
+        {/* Feature Modal */}
+        {selectedFeatureModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedFeatureModal(null)}
+                className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                aria-label="Close modal"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* BIR Integration Modal */}
+              {selectedFeatureModal === 'bir' && (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-blue-100">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7 12a5 5 0 1110 0A5 5 0 017 12z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900">BIR Integration</h2>
+                      <p className="text-slate-600">File taxes and access tax documents</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <p className="text-slate-700">Manage your business tax filings and compliance with the Bureau of Internal Revenue (BIR).</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Tax Filing</h3>
+                        <p className="text-sm text-slate-600">File your annual income tax returns and quarterly tax payments with BIR compliance.</p>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Tax Documents</h3>
+                        <p className="text-sm text-slate-600">Access and download your tax documents, certificates, and compliance records.</p>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Tax Status</h3>
+                        <p className="text-sm text-slate-600">Monitor your tax payment status and receive notifications for deadlines.</p>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Compliance</h3>
+                        <p className="text-sm text-slate-600">Ensure your business remains compliant with all BIR requirements.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
+                      View Tax Status
+                    </button>
+                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
+                      File Return
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Employees & Payroll Modal */}
+              {selectedFeatureModal === 'employees' && (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-green-100">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900">Employees & Payroll</h2>
+                      <p className="text-slate-600">Manage your workforce and compensation</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <p className="text-slate-700">Handle all aspects of employee management, payroll processing, and compensation planning.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Employee Directory</h3>
+                        <p className="text-sm text-slate-600">Add, manage, and organize all employee information and records.</p>
+                      </div>
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Payroll Processing</h3>
+                        <p className="text-sm text-slate-600">Process salaries, deductions, and benefits with automated calculations.</p>
+                      </div>
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Attendance Tracking</h3>
+                        <p className="text-sm text-slate-600">Monitor employee attendance and time-off requests.</p>
+                      </div>
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Payslips & Reports</h3>
+                        <p className="text-sm text-slate-600">Generate payslips, tax documents, and compliance reports.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-semibold transition-colors">
+                      View Employees
+                    </button>
+                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
+                      Process Payroll
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Merchant Tools Modal */}
+              {selectedFeatureModal === 'merchant' && (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-orange-100">
+                      <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900">Merchant Tools</h2>
+                      <p className="text-slate-600">Manage sales, inventory, and transactions</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <p className="text-slate-700">Complete merchant solutions for managing your sales operations and inventory.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Point of Sale</h3>
+                        <p className="text-sm text-slate-600">Manage transactions and sales at your retail or service point.</p>
+                      </div>
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Inventory Management</h3>
+                        <p className="text-sm text-slate-600">Track stock levels, orders, and product movements.</p>
+                      </div>
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Sales Analytics</h3>
+                        <p className="text-sm text-slate-600">View detailed reports on sales performance and trends.</p>
+                      </div>
+                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Customer Management</h3>
+                        <p className="text-sm text-slate-600">Build and manage your customer database and loyalty programs.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold transition-colors">
+                      Open Merchant Dashboard
+                    </button>
+                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
+                      View Analytics
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Digital Receipts Modal */}
+              {selectedFeatureModal === 'receipts' && (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-purple-100">
+                      <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900">Digital Receipts</h2>
+                      <p className="text-slate-600">Track and manage all digital receipts</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <p className="text-slate-700">Digitally capture, organize, and manage all your business receipts and documentation.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Upload Receipts</h3>
+                        <p className="text-sm text-slate-600">Scan or photograph and upload receipts for automated processing.</p>
+                      </div>
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">OCR Processing</h3>
+                        <p className="text-sm text-slate-600">Automatically extract data from receipts using advanced OCR technology.</p>
+                      </div>
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Receipt Organization</h3>
+                        <p className="text-sm text-slate-600">Categorize and tag receipts for easy searching and retrieval.</p>
+                      </div>
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Tax Integration</h3>
+                        <p className="text-sm text-slate-600">Link receipts to expenses for accurate tax filing and compliance.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold transition-colors">
+                      View Receipts
+                    </button>
+                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
+                      Upload New
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Payments Modal */}
+              {selectedFeatureModal === 'payments' && (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-pink-100">
+                      <svg className="w-8 h-8 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h10M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900">Payments</h2>
+                      <p className="text-slate-600">Connect and manage payment methods</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <p className="text-slate-700">Integrate multiple payment gateways to streamline transactions and improve customer convenience.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">GCash Integration</h3>
+                        <p className="text-sm text-slate-600">Connect your GCash account for seamless mobile payments.</p>
+                      </div>
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">PayMaya Integration</h3>
+                        <p className="text-sm text-slate-600">Accept payments through PayMaya's payment platform.</p>
+                      </div>
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Payment Tracking</h3>
+                        <p className="text-sm text-slate-600">Monitor all payment transactions and reconciliations.</p>
+                      </div>
+                      <div className="bg-pink-50 border border-pink-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Settlement Management</h3>
+                        <p className="text-sm text-slate-600">Manage payouts and settlement schedules from your integrations.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button className="flex-1 px-4 py-3 bg-pink-600 text-white rounded-lg hover:bg-pink-700 font-semibold transition-colors">
+                      Add Payment Method
+                    </button>
+                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
+                      View Transactions
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Shareholders Modal */}
+              {selectedFeatureModal === 'shareholders' && (
+                <div>
+                  <div className="flex items-center gap-4 mb-6">
+                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-yellow-100">
+                      <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold text-slate-900">Shareholders</h2>
+                      <p className="text-slate-600">Manage ownership and shareholders</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    <p className="text-slate-700">Track and manage shareholder information, ownership percentages, and corporate governance.</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Shareholder Registry</h3>
+                        <p className="text-sm text-slate-600">Maintain a complete list of shareholders and their holdings.</p>
+                      </div>
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Ownership Tracking</h3>
+                        <p className="text-sm text-slate-600">Monitor ownership percentages and voting rights.</p>
+                      </div>
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Dividend Management</h3>
+                        <p className="text-sm text-slate-600">Calculate and distribute dividends to shareholders.</p>
+                      </div>
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                        <h3 className="font-semibold text-slate-900 mb-2">Compliance Reports</h3>
+                        <p className="text-sm text-slate-600">Generate regulatory reports for shareholder meetings and filings.</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4 border-t border-slate-200">
+                    <button className="flex-1 px-4 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-semibold transition-colors">
+                      View Shareholders
+                    </button>
+                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
+                      Add Shareholder
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Select Business Modal */}
         {showBusinessSelectionModal && (
           <SelectBusinessModal
