@@ -1232,6 +1232,9 @@ export default function MyBusiness({ userId }) {
               setShowBusinessSelectionModal(false)
               initializeForm('existing')
             }}
+            onClose={() => {
+              setShowBusinessSelectionModal(false)
+            }}
           />
         )}
       </div>
