@@ -1147,7 +1147,15 @@ export default function MyBusiness({ userId }) {
         <div ref={tabContentRef} className="bg-white rounded-b-lg border border-t-0 border-slate-200 p-8">
           {activeTab === 'overview' && (
             <div>
-              <h2 className="text-2xl font-light text-slate-900 mb-6">Business Overview</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-light text-slate-900">Business Overview</h2>
+                <button
+                  onClick={openEditTaxInfo}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm"
+                >
+                  Edit Tax Information
+                </button>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">Business Name</p>
@@ -1162,8 +1170,12 @@ export default function MyBusiness({ userId }) {
                   <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.tin}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-500 mb-2">Certificate Number</p>
+                  <p className="text-sm text-slate-500 mb-2">BIR Certification Number</p>
                   <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.certificate_of_incorporation}</p>
+                </div>
+                <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                  <p className="text-sm text-slate-500 mb-2">Currency Registration Number</p>
+                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.currency_registration_number || 'Not assigned'}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">City of Registration</p>
