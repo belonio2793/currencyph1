@@ -850,7 +850,13 @@ export default function MyBusiness({ userId }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
               {/* BIR Integration */}
-              <button onClick={() => setActiveTab('bir')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
+              <button onClick={() => {
+                if (!selectedBusiness) {
+                  setShowBusinessSelectionModal(true)
+                } else {
+                  setActiveTab('bir')
+                }
+              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -864,7 +870,13 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Employee Management */}
-              <button onClick={() => setActiveTab('employees')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
+              <button onClick={() => {
+                if (!selectedBusiness) {
+                  setShowBusinessSelectionModal(true)
+                } else {
+                  setActiveTab('employees')
+                }
+              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -878,7 +890,13 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Merchant Tools */}
-              <button onClick={() => setActiveTab('merchant')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
+              <button onClick={() => {
+                if (!selectedBusiness) {
+                  setShowBusinessSelectionModal(true)
+                } else {
+                  setActiveTab('merchant')
+                }
+              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
                     <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -892,7 +910,13 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Digital Receipts */}
-              <button onClick={() => setActiveTab('receipts')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
+              <button onClick={() => {
+                if (!selectedBusiness) {
+                  setShowBusinessSelectionModal(true)
+                } else {
+                  setActiveTab('receipts')
+                }
+              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
                     <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -906,7 +930,13 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Payment Integrations */}
-              <button onClick={() => setActiveTab('payments')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
+              <button onClick={() => {
+                if (!selectedBusiness) {
+                  setShowBusinessSelectionModal(true)
+                } else {
+                  setActiveTab('payments')
+                }
+              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-pink-100 group-hover:bg-pink-200 transition-colors">
                     <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -920,7 +950,13 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Shareholders */}
-              <button onClick={() => setActiveTab('shareholders')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
+              <button onClick={() => {
+                if (!selectedBusiness) {
+                  setShowBusinessSelectionModal(true)
+                } else {
+                  setActiveTab('shareholders')
+                }
+              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-yellow-100 group-hover:bg-yellow-200 transition-colors">
                     <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
