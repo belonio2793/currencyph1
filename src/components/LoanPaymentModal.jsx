@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 
 export default function LoanPaymentModal({ loan, userId, onClose, onSuccess, wallets }) {
   const [paymentAmount, setPaymentAmount] = useState('')
