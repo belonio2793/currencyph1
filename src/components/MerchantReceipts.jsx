@@ -10,6 +10,18 @@ export default function MerchantReceipts({ business, userId }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [savedItems, setSavedItems] = useState(() => {
+    const saved = localStorage.getItem(`saved-items-${business?.id}`)
+    return saved ? JSON.parse(saved) : []
+  })
+  const [showSavedItems, setShowSavedItems] = useState(false)
+  const [saveItemName, setSaveItemName] = useState('')
+  const [showSaveItemModal, setShowSaveItemModal] = useState(false)
+  const [sendToEmail, setSendToEmail] = useState('')
+  const [sendToPhone, setSendToPhone] = useState('')
+  const [showSendToModal, setShowSendToModal] = useState(false)
+  const [createdReceiptId, setCreatedReceiptId] = useState(null)
+  const [editingItemIndex, setEditingItemIndex] = useState(null)
 
   const [formData, setFormData] = useState({
     receipt_number: '',
