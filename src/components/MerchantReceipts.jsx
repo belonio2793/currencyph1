@@ -38,6 +38,8 @@ export default function MerchantReceipts({ business, userId }) {
   const [showSendToModal, setShowSendToModal] = useState(false)
   const [createdReceiptId, setCreatedReceiptId] = useState(null)
   const [editingItemIndex, setEditingItemIndex] = useState(null)
+  const [shareEmail, setShareEmail] = useState('')
+  const [showShareModal, setShowShareModal] = useState(false)
 
   const [formData, setFormData] = useState({
     receipt_number: '',
