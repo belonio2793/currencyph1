@@ -1047,7 +1047,7 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setActiveTab('receipts')
+                  setActiveTab('merchant')
                   setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
@@ -1298,7 +1298,7 @@ export default function MyBusiness({ userId }) {
                         onClick={() => setMerchantTab('receipts')}
                         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                       >
-                        View Receipts →
+                        View Receipts ���
                       </button>
                     </div>
 
