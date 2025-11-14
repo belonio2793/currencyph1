@@ -190,7 +190,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                       key={btn.id}
                       onClick={() => onTabChange(btn.id)}
                       className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                        activeTab === btn.id ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'
+                        activeTab === btn.id ? 'text-slate-900 bg-slate-100' : 'text-slate-700 hover:bg-slate-100'
                       }`}
                     >
                       {btn.label}
@@ -200,7 +200,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                   {/* Buttons moved into the Community Projects row */}
                   <div className="ml-2 flex items-center gap-2">
                     {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
-                      <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${activeTab === btn.id ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-blue-50'}`}>
+                      <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${activeTab === btn.id ? 'text-slate-900 bg-slate-100' : 'text-slate-700 hover:bg-slate-100'}`}>
                         {btn.label}
                       </button>
                     ))}
