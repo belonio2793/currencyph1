@@ -40,6 +40,10 @@ export default function MerchantReceipts({ business, userId }) {
   const [editingItemIndex, setEditingItemIndex] = useState(null)
   const [shareEmail, setShareEmail] = useState('')
   const [showShareModal, setShowShareModal] = useState(false)
+  const [sharedUsers, setSharedUsers] = useState([])
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editedReceipt, setEditedReceipt] = useState(null)
+  const [shareEmails, setShareEmails] = useState([])
 
   const [formData, setFormData] = useState({
     receipt_number: '',
