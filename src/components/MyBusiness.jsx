@@ -1114,10 +1114,6 @@ export default function MyBusiness({ userId }) {
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
               { id: 'overview', label: 'Overview' },
-              { id: 'documents', label: 'Documents' },
-              { id: 'bir', label: 'BIR Integration' },
-              { id: 'registration', label: 'Business Registration' },
-              { id: 'shareholders', label: 'Shareholders' },
               { id: 'employees', label: 'Employees & Payroll' },
               { id: 'merchant', label: 'Merchant Tools' }
             ].map(tab => (
@@ -1298,7 +1294,7 @@ export default function MyBusiness({ userId }) {
                         onClick={() => setMerchantTab('receipts')}
                         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                       >
-                        View Receipts ���
+                        View Receipts →
                       </button>
                     </div>
 
