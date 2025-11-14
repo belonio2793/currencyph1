@@ -1052,7 +1052,7 @@ export default function MyBusiness({ userId }) {
           {activeTab === 'overview' && (
             <div>
               <h2 className="text-2xl font-light text-slate-900 mb-6">Business Overview</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">Business Name</p>
                   <p className="text-xl font-semibold text-slate-900">{selectedBusiness.business_name}</p>
