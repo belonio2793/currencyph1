@@ -287,6 +287,46 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
           <p className="text-slate-600 text-sm">Current exchange rates and currency conversion tools available on the Rates page</p>
         </div>
       </div>
+
+      {/* Receipts Modal */}
+      {showReceiptsModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Receipt History</h2>
+              <button
+                onClick={() => setShowReceiptsModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <ReceiptHistory userId={userId} userEmail={userEmail} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* My Business Modal */}
+      {showMyBusinessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">My Business</h2>
+              <button
+                onClick={() => setShowMyBusinessModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <MyBusiness userId={userId} />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
