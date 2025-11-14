@@ -236,7 +236,7 @@ export default function ReceiptTemplate({ receipt, business }) {
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-6 rounded-t-lg text-center mb-6 print:rounded-none print:mb-4">
           <h1 className="text-3xl font-bold mb-1 print:text-2xl">OFFICIAL RECEIPT</h1>
-          <p className="text-blue-100 print:text-gray-300">currency.ph</p>
+          <p className="text-blue-100 print:text-gray-300">{getBusinessInfo().name}</p>
         </div>
 
         {/* Business Information */}
