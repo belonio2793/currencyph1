@@ -453,77 +453,16 @@ export default function Profile({ userId, onSignOut }) {
             </div>
 
             {/* Enabled Cards List */}
-            <div className="space-y-2">
-              {Object.entries(quickAccessCards).filter(([_, enabled]) => enabled).length > 0 ? (
+            <div>
+              {enabledCards && enabledCards.length > 0 ? (
                 <>
-                  <p className="text-xs text-slate-500 font-medium mb-3">Enabled on Home Page:</p>
-                  <div className="space-y-2">
-                    {quickAccessCards.receipts && (
-                      <div className="flex items-center gap-2 p-2 bg-blue-50 rounded border border-blue-200">
-                        <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">Receipts</span>
-                      </div>
-                    )}
-                    {quickAccessCards.deposit && (
-                      <div className="flex items-center gap-2 p-2 bg-green-50 rounded border border-green-200">
-                        <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M5.5 13a3.5 3.5 0 01-.369-6.98 4 4 0 117.753-1.3A4.5 4.5 0 1113.5 13H11V9.413l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13H5.5z" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">Deposit</span>
-                      </div>
-                    )}
-                    {quickAccessCards.nearby && (
-                      <div className="flex items-center gap-2 p-2 bg-purple-50 rounded border border-purple-200">
-                        <svg className="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">Nearby</span>
-                      </div>
-                    )}
-                    {quickAccessCards.messages && (
-                      <div className="flex items-center gap-2 p-2 bg-pink-50 rounded border border-pink-200">
-                        <svg className="w-4 h-4 text-pink-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">Messages</span>
-                      </div>
-                    )}
-                    {quickAccessCards.p2p && (
-                      <div className="flex items-center gap-2 p-2 bg-indigo-50 rounded border border-indigo-200">
-                        <svg className="w-4 h-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">P2P Loans</span>
-                      </div>
-                    )}
-                    {quickAccessCards.poker && (
-                      <div className="flex items-center gap-2 p-2 bg-orange-50 rounded border border-orange-200">
-                        <svg className="w-4 h-4 text-orange-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">Poker</span>
-                      </div>
-                    )}
-                    {quickAccessCards.networkBalances && (
-                      <div className="flex items-center gap-2 p-2 bg-cyan-50 rounded border border-cyan-200">
-                        <svg className="w-4 h-4 text-cyan-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">Network Balances</span>
-                      </div>
-                    )}
-                    {quickAccessCards.myBusiness && (
-                      <div className="flex items-center gap-2 p-2 bg-emerald-50 rounded border border-emerald-200">
-                        <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
-                        </svg>
-                        <span className="text-xs font-medium text-slate-700">My Business</span>
-                      </div>
-                    )}
-                  </div>
+                  <p className="text-xs text-slate-500 font-medium mb-3">Enabled on Home Page (in order):</p>
+                  <DraggableQuickAccessCards
+                    userId={userId}
+                    cardKeys={enabledCards}
+                    isDragEnabled={false}
+                    isLargeMode={false}
+                  />
                 </>
               ) : (
                 <div className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded">
