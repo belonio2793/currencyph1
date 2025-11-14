@@ -518,7 +518,7 @@ export default function App() {
       <main>
         {(activeTab === 'home' || showAuth) && (
           <>
-            {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} />}
+            {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
           </>
         )}
         {showAuth ? (
