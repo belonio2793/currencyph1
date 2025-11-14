@@ -1,6 +1,9 @@
+import { supabase } from './supabaseClient'
+
 /**
  * Quick Access Card Manager
  * Handles the state and ordering of quick access cards with drag-and-drop support
+ * Now syncs with database for persistence across sessions and devices
  */
 
 const CARD_KEYS = [
@@ -38,6 +41,37 @@ const DEFAULT_VISIBILITY = {
 
 export const quickAccessManager = {
   /**
+   * Load card order from database, fallback to localStorage
+   */
+  async loadCardOrderFromDB(userId) {
+    if (!userId) return DEFAULT_ORDER
+
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('quick_access_card_order')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        console.warn('Failed to load card order from DB:', error)
+        return this.getCardOrder(userId)
+      }
+
+      if (data?.quick_access_card_order) {
+        const order = data.quick_access_card_order
+        if (this.isValidOrder(order)) {
+          return order
+        }
+      }
+    } catch (e) {
+      console.warn('Error loading card order from DB:', e)
+    }
+
+    return this.getCardOrder(userId)
+  },
+
+  /**
    * Get card order from localStorage
    */
   getCardOrder(userId) {
@@ -54,17 +88,61 @@ export const quickAccessManager = {
   },
 
   /**
-   * Save card order to localStorage
+   * Save card order to localStorage and sync to database
    */
-  setCardOrder(userId, order) {
+  async setCardOrder(userId, order) {
     try {
+      // Save to localStorage immediately
       localStorage.setItem(`quick-access-order-${userId}`, JSON.stringify(order))
+      
+      // Sync to database if user is logged in
+      if (userId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) {
+        await supabase
+          .from('user_preferences')
+          .update({
+            quick_access_card_order: order,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+      }
+      
       this.notifyUpdate(userId)
       return true
     } catch (e) {
       console.error('Failed to save card order:', e)
       return false
     }
+  },
+
+  /**
+   * Load card visibility from database, fallback to localStorage
+   */
+  async loadCardVisibilityFromDB(userId) {
+    if (!userId) return DEFAULT_VISIBILITY
+
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('quick_access_visibility')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') {
+        console.warn('Failed to load card visibility from DB:', error)
+        return this.getCardVisibility(userId)
+      }
+
+      if (data?.quick_access_visibility) {
+        const visibility = data.quick_access_visibility
+        if (visibility && typeof visibility === 'object') {
+          return { ...DEFAULT_VISIBILITY, ...visibility }
+        }
+      }
+    } catch (e) {
+      console.warn('Error loading card visibility from DB:', e)
+    }
+
+    return this.getCardVisibility(userId)
   },
 
   /**
@@ -83,11 +161,24 @@ export const quickAccessManager = {
   },
 
   /**
-   * Set card visibility
+   * Set card visibility in localStorage and sync to database
    */
-  setCardVisibility(userId, visibility) {
+  async setCardVisibility(userId, visibility) {
     try {
+      // Save to localStorage immediately
       localStorage.setItem(`quick-access-cards-${userId}`, JSON.stringify(visibility))
+      
+      // Sync to database if user is logged in
+      if (userId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) {
+        await supabase
+          .from('user_preferences')
+          .update({
+            quick_access_visibility: visibility,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+      }
+      
       this.notifyUpdate(userId)
       return true
     } catch (e) {
@@ -99,7 +190,17 @@ export const quickAccessManager = {
   /**
    * Get enabled cards in order
    */
-  getEnabledCardsInOrder(userId) {
+  async getEnabledCardsInOrder(userId) {
+    const visibility = await this.loadCardVisibilityFromDB(userId)
+    const order = await this.loadCardOrderFromDB(userId)
+    
+    return order.filter(cardKey => visibility[cardKey] === true)
+  },
+
+  /**
+   * Get enabled cards in order (synchronous version for initial load)
+   */
+  getEnabledCardsInOrderSync(userId) {
     const visibility = this.getCardVisibility(userId)
     const order = this.getCardOrder(userId)
     
@@ -109,8 +210,8 @@ export const quickAccessManager = {
   /**
    * Reorder cards
    */
-  reorderCards(userId, fromIndex, toIndex) {
-    const order = this.getCardOrder(userId)
+  async reorderCards(userId, fromIndex, toIndex) {
+    const order = await this.loadCardOrderFromDB(userId)
     const newOrder = [...order]
     
     // Remove from old position
@@ -118,32 +219,33 @@ export const quickAccessManager = {
     // Insert at new position
     newOrder.splice(toIndex, 0, movedCard)
     
+    await this.setCardOrder(userId, newOrder)
     return newOrder
   },
 
   /**
    * Get a card's current position
    */
-  getCardPosition(userId, cardKey) {
-    const order = this.getCardOrder(userId)
+  async getCardPosition(userId, cardKey) {
+    const order = await this.loadCardOrderFromDB(userId)
     return order.indexOf(cardKey)
   },
 
   /**
    * Toggle card visibility
    */
-  toggleCardVisibility(userId, cardKey) {
-    const visibility = this.getCardVisibility(userId)
+  async toggleCardVisibility(userId, cardKey) {
+    const visibility = await this.loadCardVisibilityFromDB(userId)
     visibility[cardKey] = !visibility[cardKey]
-    this.setCardVisibility(userId, visibility)
+    await this.setCardVisibility(userId, visibility)
     return visibility
   },
 
   /**
    * Reset to default order
    */
-  resetToDefaultOrder(userId) {
-    this.setCardOrder(userId, [...DEFAULT_ORDER])
+  async resetToDefaultOrder(userId) {
+    await this.setCardOrder(userId, [...DEFAULT_ORDER])
     return [...DEFAULT_ORDER]
   },
 
