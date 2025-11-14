@@ -23,9 +23,15 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'send', label: 'Send', auth: true },
     { id: 'bills', label: 'Bills', auth: true },
     { id: 'transactions', label: 'History', auth: true },
+    { id: 'payments', label: 'Payments', auth: true },
     { id: 'profile', label: 'Profile', auth: true },
     { id: 'inbox', label: 'Inbox', auth: true },
     { id: 'my-business', label: 'My Business', auth: true }
+  ]
+
+  // Sales and Tax Reporting can be accessed from My Business or as standalone
+  const businessMenuButtons = [
+    { id: 'sales-and-tax', label: 'Sales & Tax Reporting', auth: true }
   ]
 
   // Loans dropdown options
