@@ -1047,7 +1047,7 @@ export default function MyBusiness({ userId }) {
         )}
 
         {/* Tab Content */}
-        {selectedBusiness && (
+        {mainTab === 'businesses' && selectedBusiness && (
         <div ref={tabContentRef} className="bg-white rounded-b-lg border border-t-0 border-slate-200 p-8">
           {activeTab === 'overview' && (
             <div>
