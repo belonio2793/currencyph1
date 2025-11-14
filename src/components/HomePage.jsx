@@ -2,6 +2,12 @@ import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/payments'
 import ReceiptHistory from './ReceiptHistory'
 import MyBusiness from './MyBusiness'
+import Deposits from './Deposits'
+import Nearby from './Nearby'
+import Inbox from './Inbox'
+import PokerPage from './PokerPage'
+import NetworkBalances from './NetworkBalances'
+import P2PLoanMarketplace from './P2PLoanMarketplace'
 
 export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', onTabChange }) {
   const [wallets, setWallets] = useState([])
@@ -9,6 +15,12 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [loading, setLoading] = useState(true)
   const [totalBalanceConverted, setTotalBalanceConverted] = useState(null)
   const [totalDebtConverted, setTotalDebtConverted] = useState(null)
+  const [showDepositModal, setShowDepositModal] = useState(false)
+  const [showNearbyModal, setShowNearbyModal] = useState(false)
+  const [showInboxModal, setShowInboxModal] = useState(false)
+  const [showP2PModal, setShowP2PModal] = useState(false)
+  const [showPokerModal, setShowPokerModal] = useState(false)
+  const [showNetworkBalancesModal, setShowNetworkBalancesModal] = useState(false)
   const [showReceiptsModal, setShowReceiptsModal] = useState(false)
   const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
 
