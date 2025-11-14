@@ -185,6 +185,7 @@ export default function MyBusiness({ userId }) {
     notes: ''
   })
   const [savingCost, setSavingCost] = useState(false)
+  const [selectedFeatureModal, setSelectedFeatureModal] = useState(null)
 
   // Generate TIN (12-digit format like government)
   const loadSalesAndTaxData = async () => {
