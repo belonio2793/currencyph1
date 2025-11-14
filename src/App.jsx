@@ -395,6 +395,19 @@ export default function App() {
   const handleSignOut = () => {
     // Sign out handler - clears device fingerprint and resets state
     deviceFingerprint.clear()
+
+    // Clear cache but preserve user_preferences for UUID presets
+    const allKeys = Object.keys(localStorage)
+    allKeys.forEach(key => {
+      // Keep user_preferences and quick access settings
+      if (!key.includes('user_preferences') && !key.includes('quick-access')) {
+        localStorage.removeItem(key)
+      }
+    })
+
+    // Clear sessionStorage completely
+    sessionStorage.clear()
+
     setUserId(null)
     setUserEmail(null)
     setShowAuth(false)
