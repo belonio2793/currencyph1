@@ -213,6 +213,15 @@ export default function MyBusiness({ userId }) {
     }
   }, [mainTab, selectedBusiness])
 
+  // Scroll to tab content when activeTab changes
+  useEffect(() => {
+    if (tabContentRef.current && mainTab === 'businesses') {
+      setTimeout(() => {
+        tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 100)
+    }
+  }, [activeTab, mainTab])
+
   const loadBusinesses = async () => {
     try {
       setLoading(true)
