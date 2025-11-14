@@ -56,28 +56,41 @@ export default function ReceiptTemplate({ receipt, business }) {
     doc.text('currency.ph', pageWidth / 2, 20, { align: 'center' })
 
     // Business Info Section
+    const businessInfo = getBusinessInfo()
     doc.setTextColor(0, 0, 0)
     doc.setFont('Arial', 'bold')
     doc.setFontSize(12)
-    doc.text(business.business_name || 'Business Name', 20, yPos)
+    doc.text(businessInfo.name, 20, yPos)
     yPos += 8
 
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
-    if (business.tin) {
-      doc.text(`TIN: ${business.tin}`, 20, yPos)
+    if (businessInfo.tin) {
+      doc.text(`TIN: ${businessInfo.tin}`, 20, yPos)
       yPos += 5
     }
-    if (business.certificate_of_incorporation) {
-      doc.text(`BIR Certificate: ${business.certificate_of_incorporation}`, 20, yPos)
+    if (businessInfo.registration_type) {
+      doc.text(`Business Type: ${businessInfo.registration_type.charAt(0).toUpperCase() + businessInfo.registration_type.slice(1)}`, 20, yPos)
       yPos += 5
     }
-    if (business.city_of_registration) {
-      doc.text(`Location: ${business.city_of_registration}`, 20, yPos)
+    if (businessInfo.bir) {
+      doc.text(`BIR Certificate: ${businessInfo.bir}`, 20, yPos)
       yPos += 5
     }
-    if (business.metadata?.currency_registration_number) {
-      doc.text(`Currency Registration: ${business.metadata.currency_registration_number}`, 20, yPos)
+    if (businessInfo.location) {
+      doc.text(`Location: ${businessInfo.location}`, 20, yPos)
+      yPos += 5
+    }
+    if (businessInfo.address) {
+      doc.text(`Address: ${businessInfo.address}`, 20, yPos)
+      yPos += 5
+    }
+    if (businessInfo.phone) {
+      doc.text(`Phone: ${businessInfo.phone}`, 20, yPos)
+      yPos += 5
+    }
+    if (businessInfo.email) {
+      doc.text(`Email: ${businessInfo.email}`, 20, yPos)
       yPos += 5
     }
     yPos += 3
