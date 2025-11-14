@@ -893,8 +893,8 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setMainTab('businesses')
                   setActiveTab('bir')
+                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -914,8 +914,8 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setMainTab('businesses')
                   setActiveTab('employees')
+                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -935,8 +935,8 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setMainTab('businesses')
                   setActiveTab('merchant')
+                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -956,8 +956,8 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setMainTab('businesses')
                   setActiveTab('receipts')
+                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -977,8 +977,8 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setMainTab('businesses')
                   setActiveTab('payments')
+                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -998,8 +998,8 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setMainTab('businesses')
                   setActiveTab('shareholders')
+                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
                 <div className="flex justify-center mb-4">
