@@ -9,6 +9,13 @@ import { quickAccessManager } from '../lib/quickAccessManager'
 import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import DiditVerificationModal from './DiditVerificationModal'
 import ReceiptHistory from './ReceiptHistory'
+import Deposits from './Deposits'
+import Nearby from './Nearby'
+import Inbox from './Inbox'
+import P2PLoanMarketplace from './P2PLoanMarketplace'
+import PokerPage from './PokerPage'
+import NetworkBalances from './NetworkBalances'
+import MyBusiness from './MyBusiness'
 
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
