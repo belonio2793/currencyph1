@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/payments'
+import ReceiptHistory from './ReceiptHistory'
+import MyBusiness from './MyBusiness'
 
 export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', onTabChange }) {
   const [wallets, setWallets] = useState([])
@@ -7,6 +9,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [loading, setLoading] = useState(true)
   const [totalBalanceConverted, setTotalBalanceConverted] = useState(null)
   const [totalDebtConverted, setTotalDebtConverted] = useState(null)
+  const [showReceiptsModal, setShowReceiptsModal] = useState(false)
+  const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
 
   useEffect(() => {
     loadData()
