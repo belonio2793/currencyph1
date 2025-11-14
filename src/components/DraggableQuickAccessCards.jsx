@@ -161,16 +161,36 @@ export default function DraggableQuickAccessCards({
     const previousOrder = quickAccessManager.getCardOrder(userId)
 
     try {
-      // Perform the reorder
-      const newOrder = quickAccessManager.reorderCards(userId, draggedItem.index, toIndex)
+      // Get the full order and find indices of dragged/target cards
+      const fullOrder = [...previousOrder]
+      const draggedCardKey = cardKeys[draggedItem.index]
+      const targetCardKey = cardKeys[toIndex]
+
+      const draggedIndexInFullOrder = fullOrder.indexOf(draggedCardKey)
+      const targetIndexInFullOrder = fullOrder.indexOf(targetCardKey)
+
+      if (draggedIndexInFullOrder === -1 || targetIndexInFullOrder === -1) {
+        throw new Error('Could not find card in order list')
+      }
+
+      if (draggedIndexInFullOrder === targetIndexInFullOrder) {
+        setDraggedItem(null)
+        setDragOverItem(null)
+        dragCounter.current = 0
+        return
+      }
+
+      // Reorder in the full order array
+      const [movedCard] = fullOrder.splice(draggedIndexInFullOrder, 1)
+      fullOrder.splice(targetIndexInFullOrder, 0, movedCard)
 
       // Validate the new order
-      if (!quickAccessManager.isValidOrder(newOrder)) {
+      if (!quickAccessManager.isValidOrder(fullOrder)) {
         throw new Error('Invalid card order after reorder')
       }
 
       // Try to save the new order
-      const saved = quickAccessManager.setCardOrder(userId, newOrder)
+      const saved = quickAccessManager.setCardOrder(userId, fullOrder)
 
       if (!saved) {
         throw new Error('Failed to save card order')
@@ -182,7 +202,7 @@ export default function DraggableQuickAccessCards({
       dragCounter.current = 0
 
       // Force re-render by triggering the event again
-      window.dispatchEvent(new CustomEvent('quick-access-reordered', { detail: { userId, newOrder } }))
+      window.dispatchEvent(new CustomEvent('quick-access-reordered', { detail: { userId, newOrder: fullOrder } }))
     } catch (error) {
       console.error('Failed to reorder cards:', error)
 
