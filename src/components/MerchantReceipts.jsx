@@ -967,6 +967,56 @@ export default function MerchantReceipts({ business, userId }) {
               <p className="text-xs text-slate-500 mt-1">{formData.notes.length}/500</p>
             </div>
 
+            {/* Share Receipt During Creation */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h5 className="font-semibold text-slate-900 mb-3 text-sm">Share Receipt (Optional)</h5>
+              <div className="space-y-3">
+                <p className="text-sm text-slate-600">Share this receipt with other users by entering their email addresses. They will receive access to view and download the receipt.</p>
+
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={shareEmailInput}
+                    onChange={(e) => setShareEmailInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddShareEmail()}
+                    placeholder="user@example.com"
+                    className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddShareEmail}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm whitespace-nowrap"
+                  >
+                    Add Email
+                  </button>
+                </div>
+
+                {shareEmailsDuringCreation.length > 0 && (
+                  <div className="p-3 bg-white rounded-lg border border-green-200 space-y-2">
+                    <p className="text-sm font-medium text-slate-700">Will be shared with ({shareEmailsDuringCreation.length}):</p>
+                    {shareEmailsDuringCreation.map((email) => (
+                      <div key={email} className="flex items-center justify-between bg-green-50 p-2 rounded border border-green-200">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.5 3A1.5 1.5 0 001 4.5v.006c0 .823.5 1.5 1.5 1.5h15c1 0 1.5-.677 1.5-1.5v-.006C19 3.5 18.5 3 17.5 3h-15z" />
+                            <path fillRule="evenodd" d="M2 7a1 1 0 011-1h14a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V7z" clipRule="evenodd" />
+                          </svg>
+                          <span className="text-sm text-slate-700">{email}</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveShareEmailDuringCreation(email)}
+                          className="text-red-600 hover:text-red-700 text-sm font-medium"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Business Information - Read Only (Bottom Section) */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
               <h5 className="font-semibold text-slate-900 mb-4 text-sm">Business Information</h5>
