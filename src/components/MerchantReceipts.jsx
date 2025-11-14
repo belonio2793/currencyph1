@@ -89,6 +89,10 @@ export default function MerchantReceipts({ business, userId }) {
       setError('Please fill in all item details')
       return
     }
+    if (formData.payment_method === 'Other' && !formData.payment_method_custom.trim()) {
+      setError('Please specify the custom payment method')
+      return
+    }
 
     setLoading(true)
     try {
