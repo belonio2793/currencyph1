@@ -106,12 +106,10 @@ export default function ReceiptTemplate({ receipt, business }) {
     doc.setFont('Arial', 'bold')
     doc.setFontSize(10)
     doc.text(`Receipt #${receipt.receipt_number}`, 20, yPos)
-    yPos += 6
-
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
-    doc.text(`Date: ${formatDate(receipt.created_at)}`, 20, yPos)
-    yPos += 5
+    doc.text(`Date: ${formatDate(receipt.created_at)}`, pageWidth - 20, yPos, { align: 'right' })
+    yPos += 6
 
     // Customer Information
     yPos += 3
