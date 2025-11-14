@@ -149,7 +149,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Deposit Card */}
           <button
-            onClick={() => onTabChange('deposit')}
+            onClick={() => setShowDepositModal(true)}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group"
           >
             <div className="flex justify-center mb-4">
@@ -166,7 +166,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
 
           {/* Nearby Card */}
           <button
-            onClick={() => onTabChange('nearby')}
+            onClick={() => setShowNearbyModal(true)}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group"
           >
             <div className="flex justify-center mb-4">
@@ -184,7 +184,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
 
           {/* Messages Card */}
           <button
-            onClick={() => onTabChange('inbox')}
+            onClick={() => setShowInboxModal(true)}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group"
           >
             <div className="flex justify-center mb-4">
@@ -201,7 +201,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
 
           {/* P2P Loan Marketplace Card */}
           <button
-            onClick={() => onTabChange('p2p-loans')}
+            onClick={() => setShowP2PModal(true)}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group col-span-2"
           >
             <div className="flex justify-center mb-4">
@@ -218,7 +218,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
 
           {/* Poker Card */}
           <button
-            onClick={() => onTabChange('poker')}
+            onClick={() => setShowPokerModal(true)}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-rose-300 transition-all group"
           >
             <div className="flex justify-center mb-4">
@@ -235,7 +235,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
 
           {/* Network Balances Card */}
           <button
-            onClick={() => onTabChange('network-balances')}
+            onClick={() => setShowNetworkBalancesModal(true)}
             className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-teal-300 transition-all group"
           >
             <div className="flex justify-center mb-4">
