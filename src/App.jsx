@@ -41,6 +41,7 @@ export default function App() {
   const [userId, setUserId] = useState(null)
   const [userEmail, setUserEmail] = useState(null)
   const [activeTab, setActiveTab] = useState('home')
+  const [offlineTab, setOfflineTab] = useState('home')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [globalCurrency, setGlobalCurrency] = useState('PHP')
