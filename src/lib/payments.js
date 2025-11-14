@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { currencyAPI } from './currencyAPI'
+import { currencyAPI as currencyConverter } from './currencyAPI'
 
 // Helper: generate numeric account number of given length
 const generateAccountNumber = (length = 12) => {
@@ -466,7 +466,7 @@ export const currencyAPI = {
     }
 
     try {
-      const conv = await currencyAPI.convert(1, from, to)
+      const conv = await currencyConverter.convert(1, from, to)
       if (conv && conv.rate) return Number(conv.rate)
     } catch (e) {
       console.warn('Failed to compute exchange rate via currencyAPI', e)
@@ -488,7 +488,7 @@ export const currencyAPI = {
 
     // Fallback: build from currencyAPI global rates
     try {
-      const globalRates = await currencyAPI.getGlobalRates()
+      const globalRates = await currencyConverter.getGlobalRates()
       const arr = []
       const codes = Object.keys(globalRates || {})
       codes.forEach(from => {
