@@ -228,13 +228,43 @@ export default function ReceiptTemplate({ receipt, business }) {
 
         {/* Business Information */}
         <div className="mb-6 print:mb-4">
-          <h2 className="text-xl font-bold mb-2 print:text-lg">{business.business_name || 'Business Name'}</h2>
-          <div className="text-sm space-y-1 text-slate-700 print:text-black">
-            {business.tin && <p>TIN: <span className="font-mono">{business.tin}</span></p>}
-            {business.certificate_of_incorporation && <p>BIR Certificate: <span className="font-mono">{business.certificate_of_incorporation}</span></p>}
-            {business.city_of_registration && <p>Location: {business.city_of_registration}</p>}
-            {business.metadata?.currency_registration_number && <p>Currency Registration: <span className="font-mono">{business.metadata.currency_registration_number}</span></p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <h2 className="text-xl font-bold mb-4 print:text-lg text-slate-900">{getBusinessInfo().name}</h2>
+              <div className="space-y-2 text-slate-700 print:text-black">
+                {getBusinessInfo().tin && (
+                  <p><strong>TIN:</strong> <span className="font-mono">{getBusinessInfo().tin}</span></p>
+                )}
+                {getBusinessInfo().registration_type && (
+                  <p><strong>Business Type:</strong> {getBusinessInfo().registration_type.charAt(0).toUpperCase() + getBusinessInfo().registration_type.slice(1)}</p>
+                )}
+                {getBusinessInfo().bir && (
+                  <p><strong>BIR Certificate:</strong> <span className="font-mono text-xs">{getBusinessInfo().bir}</span></p>
+                )}
+                {getBusinessInfo().location && (
+                  <p><strong>Location:</strong> {getBusinessInfo().location}</p>
+                )}
+              </div>
+            </div>
+            <div className="space-y-2 text-slate-700 print:text-black text-sm">
+              {getBusinessInfo().address && (
+                <p><strong>Address:</strong> {getBusinessInfo().address}</p>
+              )}
+              {getBusinessInfo().phone && (
+                <p><strong>Phone:</strong> {getBusinessInfo().phone}</p>
+              )}
+              {getBusinessInfo().email && (
+                <p><strong>Email:</strong> {getBusinessInfo().email}</p>
+              )}
+              {getBusinessInfo().currency_reg && (
+                <p><strong>Currency Reg:</strong> <span className="font-mono text-xs">{getBusinessInfo().currency_reg}</span></p>
+              )}
+              {getBusinessInfo().registration_date && (
+                <p><strong>Est. Date:</strong> {new Date(getBusinessInfo().registration_date).toLocaleDateString('en-PH')}</p>
+              )}
+            </div>
           </div>
+          <div className="border-b-2 border-slate-300 my-4 print:border-gray-400"></div>
         </div>
 
         {/* Receipt Header */}
