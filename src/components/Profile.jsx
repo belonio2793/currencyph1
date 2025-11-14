@@ -72,7 +72,7 @@ export default function Profile({ userId, onSignOut }) {
   const [activeQuickAccessTab, setActiveQuickAccessTab] = useState('receipts')
   const [showCustomizeModal, setShowCustomizeModal] = useState(false)
   const [quickAccessCards, setQuickAccessCards] = useState(() => quickAccessManager.getCardVisibility(userId))
-  const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrder(userId))
+  const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrderSync(userId))
   const [customizeReorderKey, setCustomizeReorderKey] = useState(0)
   const [showReceiptsModal, setShowReceiptsModal] = useState(false)
   const [showDepositModal, setShowDepositModal] = useState(false)
