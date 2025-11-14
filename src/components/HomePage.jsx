@@ -141,6 +141,24 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const isNegativeNet = net < 0
   const netDisplay = Number.isFinite(net) ? net.toFixed(2) : '0.00'
 
+  const handleCardClick = (cardKey) => {
+    const modalMap = {
+      deposit: () => setShowDepositModal(true),
+      nearby: () => setShowNearbyModal(true),
+      messages: () => setShowInboxModal(true),
+      p2p: () => setShowP2PModal(true),
+      poker: () => setShowPokerModal(true),
+      networkBalances: () => setShowNetworkBalancesModal(true),
+      receipts: () => setShowReceiptsModal(true),
+      myBusiness: () => setShowMyBusinessModal(true)
+    }
+
+    const handler = modalMap[cardKey]
+    if (handler) {
+      handler()
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
