@@ -218,7 +218,7 @@ export default function ReceiptTemplate({ receipt, business }) {
             {business.tin && <p>TIN: <span className="font-mono">{business.tin}</span></p>}
             {business.certificate_of_incorporation && <p>BIR Certificate: <span className="font-mono">{business.certificate_of_incorporation}</span></p>}
             {business.city_of_registration && <p>Location: {business.city_of_registration}</p>}
-            <p>Currency Registration: <span className="font-mono">{receipt.currencies_registration_number || 'N/A'}</span></p>
+            {business.metadata?.currency_registration_number && <p>Currency Registration: <span className="font-mono">{business.metadata.currency_registration_number}</span></p>}
           </div>
         </div>
 
