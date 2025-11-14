@@ -185,6 +185,24 @@ export default function MerchantReceipts({ business, userId }) {
     }, 0)
   }
 
+  const handleAddShareEmail = () => {
+    if (!shareEmailInput.trim()) {
+      setError('Please enter an email address')
+      return
+    }
+    if (shareEmailsDuringCreation.includes(shareEmailInput.trim())) {
+      setError('This email is already added')
+      return
+    }
+    setShareEmailsDuringCreation([...shareEmailsDuringCreation, shareEmailInput.trim()])
+    setShareEmailInput('')
+    setError('')
+  }
+
+  const handleRemoveShareEmailDuringCreation = (email) => {
+    setShareEmailsDuringCreation(shareEmailsDuringCreation.filter(e => e !== email))
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -218,6 +236,18 @@ export default function MerchantReceipts({ business, userId }) {
       const newReceipt = await receiptService.createReceipt(business.id, userId, receiptData)
       setReceipts([newReceipt, ...receipts])
       setCreatedReceiptId(newReceipt.id)
+
+      // Share with the specified emails during creation
+      if (shareEmailsDuringCreation.length > 0) {
+        for (const email of shareEmailsDuringCreation) {
+          try {
+            await receiptService.shareReceiptWithUser(newReceipt.id, email)
+          } catch (shareErr) {
+            console.error(`Failed to share with ${email}:`, shareErr)
+          }
+        }
+      }
+
       setSendToEmail('')
       setSendToPhone('')
       setShowSendToModal(true)
@@ -231,6 +261,7 @@ export default function MerchantReceipts({ business, userId }) {
         items: [{ description: '', quantity: 1, price: 0 }],
         notes: ''
       })
+      setShareEmailsDuringCreation([])
       generateReceiptNumber()
     } catch (err) {
       console.error('Receipt creation error:', err)
