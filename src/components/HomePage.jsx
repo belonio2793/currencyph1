@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { wisegcashAPI } from '../lib/payments'
+import { quickAccessManager } from '../lib/quickAccessManager'
+import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import ReceiptHistory from './ReceiptHistory'
 import MyBusiness from './MyBusiness'
 import Deposits from './Deposits'
@@ -23,19 +25,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [showNetworkBalancesModal, setShowNetworkBalancesModal] = useState(false)
   const [showReceiptsModal, setShowReceiptsModal] = useState(false)
   const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
-  const [quickAccessCards, setQuickAccessCards] = useState(() => {
-    const saved = localStorage.getItem(`quick-access-cards-${userId}`)
-    return saved ? JSON.parse(saved) : {
-      receipts: true,
-      deposit: true,
-      nearby: true,
-      messages: false,
-      p2p: false,
-      poker: false,
-      networkBalances: false,
-      myBusiness: false
-    }
-  })
+  const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrder(userId))
+  const [reorderKey, setReorderKey] = useState(0)
 
   useEffect(() => {
     loadData()
@@ -44,23 +35,22 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   // Listen for localStorage changes (from profile settings)
   useEffect(() => {
     const handleStorageChange = () => {
-      const saved = localStorage.getItem(`quick-access-cards-${userId}`)
-      if (saved) {
-        try {
-          setQuickAccessCards(JSON.parse(saved))
-        } catch (e) {
-          console.error('Failed to parse quick access preferences:', e)
-        }
-      }
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
+    }
+
+    const handleReorder = () => {
+      setReorderKey(prev => prev + 1)
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
     }
 
     window.addEventListener('storage', handleStorageChange)
-    // Also listen for a custom event for same-window updates
     window.addEventListener('quick-access-updated', handleStorageChange)
+    window.addEventListener('quick-access-reordered', handleReorder)
 
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('quick-access-updated', handleStorageChange)
+      window.removeEventListener('quick-access-reordered', handleReorder)
     }
   }, [userId])
 
