@@ -60,6 +60,21 @@ export default function Profile({ userId, onSignOut }) {
   const [verificationStatus, setVerificationStatus] = useState(null)
   const [verifyingId, setVerifyingId] = useState(false)
   const [showDiditModal, setShowDiditModal] = useState(false)
+  const [activeQuickAccessTab, setActiveQuickAccessTab] = useState('receipts')
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false)
+  const [quickAccessCards, setQuickAccessCards] = useState(() => {
+    const saved = localStorage.getItem(`quick-access-cards-${userId}`)
+    return saved ? JSON.parse(saved) : {
+      receipts: true,
+      deposit: true,
+      nearby: true,
+      messages: false,
+      p2p: false,
+      poker: false,
+      networkBalances: false,
+      myBusiness: false
+    }
+  })
 
   const isValidUUID = (id) => {
     return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
