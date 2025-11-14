@@ -5,6 +5,8 @@ import { preferencesManager } from '../lib/preferencesManager'
 import { deviceFingerprint } from '../lib/deviceFingerprint'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import { diditDirectService } from '../lib/diditDirectService'
+import { quickAccessManager } from '../lib/quickAccessManager'
+import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import DiditVerificationModal from './DiditVerificationModal'
 import ReceiptHistory from './ReceiptHistory'
 
