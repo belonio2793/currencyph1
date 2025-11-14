@@ -426,6 +426,73 @@ export default function MyBusiness({ userId }) {
     setCitySearch('')
   }
 
+  const openEditTaxInfo = () => {
+    if (selectedBusiness) {
+      setEditFormData({
+        tin: selectedBusiness.tin || '',
+        certificateOfIncorporation: selectedBusiness.certificate_of_incorporation || '',
+        currencyRegistrationNumber: selectedBusiness.currency_registration_number || ''
+      })
+      setEditMode(true)
+    }
+  }
+
+  const handleUpdateTaxInfo = async () => {
+    if (!editFormData.tin || !editFormData.certificateOfIncorporation) {
+      alert('Please fill in all required fields (Tax ID and BIR Certification Number)')
+      return
+    }
+
+    try {
+      setSavingEdit(true)
+      const { error } = await supabase
+        .from('businesses')
+        .update({
+          tin: editFormData.tin,
+          certificate_of_incorporation: editFormData.certificateOfIncorporation,
+          currency_registration_number: editFormData.currencyRegistrationNumber || null
+        })
+        .eq('id', selectedBusiness.id)
+
+      if (error) throw error
+
+      setSelectedBusiness({
+        ...selectedBusiness,
+        tin: editFormData.tin,
+        certificate_of_incorporation: editFormData.certificateOfIncorporation,
+        currency_registration_number: editFormData.currencyRegistrationNumber
+      })
+
+      setBusinesses(
+        businesses.map(b =>
+          b.id === selectedBusiness.id
+            ? {
+                ...b,
+                tin: editFormData.tin,
+                certificate_of_incorporation: editFormData.certificateOfIncorporation,
+                currency_registration_number: editFormData.currencyRegistrationNumber
+              }
+            : b
+        )
+      )
+
+      setEditMode(false)
+      alert('Tax information updated successfully!')
+    } catch (err) {
+      console.error('Failed to update tax information:', err)
+      alert('Failed to update tax information. Please try again.')
+    } finally {
+      setSavingEdit(false)
+    }
+  }
+
+  const handleGenerateCurrencyRegistration = () => {
+    setEditFormData({
+      ...editFormData,
+      currencyRegistrationNumber: generateCurrencyRegistrationNumber()
+    })
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
