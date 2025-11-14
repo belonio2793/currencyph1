@@ -927,7 +927,8 @@ export default function MyBusiness({ userId }) {
           </div>
         )}
 
-        {/* Tab Navigation */}
+        {/* Tab Navigation - Only show when business is selected */}
+        {selectedBusiness && (
         <div className="bg-white border-b border-slate-200 rounded-t-lg mt-16">
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
@@ -953,6 +954,7 @@ export default function MyBusiness({ userId }) {
             ))}
           </div>
         </div>
+        )}
 
         {/* Tab Content */}
         {selectedBusiness && (
