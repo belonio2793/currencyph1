@@ -624,33 +624,67 @@ export default function MerchantReceipts({ business, userId }) {
 
         {showShareModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+            <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Share Receipt</h3>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
-                <input
-                  type="email"
-                  value={shareEmail}
-                  onChange={(e) => setShareEmail(e.target.value)}
-                  placeholder="user@example.com"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
-                />
+                <div className="flex gap-2">
+                  <input
+                    type="email"
+                    value={shareEmail}
+                    onChange={(e) => setShareEmail(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddShareEmail()}
+                    placeholder="user@example.com"
+                    className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent"
+                  />
+                  <button
+                    onClick={handleAddShareEmail}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                  >
+                    Add
+                  </button>
+                </div>
                 <p className="text-xs text-slate-500 mt-2">
-                  The receipt will be visible in the recipient's receipt history if they have an account.
+                  Add multiple email addresses to share the receipt with multiple users.
                 </p>
               </div>
+
+              {shareEmails.length > 0 && (
+                <div className="mb-4 p-3 bg-slate-50 rounded-lg space-y-2">
+                  <p className="text-sm font-medium text-slate-700">Emails to share with ({shareEmails.length}):</p>
+                  {shareEmails.map((email) => (
+                    <div key={email} className="flex items-center justify-between bg-white p-2 rounded border border-slate-200">
+                      <span className="text-sm text-slate-700">{email}</span>
+                      <button
+                        onClick={() => handleRemoveShareEmail(email)}
+                        className="text-red-600 hover:text-red-700 text-sm font-medium"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
               <div className="flex gap-3">
                 <button
-                  onClick={handleShareReceipt}
-                  disabled={loading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm disabled:opacity-50"
+                  onClick={() => {
+                    if (shareEmails.length > 0) {
+                      handleShareMultiple()
+                    } else if (shareEmail.trim()) {
+                      handleShareReceipt()
+                    }
+                  }}
+                  disabled={loading || (shareEmails.length === 0 && !shareEmail.trim())}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Sharing...' : 'Share'}
+                  {loading ? 'Sharing...' : shareEmails.length > 0 ? `Share (${shareEmails.length})` : 'Share'}
                 </button>
                 <button
                   onClick={() => {
                     setShowShareModal(false)
                     setShareEmail('')
+                    setShareEmails([])
                   }}
                   className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm"
                 >
