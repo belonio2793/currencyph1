@@ -104,6 +104,20 @@ export default function Profile({ userId, onSignOut }) {
     }
   }
 
+  const handleSaveQuickAccessPreferences = () => {
+    localStorage.setItem(`quick-access-cards-${userId}`, JSON.stringify(quickAccessCards))
+    setSuccess('Quick access preferences saved!')
+    setTimeout(() => setSuccess(''), 3000)
+    setShowCustomizeModal(false)
+  }
+
+  const toggleQuickAccessCard = (cardKey) => {
+    setQuickAccessCards(prev => ({
+      ...prev,
+      [cardKey]: !prev[cardKey]
+    }))
+  }
+
   const loadVerificationStatus = async () => {
     if (!userId || userId.includes('guest') || !isValidUUID(userId)) {
       setVerificationStatus(null)
@@ -625,7 +639,7 @@ export default function Profile({ userId, onSignOut }) {
                         <p className="text-xs text-slate-600">Verified on: {new Date(verificationStatus.didit_verified_at).toLocaleDateString()}</p>
                       )}
                       {verificationStatus.is_public && verificationStatus.status === 'approved' && (
-                        <p className="text-xs text-green-600 mt-2">🌐 Your verification is publicly visible</p>
+                        <p className="text-xs text-green-600 mt-2">���� Your verification is publicly visible</p>
                       )}
                       {!verificationStatus.is_public && verificationStatus.status === 'approved' && (
                         <p className="text-xs text-slate-600 mt-2">🔒 Your verification is private</p>
