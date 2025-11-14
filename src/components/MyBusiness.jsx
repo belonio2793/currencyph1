@@ -206,12 +206,14 @@ export default function MyBusiness({ userId }) {
     }
   }, [userId])
 
-  // Show modal when management tab is accessed without a business selected
+  // Show modal when user clicks a management feature without a business selected
+  // (Don't auto-show on page load - only when user tries to access a feature)
   useEffect(() => {
-    if (mainTab === 'management' && !selectedBusiness) {
-      setShowBusinessSelectionModal(true)
+    if (mainTab === 'management' && !selectedBusiness && showBusinessSelectionModal) {
+      // Keep modal open if already triggered
+      return
     }
-  }, [mainTab, selectedBusiness])
+  }, [mainTab, selectedBusiness, showBusinessSelectionModal])
 
   // Scroll to tab content when activeTab changes
   useEffect(() => {
@@ -232,7 +234,8 @@ export default function MyBusiness({ userId }) {
 
       if (error) throw error
       setBusinesses(data || [])
-      setSelectedBusiness(null)
+      // Only reset selected business if no business is currently selected
+      setSelectedBusiness(prev => prev || null)
       setShowRegistrationForm(false)
     } catch (err) {
       console.error('Failed to load businesses:', err)
@@ -547,7 +550,7 @@ export default function MyBusiness({ userId }) {
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Shareholders</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
-                    <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Register to access →</div>
+                    <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Register to access ���</div>
                   </button>
                 </div>
               </div>
