@@ -276,6 +276,18 @@ export default function HeaderMap({ userId: headerUserId }) {
               )}
             </div>
 
+            <div className="p-3 bg-amber-50 border-t border-amber-200">
+              <div className="flex items-start gap-2">
+                <svg className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0-10a9 9 0 110-18 9 9 0 010 18z" />
+                </svg>
+                <div className="text-xs text-amber-900">
+                  <p className="font-semibold mb-1">⚠️ Location Accuracy Notice</p>
+                  <p>Your location may not always be 100% accurate due to GPS limitations, network factors, or device settings. If your location appears incorrect, you can <span className="font-medium">drag the pin on the map</span> to your actual location before sending it.</p>
+                </div>
+              </div>
+            </div>
+
             <div className="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
