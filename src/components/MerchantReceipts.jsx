@@ -28,7 +28,7 @@ export default function MerchantReceipts({ business, userId }) {
     customer_name: '',
     customer_email: '',
     customer_phone: '',
-    payment_method: 'Cash',
+    payment_method: 'Balance',
     payment_method_custom: '',
     items: [{ description: '', quantity: 1, price: 0 }],
     notes: ''
@@ -155,14 +155,14 @@ export default function MerchantReceipts({ business, userId }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (!formData.customer_name && !formData.customer_email && !formData.customer_phone) {
-      setError('Please provide at least customer name, email, or phone number')
+    setError('')
+
+    const validItems = formData.items.filter(item => item.description && item.price > 0)
+    if (validItems.length === 0) {
+      setError('Please add at least one item with description and price')
       return
     }
-    if (formData.items.some(item => !item.description || !item.price)) {
-      setError('Please fill in all item details')
-      return
-    }
+
     if (formData.payment_method === 'Other' && !formData.payment_method_custom.trim()) {
       setError('Please specify the custom payment method')
       return
@@ -171,16 +171,16 @@ export default function MerchantReceipts({ business, userId }) {
     setLoading(true)
     try {
       const receiptData = {
-        receipt_number: formData.receipt_number,
-        customer_name: formData.customer_name,
-        customer_email: formData.customer_email,
+        receipt_number: formData.receipt_number || `RCP-${Date.now()}`,
+        customer_name: formData.customer_name || 'Walk-in Customer',
+        customer_email: formData.customer_email || null,
         customer_phone: formData.customer_phone || null,
         payment_method: formData.payment_method === 'Other'
           ? formData.payment_method_custom || 'Other'
           : formData.payment_method,
-        items: formData.items,
-        amount: calculateTotal(),
-        notes: formData.notes
+        items: validItems,
+        amount: validItems.reduce((sum, item) => sum + (item.quantity * item.price), 0),
+        notes: formData.notes || ''
       }
 
       const newReceipt = await receiptService.createReceipt(business.id, userId, receiptData)
@@ -194,15 +194,15 @@ export default function MerchantReceipts({ business, userId }) {
         customer_name: '',
         customer_email: '',
         customer_phone: '',
-        payment_method: 'Cash',
+        payment_method: 'Balance',
         payment_method_custom: '',
         items: [{ description: '', quantity: 1, price: 0 }],
         notes: ''
       })
       generateReceiptNumber()
     } catch (err) {
-      setError('Failed to create receipt')
-      console.error(err)
+      console.error('Receipt creation error:', err)
+      setError(err.message || 'Failed to create receipt. Please check your input and try again.')
     } finally {
       setLoading(false)
     }
@@ -579,7 +579,7 @@ export default function MerchantReceipts({ business, userId }) {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
               />
               <p className="text-xs text-slate-500 mt-2">
-                Item: {formData.items[editingItemIndex]?.description} - ₱{formData.items[editingItemIndex]?.price}
+                Item: {formData.items[editingItemIndex]?.description} - ���{formData.items[editingItemIndex]?.price}
               </p>
             </div>
             <div className="flex gap-3">
