@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
