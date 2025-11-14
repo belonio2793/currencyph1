@@ -137,6 +137,24 @@ export default function Profile({ userId, onSignOut }) {
     setQuickAccessCards(updated)
   }
 
+  const handleQuickAccessCardClick = (cardKey) => {
+    const modalMap = {
+      deposit: () => setShowDepositModal(true),
+      nearby: () => setShowNearbyModal(true),
+      messages: () => setShowInboxModal(true),
+      p2p: () => setShowP2PModal(true),
+      poker: () => setShowPokerModal(true),
+      networkBalances: () => setShowNetworkBalancesModal(true),
+      receipts: () => setShowReceiptsModal(true),
+      myBusiness: () => setShowMyBusinessModal(true)
+    }
+
+    const handler = modalMap[cardKey]
+    if (handler) {
+      handler()
+    }
+  }
+
   const loadVerificationStatus = async () => {
     if (!userId || userId.includes('guest') || !isValidUUID(userId)) {
       setVerificationStatus(null)
