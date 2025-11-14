@@ -37,6 +37,10 @@ export default function MerchantReceipts({ business, userId }) {
   useEffect(() => {
     loadReceipts()
     generateReceiptNumber()
+    if (business?.id) {
+      const saved = localStorage.getItem(`saved-items-${business.id}`)
+      setSavedItems(saved ? JSON.parse(saved) : [])
+    }
   }, [business?.id])
 
   const loadReceipts = async () => {
