@@ -300,6 +300,126 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         </div>
       </div>
 
+      {/* Deposit Modal */}
+      {showDepositModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Deposit</h2>
+              <button
+                onClick={() => setShowDepositModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <Deposits userId={userId} globalCurrency={globalCurrency} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Nearby Modal */}
+      {showNearbyModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Nearby</h2>
+              <button
+                onClick={() => setShowNearbyModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <Nearby userId={userId} setActiveTab={() => {}} setCurrentListingSlug={() => {}} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Inbox Modal */}
+      {showInboxModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Messages</h2>
+              <button
+                onClick={() => setShowInboxModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <Inbox userId={userId} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* P2P Loan Marketplace Modal */}
+      {showP2PModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Peer To Peer Loan Marketplace</h2>
+              <button
+                onClick={() => setShowP2PModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <P2PLoanMarketplace userId={userId} userEmail={userEmail} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Poker Modal */}
+      {showPokerModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Poker</h2>
+              <button
+                onClick={() => setShowPokerModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <PokerPage userId={userId} userEmail={userEmail} onShowAuth={() => {}} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Network Balances Modal */}
+      {showNetworkBalancesModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+              <h2 className="text-2xl font-light text-slate-900">Network Balances</h2>
+              <button
+                onClick={() => setShowNetworkBalancesModal(false)}
+                className="text-slate-400 hover:text-slate-600 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <NetworkBalances userId={userId} />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Receipts Modal */}
       {showReceiptsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
