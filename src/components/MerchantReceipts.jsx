@@ -472,7 +472,155 @@ export default function MerchantReceipts({ business, userId }) {
           </div>
         )}
 
-        <ReceiptTemplate receipt={selectedReceipt} business={business} />
+        {!isEditMode && <ReceiptTemplate receipt={selectedReceipt} business={business} />}
+
+        {isEditMode && editedReceipt && (
+          <div className="bg-white border border-slate-200 rounded-lg p-6 space-y-6">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Customer Name</label>
+                <input
+                  type="text"
+                  value={editedReceipt.customer_name || ''}
+                  onChange={(e) => setEditedReceipt({ ...editedReceipt, customer_name: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={editedReceipt.customer_email || ''}
+                  onChange={(e) => setEditedReceipt({ ...editedReceipt, customer_email: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Phone</label>
+                <input
+                  type="tel"
+                  value={editedReceipt.customer_phone || ''}
+                  onChange={(e) => setEditedReceipt({ ...editedReceipt, customer_phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
+                <select
+                  value={editedReceipt.payment_method || 'Balance'}
+                  onChange={(e) => setEditedReceipt({ ...editedReceipt, payment_method: e.target.value })}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                >
+                  <option>Balance</option>
+                  <option>Cash</option>
+                  <option>Card</option>
+                  <option>Check</option>
+                  <option>Transfer</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-slate-900">Items</h3>
+              {editedReceipt.items?.map((item, idx) => (
+                <div key={idx} className="grid grid-cols-4 gap-3 items-start">
+                  <input
+                    type="text"
+                    value={item.description}
+                    onChange={(e) => {
+                      const newItems = [...editedReceipt.items]
+                      newItems[idx].description = e.target.value
+                      setEditedReceipt({ ...editedReceipt, items: newItems })
+                    }}
+                    placeholder="Description"
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                  />
+                  <input
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => {
+                      const newItems = [...editedReceipt.items]
+                      newItems[idx].quantity = parseFloat(e.target.value) || 0
+                      setEditedReceipt({ ...editedReceipt, items: newItems })
+                    }}
+                    placeholder="Qty"
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                  />
+                  <input
+                    type="number"
+                    value={item.price}
+                    onChange={(e) => {
+                      const newItems = [...editedReceipt.items]
+                      newItems[idx].price = parseFloat(e.target.value) || 0
+                      setEditedReceipt({ ...editedReceipt, items: newItems })
+                    }}
+                    placeholder="Price"
+                    className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 text-sm"
+                  />
+                  <button
+                    onClick={() => {
+                      const newItems = editedReceipt.items.filter((_, i) => i !== idx)
+                      setEditedReceipt({ ...editedReceipt, items: newItems })
+                    }}
+                    className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 font-medium text-sm"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={() => {
+                  setEditedReceipt({
+                    ...editedReceipt,
+                    items: [...(editedReceipt.items || []), { description: '', quantity: 1, price: 0 }]
+                  })
+                }}
+                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 font-medium text-sm"
+              >
+                + Add Item
+              </button>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">Notes</label>
+              <textarea
+                value={editedReceipt.notes || ''}
+                onChange={(e) => setEditedReceipt({ ...editedReceipt, notes: e.target.value })}
+                rows="3"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+            </div>
+          </div>
+        )}
+
+        {!isEditMode && sharedUsers.length > 0 && (
+          <div className="bg-white border border-slate-200 rounded-lg p-6 mt-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Shared With</h3>
+            <div className="space-y-2">
+              {sharedUsers.map((share) => (
+                <div key={share.id} className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <svg className="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.5 3A1.5 1.5 0 001 4.5v.006c0 .823.5 1.5 1.5 1.5h15c1 0 1.5-.677 1.5-1.5v-.006C19 3.5 18.5 3 17.5 3h-15z" />
+                      <path fillRule="evenodd" d="M2 7a1 1 0 011-1h14a1 1 0 011 1v6a1 1 0 01-1 1H3a1 1 0 01-1-1V7z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <p className="font-medium text-slate-900">{share.shared_with_email}</p>
+                      <p className="text-xs text-slate-500">Shared on {new Date(share.created_at).toLocaleDateString('en-PH')}</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveShare(share.id)}
+                    disabled={loading}
+                    className="px-3 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 text-sm font-medium disabled:opacity-50"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {showShareModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
