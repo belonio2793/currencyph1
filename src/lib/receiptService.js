@@ -48,7 +48,19 @@ export const receiptService = {
     try {
       const { data, error } = await supabase
         .from('business_receipts')
-        .select('*')
+        .select(`
+          *,
+          businesses:business_id (
+            id,
+            business_name,
+            tin,
+            certificate_of_incorporation,
+            city_of_registration,
+            registration_type,
+            registration_date,
+            metadata
+          )
+        `)
         .eq('business_id', businessId)
         .order('created_at', { ascending: false })
         .limit(limit)
