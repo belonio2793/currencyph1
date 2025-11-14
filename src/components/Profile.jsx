@@ -97,23 +97,16 @@ export default function Profile({ userId, onSignOut }) {
   }
 
   const handleSaveQuickAccessPreferences = () => {
-    localStorage.setItem(`quick-access-cards-${userId}`, JSON.stringify(quickAccessCards))
+    quickAccessManager.setCardVisibility(userId, quickAccessCards)
+    setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
     setSuccess('Quick access preferences saved!')
     setTimeout(() => setSuccess(''), 3000)
     setShowCustomizeModal(false)
-    // Dispatch custom event to notify other components (like HomePage)
-    try {
-      window.dispatchEvent(new CustomEvent('quick-access-updated', { detail: { userId } }))
-    } catch (e) {
-      console.debug('Failed to dispatch quick-access-updated event:', e)
-    }
   }
 
   const toggleQuickAccessCard = (cardKey) => {
-    setQuickAccessCards(prev => ({
-      ...prev,
-      [cardKey]: !prev[cardKey]
-    }))
+    const updated = { ...quickAccessCards, [cardKey]: !quickAccessCards[cardKey] }
+    setQuickAccessCards(updated)
   }
 
   const loadVerificationStatus = async () => {
