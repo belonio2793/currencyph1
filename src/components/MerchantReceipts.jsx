@@ -750,7 +750,13 @@ export default function MerchantReceipts({ business, userId }) {
           <p className="text-sm text-slate-600">Create and manage business receipts</p>
         </div>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            setShowForm(!showForm)
+            if (showForm) {
+              setShareEmailsDuringCreation([])
+              setShareEmailInput('')
+            }
+          }}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
         >
           {showForm ? 'Cancel' : '+ Create Receipt'}
