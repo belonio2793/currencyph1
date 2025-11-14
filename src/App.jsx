@@ -448,7 +448,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-50">
       {!userId ? (
-        <OfflineTabNav activeTab={offlineTab} onTabChange={setOfflineTab} />
+        <OfflineTabNav activeTab={offlineTab} onTabChange={setOfflineTab} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} />
       ) : (
         <>
           <HeaderMap userId={userId} />
