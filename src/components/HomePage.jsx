@@ -245,7 +245,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
           {quickAccessCards.p2p && (
             <button
               onClick={() => setShowP2PModal(true)}
-              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group col-span-2"
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group"
             >
               <div className="flex justify-center mb-4">
                 <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
