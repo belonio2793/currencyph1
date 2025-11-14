@@ -6,6 +6,7 @@ import { deviceFingerprint } from '../lib/deviceFingerprint'
 import { p2pLoanService } from '../lib/p2pLoanService'
 import { diditDirectService } from '../lib/diditDirectService'
 import DiditVerificationModal from './DiditVerificationModal'
+import ReceiptHistory from './ReceiptHistory'
 
 const COUNTRIES = [
   { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
