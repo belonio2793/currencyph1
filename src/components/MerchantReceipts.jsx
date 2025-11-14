@@ -65,6 +65,14 @@ export default function MerchantReceipts({ business, userId }) {
     }
   }, [business?.id])
 
+  useEffect(() => {
+    if (selectedReceipt?.id) {
+      loadSharedUsers(selectedReceipt.id)
+      setEditedReceipt(JSON.parse(JSON.stringify(selectedReceipt)))
+      setIsEditMode(false)
+    }
+  }, [selectedReceipt?.id])
+
   const loadReceipts = async () => {
     if (!business?.id) return
     setLoading(true)
