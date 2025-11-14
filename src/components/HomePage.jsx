@@ -37,12 +37,12 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   // Listen for localStorage changes (from profile settings)
   useEffect(() => {
     const handleStorageChange = () => {
-      setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrderSync(userId))
     }
 
     const handleReorder = () => {
       setReorderKey(prev => prev + 1)
-      setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrderSync(userId))
     }
 
     window.addEventListener('storage', handleStorageChange)
