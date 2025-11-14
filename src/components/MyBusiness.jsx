@@ -839,7 +839,6 @@ export default function MyBusiness({ userId }) {
         {/* Management Tab */}
         {mainTab === 'management' && (
           <div>
-            {!selectedBusiness && setShowBusinessSelectionModal(true)}
             <h3 className="text-lg font-semibold text-slate-900 mb-6">Business Management</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
