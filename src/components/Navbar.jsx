@@ -180,48 +180,50 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             {/* Auth controls will be rendered in the investments row */}
           </div>
 
-          {/* Secondary row for Community Projects (desktop) */}
-          <div className="hidden md:flex w-full mt-2 pt-2 border-t border-slate-100">
-            <div className="w-full px-4 flex items-center">
-              <div className="flex items-center gap-2">
-                {secondaryNav.map(btn => (
-                  <button
-                    key={btn.id}
-                    onClick={() => onTabChange(btn.id)}
-                    className={`px-4 py-2 text-sm font-semibold transition-colors rounded-md ${
-                      activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'
-                    }`}
-                  >
-                    {btn.label}
-                  </button>
-                ))}
-
-                {/* Buttons moved into the Community Projects row */}
-                <div className="ml-2 flex items-center gap-2">
-                  {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
-                    <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm rounded-md ${activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
+          {/* Secondary row for Community Projects (desktop) - only show when signed in */}
+          {userEmail && (
+            <div className="hidden md:flex w-full mt-2 pt-2 border-t border-slate-100">
+              <div className="w-full px-4 flex items-center">
+                <div className="flex items-center gap-2">
+                  {secondaryNav.filter(btn => !btn.auth || userEmail).map(btn => (
+                    <button
+                      key={btn.id}
+                      onClick={() => onTabChange(btn.id)}
+                      className={`px-4 py-2 text-sm font-semibold transition-colors rounded-md ${
+                        activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'
+                      }`}
+                    >
                       {btn.label}
                     </button>
                   ))}
+
+                  {/* Buttons moved into the Community Projects row */}
+                  <div className="ml-2 flex items-center gap-2">
+                    {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
+                      <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm rounded-md ${activeTab === btn.id ? 'text-white bg-blue-600' : 'text-slate-700 bg-white hover:bg-slate-50'}`}>
+                        {btn.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right-aligned auth controls */}
+                <div className="ml-auto flex items-center gap-2">
+                  {userEmail ? (
+                    <>
+                      <span className="text-sm font-medium text-blue-600 truncate max-w-[200px]">{userEmail}</span>
+                      <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Sign out</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Login</button>
+                      <button onClick={() => onShowAuth && onShowAuth('register')} className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Register</button>
+                    </>
+                  )}
                 </div>
               </div>
-
-              {/* Right-aligned auth controls */}
-              <div className="ml-auto flex items-center gap-2">
-                {userEmail ? (
-                  <>
-                    <span className="text-sm font-medium text-blue-600 truncate max-w-[200px]">{userEmail}</span>
-                    <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Sign out</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 text-sm bg-white border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50">Login</button>
-                    <button onClick={() => onShowAuth && onShowAuth('register')} className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Register</button>
-                  </>
-                )}
-              </div>
             </div>
-          </div>
+          )}
 
           {/* Mobile menu button */}
           <button
@@ -242,7 +244,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {mobileMenuOpen && (
           <div className="md:hidden pb-2 border-t border-slate-100">
             <div className="space-y-1">
-              {mainNav.concat(secondaryNav, investmentsRowButtons).filter(btn => (btn.public || !btn.auth) || userEmail).map(btn => (
+              {mainNav.concat(secondaryNav, investmentsRowButtons).filter(btn => (btn.public || !btn.auth || userEmail)).map(btn => (
                 <button
                   key={btn.id}
                   onClick={() => {
