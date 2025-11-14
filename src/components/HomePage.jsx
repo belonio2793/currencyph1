@@ -23,6 +23,19 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [showNetworkBalancesModal, setShowNetworkBalancesModal] = useState(false)
   const [showReceiptsModal, setShowReceiptsModal] = useState(false)
   const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
+  const [quickAccessCards, setQuickAccessCards] = useState(() => {
+    const saved = localStorage.getItem(`quick-access-cards-${userId}`)
+    return saved ? JSON.parse(saved) : {
+      receipts: true,
+      deposit: true,
+      nearby: true,
+      messages: false,
+      p2p: false,
+      poker: false,
+      networkBalances: false,
+      myBusiness: false
+    }
+  })
 
   useEffect(() => {
     loadData()
