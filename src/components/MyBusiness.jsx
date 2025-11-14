@@ -984,7 +984,7 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setActiveTab('bir')
+                  setActiveTab('overview')
                   setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
@@ -1089,7 +1089,7 @@ export default function MyBusiness({ userId }) {
                 if (!selectedBusiness) {
                   setShowBusinessSelectionModal(true)
                 } else {
-                  setActiveTab('shareholders')
+                  setActiveTab('overview')
                   setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
@@ -1369,6 +1369,26 @@ export default function MyBusiness({ userId }) {
                         className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
                       >
                         Manage Payments →
+                      </button>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="p-3 bg-purple-600 rounded-lg">
+                          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h5 className="font-semibold text-slate-900">Sales & Tax Reporting</h5>
+                          <p className="text-sm text-slate-600">View sales analytics and tax reports</p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setActiveTab('overview')}
+                        className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
+                      >
+                        View Reports →
                       </button>
                     </div>
                   </div>
