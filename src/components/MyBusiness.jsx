@@ -1085,14 +1085,7 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Merchant Tools */}
-              <button onClick={() => {
-                if (!selectedBusiness) {
-                  setShowBusinessSelectionModal(true)
-                } else {
-                  setActiveTab('merchant')
-                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
-                }
-              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
+              <button onClick={() => setSelectedFeatureModal('merchant')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
                     <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
