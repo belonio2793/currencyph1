@@ -1113,14 +1113,7 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Payment Integrations */}
-              <button onClick={() => {
-                if (!selectedBusiness) {
-                  setShowBusinessSelectionModal(true)
-                } else {
-                  setActiveTab('payments')
-                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
-                }
-              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
+              <button onClick={() => setSelectedFeatureModal('payments')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-pink-100 group-hover:bg-pink-200 transition-colors">
                     <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
