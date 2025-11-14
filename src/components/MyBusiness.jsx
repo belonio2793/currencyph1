@@ -1079,7 +1079,7 @@ export default function MyBusiness({ userId }) {
                     </svg>
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Integration</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Payments</h3>
                 <p className="text-sm text-slate-600 mb-4">Connect GCash, PayMaya, and more</p>
                 <div className="text-sm font-medium text-pink-600 group-hover:text-pink-700">Access feature →</div>
               </button>
