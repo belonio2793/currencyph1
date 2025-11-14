@@ -1117,7 +1117,9 @@ export default function MyBusiness({ userId }) {
             {[
               { id: 'overview', label: 'Overview' },
               { id: 'employees', label: 'Employees & Payroll' },
-              { id: 'merchant', label: 'Merchant Tools' }
+              { id: 'merchant', label: 'Merchant Tools' },
+              { id: 'payments', label: 'Payments' },
+              { id: 'sales-and-tax', label: 'Sales & Tax Reporting' }
             ].map(tab => (
               <button
                 key={tab.id}
