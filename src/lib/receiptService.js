@@ -176,7 +176,7 @@ export const receiptService = {
 
   async searchReceipts(businessId, searchTerm) {
     try {
-      const { data, error } = await supabase
+      const { data, error } = supabase
         .from('business_receipts')
         .select('*')
         .eq('business_id', businessId)
@@ -188,6 +188,39 @@ export const receiptService = {
     } catch (error) {
       console.error('Error searching receipts:', error)
       throw error
+    }
+  },
+
+  async sendReceipt(receiptId, sendToEmail, sendToPhone) {
+    try {
+      if (!receiptId) throw new Error('Receipt ID is required')
+      if (!sendToEmail && !sendToPhone) {
+        throw new Error('Email or phone number is required to send receipt')
+      }
+
+      const updateData = {
+        is_sent: true,
+        sent_at: new Date().toISOString()
+      }
+
+      if (sendToEmail) {
+        updateData.sent_to_email = sendToEmail
+      }
+      if (sendToPhone) {
+        updateData.sent_to_phone = sendToPhone
+      }
+
+      const { data, error } = await supabase
+        .from('business_receipts')
+        .update(updateData)
+        .eq('id', receiptId)
+        .select()
+
+      if (error) throw error
+      return data?.[0]
+    } catch (error) {
+      console.error('Error sending receipt:', error)
+      throw new Error(error.message || 'Failed to send receipt')
     }
   }
 }
