@@ -237,6 +237,40 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
             <p className="text-sm text-slate-600 mb-4">View balances across the network</p>
             <div className="text-sm font-medium text-teal-600 group-hover:text-teal-700">View details →</div>
           </button>
+
+          {/* Receipts Card */}
+          <button
+            onClick={() => setShowReceiptsModal(true)}
+            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-amber-300 transition-all group"
+          >
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-amber-100 group-hover:bg-amber-200 transition-colors">
+                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">Receipts</h3>
+            <p className="text-sm text-slate-600 mb-4">View and download your digital receipts</p>
+            <div className="text-sm font-medium text-amber-600 group-hover:text-amber-700">View receipts →</div>
+          </button>
+
+          {/* My Business Card */}
+          <button
+            onClick={() => setShowMyBusinessModal(true)}
+            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-indigo-300 transition-all group"
+          >
+            <div className="flex justify-center mb-4">
+              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-100 group-hover:bg-indigo-200 transition-colors">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">My Business</h3>
+            <p className="text-sm text-slate-600 mb-4">Manage your businesses and tax information</p>
+            <div className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">View business →</div>
+          </button>
         </div>
 
         {/* Exchange Rates Preview */}
