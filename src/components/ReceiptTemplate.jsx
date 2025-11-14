@@ -57,7 +57,7 @@ export default function ReceiptTemplate({ receipt, business }) {
     doc.setTextColor(255, 255, 255)
     doc.setFont('Arial', 'bold')
     doc.setFontSize(18)
-    doc.text('OFFICIAL RECEIPT', pageWidth / 2, 12, { align: 'center' })
+    doc.text('RECEIPT', pageWidth / 2, 12, { align: 'center' })
     doc.setFontSize(10)
     doc.text(businessInfo.name, pageWidth / 2, 20, { align: 'center' })
 
