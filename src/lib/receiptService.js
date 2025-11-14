@@ -322,5 +322,23 @@ export const receiptService = {
       console.error('Error removing receipt share:', error)
       throw error
     }
+  },
+
+  async getReceiptShares(receiptId) {
+    try {
+      if (!receiptId) throw new Error('Receipt ID is required')
+
+      const { data, error } = await supabase
+        .from('receipt_shares')
+        .select('*')
+        .eq('receipt_id', receiptId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('Error fetching receipt shares:', error)
+      throw error
+    }
   }
 }
