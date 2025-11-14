@@ -79,11 +79,6 @@ export default function ReceiptHistory({ userEmail, userPhone, userId }) {
         </div>
       )}
 
-      <div>
-        <h3 className="text-lg font-semibold text-slate-900 mb-2">Receipt History</h3>
-        <p className="text-sm text-slate-600">View and download your digital receipts from businesses</p>
-      </div>
-
       {/* Summary Cards */}
       {receipts.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
