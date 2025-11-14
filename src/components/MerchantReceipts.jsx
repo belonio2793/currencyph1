@@ -95,12 +95,11 @@ export default function MerchantReceipts({ business, userId }) {
         receipt_number: formData.receipt_number,
         customer_name: formData.customer_name,
         customer_email: formData.customer_email,
-        customer_phone: formData.customer_phone,
+        customer_phone: formData.customer_phone || null,
         payment_method: formData.payment_method,
         items: formData.items,
         amount: calculateTotal(),
-        notes: formData.notes,
-        currencies_registration_number: business.metadata?.currency_registration_number
+        notes: formData.notes
       }
 
       const newReceipt = await receiptService.createReceipt(business.id, userId, receiptData)
