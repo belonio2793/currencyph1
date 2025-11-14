@@ -1409,27 +1409,27 @@ export default function MyBusiness({ userId }) {
 
                 <div className="space-y-6">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-900 mb-2">Tax ID (TIN) <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">Tax ID (TIN)</label>
                     <input
                       type="text"
-                      placeholder="XXX-XXX-XXX-XXX"
+                      placeholder="XXX-XXX-XXX-XXX (optional)"
                       value={editFormData.tin}
                       onChange={(e) => setEditFormData({ ...editFormData, tin: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
                     />
-                    <p className="text-xs text-slate-500 mt-1">Enter your Tax Identification Number</p>
+                    <p className="text-xs text-slate-500 mt-1">Enter your Tax Identification Number (optional)</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-semibold text-slate-900 mb-2">BIR Certification Number <span className="text-red-500">*</span></label>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">BIR Certification Number</label>
                     <input
                       type="text"
-                      placeholder="BIR-XXXX-XX-XXXXXX"
+                      placeholder="BIR-XXXX-XX-XXXXXX (optional)"
                       value={editFormData.certificateOfIncorporation}
                       onChange={(e) => setEditFormData({ ...editFormData, certificateOfIncorporation: e.target.value })}
                       className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
                     />
-                    <p className="text-xs text-slate-500 mt-1">Enter your BIR certification number</p>
+                    <p className="text-xs text-slate-500 mt-1">Enter your BIR certification number (optional)</p>
                   </div>
 
                   <div>
