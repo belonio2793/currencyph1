@@ -703,7 +703,7 @@ export default function Profile({ userId, onSignOut }) {
                       <div className="flex items-center gap-2 mb-3">
                         <span className={`w-3 h-3 rounded-full ${verificationStatus.status === 'approved' ? 'bg-green-500' : verificationStatus.status === 'pending' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
                         <p className="font-medium text-slate-900">
-                          {verificationStatus.status === 'approved' ? '✓ Identity Verified' : verificationStatus.status === 'pending' ? '⏳ Verification Pending' : '✗ Verification Rejected'}
+                          {verificationStatus.status === 'approved' ? '✓ Identity Verified' : verificationStatus.status === 'pending' ? '⏳ Verification Pending' : '��� Verification Rejected'}
                         </p>
                       </div>
                       {verificationStatus.document_type && (
@@ -942,11 +942,12 @@ export default function Profile({ userId, onSignOut }) {
 
             {enabledCards && enabledCards.length > 0 && (
               <div className="mb-6">
-                <p className="text-sm text-slate-600 font-medium mb-3">Reorder enabled cards (drag to move):</p>
+                <p className="text-sm text-slate-600 font-medium mb-3">Reorder enabled cards (drag to move or click to preview):</p>
                 <DraggableQuickAccessCards
                   key={customizeReorderKey}
                   userId={userId}
                   cardKeys={enabledCards}
+                  onCardClick={handleQuickAccessCardClick}
                   isDragEnabled={true}
                   isLargeMode={false}
                 />
