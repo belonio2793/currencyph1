@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 
 export default function BillPayments({ userId }) {
   const [bills, setBills] = useState([])
@@ -46,8 +46,8 @@ export default function BillPayments({ userId }) {
         return
       }
       const [billsData, walletsData] = await Promise.all([
-        wisegcashAPI.getBills(userId),
-        wisegcashAPI.getWallets(userId)
+        currencyAPI.getBills(userId),
+        currencyAPI.getWallets(userId)
       ])
       setBills(billsData)
       setWallets(walletsData)
@@ -73,7 +73,7 @@ export default function BillPayments({ userId }) {
     }
 
     try {
-      await wisegcashAPI.createBill(userId, billForm)
+      await currencyAPI.createBill(userId, billForm)
       setSuccess('Bill added successfully!')
       setBillForm({ biller_category: 'electricity', biller_name: '', account_number: '' })
       setShowAddBill(false)
@@ -93,7 +93,7 @@ export default function BillPayments({ userId }) {
         throw new Error('Please enter a valid amount')
       }
 
-      await wisegcashAPI.payBill(selectedBill.id, userId, parseFloat(paymentAmount), selectedCurrency)
+      await currencyAPI.payBill(selectedBill.id, userId, parseFloat(paymentAmount), selectedCurrency)
       setSuccess(`Payment successful!`)
       setPaymentAmount('')
       setShowPayBill(false)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from './lib/supabaseClient'
-import { wisegcashAPI } from './lib/payments'
+import { currencyAPI } from './lib/payments'
 import backgroundSync from './lib/backgroundSync'
 import { populateSlugsForListings } from './lib/slugUtils'
 import { initializePresence, stopPresence } from './lib/presence'
@@ -208,7 +208,7 @@ export default function App() {
           console.warn('Could not store device fingerprint:', e)
         }
         try {
-          await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+          await currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
         } catch (e) {
           console.error('Failed to create user profile:', e)
           setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
@@ -259,11 +259,11 @@ export default function App() {
     }
 
     try {
-      const wallets = await wisegcashAPI.getWallets(uid)
+      const wallets = await currencyAPI.getWallets(uid)
       const promises = (wallets || []).map(async (w) => {
         const bal = Number(w.balance || 0)
         if (!w.currency_code || w.currency_code === 'PHP') return bal
-        const rate = await wisegcashAPI.getExchangeRate(w.currency_code, 'PHP')
+        const rate = await currencyAPI.getExchangeRate(w.currency_code, 'PHP')
         return rate ? bal * Number(rate) : 0
       })
       const values = await Promise.all(promises)
@@ -312,25 +312,25 @@ export default function App() {
         return
       }
       try {
-        const wallets = await wisegcashAPI.getWallets(userId).catch(() => [])
+        const wallets = await currencyAPI.getWallets(userId).catch(() => [])
         const balancePromises = (wallets || []).map(async (w) => {
           const bal = Number(w.balance || 0)
           if (!bal) return 0
           const from = w.currency_code || globalCurrency
           if (from === globalCurrency) return bal
-          const rate = await wisegcashAPI.getExchangeRate(from, globalCurrency)
+          const rate = await currencyAPI.getExchangeRate(from, globalCurrency)
           return rate ? bal * Number(rate) : 0
         })
         const balanceValues = await Promise.all(balancePromises)
         const balanceTotal = balanceValues.reduce((s, v) => s + v, 0)
 
-        const loans = await wisegcashAPI.getLoans(userId).catch(() => [])
+        const loans = await currencyAPI.getLoans(userId).catch(() => [])
         const debtPromises = (loans || []).map(async (l) => {
           const d = Number(l.remaining_balance || l.total_owed || 0)
           if (!d) return 0
           const from = l.currency || l.currency_code || globalCurrency
           if (from === globalCurrency) return d
-          const rate = await wisegcashAPI.getExchangeRate(from, globalCurrency)
+          const rate = await currencyAPI.getExchangeRate(from, globalCurrency)
           return rate ? d * Number(rate) : 0
         })
         const debtValues = await Promise.all(debtPromises)
@@ -367,7 +367,7 @@ export default function App() {
     // For guest-local users (not real Supabase auth), don't try database operations
     if (!user.id.includes('guest-local')) {
       try {
-        await wisegcashAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+        await currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
         if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id)
       } catch (err) {
         console.error('Could not initialize user profile:', err)

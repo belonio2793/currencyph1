@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 import { currencyAPI } from '../lib/currencyAPI'
 import { supabase } from '../lib/supabaseClient'
 import Rates from './Rates'
@@ -466,7 +466,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         setWallets([])
         return
       }
-      const data = await wisegcashAPI.getWallets(userId)
+      const data = await currencyAPI.getWallets(userId)
       setWallets(data)
     } catch (err) {
       setWallets([])
@@ -475,7 +475,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
   const loadExchangeRates = async () => {
     try {
-      const rates = await wisegcashAPI.getAllExchangeRates()
+      const rates = await currencyAPI.getAllExchangeRates()
       const ratesMap = {}
       if (rates && rates.length > 0) {
         rates.forEach(r => {
@@ -529,7 +529,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
         setRecentTransactions([])
         return
       }
-      const data = await wisegcashAPI.getTransactions(userId, 5)
+      const data = await currencyAPI.getTransactions(userId, 5)
       setRecentTransactions(data)
     } catch (err) {
       // Silently fail for transaction loading - it's not critical
@@ -626,7 +626,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
       const convertedAmt = convertedAmounts[globalCurrency] || (numAmount * (exchangeRates[`${selectedCurrency}_${globalCurrency}`] || 1)).toFixed(2)
 
-      await wisegcashAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
+      await currencyAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
       setSuccess(`Successfully added ${amount} ${selectedCurrency}`)
       setAmount('')
       setConvertedAmounts({})
@@ -661,7 +661,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
       const convertedAmt = cryptoConvertedAmounts[globalCurrency] || (numAmount * (cryptoRates[selectedCrypto] || 0)).toFixed(2)
 
-      await wisegcashAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
+      await currencyAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
       setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto}`)
       setCryptoAmount('')
       setCryptoConvertedAmounts({})

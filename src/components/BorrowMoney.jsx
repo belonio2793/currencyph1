@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 import RequestLoanModal from './RequestLoanModal'
 import LoanPaymentModal from './LoanPaymentModal'
 
@@ -48,7 +48,7 @@ export default function BorrowMoney({ userId, loanType }) {
 
   const loadWallets = async () => {
     try {
-      const walletList = await wisegcashAPI.getWallets(userId)
+      const walletList = await currencyAPI.getWallets(userId)
       setWallets(walletList || [])
     } catch (err) {
       console.warn('Error loading wallets:', err)

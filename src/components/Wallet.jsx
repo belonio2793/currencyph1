@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
 import { connectAnyWallet, connectWallet, connectSolana, getWalletInfo, clearWalletCache, SUPPORTED_CHAINS, CHAIN_IDS, formatWalletAddress, sendCryptoTransaction } from '../lib/thirdwebClient'
@@ -148,7 +148,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       const results = {}
       await Promise.all(toFetch.map(async (code) => {
         try {
-          const rate = await wisegcashAPI.getExchangeRate(code, globalCurrency)
+          const rate = await currencyAPI.getExchangeRate(code, globalCurrency)
           if (rate != null) results[code] = Number(rate)
         } catch(e) { /* ignore */ }
       }))
@@ -287,11 +287,11 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       // Fetch internal (legacy) wallets and ensure each has an account number
       let internal = []
       try {
-        const walletsWithAcct = await wisegcashAPI.ensureWalletsHaveAccountNumbers(userId)
+        const walletsWithAcct = await currencyAPI.ensureWalletsHaveAccountNumbers(userId)
         internal = walletsWithAcct || []
       } catch (err) {
         console.warn('Could not ensure account numbers for wallets:', err)
-        const data = await wisegcashAPI.getWallets(userId)
+        const data = await currencyAPI.getWallets(userId)
         internal = data || []
       }
       setInternalWallets(internal)
@@ -429,7 +429,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
 
     try {
-      await wisegcashAPI.addFunds(userId, selectedWallet.currency_code, parseFloat(amount))
+      await currencyAPI.addFunds(userId, selectedWallet.currency_code, parseFloat(amount))
       setSuccess(`Successfully added ${amount} ${selectedWallet.currency_code}`)
       setAmount('')
       setShowAddFunds(false)
@@ -449,7 +449,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         return
       }
 
-      await wisegcashAPI.createWallet(userId, currency)
+      await currencyAPI.createWallet(userId, currency)
       await new Promise(resolve => setTimeout(resolve, 500))
       await loadWallets()
       setShowPreferencesInternal(false)

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { deviceFingerprint } from '../lib/deviceFingerprint'
 import { p2pLoanService } from '../lib/p2pLoanService'
@@ -313,7 +313,7 @@ export default function Profile({ userId, onSignOut }) {
       }
 
       try {
-        const userData = await wisegcashAPI.getUserById(userId)
+        const userData = await currencyAPI.getUserById(userId)
         setUser(userData)
         setFormData({ full_name: userData?.full_name || '', email: userData?.email || '', phone_number: userData?.phone_number || '', phone_country_code: userData?.phone_country_code || 'PH', username: userData?.username || '', country_code: userData?.country_code || 'PH', relationship_status: userData?.relationship_status || '', biography: userData?.biography || '', profile_picture_url: userData?.profile_picture_url || '', display_name_type: userData?.display_name_type || 'full_name', display_as_username_everywhere: userData?.display_as_username_everywhere || false })
         setDisplayNameType(userData?.display_name_type || 'full_name')
@@ -382,7 +382,7 @@ export default function Profile({ userId, onSignOut }) {
     try {
       const updateData = { full_name: formData.full_name, phone_number: formData.phone_number, phone_country_code: formData.phone_country_code, country_code: formData.country_code, username: formData.username || null, relationship_status: formData.relationship_status || null, biography: formData.biography || null, profile_picture_url: formData.profile_picture_url || null, display_name_type: formData.display_name_type, display_as_username_everywhere: formData.display_as_username_everywhere, email: formData.email || null }
 
-      await wisegcashAPI.updateUserProfile(userId, updateData)
+      await currencyAPI.updateUserProfile(userId, updateData)
 
       try {
         const currentUserRes = await supabase.auth.getUser()

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 
 export default function Dashboard({ userId, onNavigate }) {
   const [wallets, setWallets] = useState([])
@@ -23,7 +23,7 @@ export default function Dashboard({ userId, onNavigate }) {
         setLoading(false)
         return
       }
-      const data = await wisegcashAPI.getWallets(userId)
+      const data = await currencyAPI.getWallets(userId)
       const walletData = data || []
       setWallets(walletData)
       const total = walletData.reduce((sum, w) => sum + (w.balance || 0), 0)

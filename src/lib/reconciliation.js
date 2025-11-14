@@ -1,5 +1,5 @@
 import { supabase } from './supabaseClient'
-import { wisegcashAPI } from './payments'
+import { currencyAPI } from './payments'
 
 // Sign mapping for transaction types: negative for outflows, positive for inflows
 const isDebitType = (type) => {
@@ -53,7 +53,7 @@ export async function getWalletBalances(userId) {
 export async function fetchRatesMap() {
   // prefer existing internal table, fallback to API method
   try {
-    const rows = await wisegcashAPI.getAllExchangeRates()
+    const rows = await currencyAPI.getAllExchangeRates()
     const map = {}
     ;(rows || []).forEach(r => {
       if (r.from_currency && r.to_currency) map[`${r.from_currency}_${r.to_currency}`] = Number(r.rate)

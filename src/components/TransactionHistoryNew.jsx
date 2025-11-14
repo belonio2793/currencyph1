@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 
 export default function TransactionHistory({ userId }) {
   const [transactions, setTransactions] = useState([])
@@ -19,7 +19,7 @@ export default function TransactionHistory({ userId }) {
         setLoading(false)
         return
       }
-      const data = await wisegcashAPI.getTransactions(userId, 100)
+      const data = await currencyAPI.getTransactions(userId, 100)
       setTransactions(data)
     } catch (err) {
       // Silently fail - transactions are optional

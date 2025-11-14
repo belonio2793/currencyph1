@@ -1,6 +1,6 @@
 import { supabase } from './supabaseClient'
 import { generateSlug } from './slugUtils'
-import { wisegcashAPI } from './payments'
+import { currencyAPI } from './payments'
 
 export const nearbyUtils = {
   // Get vote for a listing by current user
@@ -142,7 +142,7 @@ export const nearbyUtils = {
 
   async payApprovalFee(pendingListingId, userId, currency = 'PHP', amount = 1000) {
     if (!userId) throw new Error('User not authenticated')
-    const tx = await wisegcashAPI.withdrawFunds(userId, currency, amount)
+    const tx = await currencyAPI.withdrawFunds(userId, currency, amount)
     try {
       await supabase
         .from('pending_listings')

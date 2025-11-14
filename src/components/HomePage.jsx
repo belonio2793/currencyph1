@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 import { quickAccessManager } from '../lib/quickAccessManager'
 import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import CustomizeQuickAccessModal from './CustomizeQuickAccessModal'
@@ -98,7 +98,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         if (fromCurrency === globalCurrency) {
           balanceSum += amt
         } else {
-          const rate = await wisegcashAPI.getExchangeRate(fromCurrency, globalCurrency)
+          const rate = await currencyAPI.getExchangeRate(fromCurrency, globalCurrency)
           balanceSum += rate ? amt * Number(rate) : 0
         }
       }
@@ -113,7 +113,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         if (loanCurrency === globalCurrency) {
           debtSum += amt
         } else {
-          const rate = await wisegcashAPI.getExchangeRate(loanCurrency, globalCurrency)
+          const rate = await currencyAPI.getExchangeRate(loanCurrency, globalCurrency)
           debtSum += rate ? amt * Number(rate) : 0
         }
       }
@@ -129,8 +129,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
     try {
       if (userId && !userId.includes('guest-local')) {
         const [walletsData, loansData] = await Promise.all([
-          wisegcashAPI.getWallets(userId).catch(() => []),
-          wisegcashAPI.getLoans(userId).catch(() => [])
+          currencyAPI.getWallets(userId).catch(() => []),
+          currencyAPI.getLoans(userId).catch(() => [])
         ])
         const w = walletsData || []
         const l = loansData || []

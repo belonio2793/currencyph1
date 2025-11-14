@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { wisegcashAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/payments'
 import { currencySymbols, formatCurrency, getCurrencySymbol } from '../lib/currency'
 
 export default function SendMoney({ userId }) {
@@ -39,8 +39,8 @@ export default function SendMoney({ userId }) {
         return
       }
       const [walletsData, beneficiariesData] = await Promise.all([
-        wisegcashAPI.getWallets(userId),
-        wisegcashAPI.getBeneficiaries(userId)
+        currencyAPI.getWallets(userId),
+        currencyAPI.getBeneficiaries(userId)
       ])
       setWallets(walletsData)
       setBeneficiaries(beneficiariesData)
@@ -64,7 +64,7 @@ export default function SendMoney({ userId }) {
 
   const calculateExchangeRate = async () => {
     try {
-      const rate = await wisegcashAPI.getExchangeRate(selectedSender, recipientCurrency)
+      const rate = await currencyAPI.getExchangeRate(selectedSender, recipientCurrency)
       if (rate) {
         setExchangeRate(rate)
         setReceiverAmount((parseFloat(amount) * rate).toFixed(2))
@@ -85,7 +85,7 @@ export default function SendMoney({ userId }) {
     setSearching(true)
     const t = setTimeout(async () => {
       try {
-        const results = await wisegcashAPI.searchUsers(q)
+        const results = await currencyAPI.searchUsers(q)
         if (!cancelled) setSearchResults(results)
       } catch (err) {
         console.error('Error searching users:', err)
@@ -118,7 +118,7 @@ export default function SendMoney({ userId }) {
     }
 
     try {
-      await wisegcashAPI.addBeneficiary(userId, {
+      await currencyAPI.addBeneficiary(userId, {
         recipient_email: selectedRecipient.email,
         recipient_name: selectedRecipient.full_name || selectedRecipient.email.split('@')[0],
         recipient_id: selectedRecipient.id,
@@ -144,7 +144,7 @@ export default function SendMoney({ userId }) {
         throw new Error('Please fill in all fields')
       }
 
-      await wisegcashAPI.sendMoney(
+      await currencyAPI.sendMoney(
         userId,
         selectedRecipient.email,
         selectedSender,
