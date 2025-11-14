@@ -190,7 +190,7 @@ export default function DraggableQuickAccessCards({
       }
 
       // Try to save the new order
-      const saved = quickAccessManager.setCardOrder(userId, fullOrder)
+      const saved = await quickAccessManager.setCardOrder(userId, fullOrder)
 
       if (!saved) {
         throw new Error('Failed to save card order')
@@ -207,7 +207,7 @@ export default function DraggableQuickAccessCards({
       console.error('Failed to reorder cards:', error)
 
       // Revert to previous order on failure
-      quickAccessManager.setCardOrder(userId, previousOrder)
+      await quickAccessManager.setCardOrder(userId, previousOrder)
 
       // Clear drag state
       setDraggedItem(null)
