@@ -883,7 +883,7 @@ export default function MyBusiness({ userId }) {
         {/* Management Tab */}
         {mainTab === 'management' && (
           <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
-            <div className="sticky top-0 bg-white z-10 pb-6 pt-0">
+            <div className="sticky top-0 z-10 pb-6 pt-0">
               <h3 className="text-lg font-semibold text-slate-900">Business Management</h3>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
