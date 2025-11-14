@@ -74,6 +74,14 @@ export default function Profile({ userId, onSignOut }) {
   const [quickAccessCards, setQuickAccessCards] = useState(() => quickAccessManager.getCardVisibility(userId))
   const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrder(userId))
   const [customizeReorderKey, setCustomizeReorderKey] = useState(0)
+  const [showReceiptsModal, setShowReceiptsModal] = useState(false)
+  const [showDepositModal, setShowDepositModal] = useState(false)
+  const [showNearbyModal, setShowNearbyModal] = useState(false)
+  const [showInboxModal, setShowInboxModal] = useState(false)
+  const [showP2PModal, setShowP2PModal] = useState(false)
+  const [showPokerModal, setShowPokerModal] = useState(false)
+  const [showNetworkBalancesModal, setShowNetworkBalancesModal] = useState(false)
+  const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
 
   const isValidUUID = (id) => {
     return id && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
