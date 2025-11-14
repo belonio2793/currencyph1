@@ -207,13 +207,8 @@ export default function MyBusiness({ userId }) {
   }, [userId])
 
   // Show modal when user clicks a management feature without a business selected
-  // (Don't auto-show on page load - only when user tries to access a feature)
-  useEffect(() => {
-    if (mainTab === 'management' && !selectedBusiness && showBusinessSelectionModal) {
-      // Keep modal open if already triggered
-      return
-    }
-  }, [mainTab, selectedBusiness, showBusinessSelectionModal])
+  // Modal is shown only when user clicks a management feature button
+  // without a business selected. This prevents unnecessary modal on tab change.
 
   // Scroll to tab content when activeTab changes
   useEffect(() => {
