@@ -219,89 +219,99 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
           )}
 
           {/* P2P Loan Marketplace Card */}
-          <button
-            onClick={() => setShowP2PModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group col-span-2"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          {quickAccessCards.p2p && (
+            <button
+              onClick={() => setShowP2PModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group col-span-2"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Peer To Peer Loan Marketplace</h3>
-            <p className="text-sm text-slate-600 mb-4">Browse loans • Submit offers • Manage your lending portfolio</p>
-            <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Explore marketplace →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Peer To Peer Loan Marketplace</h3>
+              <p className="text-sm text-slate-600 mb-4">Browse loans • Submit offers • Manage your lending portfolio</p>
+              <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Explore marketplace →</div>
+            </button>
+          )}
 
           {/* Poker Card */}
-          <button
-            onClick={() => setShowPokerModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-rose-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-rose-100 group-hover:bg-rose-200 transition-colors">
-                <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172C5.26 9.083 5 11.622 5 15c0 4.418 2.612 8 5 8s5-3.582 5-8c0-3.378-.26-5.917-2.172-7.828m5.656 5.656a4 4 0 010 5.656M9.172 9.172L12 6m0 0l2.828 2.828M12 6v6m0 0l-2.828-2.828M12 12l2.828 2.828" />
-                </svg>
+          {quickAccessCards.poker && (
+            <button
+              onClick={() => setShowPokerModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-rose-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-rose-100 group-hover:bg-rose-200 transition-colors">
+                  <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172C5.26 9.083 5 11.622 5 15c0 4.418 2.612 8 5 8s5-3.582 5-8c0-3.378-.26-5.917-2.172-7.828m5.656 5.656a4 4 0 010 5.656M9.172 9.172L12 6m0 0l2.828 2.828M12 6v6m0 0l-2.828-2.828M12 12l2.828 2.828" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Poker</h3>
-            <p className="text-sm text-slate-600 mb-4">Play poker games and win rewards</p>
-            <div className="text-sm font-medium text-rose-600 group-hover:text-rose-700">Play now →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Poker</h3>
+              <p className="text-sm text-slate-600 mb-4">Play poker games and win rewards</p>
+              <div className="text-sm font-medium text-rose-600 group-hover:text-rose-700">Play now →</div>
+            </button>
+          )}
 
           {/* Network Balances Card */}
-          <button
-            onClick={() => setShowNetworkBalancesModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-teal-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-teal-100 group-hover:bg-teal-200 transition-colors">
-                <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
+          {quickAccessCards.networkBalances && (
+            <button
+              onClick={() => setShowNetworkBalancesModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-teal-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-teal-100 group-hover:bg-teal-200 transition-colors">
+                  <svg className="w-6 h-6 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Network Balances</h3>
-            <p className="text-sm text-slate-600 mb-4">View balances across the network</p>
-            <div className="text-sm font-medium text-teal-600 group-hover:text-teal-700">View details →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Network Balances</h3>
+              <p className="text-sm text-slate-600 mb-4">View balances across the network</p>
+              <div className="text-sm font-medium text-teal-600 group-hover:text-teal-700">View details →</div>
+            </button>
+          )}
 
           {/* Receipts Card */}
-          <button
-            onClick={() => setShowReceiptsModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-amber-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-amber-100 group-hover:bg-amber-200 transition-colors">
-                <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+          {quickAccessCards.receipts && (
+            <button
+              onClick={() => setShowReceiptsModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-amber-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-amber-100 group-hover:bg-amber-200 transition-colors">
+                  <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Receipts</h3>
-            <p className="text-sm text-slate-600 mb-4">View and download your digital receipts</p>
-            <div className="text-sm font-medium text-amber-600 group-hover:text-amber-700">View receipts →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Receipts</h3>
+              <p className="text-sm text-slate-600 mb-4">View and download your digital receipts</p>
+              <div className="text-sm font-medium text-amber-600 group-hover:text-amber-700">View receipts →</div>
+            </button>
+          )}
 
           {/* My Business Card */}
-          <button
-            onClick={() => setShowMyBusinessModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-indigo-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-100 group-hover:bg-indigo-200 transition-colors">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
-                </svg>
+          {quickAccessCards.myBusiness && (
+            <button
+              onClick={() => setShowMyBusinessModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-indigo-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-100 group-hover:bg-indigo-200 transition-colors">
+                  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">My Business</h3>
-            <p className="text-sm text-slate-600 mb-4">Manage your businesses and tax information</p>
-            <div className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">View business →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">My Business</h3>
+              <p className="text-sm text-slate-600 mb-4">Manage your businesses and tax information</p>
+              <div className="text-sm font-medium text-indigo-600 group-hover:text-indigo-700">View business →</div>
+            </button>
+          )}
         </div>
 
         {/* Exchange Rates Preview */}
