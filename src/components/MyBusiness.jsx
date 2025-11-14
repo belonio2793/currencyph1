@@ -1369,11 +1369,6 @@ export default function MyBusiness({ userId }) {
                 <MerchantReceipts business={selectedBusiness} userId={userId} />
               )}
 
-              {merchantTab === 'payments' && (
-                <div className="text-center py-12">
-                  <p className="text-slate-500">Payment integrations coming soon...</p>
-                </div>
-              )}
             </div>
           )}
 
