@@ -185,7 +185,7 @@ export default function MerchantReceipts({ business, userId }) {
     }, 0)
   }
 
-  const handleAddShareEmail = () => {
+  const handleAddShareEmailDuringCreation = () => {
     if (!shareEmailInput.trim()) {
       setError('Please enter an email address')
       return
