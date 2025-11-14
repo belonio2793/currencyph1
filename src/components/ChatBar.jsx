@@ -635,7 +635,7 @@ export default function ChatBar({ userId, userEmail }) {
             <div className="flex items-center gap-3">
               <h2 className="font-bold text-lg">Messages</h2>
               <div className="flex items-center gap-2">
-                <span className={`w-2.5 h-2.5 rounded-full ${userStatus === 'online' ? 'bg-green-400' : userStatus === 'busy' ? 'bg-red-400' : userStatus === 'away' ? 'bg-yellow-400' : 'bg-slate-400'}`} />
+                <span className={`w-2.5 h-2.5 rounded-full ${userStatus === 'online' ? 'bg-green-400' : userStatus === 'busy' ? 'bg-red-400' : userStatus === 'away' ? 'bg-yellow-400' : userStatus === 'hide' ? 'bg-black' : 'bg-slate-400'}`} />
                 <select value={userStatus} onChange={(e) => updateUserStatus(e.target.value)} className="text-sm bg-blue-700/40 text-white px-2 py-1 rounded">
                   <option value="online">Online</option>
                   <option value="busy">Busy</option>
