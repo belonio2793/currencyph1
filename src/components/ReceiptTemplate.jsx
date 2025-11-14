@@ -46,182 +46,209 @@ export default function ReceiptTemplate({ receipt, business }) {
 
     const pageWidth = doc.internal.pageSize.getWidth()
     const pageHeight = doc.internal.pageSize.getHeight()
-    let yPos = 15
+    const margin = 15
+    const contentWidth = pageWidth - (2 * margin)
+    let yPos = margin
 
     // Get business info for use in PDF
     const businessInfo = getBusinessInfo()
 
-    // Header
-    doc.setFillColor(30, 64, 175)
-    doc.rect(0, 0, pageWidth, 25, 'F')
+    // ===== HEADER SECTION =====
+    doc.setFillColor(25, 55, 150)
+    doc.rect(0, 0, pageWidth, 30, 'F')
+
     doc.setTextColor(255, 255, 255)
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(18)
+    doc.setFontSize(24)
     doc.text('RECEIPT', pageWidth / 2, 12, { align: 'center' })
-    doc.setFontSize(10)
-    doc.text(businessInfo.name, pageWidth / 2, 20, { align: 'center' })
 
-    // Business Info Section
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(9)
+    doc.text(businessInfo.name, pageWidth / 2, 22, { align: 'center' })
+
+    yPos = 35
+
+    // ===== BUSINESS INFO (Compact) =====
     doc.setTextColor(0, 0, 0)
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(12)
-    doc.text(businessInfo.name, 20, yPos)
-    yPos += 8
-
-    doc.setFont('Arial', 'normal')
-    doc.setFontSize(9)
-
-    // Always show TIN with placeholder if empty
-    doc.text(`TIN: ${businessInfo.tin || '___________________'}`, 20, yPos)
+    doc.setFontSize(11)
+    doc.text(businessInfo.name, margin, yPos)
     yPos += 5
 
-    // Always show BIR Certificate with placeholder if empty
-    doc.text(`BIR Certificate: ${businessInfo.bir || '___________________'}`, 20, yPos)
-    yPos += 5
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(8)
+    const businessDetails = []
+    if (businessInfo.tin) businessDetails.push(`TIN: ${businessInfo.tin}`)
+    if (businessInfo.currency_reg) businessDetails.push(`CRN: ${businessInfo.currency_reg}`)
+    if (businessInfo.location) businessDetails.push(`Location: ${businessInfo.location}`)
 
-    // Always show Currency Registration with placeholder if empty
-    doc.text(`Currency Reg #: ${businessInfo.currency_reg || '___________________'}`, 20, yPos)
-    yPos += 5
+    businessDetails.forEach(detail => {
+      doc.text(detail, margin, yPos)
+      yPos += 4
+    })
+    yPos += 2
 
-    if (businessInfo.registration_type) {
-      doc.text(`Business Type: ${businessInfo.registration_type.charAt(0).toUpperCase() + businessInfo.registration_type.slice(1)}`, 20, yPos)
-      yPos += 5
-    }
-    if (businessInfo.location) {
-      doc.text(`Location: ${businessInfo.location}`, 20, yPos)
-      yPos += 5
-    }
-    if (businessInfo.address) {
-      doc.text(`Address: ${businessInfo.address}`, 20, yPos)
-      yPos += 5
-    }
-    if (businessInfo.phone) {
-      doc.text(`Phone: ${businessInfo.phone}`, 20, yPos)
-      yPos += 5
-    }
-    if (businessInfo.email) {
-      doc.text(`Email: ${businessInfo.email}`, 20, yPos)
-      yPos += 5
-    }
-    yPos += 3
-
-    // Receipt Details - Two columns (Receipt # left, Date right)
+    // ===== RECEIPT DETAILS (Two Column Layout) =====
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(9)
-    doc.text('RECEIPT NUMBER', 20, yPos)
+    doc.setFontSize(8)
+    doc.text('RECEIPT #', margin, yPos)
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
-    doc.text(`#${receipt.receipt_number}`, 20, yPos + 5)
+    doc.text(`${receipt.receipt_number || 'N/A'}`, margin, yPos + 4)
 
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(9)
-    doc.text('DATE & TIME', pageWidth - 20, yPos, { align: 'right' })
+    doc.setFontSize(8)
+    doc.text('DATE & TIME', margin + (contentWidth / 2), yPos)
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
-    doc.text(formatDate(receipt.created_at), pageWidth - 20, yPos + 5, { align: 'right' })
-    yPos += 15
+    doc.text(formatDate(receipt.created_at), margin + (contentWidth / 2), yPos + 4)
 
-    // Customer Information
-    yPos += 3
+    yPos += 12
+
+    // ===== DIVIDER LINE =====
+    doc.setDrawColor(200, 200, 200)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
+    yPos += 5
+
+    // ===== CUSTOMER INFORMATION =====
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(10)
-    doc.text('CUSTOMER INFORMATION', 20, yPos)
+    doc.setFontSize(9)
+    doc.text('BILL TO:', margin, yPos)
+    yPos += 4
+
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(8)
+    const customerName = receipt.customer_name || 'Guest Customer'
+    const customerEmail = receipt.customer_email || 'N/A'
+    const customerPhone = receipt.customer_phone || 'N/A'
+
+    doc.text(customerName, margin, yPos)
+    yPos += 4
+    doc.text(`Email: ${customerEmail}`, margin, yPos)
+    yPos += 4
+    doc.text(`Phone: ${customerPhone}`, margin, yPos)
     yPos += 6
 
-    doc.setFont('Arial', 'normal')
-    doc.setFontSize(9)
-    if (receipt.customer_name) {
-      doc.text(`Name: ${receipt.customer_name}`, 20, yPos)
-      yPos += 5
-    }
-    if (receipt.customer_email) {
-      doc.text(`Email: ${receipt.customer_email}`, 20, yPos)
-      yPos += 5
-    }
-    if (receipt.customer_phone) {
-      doc.text(`Phone: ${receipt.customer_phone}`, 20, yPos)
-      yPos += 5
-    }
+    // ===== DIVIDER LINE =====
+    doc.line(margin, yPos, pageWidth - margin, yPos)
+    yPos += 5
 
-    // Items Section
-    yPos += 3
+    // ===== ITEMS TABLE HEADER =====
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(10)
-    doc.text('ITEMS', 20, yPos)
-    yPos += 6
+    doc.setFontSize(9)
+    doc.text('DESCRIPTION', margin, yPos)
+    doc.text('QTY', margin + (contentWidth * 0.65), yPos, { align: 'right' })
+    doc.text('UNIT PRICE', margin + (contentWidth * 0.85), yPos, { align: 'right' })
+    yPos += 5
 
+    // ===== ITEMS TABLE DIVIDER =====
+    doc.setDrawColor(180, 180, 180)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
+    yPos += 3
+
+    // ===== ITEMS =====
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
+    let subtotal = 0
 
     if (receipt.items && Array.isArray(receipt.items) && receipt.items.length > 0) {
-      const itemStartY = yPos
-      receipt.items.forEach((item, index) => {
+      receipt.items.forEach((item) => {
         const itemName = item.description || item.name || 'Item'
         const itemQty = item.quantity || 1
         const itemPrice = parseFloat(item.price || 0)
         const itemTotal = itemQty * itemPrice
+        subtotal += itemTotal
 
-        doc.text(`${index + 1}. ${itemName}`, 20, yPos)
-        doc.text(`Qty: ${itemQty}`, 120, yPos, { align: 'right' })
-        doc.text(`${formatCurrency(itemPrice)}`, 160, yPos, { align: 'right' })
-        yPos += 5
+        // Wrap long item names
+        const lines = doc.splitTextToSize(itemName, contentWidth * 0.6)
+        doc.text(lines, margin, yPos)
+        doc.text(`${itemQty}`, margin + (contentWidth * 0.65), yPos, { align: 'right' })
+        doc.text(`${formatCurrency(itemPrice)}`, margin + (contentWidth * 0.85), yPos, { align: 'right' })
+
+        yPos += Math.max(4, lines.length * 4) + 1
 
         // Check if we need a new page
-        if (yPos > pageHeight - 30) {
+        if (yPos > pageHeight - 40) {
           doc.addPage()
-          yPos = 15
+          yPos = margin
+          // Repeat header on new page
+          doc.setFont('Arial', 'bold')
+          doc.setFontSize(9)
+          doc.text('DESCRIPTION', margin, yPos)
+          doc.text('QTY', margin + (contentWidth * 0.65), yPos, { align: 'right' })
+          doc.text('UNIT PRICE', margin + (contentWidth * 0.85), yPos, { align: 'right' })
+          yPos += 5
+          doc.setDrawColor(180, 180, 180)
+          doc.line(margin, yPos, pageWidth - margin, yPos)
+          yPos += 3
+          doc.setFont('Arial', 'normal')
+          doc.setFontSize(9)
         }
       })
     } else {
-      doc.text('(No items listed)', 20, yPos)
+      doc.text('No items listed', margin, yPos)
       yPos += 5
     }
 
-    // Total Section
-    yPos += 5
+    yPos += 2
+
+    // ===== TOTALS SECTION DIVIDER =====
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, yPos, pageWidth - 20, yPos)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
     yPos += 5
 
+    // ===== SUBTOTAL AND TOTAL =====
+    const subtotalLabel = 'SUBTOTAL'
+    const totalLabel = 'TOTAL'
+    const totalAmount = formatCurrency(receipt.amount || subtotal)
+
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(9)
+    doc.text(subtotalLabel, margin, yPos)
+    doc.text(formatCurrency(receipt.amount || subtotal), pageWidth - margin, yPos, { align: 'right' })
+    yPos += 6
+
+    // Total with emphasis
     doc.setFont('Arial', 'bold')
     doc.setFontSize(12)
-    doc.text('TOTAL', 20, yPos)
-    doc.text(formatCurrency(receipt.amount), pageWidth - 20, yPos, { align: 'right' })
+    doc.text(totalLabel, margin, yPos)
+    doc.text(totalAmount, pageWidth - margin, yPos, { align: 'right' })
     yPos += 8
 
-    // Payment Method
+    // ===== PAYMENT METHOD =====
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(8)
     if (receipt.payment_method) {
-      doc.setFont('Arial', 'normal')
-      doc.setFontSize(9)
-      doc.text(`Payment Method: ${receipt.payment_method}`, 20, yPos)
+      doc.text(`Payment Method: ${receipt.payment_method}`, margin, yPos)
       yPos += 5
     }
 
-    // Notes
+    // ===== NOTES =====
     if (receipt.notes) {
-      yPos += 3
+      yPos += 2
       doc.setFont('Arial', 'bold')
-      doc.setFontSize(9)
-      doc.text('NOTES:', 20, yPos)
+      doc.setFontSize(8)
+      doc.text('NOTES:', margin, yPos)
       yPos += 4
       doc.setFont('Arial', 'normal')
       doc.setFontSize(8)
-      doc.text(receipt.notes, 20, yPos, { maxWidth: pageWidth - 40 })
-      yPos += 10
+      const noteLines = doc.splitTextToSize(receipt.notes, contentWidth)
+      doc.text(noteLines, margin, yPos)
+      yPos += noteLines.length * 4
     }
 
-    // Footer
+    // ===== FOOTER =====
     yPos = pageHeight - 15
     doc.setDrawColor(200, 200, 200)
-    doc.line(20, yPos, pageWidth - 20, yPos)
+    doc.line(margin, yPos, pageWidth - margin, yPos)
     yPos += 5
 
     doc.setFont('Arial', 'italic')
-    doc.setFontSize(8)
+    doc.setFontSize(7)
     doc.setTextColor(100, 100, 100)
-    doc.text('Thank you for your business! This receipt is valid proof of transaction.', pageWidth / 2, yPos, { align: 'center' })
-    yPos += 4
-    doc.text(`Issued digitally by ${businessInfo.name} - Paperless Transactions`, pageWidth / 2, yPos, { align: 'center' })
+    doc.text('Thank you for your business!', pageWidth / 2, yPos, { align: 'center' })
+    yPos += 3
+    doc.text('This is a valid proof of transaction', pageWidth / 2, yPos, { align: 'center' })
 
     return doc
   }
