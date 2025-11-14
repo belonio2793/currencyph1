@@ -985,7 +985,10 @@ export default function MyBusiness({ userId }) {
                   setShowBusinessSelectionModal(true)
                 } else {
                   setActiveTab('overview')
-                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+                  setTimeout(() => {
+                    const section = document.getElementById('bir-integration-section')
+                    section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }, 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -1090,7 +1093,10 @@ export default function MyBusiness({ userId }) {
                   setShowBusinessSelectionModal(true)
                 } else {
                   setActiveTab('overview')
-                  setTimeout(() => tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100)
+                  setTimeout(() => {
+                    const section = document.getElementById('shareholders-section')
+                    section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                  }, 100)
                 }
               }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-yellow-300 transition-all group">
                 <div className="flex justify-center mb-4">
@@ -1247,7 +1253,7 @@ export default function MyBusiness({ userId }) {
               </div>
 
               {/* BIR Integration Section */}
-              <div className="mt-8 pt-8 border-t border-slate-200">
+              <div id="bir-integration-section" className="mt-8 pt-8 border-t border-slate-200">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4">BIR Integration</h3>
                 <p className="text-slate-600 mb-6">File taxes and access tax documents instantly</p>
                 <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
@@ -1284,7 +1290,7 @@ export default function MyBusiness({ userId }) {
               </div>
 
               {/* Shareholders Section */}
-              <div className="mt-8 pt-8 border-t border-slate-200">
+              <div id="shareholders-section" className="mt-8 pt-8 border-t border-slate-200">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4">Shareholders</h3>
                 <p className="text-slate-600 mb-6">Manage ownership and shareholders</p>
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
