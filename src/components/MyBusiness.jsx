@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import MerchantReceipts from './MerchantReceipts'
 import SelectBusinessModal from './SelectBusinessModal'
+import { miscellaneousCostsService } from '../lib/miscellaneousCostsService'
 
 // Generate PDF document with metadata
 const generatePDFDocument = (documentType, business) => {
@@ -172,8 +173,83 @@ export default function MyBusiness({ userId }) {
     currencyRegistrationNumber: ''
   })
   const [savingEdit, setSavingEdit] = useState(false)
+  const [miscCosts, setMiscCosts] = useState([])
+  const [receipts, setReceipts] = useState([])
+  const [showAddCostModal, setShowAddCostModal] = useState(false)
+  const [newCostData, setNewCostData] = useState({
+    description: '',
+    amount: '',
+    category: 'other',
+    cost_date: new Date().toISOString().split('T')[0],
+    payment_method: '',
+    notes: ''
+  })
+  const [savingCost, setSavingCost] = useState(false)
 
   // Generate TIN (12-digit format like government)
+  const loadSalesAndTaxData = async () => {
+    if (!selectedBusiness) return
+    try {
+      const costs = await miscellaneousCostsService.getBusinessCosts(selectedBusiness.id)
+      setMiscCosts(costs)
+
+      const receiptsData = await supabase
+        .from('business_receipts')
+        .select('*')
+        .eq('business_id', selectedBusiness.id)
+
+      if (receiptsData.error) throw receiptsData.error
+      setReceipts(receiptsData.data || [])
+    } catch (error) {
+      console.error('Error loading sales and tax data:', error)
+    }
+  }
+
+  const handleAddCost = async () => {
+    if (!selectedBusiness || !userId) return
+    if (!newCostData.description || !newCostData.amount) {
+      alert('Please fill in required fields')
+      return
+    }
+
+    try {
+      setSavingCost(true)
+      const cost = await miscellaneousCostsService.createCost(selectedBusiness.id, userId, newCostData)
+      setMiscCosts([cost, ...miscCosts])
+      setShowAddCostModal(false)
+      setNewCostData({
+        description: '',
+        amount: '',
+        category: 'other',
+        cost_date: new Date().toISOString().split('T')[0],
+        payment_method: '',
+        notes: ''
+      })
+    } catch (error) {
+      console.error('Error adding cost:', error)
+      alert('Failed to add cost')
+    } finally {
+      setSavingCost(false)
+    }
+  }
+
+  const handleDeleteCost = async (costId) => {
+    if (!confirm('Are you sure you want to delete this cost?')) return
+    try {
+      await miscellaneousCostsService.deleteCost(costId)
+      setMiscCosts(miscCosts.filter(c => c.id !== costId))
+    } catch (error) {
+      console.error('Error deleting cost:', error)
+      alert('Failed to delete cost')
+    }
+  }
+
+  const totalSales = receipts.reduce((sum, r) => sum + parseFloat(r.amount || 0), 0)
+  const totalMiscCosts = miscellaneousCostsService.calculateTotalCosts(miscCosts)
+  const totalCosts = totalMiscCosts
+  const netIncome = totalSales - totalCosts
+  const estimatedTax = netIncome > 0 ? netIncome * 0.12 : 0
+
   const generateTIN = () => {
     const randomTIN = Array.from({ length: 12 }, () => Math.floor(Math.random() * 10)).join('')
     return randomTIN.replace(/(\d{3})(\d{3})(\d{3})(\d{3})/, '$1-$2-$3-$4')
@@ -1352,7 +1428,10 @@ export default function MyBusiness({ userId }) {
                         </div>
                       </div>
                       <button
-                        onClick={() => setMerchantTab('receipts')}
+                        onClick={() => {
+                setMerchantTab('receipts')
+                loadSalesAndTaxData()
+              }}
                         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                       >
                         View Receipts →
