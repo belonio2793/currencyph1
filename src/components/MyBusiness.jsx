@@ -3,6 +3,7 @@ import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import MerchantReceipts from './MerchantReceipts'
+import SelectBusinessModal from './SelectBusinessModal'
 
 // Generate PDF document with metadata
 const generatePDFDocument = (documentType, business) => {
