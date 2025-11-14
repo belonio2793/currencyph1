@@ -303,6 +303,13 @@ export default function MyBusiness({ userId }) {
     }
   }, [activeTab, mainTab])
 
+  // Show business selection modal when no business is selected but businesses exist
+  useEffect(() => {
+    if (!loading && businesses.length > 0 && !selectedBusiness) {
+      setShowBusinessSelectionModal(true)
+    }
+  }, [loading, businesses.length, selectedBusiness])
+
   const loadBusinesses = async () => {
     try {
       setLoading(true)
