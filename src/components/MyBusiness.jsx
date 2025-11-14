@@ -1133,7 +1133,7 @@ export default function MyBusiness({ userId }) {
               {merchantTab === 'main' && (
                 <div>
                   <h4 className="text-lg font-semibold text-slate-900 mb-6">Merchant Tools Dashboard</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 gap-6">
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
                       <div className="flex items-center gap-4 mb-4">
                         <div className="p-3 bg-blue-600 rounded-lg">
