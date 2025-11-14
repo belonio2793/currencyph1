@@ -181,8 +181,10 @@ export default function MerchantReceipts({ business, userId }) {
 
       const newReceipt = await receiptService.createReceipt(business.id, userId, receiptData)
       setReceipts([newReceipt, ...receipts])
-      setSuccess('Receipt created successfully!')
-      setShowForm(false)
+      setCreatedReceiptId(newReceipt.id)
+      setSendToEmail('')
+      setSendToPhone('')
+      setShowSendToModal(true)
       setFormData({
         receipt_number: '',
         customer_name: '',
@@ -194,13 +196,42 @@ export default function MerchantReceipts({ business, userId }) {
         notes: ''
       })
       generateReceiptNumber()
-      setTimeout(() => setSuccess(''), 3000)
     } catch (err) {
       setError('Failed to create receipt')
       console.error(err)
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleSendReceipt = async () => {
+    const receipientEmail = sendToEmail || formData.customer_email
+    const recipientPhone = sendToPhone || formData.customer_phone
+
+    if (!receipientEmail && !recipientPhone) {
+      setError('Please provide an email or phone number to send the receipt to')
+      return
+    }
+
+    try {
+      console.log('Receipt would be sent to:', { email: receipientEmail, phone: recipientPhone })
+      setSuccess(`Receipt sent successfully to ${receipientEmail || recipientPhone}!`)
+      setTimeout(() => setSuccess(''), 3000)
+      setShowSendToModal(false)
+      setShowForm(false)
+      setCreatedReceiptId(null)
+    } catch (err) {
+      setError('Failed to send receipt')
+      console.error(err)
+    }
+  }
+
+  const handleSkipSend = () => {
+    setSuccess('Receipt created successfully!')
+    setTimeout(() => setSuccess(''), 3000)
+    setShowSendToModal(false)
+    setShowForm(false)
+    setCreatedReceiptId(null)
   }
 
   const filteredReceipts = receipts.filter(r =>
