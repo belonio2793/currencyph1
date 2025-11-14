@@ -49,32 +49,54 @@ export const receiptService = {
 
   async getUserReceipts(customerEmail, customerPhone) {
     try {
-      let query = supabase
-        .from('business_receipts')
-        .select(`
-          *,
-          businesses:business_id (
-            id,
-            business_name,
-            tin,
-            certificate_of_incorporation,
-            city_of_registration,
-            metadata
-          )
-        `)
-        .order('created_at', { ascending: false })
+      const receipts = []
 
       if (customerEmail) {
-        query = query.or(`customer_email.eq.${customerEmail},customer_email.ilike.${customerEmail}`)
+        const { data, error } = await supabase
+          .from('business_receipts')
+          .select(`
+            *,
+            businesses:business_id (
+              id,
+              business_name,
+              tin,
+              certificate_of_incorporation,
+              city_of_registration,
+              metadata
+            )
+          `)
+          .eq('customer_email', customerEmail)
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        if (data) receipts.push(...data)
       }
+
       if (customerPhone) {
-        query = query.or(`customer_phone.eq.${customerPhone},customer_phone.ilike.${customerPhone}`)
+        const { data, error } = await supabase
+          .from('business_receipts')
+          .select(`
+            *,
+            businesses:business_id (
+              id,
+              business_name,
+              tin,
+              certificate_of_incorporation,
+              city_of_registration,
+              metadata
+            )
+          `)
+          .eq('customer_phone', customerPhone)
+          .order('created_at', { ascending: false })
+
+        if (error) throw error
+        if (data) {
+          receipts.push(...data.filter(r => !receipts.find(existing => existing.id === r.id)))
+        }
       }
 
-      const { data, error } = await query
-
-      if (error) throw error
-      return data || []
+      receipts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      return receipts
     } catch (error) {
       console.error('Error fetching user receipts:', error)
       throw error
