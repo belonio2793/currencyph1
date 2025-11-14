@@ -240,5 +240,75 @@ export const receiptService = {
       console.error('Error sending receipt:', error)
       throw new Error(error.message || 'Failed to send receipt')
     }
+  },
+
+  async shareReceiptWithUser(receiptId, userEmail) {
+    try {
+      if (!receiptId) throw new Error('Receipt ID is required')
+      if (!userEmail) throw new Error('User email is required')
+
+      const { data, error } = await supabase
+        .from('receipt_shares')
+        .insert([
+          {
+            receipt_id: receiptId,
+            shared_with_email: userEmail,
+            shared_at: new Date().toISOString()
+          }
+        ])
+        .select()
+
+      if (error) throw error
+      return data?.[0]
+    } catch (error) {
+      console.error('Error sharing receipt:', error)
+      throw new Error(error.message || 'Failed to share receipt')
+    }
+  },
+
+  async getSharedReceiptsForUser(userEmail) {
+    try {
+      const { data, error } = await supabase
+        .from('receipt_shares')
+        .select(`
+          *,
+          receipts:receipt_id (
+            *,
+            businesses:business_id (
+              id,
+              business_name,
+              tin,
+              certificate_of_incorporation,
+              city_of_registration,
+              registration_type,
+              registration_date,
+              metadata
+            )
+          )
+        `)
+        .eq('shared_with_email', userEmail)
+        .order('shared_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('Error fetching shared receipts:', error)
+      throw error
+    }
+  },
+
+  async removeReceiptShare(shareId) {
+    try {
+      const { error } = await supabase
+        .from('receipt_shares')
+        .delete()
+        .eq('id', shareId)
+
+      if (error) throw error
+      return true
+    } catch (error) {
+      console.error('Error removing receipt share:', error)
+      throw error
+    }
   }
 }
