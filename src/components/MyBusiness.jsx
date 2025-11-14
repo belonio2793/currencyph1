@@ -1718,52 +1718,8 @@ export default function MyBusiness({ userId }) {
               )}
 
               {/* Digital Receipts Modal */}
-              {selectedFeatureModal === 'receipts' && (
-                <div>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-purple-100">
-                      <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-slate-900">Digital Receipts</h2>
-                      <p className="text-slate-600">Track and manage all digital receipts</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-6">
-                    <p className="text-slate-700">Digitally capture, organize, and manage all your business receipts and documentation.</p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Upload Receipts</h3>
-                        <p className="text-sm text-slate-600">Scan or photograph and upload receipts for automated processing.</p>
-                      </div>
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">OCR Processing</h3>
-                        <p className="text-sm text-slate-600">Automatically extract data from receipts using advanced OCR technology.</p>
-                      </div>
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Receipt Organization</h3>
-                        <p className="text-sm text-slate-600">Categorize and tag receipts for easy searching and retrieval.</p>
-                      </div>
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Tax Integration</h3>
-                        <p className="text-sm text-slate-600">Link receipts to expenses for accurate tax filing and compliance.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-slate-200">
-                    <button className="flex-1 px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold transition-colors">
-                      View Receipts
-                    </button>
-                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
-                      Upload New
-                    </button>
-                  </div>
-                </div>
+              {selectedFeatureModal === 'receipts' && selectedBusiness && (
+                <MerchantReceipts business={selectedBusiness} userId={userId} />
               )}
 
               {/* Payments Modal */}
