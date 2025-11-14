@@ -293,6 +293,7 @@ export const receiptService = {
               city_of_registration,
               registration_type,
               registration_date,
+              currency_registration_number,
               metadata
             )
           )
