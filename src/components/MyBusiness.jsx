@@ -614,7 +614,7 @@ export default function MyBusiness({ userId }) {
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Shareholders</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
-                    <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Register to access ���</div>
+                    <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Register to access ����</div>
                   </button>
                 </div>
               </div>
@@ -1317,8 +1317,9 @@ export default function MyBusiness({ userId }) {
               <div className="border-b border-slate-200 mb-6">
                 <div className="flex gap-4">
                   {[
-                    { id: 'main', label: 'Merchant Tools' },
-                    { id: 'receipts', label: 'Receipts' }
+                    { id: 'payments', label: 'Payments' },
+                    { id: 'receipts', label: 'Receipts' },
+                    { id: 'salesTaxReporting', label: 'Sales and Tax Reporting' }
                   ].map(tab => (
                     <button
                       key={tab.id}
@@ -1366,7 +1367,7 @@ export default function MyBusiness({ userId }) {
                           </svg>
                         </div>
                         <div>
-                          <h5 className="font-semibold text-slate-900">Payment Integration</h5>
+                          <h5 className="font-semibold text-slate-900">Payments</h5>
                           <p className="text-sm text-slate-600">Connect payment methods</p>
                         </div>
                       </div>
@@ -1401,8 +1402,51 @@ export default function MyBusiness({ userId }) {
                 </div>
               )}
 
+              {merchantTab === 'payments' && selectedBusiness && (
+                <div>
+                  <h4 className="text-lg font-semibold text-slate-900 mb-6">Payment Methods</h4>
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                    <h5 className="font-semibold text-slate-900 mb-2">Payment Integration</h5>
+                    <p className="text-slate-600 mb-6">Connect payment methods like GCash, PayMaya, and other payment gateways to streamline transactions.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <div className="bg-white rounded-lg p-4 border border-green-200">
+                        <h6 className="font-medium text-slate-900 mb-2">GCash</h6>
+                        <p className="text-sm text-slate-600 mb-3">Connect your GCash account for easy payments</p>
+                        <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">Connect</button>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-green-200">
+                        <h6 className="font-medium text-slate-900 mb-2">PayMaya</h6>
+                        <p className="text-sm text-slate-600 mb-3">Accept payments through PayMaya platform</p>
+                        <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">Connect</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {merchantTab === 'receipts' && selectedBusiness && (
                 <MerchantReceipts business={selectedBusiness} userId={userId} />
+              )}
+
+              {merchantTab === 'salesTaxReporting' && selectedBusiness && (
+                <div>
+                  <h4 className="text-lg font-semibold text-slate-900 mb-6">Sales & Tax Reporting</h4>
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+                    <h5 className="font-semibold text-slate-900 mb-2">Sales Analytics & Tax Reports</h5>
+                    <p className="text-slate-600 mb-6">View detailed sales analytics and generate tax reports for compliance.</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm text-slate-500 mb-1">Total Sales</p>
+                        <p className="text-2xl font-semibold text-slate-900">₱0.00</p>
+                      </div>
+                      <div className="bg-white rounded-lg p-4 border border-purple-200">
+                        <p className="text-sm text-slate-500 mb-1">Tax Liability</p>
+                        <p className="text-2xl font-semibold text-slate-900">₱0.00</p>
+                      </div>
+                    </div>
+                    <button className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">Generate Report</button>
+                  </div>
+                </div>
               )}
 
             </div>
