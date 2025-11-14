@@ -27,6 +27,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
   const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrder(userId))
   const [reorderKey, setReorderKey] = useState(0)
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false)
+  const [quickAccessCards, setQuickAccessCards] = useState(() => quickAccessManager.getCardVisibility(userId))
 
   useEffect(() => {
     loadData()
