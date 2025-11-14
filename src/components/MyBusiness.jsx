@@ -1386,7 +1386,15 @@ export default function MyBusiness({ userId }) {
             </div>
           )}
 
-          {activeTab !== 'overview' && activeTab !== 'merchant' && activeTab !== 'employees' && (
+          {activeTab === 'payments' && selectedBusiness && (
+            <PaymentIntegrations businessId={selectedBusiness.id} userId={userId} />
+          )}
+
+          {activeTab === 'sales-and-tax' && selectedBusiness && (
+            <SalesAndTaxReporting businessId={selectedBusiness.id} userId={userId} />
+          )}
+
+          {activeTab !== 'overview' && activeTab !== 'merchant' && activeTab !== 'employees' && activeTab !== 'payments' && activeTab !== 'sales-and-tax' && (
             <div className="text-center py-12">
               <p className="text-slate-500">Tab content for {activeTab} coming soon...</p>
             </div>
