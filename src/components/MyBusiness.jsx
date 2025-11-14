@@ -1017,8 +1017,8 @@ export default function MyBusiness({ userId }) {
           </div>
         )}
 
-        {/* Tab Navigation - Only show when business is selected */}
-        {selectedBusiness && (
+        {/* Tab Navigation - Only show when on Your Businesses tab and business is selected */}
+        {mainTab === 'businesses' && selectedBusiness && (
         <div className="bg-white border-b border-slate-200 rounded-t-lg mt-16">
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
