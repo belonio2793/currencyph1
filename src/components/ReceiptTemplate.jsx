@@ -243,25 +243,35 @@ export default function ReceiptTemplate({ receipt, business }) {
 
         {/* Business Information */}
         <div className="mb-6 print:mb-4">
+          <h2 className="text-xl font-bold mb-4 print:text-lg text-slate-900">{getBusinessInfo().name}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-            <div>
-              <h2 className="text-xl font-bold mb-4 print:text-lg text-slate-900">{getBusinessInfo().name}</h2>
-              <div className="space-y-2 text-slate-700 print:text-black">
-                {getBusinessInfo().tin && (
-                  <p><strong>TIN:</strong> <span className="font-mono">{getBusinessInfo().tin}</span></p>
-                )}
-                {getBusinessInfo().registration_type && (
-                  <p><strong>Business Type:</strong> {getBusinessInfo().registration_type.charAt(0).toUpperCase() + getBusinessInfo().registration_type.slice(1)}</p>
-                )}
-                {getBusinessInfo().bir && (
-                  <p><strong>BIR Certificate:</strong> <span className="font-mono text-xs">{getBusinessInfo().bir}</span></p>
-                )}
-                {getBusinessInfo().location && (
-                  <p><strong>Location:</strong> {getBusinessInfo().location}</p>
-                )}
-              </div>
+            <div className="space-y-2 text-slate-700 print:text-black">
+              <p>
+                <strong>TIN:</strong>{' '}
+                <span className={`font-mono ${getBusinessInfo().tin ? '' : 'text-slate-400 italic'}`}>
+                  {getBusinessInfo().tin || '___________________'}
+                </span>
+              </p>
+              <p>
+                <strong>BIR Certificate:</strong>{' '}
+                <span className={`font-mono text-xs ${getBusinessInfo().bir ? '' : 'text-slate-400 italic'}`}>
+                  {getBusinessInfo().bir || '___________________'}
+                </span>
+              </p>
+              <p>
+                <strong>Currency Reg #:</strong>{' '}
+                <span className={`font-mono ${getBusinessInfo().currency_reg ? '' : 'text-slate-400 italic'}`}>
+                  {getBusinessInfo().currency_reg || '___________________'}
+                </span>
+              </p>
+              {getBusinessInfo().registration_type && (
+                <p><strong>Business Type:</strong> {getBusinessInfo().registration_type.charAt(0).toUpperCase() + getBusinessInfo().registration_type.slice(1)}</p>
+              )}
             </div>
             <div className="space-y-2 text-slate-700 print:text-black text-sm">
+              {getBusinessInfo().location && (
+                <p><strong>Location:</strong> {getBusinessInfo().location}</p>
+              )}
               {getBusinessInfo().address && (
                 <p><strong>Address:</strong> {getBusinessInfo().address}</p>
               )}
@@ -270,9 +280,6 @@ export default function ReceiptTemplate({ receipt, business }) {
               )}
               {getBusinessInfo().email && (
                 <p><strong>Email:</strong> {getBusinessInfo().email}</p>
-              )}
-              {getBusinessInfo().currency_reg && (
-                <p><strong>Currency Reg:</strong> <span className="font-mono text-xs">{getBusinessInfo().currency_reg}</span></p>
               )}
               {getBusinessInfo().registration_date && (
                 <p><strong>Est. Date:</strong> {new Date(getBusinessInfo().registration_date).toLocaleDateString('en-PH')}</p>
