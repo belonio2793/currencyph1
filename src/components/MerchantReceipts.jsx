@@ -560,6 +560,94 @@ export default function MerchantReceipts({ business, userId }) {
         </div>
       )}
 
+      {/* Save Item Modal */}
+      {showSaveItemModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Save Item for Future Use</h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-2">Name this item</label>
+              <input
+                type="text"
+                value={saveItemName}
+                onChange={(e) => setSaveItemName(e.target.value)}
+                placeholder="e.g., Coffee, T-Shirt Size M, etc."
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+              />
+              <p className="text-xs text-slate-500 mt-2">
+                Item: {formData.items[editingItemIndex]?.description} - ₱{formData.items[editingItemIndex]?.price}
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleConfirmSaveItem}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm"
+              >
+                Save Item
+              </button>
+              <button
+                onClick={() => {
+                  setShowSaveItemModal(false)
+                  setSaveItemName('')
+                }}
+                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Send Receipt Modal */}
+      {showSendToModal && createdReceiptId && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">Send Receipt To Customer</h3>
+            <p className="text-sm text-slate-600 mb-6">Receipt has been created. Would you like to send it to the customer?</p>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Send to Email</label>
+                <input
+                  type="email"
+                  value={sendToEmail || formData.customer_email}
+                  onChange={(e) => setSendToEmail(e.target.value)}
+                  placeholder="customer@example.com"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Or Send to Phone (SMS)</label>
+                <input
+                  type="tel"
+                  value={sendToPhone || formData.customer_phone}
+                  onChange={(e) => setSendToPhone(e.target.value)}
+                  placeholder="+63912345678"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleSendReceipt}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+              >
+                Send Receipt
+              </button>
+              <button
+                onClick={handleSkipSend}
+                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm"
+              >
+                Skip
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mt-4 text-center">You can send the receipt anytime from the receipts list</p>
+          </div>
+        </div>
+      )}
+
       {/* Search */}
       <div className="bg-white border border-slate-200 rounded-lg p-4">
         <input
