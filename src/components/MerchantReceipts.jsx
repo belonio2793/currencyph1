@@ -79,10 +79,68 @@ export default function MerchantReceipts({ business, userId }) {
   const handleItemChange = (index, field, value) => {
     setFormData(prev => ({
       ...prev,
-      items: prev.items.map((item, i) => 
+      items: prev.items.map((item, i) =>
         i === index ? { ...item, [field]: value } : item
       )
     }))
+  }
+
+  const handleSaveItemForFuture = (index) => {
+    const item = formData.items[index]
+    if (!item.description || !item.price) {
+      setError('Please fill in item description and price before saving')
+      return
+    }
+    setEditingItemIndex(index)
+    setSaveItemName('')
+    setShowSaveItemModal(true)
+  }
+
+  const handleConfirmSaveItem = () => {
+    if (!saveItemName.trim()) {
+      setError('Please enter a name for this saved item')
+      return
+    }
+    const item = formData.items[editingItemIndex]
+    const newSavedItem = {
+      id: Date.now().toString(),
+      name: saveItemName,
+      description: item.description,
+      quantity: item.quantity,
+      price: item.price
+    }
+    const updated = [...savedItems, newSavedItem]
+    setSavedItems(updated)
+    localStorage.setItem(`saved-items-${business?.id}`, JSON.stringify(updated))
+    setSuccess(`Item "${saveItemName}" saved for future use!`)
+    setTimeout(() => setSuccess(''), 3000)
+    setShowSaveItemModal(false)
+    setSaveItemName('')
+  }
+
+  const handleUseSavedItem = (savedItem) => {
+    setFormData(prev => ({
+      ...prev,
+      items: [...prev.items, {
+        description: savedItem.description,
+        quantity: savedItem.quantity,
+        price: savedItem.price
+      }]
+    }))
+    setSuccess(`Added "${savedItem.name}" to items`)
+    setTimeout(() => setSuccess(''), 3000)
+  }
+
+  const handleRemoveSavedItem = (id) => {
+    const updated = savedItems.filter(item => item.id !== id)
+    setSavedItems(updated)
+    localStorage.setItem(`saved-items-${business?.id}`, JSON.stringify(updated))
+    setSuccess('Saved item removed')
+    setTimeout(() => setSuccess(''), 3000)
+  }
+
+  const handleReEditItem = (index) => {
+    setEditingItemIndex(index)
   }
 
   const calculateTotal = () => {
