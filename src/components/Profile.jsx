@@ -444,6 +444,46 @@ export default function Profile({ userId, onSignOut }) {
               </div>
             </div>
           </div>
+
+          {/* Quick Access Section */}
+          <div className="border-t border-slate-100 pt-6 mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h4 className="text-sm font-semibold text-slate-900">Quick Access</h4>
+              <button
+                onClick={() => setShowCustomizeModal(true)}
+                className="p-1 hover:bg-slate-100 rounded transition-colors text-slate-600 hover:text-slate-900"
+                title="Customize quick access cards"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex gap-2 mb-4 border-b border-slate-200">
+              <button
+                onClick={() => setActiveQuickAccessTab('receipts')}
+                className={`px-3 py-2 text-xs font-medium border-b-2 transition-colors ${
+                  activeQuickAccessTab === 'receipts'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Receipt History
+              </button>
+            </div>
+
+            {/* Tab Content */}
+            <div className="space-y-2">
+              {activeQuickAccessTab === 'receipts' && (
+                <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded">
+                  <p>Your receipt history will appear here. Visit the home page or merchant section to create and manage receipts.</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="lg:col-span-2">
@@ -639,7 +679,7 @@ export default function Profile({ userId, onSignOut }) {
                         <p className="text-xs text-slate-600">Verified on: {new Date(verificationStatus.didit_verified_at).toLocaleDateString()}</p>
                       )}
                       {verificationStatus.is_public && verificationStatus.status === 'approved' && (
-                        <p className="text-xs text-green-600 mt-2">���� Your verification is publicly visible</p>
+                        <p className="text-xs text-green-600 mt-2">🌐 Your verification is publicly visible</p>
                       )}
                       {!verificationStatus.is_public && verificationStatus.status === 'approved' && (
                         <p className="text-xs text-slate-600 mt-2">🔒 Your verification is private</p>
