@@ -19,6 +19,21 @@ export default function ReceiptTemplate({ receipt, business }) {
     })
   }
 
+  const getBusinessInfo = () => {
+    return {
+      name: business?.business_name || 'Business Name Not Provided',
+      tin: business?.tin || '',
+      bir: business?.certificate_of_incorporation || '',
+      location: business?.city_of_registration || '',
+      registration_type: business?.registration_type || '',
+      registration_date: business?.registration_date || '',
+      currency_reg: business?.metadata?.currency_registration_number || '',
+      address: business?.metadata?.address || '',
+      phone: business?.metadata?.phone || '',
+      email: business?.metadata?.email || ''
+    }
+  }
+
   const generatePDF = () => {
     const doc = new jsPDF({
       orientation: 'portrait',
