@@ -971,6 +971,142 @@ export default function Profile({ userId, onSignOut }) {
           </div>
         </div>
       )}
+
+      {/* Modals for Quick Access Cards */}
+      {showReceiptsModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-slate-900">Receipts</h3>
+              <button
+                onClick={() => setShowReceiptsModal(false)}
+                className="text-slate-400 hover:text-slate-600"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <ReceiptHistory
+              userEmail={formData.email || user?.email}
+              userPhone={formData.phone_number}
+              userId={userId}
+            />
+          </div>
+        </div>
+      )}
+
+      {showDepositModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowDepositModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <Deposits userId={userId} onClose={() => setShowDepositModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {showNearbyModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowNearbyModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <Nearby userId={userId} onClose={() => setShowNearbyModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {showInboxModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowInboxModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <Inbox userId={userId} onClose={() => setShowInboxModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {showP2PModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowP2PModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <P2PLoanMarketplace userId={userId} onClose={() => setShowP2PModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {showPokerModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowPokerModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <PokerPage userId={userId} onClose={() => setShowPokerModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {showNetworkBalancesModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowNetworkBalancesModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <NetworkBalances userId={userId} onClose={() => setShowNetworkBalancesModal(false)} />
+          </div>
+        </div>
+      )}
+
+      {showMyBusinessModal && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <button
+              onClick={() => setShowMyBusinessModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 z-10"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <MyBusiness userId={userId} onClose={() => setShowMyBusinessModal(false)} />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
