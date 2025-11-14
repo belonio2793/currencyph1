@@ -164,12 +164,18 @@ export default function Profile({ userId, onSignOut }) {
     }
   }
 
-  const handleSaveQuickAccessPreferences = () => {
-    quickAccessManager.setCardVisibility(userId, quickAccessCards)
-    setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
-    setSuccess('Quick access preferences saved!')
-    setTimeout(() => setSuccess(''), 3000)
-    setShowCustomizeModal(false)
+  const handleSaveQuickAccessPreferences = async () => {
+    try {
+      await quickAccessManager.setCardVisibility(userId, quickAccessCards)
+      const newEnabledCards = await quickAccessManager.getEnabledCardsInOrder(userId)
+      setEnabledCards(newEnabledCards)
+      setSuccess('Quick access preferences saved!')
+      setTimeout(() => setSuccess(''), 3000)
+      setShowCustomizeModal(false)
+    } catch (err) {
+      console.error('Error saving quick access preferences:', err)
+      setError('Failed to save preferences. Please try again.')
+    }
   }
 
   const toggleQuickAccessCard = (cardKey) => {
