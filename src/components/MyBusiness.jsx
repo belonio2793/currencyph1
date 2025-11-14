@@ -438,18 +438,13 @@ export default function MyBusiness({ userId }) {
   }
 
   const handleUpdateTaxInfo = async () => {
-    if (!editFormData.tin || !editFormData.certificateOfIncorporation) {
-      alert('Please fill in all required fields (Tax ID and BIR Certification Number)')
-      return
-    }
-
     try {
       setSavingEdit(true)
       const { error } = await supabase
         .from('businesses')
         .update({
-          tin: editFormData.tin,
-          certificate_of_incorporation: editFormData.certificateOfIncorporation,
+          tin: editFormData.tin || null,
+          certificate_of_incorporation: editFormData.certificateOfIncorporation || null,
           currency_registration_number: editFormData.currencyRegistrationNumber || null
         })
         .eq('id', selectedBusiness.id)
@@ -458,8 +453,8 @@ export default function MyBusiness({ userId }) {
 
       setSelectedBusiness({
         ...selectedBusiness,
-        tin: editFormData.tin,
-        certificate_of_incorporation: editFormData.certificateOfIncorporation,
+        tin: editFormData.tin || null,
+        certificate_of_incorporation: editFormData.certificateOfIncorporation || null,
         currency_registration_number: editFormData.currencyRegistrationNumber
       })
 
@@ -468,8 +463,8 @@ export default function MyBusiness({ userId }) {
           b.id === selectedBusiness.id
             ? {
                 ...b,
-                tin: editFormData.tin,
-                certificate_of_incorporation: editFormData.certificateOfIncorporation,
+                tin: editFormData.tin || null,
+                certificate_of_incorporation: editFormData.certificateOfIncorporation || null,
                 currency_registration_number: editFormData.currencyRegistrationNumber
               }
             : b
