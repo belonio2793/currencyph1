@@ -1142,7 +1142,6 @@ export default function MyBusiness({ userId }) {
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
               { id: 'overview', label: 'Overview' },
-              { id: 'merchant', label: 'Merchant Tools' },
               { id: 'salesTaxReporting', label: 'Sales and Tax Reporting' }
             ].map(tab => (
               <button
