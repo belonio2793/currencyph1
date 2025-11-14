@@ -565,6 +565,8 @@ export default function App() {
                 {activeTab === 'network' && <Network userId={userId} />}
                 {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
                 {activeTab === 'p2p-loans' && <P2PLoanMarketplace userId={userId} userEmail={userEmail} onTabChange={setActiveTab} />}
+                {activeTab === 'payments' && <PaymentIntegrations businessId={currentBusinessId} userId={userId} />}
+                {activeTab === 'sales-and-tax' && currentBusinessId && <SalesAndTaxReporting businessId={currentBusinessId} userId={userId} />}
                 {activeTab === 'about' && <About />}
                 {activeTab === 'inbox' && <Inbox userId={userId} />}
                 {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
