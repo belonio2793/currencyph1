@@ -97,7 +97,9 @@ export default function MerchantReceipts({ business, userId }) {
         customer_name: formData.customer_name,
         customer_email: formData.customer_email,
         customer_phone: formData.customer_phone || null,
-        payment_method: formData.payment_method,
+        payment_method: formData.payment_method === 'Other'
+          ? formData.payment_method_custom || 'Other'
+          : formData.payment_method,
         items: formData.items,
         amount: calculateTotal(),
         notes: formData.notes
