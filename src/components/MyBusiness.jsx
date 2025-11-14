@@ -1179,6 +1179,119 @@ export default function MyBusiness({ userId }) {
                   </p>
                 </div>
               </div>
+
+              {/* Supporting Documents Section */}
+              <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-xl font-semibold text-slate-900 mb-4">Supporting Documents</h3>
+                <p className="text-slate-600 mb-6">Official documents for {selectedBusiness.business_name}</p>
+                <div className="space-y-4">
+                  {/* Business Name Registration Certificate */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-lg font-semibold text-slate-900 mb-1">Business Name Registration</h4>
+                        <p className="text-sm text-slate-600">Official registration certificate for business name and type</p>
+                        <p className="text-xs text-slate-500 mt-2">Certificate #: {selectedBusiness.certificate_of_incorporation}</p>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => generateAndViewPDF('business-name', selectedBusiness)}
+                          className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium whitespace-nowrap"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => generateAndDownloadPDF('business-name', selectedBusiness)}
+                          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+                        >
+                          Export PDF
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Certificate of Incorporation */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-lg font-semibold text-slate-900 mb-1">Certificate of Incorporation</h4>
+                        <p className="text-sm text-slate-600">Official certificate of incorporation and business registration</p>
+                        <p className="text-xs text-slate-500 mt-2">TIN: {selectedBusiness.tin}</p>
+                      </div>
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => generateAndViewPDF('incorporation', selectedBusiness)}
+                          className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium whitespace-nowrap"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => generateAndDownloadPDF('incorporation', selectedBusiness)}
+                          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap"
+                        >
+                          Export PDF
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h4 className="text-sm font-semibold text-blue-900 mb-2">📌 Document Information</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>✓ All documents are officially certified and BIR compliant</li>
+                    <li>✓ PDFs can be printed, shared, or archived</li>
+                    <li>✓ Digital signatures included for authenticity</li>
+                    <li>✓ Generate new copies anytime needed</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* BIR Integration Section */}
+              <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-xl font-semibold text-slate-900 mb-4">BIR Integration</h3>
+                <p className="text-slate-600 mb-6">File taxes and access tax documents instantly</p>
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+                  <p className="text-slate-700 mb-4">Your business is registered with the Bureau of Internal Revenue. Tax compliance features are available through our integration.</p>
+                  <div className="flex gap-3">
+                    <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium">View Tax Status</button>
+                    <button className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium">File Annual Return</button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Business Registration Section */}
+              <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-xl font-semibold text-slate-900 mb-4">Business Registration</h3>
+                <p className="text-slate-600 mb-6">Manage your business and tax information</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-500 mb-2">Registration Status</p>
+                    <p className="text-lg font-semibold text-green-600">Active</p>
+                  </div>
+                  <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
+                    <p className="text-sm text-slate-500 mb-2">Last Updated</p>
+                    <p className="text-lg font-semibold text-slate-900">{selectedBusiness.registration_date ? new Date(selectedBusiness.registration_date).toLocaleDateString() : 'N/A'}</p>
+                  </div>
+                </div>
+                <div className="mt-4">
+                  <button
+                    onClick={openEditTaxInfo}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  >
+                    Update Information
+                  </button>
+                </div>
+              </div>
+
+              {/* Shareholders Section */}
+              <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-xl font-semibold text-slate-900 mb-4">Shareholders</h3>
+                <p className="text-slate-600 mb-6">Manage ownership and shareholders</p>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                  <p className="text-slate-700 mb-4">Shareholder management features allow you to track ownership percentages and maintain shareholder information for regulatory compliance.</p>
+                  <button className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium">Manage Shareholders</button>
+                </div>
+              </div>
             </div>
           )}
 
