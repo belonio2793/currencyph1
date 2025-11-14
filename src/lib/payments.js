@@ -36,7 +36,7 @@ const generateUniqueAccountNumber = async (length = 12, attempts = 10) => {
   throw new Error('Could not generate unique account number after multiple attempts')
 }
 
-export const wisegcashAPI = {
+export const currencyAPI = {
   // ============ User Management ============
   async getOrCreateUser(email, fullName = 'User') {
     try {
