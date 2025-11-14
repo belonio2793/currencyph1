@@ -34,6 +34,27 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
     loadData()
   }, [userId])
 
+  // Load quick access preferences from database on mount and when userId changes
+  useEffect(() => {
+    const loadQuickAccessFromDB = async () => {
+      if (!userId) return
+
+      try {
+        const visibility = await quickAccessManager.loadCardVisibilityFromDB(userId)
+        const order = await quickAccessManager.loadCardOrderFromDB(userId)
+
+        setQuickAccessCards(visibility)
+        const enabledInOrder = order.filter(cardKey => visibility[cardKey] === true)
+        setEnabledCards(enabledInOrder)
+        setReorderKey(prev => prev + 1)
+      } catch (err) {
+        console.error('Error loading quick access preferences from DB:', err)
+      }
+    }
+
+    loadQuickAccessFromDB()
+  }, [userId])
+
   // Listen for localStorage changes (from profile settings)
   useEffect(() => {
     const handleStorageChange = () => {
