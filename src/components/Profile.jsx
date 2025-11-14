@@ -93,8 +93,48 @@ export default function Profile({ userId, onSignOut }) {
     loadUser()
     loadDeviceInfo()
     loadVerificationStatus()
-    setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
+    loadPreferencesFromDatabase()
   }, [userId])
+
+  const loadPreferencesFromDatabase = async () => {
+    if (!userId || userId.includes('guest') || !isValidUUID(userId)) {
+      // For guest users, load from localStorage
+      setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
+      return
+    }
+
+    try {
+      // Load preferences from database
+      const dbPrefs = await preferencesManager.loadUserPreferences(userId)
+      if (dbPrefs) {
+        // Set auto scroll from database
+        setAutoScrollToTop(dbPrefs.auto_scroll_enabled)
+        // Store in localStorage as well for quick access
+        localStorage.setItem(`preferences_${userId}_autoScroll`, String(dbPrefs.auto_scroll_enabled))
+
+        // Load quick access cards from database
+        setQuickAccessCards(dbPrefs.quick_access_visibility || quickAccessManager.getCardVisibility(userId))
+        // Store card order from database
+        if (dbPrefs.quick_access_card_order && quickAccessManager.isValidOrder(dbPrefs.quick_access_card_order)) {
+          localStorage.setItem(`quick-access-order-${userId}`, JSON.stringify(dbPrefs.quick_access_card_order))
+        }
+
+        // Update enabled cards based on loaded preferences
+        const visibility = dbPrefs.quick_access_visibility || quickAccessManager.getCardVisibility(userId)
+        const order = dbPrefs.quick_access_card_order || quickAccessManager.getCardOrder(userId)
+        const enabledInOrder = order.filter(cardKey => visibility[cardKey] === true)
+        setEnabledCards(enabledInOrder)
+      } else {
+        // Fallback to localStorage if database load fails
+        setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
+        setEnabledCards(quickAccessManager.getEnabledCardsInOrderSync(userId))
+      }
+    } catch (err) {
+      console.warn('Error loading preferences from database, using localStorage:', err)
+      setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrderSync(userId))
+    }
+  }
 
   // Listen for reordering from customize modal
   useEffect(() => {
