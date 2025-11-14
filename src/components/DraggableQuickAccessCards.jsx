@@ -270,10 +270,25 @@ export default function DraggableQuickAccessCards({
     )
   } else {
     // Compact mode for profile settings
+    const getCompactCardColors = (cardKey) => {
+      const colorMap = {
+        receipts: { bg: 'bg-amber-50', border: 'border-amber-200', icon: 'text-amber-600' },
+        deposit: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
+        nearby: { bg: 'bg-green-50', border: 'border-green-200', icon: 'text-green-600' },
+        messages: { bg: 'bg-purple-50', border: 'border-purple-200', icon: 'text-purple-600' },
+        p2p: { bg: 'bg-purple-50', border: 'border-purple-200', icon: 'text-purple-600' },
+        poker: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'text-rose-600' },
+        networkBalances: { bg: 'bg-teal-50', border: 'border-teal-200', icon: 'text-teal-600' },
+        myBusiness: { bg: 'bg-indigo-50', border: 'border-indigo-200', icon: 'text-indigo-600' }
+      }
+      return colorMap[cardKey] || { bg: 'bg-slate-50', border: 'border-slate-200', icon: 'text-slate-600' }
+    }
+
     return (
       <div className="space-y-2">
         {cardKeys.map((cardKey, index) => {
           const config = CARD_CONFIG[cardKey]
+          const colors = getCompactCardColors(cardKey)
           if (!config) return null
 
           const isDragging = draggedItem?.cardKey === cardKey
@@ -288,33 +303,24 @@ export default function DraggableQuickAccessCards({
               onDragEnter={handleDragEnter}
               onDragLeave={handleDragLeave}
               onDrop={(e) => handleDrop(e, index)}
-              className={`transition-all duration-200 ${isDragEnabled ? 'cursor-grab active:cursor-grabbing' : ''} ${isDragging ? 'opacity-50' : ''}`}
+              className={`transition-all duration-200 ${isDragEnabled ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'} ${isDragging ? 'opacity-50' : ''}`}
             >
-              <div
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
+              <button
+                onClick={() => onCardClick && onCardClick(cardKey)}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all ${colors.bg} ${colors.border} ${
                   isDragOver ? 'ring-2 ring-blue-400 scale-102' : ''
-                } ${
-                  cardKey === 'receipts'
-                    ? 'bg-blue-50 border-blue-200'
-                    : cardKey === 'deposit'
-                      ? 'bg-green-50 border-green-200'
-                      : cardKey === 'nearby'
-                        ? 'bg-purple-50 border-purple-200'
-                        : cardKey === 'messages'
-                          ? 'bg-pink-50 border-pink-200'
-                          : 'bg-slate-50 border-slate-200'
-                }`}
+                } hover:shadow-md`}
               >
                 {isDragEnabled && (
-                  <div className="cursor-grab active:cursor-grabbing flex items-center gap-1 text-slate-400">
-                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <div className="cursor-grab active:cursor-grabbing flex items-center gap-1 flex-shrink-0">
+                    <svg className={`w-4 h-4 ${colors.icon}`} fill="currentColor" viewBox="0 0 20 20">
                       <path d="M8 5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM8 10a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM8 15a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM12.5 5a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM12.5 10a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM12.5 15a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
                     </svg>
                   </div>
                 )}
-                <span className="text-xs font-medium text-slate-700 flex-1">{config.title}</span>
-                {isDragEnabled && <span className="text-xs text-slate-500">drag</span>}
-              </div>
+                <span className="text-xs font-medium text-slate-700 flex-1 text-left">{config.title}</span>
+                <span className={`text-xs font-semibold ${colors.icon}`}>click</span>
+              </button>
             </div>
           )
         })}
