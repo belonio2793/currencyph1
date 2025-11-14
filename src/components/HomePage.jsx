@@ -270,149 +270,18 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         </div>
       </div>
 
-      {/* Customize Quick Access Modal */}
-      {showCustomizeModal && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full p-6 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">Customize Quick Access</h3>
-              <button
-                onClick={() => setShowCustomizeModal(false)}
-                className="text-slate-400 hover:text-slate-600 transition-colors"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-
-            <div className="mb-6">
-              <p className="text-sm text-slate-600 mb-4">Enable/disable cards to customize your home page:</p>
-
-              <div className="space-y-3 mb-6">
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.receipts}
-                    onChange={() => toggleQuickAccessCard('receipts')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Receipts</p>
-                    <p className="text-xs text-slate-500">View and download digital receipts</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.deposit}
-                    onChange={() => toggleQuickAccessCard('deposit')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Deposit</p>
-                    <p className="text-xs text-slate-500">Add funds to your wallet</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.nearby}
-                    onChange={() => toggleQuickAccessCard('nearby')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Nearby</p>
-                    <p className="text-xs text-slate-500">Find nearby businesses</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.messages}
-                    onChange={() => toggleQuickAccessCard('messages')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Messages</p>
-                    <p className="text-xs text-slate-500">Check your messages and stay connected</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.p2p}
-                    onChange={() => toggleQuickAccessCard('p2p')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">P2P Loan Marketplace</p>
-                    <p className="text-xs text-slate-500">Browse loans and submit offers</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.poker}
-                    onChange={() => toggleQuickAccessCard('poker')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Poker</p>
-                    <p className="text-xs text-slate-500">Play poker games and win rewards</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.networkBalances}
-                    onChange={() => toggleQuickAccessCard('networkBalances')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">Network Balances</p>
-                    <p className="text-xs text-slate-500">View balances across the network</p>
-                  </div>
-                </label>
-
-                <label className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer transition-colors">
-                  <input
-                    type="checkbox"
-                    checked={quickAccessCards.myBusiness}
-                    onChange={() => toggleQuickAccessCard('myBusiness')}
-                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-600"
-                  />
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-slate-900">My Business</p>
-                    <p className="text-xs text-slate-500">Manage your business and tax information</p>
-                  </div>
-                </label>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <button
-                onClick={handleSaveQuickAccessPreferences}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors"
-              >
-                Save Preferences
-              </button>
-              <button
-                onClick={() => setShowCustomizeModal(false)}
-                className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <CustomizeQuickAccessModal
+        isOpen={showCustomizeModal}
+        onClose={() => setShowCustomizeModal(false)}
+        userId={userId}
+        quickAccessCards={quickAccessCards}
+        onToggleCard={toggleQuickAccessCard}
+        enabledCards={enabledCards}
+        customizeReorderKey={reorderKey}
+        onSave={handleSaveQuickAccessPreferences}
+        onCardClick={handleCardClick}
+        showReorderSection={false}
+      />
 
       {/* Deposit Modal */}
       {showDepositModal && (
