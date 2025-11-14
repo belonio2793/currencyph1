@@ -262,6 +262,32 @@ export default function MerchantReceipts({ business, userId }) {
     setCreatedReceiptId(null)
   }
 
+  const handleShareReceipt = async () => {
+    if (!selectedReceipt?.id) {
+      setError('Receipt ID is missing')
+      return
+    }
+
+    if (!shareEmail.trim()) {
+      setError('Please enter an email address to share with')
+      return
+    }
+
+    setLoading(true)
+    try {
+      await receiptService.shareReceiptWithUser(selectedReceipt.id, shareEmail.trim())
+      setSuccess(`Receipt shared with ${shareEmail}!`)
+      setTimeout(() => setSuccess(''), 3000)
+      setShareEmail('')
+      setShowShareModal(false)
+    } catch (err) {
+      console.error('Error sharing receipt:', err)
+      setError(err.message || 'Failed to share receipt')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const filteredReceipts = receipts.filter(r =>
     r.receipt_number.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.customer_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
