@@ -1302,8 +1302,7 @@ export default function MyBusiness({ userId }) {
                 <div className="flex gap-4">
                   {[
                     { id: 'main', label: 'Merchant Tools' },
-                    { id: 'receipts', label: 'Receipts' },
-                    { id: 'payments', label: 'Payment Integrations' }
+                    { id: 'receipts', label: 'Receipts' }
                   ].map(tab => (
                     <button
                       key={tab.id}
