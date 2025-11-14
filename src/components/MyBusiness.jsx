@@ -1214,6 +1214,26 @@ export default function MyBusiness({ userId }) {
             </div>
           </div>
         )}
+
+        {/* Select Business Modal */}
+        {showBusinessSelectionModal && (
+          <SelectBusinessModal
+            businesses={businesses}
+            onSelect={(business) => {
+              setSelectedBusiness(business)
+              setShowBusinessSelectionModal(false)
+              setMainTab('businesses')
+            }}
+            onCreateNew={() => {
+              setShowBusinessSelectionModal(false)
+              initializeForm('create')
+            }}
+            onAddExisting={() => {
+              setShowBusinessSelectionModal(false)
+              initializeForm('existing')
+            }}
+          />
+        )}
       </div>
     </div>
   )
