@@ -877,6 +877,28 @@ export default function MyBusiness({ userId }) {
                 </div>
               </div>
             )}
+
+            {selectedBusiness && (
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 p-8 text-center">
+                <div className="max-w-2xl mx-auto">
+                  <p className="text-slate-700 mb-4">Want to add another business?</p>
+                  <div className="flex gap-3 justify-center">
+                    <button
+                      onClick={() => initializeForm('create')}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                    >
+                      Create New Business
+                    </button>
+                    <button
+                      onClick={() => initializeForm('existing')}
+                      className="px-6 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 font-medium"
+                    >
+                      Add Existing Business
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1017,8 +1039,8 @@ export default function MyBusiness({ userId }) {
           </div>
         )}
 
-        {/* Tab Navigation - Only show when on Your Businesses tab and business is selected */}
-        {mainTab === 'businesses' && selectedBusiness && (
+        {/* Tab Navigation - Only show when on Business Management tab and business is selected */}
+        {mainTab === 'management' && selectedBusiness && (
         <div className="bg-white border-b border-slate-200 rounded-t-lg mt-16">
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
@@ -1047,7 +1069,7 @@ export default function MyBusiness({ userId }) {
         )}
 
         {/* Tab Content */}
-        {mainTab === 'businesses' && selectedBusiness && (
+        {mainTab === 'management' && selectedBusiness && (
         <div ref={tabContentRef} className="bg-white rounded-b-lg border border-t-0 border-slate-200 p-8">
           {activeTab === 'overview' && (
             <div>
