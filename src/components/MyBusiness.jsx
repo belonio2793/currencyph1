@@ -165,6 +165,13 @@ export default function MyBusiness({ userId }) {
     cityOfRegistration: '',
     registrationDate: ''
   })
+  const [editMode, setEditMode] = useState(false)
+  const [editFormData, setEditFormData] = useState({
+    tin: '',
+    certificateOfIncorporation: '',
+    currencyRegistrationNumber: ''
+  })
+  const [savingEdit, setSavingEdit] = useState(false)
 
   // Generate TIN (12-digit format like government)
   const generateTIN = () => {
