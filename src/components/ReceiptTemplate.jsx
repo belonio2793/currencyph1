@@ -102,14 +102,21 @@ export default function ReceiptTemplate({ receipt, business }) {
     }
     yPos += 3
 
-    // Receipt Details
+    // Receipt Details - Two columns (Receipt # left, Date right)
     doc.setFont('Arial', 'bold')
-    doc.setFontSize(10)
-    doc.text(`Receipt #${receipt.receipt_number}`, 20, yPos)
+    doc.setFontSize(9)
+    doc.text('RECEIPT NUMBER', 20, yPos)
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
-    doc.text(`Date: ${formatDate(receipt.created_at)}`, pageWidth - 20, yPos, { align: 'right' })
-    yPos += 6
+    doc.text(`#${receipt.receipt_number}`, 20, yPos + 5)
+
+    doc.setFont('Arial', 'bold')
+    doc.setFontSize(9)
+    doc.text('DATE & TIME', pageWidth - 20, yPos, { align: 'right' })
+    doc.setFont('Arial', 'normal')
+    doc.setFontSize(9)
+    doc.text(formatDate(receipt.created_at), pageWidth - 20, yPos + 5, { align: 'right' })
+    yPos += 15
 
     // Customer Information
     yPos += 3
