@@ -45,6 +45,9 @@ export default function ReceiptTemplate({ receipt, business }) {
     const pageHeight = doc.internal.pageSize.getHeight()
     let yPos = 15
 
+    // Get business info for use in PDF
+    const businessInfo = getBusinessInfo()
+
     // Header
     doc.setFillColor(30, 64, 175)
     doc.rect(0, 0, pageWidth, 25, 'F')
@@ -53,7 +56,7 @@ export default function ReceiptTemplate({ receipt, business }) {
     doc.setFontSize(18)
     doc.text('OFFICIAL RECEIPT', pageWidth / 2, 12, { align: 'center' })
     doc.setFontSize(10)
-    doc.text('currency.ph', pageWidth / 2, 20, { align: 'center' })
+    doc.text(businessInfo.name, pageWidth / 2, 20, { align: 'center' })
 
     // Business Info Section
     const businessInfo = getBusinessInfo()
