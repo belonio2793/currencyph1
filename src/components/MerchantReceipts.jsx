@@ -601,7 +601,7 @@ export default function MerchantReceipts({ business, userId }) {
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
               />
               <p className="text-xs text-slate-500 mt-2">
-                Item: {formData.items[editingItemIndex]?.description} - ���{formData.items[editingItemIndex]?.price}
+                Item: {formData.items[editingItemIndex]?.description} - ₱{formData.items[editingItemIndex]?.price}
               </p>
             </div>
             <div className="flex gap-3">
