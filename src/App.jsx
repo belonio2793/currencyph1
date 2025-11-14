@@ -575,7 +575,8 @@ export default function App() {
       {/* Chat Bar */}
       {userId && <ChatBar userId={userId} userEmail={userEmail} />}
 
-      {/* Footer - On all pages */}
+      {/* Footer - Only show when logged in */}
+      {userId && (
       <footer className="bg-white border-t border-slate-100 mt-20">
         <div className="max-w-7xl mx-auto px-6 py-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
@@ -612,6 +613,7 @@ export default function App() {
           </div>
         </div>
       </footer>
+      )}
     </div>
   )
 }
