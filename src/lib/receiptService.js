@@ -176,7 +176,7 @@ export const receiptService = {
 
   async searchReceipts(businessId, searchTerm) {
     try {
-      const { data, error } = supabase
+      const { data, error } = await supabase
         .from('business_receipts')
         .select('*')
         .eq('business_id', businessId)
