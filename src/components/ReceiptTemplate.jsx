@@ -208,7 +208,7 @@ export default function ReceiptTemplate({ receipt, business }) {
     doc.setTextColor(100, 100, 100)
     doc.text('Thank you for your business! This receipt is valid proof of transaction.', pageWidth / 2, yPos, { align: 'center' })
     yPos += 4
-    doc.text('Issued digitally on currency.ph - Paperless Transactions', pageWidth / 2, yPos, { align: 'center' })
+    doc.text(`Issued digitally by ${businessInfo.name} - Paperless Transactions`, pageWidth / 2, yPos, { align: 'center' })
 
     return doc
   }
