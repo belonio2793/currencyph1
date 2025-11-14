@@ -59,7 +59,6 @@ export default function ReceiptTemplate({ receipt, business }) {
     doc.text(businessInfo.name, pageWidth / 2, 20, { align: 'center' })
 
     // Business Info Section
-    const businessInfo = getBusinessInfo()
     doc.setTextColor(0, 0, 0)
     doc.setFont('Arial', 'bold')
     doc.setFontSize(12)
