@@ -7,14 +7,14 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
   const mainNav = [
     { id: 'home', label: 'Home', public: true },
-    { id: 'nearby', label: 'Nearby', public: true },
+    { id: 'nearby', label: 'Nearby', auth: true },
     { id: 'online-users', label: 'Online Users', auth: true },
     { id: 'deposit', label: 'Deposit', auth: true },
-    { id: 'rates', label: 'Rates', public: true }
+    { id: 'rates', label: 'Rates', auth: true }
   ]
 
   const secondaryNav = [
-    { id: 'investments', label: 'Community Projects' }
+    { id: 'investments', label: 'Community Projects', auth: true }
   ]
 
   // Buttons that should appear under the Community Projects row
