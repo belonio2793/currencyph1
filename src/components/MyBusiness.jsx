@@ -1378,7 +1378,7 @@ export default function MyBusiness({ userId }) {
             </div>
           )}
 
-          {activeTab !== 'overview' && activeTab !== 'documents' && activeTab !== 'merchant' && (
+          {activeTab !== 'overview' && activeTab !== 'merchant' && activeTab !== 'employees' && (
             <div className="text-center py-12">
               <p className="text-slate-500">Tab content for {activeTab} coming soon...</p>
             </div>
