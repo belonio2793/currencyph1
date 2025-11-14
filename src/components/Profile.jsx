@@ -271,6 +271,18 @@ export default function Profile({ userId, onSignOut }) {
       // Clear device fingerprint
       deviceFingerprint.clear()
 
+      // Clear cache but preserve user_preferences for UUID presets
+      const allKeys = Object.keys(localStorage)
+      allKeys.forEach(key => {
+        // Keep user_preferences and quick access settings
+        if (!key.includes('user_preferences') && !key.includes('quick-access')) {
+          localStorage.removeItem(key)
+        }
+      })
+
+      // Clear sessionStorage completely
+      sessionStorage.clear()
+
       // Sign out from Supabase
       await supabase.auth.signOut()
 
