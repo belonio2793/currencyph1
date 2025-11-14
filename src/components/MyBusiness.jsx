@@ -1292,6 +1292,16 @@ export default function MyBusiness({ userId }) {
                   <button className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 font-medium">Manage Shareholders</button>
                 </div>
               </div>
+
+              {/* Payments Section */}
+              <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-xl font-semibold text-slate-900 mb-4">Payments</h3>
+                <p className="text-slate-600 mb-6">Connect and manage payment methods</p>
+                <div className="bg-pink-50 border border-pink-200 rounded-lg p-6">
+                  <p className="text-slate-700 mb-4">Connect your payment integrations like GCash, PayMaya, and other payment methods to streamline transactions and improve customer payment options.</p>
+                  <button className="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 font-medium">Manage Payment Methods</button>
+                </div>
+              </div>
             </div>
           )}
 
