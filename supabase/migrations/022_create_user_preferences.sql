@@ -6,8 +6,8 @@ CREATE TABLE IF NOT EXISTS user_preferences (
   quick_access_card_order TEXT[] DEFAULT ARRAY['deposit', 'nearby', 'receipts', 'messages', 'p2p', 'poker', 'networkBalances', 'myBusiness'],
   quick_access_visibility JSONB DEFAULT '{"receipts": true, "deposit": true, "nearby": true, "messages": false, "p2p": false, "poker": false, "networkBalances": false, "myBusiness": false}',
   other_preferences JSONB DEFAULT '{}',
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(user_id)
 );
 
