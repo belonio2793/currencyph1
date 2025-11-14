@@ -16,7 +16,7 @@ const COUNTRIES = [
   { code: 'CA', name: 'Canada', flag: '🇨��' },
   { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
   { code: 'AU', name: 'Australia', flag: '🇦🇺' },
-  { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+  { code: 'NZ', name: 'New Zealand', flag: '🇳��' },
   { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
   { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
   { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
@@ -79,6 +79,19 @@ export default function Profile({ userId, onSignOut }) {
     loadDeviceInfo()
     loadVerificationStatus()
     setAutoScrollToTop(preferencesManager.getAutoScrollToTop(userId))
+  }, [userId])
+
+  // Listen for reordering from customize modal
+  useEffect(() => {
+    const handleReorder = () => {
+      setCustomizeReorderKey(prev => prev + 1)
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
+    }
+
+    window.addEventListener('quick-access-reordered', handleReorder)
+    return () => {
+      window.removeEventListener('quick-access-reordered', handleReorder)
+    }
   }, [userId])
 
   const loadDeviceInfo = async () => {
