@@ -502,11 +502,12 @@ export default function Profile({ userId, onSignOut }) {
             <div>
               {enabledCards && enabledCards.length > 0 ? (
                 <>
-                  <p className="text-xs text-slate-500 font-medium mb-3">Enabled on Home Page (in order):</p>
+                  <p className="text-xs text-slate-500 font-medium mb-3">Enabled on Home Page (in order) - Drag to reorder, click to open:</p>
                   <DraggableQuickAccessCards
                     userId={userId}
                     cardKeys={enabledCards}
-                    isDragEnabled={false}
+                    onCardClick={handleQuickAccessCardClick}
+                    isDragEnabled={true}
                     isLargeMode={false}
                   />
                 </>
