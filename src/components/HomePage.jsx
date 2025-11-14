@@ -161,6 +161,23 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
     }
   }
 
+  const toggleQuickAccessCard = (cardKey) => {
+    const updated = { ...quickAccessCards, [cardKey]: !quickAccessCards[cardKey] }
+    setQuickAccessCards(updated)
+  }
+
+  const handleSaveQuickAccessPreferences = async () => {
+    try {
+      await quickAccessManager.setCardVisibility(userId, quickAccessCards)
+      const newEnabledCards = await quickAccessManager.getEnabledCardsInOrder(userId)
+      setEnabledCards(newEnabledCards)
+      setReorderKey(prev => prev + 1)
+      setShowCustomizeModal(false)
+    } catch (err) {
+      console.error('Error saving quick access preferences:', err)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
