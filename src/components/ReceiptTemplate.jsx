@@ -379,7 +379,7 @@ export default function ReceiptTemplate({ receipt, business }) {
         {/* Footer */}
         <div className="mt-8 print:mt-6 pt-6 print:pt-4 border-t print:border-gray-400 text-center text-xs text-slate-600 print:text-gray-700">
           <p className="mb-1">Thank you for your business! This receipt is valid proof of transaction.</p>
-          <p className="text-slate-500 print:text-gray-600">Issued digitally on currency.ph - Paperless Transactions</p>
+          <p className="text-slate-500 print:text-gray-600">Issued digitally by {getBusinessInfo().name} - Paperless Transactions</p>
         </div>
       </div>
 
