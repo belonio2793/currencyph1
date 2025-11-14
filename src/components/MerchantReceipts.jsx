@@ -333,6 +333,62 @@ export default function MerchantReceipts({ business, userId }) {
               <p className="text-xs text-slate-500 mt-1">{formData.notes.length}/500</p>
             </div>
 
+            {/* Business Information - Read Only (Bottom Section) */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+              <h5 className="font-semibold text-slate-900 mb-4 text-sm">Business Information</h5>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Business Name</label>
+                  <input
+                    type="text"
+                    value={business.business_name || ''}
+                    readOnly
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-900 font-semibold text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Currency Registration Number</label>
+                  <input
+                    type="text"
+                    value={business.currency_registration_number || 'N/A'}
+                    readOnly
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-600 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">TIN</label>
+                  <input
+                    type="text"
+                    value={business.tin || 'N/A'}
+                    readOnly
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-600 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">BIR Certificate</label>
+                  <input
+                    type="text"
+                    value={business.certificate_of_incorporation || 'N/A'}
+                    readOnly
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-600 font-mono text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-700 mb-1">Receipt Date</label>
+                  <input
+                    type="text"
+                    value={new Date().toLocaleDateString('en-PH', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                    readOnly
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-600 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
