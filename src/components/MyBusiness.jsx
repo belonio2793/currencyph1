@@ -1057,17 +1057,7 @@ export default function MyBusiness({ userId }) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
               {/* BIR Integration */}
-              <button onClick={() => {
-                if (!selectedBusiness) {
-                  setShowBusinessSelectionModal(true)
-                } else {
-                  setActiveTab('overview')
-                  setTimeout(() => {
-                    const section = document.getElementById('bir-integration-section')
-                    section?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                  }, 100)
-                }
-              }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
+              <button onClick={() => setSelectedFeatureModal('bir')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
