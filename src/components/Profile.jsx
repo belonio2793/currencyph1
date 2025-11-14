@@ -140,7 +140,7 @@ export default function Profile({ userId, onSignOut }) {
   useEffect(() => {
     const handleReorder = () => {
       setCustomizeReorderKey(prev => prev + 1)
-      setEnabledCards(quickAccessManager.getEnabledCardsInOrder(userId))
+      setEnabledCards(quickAccessManager.getEnabledCardsInOrderSync(userId))
     }
 
     window.addEventListener('quick-access-reordered', handleReorder)
