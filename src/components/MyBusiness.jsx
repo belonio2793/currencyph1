@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { jsPDF } from 'jspdf'
 import { supabase } from '../lib/supabaseClient'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
+import MerchantReceipts from './MerchantReceipts'
 
 // Generate PDF document with metadata
 const generatePDFDocument = (documentType, business) => {
