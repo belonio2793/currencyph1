@@ -10,6 +10,22 @@ export default function MerchantReceipts({ business, userId }) {
   const [searchTerm, setSearchTerm] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+
+  if (!userId) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <p className="text-yellow-900">Unable to access receipts. User ID is missing. Please refresh the page.</p>
+      </div>
+    )
+  }
+
+  if (!business?.id) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <p className="text-yellow-900">No business selected. Please select a business to manage receipts.</p>
+      </div>
+    )
+  }
   const [savedItems, setSavedItems] = useState(() => {
     const saved = localStorage.getItem(`saved-items-${business?.id}`)
     return saved ? JSON.parse(saved) : []
