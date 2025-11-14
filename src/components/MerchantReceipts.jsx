@@ -287,17 +287,22 @@ export default function MerchantReceipts({ business, userId }) {
               <label className="block text-sm font-medium text-slate-700 mb-2">Payment Method</label>
               <select
                 value={formData.payment_method}
-                onChange={(e) => setFormData({...formData, payment_method: e.target.value})}
+                onChange={(e) => setFormData({...formData, payment_method: e.target.value, payment_method_custom: ''})}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
               >
                 <option value="Cash">Cash</option>
-                <option value="Credit Card">Credit Card</option>
-                <option value="Debit Card">Debit Card</option>
-                <option value="Online Transfer">Online Transfer</option>
-                <option value="E-Wallet">E-Wallet</option>
-                <option value="Check">Check</option>
+                <option value="Balance">Balance</option>
                 <option value="Other">Other</option>
               </select>
+              {formData.payment_method === 'Other' && (
+                <input
+                  type="text"
+                  value={formData.payment_method_custom}
+                  onChange={(e) => setFormData({...formData, payment_method_custom: e.target.value})}
+                  placeholder="e.g., Credit Card, Online Transfer, E-Wallet, Check..."
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent mt-2"
+                />
+              )}
             </div>
 
             {/* Items Section */}
