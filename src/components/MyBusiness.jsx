@@ -1404,6 +1404,83 @@ export default function MyBusiness({ userId }) {
           </div>
         )}
 
+        {/* Edit Tax Information Modal */}
+        {editMode && selectedBusiness && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-2xl max-w-2xl w-full mx-4">
+              <div className="p-8">
+                <h2 className="text-2xl font-light text-slate-900 mb-2">Edit Tax Information</h2>
+                <p className="text-slate-600 mb-6">Update tax ID, BIR certification number, and currency registration number</p>
+
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">Tax ID (TIN) <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      placeholder="XXX-XXX-XXX-XXX"
+                      value={editFormData.tin}
+                      onChange={(e) => setEditFormData({ ...editFormData, tin: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Enter your Tax Identification Number</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">BIR Certification Number <span className="text-red-500">*</span></label>
+                    <input
+                      type="text"
+                      placeholder="BIR-XXXX-XX-XXXXXX"
+                      value={editFormData.certificateOfIncorporation}
+                      onChange={(e) => setEditFormData({ ...editFormData, certificateOfIncorporation: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Enter your BIR certification number</p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="block text-sm font-semibold text-slate-900">Currency Registration Number</label>
+                      {!editFormData.currencyRegistrationNumber && (
+                        <button
+                          onClick={handleGenerateCurrencyRegistration}
+                          className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                          Generate One
+                        </button>
+                      )}
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="CRN-XXXXXXXXXXXXXXXX"
+                      value={editFormData.currencyRegistrationNumber}
+                      onChange={(e) => setEditFormData({ ...editFormData, currencyRegistrationNumber: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 font-mono"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">Your unique Currency Registration Number for currency.ph</p>
+                  </div>
+                </div>
+
+                <div className="flex gap-3 pt-6 border-t border-slate-200 mt-6">
+                  <button
+                    onClick={handleUpdateTaxInfo}
+                    disabled={savingEdit || !editFormData.tin || !editFormData.certificateOfIncorporation}
+                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold transition-colors"
+                  >
+                    {savingEdit ? 'Saving...' : 'Save Changes'}
+                  </button>
+                  <button
+                    onClick={() => setEditMode(false)}
+                    disabled={savingEdit}
+                    className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Select Business Modal */}
         {showBusinessSelectionModal && (
           <SelectBusinessModal
