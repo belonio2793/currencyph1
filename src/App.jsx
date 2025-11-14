@@ -447,48 +447,54 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <HeaderMap userId={userId} />
-      <Navbar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        globalCurrency={globalCurrency}
-        setGlobalCurrency={setGlobalCurrency}
-        userEmail={userEmail}
-        userId={userId}
-        totalBalancePHP={totalBalancePHP}
-        totalBalanceConverted={totalBalanceConverted}
-        totalDebtConverted={totalDebtConverted}
-        totalNet={totalNet}
-        onShowAuth={(tab) => {
-          setAuthInitialTab(tab || 'login')
-          setShowAuth(true)
-          if (tab === 'register') window.history.replaceState(null, '', '/register')
-          else window.history.replaceState(null, '', '/login')
-          // scroll to top so auth card is visible (if preference is enabled)
-          const autoScroll = preferencesManager.getAutoScrollToTop(userId)
-          if (autoScroll) {
-            setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
-          }
-        }}
-        onSignOut={async () => {
-          try {
-            stopPresence()
-            await supabase.auth.signOut()
-          } catch (e) {
-            console.warn('Sign out error', e)
-          }
-          // Clear guest session from localStorage
-          try {
-            localStorage.removeItem('currency_ph_guest_session')
-          } catch (e) {
-            console.warn('Could not clear guest session', e)
-          }
-          setUserId(null)
-          setUserEmail(null)
-          // Don't force the auth overlay — keep the current route visible (e.g., /nearby)
-          setShowAuth(false)
-        }}
-      />
+      {!userId ? (
+        <OfflineTabNav activeTab={offlineTab} onTabChange={setOfflineTab} />
+      ) : (
+        <>
+          <HeaderMap userId={userId} />
+          <Navbar
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            globalCurrency={globalCurrency}
+            setGlobalCurrency={setGlobalCurrency}
+            userEmail={userEmail}
+            userId={userId}
+            totalBalancePHP={totalBalancePHP}
+            totalBalanceConverted={totalBalanceConverted}
+            totalDebtConverted={totalDebtConverted}
+            totalNet={totalNet}
+            onShowAuth={(tab) => {
+              setAuthInitialTab(tab || 'login')
+              setShowAuth(true)
+              if (tab === 'register') window.history.replaceState(null, '', '/register')
+              else window.history.replaceState(null, '', '/login')
+              // scroll to top so auth card is visible (if preference is enabled)
+              const autoScroll = preferencesManager.getAutoScrollToTop(userId)
+              if (autoScroll) {
+                setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
+              }
+            }}
+            onSignOut={async () => {
+              try {
+                stopPresence()
+                await supabase.auth.signOut()
+              } catch (e) {
+                console.warn('Sign out error', e)
+              }
+              // Clear guest session from localStorage
+              try {
+                localStorage.removeItem('currency_ph_guest_session')
+              } catch (e) {
+                console.warn('Could not clear guest session', e)
+              }
+              setUserId(null)
+              setUserEmail(null)
+              // Don't force the auth overlay — keep the current route visible (e.g., /nearby)
+              setShowAuth(false)
+            }}
+          />
+        </>
+      )}
 
       {/* User Status Bar */}
       {activeTab !== 'home' && (
