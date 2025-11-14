@@ -77,7 +77,7 @@ const FEATURE_ROWS = [
   }
 ]
 
-export default function OfflineDisplay() {
+export default function OfflineDisplay({ onShowAuth }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -88,10 +88,10 @@ export default function OfflineDisplay() {
             Your all-in-one financial platform for crypto, payments, and business management
           </p>
           <div className="flex gap-4 justify-center">
-            <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
+            <button onClick={() => onShowAuth?.('login')} className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
               Sign In
             </button>
-            <button className="px-8 py-3 bg-white text-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-50 font-semibold transition-colors">
+            <button onClick={() => onShowAuth?.('register')} className="px-8 py-3 bg-white text-blue-600 border-2 border-blue-600 rounded-lg hover:bg-blue-50 font-semibold transition-colors">
               Create Account
             </button>
           </div>
@@ -149,7 +149,7 @@ export default function OfflineDisplay() {
         {/* Footer */}
         <div className="mt-12 text-center text-slate-600">
           <p className="mb-4">Ready to get started?</p>
-          <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
+          <button onClick={() => onShowAuth?.('login')} className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
             Sign In or Create Account
           </button>
         </div>
