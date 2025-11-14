@@ -1488,7 +1488,7 @@ export default function MyBusiness({ userId }) {
             onSelect={(business) => {
               setSelectedBusiness(business)
               setShowBusinessSelectionModal(false)
-              setMainTab('businesses')
+              setMainTab('management')
             }}
             onCreateNew={() => {
               setShowBusinessSelectionModal(false)
