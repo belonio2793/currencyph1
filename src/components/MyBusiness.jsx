@@ -1545,55 +1545,6 @@ export default function MyBusiness({ userId }) {
               )}
 
               {/* Employees & Payroll Modal */}
-              {/* Merchant Tools Modal */}
-              {selectedFeatureModal === 'merchant' && (
-                <div>
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center justify-center w-16 h-16 rounded-lg bg-orange-100">
-                      <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h2 className="text-2xl font-bold text-slate-900">Merchant Tools</h2>
-                      <p className="text-slate-600">Manage sales, inventory, and transactions</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 mb-6">
-                    <p className="text-slate-700">Complete merchant solutions for managing your sales operations and inventory.</p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Point of Sale</h3>
-                        <p className="text-sm text-slate-600">Manage transactions and sales at your retail or service point.</p>
-                      </div>
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Inventory Management</h3>
-                        <p className="text-sm text-slate-600">Track stock levels, orders, and product movements.</p>
-                      </div>
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Sales Analytics</h3>
-                        <p className="text-sm text-slate-600">View detailed reports on sales performance and trends.</p>
-                      </div>
-                      <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                        <h3 className="font-semibold text-slate-900 mb-2">Customer Management</h3>
-                        <p className="text-sm text-slate-600">Build and manage your customer database and loyalty programs.</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t border-slate-200">
-                    <button className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-semibold transition-colors">
-                      Open Merchant Dashboard
-                    </button>
-                    <button className="flex-1 px-4 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors">
-                      View Analytics
-                    </button>
-                  </div>
-                </div>
-              )}
-
               {/* Digital Receipts Modal */}
               {selectedFeatureModal === 'receipts' && selectedBusiness && (
                 <MerchantReceipts business={selectedBusiness} userId={userId} />
