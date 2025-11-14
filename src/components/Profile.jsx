@@ -109,6 +109,8 @@ export default function Profile({ userId, onSignOut }) {
     setSuccess('Quick access preferences saved!')
     setTimeout(() => setSuccess(''), 3000)
     setShowCustomizeModal(false)
+    // Force a state update to re-render the sidebar
+    setAutoScrollToTop(!autoScrollToTop)
   }
 
   const toggleQuickAccessCard = (cardKey) => {
