@@ -3,30 +3,44 @@ import { supabase } from './supabaseClient'
 export const receiptService = {
   async createReceipt(businessId, userId, receiptData) {
     try {
+      if (!businessId) throw new Error('Business ID is required')
+      if (!userId) throw new Error('User ID is required')
+
+      const amount = parseFloat(receiptData.amount) || 0
+      if (amount < 0) throw new Error('Amount must be greater than or equal to 0')
+
       const { data, error } = await supabase
         .from('business_receipts')
         .insert([
           {
             business_id: businessId,
             user_id: userId,
-            receipt_number: receiptData.receipt_number,
-            customer_name: receiptData.customer_name,
-            customer_email: receiptData.customer_email,
-            customer_phone: receiptData.customer_phone,
-            amount: parseFloat(receiptData.amount),
-            payment_method: receiptData.payment_method,
-            items: receiptData.items || [],
-            notes: receiptData.notes,
+            receipt_number: receiptData.receipt_number || `RCP-${Date.now()}`,
+            customer_name: receiptData.customer_name || 'Walk-in Customer',
+            customer_email: receiptData.customer_email || null,
+            customer_phone: receiptData.customer_phone || null,
+            amount: amount,
+            payment_method: receiptData.payment_method || 'Balance',
+            items: Array.isArray(receiptData.items) ? receiptData.items : [],
+            notes: receiptData.notes || '',
             status: 'completed'
           }
         ])
         .select()
 
-      if (error) throw error
-      return data?.[0]
+      if (error) {
+        const errorMsg = error.message || 'Failed to create receipt'
+        throw new Error(errorMsg)
+      }
+
+      if (!data || data.length === 0) {
+        throw new Error('Receipt was not created. Please try again.')
+      }
+
+      return data[0]
     } catch (error) {
       console.error('Error creating receipt:', error)
-      throw error
+      throw new Error(error.message || 'Failed to create receipt')
     }
   },
 
