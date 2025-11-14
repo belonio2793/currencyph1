@@ -984,13 +984,13 @@ export default function MerchantReceipts({ business, userId }) {
                     type="email"
                     value={shareEmailInput}
                     onChange={(e) => setShareEmailInput(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleAddShareEmail()}
+                    onKeyPress={(e) => e.key === 'Enter' && handleAddShareEmailDuringCreation()}
                     placeholder="user@example.com"
                     className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-transparent text-sm"
                   />
                   <button
                     type="button"
-                    onClick={handleAddShareEmail}
+                    onClick={handleAddShareEmailDuringCreation}
                     className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm whitespace-nowrap"
                   >
                     Add Email
