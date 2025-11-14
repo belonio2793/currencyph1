@@ -30,7 +30,7 @@ export default function ReceiptTemplate({ receipt, business }) {
       location: businessData?.city_of_registration || '',
       registration_type: businessData?.registration_type || '',
       registration_date: businessData?.registration_date || '',
-      currency_reg: businessData?.metadata?.currency_registration_number || '',
+      currency_reg: businessData?.currency_registration_number || '',
       address: businessData?.metadata?.address || '',
       phone: businessData?.metadata?.phone || '',
       email: businessData?.metadata?.email || ''
