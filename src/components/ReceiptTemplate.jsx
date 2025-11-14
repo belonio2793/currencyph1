@@ -67,16 +67,21 @@ export default function ReceiptTemplate({ receipt, business }) {
 
     doc.setFont('Arial', 'normal')
     doc.setFontSize(9)
-    if (businessInfo.tin) {
-      doc.text(`TIN: ${businessInfo.tin}`, 20, yPos)
-      yPos += 5
-    }
+
+    // Always show TIN with placeholder if empty
+    doc.text(`TIN: ${businessInfo.tin || '___________________'}`, 20, yPos)
+    yPos += 5
+
+    // Always show BIR Certificate with placeholder if empty
+    doc.text(`BIR Certificate: ${businessInfo.bir || '___________________'}`, 20, yPos)
+    yPos += 5
+
+    // Always show Currency Registration with placeholder if empty
+    doc.text(`Currency Reg #: ${businessInfo.currency_reg || '___________________'}`, 20, yPos)
+    yPos += 5
+
     if (businessInfo.registration_type) {
       doc.text(`Business Type: ${businessInfo.registration_type.charAt(0).toUpperCase() + businessInfo.registration_type.slice(1)}`, 20, yPos)
-      yPos += 5
-    }
-    if (businessInfo.bir) {
-      doc.text(`BIR Certificate: ${businessInfo.bir}`, 20, yPos)
       yPos += 5
     }
     if (businessInfo.location) {
