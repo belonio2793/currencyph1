@@ -360,51 +360,110 @@ export default function MerchantReceipts({ business, userId }) {
             <div>
               <div className="flex justify-between items-center mb-4">
                 <label className="block text-sm font-medium text-slate-700">Items</label>
-                <button
-                  type="button"
-                  onClick={handleAddItem}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                >
-                  + Add Item
-                </button>
+                <div className="flex gap-2">
+                  {savedItems.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowSavedItems(!showSavedItems)}
+                      className="text-sm text-green-600 hover:text-green-700 font-medium flex items-center gap-1"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Saved Items ({savedItems.length})
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleAddItem}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Add Item
+                  </button>
+                </div>
               </div>
+
+              {showSavedItems && savedItems.length > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                  <h5 className="text-sm font-semibold text-green-900 mb-3">Quick Add - Saved Items</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {savedItems.map((savedItem) => (
+                      <div key={savedItem.id} className="flex items-center justify-between bg-white p-3 rounded border border-green-200">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-slate-900 truncate">{savedItem.name}</p>
+                          <p className="text-xs text-slate-600">₱{savedItem.price} × {savedItem.quantity}</p>
+                        </div>
+                        <div className="flex gap-2 ml-2">
+                          <button
+                            type="button"
+                            onClick={() => handleUseSavedItem(savedItem)}
+                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            Add
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSavedItem(savedItem.id)}
+                            className="px-2 py-1 text-xs text-red-600 hover:bg-red-50 rounded"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-3">
                 {formData.items.map((item, index) => (
-                  <div key={index} className="flex gap-3">
-                    <input
-                      type="text"
-                      value={item.description}
-                      onChange={(e) => handleItemChange(index, 'description', e.target.value)}
-                      placeholder="Item description"
-                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
-                    <input
-                      type="number"
-                      value={item.quantity}
-                      onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                      min="1"
-                      placeholder="Qty"
-                      className="w-20 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
-                    <input
-                      type="number"
-                      value={item.price}
-                      onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value) || 0)}
-                      step="0.01"
-                      placeholder="Price"
-                      className="w-24 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    />
-                    {formData.items.length > 1 && (
+                  <div key={index} className={`flex gap-2 ${editingItemIndex === index ? 'bg-blue-50 p-3 rounded-lg border border-blue-200' : ''}`}>
+                    <div className="flex-1 flex gap-3">
+                      <input
+                        type="text"
+                        value={item.description}
+                        onChange={(e) => handleItemChange(index, 'description', e.target.value)}
+                        placeholder="Item description"
+                        className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      />
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                        min="1"
+                        placeholder="Qty"
+                        className="w-20 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      />
+                      <input
+                        type="number"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(index, 'price', parseFloat(e.target.value) || 0)}
+                        step="0.01"
+                        placeholder="Price"
+                        className="w-24 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      />
+                    </div>
+                    <div className="flex gap-1">
                       <button
                         type="button"
-                        onClick={() => handleRemoveItem(index)}
-                        className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        onClick={() => handleSaveItemForFuture(index)}
+                        className="px-3 py-2 text-green-600 hover:bg-green-50 rounded-lg text-xs font-medium whitespace-nowrap"
+                        title="Save this item for future use"
                       >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        Save
                       </button>
-                    )}
+                      {formData.items.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveItem(index)}
+                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
