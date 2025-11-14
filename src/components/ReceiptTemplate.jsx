@@ -61,8 +61,11 @@ export default function ReceiptTemplate({ receipt, business }) {
       doc.text(`Location: ${business.city_of_registration}`, 20, yPos)
       yPos += 5
     }
-    doc.text(`Currency Registration: ${receipt.currencies_registration_number || 'N/A'}`, 20, yPos)
-    yPos += 8
+    if (business.metadata?.currency_registration_number) {
+      doc.text(`Currency Registration: ${business.metadata.currency_registration_number}`, 20, yPos)
+      yPos += 5
+    }
+    yPos += 3
 
     // Receipt Details
     doc.setFont('Arial', 'bold')
