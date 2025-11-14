@@ -161,56 +161,62 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         {/* Featured Sections */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Deposit Card */}
-          <button
-            onClick={() => setShowDepositModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+          {quickAccessCards.deposit && (
+            <button
+              onClick={() => setShowDepositModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Deposit</h3>
-            <p className="text-sm text-slate-600 mb-4">Add funds to your wallet using fiat or cryptocurrency</p>
-            <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">Get started →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Deposit</h3>
+              <p className="text-sm text-slate-600 mb-4">Add funds to your wallet using fiat or cryptocurrency</p>
+              <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">Get started →</div>
+            </button>
+          )}
 
           {/* Nearby Card */}
-          <button
-            onClick={() => setShowNearbyModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
+          {quickAccessCards.nearby && (
+            <button
+              onClick={() => setShowNearbyModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Nearby</h3>
-            <p className="text-sm text-slate-600 mb-4">Find nearby businesses, shops, and services</p>
-            <div className="text-sm font-medium text-green-600 group-hover:text-green-700">Explore →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Nearby</h3>
+              <p className="text-sm text-slate-600 mb-4">Find nearby businesses, shops, and services</p>
+              <div className="text-sm font-medium text-green-600 group-hover:text-green-700">Explore →</div>
+            </button>
+          )}
 
           {/* Messages Card */}
-          <button
-            onClick={() => setShowInboxModal(true)}
-            className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group"
-          >
-            <div className="flex justify-center mb-4">
-              <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+          {quickAccessCards.messages && (
+            <button
+              onClick={() => setShowInboxModal(true)}
+              className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group"
+            >
+              <div className="flex justify-center mb-4">
+                <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
               </div>
-            </div>
-            <h3 className="text-xl font-semibold text-slate-900 mb-2">Messages</h3>
-            <p className="text-sm text-slate-600 mb-4">Check your messages and stay connected</p>
-            <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Open inbox →</div>
-          </button>
+              <h3 className="text-xl font-semibold text-slate-900 mb-2">Messages</h3>
+              <p className="text-sm text-slate-600 mb-4">Check your messages and stay connected</p>
+              <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Open inbox →</div>
+            </button>
+          )}
 
           {/* P2P Loan Marketplace Card */}
           <button
