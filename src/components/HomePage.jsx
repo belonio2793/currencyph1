@@ -41,6 +41,29 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
     loadData()
   }, [userId])
 
+  // Listen for localStorage changes (from profile settings)
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved = localStorage.getItem(`quick-access-cards-${userId}`)
+      if (saved) {
+        try {
+          setQuickAccessCards(JSON.parse(saved))
+        } catch (e) {
+          console.error('Failed to parse quick access preferences:', e)
+        }
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    // Also listen for a custom event for same-window updates
+    window.addEventListener('quick-access-updated', handleStorageChange)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('quick-access-updated', handleStorageChange)
+    }
+  }, [userId])
+
   // Recompute converted totals when display currency changes
   useEffect(() => {
     if (!loading) {
