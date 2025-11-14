@@ -141,6 +141,8 @@ export const receiptService = {
             tin,
             certificate_of_incorporation,
             city_of_registration,
+            registration_type,
+            registration_date,
             metadata
           )
         `)
