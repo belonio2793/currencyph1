@@ -113,6 +113,7 @@ export default function MerchantReceipts({ business, userId }) {
         customer_email: '',
         customer_phone: '',
         payment_method: 'Cash',
+        payment_method_custom: '',
         items: [{ description: '', quantity: 1, price: 0 }],
         notes: ''
       })
