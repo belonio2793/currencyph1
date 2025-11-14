@@ -1077,20 +1077,6 @@ export default function MyBusiness({ userId }) {
                 <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">Access feature →</div>
               </button>
 
-              {/* Merchant Tools */}
-              <button onClick={() => setSelectedFeatureModal('merchant')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-orange-300 transition-all group">
-                <div className="flex justify-center mb-4">
-                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4z" />
-                    </svg>
-                  </div>
-                </div>
-                <h3 className="text-xl font-semibold text-slate-900 mb-2">Merchant Tools</h3>
-                <p className="text-sm text-slate-600 mb-4">Manage sales, inventory, and transactions</p>
-                <div className="text-sm font-medium text-orange-600 group-hover:text-orange-700">Access feature →</div>
-              </button>
-
               {/* Digital Receipts */}
               <button onClick={() => setSelectedFeatureModal('receipts')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
                 <div className="flex justify-center mb-4">
