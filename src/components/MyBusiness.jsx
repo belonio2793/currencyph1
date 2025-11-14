@@ -589,7 +589,7 @@ export default function MyBusiness({ userId }) {
                     <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Register to access →</div>
                   </button>
 
-                  {/* Payment Integrations */}
+                  {/* Payments */}
                   <button className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-pink-300 transition-all group opacity-75">
                     <div className="flex justify-center mb-4">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-pink-100 group-hover:bg-pink-200 transition-colors">
@@ -598,7 +598,7 @@ export default function MyBusiness({ userId }) {
                         </svg>
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Payment Integration</h3>
+                    <h3 className="text-xl font-semibold text-slate-900 mb-2">Payments</h3>
                     <p className="text-sm text-slate-600 mb-4">Connect GCash, PayMaya, and more</p>
                     <div className="text-sm font-medium text-pink-600 group-hover:text-pink-700">Register to access →</div>
                   </button>
