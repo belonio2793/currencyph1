@@ -205,6 +205,13 @@ export default function MyBusiness({ userId }) {
     }
   }, [userId])
 
+  // Show modal when management tab is accessed without a business selected
+  useEffect(() => {
+    if (mainTab === 'management' && !selectedBusiness) {
+      setShowBusinessSelectionModal(true)
+    }
+  }, [mainTab, selectedBusiness])
+
   const loadBusinesses = async () => {
     try {
       setLoading(true)
@@ -895,7 +902,7 @@ export default function MyBusiness({ userId }) {
                 </div>
                 <h3 className="text-xl font-semibold text-slate-900 mb-2">Digital Receipts</h3>
                 <p className="text-sm text-slate-600 mb-4">Track and manage all digital receipts</p>
-                <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Access feature →</div>
+                <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Access feature ��</div>
               </button>
 
               {/* Payment Integrations */}
