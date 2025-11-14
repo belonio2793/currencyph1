@@ -1458,7 +1458,7 @@ export default function MyBusiness({ userId }) {
                 <div className="flex gap-3 pt-6 border-t border-slate-200 mt-6">
                   <button
                     onClick={handleUpdateTaxInfo}
-                    disabled={savingEdit || !editFormData.tin || !editFormData.certificateOfIncorporation}
+                    disabled={savingEdit}
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-semibold transition-colors"
                   >
                     {savingEdit ? 'Saving...' : 'Save Changes'}
