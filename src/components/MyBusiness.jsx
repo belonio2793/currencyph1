@@ -1490,7 +1490,33 @@ export default function MyBusiness({ userId }) {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h4 className="text-lg font-semibold text-slate-900">Sales & Tax Reporting</h4>
-                <button onClick={() => { loadSalesAndTaxData() }} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm">Refresh Data</button>
+                <div className="flex gap-2">
+                  <button onClick={() => exportToCSV()} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm">Export CSV</button>
+                  <button onClick={() => { loadSalesAndTaxData(); loadReportingData(); }} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm">Refresh</button>
+                </div>
+              </div>
+
+              {/* Period Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-slate-50 p-6 rounded-lg border border-slate-200">
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">Reporting Period</label>
+                  <select value={reportingPeriod} onChange={(e) => setReportingPeriod(e.target.value)} className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600">
+                    <option value="annual">Annual</option>
+                    <option value="Q1">Q1 (Jan - Mar)</option>
+                    <option value="Q2">Q2 (Apr - Jun)</option>
+                    <option value="Q3">Q3 (Jul - Sep)</option>
+                    <option value="Q4">Q4 (Oct - Dec)</option>
+                    <option value="ytd">Year-to-Date</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-slate-900 mb-2">Year</label>
+                  <select value={reportingYear} onChange={(e) => setReportingYear(parseInt(e.target.value))} className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600">
+                    {[new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2].map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
               {/* Key Metrics */}
