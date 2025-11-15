@@ -1519,32 +1519,38 @@ export default function MyBusiness({ userId }) {
                 </div>
               </div>
 
-              {/* Key Metrics */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
-                  <p className="text-sm text-slate-600 font-medium mb-2">Total Sales</p>
-                  <p className="text-3xl font-bold text-blue-600">₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  <p className="text-xs text-slate-600 mt-2">{receipts.length} receipts</p>
+              {/* Key Metrics for Selected Period */}
+              {loadingReports ? (
+                <div className="text-center py-12">
+                  <p className="text-slate-500">Loading reporting data...</p>
                 </div>
+              ) : annualReport ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+                    <p className="text-sm text-slate-600 font-medium mb-2">Total Sales</p>
+                    <p className="text-3xl font-bold text-blue-600">₱{annualReport.totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">{annualReport.receiptCount} receipts</p>
+                  </div>
 
-                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
-                  <p className="text-sm text-slate-600 font-medium mb-2">Total Expenses</p>
-                  <p className="text-3xl font-bold text-orange-600">₱{totalCosts.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  <p className="text-xs text-slate-600 mt-2">{miscCosts.length} deductions</p>
-                </div>
+                  <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
+                    <p className="text-sm text-slate-600 font-medium mb-2">Total Expenses</p>
+                    <p className="text-3xl font-bold text-orange-600">₱{annualReport.totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">{annualReport.expenseCount} deductions</p>
+                  </div>
 
-                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
-                  <p className="text-sm text-slate-600 font-medium mb-2">Net Income</p>
-                  <p className={`text-3xl font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  <p className="text-xs text-slate-600 mt-2">After deductions</p>
-                </div>
+                  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+                    <p className="text-sm text-slate-600 font-medium mb-2">Net Income</p>
+                    <p className={`text-3xl font-bold ${annualReport.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{annualReport.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">Profit Margin: {annualReport.profitMargin}%</p>
+                  </div>
 
-                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
-                  <p className="text-sm text-slate-600 font-medium mb-2">Estimated Tax (12%)</p>
-                  <p className="text-3xl font-bold text-purple-600">₱{estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                  <p className="text-xs text-slate-600 mt-2">Tax liability</p>
+                  <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+                    <p className="text-sm text-slate-600 font-medium mb-2">Tax Liability</p>
+                    <p className="text-3xl font-bold text-purple-600">₱{annualReport.estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">Paid: ₱{annualReport.taxPaid.toFixed(2)}</p>
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
               {/* Detailed Report */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
