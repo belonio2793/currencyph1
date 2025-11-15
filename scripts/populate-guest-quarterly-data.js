@@ -92,30 +92,33 @@ async function populateQuarterlyData() {
     // Create test expenses across quarters
     const testExpenses = [
       // Q1 (Jan-Mar)
-      { amount: 100, created_at: '2025-01-10T10:00:00Z', category: 'supplies' },
-      { amount: 150, created_at: '2025-02-15T10:00:00Z', category: 'utilities' },
-      { amount: 80, created_at: '2025-03-18T10:00:00Z', category: 'rent' },
+      { amount: 100, cost_date: '2025-01-10', category: 'supplies' },
+      { amount: 150, cost_date: '2025-02-15', category: 'utilities' },
+      { amount: 80, cost_date: '2025-03-18', category: 'rent' },
       // Q2 (Apr-Jun)
-      { amount: 200, created_at: '2025-04-08T10:00:00Z', category: 'supplies' },
-      { amount: 180, created_at: '2025-05-12T10:00:00Z', category: 'utilities' },
-      { amount: 150, created_at: '2025-06-20T10:00:00Z', category: 'rent' },
+      { amount: 200, cost_date: '2025-04-08', category: 'supplies' },
+      { amount: 180, cost_date: '2025-05-12', category: 'utilities' },
+      { amount: 150, cost_date: '2025-06-20', category: 'rent' },
       // Q3 (Jul-Sep)
-      { amount: 220, created_at: '2025-07-14T10:00:00Z', category: 'supplies' },
-      { amount: 200, created_at: '2025-08-16T10:00:00Z', category: 'utilities' },
-      { amount: 180, created_at: '2025-09-22T10:00:00Z', category: 'rent' },
+      { amount: 220, cost_date: '2025-07-14', category: 'supplies' },
+      { amount: 200, cost_date: '2025-08-16', category: 'utilities' },
+      { amount: 180, cost_date: '2025-09-22', category: 'rent' },
       // Q4 (Oct-Dec)
-      { amount: 250, created_at: '2025-10-12T10:00:00Z', category: 'supplies' },
-      { amount: 230, created_at: '2025-11-18T10:00:00Z', category: 'utilities' },
-      { amount: 200, created_at: '2025-12-20T10:00:00Z', category: 'rent' }
+      { amount: 250, cost_date: '2025-10-12', category: 'supplies' },
+      { amount: 230, cost_date: '2025-11-18', category: 'utilities' },
+      { amount: 200, cost_date: '2025-12-20', category: 'rent' }
     ];
 
-    const expensesToInsert = testExpenses.map(e => ({
+    const expensesToInsert = testExpenses.map((e, idx) => ({
       business_id: business.id,
+      user_id: userId || business.user_id,
+      description: `Test ${e.category} expense - ₱${e.amount}`,
       amount: e.amount,
-      description: `Test expense - ₱${e.amount} (${e.category})`,
       category: e.category,
-      created_at: e.created_at,
-      updated_at: e.created_at
+      cost_date: e.cost_date,
+      payment_method: 'Cash',
+      notes: `Test expense for quarterly reporting`,
+      status: 'recorded'
     }));
 
     const { data: insertedExpenses, error: expensesError } = await supabase
