@@ -187,6 +187,27 @@ export default function MyBusiness({ userId }) {
   })
   const [savingCost, setSavingCost] = useState(false)
   const [selectedFeatureModal, setSelectedFeatureModal] = useState(null)
+  const [reportingPeriod, setReportingPeriod] = useState('annual')
+  const [reportingYear, setReportingYear] = useState(new Date().getFullYear())
+  const [quarterlyReports, setQuarterlyReports] = useState([])
+  const [annualReport, setAnnualReport] = useState(null)
+  const [monthlyData, setMonthlyData] = useState([])
+  const [showExpenseForm, setShowExpenseForm] = useState(false)
+  const [expenseFormData, setExpenseFormData] = useState({
+    description: '',
+    amount: '',
+    category: 'other',
+    receiptDate: new Date().toISOString().split('T')[0]
+  })
+  const [showTaxPaymentForm, setShowTaxPaymentForm] = useState(false)
+  const [taxPaymentData, setTaxPaymentData] = useState({
+    amount: '',
+    paymentDate: new Date().toISOString().split('T')[0],
+    paymentMethod: 'bank_transfer',
+    referenceNumber: ''
+  })
+  const [taxPayments, setTaxPayments] = useState([])
+  const [loadingReports, setLoadingReports] = useState(false)
 
   // Generate TIN (12-digit format like government)
   const loadSalesAndTaxData = async () => {
