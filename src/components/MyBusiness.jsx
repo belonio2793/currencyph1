@@ -1321,22 +1321,148 @@ export default function MyBusiness({ userId }) {
 
           {activeTab === 'salesTaxReporting' && selectedBusiness && (
             <div>
-              <h4 className="text-lg font-semibold text-slate-900 mb-6">Sales & Tax Reporting</h4>
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-                <h5 className="font-semibold text-slate-900 mb-2">Sales Analytics & Tax Reports</h5>
-                <p className="text-slate-600 mb-6">View detailed sales analytics and generate tax reports for compliance.</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-white rounded-lg p-4 border border-purple-200">
-                    <p className="text-sm text-slate-500 mb-1">Total Sales</p>
-                    <p className="text-2xl font-semibold text-slate-900">₱0.00</p>
-                  </div>
-                  <div className="bg-white rounded-lg p-4 border border-purple-200">
-                    <p className="text-sm text-slate-500 mb-1">Tax Liability</p>
-                    <p className="text-2xl font-semibold text-slate-900">₱0.00</p>
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-lg font-semibold text-slate-900">Sales & Tax Reporting</h4>
+                <button onClick={() => { loadSalesAndTaxData() }} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm">Refresh Data</button>
+              </div>
+
+              {/* Key Metrics */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+                  <p className="text-sm text-slate-600 font-medium mb-2">Total Sales</p>
+                  <p className="text-3xl font-bold text-blue-600">₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-slate-600 mt-2">{receipts.length} receipts</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
+                  <p className="text-sm text-slate-600 font-medium mb-2">Total Expenses</p>
+                  <p className="text-3xl font-bold text-orange-600">₱{totalCosts.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-slate-600 mt-2">{miscCosts.length} deductions</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+                  <p className="text-sm text-slate-600 font-medium mb-2">Net Income</p>
+                  <p className={`text-3xl font-bold ${netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-slate-600 mt-2">After deductions</p>
+                </div>
+
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+                  <p className="text-sm text-slate-600 font-medium mb-2">Estimated Tax (12%)</p>
+                  <p className="text-3xl font-bold text-purple-600">₱{estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                  <p className="text-xs text-slate-600 mt-2">Tax liability</p>
+                </div>
+              </div>
+
+              {/* Detailed Report */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Sales Summary */}
+                <div className="bg-white rounded-lg border border-slate-200 p-6">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-4">Sales Summary</h5>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                      <span className="text-slate-600">Total Receipts</span>
+                      <span className="font-semibold text-slate-900">{receipts.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                      <span className="text-slate-600">Total Sales Amount</span>
+                      <span className="font-semibold text-slate-900">₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    {receipts.length > 0 && (
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <span className="text-slate-600">Average Transaction</span>
+                        <span className="font-semibold text-slate-900">₱{(totalSales / receipts.length).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </div>
+                    )}
+                    <div className="pt-4">
+                      <p className="text-xs text-slate-500">Last Updated: {new Date().toLocaleDateString()}</p>
+                    </div>
                   </div>
                 </div>
-                <button className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium">Generate Report</button>
+
+                {/* Expenses Summary */}
+                <div className="bg-white rounded-lg border border-slate-200 p-6">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-4">Expenses & Deductions</h5>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                      <span className="text-slate-600">Total Deductions</span>
+                      <span className="font-semibold text-slate-900">{miscCosts.length}</span>
+                    </div>
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                      <span className="text-slate-600">Total Expense Amount</span>
+                      <span className="font-semibold text-slate-900">₱{totalCosts.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                      <span className="text-slate-600">Net Profit Margin</span>
+                      <span className="font-semibold text-slate-900">{totalSales > 0 ? ((netIncome / totalSales) * 100).toFixed(2) : 0}%</span>
+                    </div>
+                    <div className="pt-4">
+                      <p className="text-xs text-slate-500">Manage deductions in the business details section</p>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* Tax Breakdown */}
+              <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 p-6 mt-8">
+                <h5 className="text-lg font-semibold text-slate-900 mb-6">Tax Calculation Breakdown</h5>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between pb-4 border-b border-purple-300">
+                    <span className="text-slate-700">Gross Sales</span>
+                    <span className="font-semibold text-slate-900">₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-4 border-b border-purple-300">
+                    <span className="text-slate-700">Less: Expenses & Deductions</span>
+                    <span className="font-semibold text-slate-900">-₱{totalCosts.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex items-center justify-between pb-4 border-b border-purple-300 bg-white bg-opacity-50 px-4 py-2 rounded">
+                    <span className="text-slate-700 font-medium">Taxable Income</span>
+                    <span className="font-bold text-slate-900">₱{netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                  <div className="flex items-center justify-between pt-4">
+                    <span className="text-slate-700 font-medium">Tax Rate</span>
+                    <span className="font-semibold text-slate-900">12%</span>
+                  </div>
+                  <div className="flex items-center justify-between bg-purple-600 text-white px-4 py-3 rounded-lg mt-4">
+                    <span className="font-semibold">Estimated Tax Liability</span>
+                    <span className="text-2xl font-bold">₱{estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Receipts Preview */}
+              {receipts.length > 0 && (
+                <div className="mt-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-4">Recent Receipts (Last 5)</h5>
+                  <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                          <th className="text-left px-6 py-3 text-slate-700 font-semibold">Date</th>
+                          <th className="text-left px-6 py-3 text-slate-700 font-semibold">Description</th>
+                          <th className="text-right px-6 py-3 text-slate-700 font-semibold">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {receipts.slice(0, 5).map((receipt, index) => (
+                          <tr key={receipt.id || index} className="border-b border-slate-200 hover:bg-slate-50">
+                            <td className="px-6 py-3 text-slate-600">{new Date(receipt.created_at || receipt.receipt_date).toLocaleDateString()}</td>
+                            <td className="px-6 py-3 text-slate-700 font-medium">{receipt.description || receipt.notes || 'Receipt'}</td>
+                            <td className="px-6 py-3 text-right font-semibold text-slate-900">₱{parseFloat(receipt.amount || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+
+              {/* No Data State */}
+              {receipts.length === 0 && miscCosts.length === 0 && (
+                <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 mt-8">
+                  <p className="text-slate-500 text-lg">No sales or expense data yet</p>
+                  <p className="text-slate-400 text-sm mt-2">Add receipts and expenses to see your tax reporting</p>
+                </div>
+              )}
             </div>
           )}
 
