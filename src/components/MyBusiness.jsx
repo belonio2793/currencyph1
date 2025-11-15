@@ -310,6 +310,13 @@ export default function MyBusiness({ userId }) {
     }
   }, [loading, businesses.length, selectedBusiness])
 
+  // Load sales and tax data when Sales and Tax Reporting tab is accessed
+  useEffect(() => {
+    if (activeTab === 'salesTaxReporting' && selectedBusiness) {
+      loadSalesAndTaxData()
+    }
+  }, [activeTab, selectedBusiness?.id])
+
   const loadBusinesses = async () => {
     try {
       setLoading(true)
