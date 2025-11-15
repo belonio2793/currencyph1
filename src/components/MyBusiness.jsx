@@ -466,8 +466,16 @@ export default function MyBusiness({ userId }) {
   useEffect(() => {
     if (activeTab === 'salesTaxReporting' && selectedBusiness) {
       loadSalesAndTaxData()
+      loadReportingData()
     }
   }, [activeTab, selectedBusiness?.id])
+
+  // Reload reporting data when period or year changes
+  useEffect(() => {
+    if (activeTab === 'salesTaxReporting' && selectedBusiness) {
+      loadReportingData()
+    }
+  }, [reportingPeriod, reportingYear, selectedBusiness?.id])
 
   const loadBusinesses = async () => {
     try {
