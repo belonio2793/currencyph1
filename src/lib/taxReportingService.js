@@ -126,7 +126,7 @@ export const taxReportingService = {
       })
 
       expenses?.forEach(expense => {
-        const month = new Date(expense.created_at).getMonth()
+        const month = new Date(expense.cost_date).getMonth()
         monthlyData[month].expenses += parseFloat(expense.amount || 0)
       })
 
