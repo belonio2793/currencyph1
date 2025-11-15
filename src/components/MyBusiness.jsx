@@ -1552,6 +1552,139 @@ export default function MyBusiness({ userId }) {
                 </div>
               ) : null}
 
+              {/* Monthly Breakdown */}
+              {monthlyData.length > 0 && (
+                <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-6">Monthly Breakdown ({reportingYear})</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {monthlyData.map((month, idx) => (
+                      month.sales > 0 || month.expenses > 0 ? (
+                        <div key={idx} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200">
+                          <p className="font-semibold text-slate-900 mb-3">{month.month}</p>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Sales:</span>
+                              <span className="font-medium text-blue-600">₱{month.sales.toFixed(0)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Expenses:</span>
+                              <span className="font-medium text-orange-600">₱{month.expenses.toFixed(0)}</span>
+                            </div>
+                            <div className="flex justify-between pt-2 border-t border-slate-300">
+                              <span className="font-semibold text-slate-900">Net:</span>
+                              <span className={`font-bold ${month.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{month.netIncome.toFixed(0)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ) : null
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 mb-8">
+                <button onClick={() => setShowExpenseForm(!showExpenseForm)} className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">+ Add Expense</button>
+                <button onClick={() => setShowTaxPaymentForm(!showTaxPaymentForm)} className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">+ Record Tax Payment</button>
+              </div>
+
+              {/* Expense Form */}
+              {showExpenseForm && (
+                <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6 mb-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-4">Add Business Expense</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="text" placeholder="Description" value={expenseFormData.description} onChange={(e) => setExpenseFormData({ ...expenseFormData, description: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600" />
+                    <input type="number" placeholder="Amount" value={expenseFormData.amount} onChange={(e) => setExpenseFormData({ ...expenseFormData, amount: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600" />
+                    <select value={expenseFormData.category} onChange={(e) => setExpenseFormData({ ...expenseFormData, category: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600">
+                      <option value="supplies">Office Supplies</option>
+                      <option value="rent">Rent</option>
+                      <option value="utilities">Utilities</option>
+                      <option value="transport">Transportation</option>
+                      <option value="meals">Meals & Entertainment</option>
+                      <option value="equipment">Equipment</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <input type="date" value={expenseFormData.receiptDate} onChange={(e) => setExpenseFormData({ ...expenseFormData, receiptDate: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600" />
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <button onClick={handleAddExpense} disabled={savingCost} className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-slate-300 font-medium">{savingCost ? 'Saving...' : 'Save Expense'}</button>
+                    <button onClick={() => setShowExpenseForm(false)} className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Tax Payment Form */}
+              {showTaxPaymentForm && (
+                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-4">Record Tax Payment</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input type="number" placeholder="Payment Amount" value={taxPaymentData.amount} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, amount: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600" />
+                    <input type="date" value={taxPaymentData.paymentDate} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, paymentDate: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600" />
+                    <select value={taxPaymentData.paymentMethod} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, paymentMethod: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600">
+                      <option value="bank_transfer">Bank Transfer</option>
+                      <option value="check">Check</option>
+                      <option value="cash">Cash</option>
+                      <option value="credit_card">Credit Card</option>
+                    </select>
+                    <input type="text" placeholder="Reference Number (Optional)" value={taxPaymentData.referenceNumber} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, referenceNumber: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600" />
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <button onClick={handleSaveTaxPayment} disabled={savingCost} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 font-medium">{savingCost ? 'Saving...' : 'Record Payment'}</button>
+                    <button onClick={() => setShowTaxPaymentForm(false)} className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Recent Tax Payments */}
+              {taxPayments.length > 0 && (
+                <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-4">Tax Payments History</h5>
+                  <div className="space-y-3">
+                    {taxPayments.map((payment, idx) => (
+                      <div key={idx} className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div>
+                          <p className="font-medium text-slate-900">{new Date(payment.payment_date).toLocaleDateString()}</p>
+                          <p className="text-sm text-slate-600">{payment.payment_method} {payment.reference_number && `- Ref: ${payment.reference_number}`}</p>
+                        </div>
+                        <p className="text-lg font-bold text-green-600">₱{parseFloat(payment.amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quarterly Breakdown */}
+              {quarterlyReports.length > 0 && reportingPeriod === 'annual' && (
+                <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-6">Quarterly Breakdown ({reportingYear})</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {quarterlyReports.map((q, idx) => (
+                      <div key={idx} className="border border-slate-300 rounded-lg p-4 bg-slate-50">
+                        <h6 className="font-semibold text-slate-900 mb-3">{q.period}</h6>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-slate-600">Sales:</span>
+                            <span className="font-medium">₱{q.totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-600">Expenses:</span>
+                            <span className="font-medium">₱{q.totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between border-t border-slate-300 pt-2">
+                            <span className="font-semibold">Net Income:</span>
+                            <span className={`font-bold ${q.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{q.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-slate-600">Est. Tax:</span>
+                            <span className="font-medium">₱{q.estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Detailed Report */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Sales Summary */}
