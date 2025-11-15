@@ -228,6 +228,136 @@ export default function MyBusiness({ userId }) {
     }
   }
 
+  // Load detailed tax reporting data
+  const loadReportingData = async () => {
+    if (!selectedBusiness) return
+    try {
+      setLoadingReports(true)
+
+      // Load quarterly reports
+      const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
+      const qReports = await Promise.all(
+        quarters.map(q => taxReportingService.calculateReportingPeriod(selectedBusiness.id, q, reportingYear))
+      )
+      setQuarterlyReports(qReports)
+
+      // Load annual report
+      const annual = await taxReportingService.calculateReportingPeriod(selectedBusiness.id, 'annual', reportingYear)
+      setAnnualReport(annual)
+
+      // Load monthly breakdown
+      const monthly = await taxReportingService.getMonthlyBreakdown(selectedBusiness.id, reportingYear)
+      setMonthlyData(monthly)
+
+      // Load tax payments
+      const yearStart = new Date(reportingYear, 0, 1)
+      const yearEnd = new Date(reportingYear, 11, 31)
+      const { data: payments } = await supabase
+        .from('tax_payments')
+        .select('*')
+        .eq('business_id', selectedBusiness.id)
+        .gte('payment_date', yearStart.toISOString())
+        .lte('payment_date', yearEnd.toISOString())
+      setTaxPayments(payments || [])
+    } catch (error) {
+      console.error('Error loading reporting data:', error)
+    } finally {
+      setLoadingReports(false)
+    }
+  }
+
+  // Add expense function
+  const handleAddExpense = async () => {
+    if (!selectedBusiness || !expenseFormData.description || !expenseFormData.amount) return
+    try {
+      setSavingCost(true)
+      const cost = await taxReportingService.addBusinessExpense(
+        selectedBusiness.id,
+        expenseFormData.description,
+        parseFloat(expenseFormData.amount),
+        expenseFormData.category,
+        expenseFormData.receiptDate
+      )
+      setMiscCosts([cost, ...miscCosts])
+      setShowExpenseForm(false)
+      setExpenseFormData({
+        description: '',
+        amount: '',
+        category: 'other',
+        receiptDate: new Date().toISOString().split('T')[0]
+      })
+      loadReportingData()
+    } catch (error) {
+      console.error('Error adding expense:', error)
+    } finally {
+      setSavingCost(false)
+    }
+  }
+
+  // Save tax payment
+  const handleSaveTaxPayment = async () => {
+    if (!selectedBusiness || !taxPaymentData.amount || !taxPaymentData.paymentDate) return
+    try {
+      setSavingCost(true)
+      await taxReportingService.saveTaxPayment(
+        selectedBusiness.id,
+        parseFloat(taxPaymentData.amount),
+        taxPaymentData.paymentDate,
+        taxPaymentData.paymentMethod,
+        taxPaymentData.referenceNumber
+      )
+      setShowTaxPaymentForm(false)
+      setTaxPaymentData({
+        amount: '',
+        paymentDate: new Date().toISOString().split('T')[0],
+        paymentMethod: 'bank_transfer',
+        referenceNumber: ''
+      })
+      loadReportingData()
+    } catch (error) {
+      console.error('Error saving tax payment:', error)
+    } finally {
+      setSavingCost(false)
+    }
+  }
+
+  // Export report to CSV
+  const exportToCSV = () => {
+    if (!annualReport) return
+
+    const headers = ['Metric', 'Value']
+    const rows = [
+      ['Period', `${reportingYear}`],
+      ['Total Sales', `₱${annualReport.totalSales.toFixed(2)}`],
+      ['Total Expenses', `₱${annualReport.totalExpenses.toFixed(2)}`],
+      ['Net Income', `₱${annualReport.netIncome.toFixed(2)}`],
+      ['Profit Margin', `${annualReport.profitMargin}%`],
+      ['Estimated Tax (12%)', `₱${annualReport.estimatedTax.toFixed(2)}`],
+      ['Tax Paid', `₱${annualReport.taxPaid.toFixed(2)}`],
+      ['Tax Due', `₱${annualReport.taxDue.toFixed(2)}`],
+      ['', ''],
+      ['Monthly Breakdown', ''],
+    ]
+
+    monthlyData.forEach(month => {
+      rows.push([
+        month.month,
+        `Sales: ₱${month.sales.toFixed(2)}, Expenses: ₱${month.expenses.toFixed(2)}, Net: ₱${month.netIncome.toFixed(2)}`
+      ])
+    })
+
+    const csv = [headers, ...rows]
+      .map(row => row.map(cell => `"${cell}"`).join(','))
+      .join('\n')
+
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `tax-report-${reportingYear}.csv`
+    a.click()
+  }
+
   const handleAddCost = async () => {
     if (!selectedBusiness || !userId) return
     if (!newCostData.description || !newCostData.amount) {
