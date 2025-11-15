@@ -1,11 +1,23 @@
 import { supabase } from './supabaseClient'
 
 export const taxReportingService = {
+  // Month range mapping for quarters
+  getQuarterMonthRange(quarterNumber) {
+    const monthRanges = {
+      1: 'Jan - Mar',
+      2: 'Apr - Jun',
+      3: 'Jul - Sep',
+      4: 'Oct - Dec'
+    }
+    return monthRanges[quarterNumber] || ''
+  },
+
   // Calculate quarterly/annual totals
   async calculateReportingPeriod(businessId, period = 'annual', year = new Date().getFullYear()) {
     try {
       const currentYear = new Date().getFullYear()
       let startDate, endDate
+      let monthRange = ''
 
       if (period === 'annual') {
         startDate = new Date(year, 0, 1)
@@ -14,6 +26,7 @@ export const taxReportingService = {
         const quarter = parseInt(period.slice(1))
         startDate = new Date(year, (quarter - 1) * 3, 1)
         endDate = new Date(year, quarter * 3, 0)
+        monthRange = this.getQuarterMonthRange(quarter)
         if (year === currentYear && quarter === Math.ceil((new Date().getMonth() + 1) / 3)) {
           endDate = new Date()
         }
