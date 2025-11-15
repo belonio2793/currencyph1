@@ -37,6 +37,15 @@ async function populateQuarterlyData() {
 
     console.log('Cleared existing data');
 
+    // First get a guest user from auth (we need a user_id for receipts)
+    const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
+    const guestAuthUser = authUsers?.find(u => u.email === 'guest@currency.ph');
+    const userId = guestAuthUser?.id || business.user_id;
+
+    if (!userId) {
+      console.log('Warning: Could not determine user_id. Using business.user_id');
+    }
+
     // Create test receipts across quarters
     const testReceipts = [
       // Q1 (Jan-Mar)
@@ -57,12 +66,19 @@ async function populateQuarterlyData() {
       { amount: 1300, created_at: '2025-12-22T10:00:00Z' }
     ];
 
-    const receiptsToInsert = testReceipts.map(r => ({
+    const receiptsToInsert = testReceipts.map((r, idx) => ({
       business_id: business.id,
+      user_id: userId || business.user_id,
+      receipt_number: `RCP-Q${Math.ceil((idx + 1) / 3)}-${idx + 1}`,
+      customer_name: `Customer ${idx + 1}`,
+      customer_email: null,
+      customer_phone: null,
       amount: r.amount,
-      description: `Test receipt - ₱${r.amount}`,
-      created_at: r.created_at,
-      updated_at: r.created_at
+      payment_method: 'Cash',
+      items: [],
+      notes: `Test receipt for quarterly reporting`,
+      status: 'completed',
+      created_at: r.created_at
     }));
 
     const { data: insertedReceipts, error: receiptsError } = await supabase
