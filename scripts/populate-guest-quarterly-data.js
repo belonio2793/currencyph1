@@ -36,10 +36,10 @@ async function populateQuarterlyData() {
         .insert({
           user_id: users.id,
           business_name: 'Currency.ph',
-          business_type: 'retail',
-          registration_type: 'sole_proprietor',
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          registration_type: 'sole',
+          currency_registration_number: 'CURR-' + Date.now(),
+          city_of_registration: 'Manila',
+          status: 'active'
         })
         .select()
         .single();
