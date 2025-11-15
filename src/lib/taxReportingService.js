@@ -50,8 +50,8 @@ export const taxReportingService = {
         .from('miscellaneous_costs')
         .select('*')
         .eq('business_id', businessId)
-        .gte('created_at', startDate.toISOString())
-        .lte('created_at', endDate.toISOString())
+        .gte('cost_date', startDate.toISOString().split('T')[0])
+        .lte('cost_date', endDate.toISOString().split('T')[0])
 
       if (expensesError) throw expensesError
 
