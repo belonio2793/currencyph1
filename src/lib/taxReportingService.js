@@ -109,10 +109,10 @@ export const taxReportingService = {
 
       const { data: expenses } = await supabase
         .from('miscellaneous_costs')
-        .select('amount, created_at')
+        .select('amount, cost_date')
         .eq('business_id', businessId)
-        .gte('created_at', yearStart.toISOString())
-        .lte('created_at', yearEnd.toISOString())
+        .gte('cost_date', yearStart.toISOString().split('T')[0])
+        .lte('cost_date', yearEnd.toISOString().split('T')[0])
 
       const monthlyData = Array(12).fill(null).map((_, i) => ({
         month: new Date(year, i, 1).toLocaleString('en-US', { month: 'short' }),
