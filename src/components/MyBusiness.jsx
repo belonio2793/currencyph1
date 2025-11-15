@@ -1660,7 +1660,10 @@ export default function MyBusiness({ userId }) {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {quarterlyReports.map((q, idx) => (
                       <div key={idx} className="border border-slate-300 rounded-lg p-4 bg-slate-50">
-                        <h6 className="font-semibold text-slate-900 mb-3">{q.period}</h6>
+                        <div className="mb-3">
+                          <h6 className="font-semibold text-slate-900">{q.period}</h6>
+                          <p className="text-xs text-slate-500">{q.monthRange}</p>
+                        </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
                             <span className="text-slate-600">Sales:</span>
