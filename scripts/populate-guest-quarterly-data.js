@@ -7,47 +7,20 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 async function populateQuarterlyData() {
   try {
-    // Find guest user
-    const { data: users } = await supabase
-      .from('users')
+    // Find any business (the guest user likely created one through the UI)
+    const { data: allBusinesses } = await supabase
+      .from('businesses')
       .select('*')
-      .eq('email', 'guest@currency.ph')
-      .single();
+      .limit(1);
 
-    if (!users) {
-      console.log('Guest user not found');
+    if (!allBusinesses || allBusinesses.length === 0) {
+      console.log('No businesses found in the system');
+      console.log('Please create a business in the app first using "Add Business" button');
       return;
     }
 
-    console.log('Found guest user:', users.id);
-
-    // Find their business
-    let { data: businesses } = await supabase
-      .from('businesses')
-      .select('*')
-      .eq('user_id', users.id);
-
-    let business = businesses && businesses.length > 0 ? businesses[0] : null;
-
-    if (!business) {
-      console.log('No business found for guest user, creating one...');
-      const { data: newBusiness, error: createError } = await supabase
-        .from('businesses')
-        .insert({
-          user_id: users.id,
-          business_name: 'Currency.ph',
-          registration_type: 'sole',
-          currency_registration_number: 'CURR-' + Date.now(),
-          city_of_registration: 'Manila',
-          status: 'active'
-        })
-        .select()
-        .single();
-
-      if (createError) throw createError;
-      business = newBusiness;
-      console.log('Created new business:', business.id);
-    }
+    const business = allBusinesses[0];
+    console.log('Using business:', business.id, '-', business.business_name);
 
     console.log('Found business:', business.id);
 
