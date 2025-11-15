@@ -22,15 +22,30 @@ async function populateQuarterlyData() {
     console.log('Found guest user:', users.id);
 
     // Find their business
-    const { data: business } = await supabase
+    let { data: business } = await supabase
       .from('user_businesses')
       .select('*')
       .eq('user_id', users.id)
       .single();
 
     if (!business) {
-      console.log('No business found for guest user');
-      return;
+      console.log('No business found for guest user, creating one...');
+      const { data: newBusiness, error: createError } = await supabase
+        .from('user_businesses')
+        .insert({
+          user_id: users.id,
+          business_name: 'Currency.ph',
+          business_type: 'retail',
+          registration_type: 'sole_proprietor',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (createError) throw createError;
+      business = newBusiness;
+      console.log('Created new business:', business.id);
     }
 
     console.log('Found business:', business.id);
