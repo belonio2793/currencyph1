@@ -1453,7 +1453,7 @@ export default function MyBusiness({ userId }) {
                         {receipts.slice(0, 5).map((receipt, index) => (
                           <tr key={receipt.id || index} className="border-b border-slate-200 hover:bg-slate-50">
                             <td className="px-6 py-3 text-slate-600">{new Date(receipt.created_at || receipt.receipt_date).toLocaleDateString()}</td>
-                            <td className="px-6 py-3 text-slate-700 font-medium">{receipt.description || receipt.notes || 'Receipt'}</td>
+                            <td className="px-6 py-3 text-slate-700 font-medium">{receipt.description || receipt.receipt_type || 'Transaction'}</td>
                             <td className="px-6 py-3 text-right font-semibold text-slate-900">₱{parseFloat(receipt.amount || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                           </tr>
                         ))}
@@ -1474,11 +1474,6 @@ export default function MyBusiness({ userId }) {
           )}
 
 
-          {activeTab !== 'overview' && activeTab !== 'employees' && (
-            <div className="text-center py-12">
-              <p className="text-slate-500">Tab content for {activeTab} coming soon...</p>
-            </div>
-          )}
         </div>
         )}
 
