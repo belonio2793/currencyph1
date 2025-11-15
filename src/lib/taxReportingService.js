@@ -74,6 +74,7 @@ export const taxReportingService = {
 
       return {
         period,
+        monthRange,
         year,
         startDate,
         endDate,
