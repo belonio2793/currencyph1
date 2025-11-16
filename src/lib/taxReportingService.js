@@ -101,8 +101,14 @@ export const taxReportingService = {
   // Get monthly breakdown
   async getMonthlyBreakdown(businessId, year) {
     try {
+      const currentYear = new Date().getFullYear()
       const yearStart = new Date(year, 0, 1)
-      const yearEnd = new Date(Math.min(year, new Date().getFullYear()), Math.min(11, new Date().getMonth()), year === new Date().getFullYear() ? new Date().getDate() : 31)
+      let yearEnd
+      if (year === currentYear) {
+        yearEnd = new Date()
+      } else {
+        yearEnd = new Date(year, 11, 31, 23, 59, 59, 999)
+      }
 
       const { data: receipts } = await supabase
         .from('business_receipts')
