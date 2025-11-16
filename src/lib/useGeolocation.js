@@ -40,30 +40,24 @@ export function useGeolocation() {
                   let timedOut = false
 
                   const timeoutId = setTimeout(() => {
-                    if (timedOut) return // Already timed out, skip
+                    if (timedOut) return
                     timedOut = true
                     try {
-                      controller?.abort?.()
-                    } catch (e) {
-                      // Silently ignore all abort errors
-                    }
+                      if (!controller.signal.aborted) {
+                        controller.abort()
+                      }
+                    } catch (e) {}
                   }, 3000)
 
-                  try {
                   let resp = null
                   try {
-                    if (controller.signal.aborted) {
-                      // Signal already aborted, skip fetch
-                      resp = null
-                    } else {
+                    if (!controller.signal.aborted) {
                       resp = await fetch(url, { signal: controller.signal })
                     }
                   } catch (fetchErr) {
-                    // fetch may reject on abort or network errors — treat as null response
                     resp = null
                   }
 
-                  // Clear the timeout once fetch finished or failed
                   clearTimeout(timeoutId)
 
                   if (resp?.ok && isMountedRef.current) {
@@ -74,20 +68,12 @@ export function useGeolocation() {
                         setCity(props.city || props.town || props.village || props.county || props.state || null)
                         return true
                       }
-                    } catch (parseErr) {
-                      // JSON parse error - silently ignore
-                    }
+                    } catch (parseErr) {}
                   }
-                } finally {
-                  // Ensure controller is cleaned up from the list
-                  try {
-                    const idx = controllersRef.current.indexOf(controller)
-                    if (idx !== -1) controllersRef.current.splice(idx, 1)
-                  } catch (e) {}
-                }
-                } catch (e) {
-                  // Silently fail - try fallback
-                }
+
+                  const idx = controllersRef.current.indexOf(controller)
+                  if (idx !== -1) controllersRef.current.splice(idx, 1)
+                } catch (e) {}
               }
 
               // Fallback to Nominatim
@@ -97,75 +83,51 @@ export function useGeolocation() {
                 let timedOut = false
 
                 const timeoutId = setTimeout(() => {
-                  if (timedOut) return // Already timed out, skip
+                  if (timedOut) return
                   timedOut = true
                   try {
-                    controller?.abort?.()
-                  } catch (e) {
-                    // Silently ignore all abort errors
-                  }
+                    if (!controller.signal.aborted) {
+                      controller.abort()
+                    }
+                  } catch (e) {}
                 }, 3000)
 
+                let response = null
                 try {
-                  let response = null
-                  try {
-                    if (controller.signal.aborted) {
-                      // Signal already aborted, skip fetch
-                      response = null
-                    } else {
-                      response = await fetch(
-                        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                        { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
-                      )
-                    }
-                  } catch (fetchErr) {
-                    response = null
+                  if (!controller.signal.aborted) {
+                    response = await fetch(
+                      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                      { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
+                    )
                   }
-
-                  clearTimeout(timeoutId)
-
-                  if (response?.ok && isMountedRef.current) {
-                    try {
-                      const nom = await response.json()
-                      setCity(
-                        nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
-                      )
-                    } catch (parseErr) {
-                      // JSON parse error - silently ignore
-                    }
-                  }
-                } finally {
-                  // Ensure controller is cleaned up from the list
-                  try {
-                    const idx = controllersRef.current.indexOf(controller)
-                    if (idx !== -1) controllersRef.current.splice(idx, 1)
-                  } catch (e) {}
+                } catch (fetchErr) {
+                  response = null
                 }
-              } catch (e) {
-                // Silently fail - any network error is acceptable
-              }
-            } catch (e) {
-              // Outer catch for any uncaught errors
-              // Silently fail
-            } finally {
+
+                clearTimeout(timeoutId)
+
+                if (response?.ok && isMountedRef.current) {
+                  try {
+                    const nom = await response.json()
+                    setCity(
+                      nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
+                    )
+                  } catch (parseErr) {}
+                }
+
+                const idx = controllersRef.current.indexOf(controller)
+                if (idx !== -1) controllersRef.current.splice(idx, 1)
+              } catch (e) {}
+            } catch (e) {} finally {
               try {
                 if (isMountedRef.current) {
                   setLoading(false)
                 }
-              } catch (e) {
-                // ignore any state-setting errors
-              }
+              } catch (e) {}
             }
           }
 
-          // Execute reverse geocoding without letting errors bubble up
-          reverseGeocode().catch((err) => {
-            // Silently catch any errors that somehow escape, including AbortError
-            // Do not log or re-throw
-            void err
-          }).catch(() => {
-            // Double-catch to ensure no errors escape
-          })
+          reverseGeocode().catch(() => {})
         },
         (err) => {
           if (isMountedRef.current) {
