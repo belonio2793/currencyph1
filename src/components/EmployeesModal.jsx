@@ -355,12 +355,12 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
         <div className="sticky top-16 bg-white border-b border-slate-200 px-6">
           <div className="flex gap-1 overflow-x-auto">
             {[
-              { id: 'employees', label: 'Employees', icon: '👥' },
-              { id: 'attendance', label: 'Attendance', icon: '📋' },
-              { id: 'medical', label: 'Medical', icon: '⚕️' },
-              { id: 'benefits', label: 'Benefits', icon: '🎁' },
-              { id: 'performance', label: 'Performance', icon: '⭐' },
-              { id: 'payroll', label: 'Payroll', icon: '💰' }
+              { id: 'employees', label: 'Employees' },
+              { id: 'attendance', label: 'Attendance' },
+              { id: 'medical', label: 'Medical' },
+              { id: 'benefits', label: 'Benefits' },
+              { id: 'performance', label: 'Performance' },
+              { id: 'payroll', label: 'Payroll' }
             ].map(tab => (
               <button
                 key={tab.id}
