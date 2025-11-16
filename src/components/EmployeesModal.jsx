@@ -544,8 +544,8 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                         </div>
                       </div>
                       <div className="text-sm text-slate-600">
-                        <p>📧 {employee.email}</p>
-                        {employee.department && <p>🏢 {employee.department}</p>}
+                        <p>{employee.email}</p>
+                        {employee.department && <p>{employee.department}</p>}
                         <p className={`mt-2 font-medium ${employee.employment_status === 'active' ? 'text-green-600' : 'text-slate-600'}`}>
                           {employee.employment_status}
                         </p>
