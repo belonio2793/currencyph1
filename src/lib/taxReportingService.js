@@ -21,11 +21,15 @@ export const taxReportingService = {
 
       if (period === 'annual') {
         startDate = new Date(year, 0, 1)
-        endDate = new Date(Math.min(year, currentYear), currentYear === year ? new Date().getMonth() : 11, currentYear === year ? new Date().getDate() : 31)
+        if (year === currentYear) {
+          endDate = new Date()
+        } else {
+          endDate = new Date(year, 11, 31, 23, 59, 59, 999)
+        }
       } else if (period.startsWith('Q')) {
         const quarter = parseInt(period.slice(1))
         startDate = new Date(year, (quarter - 1) * 3, 1)
-        endDate = new Date(year, quarter * 3, 0)
+        endDate = new Date(year, quarter * 3, 0, 23, 59, 59, 999)
         monthRange = this.getQuarterMonthRange(quarter)
         if (year === currentYear && quarter === Math.ceil((new Date().getMonth() + 1) / 3)) {
           endDate = new Date()
