@@ -186,8 +186,8 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .search-form {
-    flex-direction: column;
+  .search-input-wrapper {
+    flex-direction: row;
   }
 
   .filters-grid {
@@ -196,6 +196,19 @@
 }
 
 @media (max-width: 480px) {
+  .search-input-wrapper {
+    flex-direction: row;
+  }
+
+  .search-input {
+    padding: 12px 12px;
+  }
+
+  .search-btn {
+    padding: 12px 12px;
+    font-size: 0.9rem;
+  }
+
   .filters-grid {
     grid-template-columns: 1fr;
   }
