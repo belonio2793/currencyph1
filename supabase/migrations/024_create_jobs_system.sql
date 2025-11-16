@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS public.job_history (
   service_provider_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   
   -- Completion Info
-  completion_status VARCHAR(50) -- 'pending', 'in_progress', 'completed', 'cancelled'
+  completion_status VARCHAR(50), -- 'pending', 'in_progress', 'completed', 'cancelled'
   completion_date TIMESTAMP WITH TIME ZONE,
   completion_notes TEXT,
   
