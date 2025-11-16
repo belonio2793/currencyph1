@@ -147,9 +147,7 @@ export function useGeolocation() {
       try {
         navigator.geolocation.clearWatch(watchId)
       } catch (e) {}
-      controllersRef.current = []
       window.removeEventListener('geolocation:refresh', handler)
-      window.removeEventListener('unhandledrejection', unhandledRejectionHandler)
     }
   }, [])
 
