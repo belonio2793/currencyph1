@@ -1,0 +1,377 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.job-details-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 24px;
+  border-bottom: 1px solid #e0e0e0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px 12px 0 0;
+}
+
+.header-content h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-badge.active {
+  background: rgba(200, 230, 201, 0.3);
+  color: #fff;
+}
+
+.status-badge.filled {
+  background: rgba(255, 204, 188, 0.3);
+  color: #fff;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  opacity: 0.8;
+}
+
+/* Error Message */
+.error-message {
+  background: #ffe5e5;
+  border-left: 4px solid #d63031;
+  padding: 12px 15px;
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #d63031;
+  font-size: 0.9rem;
+}
+
+.close-error {
+  background: none;
+  border: none;
+  color: #d63031;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* Tabs */
+.modal-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e0e0e0;
+  padding: 0 24px;
+  background: #f9f9f9;
+}
+
+.modal-tabs .tab {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  bottom: -2px;
+}
+
+.modal-tabs .tab:hover {
+  color: #667eea;
+}
+
+.modal-tabs .tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
+/* Content */
+.modal-content {
+  padding: 24px;
+}
+
+.details-tab {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+.detail-column h4 {
+  margin: 0 0 15px 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #667eea;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  color: #666;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.info-item .value {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.info-item .value.highlight {
+  color: #667eea;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.description-section,
+.skills-section,
+.timeline-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.description-section h4,
+.skills-section h4,
+.timeline-section h4 {
+  margin: 0 0 15px 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #667eea;
+}
+
+.description-section p {
+  margin: 0;
+  color: #555;
+  line-height: 1.6;
+}
+
+.skills-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.skill-tag {
+  background: #e8eaf6;
+  color: #667eea;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.timeline-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.timeline-item:last-child {
+  border-bottom: none;
+}
+
+.timeline-item .label {
+  color: #666;
+  font-weight: 600;
+}
+
+.timeline-item .value {
+  color: #1a1a1a;
+}
+
+.btn-apply-large {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.btn-apply-large:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Offers Tab */
+.offers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.offer-card {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid #667eea;
+}
+
+.offer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.offer-header h4 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 0.95rem;
+}
+
+.offer-header .status {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.offer-header .status.pending {
+  background: #ffeaa7;
+  color: #d63031;
+}
+
+.offer-header .status.accepted {
+  background: #81ecec;
+  color: #00b894;
+}
+
+.offer-body {
+  color: #555;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.offer-body p {
+  margin: 5px 0;
+}
+
+.offer-body strong {
+  color: #1a1a1a;
+}
+
+.offer-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 30px;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 0;
+  }
+
+  .job-details-modal {
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .modal-header {
+    border-radius: 0;
+  }
+
+  .modal-tabs {
+    flex-wrap: wrap;
+    overflow-x: auto;
+  }
+
+  .detail-row {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-header {
+    padding: 16px;
+  }
+
+  .header-content h2 {
+    font-size: 1.2rem;
+  }
+
+  .modal-content {
+    padding: 16px;
+  }
+}
