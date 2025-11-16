@@ -1547,40 +1547,40 @@ export default function MyBusiness({ userId }) {
                 <div className="text-center py-12">
                   <p className="text-slate-500">Loading reporting data...</p>
                 </div>
-              ) : annualReport ? (
+              ) : currentPeriodReport ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                   <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
                     <p className="text-sm text-slate-600 font-medium mb-2">Total Sales</p>
-                    <p className="text-3xl font-bold text-blue-600">₱{annualReport.totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                    <p className="text-xs text-slate-600 mt-2">{annualReport.receiptCount} receipts</p>
+                    <p className="text-3xl font-bold text-blue-600">₱{currentPeriodReport.totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">{currentPeriodReport.receiptCount} receipts</p>
                   </div>
 
                   <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
                     <p className="text-sm text-slate-600 font-medium mb-2">Total Expenses</p>
-                    <p className="text-3xl font-bold text-orange-600">₱{annualReport.totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                    <p className="text-xs text-slate-600 mt-2">{annualReport.expenseCount} deductions</p>
+                    <p className="text-3xl font-bold text-orange-600">₱{currentPeriodReport.totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">{currentPeriodReport.expenseCount} deductions</p>
                   </div>
 
                   <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
                     <p className="text-sm text-slate-600 font-medium mb-2">Net Income</p>
-                    <p className={`text-3xl font-bold ${annualReport.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{annualReport.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                    <p className="text-xs text-slate-600 mt-2">Profit Margin: {annualReport.profitMargin}%</p>
+                    <p className={`text-3xl font-bold ${currentPeriodReport.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{currentPeriodReport.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">Profit Margin: {currentPeriodReport.profitMargin}%</p>
                   </div>
 
                   <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
                     <p className="text-sm text-slate-600 font-medium mb-2">Tax Liability</p>
-                    <p className="text-3xl font-bold text-purple-600">₱{annualReport.estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
-                    <p className="text-xs text-slate-600 mt-2">Paid: ₱{annualReport.taxPaid.toFixed(2)}</p>
+                    <p className="text-3xl font-bold text-purple-600">₱{currentPeriodReport.estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <p className="text-xs text-slate-600 mt-2">Paid: ₱{currentPeriodReport.taxPaid.toFixed(2)}</p>
                   </div>
                 </div>
               ) : null}
 
               {/* Monthly Breakdown */}
-              {monthlyData.length > 0 && (
+              {filteredMonthlyData.length > 0 && (
                 <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
                   <h5 className="text-lg font-semibold text-slate-900 mb-6">Monthly Breakdown ({reportingYear})</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    {monthlyData.map((month, idx) => (
+                    {filteredMonthlyData.map((month, idx) => (
                       month.sales > 0 || month.expenses > 0 ? (
                         <div key={idx} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200">
                           <p className="font-semibold text-slate-900 mb-3">{month.month}</p>
