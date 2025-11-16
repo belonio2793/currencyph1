@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { useGeolocation } from '../lib/useGeolocation'
 import './PostJobModal.css'
 
 // Fix Leaflet icon issues
@@ -38,11 +39,13 @@ export default function SubmitJobModal({
   userId
 }) {
   const mapRef = useRef(null)
+  const { location: userLocation, loading: geoLoading } = useGeolocation()
   const [jobTitleSuggestions, setJobTitleSuggestions] = useState([])
   const [showTitleSuggestions, setShowTitleSuggestions] = useState(false)
   const [mapLocation, setMapLocation] = useState([12.5, 121.5]) // Default to Philippines center
   const [equipment, setEquipment] = useState([])
   const [equipmentInput, setEquipmentInput] = useState('')
+  const [fetchingLocation, setFetchingLocation] = useState(false)
 
   const [formData, setFormData] = useState({
     job_title: '',
@@ -146,6 +149,25 @@ export default function SubmitJobModal({
       longitude: coords[1],
       city: `${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}`
     })
+  }
+
+  const handleFetchCurrentLocation = () => {
+    if (userLocation && userLocation.latitude && userLocation.longitude) {
+      const coords = [userLocation.latitude, userLocation.longitude]
+      setMapLocation(coords)
+      setFormData({
+        ...formData,
+        latitude: userLocation.latitude,
+        longitude: userLocation.longitude,
+        city: `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`
+      })
+      setFetchingLocation(false)
+    } else {
+      setFetchingLocation(true)
+      try {
+        window.dispatchEvent(new Event('geolocation:refresh'))
+      } catch (e) {}
+    }
   }
 
   const validateForm = () => {
