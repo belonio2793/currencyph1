@@ -1361,7 +1361,8 @@ export default function MyBusiness({ userId }) {
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
               { id: 'overview', label: 'Overview' },
-              { id: 'salesTaxReporting', label: 'Sales and Tax Reporting' }
+              { id: 'salesTaxReporting', label: 'Sales and Tax Reporting' },
+              { id: 'jobs', label: 'Jobs Marketplace' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -1741,7 +1742,7 @@ export default function MyBusiness({ userId }) {
                           </div>
                           <div className="flex justify-between border-t border-slate-300 pt-2">
                             <span className="font-semibold">Net Income:</span>
-                            <span className={`font-bold ${q.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{q.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            <span className={`font-bold ${q.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>���{q.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-slate-600">Est. Tax:</span>
