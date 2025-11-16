@@ -191,7 +191,9 @@ export default function MyBusiness({ userId }) {
   const [reportingYear, setReportingYear] = useState(new Date().getFullYear())
   const [quarterlyReports, setQuarterlyReports] = useState([])
   const [annualReport, setAnnualReport] = useState(null)
+  const [currentPeriodReport, setCurrentPeriodReport] = useState(null)
   const [monthlyData, setMonthlyData] = useState([])
+  const [filteredMonthlyData, setFilteredMonthlyData] = useState([])
   const [showExpenseForm, setShowExpenseForm] = useState(false)
   const [expenseFormData, setExpenseFormData] = useState({
     description: '',
@@ -234,20 +236,41 @@ export default function MyBusiness({ userId }) {
     try {
       setLoadingReports(true)
 
-      // Load quarterly reports
+      // Load all quarterly reports for the annual view and quarterly breakdown
       const quarters = ['Q1', 'Q2', 'Q3', 'Q4']
       const qReports = await Promise.all(
         quarters.map(q => taxReportingService.calculateReportingPeriod(selectedBusiness.id, q, reportingYear))
       )
       setQuarterlyReports(qReports)
 
-      // Load annual report
-      const annual = await taxReportingService.calculateReportingPeriod(selectedBusiness.id, 'annual', reportingYear)
-      setAnnualReport(annual)
+      // Load report based on selected period
+      let selectedReport
+      if (reportingPeriod === 'annual') {
+        selectedReport = await taxReportingService.calculateReportingPeriod(selectedBusiness.id, 'annual', reportingYear)
+        setAnnualReport(selectedReport)
+      } else if (reportingPeriod.startsWith('Q')) {
+        selectedReport = await taxReportingService.calculateReportingPeriod(selectedBusiness.id, reportingPeriod, reportingYear)
+      } else if (reportingPeriod === 'ytd') {
+        selectedReport = await taxReportingService.calculateReportingPeriod(selectedBusiness.id, 'ytd', reportingYear)
+      }
+      setCurrentPeriodReport(selectedReport)
 
-      // Load monthly breakdown
+      // Load full year monthly breakdown
       const monthly = await taxReportingService.getMonthlyBreakdown(selectedBusiness.id, reportingYear)
       setMonthlyData(monthly)
+
+      // Filter monthly data based on selected period
+      let filtered = monthly
+      if (reportingPeriod.startsWith('Q')) {
+        const quarter = parseInt(reportingPeriod.slice(1))
+        const startMonth = (quarter - 1) * 3
+        const endMonth = startMonth + 3
+        filtered = monthly.slice(startMonth, endMonth)
+      } else if (reportingPeriod === 'ytd') {
+        const currentMonth = new Date().getMonth() + 1
+        filtered = monthly.slice(0, currentMonth)
+      }
+      setFilteredMonthlyData(filtered)
 
       // Load tax payments
       const yearStart = new Date(reportingYear, 0, 1)
