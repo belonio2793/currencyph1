@@ -1,0 +1,242 @@
+.remarks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+/* Add Remark Form */
+.add-remark-form {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.add-remark-form h4 {
+  margin: 0 0 15px 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+}
+
+.add-remark-form .error-message {
+  background: #ffe5e5;
+  border-left: 4px solid #d63031;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #d63031;
+  font-size: 0.9rem;
+}
+
+.add-remark-form .error-message button {
+  background: none;
+  border: none;
+  color: #d63031;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.add-remark-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.remark-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.remark-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.remark-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.visibility-toggle {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.visibility-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.visibility-toggle input[type="checkbox"] {
+  cursor: pointer;
+  width: 18px;
+  height: 18px;
+}
+
+.visibility-toggle input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.visibility-toggle small {
+  color: #999;
+  font-size: 0.8rem;
+  margin-left: 26px;
+}
+
+.btn-submit-remark {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-submit-remark:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.btn-submit-remark:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Remarks Sections */
+.remarks-section {
+  margin-top: 20px;
+}
+
+.remarks-section h4 {
+  margin: 0 0 15px 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #667eea;
+}
+
+.remarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.remark-card {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border-left: 4px solid;
+  transition: all 0.3s ease;
+}
+
+.remark-card.public {
+  border-left-color: #667eea;
+  background: #f5f7ff;
+}
+
+.remark-card.private {
+  border-left-color: #ffa500;
+  background: #fffbf0;
+}
+
+.remark-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.remark-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.user-badge,
+.lock-badge {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.remark-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  font-size: 0.85rem;
+}
+
+.remark-meta .date {
+  color: #999;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.type-badge.public {
+  background: #e8eaf6;
+  color: #667eea;
+}
+
+.type-badge.private {
+  background: #ffe8cc;
+  color: #ff8c00;
+}
+
+.remark-body {
+  margin: 0;
+  padding: 0;
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.remark-body p {
+  margin: 0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .remark-options {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-submit-remark {
+    width: 100%;
+  }
+
+  .remark-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .remark-meta {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
