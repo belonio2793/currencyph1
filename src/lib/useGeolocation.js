@@ -156,20 +156,7 @@ export function useGeolocation() {
       isMountedRef.current = false
       try {
         navigator.geolocation.clearWatch(watchId)
-      } catch (e) {
-        // ignore clearWatch errors
-      }
-      // Abort all pending fetch requests safely
-      const controllers = controllersRef.current || []
-      controllers.forEach(controller => {
-        try {
-          if (controller?.abort && controller.signal && !controller.signal.aborted) {
-            controller.abort()
-          }
-        } catch (e) {
-          // ignore individual abort errors
-        }
-      })
+      } catch (e) {}
       controllersRef.current = []
       window.removeEventListener('geolocation:refresh', handler)
       window.removeEventListener('unhandledrejection', unhandledRejectionHandler)
