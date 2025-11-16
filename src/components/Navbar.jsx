@@ -256,6 +256,23 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {mobileMenuOpen && (
           <div className="md:hidden pb-2 border-t border-slate-100">
             <div className="space-y-1">
+              {/* Jobs tab for mobile */}
+              {userEmail && (
+                <button
+                  onClick={() => {
+                    onTabChange('jobs')
+                    setMobileMenuOpen(false)
+                  }}
+                  className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    activeTab === 'jobs'
+                      ? 'text-blue-600 bg-blue-50'
+                      : 'text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  Jobs
+                </button>
+              )}
+
               {mainNav.concat(secondaryNav, investmentsRowButtons).filter(btn => (btn.public || !btn.auth || userEmail)).map(btn => (
                 <button
                   key={btn.id}
