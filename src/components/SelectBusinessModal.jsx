@@ -1,16 +1,40 @@
 import React, { useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
 
 export default function SelectBusinessModal({ businesses, onSelect, onCreateNew, onAddExisting, onClose }) {
   const [isOpen, setDropdownOpen] = useState(false)
   const [selectedId, setSelectedId] = useState('')
+  const [isDefault, setIsDefault] = useState(false)
+  const [savingDefault, setSavingDefault] = useState(false)
 
-  const handleSelectBusiness = () => {
+  const handleSelectBusiness = async () => {
     if (selectedId) {
       const selected = businesses.find(b => b.id === selectedId)
       if (selected) {
-        onSelect(selected)
+        // If marking as default, update the database
+        if (isDefault) {
+          setSavingDefault(true)
+          try {
+            await supabase
+              .from('businesses')
+              .update({ is_default: true })
+              .eq('id', selectedId)
+            
+            // Update local state to reflect changes
+            onSelect({ ...selected, is_default: true })
+          } catch (error) {
+            console.error('Error setting default business:', error)
+            onSelect(selected)
+          } finally {
+            setSavingDefault(false)
+          }
+        } else {
+          onSelect(selected)
+        }
+        
         setDropdownOpen(false)
         setSelectedId('')
+        setIsDefault(false)
       }
     }
   }
@@ -88,10 +112,17 @@ export default function SelectBusinessModal({ businesses, onSelect, onCreateNew,
                         selectedId === business.id ? 'bg-blue-100 font-semibold text-blue-900' : 'text-slate-900'
                       }`}
                     >
-                      <div className="font-medium">{business.business_name}</div>
-                      <div className="text-xs text-slate-500 mt-1">
-                        {business.registration_type && `${business.registration_type.charAt(0).toUpperCase() + business.registration_type.slice(1)}`}
-                        {business.city_of_registration && ` • ${business.city_of_registration}`}
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium">{business.business_name}</div>
+                          <div className="text-xs text-slate-500 mt-1">
+                            {business.registration_type && `${business.registration_type.charAt(0).toUpperCase() + business.registration_type.slice(1)}`}
+                            {business.city_of_registration && ` • ${business.city_of_registration}`}
+                          </div>
+                        </div>
+                        {business.is_default && (
+                          <div className="ml-2 text-sm font-semibold text-blue-600">✓ Default</div>
+                        )}
                       </div>
                     </button>
                   ))
@@ -101,13 +132,33 @@ export default function SelectBusinessModal({ businesses, onSelect, onCreateNew,
           </div>
         </div>
 
+        {/* Default Business Checkbox */}
+        {selectedId && (
+          <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <label className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isDefault}
+                onChange={(e) => setIsDefault(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-2 focus:ring-blue-600 cursor-pointer"
+              />
+              <span className="ml-3 text-sm font-medium text-slate-900">
+                Set as default business
+              </span>
+            </label>
+            <p className="text-xs text-slate-600 mt-2 ml-7">
+              Your default business will be automatically selected when you visit this page
+            </p>
+          </div>
+        )}
+
         {/* Select Button */}
         <button
           onClick={handleSelectBusiness}
-          disabled={!selectedId}
+          disabled={!selectedId || savingDefault}
           className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors mb-3"
         >
-          Select Business
+          {savingDefault ? 'Saving...' : 'Select Business'}
         </button>
 
         {/* Divider */}
