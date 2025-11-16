@@ -5,7 +5,7 @@ import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import MerchantReceipts from './MerchantReceipts'
 import SelectBusinessModal from './SelectBusinessModal'
 import EmployeesModal from './EmployeesModal'
-import Jobs from './Jobs'
+import EmployerJobsOverview from './EmployerJobsOverview'
 import { miscellaneousCostsService } from '../lib/miscellaneousCostsService'
 import { taxReportingService } from '../lib/taxReportingService'
 
@@ -1635,7 +1635,7 @@ export default function MyBusiness({ userId }) {
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-600">Expenses:</span>
-                              <span className="font-medium text-orange-600">₱{month.expenses.toFixed(0)}</span>
+                              <span className="font-medium text-orange-600">���{month.expenses.toFixed(0)}</span>
                             </div>
                             <div className="flex justify-between pt-2 border-t border-slate-300">
                               <span className="font-semibold text-slate-900">Net:</span>
