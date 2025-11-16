@@ -716,7 +716,7 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                               <p className="font-semibold text-slate-900 capitalize">{record.record_type}</p>
                               <p className="text-sm text-slate-600 mt-1">{record.description}</p>
                               {record.healthcare_provider && (
-                                <p className="text-sm text-slate-600 mt-1">🏥 {record.healthcare_provider}</p>
+                                <p className="text-sm text-slate-600 mt-1">Provider: {record.healthcare_provider}</p>
                               )}
                             </div>
                             <p className="text-sm text-slate-600">{new Date(record.date_recorded).toLocaleDateString()}</p>
