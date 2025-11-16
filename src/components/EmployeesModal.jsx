@@ -840,7 +840,7 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                           <div className="flex items-center justify-between">
                             <span className="text-slate-600">Health Insurance</span>
                             <span className={`font-semibold ${benefits.has_health_insurance ? 'text-green-600' : 'text-slate-600'}`}>
-                              {benefits.has_health_insurance ? '✓ Yes' : '✗ No'}
+                              {benefits.has_health_insurance ? 'Yes' : 'No'}
                             </span>
                           </div>
                           {benefits.has_health_insurance && benefits.health_insurance_provider && (
