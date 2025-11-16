@@ -6,7 +6,6 @@ export function useGeolocation() {
   const [loading, setLoading] = useState(true)
   const [city, setCity] = useState(null)
   const isMountedRef = useRef(true)
-  const controllersRef = useRef([])
 
   const requestLocation = () => {
     try {
