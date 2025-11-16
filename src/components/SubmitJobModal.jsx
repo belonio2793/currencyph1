@@ -492,6 +492,56 @@ export default function SubmitJobModal({
           </div>
 
           <div className="form-section">
+            <h3>Business Details</h3>
+
+            <div className="form-group">
+              <label htmlFor="currency_registration_number">Currency Registration Number (Optional)</label>
+              <div style={{ marginBottom: '10px' }}>
+                <select
+                  id="currency_registration_select"
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      setFormData({
+                        ...formData,
+                        currency_registration_number: e.target.value
+                      })
+                    }
+                  }}
+                  className="form-control"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    marginBottom: '10px'
+                  }}
+                >
+                  <option value="">Select from existing businesses...</option>
+                  {userBusinesses && userBusinesses.map(business => (
+                    business.currency_registration_number && (
+                      <option key={business.id} value={business.currency_registration_number}>
+                        {business.business_name} ({business.currency_registration_number})
+                      </option>
+                    )
+                  ))}
+                </select>
+              </div>
+              <input
+                id="currency_registration_number"
+                type="text"
+                name="currency_registration_number"
+                value={formData.currency_registration_number}
+                onChange={handleInputChange}
+                placeholder="Or manually enter registration number"
+              />
+              <p style={{ fontSize: '0.8rem', color: '#999', marginTop: '6px' }}>
+                Link a business registration to this job (optional)
+              </p>
+            </div>
+          </div>
+
+          <div className="form-section">
             <h3>Requirements</h3>
 
             <div className="form-group">
