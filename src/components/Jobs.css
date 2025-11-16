@@ -482,17 +482,23 @@
     gap: 15px;
   }
 
+  .header-buttons {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .btn-post-job,
+  .btn-submit-job {
+    width: 100%;
+    justify-content: center;
+  }
+
   .jobs-grid {
     grid-template-columns: 1fr;
   }
 
   .jobs-stats {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .btn-post-job {
-    width: 100%;
-    justify-content: center;
   }
 
   .job-details {
