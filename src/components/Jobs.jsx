@@ -5,16 +5,21 @@ import JobCard from './JobCard'
 import JobSearch from './JobSearch'
 import PostJobModal from './PostJobModal'
 import JobDetailsModal from './JobDetailsModal'
+import SelectBusinessModal from './SelectBusinessModal'
 import './Jobs.css'
 
-export default function Jobs({ businessId, currentUserId }) {
+export default function Jobs({ userId }) {
+  const [userType, setUserType] = useState('job-seeker') // 'employer' or 'job-seeker'
   const [activeTab, setActiveTab] = useState('looking-to-hire') // 'looking-to-hire' or 'offers'
   const [jobs, setJobs] = useState([])
   const [offers, setOffers] = useState([])
+  const [userBusinesses, setUserBusinesses] = useState([])
+  const [selectedBusiness, setSelectedBusiness] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [filters, setFilters] = useState({})
   const [showPostModal, setShowPostModal] = useState(false)
+  const [showSelectBusiness, setShowSelectBusiness] = useState(false)
   const [selectedJob, setSelectedJob] = useState(null)
   const [showJobDetails, setShowJobDetails] = useState(false)
   const [categories, setCategories] = useState([])
@@ -27,35 +32,60 @@ export default function Jobs({ businessId, currentUserId }) {
     acceptedOffers: 0
   })
 
-  // Load categories and cities for search filters
+  // Load categories, cities, and user's businesses
   useEffect(() => {
-    const loadSearchOptions = async () => {
+    const loadInitialData = async () => {
       try {
-        const [cats, citys] = await Promise.all([
+        const [cats, citys, businesses] = await Promise.all([
           jobsService.getJobCategories(),
-          jobsService.getJobCities()
+          jobsService.getJobCities(),
+          loadUserBusinesses()
         ])
         setCategories(cats)
         setCities(citys)
+        setUserBusinesses(businesses)
+        
+        // Determine user type based on whether they have businesses
+        if (businesses && businesses.length > 0) {
+          setUserType('employer')
+        } else {
+          setUserType('job-seeker')
+        }
       } catch (err) {
-        console.error('Error loading search options:', err)
+        console.error('Error loading initial data:', err)
       }
     }
 
-    loadSearchOptions()
-  }, [])
+    loadInitialData()
+  }, [userId])
+
+  // Load user's businesses
+  const loadUserBusinesses = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('user_id', userId)
+
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.error('Error loading businesses:', err)
+      return []
+    }
+  }
 
   // Load jobs based on active tab
   useEffect(() => {
     loadJobs()
-  }, [activeTab, filters])
+  }, [activeTab, filters, selectedBusiness])
 
-  // Load business stats
+  // Load user stats
   useEffect(() => {
-    if (businessId) {
+    if (selectedBusiness) {
       loadStats()
     }
-  }, [businessId])
+  }, [selectedBusiness])
 
   const loadJobs = async () => {
     setLoading(true)
@@ -66,7 +96,7 @@ export default function Jobs({ businessId, currentUserId }) {
         const data = await jobsService.getActiveJobs(filters)
         setJobs(data)
       } else {
-        const data = await jobsService.getProviderOffers(currentUserId)
+        const data = await jobsService.getProviderOffers(userId)
         setOffers(data)
       }
     } catch (err) {
@@ -79,19 +109,38 @@ export default function Jobs({ businessId, currentUserId }) {
 
   const loadStats = async () => {
     try {
-      const data = await jobsService.getBusinessJobStats(businessId)
+      const data = await jobsService.getBusinessJobStats(selectedBusiness.id)
       setStats(data)
     } catch (err) {
       console.error('Error loading stats:', err)
     }
   }
 
+  const handlePostJobClick = () => {
+    if (userBusinesses.length === 0) {
+      setError('Please create a business first to post jobs.')
+      return
+    }
+    if (userBusinesses.length === 1) {
+      setSelectedBusiness(userBusinesses[0])
+      setShowPostModal(true)
+    } else {
+      setShowSelectBusiness(true)
+    }
+  }
+
+  const handleSelectBusiness = (business) => {
+    setSelectedBusiness(business)
+    setShowSelectBusiness(false)
+    setShowPostModal(true)
+  }
+
   const handlePostJob = async (jobData) => {
     try {
       const newJob = await jobsService.createJob({
         ...jobData,
-        business_id: businessId,
-        posted_by_user_id: currentUserId
+        business_id: selectedBusiness.id,
+        posted_by_user_id: userId
       })
       setShowPostModal(false)
       loadJobs()
@@ -117,8 +166,8 @@ export default function Jobs({ businessId, currentUserId }) {
     try {
       await jobsService.createJobOffer({
         job_id: jobId,
-        service_provider_id: currentUserId,
-        business_id: businessId,
+        service_provider_id: userId,
+        business_id: selectedJob.business_id,
         ...offerData
       })
       loadJobs()
@@ -138,38 +187,65 @@ export default function Jobs({ businessId, currentUserId }) {
       <div className="jobs-header">
         <div className="jobs-title-section">
           <h2>Jobs Marketplace</h2>
-          <p>Post jobs and find service providers</p>
+          <p>
+            {userType === 'employer' 
+              ? 'Post jobs and find service providers' 
+              : 'Browse jobs and submit your offers'}
+          </p>
         </div>
 
-        {activeTab === 'looking-to-hire' && (
+        {userType === 'employer' && activeTab === 'looking-to-hire' && (
           <button
             className="btn-post-job"
-            onClick={() => setShowPostModal(true)}
+            onClick={handlePostJobClick}
           >
             <span className="icon">+</span> Post a Job
           </button>
         )}
       </div>
 
-      {/* Stats Dashboard */}
-      <div className="jobs-stats">
-        <div className="stat-card">
-          <div className="stat-value">{stats.activeJobs}</div>
-          <div className="stat-label">Active Jobs</div>
+      {/* Stats Dashboard - Only for employers */}
+      {userType === 'employer' && selectedBusiness && (
+        <div className="jobs-stats">
+          <div className="stat-card">
+            <div className="stat-value">{stats.activeJobs}</div>
+            <div className="stat-label">Active Jobs</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value">{stats.totalOffers}</div>
+            <div className="stat-label">Total Offers</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value">{stats.acceptedOffers}</div>
+            <div className="stat-label">Accepted</div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-value">{stats.filledJobs}</div>
+            <div className="stat-label">Completed</div>
+          </div>
         </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.totalOffers}</div>
-          <div className="stat-label">Total Offers</div>
+      )}
+
+      {/* Business Selector for Employers */}
+      {userType === 'employer' && userBusinesses.length > 1 && (
+        <div className="business-selector">
+          <label>Select Business:</label>
+          <select 
+            value={selectedBusiness?.id || ''}
+            onChange={(e) => {
+              const business = userBusinesses.find(b => b.id === e.target.value)
+              if (business) setSelectedBusiness(business)
+            }}
+          >
+            <option value="">Choose a business...</option>
+            {userBusinesses.map(business => (
+              <option key={business.id} value={business.id}>
+                {business.business_name}
+              </option>
+            ))}
+          </select>
         </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.acceptedOffers}</div>
-          <div className="stat-label">Accepted</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-value">{stats.filledJobs}</div>
-          <div className="stat-label">Completed</div>
-        </div>
-      </div>
+      )}
 
       {/* Tabs */}
       <div className="jobs-tabs">
@@ -177,13 +253,13 @@ export default function Jobs({ businessId, currentUserId }) {
           className={`tab ${activeTab === 'looking-to-hire' ? 'active' : ''}`}
           onClick={() => setActiveTab('looking-to-hire')}
         >
-          Looking to Hire
+          {userType === 'employer' ? 'Post Jobs' : 'Available Jobs'}
         </button>
         <button
           className={`tab ${activeTab === 'offers' ? 'active' : ''}`}
           onClick={() => setActiveTab('offers')}
         >
-          My Offers
+          {userType === 'employer' ? 'Offers Received' : 'My Offers'}
         </button>
       </div>
 
@@ -198,24 +274,36 @@ export default function Jobs({ businessId, currentUserId }) {
       {/* Tab Content */}
       {activeTab === 'looking-to-hire' ? (
         <div className="jobs-content">
-          <JobSearch
-            onFilterChange={handleFilterChange}
-            categories={categories}
-            cities={cities}
-          />
+          {userType === 'job-seeker' && (
+            <JobSearch
+              onFilterChange={handleFilterChange}
+              categories={categories}
+              cities={cities}
+            />
+          )}
 
           {loading ? (
             <div className="loading">Loading jobs...</div>
           ) : jobs.length === 0 ? (
             <div className="empty-state">
-              <h3>No jobs found</h3>
-              <p>Try adjusting your search filters</p>
-              <button
-                className="btn-primary"
-                onClick={() => setFilters({})}
-              >
-                Clear Filters
-              </button>
+              <h3>
+                {userType === 'employer' 
+                  ? 'No jobs posted yet' 
+                  : 'No jobs found'}
+              </h3>
+              <p>
+                {userType === 'employer' 
+                  ? 'Create your first job posting to start finding service providers' 
+                  : 'Try adjusting your search filters'}
+              </p>
+              {userType === 'job-seeker' && (
+                <button
+                  className="btn-primary"
+                  onClick={() => setFilters({})}
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           ) : (
             <div className="jobs-grid">
@@ -236,14 +324,24 @@ export default function Jobs({ businessId, currentUserId }) {
             <div className="loading">Loading offers...</div>
           ) : offers.length === 0 ? (
             <div className="empty-state">
-              <h3>No offers yet</h3>
-              <p>Browse available jobs and submit your offers</p>
-              <button
-                className="btn-primary"
-                onClick={() => setActiveTab('looking-to-hire')}
-              >
-                Browse Jobs
-              </button>
+              <h3>
+                {userType === 'employer' 
+                  ? 'No offers received yet' 
+                  : 'No offers submitted yet'}
+              </h3>
+              <p>
+                {userType === 'employer' 
+                  ? 'Offers will appear here when people apply for your jobs' 
+                  : 'Browse available jobs and submit your offers'}
+              </p>
+              {userType === 'job-seeker' && (
+                <button
+                  className="btn-primary"
+                  onClick={() => setActiveTab('looking-to-hire')}
+                >
+                  Browse Jobs
+                </button>
+              )}
             </div>
           ) : (
             <div className="offers-list">
@@ -279,7 +377,15 @@ export default function Jobs({ businessId, currentUserId }) {
       )}
 
       {/* Modals */}
-      {showPostModal && (
+      {showSelectBusiness && (
+        <SelectBusinessModal
+          businesses={userBusinesses}
+          onSelect={handleSelectBusiness}
+          onClose={() => setShowSelectBusiness(false)}
+        />
+      )}
+
+      {showPostModal && selectedBusiness && (
         <PostJobModal
           onClose={() => setShowPostModal(false)}
           onSubmit={handlePostJob}
@@ -293,8 +399,8 @@ export default function Jobs({ businessId, currentUserId }) {
           job={selectedJob}
           onClose={() => setShowJobDetails(false)}
           onApply={handleApplyForJob}
-          currentUserId={currentUserId}
-          businessId={businessId}
+          currentUserId={userId}
+          businessId={selectedBusiness?.id}
         />
       )}
     </div>
