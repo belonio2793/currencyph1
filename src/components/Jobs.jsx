@@ -190,20 +190,31 @@ export default function Jobs({ userId }) {
         <div className="jobs-title-section">
           <h2>Jobs Marketplace</h2>
           <p>
-            {userType === 'employer' 
-              ? 'Post jobs and find service providers' 
+            {userType === 'employer'
+              ? 'Post jobs and find service providers'
               : 'Browse jobs and submit your offers'}
           </p>
         </div>
 
-        {userType === 'employer' && activeTab === 'looking-to-hire' && (
-          <button
-            className="btn-post-job"
-            onClick={handlePostJobClick}
-          >
-            <span className="icon">+</span> Post a Job
-          </button>
-        )}
+        <div className="header-buttons">
+          {userType === 'employer' && activeTab === 'looking-to-hire' && (
+            <button
+              className="btn-post-job"
+              onClick={handlePostJobClick}
+            >
+              <span className="icon">+</span> Post a Job
+            </button>
+          )}
+
+          {activeTab === 'looking-to-hire' && (
+            <button
+              className="btn-submit-job"
+              onClick={() => setShowSubmitModal(true)}
+            >
+              <span className="icon">+</span> Submit a Job
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats Dashboard - Only for employers */}
