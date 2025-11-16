@@ -41,7 +41,6 @@ export default function SubmitJobModal({
   const [jobTitleSuggestions, setJobTitleSuggestions] = useState([])
   const [showTitleSuggestions, setShowTitleSuggestions] = useState(false)
   const [mapLocation, setMapLocation] = useState([12.5, 121.5]) // Default to Philippines center
-  const [showMap, setShowMap] = useState(false)
   const [equipment, setEquipment] = useState([])
   const [equipmentInput, setEquipmentInput] = useState('')
 
@@ -54,6 +53,8 @@ export default function SubmitJobModal({
     pay_type: 'fixed',
     location: '',
     city: '',
+    latitude: 12.5,
+    longitude: 121.5,
     skills_required: [],
     experience_level: 'intermediate',
     start_date: '',
@@ -139,9 +140,10 @@ export default function SubmitJobModal({
 
   const handleLocationSelect = (coords) => {
     setMapLocation(coords)
-    // Reverse geocode to get city name (optional - using coords for now)
     setFormData({
       ...formData,
+      latitude: coords[0],
+      longitude: coords[1],
       city: `${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}`
     })
   }
@@ -159,7 +161,7 @@ export default function SubmitJobModal({
       setError('Job description is required')
       return false
     }
-    if (!formData.city) {
+    if (!formData.latitude || !formData.longitude) {
       setError('Location is required')
       return false
     }
@@ -183,9 +185,7 @@ export default function SubmitJobModal({
       await onSubmit({
         ...formData,
         skills_required: JSON.stringify(formData.skills_required),
-        equipment_required: JSON.stringify(equipment),
-        latitude: mapLocation[0],
-        longitude: mapLocation[1]
+        equipment_required: JSON.stringify(equipment)
       })
     } catch (err) {
       console.error('Error submitting job:', err)
@@ -361,37 +361,55 @@ export default function SubmitJobModal({
 
             <div className="form-group">
               <label>Job Location *</label>
-              <div style={{ marginBottom: '10px' }}>
-                <button
-                  type="button"
-                  onClick={() => setShowMap(!showMap)}
-                  className="btn-add-skill"
-                  style={{ width: '100%' }}
+              <div style={{ height: '300px', borderRadius: '6px', overflow: 'hidden', marginBottom: '15px', border: '1px solid #e0e0e0' }}>
+                <MapContainer
+                  ref={mapRef}
+                  center={mapLocation}
+                  zoom={12}
+                  style={{ height: '100%', width: '100%' }}
+                  attributionControl={false}
                 >
-                  {showMap ? '▼ Close Map' : '▶ Open Map to Select Location'}
-                </button>
+                  <TileLayer
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
+                </MapContainer>
               </div>
-              {showMap && (
-                <div style={{ height: '300px', borderRadius: '6px', overflow: 'hidden', marginBottom: '10px', border: '1px solid #e0e0e0' }}>
-                  <MapContainer
-                    ref={mapRef}
-                    center={mapLocation}
-                    zoom={12}
-                    style={{ height: '100%', width: '100%' }}
-                    attributionControl={false}
-                  >
-                    <TileLayer
-                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-                    <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
-                  </MapContainer>
+              <p style={{ color: '#666', marginBottom: '10px', fontSize: '0.85rem' }}>Click on the map to select a location</p>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="latitude">Latitude *</label>
+                  <input
+                    id="latitude"
+                    type="number"
+                    name="latitude"
+                    value={formData.latitude}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      latitude: parseFloat(e.target.value) || 0
+                    })}
+                    placeholder="12.500000"
+                    step="0.000001"
+                    required
+                  />
                 </div>
-              )}
-              <div style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: '6px', fontSize: '0.85rem' }}>
-                <p style={{ color: '#666', marginBottom: '8px', fontWeight: '500' }}>Selected Coordinates:</p>
-                <div style={{ fontSize: '0.8rem', color: '#333', fontFamily: 'monospace', lineHeight: '1.6' }}>
-                  <div><span style={{ color: '#666' }}>Latitude:</span> {mapLocation[0].toFixed(6)}</div>
-                  <div><span style={{ color: '#666' }}>Longitude:</span> {mapLocation[1].toFixed(6)}</div>
+
+                <div className="form-group">
+                  <label htmlFor="longitude">Longitude *</label>
+                  <input
+                    id="longitude"
+                    type="number"
+                    name="longitude"
+                    value={formData.longitude}
+                    onChange={(e) => setFormData({
+                      ...formData,
+                      longitude: parseFloat(e.target.value) || 0
+                    })}
+                    placeholder="121.500000"
+                    step="0.000001"
+                    required
+                  />
                 </div>
               </div>
             </div>
