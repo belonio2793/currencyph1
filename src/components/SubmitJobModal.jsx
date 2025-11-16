@@ -378,22 +378,22 @@ export default function SubmitJobModal({
                     center={mapLocation}
                     zoom={12}
                     style={{ height: '100%', width: '100%' }}
+                    attributionControl={false}
                   >
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; OpenStreetMap contributors'
                     />
                     <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
                   </MapContainer>
                 </div>
               )}
-              <input
-                type="text"
-                value={formData.city}
-                readOnly
-                placeholder="Selected location coordinates"
-                style={{ opacity: 0.7 }}
-              />
+              <div style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: '6px', fontSize: '0.85rem' }}>
+                <p style={{ color: '#666', marginBottom: '8px', fontWeight: '500' }}>Selected Coordinates:</p>
+                <div style={{ fontSize: '0.8rem', color: '#333', fontFamily: 'monospace', lineHeight: '1.6' }}>
+                  <div><span style={{ color: '#666' }}>Latitude:</span> {mapLocation[0].toFixed(6)}</div>
+                  <div><span style={{ color: '#666' }}>Longitude:</span> {mapLocation[1].toFixed(6)}</div>
+                </div>
+              </div>
             </div>
 
             <div className="form-group">
