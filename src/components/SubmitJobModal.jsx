@@ -459,6 +459,24 @@ export default function SubmitJobModal({
                   />
                 </div>
               </div>
+
+              {/* Location Info Messages */}
+              <div style={{
+                padding: '12px 15px',
+                backgroundColor: '#e3f2fd',
+                borderLeft: '4px solid #2196f3',
+                borderRadius: '4px',
+                marginTop: '15px',
+                fontSize: '0.85rem',
+                color: '#1565c0'
+              }}>
+                <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>📍 Location Services Info:</p>
+                <ul style={{ margin: '0', paddingLeft: '20px', color: '#1565c0' }}>
+                  <li style={{ marginBottom: '6px' }}>Make sure location services are enabled on your device</li>
+                  <li style={{ marginBottom: '6px' }}>You can disable location tracking in your browser or device settings at any time</li>
+                  <li>Location accuracy may vary depending on your device and connection</li>
+                </ul>
+              </div>
             </div>
 
             <div className="form-group">
