@@ -509,12 +509,21 @@ export default function MyBusiness({ userId }) {
         .from('businesses')
         .select('*')
         .eq('user_id', userId)
+        .order('is_default', { ascending: false })
 
       if (error) throw error
-      setBusinesses(data || [])
-      // Only reset selected business if no business is currently selected
-      setSelectedBusiness(prev => prev || null)
-      setShowRegistrationForm(false)
+
+      const businessesData = data || []
+      setBusinesses(businessesData)
+
+      // Auto-select default business if it exists and no business is currently selected
+      if (businessesData.length > 0 && !selectedBusiness) {
+        const defaultBusiness = businessesData.find(b => b.is_default === true)
+        if (defaultBusiness) {
+          setSelectedBusiness(defaultBusiness)
+          setShowRegistrationForm(false)
+        }
+      }
     } catch (err) {
       console.error('Failed to load businesses:', err)
     } finally {
