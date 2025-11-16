@@ -397,7 +397,18 @@ export default function SubmitJobModal({
                   <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
                 </MapContainer>
               </div>
-              <p style={{ color: '#666', marginBottom: '10px', fontSize: '0.85rem' }}>Click on the map to select a location</p>
+              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center' }}>
+                <p style={{ color: '#666', margin: 0, fontSize: '0.85rem', flex: 1 }}>Click on the map to select a location</p>
+                <button
+                  type="button"
+                  onClick={handleFetchCurrentLocation}
+                  disabled={geoLoading || fetchingLocation}
+                  className="btn-add-skill"
+                  style={{ whiteSpace: 'nowrap', padding: '8px 16px', fontSize: '0.85rem' }}
+                >
+                  {geoLoading || fetchingLocation ? 'Fetching...' : 'Fetch Location'}
+                </button>
+              </div>
 
               <div className="form-row">
                 <div className="form-group">
