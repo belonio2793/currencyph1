@@ -1,0 +1,157 @@
+.job-offer-form {
+  background: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-top: 20px;
+}
+
+.job-offer-form h4 {
+  margin: 0 0 15px 0;
+  color: #1a1a1a;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.job-offer-form .error-message {
+  background: #ffe5e5;
+  border-left: 4px solid #d63031;
+  padding: 12px 15px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #d63031;
+  font-size: 0.9rem;
+}
+
+.job-offer-form .close-error {
+  background: none;
+  border: none;
+  color: #d63031;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.job-offer-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 15px;
+}
+
+.job-offer-form .form-group label {
+  color: #1a1a1a;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.job-offer-form input,
+.job-offer-form textarea {
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.job-offer-form input:focus,
+.job-offer-form textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.job-offer-form textarea {
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+/* Rate Input Group */
+.rate-input-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.rate-input-group input {
+  flex: 1;
+}
+
+.job-rate-info {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Form Actions */
+.form-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.btn-cancel-offer,
+.btn-submit-offer {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.btn-cancel-offer {
+  background: #e0e0e0;
+  color: #1a1a1a;
+}
+
+.btn-cancel-offer:hover {
+  background: #d0d0d0;
+}
+
+.btn-submit-offer {
+  background: #667eea;
+  color: white;
+}
+
+.btn-submit-offer:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.btn-submit-offer:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .rate-input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .job-rate-info {
+    white-space: normal;
+  }
+}
