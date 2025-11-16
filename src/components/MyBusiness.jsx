@@ -1323,6 +1323,20 @@ export default function MyBusiness({ userId }) {
                 <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Access feature →</div>
               </button>
 
+              {/* Employees & Payroll */}
+              <button onClick={() => setShowEmployeesModal(true)} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
+                <div className="flex justify-center mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10h.01M13 16h2v2h-2z" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Employees & Payroll</h3>
+                <p className="text-sm text-slate-600 mb-4">Manage employees, attendance, payroll, and benefits</p>
+                <div className="text-sm font-medium text-purple-600 group-hover:text-purple-700">Access feature →</div>
+              </button>
+
               {/* Sales and Tax Reporting */}
               <button onClick={() => setShowSalesTaxModal(true)} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
                 <div className="flex justify-center mb-4">
