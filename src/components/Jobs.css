@@ -60,7 +60,7 @@
 }
 
 .btn-submit-job {
-  background: #48bb78;
+  background: #667eea;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -75,7 +75,7 @@
 }
 
 .btn-submit-job:hover {
-  background: #38a169;
+  background: #5568d3;
 }
 
 /* Stats Dashboard */
