@@ -371,7 +371,7 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                     : 'text-slate-600 border-transparent hover:text-slate-900'
                 }`}
               >
-                {tab.icon} {tab.label}
+                {tab.label}
               </button>
             ))}
           </div>
