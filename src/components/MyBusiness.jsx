@@ -1635,7 +1635,7 @@ export default function MyBusiness({ userId }) {
                             </div>
                             <div className="flex justify-between">
                               <span className="text-slate-600">Expenses:</span>
-                              <span className="font-medium text-orange-600">���{month.expenses.toFixed(0)}</span>
+                              <span className="font-medium text-orange-600">₱{month.expenses.toFixed(0)}</span>
                             </div>
                             <div className="flex justify-between pt-2 border-t border-slate-300">
                               <span className="font-semibold text-slate-900">Net:</span>
@@ -1869,7 +1869,7 @@ export default function MyBusiness({ userId }) {
           )}
 
           {activeTab === 'jobs' && selectedBusiness && (
-            <Jobs businessId={selectedBusiness.id} currentUserId={userId} />
+            <EmployerJobsOverview businessId={selectedBusiness.id} currentUserId={userId} />
           )}
 
         </div>
