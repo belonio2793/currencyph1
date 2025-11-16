@@ -1,6 +1,33 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import './PostJobModal.css'
+
+// Fix Leaflet icon issues
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
+
+const JOB_CATEGORIES = ['Personal', 'Digital', 'Home', 'Business', 'Other']
+
+// Map click handler component
+function LocationMarker({ onLocationSelect, initialPosition }) {
+  const [position, setPosition] = useState(initialPosition || [12.5, 121.5])
+  
+  useMapEvents({
+    click(e) {
+      setPosition([e.latlng.lat, e.latlng.lng])
+      onLocationSelect([e.latlng.lat, e.latlng.lng])
+    },
+  })
+
+  return position ? <Marker position={position} /> : null
+}
 
 export default function SubmitJobModal({
   onClose,
@@ -10,6 +37,14 @@ export default function SubmitJobModal({
   userBusinesses = [],
   userId
 }) {
+  const mapRef = useRef(null)
+  const [jobTitleSuggestions, setJobTitleSuggestions] = useState([])
+  const [showTitleSuggestions, setShowTitleSuggestions] = useState(false)
+  const [mapLocation, setMapLocation] = useState([12.5, 121.5]) // Default to Philippines center
+  const [showMap, setShowMap] = useState(false)
+  const [equipment, setEquipment] = useState([])
+  const [equipmentInput, setEquipmentInput] = useState('')
+
   const [formData, setFormData] = useState({
     job_title: '',
     job_category: '',
@@ -19,12 +54,11 @@ export default function SubmitJobModal({
     pay_type: 'fixed',
     location: '',
     city: '',
-    province: '',
     skills_required: [],
     experience_level: 'intermediate',
     start_date: '',
     end_date: '',
-    deadline_for_applications: '',
+    offer_expiry_date: '',
     positions_available: 1,
     business_id: '',
     posted_by_user_id: userId,
@@ -36,12 +70,43 @@ export default function SubmitJobModal({
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  // Load existing job titles for suggestions
+  useEffect(() => {
+    const loadJobTitleSuggestions = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('jobs')
+          .select('job_title')
+          .limit(20)
+        
+        if (!error && data) {
+          const uniqueTitles = [...new Set(data.map(j => j.job_title))]
+          setJobTitleSuggestions(uniqueTitles)
+        }
+      } catch (err) {
+        console.error('Error loading job title suggestions:', err)
+      }
+    }
+
+    loadJobTitleSuggestions()
+  }, [])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value
     })
+
+    // Show title suggestions when typing
+    if (name === 'job_title' && value.length > 0) {
+      setShowTitleSuggestions(true)
+    }
+  }
+
+  const handleTitleSuggestionClick = (title) => {
+    setFormData({ ...formData, job_title: title })
+    setShowTitleSuggestions(false)
   }
 
   const handleAddSkill = () => {
@@ -61,6 +126,26 @@ export default function SubmitJobModal({
     })
   }
 
+  const handleAddEquipment = () => {
+    if (equipmentInput.trim() && !equipment.includes(equipmentInput)) {
+      setEquipment([...equipment, equipmentInput])
+      setEquipmentInput('')
+    }
+  }
+
+  const handleRemoveEquipment = (item) => {
+    setEquipment(equipment.filter(e => e !== item))
+  }
+
+  const handleLocationSelect = (coords) => {
+    setMapLocation(coords)
+    // Reverse geocode to get city name (optional - using coords for now)
+    setFormData({
+      ...formData,
+      city: `${coords[0].toFixed(4)}, ${coords[1].toFixed(4)}`
+    })
+  }
+
   const validateForm = () => {
     if (!formData.job_title.trim()) {
       setError('Job title is required')
@@ -75,7 +160,7 @@ export default function SubmitJobModal({
       return false
     }
     if (!formData.city) {
-      setError('City is required')
+      setError('Location is required')
       return false
     }
     if (formData.pay_type === 'fixed' && !formData.pay_rate) {
@@ -97,7 +182,10 @@ export default function SubmitJobModal({
     try {
       await onSubmit({
         ...formData,
-        skills_required: JSON.stringify(formData.skills_required)
+        skills_required: JSON.stringify(formData.skills_required),
+        equipment_required: JSON.stringify(equipment),
+        latitude: mapLocation[0],
+        longitude: mapLocation[1]
       })
     } catch (err) {
       console.error('Error submitting job:', err)
@@ -106,6 +194,12 @@ export default function SubmitJobModal({
       setLoading(false)
     }
   }
+
+  const filteredTitleSuggestions = showTitleSuggestions && formData.job_title
+    ? jobTitleSuggestions.filter(title =>
+        title.toLowerCase().includes(formData.job_title.toLowerCase())
+      ).slice(0, 5)
+    : []
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -154,15 +248,32 @@ export default function SubmitJobModal({
 
             <div className="form-group">
               <label htmlFor="job_title">Job Title *</label>
-              <input
-                id="job_title"
-                type="text"
-                name="job_title"
-                value={formData.job_title}
-                onChange={handleInputChange}
-                placeholder="e.g., Expert Hairstylist, Makeup Artist"
-                required
-              />
+              <div className="job-title-wrapper" style={{ position: 'relative' }}>
+                <input
+                  id="job_title"
+                  type="text"
+                  name="job_title"
+                  value={formData.job_title}
+                  onChange={handleInputChange}
+                  onFocus={() => formData.job_title && setShowTitleSuggestions(true)}
+                  placeholder="e.g., Expert Hairstylist, Makeup Artist"
+                  required
+                />
+                {filteredTitleSuggestions.length > 0 && (
+                  <div className="suggestions-dropdown" style={{ position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 100 }}>
+                    {filteredTitleSuggestions.map((title, idx) => (
+                      <div
+                        key={idx}
+                        className="suggestion-item"
+                        onClick={() => handleTitleSuggestionClick(title)}
+                        style={{ padding: '10px 15px', cursor: 'pointer', borderBottom: '1px solid #f0f0f0' }}
+                      >
+                        {title}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="form-row">
@@ -176,24 +287,9 @@ export default function SubmitJobModal({
                   required
                 >
                   <option value="">Select a category</option>
-                  {categories.length > 0 ? (
-                    categories.map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="haircut">Haircut</option>
-                      <option value="beauty">Beauty Services</option>
-                      <option value="makeup">Makeup</option>
-                      <option value="nails">Nails</option>
-                      <option value="chef">Culinary/Chef</option>
-                      <option value="personal_services">Personal Services</option>
-                      <option value="construction">Construction</option>
-                      <option value="cleaning">Cleaning</option>
-                      <option value="tutoring">Tutoring</option>
-                      <option value="other">Other</option>
-                    </>
-                  )}
+                  {JOB_CATEGORIES.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
                 </select>
               </div>
 
@@ -263,62 +359,58 @@ export default function SubmitJobModal({
               )}
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="city">City *</label>
-                <select
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
-                  required
+            <div className="form-group">
+              <label>Job Location *</label>
+              <div style={{ marginBottom: '10px' }}>
+                <button
+                  type="button"
+                  onClick={() => setShowMap(!showMap)}
+                  className="btn-add-skill"
+                  style={{ width: '100%' }}
                 >
-                  <option value="">Select a city</option>
-                  {cities.length > 0 ? (
-                    cities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="Manila">Manila</option>
-                      <option value="Cebu">Cebu</option>
-                      <option value="Davao">Davao</option>
-                      <option value="Cagayan de Oro">Cagayan de Oro</option>
-                      <option value="Makati">Makati</option>
-                      <option value="Quezon City">Quezon City</option>
-                    </>
-                  )}
-                </select>
+                  {showMap ? '▼ Close Map' : '▶ Open Map to Select Location'}
+                </button>
               </div>
-
-              <div className="form-group">
-                <label htmlFor="province">Province</label>
-                <input
-                  id="province"
-                  type="text"
-                  name="province"
-                  value={formData.province}
-                  onChange={handleInputChange}
-                  placeholder="e.g., Metro Manila"
-                />
-              </div>
+              {showMap && (
+                <div style={{ height: '300px', borderRadius: '6px', overflow: 'hidden', marginBottom: '10px', border: '1px solid #e0e0e0' }}>
+                  <MapContainer
+                    ref={mapRef}
+                    center={mapLocation}
+                    zoom={12}
+                    style={{ height: '100%', width: '100%' }}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                      attribution='&copy; OpenStreetMap contributors'
+                    />
+                    <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
+                  </MapContainer>
+                </div>
+              )}
+              <input
+                type="text"
+                value={formData.city}
+                readOnly
+                placeholder="Selected location coordinates"
+                style={{ opacity: 0.7 }}
+              />
             </div>
 
             <div className="form-group">
-              <label htmlFor="location">Detailed Location</label>
+              <label htmlFor="location">Other Location Details</label>
               <input
                 id="location"
                 type="text"
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                placeholder="e.g., Makati CBD, Taguig"
+                placeholder="e.g., Near the mall, accessible by car"
               />
             </div>
           </div>
 
           <div className="form-section">
-            <h3>Requirements & Timeline</h3>
+            <h3>Requirements</h3>
 
             <div className="form-group">
               <label>Skills Required</label>
@@ -357,6 +449,85 @@ export default function SubmitJobModal({
               )}
             </div>
 
+            <div className="form-group">
+              <label>Equipment Required</label>
+              <div className="skill-input-group">
+                <input
+                  type="text"
+                  value={equipmentInput}
+                  onChange={(e) => setEquipmentInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddEquipment())}
+                  placeholder="Add equipment and press Enter"
+                  className="skill-input"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddEquipment}
+                  className="btn-add-skill"
+                >
+                  Add
+                </button>
+              </div>
+              {equipment.length > 0 && (
+                <div className="skills-list">
+                  {equipment.map((item, idx) => (
+                    <span key={idx} className="skill-tag">
+                      {item}
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveEquipment(item)}
+                        className="remove-skill"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h3>Timeline</h3>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="start_date">Start Date</label>
+                <input
+                  id="start_date"
+                  type="date"
+                  name="start_date"
+                  value={formData.start_date}
+                  onChange={handleInputChange}
+                />
+              </div>
+
+              <div className="form-group">
+                <label htmlFor="end_date">End Date</label>
+                <input
+                  id="end_date"
+                  type="date"
+                  name="end_date"
+                  value={formData.end_date}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="offer_expiry_date">Offer Expiry Date</label>
+              <input
+                id="offer_expiry_date"
+                type="date"
+                name="offer_expiry_date"
+                value={formData.offer_expiry_date}
+                onChange={handleInputChange}
+              />
+              <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
+                Job will be marked as closed after this date
+              </small>
+            </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="experience_level">Experience Level</label>
@@ -384,41 +555,6 @@ export default function SubmitJobModal({
                   placeholder="1"
                 />
               </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="start_date">Start Date</label>
-                <input
-                  id="start_date"
-                  type="date"
-                  name="start_date"
-                  value={formData.start_date}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="end_date">End Date</label>
-                <input
-                  id="end_date"
-                  type="date"
-                  name="end_date"
-                  value={formData.end_date}
-                  onChange={handleInputChange}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="deadline_for_applications">Application Deadline</label>
-              <input
-                id="deadline_for_applications"
-                type="date"
-                name="deadline_for_applications"
-                value={formData.deadline_for_applications}
-                onChange={handleInputChange}
-              />
             </div>
           </div>
 
