@@ -35,24 +35,15 @@ export function useGeolocation() {
               if (MAPTILER_KEY) {
                 try {
                   const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
-                  const controller = new AbortController()
-                  controllersRef.current.push(controller)
-                  let timedOut = false
-
+                  let shouldFetch = true
                   const timeoutId = setTimeout(() => {
-                    if (timedOut) return
-                    timedOut = true
-                    try {
-                      if (!controller.signal.aborted) {
-                        controller.abort()
-                      }
-                    } catch (e) {}
+                    shouldFetch = false
                   }, 3000)
 
                   let resp = null
                   try {
-                    if (!controller.signal.aborted) {
-                      resp = await fetch(url, { signal: controller.signal })
+                    if (shouldFetch) {
+                      resp = await fetch(url)
                     }
                   } catch (fetchErr) {
                     resp = null
@@ -70,34 +61,22 @@ export function useGeolocation() {
                       }
                     } catch (parseErr) {}
                   }
-
-                  const idx = controllersRef.current.indexOf(controller)
-                  if (idx !== -1) controllersRef.current.splice(idx, 1)
                 } catch (e) {}
               }
 
               // Fallback to Nominatim
               try {
-                const controller = new AbortController()
-                controllersRef.current.push(controller)
-                let timedOut = false
-
+                let shouldFetch = true
                 const timeoutId = setTimeout(() => {
-                  if (timedOut) return
-                  timedOut = true
-                  try {
-                    if (!controller.signal.aborted) {
-                      controller.abort()
-                    }
-                  } catch (e) {}
+                  shouldFetch = false
                 }, 3000)
 
                 let response = null
                 try {
-                  if (!controller.signal.aborted) {
+                  if (shouldFetch) {
                     response = await fetch(
                       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                      { signal: controller.signal, headers: { 'Accept-Language': 'en' } }
+                      { headers: { 'Accept-Language': 'en' } }
                     )
                   }
                 } catch (fetchErr) {
@@ -114,9 +93,6 @@ export function useGeolocation() {
                     )
                   } catch (parseErr) {}
                 }
-
-                const idx = controllersRef.current.indexOf(controller)
-                if (idx !== -1) controllersRef.current.splice(idx, 1)
               } catch (e) {}
             } catch (e) {} finally {
               try {
