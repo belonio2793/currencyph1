@@ -210,6 +210,7 @@ export default function MyBusiness({ userId }) {
   })
   const [taxPayments, setTaxPayments] = useState([])
   const [loadingReports, setLoadingReports] = useState(false)
+  const [showSalesTaxModal, setShowSalesTaxModal] = useState(false)
 
   // Generate TIN (12-digit format like government)
   const loadSalesAndTaxData = async () => {
@@ -1321,7 +1322,7 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Sales and Tax Reporting */}
-              <button onClick={() => { setMainTab('management'); setActiveTab('salesTaxReporting') }} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
+              <button onClick={() => setShowSalesTaxModal(true)} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-green-300 transition-all group">
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2151,6 +2152,353 @@ export default function MyBusiness({ userId }) {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Sales and Tax Reporting Modal */}
+        {showSalesTaxModal && selectedBusiness && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-green-100">
+                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900">Sales & Tax Reporting</h2>
+                    <p className="text-slate-600 text-sm">Track sales, expenses, and tax obligations</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSalesTaxModal(false)}
+                  className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors"
+                  aria-label="Close modal"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="p-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h4 className="text-lg font-semibold text-slate-900">Sales & Tax Reporting</h4>
+                  <div className="flex gap-2">
+                    <button onClick={() => exportToCSV()} className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm">Export CSV</button>
+                    <button onClick={() => { loadSalesAndTaxData(); loadReportingData(); }} className="px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium text-sm">Refresh</button>
+                  </div>
+                </div>
+
+                {/* Period Selection */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 bg-slate-50 p-6 rounded-lg border border-slate-200">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">Reporting Period</label>
+                    <select value={reportingPeriod} onChange={(e) => setReportingPeriod(e.target.value)} className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600">
+                      <option value="annual">Annual</option>
+                      <option value="Q1">Q1 (Jan - Mar)</option>
+                      <option value="Q2">Q2 (Apr - Jun)</option>
+                      <option value="Q3">Q3 (Jul - Sep)</option>
+                      <option value="Q4">Q4 (Oct - Dec)</option>
+                      <option value="ytd">Year-to-Date</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-900 mb-2">Year</label>
+                    <select value={reportingYear} onChange={(e) => setReportingYear(parseInt(e.target.value))} className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600">
+                      {[new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2].map(year => (
+                        <option key={year} value={year}>{year}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Key Metrics for Selected Period */}
+                {loadingReports ? (
+                  <div className="text-center py-12">
+                    <p className="text-slate-500">Loading reporting data...</p>
+                  </div>
+                ) : currentPeriodReport ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 border border-blue-200">
+                      <p className="text-sm text-slate-600 font-medium mb-2">Total Sales</p>
+                      <p className="text-3xl font-bold text-blue-600">₱{currentPeriodReport.totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-xs text-slate-600 mt-2">{currentPeriodReport.receiptCount} receipts</p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-6 border border-orange-200">
+                      <p className="text-sm text-slate-600 font-medium mb-2">Total Expenses</p>
+                      <p className="text-3xl font-bold text-orange-600">₱{currentPeriodReport.totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-xs text-slate-600 mt-2">{currentPeriodReport.expenseCount} deductions</p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border border-green-200">
+                      <p className="text-sm text-slate-600 font-medium mb-2">Net Income</p>
+                      <p className={`text-3xl font-bold ${currentPeriodReport.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{currentPeriodReport.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-xs text-slate-600 mt-2">Profit Margin: {currentPeriodReport.profitMargin}%</p>
+                    </div>
+
+                    <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-6 border border-purple-200">
+                      <p className="text-sm text-slate-600 font-medium mb-2">Tax Liability</p>
+                      <p className="text-3xl font-bold text-purple-600">₱{currentPeriodReport.estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-xs text-slate-600 mt-2">Paid: ₱{currentPeriodReport.taxPaid.toFixed(2)}</p>
+                    </div>
+                  </div>
+                ) : null}
+
+                {/* Monthly Breakdown */}
+                {filteredMonthlyData.length > 0 && (
+                  <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-6">Monthly Breakdown ({reportingYear})</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {filteredMonthlyData.map((month, idx) => (
+                        month.sales > 0 || month.expenses > 0 ? (
+                          <div key={idx} className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200">
+                            <p className="font-semibold text-slate-900 mb-3">{month.month}</p>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span className="text-slate-600">Sales:</span>
+                                <span className="font-medium text-blue-600">₱{month.sales.toFixed(0)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-slate-600">Expenses:</span>
+                                <span className="font-medium text-orange-600">₱{month.expenses.toFixed(0)}</span>
+                              </div>
+                              <div className="flex justify-between pt-2 border-t border-slate-300">
+                                <span className="font-semibold text-slate-900">Net:</span>
+                                <span className={`font-bold ${month.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{month.netIncome.toFixed(0)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-4 mb-8">
+                  <button onClick={() => setShowExpenseForm(!showExpenseForm)} className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 font-medium">+ Add Expense</button>
+                  <button onClick={() => setShowTaxPaymentForm(!showTaxPaymentForm)} className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">+ Record Tax Payment</button>
+                </div>
+
+                {/* Expense Form */}
+                {showExpenseForm && (
+                  <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6 mb-8">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-4">Add Business Expense</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <input type="text" placeholder="Description" value={expenseFormData.description} onChange={(e) => setExpenseFormData({ ...expenseFormData, description: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600" />
+                      <input type="number" placeholder="Amount" value={expenseFormData.amount} onChange={(e) => setExpenseFormData({ ...expenseFormData, amount: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600" />
+                      <select value={expenseFormData.category} onChange={(e) => setExpenseFormData({ ...expenseFormData, category: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600">
+                        <option value="supplies">Office Supplies</option>
+                        <option value="rent">Rent</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="transport">Transportation</option>
+                        <option value="meals">Meals & Entertainment</option>
+                        <option value="equipment">Equipment</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <input type="date" value={expenseFormData.receiptDate} onChange={(e) => setExpenseFormData({ ...expenseFormData, receiptDate: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-orange-600" />
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                      <button onClick={handleAddExpense} disabled={savingCost} className="px-6 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-slate-300 font-medium">{savingCost ? 'Saving...' : 'Save Expense'}</button>
+                      <button onClick={() => setShowExpenseForm(false)} className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Tax Payment Form */}
+                {showTaxPaymentForm && (
+                  <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-8">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-4">Record Tax Payment</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <input type="number" placeholder="Payment Amount" value={taxPaymentData.amount} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, amount: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600" />
+                      <input type="date" value={taxPaymentData.paymentDate} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, paymentDate: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600" />
+                      <select value={taxPaymentData.paymentMethod} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, paymentMethod: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600">
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="check">Check</option>
+                        <option value="cash">Cash</option>
+                        <option value="credit_card">Credit Card</option>
+                      </select>
+                      <input type="text" placeholder="Reference Number (Optional)" value={taxPaymentData.referenceNumber} onChange={(e) => setTaxPaymentData({ ...taxPaymentData, referenceNumber: e.target.value })} className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-green-600" />
+                    </div>
+                    <div className="flex gap-3 mt-4">
+                      <button onClick={handleSaveTaxPayment} disabled={savingCost} className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 font-medium">{savingCost ? 'Saving...' : 'Record Payment'}</button>
+                      <button onClick={() => setShowTaxPaymentForm(false)} className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300">Cancel</button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent Tax Payments */}
+                {taxPayments.length > 0 && (
+                  <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-4">Tax Payments History</h5>
+                    <div className="space-y-3">
+                      {taxPayments.map((payment, idx) => (
+                        <div key={idx} className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                          <div>
+                            <p className="font-medium text-slate-900">{new Date(payment.payment_date).toLocaleDateString()}</p>
+                            <p className="text-sm text-slate-600">{payment.payment_method} {payment.reference_number && `- Ref: ${payment.reference_number}`}</p>
+                          </div>
+                          <p className="text-lg font-bold text-green-600">₱{parseFloat(payment.amount).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Quarterly Breakdown */}
+                {quarterlyReports.length > 0 && reportingPeriod === 'annual' && (
+                  <div className="bg-white rounded-lg border border-slate-200 p-6 mb-8">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-6">Quarterly Breakdown ({reportingYear})</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {quarterlyReports.map((q, idx) => (
+                        <div key={idx} className="border border-slate-300 rounded-lg p-4 bg-slate-50">
+                          <div className="mb-3">
+                            <h6 className="font-semibold text-slate-900">{q.period}</h6>
+                            <p className="text-xs text-slate-500">{q.monthRange}</p>
+                          </div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Sales:</span>
+                              <span className="font-medium">₱{q.totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Expenses:</span>
+                              <span className="font-medium">₱{q.totalExpenses.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between border-t border-slate-300 pt-2">
+                              <span className="font-semibold">Net Income:</span>
+                              <span className={`font-bold ${q.netIncome >= 0 ? 'text-green-600' : 'text-red-600'}`}>₱{q.netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-600">Est. Tax:</span>
+                              <span className="font-medium">₱{q.estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Detailed Report */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  {/* Sales Summary */}
+                  <div className="bg-white rounded-lg border border-slate-200 p-6">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-4">Sales Summary</h5>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <span className="text-slate-600">Total Receipts</span>
+                        <span className="font-semibold text-slate-900">{receipts.length}</span>
+                      </div>
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <span className="text-slate-600">Total Sales Amount</span>
+                        <span className="font-semibold text-slate-900">₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </div>
+                      {receipts.length > 0 && (
+                        <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                          <span className="text-slate-600">Average Transaction</span>
+                          <span className="font-semibold text-slate-900">₱{(totalSales / receipts.length).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                      )}
+                      <div className="pt-4">
+                        <p className="text-xs text-slate-500">Last Updated: {new Date().toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expenses Summary */}
+                  <div className="bg-white rounded-lg border border-slate-200 p-6">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-4">Expenses & Deductions</h5>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <span className="text-slate-600">Total Deductions</span>
+                        <span className="font-semibold text-slate-900">{miscCosts.length}</span>
+                      </div>
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <span className="text-slate-600">Total Expense Amount</span>
+                        <span className="font-semibold text-slate-900">₱{totalCosts.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+                        <span className="text-slate-600">Net Profit Margin</span>
+                        <span className="font-semibold text-slate-900">{totalSales > 0 ? ((netIncome / totalSales) * 100).toFixed(2) : 0}%</span>
+                      </div>
+                      <div className="pt-4">
+                        <p className="text-xs text-slate-500">Manage deductions in the business details section</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tax Breakdown */}
+                <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-lg border border-purple-200 p-6 mt-8">
+                  <h5 className="text-lg font-semibold text-slate-900 mb-6">Tax Calculation Breakdown</h5>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between pb-4 border-b border-purple-300">
+                      <span className="text-slate-700">Gross Sales</span>
+                      <span className="font-semibold text-slate-900">₱{totalSales.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex items-center justify-between pb-4 border-b border-purple-300">
+                      <span className="text-slate-700">Less: Expenses & Deductions</span>
+                      <span className="font-semibold text-slate-900">-₱{totalCosts.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex items-center justify-between pb-4 border-b border-purple-300 bg-white bg-opacity-50 px-4 py-2 rounded">
+                      <span className="text-slate-700 font-medium">Taxable Income</span>
+                      <span className="font-bold text-slate-900">₱{netIncome.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                    <div className="flex items-center justify-between pt-4">
+                      <span className="text-slate-700 font-medium">Tax Rate</span>
+                      <span className="font-semibold text-slate-900">12%</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-purple-600 text-white px-4 py-3 rounded-lg mt-4">
+                      <span className="font-semibold">Estimated Tax Liability</span>
+                      <span className="text-2xl font-bold">₱{estimatedTax.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Recent Receipts Preview */}
+                {receipts.length > 0 && (
+                  <div className="mt-8">
+                    <h5 className="text-lg font-semibold text-slate-900 mb-4">Recent Receipts (Last 5)</h5>
+                    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead className="bg-slate-50 border-b border-slate-200">
+                          <tr>
+                            <th className="text-left px-6 py-3 text-slate-700 font-semibold">Date</th>
+                            <th className="text-left px-6 py-3 text-slate-700 font-semibold">Description</th>
+                            <th className="text-right px-6 py-3 text-slate-700 font-semibold">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {receipts.slice(0, 5).map((receipt, index) => (
+                            <tr key={receipt.id || index} className="border-b border-slate-200 hover:bg-slate-50">
+                              <td className="px-6 py-3 text-slate-600">{new Date(receipt.created_at || receipt.receipt_date).toLocaleDateString()}</td>
+                              <td className="px-6 py-3 text-slate-700 font-medium">{receipt.description || receipt.receipt_type || 'Transaction'}</td>
+                              <td className="px-6 py-3 text-right font-semibold text-slate-900">₱{parseFloat(receipt.amount || 0).toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
+                {/* No Data State */}
+                {receipts.length === 0 && miscCosts.length === 0 && (
+                  <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200 mt-8">
+                    <p className="text-slate-500 text-lg">No sales or expense data yet</p>
+                    <p className="text-slate-400 text-sm mt-2">Add receipts and expenses to see your tax reporting</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="sticky bottom-0 bg-white border-t border-slate-200 p-6 flex gap-3 justify-end">
+                <button onClick={() => setShowSalesTaxModal(false)} className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-medium">Close</button>
+              </div>
             </div>
           </div>
         )}
