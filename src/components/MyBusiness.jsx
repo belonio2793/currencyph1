@@ -1868,6 +1868,9 @@ export default function MyBusiness({ userId }) {
             </div>
           )}
 
+          {activeTab === 'jobs' && selectedBusiness && (
+            <Jobs businessId={selectedBusiness.id} currentUserId={userId} />
+          )}
 
         </div>
         )}
