@@ -2519,6 +2519,15 @@ export default function MyBusiness({ userId }) {
           </div>
         )}
 
+        {/* Employees & Payroll Modal */}
+        {showEmployeesModal && selectedBusiness && (
+          <EmployeesModal
+            businessId={selectedBusiness.id}
+            userId={userId}
+            onClose={() => setShowEmployeesModal(false)}
+          />
+        )}
+
         {/* Select Business Modal */}
         {showBusinessSelectionModal && (
           <SelectBusinessModal
