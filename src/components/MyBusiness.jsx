@@ -346,23 +346,25 @@ export default function MyBusiness({ userId }) {
 
   // Export report to CSV
   const exportToCSV = () => {
-    if (!annualReport) return
+    const reportData = currentPeriodReport || annualReport
+    if (!reportData) return
 
     const headers = ['Metric', 'Value']
+    const periodLabel = reportData.monthRange ? `${reportData.period} ${reportData.monthRange}` : reportData.period
     const rows = [
-      ['Period', `${reportingYear}`],
-      ['Total Sales', `₱${annualReport.totalSales.toFixed(2)}`],
-      ['Total Expenses', `₱${annualReport.totalExpenses.toFixed(2)}`],
-      ['Net Income', `₱${annualReport.netIncome.toFixed(2)}`],
-      ['Profit Margin', `${annualReport.profitMargin}%`],
-      ['Estimated Tax (12%)', `₱${annualReport.estimatedTax.toFixed(2)}`],
-      ['Tax Paid', `₱${annualReport.taxPaid.toFixed(2)}`],
-      ['Tax Due', `₱${annualReport.taxDue.toFixed(2)}`],
+      ['Period', `${periodLabel} (${reportingYear})`],
+      ['Total Sales', `₱${reportData.totalSales.toFixed(2)}`],
+      ['Total Expenses', `₱${reportData.totalExpenses.toFixed(2)}`],
+      ['Net Income', `₱${reportData.netIncome.toFixed(2)}`],
+      ['Profit Margin', `${reportData.profitMargin}%`],
+      ['Estimated Tax (12%)', `₱${reportData.estimatedTax.toFixed(2)}`],
+      ['Tax Paid', `₱${reportData.taxPaid.toFixed(2)}`],
+      ['Tax Due', `₱${reportData.taxDue.toFixed(2)}`],
       ['', ''],
       ['Monthly Breakdown', ''],
     ]
 
-    monthlyData.forEach(month => {
+    filteredMonthlyData.forEach(month => {
       rows.push([
         month.month,
         `Sales: ₱${month.sales.toFixed(2)}, Expenses: ₱${month.expenses.toFixed(2)}, Net: ₱${month.netIncome.toFixed(2)}`
@@ -377,7 +379,7 @@ export default function MyBusiness({ userId }) {
     const url = window.URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `tax-report-${reportingYear}.csv`
+    a.download = `tax-report-${reportingPeriod}-${reportingYear}.csv`
     a.click()
   }
 
