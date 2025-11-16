@@ -54,8 +54,28 @@
   background: #5568d3;
 }
 
-.btn-post-job .icon {
+.btn-post-job .icon,
+.btn-submit-job .icon {
   font-size: 1.2rem;
+}
+
+.btn-submit-job {
+  background: #48bb78;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-submit-job:hover {
+  background: #38a169;
 }
 
 /* Stats Dashboard */
