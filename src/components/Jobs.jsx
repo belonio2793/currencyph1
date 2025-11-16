@@ -407,6 +407,17 @@ export default function Jobs({ userId }) {
         />
       )}
 
+      {showSubmitModal && (
+        <SubmitJobModal
+          onClose={() => setShowSubmitModal(false)}
+          onSubmit={handleSubmitJob}
+          categories={categories}
+          cities={cities}
+          userBusinesses={userBusinesses}
+          userId={userId}
+        />
+      )}
+
       {showJobDetails && selectedJob && (
         <JobDetailsModal
           job={selectedJob}
