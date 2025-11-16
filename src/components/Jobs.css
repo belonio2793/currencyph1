@@ -9,6 +9,11 @@
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 30px;
+  gap: 20px;
+}
+
+.jobs-title-section {
+  flex: 1;
 }
 
 .jobs-title-section h2 {
@@ -21,6 +26,13 @@
   margin: 5px 0 0 0;
   color: #666;
   font-size: 0.95rem;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .btn-post-job {
