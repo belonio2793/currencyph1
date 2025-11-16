@@ -167,16 +167,15 @@ export default function SubmitJobModal({
   }
 
   const handleFetchCurrentLocation = () => {
-    if (userLocation && userLocation.latitude && userLocation.longitude) {
+    if (userLocation && userLocation.latitude && userLocation.longitude && !geoLoading) {
       const coords = [userLocation.latitude, userLocation.longitude]
       setMapLocation(coords)
-      setFormData({
-        ...formData,
+      setFormData(prev => ({
+        ...prev,
         latitude: userLocation.latitude,
         longitude: userLocation.longitude,
         city: `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`
-      })
-      setFetchingLocation(false)
+      }))
     } else {
       setFetchingLocation(true)
       try {
