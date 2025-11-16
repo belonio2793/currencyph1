@@ -180,6 +180,24 @@ export default function Jobs({ userId }) {
     }
   }
 
+  const handleSubmitJob = async (jobData) => {
+    try {
+      const newJob = await jobsService.createJob({
+        ...jobData,
+        posted_by_user_id: userId,
+        is_public: true,
+        status: 'active'
+      })
+      setShowSubmitModal(false)
+      loadJobs()
+      setError('Job submitted successfully!')
+      setTimeout(() => setError(''), 3000)
+    } catch (err) {
+      console.error('Error submitting job:', err)
+      setError('Failed to submit job. Please try again.')
+    }
+  }
+
   const handleFilterChange = (newFilters) => {
     setFilters(newFilters)
   }
