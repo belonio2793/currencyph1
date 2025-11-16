@@ -65,6 +65,7 @@ export default function SubmitJobModal({
     offer_expiry_date: '',
     positions_available: 1,
     business_id: '',
+    currency_registration_number: '',
     posted_by_user_id: userId,
     is_public: true,
     status: 'active'
