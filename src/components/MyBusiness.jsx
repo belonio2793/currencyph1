@@ -5,6 +5,7 @@ import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import MerchantReceipts from './MerchantReceipts'
 import SelectBusinessModal from './SelectBusinessModal'
 import EmployeesModal from './EmployeesModal'
+import Jobs from './Jobs'
 import { miscellaneousCostsService } from '../lib/miscellaneousCostsService'
 import { taxReportingService } from '../lib/taxReportingService'
 
