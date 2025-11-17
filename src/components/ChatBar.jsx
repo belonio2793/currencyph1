@@ -390,12 +390,14 @@ export default function ChatBar({ userId, userEmail }) {
   const handleDragOver = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    setIsDraggingOver(true)
     e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)'
   }
 
   const handleDragLeave = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    setIsDraggingOver(false)
     e.currentTarget.style.backgroundColor = 'white'
   }
 
