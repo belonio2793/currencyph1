@@ -38,7 +38,6 @@ export default function SubmitJobModal({
   userId
 }) {
   const mapRef = useRef(null)
-  const { location: userLocation, loading: geoLoading } = useGeolocation()
   const [jobTitleSuggestions, setJobTitleSuggestions] = useState([])
   const [showTitleSuggestions, setShowTitleSuggestions] = useState(false)
   const [mapLocation, setMapLocation] = useState([12.5, 121.5]) // Default to Philippines center
