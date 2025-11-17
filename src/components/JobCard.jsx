@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { formatFieldValue } from '../lib/formatters'
 import './JobCard.css'
 
 export default function JobCard({ job, onSelect, onApply }) {
@@ -15,7 +16,7 @@ export default function JobCard({ job, onSelect, onApply }) {
       <div className="job-card-header">
         <div className="job-title-section">
           <h3 className="job-title">{job.job_title}</h3>
-          <span className="job-category">{job.job_category}</span>
+          <span className="job-category">{formatFieldValue(job.job_category)}</span>
         </div>
         <span className={`job-status ${job.status}`}>{job.status}</span>
       </div>
@@ -27,7 +28,7 @@ export default function JobCard({ job, onSelect, onApply }) {
       <div className="job-meta">
         <div className="meta-item">
           <span className="label">Type:</span>
-          <span className="value">{job.job_type}</span>
+          <span className="value">{formatFieldValue(job.job_type)}</span>
         </div>
         <div className="meta-item">
           <span className="label">Pay:</span>
