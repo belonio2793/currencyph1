@@ -1361,8 +1361,7 @@ export default function MyBusiness({ userId }) {
           <div className="max-w-7xl mx-auto px-6 flex flex-wrap gap-1">
             {[
               { id: 'overview', label: 'Overview' },
-              { id: 'salesTaxReporting', label: 'Sales and Tax Reporting' },
-              { id: 'jobs', label: 'Jobs Marketplace' }
+              { id: 'salesTaxReporting', label: 'Sales and Tax Reporting' }
             ].map(tab => (
               <button
                 key={tab.id}
@@ -1866,10 +1865,6 @@ export default function MyBusiness({ userId }) {
                 </div>
               )}
             </div>
-          )}
-
-          {activeTab === 'jobs' && selectedBusiness && (
-            <EmployerJobsOverview businessId={selectedBusiness.id} currentUserId={userId} />
           )}
 
         </div>
