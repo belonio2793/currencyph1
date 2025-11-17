@@ -229,9 +229,6 @@ export default function WalletTestPage() {
                 </a>
               </li>
               <li>
-                <strong>WalletConnect:</strong> Requires a valid Project ID and supports QR code scanning
-              </li>
-              <li>
                 <strong>Coinbase:</strong> Install{' '}
                 <a
                   href="https://www.coinbase.com/wallet"
