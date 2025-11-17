@@ -158,9 +158,9 @@ export default function App() {
       setShowAuth(false)
     }
 
-    // Direct /wallets route should activate network balances page
+    // Direct /wallets route should activate wallets page
     if (path === '/wallets') {
-      setActiveTab('network-balances')
+      setActiveTab('wallet')
       setShowAuth(false)
     }
 
