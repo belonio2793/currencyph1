@@ -422,6 +422,23 @@ export default function SubmitJobModal({
           <div className="form-section">
             <h3>Compensation & Location</h3>
 
+            {formData.job_type === 'remote' && (
+              <div className="form-group" style={{
+                padding: '15px',
+                backgroundColor: '#f0f4ff',
+                borderLeft: '4px solid #667eea',
+                borderRadius: '6px',
+                marginBottom: '20px'
+              }}>
+                <p style={{ margin: 0, color: '#667eea', fontWeight: '600', fontSize: '0.95rem' }}>
+                  ✓ Remote Job Selected
+                </p>
+                <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '0.85rem' }}>
+                  Service providers can work from anywhere. Location information is optional.
+                </p>
+              </div>
+            )}
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="pay_type">Pay Type *</label>
