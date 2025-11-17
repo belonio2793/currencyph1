@@ -161,18 +161,21 @@ export async function subscribeToMultiplePresence(userIds, callback) {
           table: 'user_presence',
           filter: `user_id=eq.${userId}`
         }, (payload) => {
-          try { callback(userId, payload.new.status) } catch (e) { console.error('presence callback error', e) }
+          try { callback(userId, payload.new.status) } catch (e) {
+            // Silently ignore callback errors
+            console.debug('[presence] callback error (ignored):', e?.message)
+          }
         })
         .subscribe()
     )
 
     return () => {
       channels.forEach(channel => {
-        try { supabase.removeChannel(channel) } catch (e) { console.debug('Failed to remove channel', e) }
+        try { supabase.removeChannel(channel) } catch (e) { /* silently ignore */ }
       })
     }
   } catch (err) {
-    console.debug('subscribeToMultiplePresence not available', err)
+    // Silently ignore subscription errors
     return () => {}
   }
 }
