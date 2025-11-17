@@ -10,6 +10,7 @@ export default function JobDetailsModal({
   job,
   onClose,
   onApply,
+  onEdit,
   currentUserId,
   businessId
 }) {
@@ -92,7 +93,18 @@ export default function JobDetailsModal({
             <h2>{job.job_title}</h2>
             <span className={`status-badge ${job.status}`}>{job.status}</span>
           </div>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            {currentUserId === job.posted_by_user_id && (
+              <button
+                className="btn-edit-job"
+                onClick={() => onEdit && onEdit(job)}
+                title="Edit this job posting"
+              >
+                ✎ Edit
+              </button>
+            )}
+            <button className="close-btn" onClick={onClose}>×</button>
+          </div>
         </div>
 
         {/* Error Message */}
