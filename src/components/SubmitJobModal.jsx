@@ -333,17 +333,32 @@ export default function SubmitJobModal({
     setLoading(true)
     try {
       // Map offer_expiry_date to deadline_for_applications for database compatibility
-      const { offer_expiry_date, ...restFormData } = formData
+      const { offer_expiry_date, business_id, ...restFormData } = formData
 
-      await onSubmit({
-        ...restFormData,
-        posting_type: 'service_offer',
+      // Only include fields that exist in the jobs table schema
+      const jobDataToSubmit = {
+        job_title: restFormData.job_title,
+        job_category: restFormData.job_category,
+        job_description: restFormData.job_description,
+        job_type: restFormData.job_type,
+        pay_rate: restFormData.pay_rate || null,
+        pay_type: restFormData.pay_type,
+        location: restFormData.location || null,
+        city: restFormData.city || null,
         skills_required: JSON.stringify(formData.skills_required),
+        experience_level: restFormData.experience_level,
+        start_date: restFormData.start_date || null,
+        end_date: restFormData.end_date || null,
         deadline_for_applications: offer_expiry_date || null,
+        positions_available: restFormData.positions_available || 1,
+        is_public: restFormData.is_public !== false,
+        status: restFormData.status || 'active',
         latitude: locationMode === 'location' ? formData.latitude : null,
         longitude: locationMode === 'location' ? formData.longitude : null,
-        save_to_profile: saveToProfile
-      })
+        posted_by_user_id: restFormData.posted_by_user_id
+      }
+
+      await onSubmit(jobDataToSubmit)
     } catch (err) {
       console.error('Error submitting job:', err)
       let errorMessage = 'Failed to submit job. Please try again.'
