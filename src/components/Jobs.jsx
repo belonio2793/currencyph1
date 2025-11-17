@@ -703,14 +703,17 @@ export default function Jobs({ userId }) {
       {showApplyConfirmation && jobToApplyFor && (
         <ApplyConfirmationModal
           job={jobToApplyFor}
+          userId={userId}
           onClose={() => {
             setShowApplyConfirmation(false)
             setJobToApplyFor(null)
           }}
           onAccept={() => {
             setShowApplyConfirmation(false)
-            setSelectedJob(jobToApplyFor)
-            setShowJobDetails(true)
+            setJobToApplyFor(null)
+            loadJobs()
+            setError('Application submitted successfully!')
+            setTimeout(() => setError(''), 3000)
           }}
         />
       )}
