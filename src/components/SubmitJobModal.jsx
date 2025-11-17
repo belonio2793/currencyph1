@@ -156,20 +156,6 @@ export default function SubmitJobModal({
     loadJobTitleSuggestions()
   }, [])
 
-  // Auto-update location when user's location is fetched
-  useEffect(() => {
-    if (fetchingLocation && userLocation && userLocation.latitude && userLocation.longitude) {
-      const coords = [userLocation.latitude, userLocation.longitude]
-      setMapLocation(coords)
-      setFormData(prev => ({
-        ...prev,
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        city: `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`
-      }))
-      setFetchingLocation(false)
-    }
-  }, [userLocation, fetchingLocation])
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
