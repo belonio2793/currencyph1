@@ -41,8 +41,6 @@ export default function SubmitJobModal({
   const [jobTitleSuggestions, setJobTitleSuggestions] = useState([])
   const [showTitleSuggestions, setShowTitleSuggestions] = useState(false)
   const [mapLocation, setMapLocation] = useState([12.5, 121.5]) // Default to Philippines center
-  const [equipment, setEquipment] = useState([])
-  const [equipmentInput, setEquipmentInput] = useState('')
   const [fetchingLocation, setFetchingLocation] = useState(false)
   const [showAddBusinessModal, setShowAddBusinessModal] = useState(false)
   const [updatedBusinesses, setUpdatedBusinesses] = useState([])
