@@ -324,6 +324,12 @@
   font-size: 0.9rem;
 }
 
+.error-message.success {
+  background: #e8f5e9;
+  border-left-color: #27ae60;
+  color: #27ae60;
+}
+
 .close-error {
   background: none;
   border: none;
@@ -331,6 +337,10 @@
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
+}
+
+.error-message.success .close-error {
+  color: #27ae60;
   width: 24px;
   height: 24px;
   display: flex;
