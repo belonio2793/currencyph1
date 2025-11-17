@@ -34,6 +34,17 @@ export default function PostJobModal({
   const [filteredCities, setFilteredCities] = useState([])
   const cityDropdownRef = useRef(null)
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target)) {
+        setShowCityDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({
