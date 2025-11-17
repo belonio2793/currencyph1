@@ -258,6 +258,20 @@
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .remark-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .remark-meta {
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
+  }
+}
+
 @media (max-width: 600px) {
   .remark-options {
     flex-direction: column;
@@ -273,8 +287,17 @@
     align-items: flex-start;
   }
 
+  .user-info {
+    width: 100%;
+  }
+
   .remark-meta {
     flex-direction: column;
     gap: 4px;
+    width: 100%;
+  }
+
+  .username {
+    font-size: 0.95rem;
   }
 }
