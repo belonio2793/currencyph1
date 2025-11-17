@@ -294,6 +294,9 @@ export default function EmployerJobsOverview({ businessId, currentUserId }) {
           job={selectedJob}
           onClose={() => setShowJobDetails(false)}
           onApply={() => {}}
+          onEdit={() => {
+            setShowJobDetails(false)
+          }}
           currentUserId={currentUserId}
           businessId={businessId}
         />
