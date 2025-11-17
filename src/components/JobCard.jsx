@@ -106,10 +106,7 @@ export default function JobCard({ job, onSelect, onApply }) {
             <h3 className="job-title">{job.job_title}</h3>
             <span className="job-category">{formatFieldValue(job.job_category)}</span>
           </div>
-          <div className="header-badges">
-            <span className={`job-status ${job.status}`}>{job.status}</span>
-            <span className="employer-badge">Employer</span>
-          </div>
+          <span className={`job-status ${job.status}`}>{job.status}</span>
         </div>
 
         <p className="job-description">
