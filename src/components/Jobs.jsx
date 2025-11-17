@@ -220,23 +220,45 @@ export default function Jobs({ userId }) {
           </p>
         </div>
 
-        <div className="header-buttons">
-          {userType === 'employer' && activeTab === 'looking-to-hire' && (
-            <button
-              className="btn-post-job"
-              onClick={handlePostJobClick}
-            >
-              <span className="icon">+</span> Post a Job
-            </button>
-          )}
+        <div className="header-buttons" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          {userId && (
+            <>
+              <button
+                className="btn-post-job"
+                onClick={() => setShowSubmitModal(true)}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: '#667eea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.95rem',
+                  transition: 'background 0.2s ease'
+                }}
+              >
+                <span style={{ marginRight: '6px' }}>+</span> Post a Job
+              </button>
 
-          {activeTab === 'looking-to-hire' && (
-            <button
-              className="btn-submit-job"
-              onClick={() => setShowSubmitModal(true)}
-            >
-              <span className="icon">+</span> Submit a Job
-            </button>
+              <button
+                className="btn-looking-to-hire"
+                onClick={() => setShowLookingToHireModal(true)}
+                style={{
+                  padding: '12px 20px',
+                  backgroundColor: '#667eea',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.95rem',
+                  transition: 'background 0.2s ease'
+                }}
+              >
+                <span style={{ marginRight: '6px' }}>+</span> Looking To Hire
+              </button>
+            </>
           )}
         </div>
       </div>
