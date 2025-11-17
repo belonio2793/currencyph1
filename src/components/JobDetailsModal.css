@@ -190,7 +190,7 @@
 .info-item {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
   gap: 15px;
