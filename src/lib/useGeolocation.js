@@ -92,23 +92,25 @@ export function useGeolocation() {
                       signal: controller.signal
                     }
                   )
-                  if (timedOut) return
+                  if (timedOut || !isMountedRef.current) return
                   clearTimeout(timeoutId)
 
                   if (response?.ok && isMountedRef.current) {
                     try {
                       const nom = await response.json()
-                      setCity(
-                        nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
-                      )
+                      if (isMountedRef.current) {
+                        setCity(
+                          nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
+                        )
+                      }
                     } catch (parseErr) {}
                   }
                 } catch (fetchErr) {
                   if (!timedOut) {
                     clearTimeout(timeoutId)
                   }
-                  if (fetchErr?.name === 'AbortError' && !timedOut) {
-                    // Unexpected abort, silently ignore
+                  if (fetchErr?.name === 'AbortError') {
+                    // Silently ignore abort errors (timeout or cleanup)
                   }
                 }
               } catch (e) {
