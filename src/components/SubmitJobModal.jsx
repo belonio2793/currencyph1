@@ -367,32 +367,6 @@ export default function SubmitJobModal({
         )}
 
         <form onSubmit={handleSubmit} className="post-job-form">
-          {/* Business Selection - Only show if user has businesses */}
-          {userBusinesses.length > 0 && (
-            <div className="form-section">
-              <h3>Business Association (Optional)</h3>
-              <div className="form-group">
-                <label htmlFor="business_id">Associate with a Business</label>
-                <select
-                  id="business_id"
-                  name="business_id"
-                  value={formData.business_id}
-                  onChange={handleInputChange}
-                >
-                  <option value="">Not associated with a business</option>
-                  {userBusinesses.map(business => (
-                    <option key={business.id} value={business.id}>
-                      {business.business_name}
-                    </option>
-                  ))}
-                </select>
-                <small style={{ color: '#666', marginTop: '4px', display: 'block' }}>
-                  Associating with a business will sync this job to your My Business tab
-                </small>
-              </div>
-            </div>
-          )}
-
           <div className="form-section">
             <h3>Job Details</h3>
 
