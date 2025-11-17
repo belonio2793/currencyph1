@@ -332,10 +332,14 @@ export default function SubmitJobModal({
 
     setLoading(true)
     try {
+      // Map offer_expiry_date to deadline_for_applications for database compatibility
+      const { offer_expiry_date, ...restFormData } = formData
+
       await onSubmit({
-        ...formData,
+        ...restFormData,
         posting_type: 'service_offer',
         skills_required: JSON.stringify(formData.skills_required),
+        deadline_for_applications: offer_expiry_date || null,
         latitude: locationMode === 'location' ? formData.latitude : null,
         longitude: locationMode === 'location' ? formData.longitude : null,
         save_to_profile: saveToProfile
