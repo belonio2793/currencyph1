@@ -42,7 +42,8 @@ export function useGeolocation() {
                   let resp = null
                   try {
                     if (shouldFetch) {
-                      resp = await fetch(url)
+                      const controller = new AbortController()
+                      resp = await fetch(url, { signal: controller.signal })
                     }
                   } catch (fetchErr) {
                     resp = null
@@ -60,7 +61,9 @@ export function useGeolocation() {
                       }
                     } catch (parseErr) {}
                   }
-                } catch (e) {}
+                } catch (e) {
+                  // Silently fail MapTiler, try fallback
+                }
               }
 
               // Fallback to Nominatim
@@ -73,9 +76,13 @@ export function useGeolocation() {
                 let response = null
                 try {
                   if (shouldFetch) {
+                    const controller = new AbortController()
                     response = await fetch(
                       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                      { headers: { 'Accept-Language': 'en' } }
+                      {
+                        headers: { 'Accept-Language': 'en' },
+                        signal: controller.signal
+                      }
                     )
                   }
                 } catch (fetchErr) {
@@ -92,8 +99,12 @@ export function useGeolocation() {
                     )
                   } catch (parseErr) {}
                 }
-              } catch (e) {}
-            } catch (e) {} finally {
+              } catch (e) {
+                // Silently fail Nominatim fallback
+              }
+            } catch (e) {
+              // Silently fail reverse geocoding
+            } finally {
               try {
                 if (isMountedRef.current) {
                   setLoading(false)
