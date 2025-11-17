@@ -91,7 +91,7 @@
     "@noble/secp256k1": "^3.0.0",
     "@solana/web3.js": "^1.75.3",
     "@supabase/supabase-js": "^2.38.0",
-    "@thirdweb-dev/sdk": "^4.1.0",
+    "@thirdweb-dev/sdk": "^4.0.99",
     "@walletconnect/ethereum-provider": "^2.15.0",
     "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.15.0",
