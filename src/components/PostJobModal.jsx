@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
+import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import './PostJobModal.css'
 
 export default function PostJobModal({
