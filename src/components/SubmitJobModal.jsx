@@ -337,7 +337,8 @@ export default function SubmitJobModal({
         posting_type: 'service_offer',
         skills_required: JSON.stringify(formData.skills_required),
         latitude: locationMode === 'location' ? formData.latitude : null,
-        longitude: locationMode === 'location' ? formData.longitude : null
+        longitude: locationMode === 'location' ? formData.longitude : null,
+        save_to_profile: saveToProfile
       })
     } catch (err) {
       console.error('Error submitting job:', err)
