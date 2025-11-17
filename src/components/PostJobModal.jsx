@@ -29,6 +29,10 @@ export default function PostJobModal({
   const [skillInput, setSkillInput] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showCityDropdown, setShowCityDropdown] = useState(false)
+  const [citySearchQuery, setCitySearchQuery] = useState('')
+  const [filteredCities, setFilteredCities] = useState([])
+  const cityDropdownRef = useRef(null)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
