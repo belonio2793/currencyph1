@@ -389,6 +389,38 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
                     {fetchingLocation ? 'Fetching...' : 'Fetch Location'}
                   </button>
                 </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="latitude">Latitude</label>
+                    <input
+                      id="latitude"
+                      type="number"
+                      value={formData.latitude}
+                      readOnly
+                      placeholder="Click on map to set"
+                      style={{ backgroundColor: '#f5f5f5', color: '#666', cursor: 'not-allowed' }}
+                    />
+                    <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
+                      Auto-populated from map selection
+                    </small>
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="longitude">Longitude</label>
+                    <input
+                      id="longitude"
+                      type="number"
+                      value={formData.longitude}
+                      readOnly
+                      placeholder="Click on map to set"
+                      style={{ backgroundColor: '#f5f5f5', color: '#666', cursor: 'not-allowed' }}
+                    />
+                    <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
+                      Auto-populated from map selection
+                    </small>
+                  </div>
+                </div>
               </div>
               )}
 
