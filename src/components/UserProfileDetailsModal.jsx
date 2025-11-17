@@ -74,7 +74,7 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
           .eq('completion_status', 'completed'),
         supabase
           .from('job_ratings')
-          .select('id, rating_score, review_text, created_at, rated_by_user_id, users(full_name, username, display_name_type)')
+          .select('id, rating_score, review_text, created_at, rated_by_user_id')
           .eq('rated_user_id', userId)
           .order('created_at', { ascending: false }),
         supabase
