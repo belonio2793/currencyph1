@@ -310,6 +310,28 @@ export default function Jobs({ userId }) {
     }
   }
 
+  const handleAcceptOffer = async (offerId) => {
+    try {
+      await jobsService.acceptJobOffer(offerId)
+      setError('Offer accepted successfully!')
+      loadJobs()
+    } catch (err) {
+      console.error('Error accepting offer:', err)
+      throw err
+    }
+  }
+
+  const handleRejectOffer = async (offerId) => {
+    try {
+      await jobsService.rejectJobOffer(offerId)
+      setError('Offer rejected.')
+      loadJobs()
+    } catch (err) {
+      console.error('Error rejecting offer:', err)
+      throw err
+    }
+  }
+
   return (
     <div className="jobs-container">
       {/* User Profile Preview */}
