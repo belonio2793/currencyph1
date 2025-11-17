@@ -544,11 +544,17 @@ export default function Jobs({ userId }) {
                     <button
                       className="btn-edit"
                       onClick={() => {
-                        setSelectedJob(job)
-                        setShowJobDetails(true)
+                        setEditingJob(job)
+                        setShowEditJobModal(true)
                       }}
                     >
                       Edit
+                    </button>
+                    <button
+                      className="btn-delete"
+                      onClick={() => handleDeleteJob(job.id)}
+                    >
+                      Delete
                     </button>
                   </div>
                 </div>
