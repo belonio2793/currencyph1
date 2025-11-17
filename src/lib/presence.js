@@ -217,7 +217,8 @@ export async function getOnlineUsers() {
 
     return data || []
   } catch (err) {
-    console.warn('Get online users error:', err)
+    // Silently return empty array on error
+    console.debug('[presence] getOnlineUsers failed, returning empty list:', err?.message)
     return []
   }
 }
