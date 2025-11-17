@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { jobsService } from '../lib/jobsService'
+import { formatFieldValue } from '../lib/formatters'
 import JobRatings from './JobRatings'
 import JobRemarks from './JobRemarks'
 import JobOfferForm from './JobOfferForm'
@@ -135,28 +136,28 @@ export default function JobDetailsModal({
           {/* Details Tab */}
           {activeTab === 'details' && (
             <div className="details-tab">
-              <div className="detail-row">
-                <div className="detail-column">
+              <div className="details-grid">
+                <div className="detail-section">
                   <h4>Job Information</h4>
                   <div className="info-item">
                     <span className="label">Category:</span>
-                    <span className="value">{job.job_category}</span>
+                    <span className="value">{formatFieldValue(job.job_category)}</span>
                   </div>
                   <div className="info-item">
                     <span className="label">Type:</span>
-                    <span className="value">{job.job_type}</span>
+                    <span className="value">{formatFieldValue(job.job_type)}</span>
                   </div>
                   <div className="info-item">
                     <span className="label">Location:</span>
-                    <span className="value">{job.city}, {job.province}</span>
+                    <span className="value">{job.city}{job.province ? `, ${job.province}` : ''}</span>
                   </div>
-                  <div className="info-item">
+                  <div className="info-item full-width">
                     <span className="label">Experience Level:</span>
-                    <span className="value">{job.experience_level || 'Not specified'}</span>
+                    <span className="value">{formatFieldValue(job.experience_level) || 'Not specified'}</span>
                   </div>
                 </div>
 
-                <div className="detail-column">
+                <div className="detail-section">
                   <h4>Compensation</h4>
                   <div className="info-item">
                     <span className="label">Rate:</span>
@@ -166,7 +167,7 @@ export default function JobDetailsModal({
                   </div>
                   <div className="info-item">
                     <span className="label">Pay Type:</span>
-                    <span className="value">{job.pay_type}</span>
+                    <span className="value">{formatFieldValue(job.pay_type)}</span>
                   </div>
                   <div className="info-item">
                     <span className="label">Positions Available:</span>
