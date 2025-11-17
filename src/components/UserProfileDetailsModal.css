@@ -532,23 +532,29 @@
 
 /* Account Info */
 .send-message-btn {
-  width: 100%;
-  padding: 12px 16px;
-  margin-bottom: 16px;
+  padding: 10px 16px;
   background: #667eea;
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .send-message-btn:hover {
   background: #5568d3;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.profile-main .send-message-btn {
+  margin-left: auto;
+  margin-top: auto;
+  align-self: flex-end;
 }
 
 .account-info-section {
