@@ -247,30 +247,60 @@ export default function UserProfilePreview({ userId }) {
             </span>
           </div>
 
-          <button
-            onClick={handleSendMessage}
-            style={{
-              padding: '10px 16px',
-              backgroundColor: 'rgba(255, 255, 255, 0.2)',
-              color: 'white',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontWeight: '600',
-              fontSize: '0.85rem',
-              transition: 'all 0.2s ease',
-              whiteSpace: 'nowrap',
-              flexShrink: 0
-            }}
-            onMouseEnter={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
-            }}
-            onMouseLeave={(e) => {
-              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
-            }}
-          >
-            💬 Send Message
-          </button>
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            flexShrink: 0
+          }}>
+            <button
+              onClick={handleViewProfile}
+              style={{
+                padding: '10px 16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.4)',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.85rem',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.25)'
+                e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)'
+              }}
+            >
+              👤 View Profile
+            </button>
+            <button
+              onClick={handleSendMessage}
+              style={{
+                padding: '10px 16px',
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '0.85rem',
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+              }}
+            >
+              💬 Send Message
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
