@@ -252,12 +252,11 @@
 
 .job-card-footer {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: auto;
 }
 
-.btn-view-profile,
 .btn-view-details,
 .btn-apply {
   padding: 10px 16px;
@@ -269,17 +268,6 @@
   transition: all 0.3s ease;
   text-align: center;
   white-space: nowrap;
-}
-
-.btn-view-profile {
-  background: #e8eaf6;
-  color: #667eea;
-  border: 1px solid #667eea;
-}
-
-.btn-view-profile:hover {
-  background: #667eea;
-  color: white;
 }
 
 .btn-view-details {
