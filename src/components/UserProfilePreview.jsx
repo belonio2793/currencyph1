@@ -167,328 +167,334 @@ export default function UserProfilePreview({ userId }) {
   }
 
   return (
-    <div style={{
-      background: '#667eea',
-      borderRadius: '12px',
-      padding: '24px',
-      marginBottom: '30px',
-      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.15)',
-      color: 'white',
-      position: 'relative'
-    }}>
-      <div style={{ maxWidth: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Profile Header */}
-        <div style={{
-          display: 'flex',
-          gap: '16px',
-          alignItems: 'flex-start',
-          marginBottom: '24px',
-          paddingBottom: '20px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-          width: '100%'
-        }}>
+    <>
+      <div style={{
+        background: '#667eea',
+        borderRadius: '12px',
+        padding: '24px',
+        marginBottom: '30px',
+        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.15)',
+        color: 'white',
+        position: 'relative'
+      }}>
+        <div style={{ maxWidth: '100%', display: 'flex', flexDirection: 'column' }}>
+          {/* Profile Header */}
           <div style={{
-            width: '64px',
-            height: '64px',
-            borderRadius: '50%',
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '28px',
-            fontWeight: '700',
-            color: 'white',
-            flexShrink: 0,
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
-            backgroundColor: avatarBg,
-            position: 'relative',
-            zIndex: 2
+            gap: '16px',
+            alignItems: 'flex-start',
+            marginBottom: '24px',
+            paddingBottom: '20px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            width: '100%'
           }}>
-            {userName.charAt(0).toUpperCase()}
-          </div>
-
-          <div style={{
-            flex: 1,
-            minWidth: 0,
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            <h2 style={{
-              margin: '0 0 4px 0',
-              fontSize: '1.4rem',
+            <div style={{
+              width: '64px',
+              height: '64px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '28px',
               fontWeight: '700',
               color: 'white',
-              wordBreak: 'break-word',
-              lineHeight: '1.2'
+              flexShrink: 0,
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+              backgroundColor: avatarBg,
+              position: 'relative',
+              zIndex: 2
             }}>
-              {userName}
-            </h2>
-            <p style={{
-              margin: '0 0 6px 0',
-              fontSize: '0.9rem',
-              color: 'rgba(255, 255, 255, 0.9)',
-              wordBreak: 'break-all',
-              lineHeight: '1.3'
-            }}>
-              {blurEmail(userProfile.email)}
-            </p>
-            <span style={{
-              display: 'inline-block',
-              fontSize: '0.85rem',
-              color: 'rgba(255, 255, 255, 0.9)',
-              padding: '6px 12px',
-              background: 'rgba(255, 255, 255, 0.25)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: '6px',
-              alignSelf: 'flex-start'
-            }}>
-              Member since {stats.memberSince}
-            </span>
-          </div>
+              {userName.charAt(0).toUpperCase()}
+            </div>
 
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            flexShrink: 0
-          }}>
-            <button
-              onClick={handleViewProfile}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.25)',
+            <div style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              <h2 style={{
+                margin: '0 0 4px 0',
+                fontSize: '1.4rem',
+                fontWeight: '700',
                 color: 'white',
-                border: '1px solid rgba(255, 255, 255, 0.4)',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '600',
+                wordBreak: 'break-word',
+                lineHeight: '1.2'
+              }}>
+                {userName}
+              </h2>
+              <p style={{
+                margin: '0 0 6px 0',
+                fontSize: '0.9rem',
+                color: 'rgba(255, 255, 255, 0.9)',
+                wordBreak: 'break-all',
+                lineHeight: '1.3'
+              }}>
+                {blurEmail(userProfile.email)}
+              </p>
+              <span style={{
+                display: 'inline-block',
                 fontSize: '0.85rem',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.25)'
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)'
-              }}
-            >
-              View Profile
-            </button>
-            <button
-              onClick={handleSendMessage}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                color: 'white',
+                color: 'rgba(255, 255, 255, 0.9)',
+                padding: '6px 12px',
+                background: 'rgba(255, 255, 255, 0.25)',
                 border: '1px solid rgba(255, 255, 255, 0.3)',
                 borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '0.85rem',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
-              }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
-              }}
-            >
-              Send Message
-            </button>
-          </div>
-        </div>
-
-        {/* Stats Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-          gap: '16px',
-          width: '100%'
-        }}>
-          {/* Jobs Posted */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.15)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '8px',
-            padding: '14px',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-            backdropFilter: 'blur(10px)',
-            transition: 'all 0.3s ease',
-            minHeight: '60px'
-          }}>
-            <div style={{
-              fontSize: '24px',
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              background: 'rgba(255, 255, 255, 0.25)',
-              borderRadius: '6px',
-              fontWeight: '700',
-              color: 'white',
-              position: 'relative',
-              minWidth: '40px',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              □
+                alignSelf: 'flex-start'
+              }}>
+                Member since {stats.memberSince}
+              </span>
             </div>
+
             <div style={{
-              flex: 1,
-              minWidth: 0,
               display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center'
+              gap: '8px',
+              flexShrink: 0
             }}>
-              <div style={{
-                fontSize: '1.3rem',
-                fontWeight: '700',
-                color: 'white',
-                marginBottom: '2px',
-                lineHeight: '1.2'
-              }}>
-                {stats.postedJobs}
-              </div>
-              <div style={{
-                fontSize: '0.75rem',
-                color: 'rgba(255, 255, 255, 0.8)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                fontWeight: '500',
-                lineHeight: '1.2'
-              }}>
-                Jobs Posted
-              </div>
+              <button
+                onClick={() => setShowProfileModal(true)}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.25)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.4)',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.85rem',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.25)'
+                  e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)'
+                }}
+              >
+                Edit Profile
+              </button>
+              <button
+                onClick={handleSendMessage}
+                style={{
+                  padding: '10px 16px',
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.85rem',
+                  transition: 'all 0.2s ease',
+                  whiteSpace: 'nowrap'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                Send Message
+              </button>
             </div>
           </div>
 
-          {/* Accepted Offers */}
+          {/* Stats Grid */}
           <div style={{
-            background: 'rgba(255, 255, 255, 0.15)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '8px',
-            padding: '14px',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-            backdropFilter: 'blur(10px)',
-            transition: 'all 0.3s ease',
-            minHeight: '60px'
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+            gap: '16px',
+            width: '100%'
           }}>
+            {/* Jobs Posted */}
             <div style={{
-              fontSize: '24px',
-              flexShrink: 0,
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '14px',
               display: 'flex',
+              gap: '10px',
               alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              background: 'rgba(255, 255, 255, 0.25)',
-              borderRadius: '6px',
-              fontWeight: '700',
-              color: 'white',
-              position: 'relative',
-              minWidth: '40px',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              ✓
-            </div>
-            <div style={{
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center'
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease',
+              minHeight: '60px'
             }}>
               <div style={{
-                fontSize: '1.3rem',
+                fontSize: '24px',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '40px',
+                height: '40px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                borderRadius: '6px',
                 fontWeight: '700',
                 color: 'white',
-                marginBottom: '2px',
-                lineHeight: '1.2'
+                position: 'relative',
+                minWidth: '40px',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
               }}>
-                {stats.acceptedOffers}
+                □
               </div>
               <div style={{
-                fontSize: '0.75rem',
-                color: 'rgba(255, 255, 255, 0.8)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                fontWeight: '500',
-                lineHeight: '1.2'
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}>
-                Accepted Offers
+                <div style={{
+                  fontSize: '1.3rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  marginBottom: '2px',
+                  lineHeight: '1.2'
+                }}>
+                  {stats.postedJobs}
+                </div>
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontWeight: '500',
+                  lineHeight: '1.2'
+                }}>
+                  Jobs Posted
+                </div>
               </div>
             </div>
-          </div>
 
-          {/* Completed */}
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.15)',
-            border: '1px solid rgba(255, 255, 255, 0.3)',
-            borderRadius: '8px',
-            padding: '14px',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-            backdropFilter: 'blur(10px)',
-            transition: 'all 0.3s ease',
-            minHeight: '60px'
-          }}>
+            {/* Accepted Offers */}
             <div style={{
-              fontSize: '24px',
-              flexShrink: 0,
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '14px',
               display: 'flex',
+              gap: '10px',
               alignItems: 'center',
-              justifyContent: 'center',
-              width: '40px',
-              height: '40px',
-              background: 'rgba(255, 255, 255, 0.25)',
-              borderRadius: '6px',
-              fontWeight: '700',
-              color: 'white',
-              position: 'relative',
-              minWidth: '40px',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              ▲
-            </div>
-            <div style={{
-              flex: 1,
-              minWidth: 0,
-              display: 'flex',
-              flexDirection: 'column',
-              justifyContent: 'center'
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease',
+              minHeight: '60px'
             }}>
               <div style={{
-                fontSize: '1.3rem',
+                fontSize: '24px',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '40px',
+                height: '40px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                borderRadius: '6px',
                 fontWeight: '700',
                 color: 'white',
-                marginBottom: '2px',
-                lineHeight: '1.2'
+                position: 'relative',
+                minWidth: '40px',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
               }}>
-                {stats.completedJobs}
+                ✓
               </div>
               <div style={{
-                fontSize: '0.75rem',
-                color: 'rgba(255, 255, 255, 0.8)',
-                textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                fontWeight: '500',
-                lineHeight: '1.2'
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
               }}>
-                Completed
+                <div style={{
+                  fontSize: '1.3rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  marginBottom: '2px',
+                  lineHeight: '1.2'
+                }}>
+                  {stats.acceptedOffers}
+                </div>
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontWeight: '500',
+                  lineHeight: '1.2'
+                }}>
+                  Accepted Offers
+                </div>
+              </div>
+            </div>
+
+            {/* Completed */}
+            <div style={{
+              background: 'rgba(255, 255, 255, 0.15)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '8px',
+              padding: '14px',
+              display: 'flex',
+              gap: '10px',
+              alignItems: 'center',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease',
+              minHeight: '60px'
+            }}>
+              <div style={{
+                fontSize: '24px',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '40px',
+                height: '40px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                borderRadius: '6px',
+                fontWeight: '700',
+                color: 'white',
+                position: 'relative',
+                minWidth: '40px',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}>
+                ▲
+              </div>
+              <div style={{
+                flex: 1,
+                minWidth: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center'
+              }}>
+                <div style={{
+                  fontSize: '1.3rem',
+                  fontWeight: '700',
+                  color: 'white',
+                  marginBottom: '2px',
+                  lineHeight: '1.2'
+                }}>
+                  {stats.completedJobs}
+                </div>
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  fontWeight: '500',
+                  lineHeight: '1.2'
+                }}>
+                  Completed
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+
+      {showProfileModal && (
+        <ProfileEditModal onClose={() => setShowProfileModal(false)} />
+      )}
+    </>
   )
 }
