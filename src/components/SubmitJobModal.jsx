@@ -134,17 +134,13 @@ export default function SubmitJobModal({
     }
   }
 
-  // Initialize updatedBusinesses with userBusinesses prop on component mount
+  // Initialize updatedBusinesses with userBusinesses prop when they change
   useEffect(() => {
-    console.log('SubmitJobModal received userBusinesses:', userBusinesses)
-    console.log('SubmitJobModal received userId:', userId)
     if (userBusinesses && userBusinesses.length > 0) {
       setUpdatedBusinesses(userBusinesses)
-      console.log('Setting updatedBusinesses to:', userBusinesses)
-    } else {
-      console.log('No userBusinesses to display')
+      console.log('SubmitJobModal: Loading user businesses', userBusinesses)
     }
-  }, [userBusinesses, userId])
+  }, [userBusinesses])
 
   // Load existing job titles for suggestions
   useEffect(() => {
