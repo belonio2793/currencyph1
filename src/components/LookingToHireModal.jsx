@@ -227,10 +227,10 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
 
         <form className="post-job-form" onSubmit={handleSubmit}>
           <div className="form-section">
-            <h3>Service Details</h3>
+            <h3>Job Details</h3>
 
             <div className="form-group">
-              <label htmlFor="job_title">Service Needed *</label>
+              <label htmlFor="job_title">Job Needed *</label>
               <input
                 id="job_title"
                 type="text"
