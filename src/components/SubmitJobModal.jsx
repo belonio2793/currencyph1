@@ -1035,20 +1035,23 @@ export default function SubmitJobModal({
                 <input
                   type="text"
                   value={businessFormData.currencyRegistrationNumber}
-                  onChange={(e) => setBusinessFormData({
-                    ...businessFormData,
-                    currencyRegistrationNumber: e.target.value
-                  })}
-                  placeholder="e.g., P-12345678-001"
+                  disabled
+                  placeholder="Auto-generated"
                   style={{
                     width: '100%',
                     padding: '10px 12px',
                     border: '1px solid #e0e0e0',
                     borderRadius: '6px',
                     fontSize: '0.9rem',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    backgroundColor: '#f5f5f5',
+                    color: '#666',
+                    cursor: 'not-allowed'
                   }}
                 />
+                <small style={{ color: '#666', marginTop: '4px', display: 'block', fontSize: '0.8rem' }}>
+                  Auto-generated and will be permanent when business is created
+                </small>
               </div>
 
               <div style={{ marginBottom: '15px' }}>
