@@ -39,6 +39,7 @@ export default function EditJobModal({
 
   useEffect(() => {
     if (job) {
+      const city = job.city || ''
       setFormData({
         job_title: job.job_title || '',
         job_category: job.job_category || '',
@@ -47,9 +48,9 @@ export default function EditJobModal({
         pay_rate: job.pay_rate || '',
         pay_type: job.pay_type || 'fixed',
         location: job.location || '',
-        city: job.city || '',
+        city: city,
         province: job.province || '',
-        skills_required: typeof job.skills_required === 'string' 
+        skills_required: typeof job.skills_required === 'string'
           ? JSON.parse(job.skills_required || '[]')
           : job.skills_required || [],
         experience_level: job.experience_level || 'intermediate',
@@ -59,6 +60,12 @@ export default function EditJobModal({
         positions_available: job.positions_available || 1,
         status: job.status || 'active'
       })
+      setCitySearchQuery(city)
+      if (city) {
+        setFilteredCities([city])
+      } else {
+        setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
+      }
     }
   }, [job])
 
