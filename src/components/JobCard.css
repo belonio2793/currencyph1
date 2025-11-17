@@ -2,9 +2,11 @@
 .job-poster-section {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   margin-bottom: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid #e0e0e0;
+  gap: 12px;
 }
 
 .poster-avatar-wrapper {
