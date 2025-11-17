@@ -502,7 +502,7 @@ export default function SubmitJobModal({
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  📍 Specific Location
+                  Specific Location
                 </button>
                 <button
                   type="button"
@@ -520,7 +520,7 @@ export default function SubmitJobModal({
                     transition: 'all 0.2s ease'
                   }}
                 >
-                  ��� Remote
+                  Remote Location
                 </button>
               </div>
 
