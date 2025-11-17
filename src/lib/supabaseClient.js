@@ -60,11 +60,14 @@ function initClient() {
       // Wrap fetch to handle network errors gracefully and retry transient failures
       const originalFetch = (typeof globalThis !== 'undefined' && globalThis.fetch) || (typeof window !== 'undefined' && window.fetch) || null
       const wrappedFetch = async (...args) => {
-        const maxRetries = 2
+        const maxRetries = 3
+        let lastError = null
+
         for (let attempt = 0; attempt <= maxRetries; attempt++) {
           try {
             // If browser is offline, fail fast with a synthetic Response to avoid noisy "Failed to fetch" TypeErrors
             if (typeof navigator !== 'undefined' && !navigator.onLine) {
+              console.warn('[supabase-client] Browser is offline')
               try {
                 const body = JSON.stringify({ error: 'offline', message: 'Network appears to be offline' })
                 return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
@@ -85,6 +88,8 @@ function initClient() {
             const resp = await originalFetch(...args)
             return resp
           } catch (err) {
+            lastError = err
+
             // Abort errors: return a synthetic Response so callers receive a proper response object instead of an uncaught exception
             if (err && err.name === 'AbortError') {
               console.debug('[supabase-client] fetch aborted:', err && err.message)
@@ -98,13 +103,21 @@ function initClient() {
               }
             }
 
+            // Log fetch errors with more context
+            const url = args && args[0]
+            const method = (args && args[1] && args[1].method) || 'GET'
+            console.warn(`[supabase-client] Fetch error (attempt ${attempt + 1}/${maxRetries + 1}): ${method} ${url}`, {
+              error: err?.message || String(err),
+              name: err?.name
+            })
+
             // On last attempt, instead of throwing a raw TypeError which causes noisy console traces
             // return a synthetic Response with 503 status so callers receive a proper response object.
             if (attempt === maxRetries) {
-              console.warn('[supabase-client] Network error during fetch (final):', err && err.message)
+              console.error('[supabase-client] Network error during fetch (final attempt):', err && err.message)
               try {
                 const url = args && args[0]
-                if (url) console.debug('[supabase-client] failed URL:', url)
+                if (url) console.error('[supabase-client] failed URL:', url)
               } catch (e) {}
 
               try {
@@ -119,7 +132,8 @@ function initClient() {
             }
 
             // small backoff before retrying
-            const backoff = 150 * (attempt + 1)
+            const backoff = 100 * Math.pow(2, attempt)
+            console.debug(`[supabase-client] Retrying after ${backoff}ms...`)
             await new Promise((res) => setTimeout(res, backoff))
             // retry
           }
