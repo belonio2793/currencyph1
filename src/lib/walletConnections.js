@@ -110,8 +110,8 @@ export const walletconnectConnection = {
       throw new Error('WalletConnect is not configured. Missing project ID.')
     }
 
-    if (isRunningInIframe()) {
-      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    if (isBuilderPreviewIframe()) {
+      throw new Error('⚠️ Wallet connection detected in Builder preview iframe. Click "Open Preview" to test wallet connections in a full browser window.')
     }
 
     try {
@@ -189,8 +189,8 @@ export const coinbaseConnection = {
   },
 
   async connect() {
-    if (isRunningInIframe()) {
-      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    if (isBuilderPreviewIframe()) {
+      throw new Error('⚠️ Wallet connection detected in Builder preview iframe. Click "Open Preview" to test wallet connections in a full browser window.')
     }
 
     try {
@@ -286,8 +286,8 @@ export const phantomConnection = {
   },
 
   async connect() {
-    if (isRunningInIframe()) {
-      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    if (isBuilderPreviewIframe()) {
+      throw new Error('⚠️ Wallet connection detected in Builder preview iframe. Click "Open Preview" to test wallet connections in a full browser window.')
     }
 
     try {
@@ -353,8 +353,8 @@ export const venlyConnection = {
   },
 
   async connect() {
-    if (isRunningInIframe()) {
-      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    if (isBuilderPreviewIframe()) {
+      throw new Error('⚠️ Wallet connection detected in Builder preview iframe. Click "Open Preview" to test wallet connections in a full browser window.')
     }
 
     try {
