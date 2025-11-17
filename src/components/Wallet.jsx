@@ -76,7 +76,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   useEffect(() => {
     loadWallets()
     loadPreferences()
-    loadNetworkWallets()
 
     // Subscribe to realtime changes so UI updates automatically
     const channels = []
@@ -105,30 +104,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       console.warn('Failed to subscribe to wallets_fiat realtime:', e)
     }
 
-    try {
-      const chCrypto = supabase
-        .channel('public:wallets_crypto')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_crypto', filter: `user_id=eq.${userId}` }, () => {
-          loadWallets()
-        })
-        .subscribe()
-      channels.push(chCrypto)
-    } catch (e) {
-      console.warn('Failed to subscribe to wallets_crypto realtime:', e)
-    }
-
-    try {
-      const chHouse = supabase
-        .channel('public:wallets_house')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_house' }, () => {
-          loadWallets()
-        })
-        .subscribe()
-      channels.push(chHouse)
-    } catch (e) {
-      console.warn('Failed to subscribe to wallets_house realtime:', e)
-    }
-
     return () => {
       try {
         channels.forEach(c => c && c.unsubscribe && c.unsubscribe())
@@ -142,18 +117,12 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     // Legacy key 'walletCurrencies' controls internal (public.wallets)
     if (prefs.walletCurrencies) setEnabledInternal(prefs.walletCurrencies)
 
-    // New independent keys for fiat & crypto
+    // New independent keys for fiat
     if (prefs.walletCurrencies_fiat) setEnabledFiat(prefs.walletCurrencies_fiat)
-    if (prefs.walletCurrencies_crypto) setEnabledCrypto(prefs.walletCurrencies_crypto)
-
-    // Favorites for crypto
-    if (prefs.walletFavorites_crypto) setFavoriteCrypto(prefs.walletFavorites_crypto)
 
     // Defaults when not set
     if (!prefs.walletCurrencies) setEnabledInternal(['PHP', 'USD'])
     if (!prefs.walletCurrencies_fiat) setEnabledFiat(['PHP', 'USD'])
-    if (!prefs.walletCurrencies_crypto) setEnabledCrypto(['BTC', 'ETH'])
-    if (!prefs.walletFavorites_crypto) setFavoriteCrypto([])
   }
 
   const savePreferences = (type, currencies) => {
@@ -166,18 +135,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       prefs.walletCurrencies_fiat = currencies
       preferencesManager.setPreferences(userId, prefs)
       setEnabledFiat(currencies)
-    } else if (type === 'crypto') {
-      prefs.walletCurrencies_crypto = currencies
-      preferencesManager.setPreferences(userId, prefs)
-      setEnabledCrypto(currencies)
     }
-  }
-
-  const saveFavoriteCrypto = (favorites) => {
-    const prefs = preferencesManager.getAllPreferences(userId)
-    prefs.walletFavorites_crypto = favorites
-    preferencesManager.setPreferences(userId, prefs)
-    setFavoriteCrypto(favorites)
   }
 
   const loadWallets = async () => {
