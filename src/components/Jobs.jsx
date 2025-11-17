@@ -196,8 +196,40 @@ export default function Jobs({ userId }) {
 
   const handleSubmitJob = async (jobData) => {
     try {
+      // Ensure user has a business to submit the job
+      let businessId = null
+
+      if (userBusinesses.length === 0) {
+        // Create a default business for the user if they don't have one
+        try {
+          const { data: newBusiness, error: createError } = await supabase
+            .from('businesses')
+            .insert([{
+              user_id: userId,
+              name: `${jobData.job_title || 'Service'} Provider`,
+              registration_type: 'sole',
+              status: 'active'
+            }])
+            .select()
+            .single()
+
+          if (createError) throw createError
+          businessId = newBusiness.id
+
+          // Update local businesses list
+          setUserBusinesses([...userBusinesses, newBusiness])
+        } catch (err) {
+          console.warn('Could not create business:', err)
+          setError('Please create a business profile first to submit jobs.')
+          return
+        }
+      } else {
+        businessId = userBusinesses[0].id
+      }
+
       const newJob = await jobsService.createJob({
         ...jobData,
+        business_id: businessId,
         posted_by_user_id: userId,
         is_public: true,
         status: 'active'
