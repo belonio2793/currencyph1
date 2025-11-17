@@ -709,29 +709,27 @@ export default function SubmitJobModal({
                   <option disabled>No businesses available</option>
                 )}
               </select>
-              {(!updatedBusinesses || updatedBusinesses.length === 0) && (
-                <div style={{ marginTop: '8px' }}>
-                  <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '6px' }}>
-                    💡 No businesses yet? Create one to link to this job:
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => setShowAddBusinessModal(true)}
-                    style={{
-                      fontSize: '0.85rem',
-                      padding: '8px 16px',
-                      background: '#667eea',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: '600'
-                    }}
-                  >
-                    + Create a Business
-                  </button>
-                </div>
-              )}
+              <div style={{ marginTop: '8px' }}>
+                <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '6px' }}>
+                  💡 Create a new business to link to this job:
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowAddBusinessModal(true)}
+                  style={{
+                    fontSize: '0.85rem',
+                    padding: '8px 16px',
+                    background: '#667eea',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600'
+                  }}
+                >
+                  + Create a Business
+                </button>
+              </div>
             </div>
           </div>
 
