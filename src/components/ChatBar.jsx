@@ -97,7 +97,7 @@ export default function ChatBar({ userId, userEmail }) {
     loadMessages()
     subscribeToMessages()
     return () => {
-      if (subRef.current) supabase.removeSubscription(subRef.current)
+      if (subRef.current) subRef.current.unsubscribe()
     }
   }, [selectedConversation])
 
@@ -129,7 +129,7 @@ export default function ChatBar({ userId, userEmail }) {
     }
 
     return () => {
-      try { if (privacySubRef.current) supabase.removeChannel(privacySubRef.current) } catch (e) {}
+      try { if (privacySubRef.current) privacySubRef.current.unsubscribe() } catch (e) {}
     }
   }, [userId])
 
