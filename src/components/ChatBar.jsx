@@ -708,13 +708,16 @@ export default function ChatBar({ userId, userEmail }) {
                     ))}
                   </div>
 
-                  <div className="p-3 border-t border-slate-200 bg-slate-50">
+                  <div className="p-3 border-t border-slate-200 bg-slate-50 space-y-2">
                     <div className="flex gap-2">
                       <input type="text" placeholder="Write a message..." value={messageText} onChange={(e) => setMessageText(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())} className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500" />
-                      <input ref={mediaInputRef} type="file" onChange={(e) => e.target.files?.[0] && handleMediaUpload(e.target.files[0])} className="hidden" />
-                      <button onClick={() => mediaInputRef.current?.click()} disabled={uploading} title="Upload file" className="text-slate-600 hover:text-blue-600 disabled:opacity-50 transition-colors">Upload</button>
-                      <button onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording} disabled={uploading} title={recordingVoice ? 'Stop recording' : 'Record voice message'} className={`text-slate-600 disabled:opacity-50 transition-colors ${recordingVoice ? 'text-red-500 animate-pulse' : 'hover:text-blue-600'}`}>Record</button>
                       <button onClick={sendMessage} disabled={sending || !messageText.trim()} className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors">Send</button>
+                    </div>
+                    <div className="flex gap-2">
+                      <input ref={mediaInputRef} type="file" onChange={(e) => e.target.files?.[0] && handleMediaUpload(e.target.files[0])} className="hidden" />
+                      <button onClick={() => mediaInputRef.current?.click()} disabled={uploading} title="Upload file" className="text-slate-600 hover:text-blue-600 disabled:opacity-50 transition-colors text-sm">📎 Upload</button>
+                      <button onClick={recordingVoice ? stopVoiceRecording : startVoiceRecording} disabled={uploading} title={recordingVoice ? 'Stop recording' : 'Record voice message'} className={`text-slate-600 disabled:opacity-50 transition-colors text-sm ${recordingVoice ? 'text-red-500 animate-pulse' : 'hover:text-blue-600'}`}>🎤 Record</button>
+                      <div className="flex-1" />
                     </div>
                   </div>
                 </div>
