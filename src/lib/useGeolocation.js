@@ -36,16 +36,17 @@ export function useGeolocation() {
                   const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
                   const controller = new AbortController()
                   let timedOut = false
+                  let aborted = false
 
                   const timeoutId = setTimeout(() => {
                     timedOut = true
-                    try {
-                      controller.abort()
-                    } catch (e) {}
+                    aborted = true
+                    controller.abort()
                   }, 3000)
 
                   try {
                     const resp = await fetch(url, { signal: controller.signal })
+                    if (timedOut) return
                     clearTimeout(timeoutId)
 
                     if (resp?.ok && isMountedRef.current) {
@@ -59,11 +60,11 @@ export function useGeolocation() {
                       } catch (parseErr) {}
                     }
                   } catch (fetchErr) {
-                    clearTimeout(timeoutId)
-                    if (fetchErr?.name === 'AbortError' && timedOut) {
-                      // Expected timeout, silently ignore
-                    } else if (fetchErr?.name !== 'AbortError') {
-                      // Unexpected error
+                    if (!timedOut) {
+                      clearTimeout(timeoutId)
+                    }
+                    if (fetchErr?.name === 'AbortError' && !timedOut) {
+                      // Unexpected abort, silently ignore
                     }
                   }
                 } catch (e) {
@@ -75,12 +76,12 @@ export function useGeolocation() {
               try {
                 const controller = new AbortController()
                 let timedOut = false
+                let aborted = false
 
                 const timeoutId = setTimeout(() => {
                   timedOut = true
-                  try {
-                    controller.abort()
-                  } catch (e) {}
+                  aborted = true
+                  controller.abort()
                 }, 3000)
 
                 try {
@@ -91,6 +92,7 @@ export function useGeolocation() {
                       signal: controller.signal
                     }
                   )
+                  if (timedOut) return
                   clearTimeout(timeoutId)
 
                   if (response?.ok && isMountedRef.current) {
@@ -102,11 +104,11 @@ export function useGeolocation() {
                     } catch (parseErr) {}
                   }
                 } catch (fetchErr) {
-                  clearTimeout(timeoutId)
-                  if (fetchErr?.name === 'AbortError' && timedOut) {
-                    // Expected timeout, silently ignore
-                  } else if (fetchErr?.name !== 'AbortError') {
-                    // Unexpected error
+                  if (!timedOut) {
+                    clearTimeout(timeoutId)
+                  }
+                  if (fetchErr?.name === 'AbortError' && !timedOut) {
+                    // Unexpected abort, silently ignore
                   }
                 }
               } catch (e) {
