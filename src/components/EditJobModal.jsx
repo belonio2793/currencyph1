@@ -32,6 +32,10 @@ export default function EditJobModal({
   const [skillInput, setSkillInput] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showCityDropdown, setShowCityDropdown] = useState(false)
+  const [citySearchQuery, setCitySearchQuery] = useState('')
+  const [filteredCities, setFilteredCities] = useState([])
+  const cityDropdownRef = useRef(null)
 
   useEffect(() => {
     if (job) {
