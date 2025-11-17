@@ -215,6 +215,9 @@ export default function Jobs({ userId }) {
 
   return (
     <div className="jobs-container">
+      {/* User Profile Preview */}
+      {userId && <UserProfilePreview userId={userId} />}
+
       <div className="jobs-header">
         <div className="jobs-title-section">
           <h2>Jobs Marketplace</h2>
