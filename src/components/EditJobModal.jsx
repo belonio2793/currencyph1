@@ -306,31 +306,54 @@ export default function EditJobModal({
             </div>
 
             <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="city">City *</label>
-                <select
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleInputChange}
+              <div className="form-group" ref={cityDropdownRef} style={{ position: 'relative' }}>
+                <label htmlFor="city-search">City *</label>
+                <input
+                  id="city-search"
+                  type="text"
+                  value={citySearchQuery}
+                  onChange={(e) => handleCitySearch(e.target.value)}
+                  onFocus={() => setShowCityDropdown(true)}
+                  placeholder="Type to search cities..."
                   required
-                >
-                  <option value="">Select a city</option>
-                  {cities.length > 0 ? (
-                    cities.map(city => (
-                      <option key={city} value={city}>{city}</option>
-                    ))
-                  ) : (
-                    <>
-                      <option value="Manila">Manila</option>
-                      <option value="Cebu">Cebu</option>
-                      <option value="Davao">Davao</option>
-                      <option value="Cagayan de Oro">Cagayan de Oro</option>
-                      <option value="Makati">Makati</option>
-                      <option value="Quezon City">Quezon City</option>
-                    </>
-                  )}
-                </select>
+                  style={{ width: '100%' }}
+                />
+                {showCityDropdown && filteredCities.length > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    backgroundColor: 'white',
+                    border: '1px solid #ddd',
+                    borderRadius: '4px',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    zIndex: 1000,
+                    marginTop: '2px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                  }}>
+                    {filteredCities.map((city, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => handleCitySelect(city)}
+                        style={{
+                          padding: '8px 12px',
+                          cursor: 'pointer',
+                          borderBottom: '1px solid #eee',
+                          backgroundColor: city === formData.city ? '#f0f0f0' : 'white',
+                          ':hover': {
+                            backgroundColor: '#f5f5f5'
+                          }
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = city === formData.city ? '#f0f0f0' : 'white'}
+                      >
+                        {city}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
