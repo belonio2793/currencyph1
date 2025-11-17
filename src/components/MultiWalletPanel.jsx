@@ -5,7 +5,6 @@ import { WALLET_PROVIDERS } from '../lib/walletProviders'
 
 const WALLET_COLORS = {
   'MetaMask': 'from-orange-400 to-orange-600',
-  'WalletConnect': 'from-blue-400 to-blue-600',
   'Coinbase Wallet': 'from-blue-500 to-cyan-600',
   'Phantom': 'from-purple-400 to-purple-600',
   'Venly': 'from-indigo-400 to-indigo-600'
@@ -13,7 +12,6 @@ const WALLET_COLORS = {
 
 const WALLET_ICONS = {
   'MetaMask': '🦊',
-  'WalletConnect': '🔗',
   'Coinbase Wallet': '🪙',
   'Phantom': '👻',
   'Venly': '✨'
