@@ -164,7 +164,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   useEffect(() => {
     loadWallets()
     loadPreferences()
-
+    loadNetworkWallets()
 
     // Subscribe to realtime changes so UI updates automatically
     const channels = []
