@@ -315,4 +315,9 @@
   .job-card-footer {
     grid-template-columns: 1fr;
   }
+
+  .header-badges {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }
