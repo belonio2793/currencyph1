@@ -420,19 +420,19 @@ export default function Jobs({ userId }) {
       {userType === 'employer' && selectedBusiness && (
         <div className="jobs-stats">
           <div className="stat-card">
-            <div className="stat-value">{stats.activeJobs}</div>
-            <div className="stat-label">Active Jobs</div>
+            <div className="stat-value">{stats.jobsPosted}</div>
+            <div className="stat-label">Jobs Posted</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value">{stats.totalOffers}</div>
-            <div className="stat-label">Total Offers</div>
+            <div className="stat-value">{stats.pendingOffers}</div>
+            <div className="stat-label">Pending Offers</div>
           </div>
           <div className="stat-card">
             <div className="stat-value">{stats.acceptedOffers}</div>
-            <div className="stat-label">Accepted</div>
+            <div className="stat-label">Accepted Offers</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value">{stats.filledJobs}</div>
+            <div className="stat-value">{stats.completed}</div>
             <div className="stat-label">Completed</div>
           </div>
         </div>
