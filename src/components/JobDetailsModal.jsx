@@ -151,7 +151,7 @@ export default function JobDetailsModal({
                     <span className="label">Location:</span>
                     <span className="value">{job.city}{job.province ? `, ${job.province}` : ''}</span>
                   </div>
-                  <div className="info-item full-width">
+                  <div className="info-item">
                     <span className="label">Experience Level:</span>
                     <span className="value">{formatFieldValue(job.experience_level) || 'Not specified'}</span>
                   </div>
