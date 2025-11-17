@@ -226,10 +226,10 @@ export const jobsService = {
           id,
           rating_score,
           review_text,
-          reviewer_name
+          review_title
         )
       `)
-      .eq('user_id', userId)
+      .eq('posted_by_user_id', userId)
       .order('created_at', { ascending: false })
 
     if (error) throw error
