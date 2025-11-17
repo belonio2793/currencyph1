@@ -233,13 +233,16 @@ export async function subscribeToOnlineUsers(callback) {
         schema: 'public',
         table: 'user_presence'
       }, (payload) => {
-        try { callback(payload.new || payload) } catch (e) { console.error('online users callback', e) }
+        try { callback(payload.new || payload) } catch (e) {
+          // Silently ignore callback errors
+          console.debug('[presence] online users callback error (ignored):', e?.message)
+        }
       })
       .subscribe()
 
-    return () => { try { supabase.removeChannel(channel) } catch (e) { console.debug('Failed to remove online_users channel', e) } }
+    return () => { try { supabase.removeChannel(channel) } catch (e) { /* silently ignore */ } }
   } catch (err) {
-    console.debug('subscribeToOnlineUsers not available', err)
+    // Silently ignore subscription errors
     return () => {}
   }
 }
