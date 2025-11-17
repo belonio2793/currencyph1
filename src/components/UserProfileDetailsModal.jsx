@@ -276,7 +276,7 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
               <div className="overview-section">
                 <div className="overview-item">
                   <span className="label">Display Name Type:</span>
-                  <span className="value">{userProfile.display_name_type?.replace(/_/g, ' ') || 'Full Name'}</span>
+                  <span className="value">{formatDisplayNameType(userProfile.display_name_type)}</span>
                 </div>
                 {userProfile.country_code && (
                   <div className="overview-item">
