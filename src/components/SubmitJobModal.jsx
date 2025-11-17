@@ -743,6 +743,14 @@ export default function SubmitJobModal({
           </div>
         </form>
       </div>
+
+      {showAddBusinessModal && (
+        <AddBusinessModal
+          userId={userId}
+          onClose={() => setShowAddBusinessModal(false)}
+          onSubmitted={handleBusinessCreated}
+        />
+      )}
     </div>
   )
 }
