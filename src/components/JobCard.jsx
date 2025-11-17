@@ -1,9 +1,51 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import { formatFieldValue } from '../lib/formatters'
+import UserProfileDetailsModal from './UserProfileDetailsModal'
 import './JobCard.css'
 
 export default function JobCard({ job, onSelect, onApply }) {
   const [showRating, setShowRating] = useState(false)
+  const [posterProfile, setPosterProfile] = useState(null)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+
+  useEffect(() => {
+    if (job?.posted_by_user_id) {
+      loadPosterProfile()
+    }
+  }, [job?.posted_by_user_id])
+
+  const loadPosterProfile = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('id, full_name, username, profile_picture_url, display_name_type')
+        .eq('id', job.posted_by_user_id)
+        .single()
+
+      if (error) throw error
+      setPosterProfile(data)
+    } catch (err) {
+      console.error('Error loading poster profile:', err)
+    }
+  }
+
+  const getDisplayName = (profile) => {
+    if (!profile) return 'Unknown'
+    const displayType = profile.display_name_type || 'full_name'
+
+    switch (displayType) {
+      case 'username':
+        return profile.username || profile.full_name || 'User'
+      case 'first_name':
+        return profile.full_name?.split(' ')[0] || 'User'
+      case 'last_name':
+        return profile.full_name?.split(' ').pop() || 'User'
+      case 'full_name':
+      default:
+        return profile.full_name || 'User'
+    }
+  }
 
   const averageRating = job.job_ratings && job.job_ratings.length > 0
     ? (job.job_ratings.reduce((sum, r) => sum + r.rating_score, 0) / job.job_ratings.length).toFixed(1)
