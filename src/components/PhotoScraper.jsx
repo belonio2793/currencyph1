@@ -92,7 +92,7 @@ export default function PhotoScraper() {
 
       {result && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h3 className="text-green-900 font-semibold mb-3">✅ Scraping Complete</h3>
+          <h3 className="text-green-900 font-semibold mb-3">Scraping Complete</h3>
           <div className="space-y-2 text-sm text-green-800">
             <p>
               <span className="font-semibold">Processed:</span> {result.processed} listings

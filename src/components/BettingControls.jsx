@@ -121,7 +121,7 @@ export default function BettingControls({ maxBet, onBet, onCall, onRaise, onChec
           disabled={isProcessing || selectedBet > 0}
           className="px-3 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition flex items-center justify-center gap-1 text-sm"
         >
-          <span>✓</span> Check
+          Check
         </button>
 
         {/* Call Button */}
@@ -130,7 +130,7 @@ export default function BettingControls({ maxBet, onBet, onCall, onRaise, onChec
           disabled={isProcessing}
           className="px-3 py-3 bg-green-600 hover:bg-green-700 disabled:bg-green-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition flex items-center justify-center gap-1 text-sm"
         >
-          <span>→</span> Call
+          Call
         </button>
 
         {/* Bet/Raise Button */}
@@ -139,7 +139,7 @@ export default function BettingControls({ maxBet, onBet, onCall, onRaise, onChec
           disabled={isProcessing || selectedBet <= 0}
           className="px-3 py-3 bg-amber-600 hover:bg-amber-700 disabled:bg-amber-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition flex items-center justify-center gap-1 text-sm"
         >
-          <span>💰</span> {actionMode === 'raise' ? 'Raise' : 'Bet'}
+          {actionMode === 'raise' ? 'Raise' : 'Bet'}
         </button>
 
         {/* Fold Button */}
@@ -148,7 +148,7 @@ export default function BettingControls({ maxBet, onBet, onCall, onRaise, onChec
           disabled={isProcessing}
           className="px-3 py-3 bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition flex items-center justify-center gap-1 text-sm"
         >
-          <span>✕</span> Fold
+          Fold
         </button>
       </div>
 

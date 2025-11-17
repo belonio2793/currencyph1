@@ -201,7 +201,7 @@ export default function WalletTestPage() {
         </div>
 
         <div className="mt-8 bg-white rounded-lg border border-slate-200 p-6">
-          <h2 className="text-lg font-semibold text-slate-900 mb-4">📋 Connection Status</h2>
+          <h2 className="text-lg font-semibold text-slate-900 mb-4">Connection Status</h2>
           <div className="space-y-2 text-sm">
             <p className="text-slate-600">
               <strong>Available Wallets ({availableWallets.filter(w => w.isAvailable).length}):</strong>
