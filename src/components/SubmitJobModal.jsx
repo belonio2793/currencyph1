@@ -340,7 +340,20 @@ export default function SubmitJobModal({
       })
     } catch (err) {
       console.error('Error submitting job:', err)
-      const errorMessage = err?.message || err?.details || 'Failed to submit job. Please try again.'
+      let errorMessage = 'Failed to submit job. Please try again.'
+
+      if (err?.message) {
+        errorMessage = err.message
+      } else if (err?.details) {
+        errorMessage = typeof err.details === 'string' ? err.details : JSON.stringify(err.details)
+      } else if (err?.error_description) {
+        errorMessage = err.error_description
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      } else if (err?.toString && err.toString() !== '[object Object]') {
+        errorMessage = err.toString()
+      }
+
       setError(`Failed to submit job: ${errorMessage}`)
     } finally {
       setLoading(false)
