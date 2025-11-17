@@ -154,6 +154,40 @@ function initClient() {
   return _client
 }
 
+// Verify Supabase connectivity on module load
+let _supabaseHealthy = true
+async function checkSupabaseHealth() {
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return false
+
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+
+    const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+      signal: controller.signal,
+      headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+    })
+
+    clearTimeout(timeoutId)
+    _supabaseHealthy = response.ok
+
+    if (!_supabaseHealthy) {
+      console.warn('[supabase-client] Health check failed with status:', response.status)
+    }
+    return _supabaseHealthy
+  } catch (err) {
+    _supabaseHealthy = false
+    console.warn('[supabase-client] Health check error:', err?.message || 'Unknown error')
+    return false
+  }
+}
+
+// Run health check if in browser environment
+if (typeof window !== 'undefined' && typeof setTimeout !== 'undefined') {
+  // Run health check after a short delay to not block app startup
+  setTimeout(() => checkSupabaseHealth(), 100)
+}
+
 // Export a Proxy that lazily initializes the real client on first access while keeping the same import shape
 const supabase = new Proxy({}, {
   get(_, prop) {
@@ -172,6 +206,7 @@ const supabase = new Proxy({}, {
 export { supabase }
 
 export const isSupabaseConfigured = !!(SUPABASE_URL && SUPABASE_ANON_KEY)
+export const isSupabaseHealthy = () => _supabaseHealthy
 
 // Generic Token API utilities (replacing deprecated dog token API)
 export const tokenAPI = {
