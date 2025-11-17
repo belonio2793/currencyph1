@@ -13,6 +13,7 @@ import ApplyConfirmationModal from './ApplyConfirmationModal'
 import OfferActions from './OfferActions'
 import SelectBusinessModal from './SelectBusinessModal'
 import UserProfilePreview from './UserProfilePreview'
+import UserProfileModal from './UserProfileModal'
 import './Jobs.css'
 
 export default function Jobs({ userId }) {
@@ -29,6 +30,8 @@ export default function Jobs({ userId }) {
   const [showPostModal, setShowPostModal] = useState(false)
   const [showSubmitModal, setShowSubmitModal] = useState(false)
   const [showLookingToHireModal, setShowLookingToHireModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileUserId, setProfileUserId] = useState(null)
   const [showSelectBusiness, setShowSelectBusiness] = useState(false)
   const [selectedJob, setSelectedJob] = useState(null)
   const [showJobDetails, setShowJobDetails] = useState(false)
