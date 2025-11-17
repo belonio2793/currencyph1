@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import ProfileEditModal from './ProfileEditModal'
 
 export default function UserProfilePreview({ userId }) {
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showProfileModal, setShowProfileModal] = useState(false)
   const [stats, setStats] = useState({
     postedJobs: 0,
     acceptedOffers: 0,
@@ -162,10 +164,6 @@ export default function UserProfilePreview({ userId }) {
 
   const handleSendMessage = () => {
     window.dispatchEvent(new CustomEvent('openChat', { detail: { userId } }))
-  }
-
-  const handleViewProfile = () => {
-    window.dispatchEvent(new CustomEvent('viewUserProfile', { detail: { userId } }))
   }
 
   return (
