@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { jobsService } from '../lib/jobsService'
+import { formatFieldValue } from '../lib/formatters'
 import JobCard from './JobCard'
 import JobSearch from './JobSearch'
 import PostJobModal from './PostJobModal'
