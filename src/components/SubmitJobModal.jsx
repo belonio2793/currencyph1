@@ -730,7 +730,7 @@ export default function SubmitJobModal({
             <h3>Requirements</h3>
 
             <div className="form-group">
-              <label>Skills Required</label>
+              <label>Skills Offered</label>
               <div className="skill-input-group">
                 <input
                   type="text"
