@@ -181,12 +181,14 @@
     margin-bottom: 16px;
     padding-bottom: 16px;
     gap: 12px;
+    width: 100%;
   }
 
   .profile-avatar {
     width: 56px;
     height: 56px;
     font-size: 24px;
+    flex-shrink: 0;
   }
 
   .profile-name {
@@ -196,17 +198,20 @@
   .profile-stats {
     grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
     gap: 12px;
+    width: 100%;
   }
 
   .stat-box {
     padding: 12px;
     gap: 8px;
+    min-height: auto;
   }
 
   .stat-icon {
     width: 36px;
     height: 36px;
     font-size: 20px;
+    min-width: 36px;
   }
 
   .stat-value {
@@ -221,12 +226,14 @@
 @media (max-width: 480px) {
   .profile-stats {
     grid-template-columns: repeat(2, 1fr);
+    width: 100%;
   }
 
   .stat-box {
     flex-direction: column;
     text-align: center;
     gap: 6px;
+    min-height: auto;
   }
 
   .stat-icon {
