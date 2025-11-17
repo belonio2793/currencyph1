@@ -52,8 +52,8 @@ export const metamaskConnection = {
       throw new Error('MetaMask is not installed. Please install the MetaMask extension.')
     }
 
-    if (isRunningInIframe()) {
-      throw new Error('⚠️ Wallet connection detected in iframe (Builder preview). Click "Open Preview" to test wallet connections in a full browser window.')
+    if (isBuilderPreviewIframe()) {
+      throw new Error('⚠️ Wallet connection detected in Builder preview iframe. Click "Open Preview" to test wallet connections in a full browser window.')
     }
 
     try {
