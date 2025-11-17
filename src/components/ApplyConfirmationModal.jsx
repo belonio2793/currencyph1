@@ -14,6 +14,7 @@ export default function ApplyConfirmationModal({
   const [error, setError] = useState('')
   const [userProfile, setUserProfile] = useState(null)
   const [userLoading, setUserLoading] = useState(true)
+  const [offerMessage, setOfferMessage] = useState(`I am interested in this ${job.job_title} position and am ready to start immediately.`)
 
   useEffect(() => {
     if (userId) {
