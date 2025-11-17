@@ -554,13 +554,21 @@ export default function Jobs({ userId }) {
                     <p>{offer.offer_message}</p>
                   </div>
                   <div className="offer-footer">
-                    <span className="date">{new Date(offer.created_at).toLocaleDateString()}</span>
-                    <button
-                      className="btn-small"
-                      onClick={() => handleJobSelect(offer.jobs)}
-                    >
-                      View Details
-                    </button>
+                    <div className="footer-left">
+                      <span className="date">{new Date(offer.created_at).toLocaleDateString()}</span>
+                      <button
+                        className="btn-small"
+                        onClick={() => handleJobSelect(offer.jobs)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                    <OfferActions
+                      offer={offer}
+                      onAccept={handleAcceptOffer}
+                      onReject={handleRejectOffer}
+                      userType="job-seeker"
+                    />
                   </div>
                 </div>
               ))}
