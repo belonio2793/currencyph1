@@ -286,7 +286,15 @@
 .offer-footer {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.offer-footer .footer-left {
+  display: flex;
   align-items: center;
+  gap: 12px;
 }
 
 .date {
