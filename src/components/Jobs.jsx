@@ -44,6 +44,11 @@ export default function Jobs({ userId }) {
     totalOffers: 0,
     acceptedOffers: 0
   })
+  const [tabCounts, setTabCounts] = useState({
+    jobListings: 0,
+    offersReceived: 0,
+    myJobs: 0
+  })
 
   // Load categories, cities, and user's businesses
   useEffect(() => {
