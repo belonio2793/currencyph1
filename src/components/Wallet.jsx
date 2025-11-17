@@ -116,11 +116,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [noWalletDetected, setNoWalletDetected] = useState(false)
   const [showProviderList, setShowProviderList] = useState(false)
 
-  // Manual wallet creation state
-  const [showCreateManualWalletModal, setShowCreateManualWalletModal] = useState(false)
-  const [selectedManualChainId, setSelectedManualChainId] = useState(null)
-  const [creatingManualWallet, setCreatingManualWallet] = useState(false)
-
   // Network wallets (house) UI state
   const [showNetworkPanel, setShowNetworkPanel] = useState(false)
 
