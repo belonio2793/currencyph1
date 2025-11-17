@@ -662,6 +662,7 @@ export default function Profile({ userId, onSignOut }) {
                 </div>
 
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">Save Changes</button>
+                {error && (<div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm" role="alert" aria-live="polite">{error}</div>)}
                 {success && (<div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm" role="status" aria-live="polite">{success}</div>)}
               </form>
             ) : (
