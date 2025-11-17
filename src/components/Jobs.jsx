@@ -578,7 +578,7 @@ export default function Jobs({ userId }) {
                     <p><strong>Category:</strong> {offer.jobs?.job_category}</p>
                     <p><strong>Your Rate:</strong> ₱{offer.offered_rate?.toFixed(2)}</p>
                     <p><strong>Job Rate:</strong> ₱{offer.jobs?.pay_rate?.toFixed(2)}</p>
-                    <p><strong>Type:</strong> {offer.jobs?.job_type}</p>
+                    <p><strong>Type:</strong> {formatFieldValue(offer.jobs?.job_type)}</p>
                   </div>
                   <div className="offer-message">
                     <p>{offer.offer_message}</p>
