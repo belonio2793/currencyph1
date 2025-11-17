@@ -150,7 +150,13 @@ export default function Jobs({ userId }) {
   const loadStats = async () => {
     try {
       const data = await jobsService.getBusinessJobStats(selectedBusiness.id)
-      setStats(data)
+      setStats({
+        ...data,
+        jobsPosted: data.totalJobs || 0,
+        pendingOffers: (data.totalOffers || 0) - (data.acceptedOffers || 0),
+        acceptedOffers: data.acceptedOffers || 0,
+        completed: data.filledJobs || 0
+      })
     } catch (err) {
       console.error('Error loading stats:', err)
     }
