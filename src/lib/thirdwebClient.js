@@ -1,4 +1,4 @@
-// Supports browser-injected wallet providers (MetaMask, WalletConnect, Phantom)
+// Supports browser-injected wallet providers (MetaMask, Phantom)
 
 const CLIENT_ID = import.meta.env.VITE_THIRDWEB_CLIENT_ID
 
