@@ -13,9 +13,10 @@ import './Jobs.css'
 
 export default function Jobs({ userId }) {
   const [userType, setUserType] = useState('job-seeker') // 'employer' or 'job-seeker'
-  const [activeTab, setActiveTab] = useState('looking-to-hire') // 'looking-to-hire' or 'offers'
+  const [activeTab, setActiveTab] = useState('job-listings') // 'job-listings', 'offers-received', 'my-jobs'
   const [jobs, setJobs] = useState([])
   const [offers, setOffers] = useState([])
+  const [userJobs, setUserJobs] = useState([])
   const [userBusinesses, setUserBusinesses] = useState([])
   const [selectedBusiness, setSelectedBusiness] = useState(null)
   const [loading, setLoading] = useState(true)
