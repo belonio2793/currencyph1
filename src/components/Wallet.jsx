@@ -276,17 +276,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
   }
 
-  // Crypto helpers
-  const changeCryptoBalance = async (walletId, delta) => {
-    const w = cryptoWallets.find(c => c.id === walletId)
-    if (!w) return
-    const newBalance = Math.max(0, Number(w.balance || 0) + delta)
-    const { error: updErr } = await supabase
-      .from('wallets_crypto')
-      .update({ balance: newBalance, updated_at: new Date() })
-      .eq('id', walletId)
-    if (updErr) throw updErr
-  }
 
   const handleCryptoSubmit = async (e) => {
     e.preventDefault()
