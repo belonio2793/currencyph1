@@ -194,7 +194,8 @@ export default function Jobs({ userId }) {
       setTimeout(() => setError(''), 3000)
     } catch (err) {
       console.error('Error submitting job:', err)
-      setError('Failed to submit job. Please try again.')
+      const errorMessage = err?.message || err?.details || 'Unknown error occurred'
+      setError(`Failed to submit job: ${errorMessage}`)
     }
   }
 
