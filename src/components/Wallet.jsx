@@ -911,43 +911,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
   }
 
-  const handleCreateManualWallet = async () => {
-    if (!selectedManualChainId) {
-      setError('Please select a blockchain')
-      return
-    }
-
-    if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
-      setError('Please sign in to create a wallet')
-      return
-    }
-
-    try {
-      setCreatingManualWallet(true)
-      setError('')
-
-      // Call edge function to create wallet
-      const { data, error: invokeError } = await supabase.functions.invoke('create-wallet-unified', {
-        body: {
-          user_id: userId,
-          chain_id: selectedManualChainId
-        }
-      })
-
-      if (invokeError) throw invokeError
-      if (!data || !data.ok) throw new Error(data?.error || 'Failed to create wallet')
-
-      setSuccess(`Wallet created on ${data.wallet.chainName} (${formatWalletAddress(data.wallet.address)})`)
-      setShowCreateManualWalletModal(false)
-      setSelectedManualChainId(null)
-      await loadWallets()
-    } catch (err) {
-      console.error('Error creating wallet:', err)
-      setError(fmtErr(err) || 'Failed to create wallet')
-    } finally {
-      setCreatingManualWallet(false)
-    }
-  }
 
   if (loading) {
     return (
@@ -1511,7 +1474,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-500 text-center mt-2">Supported: MetaMask • WalletConnect • Coinbase Wallet • Phantom • Rainbow • Trust Wallet • Exodus • Ledger • Trezor</p>
+                <p className="text-xs text-slate-500 text-center mt-2">Supported: MetaMask • WalletConnect • Coinbase Wallet • Phantom �� Rainbow • Trust Wallet • Exodus • Ledger • Trezor</p>
               </div>
             ) : (
               <div className="space-y-3">
