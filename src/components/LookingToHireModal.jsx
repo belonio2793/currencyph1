@@ -215,7 +215,7 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
     <div className="modal-overlay" onClick={onClose}>
       <div className="post-job-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Looking To Hire</h2>
+          <h2>Looking For Work</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
