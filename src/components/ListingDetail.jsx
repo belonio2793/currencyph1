@@ -349,11 +349,11 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Address */}
         {listing.address && (
           <div className="mb-6 p-4 bg-slate-50 rounded-lg border border-slate-200">
-            <div className="font-semibold text-slate-900 mb-1">📍 Address</div>
+            <div className="font-semibold text-slate-900 mb-1">Address</div>
             <p className="text-slate-700">{listing.address}</p>
             {(listing.latitude || listing.lat) && (
               <p className="text-sm text-slate-500 mt-2">
-                📌 {(listing.latitude || listing.lat).toFixed(4)}, {(listing.longitude || listing.lng).toFixed(4)}
+                Coordinates: {(listing.latitude || listing.lat).toFixed(4)}, {(listing.longitude || listing.lng).toFixed(4)}
               </p>
             )}
 

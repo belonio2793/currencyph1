@@ -234,7 +234,7 @@ export default function ListingCard({
           {/* City */}
           {(listing.city || listing.country) && (
             <p className="text-sm font-semibold text-blue-600 mb-1">
-              📍 {[listing.city, listing.country].filter(Boolean).join(', ')}
+              Location: {[listing.city, listing.country].filter(Boolean).join(', ')}
             </p>
           )}
           {/* Address */}

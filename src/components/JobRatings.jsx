@@ -10,7 +10,7 @@ export default function JobRatings({ ratings = [], averageRating = 0 }) {
   }
 
   const getRatingStars = (score) => {
-    return '⭐'.repeat(score) + '☆'.repeat(5 - score)
+    return score > 0 ? `${score}/5 stars` : 'Not rated'
   }
 
   return (
@@ -33,7 +33,7 @@ export default function JobRatings({ ratings = [], averageRating = 0 }) {
             <div className="rating-distribution">
               {[5, 4, 3, 2, 1].map(score => (
                 <div key={score} className="distribution-item">
-                  <span className="stars">{score}⭐</span>
+                  <span className="stars">{score} stars</span>
                   <div className="bar">
                     <div
                       className="bar-fill"
@@ -54,7 +54,7 @@ export default function JobRatings({ ratings = [], averageRating = 0 }) {
               <div key={rating.id} className="review-card">
                 <div className="review-header">
                   <div className="review-user">
-                    <div className="user-avatar">👤</div>
+                    <div className="user-avatar"><span className="text-xs">User</span></div>
                     <div className="user-info">
                       <h5>{rating.review_title || 'Unnamed Review'}</h5>
                       <p className="user-name">By User {rating.rated_by_user_id?.slice(0, 8)}</p>
