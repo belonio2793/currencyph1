@@ -91,7 +91,6 @@
     "@noble/secp256k1": "^3.0.0",
     "@solana/web3.js": "^1.75.3",
     "@supabase/supabase-js": "^2.38.0",
-    "@thirdweb-dev/sdk": "^4.0.99",
     "bs58": "^6.0.0",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
