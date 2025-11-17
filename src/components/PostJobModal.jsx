@@ -35,6 +35,10 @@ export default function PostJobModal({
   const cityDropdownRef = useRef(null)
 
   useEffect(() => {
+    setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
+  }, [])
+
+  useEffect(() => {
     const handleClickOutside = (event) => {
       if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target)) {
         setShowCityDropdown(false)
