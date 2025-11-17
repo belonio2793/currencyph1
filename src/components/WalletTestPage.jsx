@@ -16,13 +16,6 @@ const WALLETS = [
     description: 'Injected wallet - requires browser extension'
   },
   {
-    key: 'walletconnect',
-    name: 'WalletConnect',
-    icon: '🔗',
-    connection: walletconnectConnection,
-    description: 'Multi-chain QR code connection'
-  },
-  {
     key: 'coinbase',
     name: 'Coinbase Wallet',
     icon: '🪙',
