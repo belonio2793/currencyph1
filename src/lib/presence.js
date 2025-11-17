@@ -197,7 +197,8 @@ export async function getMultipleUsersPresence(userIds) {
 
     return presenceMap
   } catch (err) {
-    console.warn('Get multiple presence error:', err)
+    // Silently return offline for all users on error
+    console.debug('[presence] getMultipleUsersPresence failed, returning all offline:', err?.message)
     return userIds.reduce((acc, id) => ({ ...acc, [id]: 'offline' }), {})
   }
 }
