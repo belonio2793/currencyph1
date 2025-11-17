@@ -76,8 +76,23 @@
 
 .poster-actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
+  align-items: flex-end;
+}
+
+.employer-badge-top {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #c8e6c9;
+  color: #2e7d32;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1;
 }
 
 .btn-view-profile-top {
