@@ -34,26 +34,22 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [wallets, setWallets] = useState([])
   const [internalWallets, setInternalWallets] = useState([])
   const [fiatWallets, setFiatWallets] = useState([])
-  const [cryptoWallets, setCryptoWallets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
 
   // Preference states (separate for each table)
   const [enabledInternal, setEnabledInternal] = useState([])
   const [enabledFiat, setEnabledFiat] = useState([])
-  const [enabledCrypto, setEnabledCrypto] = useState([])
 
   // Which preference modal is shown
   const [showPreferencesInternal, setShowPreferencesInternal] = useState(false)
   const [showPreferencesFiat, setShowPreferencesFiat] = useState(false)
-  const [showPreferencesCrypto, setShowPreferencesCrypto] = useState(false)
 
   const [selectedWallet, setSelectedWallet] = useState(null)
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
-  const [favoriteCrypto, setFavoriteCrypto] = useState([])
   const [filterMode, setFilterMode] = useState('all') // all | favorites | owned
   const [showConnectedMenu, setShowConnectedMenu] = useState(false)
 
@@ -75,26 +71,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [fiatAction, setFiatAction] = useState('deposit') // 'deposit' | 'pay'
   const [fiatAmount, setFiatAmount] = useState('')
 
-  // Crypto modal state
-  const [showCryptoModal, setShowCryptoModal] = useState(false)
-  const [selectedCryptoWallet, setSelectedCryptoWallet] = useState(null)
-  const [cryptoAction, setCryptoAction] = useState('send') // 'send' | 'receive'
-  const [cryptoAmount, setCryptoAmount] = useState('')
-  const [recipientAddress, setRecipientAddress] = useState('')
-  const [sendingCrypto, setSendingCrypto] = useState(false)
-
-  // Thirdweb integration state
-  const [connectedWallet, setConnectedWallet] = useState(null)
-  const [connectedWallets, setConnectedWallets] = useState([])
-  const [selectedChainId, setSelectedChainId] = useState(null)
-  const [showThirdwebModal, setShowThirdwebModal] = useState(false)
-  const [thirdwebConnecting, setThirdwebConnecting] = useState(false)
-  const [walletAvailable, setWalletAvailable] = useState(true)
-  const [noWalletDetected, setNoWalletDetected] = useState(false)
-  const [showProviderList, setShowProviderList] = useState(false)
-
-  // Network wallets (house) UI state - default to showing Network Balances
-  const [showNetworkPanel, setShowNetworkPanel] = useState(true)
 
   // Currency exchange rates cache (rate to globalCurrency)
   const [currencyRates, setCurrencyRates] = useState({})
