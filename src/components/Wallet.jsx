@@ -1105,9 +1105,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                     </div>
                   ))}
 
-                  <div className="flex items-center gap-2 mt-2">
-                    <button onClick={() => setShowCreateManualWalletModal(true)} className="px-3 py-2 bg-slate-600 text-white rounded text-sm">Create Wallet</button>
-                  </div>
                 </div>
               </div>
             )}
@@ -1474,7 +1471,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   </div>
                 </div>
 
-                <p className="text-xs text-slate-500 text-center mt-2">Supported: MetaMask • WalletConnect • Coinbase Wallet • Phantom �� Rainbow • Trust Wallet • Exodus • Ledger • Trezor</p>
+                <p className="text-xs text-slate-500 text-center mt-2">Supported: MetaMask • WalletConnect • Coinbase Wallet • Phantom • Rainbow • Trust Wallet • Exodus • Ledger • Trezor</p>
               </div>
             ) : (
               <div className="space-y-3">
