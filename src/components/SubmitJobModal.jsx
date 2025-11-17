@@ -792,12 +792,251 @@ export default function SubmitJobModal({
         </form>
       </div>
 
+      {/* Create Business Modal */}
       {showAddBusinessModal && (
-        <AddBusinessModal
-          userId={userId}
-          onClose={() => setShowAddBusinessModal(false)}
-          onSubmitted={handleBusinessCreated}
-        />
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 10000,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          padding: '20px'
+        }}
+        onClick={() => setShowAddBusinessModal(false)}
+        >
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            maxWidth: '500px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflow: 'auto',
+            boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+          }}
+          onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{
+              padding: '24px',
+              borderBottom: '1px solid #e0e0e0',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0, fontSize: '1.3rem', color: '#1a1a1a' }}>Create a Business</h2>
+              <button
+                onClick={() => setShowAddBusinessModal(false)}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  fontSize: '1.5rem',
+                  cursor: 'pointer',
+                  color: '#1a1a1a'
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateBusiness} style={{ padding: '24px' }}>
+              {error && (
+                <div style={{
+                  background: '#ffe5e5',
+                  borderLeft: '4px solid #d63031',
+                  padding: '12px 15px',
+                  color: '#d63031',
+                  marginBottom: '15px',
+                  borderRadius: '4px',
+                  fontSize: '0.9rem'
+                }}>
+                  {error}
+                </div>
+              )}
+
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
+                  Business Name *
+                </label>
+                <input
+                  type="text"
+                  value={businessFormData.businessName}
+                  onChange={(e) => setBusinessFormData({
+                    ...businessFormData,
+                    businessName: e.target.value
+                  })}
+                  placeholder="e.g., John's Plumbing Services"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                  required
+                />
+              </div>
+
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
+                  Registration Type
+                </label>
+                <select
+                  value={businessFormData.registrationType}
+                  onChange={(e) => setBusinessFormData({
+                    ...businessFormData,
+                    registrationType: e.target.value
+                  })}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                >
+                  <option value="sole">Sole Proprietor</option>
+                  <option value="partnership">Partnership</option>
+                  <option value="corporation">Corporation</option>
+                  <option value="cooperative">Cooperative</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
+                  Currency Registration Number
+                </label>
+                <input
+                  type="text"
+                  value={businessFormData.currencyRegistrationNumber}
+                  onChange={(e) => setBusinessFormData({
+                    ...businessFormData,
+                    currencyRegistrationNumber: e.target.value
+                  })}
+                  placeholder="e.g., P-12345678-001"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
+                  TIN (Tax Identification Number)
+                </label>
+                <input
+                  type="text"
+                  value={businessFormData.tin}
+                  onChange={(e) => setBusinessFormData({
+                    ...businessFormData,
+                    tin: e.target.value
+                  })}
+                  placeholder="Optional"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
+                  City of Registration
+                </label>
+                <input
+                  type="text"
+                  value={businessFormData.cityOfRegistration}
+                  onChange={(e) => setBusinessFormData({
+                    ...businessFormData,
+                    cityOfRegistration: e.target.value
+                  })}
+                  placeholder="e.g., Manila"
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
+                  Registration Date
+                </label>
+                <input
+                  type="date"
+                  value={businessFormData.registrationDate}
+                  onChange={(e) => setBusinessFormData({
+                    ...businessFormData,
+                    registrationDate: e.target.value
+                  })}
+                  style={{
+                    width: '100%',
+                    padding: '10px 12px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    fontSize: '0.9rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+              </div>
+
+              <div style={{
+                display: 'flex',
+                gap: '12px',
+                justifyContent: 'flex-end'
+              }}>
+                <button
+                  type="button"
+                  onClick={() => setShowAddBusinessModal(false)}
+                  style={{
+                    padding: '10px 24px',
+                    border: '1px solid #e0e0e0',
+                    borderRadius: '6px',
+                    background: '#f5f5f5',
+                    color: '#1a1a1a',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.9rem'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creatingBusiness}
+                  style={{
+                    padding: '10px 24px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    background: '#667eea',
+                    color: 'white',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    opacity: creatingBusiness ? 0.6 : 1
+                  }}
+                >
+                  {creatingBusiness ? 'Creating...' : 'Create Business'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       )}
     </div>
   )
