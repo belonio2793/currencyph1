@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import './UserProfilePreview.css'
 
 export default function UserProfilePreview({ userId }) {
   const [userProfile, setUserProfile] = useState(null)
@@ -29,19 +28,18 @@ export default function UserProfilePreview({ userId }) {
       if (authError) throw authError
 
       if (user) {
-        // Fetch full user profile from users table
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, full_name, username, email, display_name_type, profile_picture_url, created_at')
           .eq('id', user.id)
           .single()
 
-        if (userError) throw userError
+        if (userError && userError.code !== 'PGRST116') throw userError
 
         setUserProfile({
           id: user.id,
           email: userData?.email || user.email,
-          full_name: userData?.full_name || user.user_metadata?.full_name,
+          full_name: userData?.full_name || user.user_metadata?.full_name || 'User',
           username: userData?.username,
           display_name_type: userData?.display_name_type || 'full_name',
           profile_picture_url: userData?.profile_picture_url,
@@ -52,7 +50,6 @@ export default function UserProfilePreview({ userId }) {
       }
     } catch (err) {
       console.error('Error loading user profile:', err)
-    } finally {
       setLoading(false)
     }
   }
@@ -60,11 +57,10 @@ export default function UserProfilePreview({ userId }) {
   const loadUserStats = async (uid, createdAt) => {
     try {
       const [
-        { count: postedCount },
-        { count: acceptedCount },
-        { count: completedCount },
-        { data: ratings },
-        { data: jobHistory }
+        postedJobsResult,
+        acceptedOffersResult,
+        completedJobsResult,
+        ratingsResult
       ] = await Promise.all([
         supabase
           .from('jobs')
@@ -83,42 +79,51 @@ export default function UserProfilePreview({ userId }) {
         supabase
           .from('job_ratings')
           .select('rating_score')
-          .eq('rated_user_id', uid),
-        supabase
-          .from('job_history')
-          .select('final_amount_paid')
-          .eq('service_provider_id', uid)
-          .eq('completion_status', 'completed')
+          .eq('rated_user_id', uid)
       ])
 
+      const postedCount = postedJobsResult.count || 0
+      const acceptedCount = acceptedOffersResult.count || 0
+      const completedCount = completedJobsResult.count || 0
+      const ratings = ratingsResult.data || []
+
       const avgRating = ratings && ratings.length > 0
-        ? (ratings.reduce((sum, r) => sum + r.rating_score, 0) / ratings.length).toFixed(1)
+        ? (ratings.reduce((sum, r) => sum + (r.rating_score || 0), 0) / ratings.length).toFixed(1)
         : 0
 
-      const totalEarnings = jobHistory && jobHistory.length > 0
-        ? jobHistory.reduce((sum, h) => sum + (h.final_amount_paid || 0), 0)
-        : 0
-
-      const memberDate = createdAt ? new Date(createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'
+      const memberDate = createdAt 
+        ? new Date(createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+        : 'N/A'
 
       setStats({
-        postedJobs: postedCount || 0,
-        acceptedOffers: acceptedCount || 0,
-        completedJobs: completedCount || 0,
+        postedJobs: postedCount,
+        acceptedOffers: acceptedCount,
+        completedJobs: completedCount,
         averageRating: avgRating,
-        totalRatings: ratings?.length || 0,
-        totalEarnings: totalEarnings || 0,
+        totalRatings: ratings.length,
+        totalEarnings: 0,
         memberSince: memberDate
       })
     } catch (err) {
       console.error('Error loading user stats:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
   if (loading) {
     return (
-      <div className="user-profile-preview">
-        <div className="profile-loading">Loading profile...</div>
+      <div style={{
+        background: '#667eea',
+        borderRadius: '12px',
+        padding: '24px',
+        marginBottom: '30px',
+        boxShadow: '0 4px 15px rgba(102, 126, 234, 0.15)',
+        color: 'white'
+      }}>
+        <div style={{ textAlign: 'center', padding: '30px', color: 'rgba(255, 255, 255, 0.9)', fontSize: '0.95rem' }}>
+          Loading profile...
+        </div>
       </div>
     )
   }
@@ -148,66 +153,271 @@ export default function UserProfilePreview({ userId }) {
   const avatarBg = `hsl(${userName.charCodeAt(0) * 10}, 70%, 55%)`
 
   return (
-    <div className="user-profile-preview">
-      {/* Main Profile Card */}
-      <div className="profile-main">
-        {/* Avatar and Basic Info */}
-        <div className="profile-header">
-          <div className="profile-avatar" style={{ backgroundColor: avatarBg }}>
+    <div style={{
+      background: '#667eea',
+      borderRadius: '12px',
+      padding: '24px',
+      marginBottom: '30px',
+      boxShadow: '0 4px 15px rgba(102, 126, 234, 0.15)',
+      color: 'white',
+      position: 'relative'
+    }}>
+      <div style={{ maxWidth: '100%', display: 'flex', flexDirection: 'column' }}>
+        {/* Profile Header */}
+        <div style={{
+          display: 'flex',
+          gap: '16px',
+          alignItems: 'flex-start',
+          marginBottom: '24px',
+          paddingBottom: '20px',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+          width: '100%'
+        }}>
+          <div style={{
+            width: '64px',
+            height: '64px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontSize: '28px',
+            fontWeight: '700',
+            color: 'white',
+            flexShrink: 0,
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+            backgroundColor: avatarBg,
+            position: 'relative',
+            zIndex: 2
+          }}>
             {userName.charAt(0).toUpperCase()}
           </div>
-          <div className="profile-info">
-            <h2 className="profile-name">{userName}</h2>
-            <p className="profile-email">{userProfile.email}</p>
-            <span className="profile-member">Member since {stats.memberSince}</span>
+          
+          <div style={{
+            flex: 1,
+            minWidth: 0,
+            display: 'flex',
+            flexDirection: 'column'
+          }}>
+            <h2 style={{
+              margin: '0 0 4px 0',
+              fontSize: '1.4rem',
+              fontWeight: '700',
+              color: 'white',
+              wordBreak: 'break-word',
+              lineHeight: '1.2'
+            }}>
+              {userName}
+            </h2>
+            <p style={{
+              margin: '0 0 6px 0',
+              fontSize: '0.9rem',
+              color: 'rgba(255, 255, 255, 0.9)',
+              wordBreak: 'break-all',
+              lineHeight: '1.3'
+            }}>
+              {userProfile.email}
+            </p>
+            <span style={{
+              display: 'inline-block',
+              fontSize: '0.85rem',
+              color: 'rgba(255, 255, 255, 0.9)',
+              padding: '6px 12px',
+              background: 'rgba(255, 255, 255, 0.25)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '6px',
+              alignSelf: 'flex-start'
+            }}>
+              Member since {stats.memberSince}
+            </span>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="profile-stats">
-          <div className="stat-box">
-            <div className="stat-icon" data-icon="briefcase"></div>
-            <div className="stat-data">
-              <div className="stat-value">{stats.postedJobs}</div>
-              <div className="stat-label">Jobs Posted</div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+          gap: '16px',
+          width: '100%'
+        }}>
+          {/* Jobs Posted */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '8px',
+            padding: '14px',
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease',
+            minHeight: '60px'
+          }}>
+            <div style={{
+              fontSize: '24px',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'rgba(255, 255, 255, 0.25)',
+              borderRadius: '6px',
+              fontWeight: '700',
+              color: 'white',
+              position: 'relative',
+              minWidth: '40px',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              □
             </div>
-          </div>
-
-          <div className="stat-box">
-            <div className="stat-icon" data-icon="check"></div>
-            <div className="stat-data">
-              <div className="stat-value">{stats.acceptedOffers}</div>
-              <div className="stat-label">Accepted Offers</div>
-            </div>
-          </div>
-
-          <div className="stat-box">
-            <div className="stat-icon" data-icon="trophy"></div>
-            <div className="stat-data">
-              <div className="stat-value">{stats.completedJobs}</div>
-              <div className="stat-label">Completed</div>
-            </div>
-          </div>
-
-          {stats.totalRatings > 0 && (
-            <div className="stat-box">
-              <div className="stat-icon" data-icon="star"></div>
-              <div className="stat-data">
-                <div className="stat-value">{stats.averageRating}</div>
-                <div className="stat-label">Rating ({stats.totalRatings})</div>
+            <div style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}>
+              <div style={{
+                fontSize: '1.3rem',
+                fontWeight: '700',
+                color: 'white',
+                marginBottom: '2px',
+                lineHeight: '1.2'
+              }}>
+                {stats.postedJobs}
+              </div>
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'rgba(255, 255, 255, 0.8)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: '500',
+                lineHeight: '1.2'
+              }}>
+                Jobs Posted
               </div>
             </div>
-          )}
+          </div>
 
-          {stats.totalEarnings > 0 && (
-            <div className="stat-box">
-              <div className="stat-icon" data-icon="currency"></div>
-              <div className="stat-data">
-                <div className="stat-value">₱{stats.totalEarnings.toFixed(0)}</div>
-                <div className="stat-label">Total Earnings</div>
+          {/* Accepted Offers */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '8px',
+            padding: '14px',
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease',
+            minHeight: '60px'
+          }}>
+            <div style={{
+              fontSize: '24px',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'rgba(255, 255, 255, 0.25)',
+              borderRadius: '6px',
+              fontWeight: '700',
+              color: 'white',
+              position: 'relative',
+              minWidth: '40px',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              ✓
+            </div>
+            <div style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}>
+              <div style={{
+                fontSize: '1.3rem',
+                fontWeight: '700',
+                color: 'white',
+                marginBottom: '2px',
+                lineHeight: '1.2'
+              }}>
+                {stats.acceptedOffers}
+              </div>
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'rgba(255, 255, 255, 0.8)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: '500',
+                lineHeight: '1.2'
+              }}>
+                Accepted Offers
               </div>
             </div>
-          )}
+          </div>
+
+          {/* Completed */}
+          <div style={{
+            background: 'rgba(255, 255, 255, 0.15)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '8px',
+            padding: '14px',
+            display: 'flex',
+            gap: '10px',
+            alignItems: 'center',
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease',
+            minHeight: '60px'
+          }}>
+            <div style={{
+              fontSize: '24px',
+              flexShrink: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: '40px',
+              height: '40px',
+              background: 'rgba(255, 255, 255, 0.25)',
+              borderRadius: '6px',
+              fontWeight: '700',
+              color: 'white',
+              position: 'relative',
+              minWidth: '40px',
+              border: '1px solid rgba(255, 255, 255, 0.2)'
+            }}>
+              ▲
+            </div>
+            <div style={{
+              flex: 1,
+              minWidth: 0,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center'
+            }}>
+              <div style={{
+                fontSize: '1.3rem',
+                fontWeight: '700',
+                color: 'white',
+                marginBottom: '2px',
+                lineHeight: '1.2'
+              }}>
+                {stats.completedJobs}
+              </div>
+              <div style={{
+                fontSize: '0.75rem',
+                color: 'rgba(255, 255, 255, 0.8)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                fontWeight: '500',
+                lineHeight: '1.2'
+              }}>
+                Completed
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
