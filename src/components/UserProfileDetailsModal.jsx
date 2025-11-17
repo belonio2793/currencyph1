@@ -418,9 +418,6 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
           {activeTab === 'account' && (
             <div className="tab-panel">
               <h3 className="section-title">Account Information</h3>
-              <button className="send-message-btn" onClick={handleSendMessage}>
-                📧 Send Message
-              </button>
               <div className="account-info-section">
                 <div className="info-group">
                   <h4>Basic Information</h4>
