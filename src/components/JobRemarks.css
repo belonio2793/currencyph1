@@ -166,14 +166,52 @@
 .remark-header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
   margin-bottom: 10px;
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
 }
 
 .user-badge,
 .lock-badge {
   font-size: 1.2rem;
   flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.user-avatar,
+.user-avatar-fallback {
+  flex-shrink: 0;
+}
+
+.username {
+  color: #667eea;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  text-decoration: underline;
+}
+
+.user-info:hover .username {
+  color: #5568d3;
+  opacity: 0.8;
+}
+
+.user-email {
+  font-size: 0.75rem;
+  color: #999;
+  margin: 0;
 }
 
 .remark-meta {
