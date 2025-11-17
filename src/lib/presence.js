@@ -16,11 +16,11 @@ export function initializePresence(userId) {
   currentUserId = userId
   if (!userId) return
 
-  // Fire-and-forget but handle possible rejection to avoid unhandled promise errors
-  updatePresence('online').catch(err => console.debug('updatePresence initial failed (ignored):', err))
+  // Fire-and-forget; silently ignore all errors since presence is non-critical
+  updatePresence('online').catch(() => {})
 
   presenceIntervalId = setInterval(() => {
-    updatePresence('online').catch(err => console.debug('updatePresence interval failed (ignored):', err))
+    updatePresence('online').catch(() => {})
   }, PRESENCE_UPDATE_INTERVAL)
 
   window.addEventListener('beforeunload', () => {
