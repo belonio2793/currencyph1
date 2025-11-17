@@ -62,7 +62,7 @@ export default function JobCard({ job, onSelect, onApply }) {
         />
       )}
       <div className="job-card" onClick={() => onSelect(job)}>
-        {/* Poster Profile Section */}
+        {/* Poster Profile Section with Action Buttons */}
         {posterProfile && (
           <div className="job-poster-section">
             <div
@@ -85,6 +85,17 @@ export default function JobCard({ job, onSelect, onApply }) {
                 <p className="poster-name">{getDisplayName(posterProfile)}</p>
                 <p className="poster-display-type">{posterProfile.full_name || 'User'}</p>
               </div>
+            </div>
+            <div className="poster-actions">
+              <button
+                className="btn-view-profile-top"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setShowProfileModal(true)
+                }}
+              >
+                View Profile
+              </button>
             </div>
           </div>
         )}
