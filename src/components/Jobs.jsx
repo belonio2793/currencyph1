@@ -345,7 +345,7 @@ export default function Jobs({ userId }) {
       )}
 
       {/* Tab Content */}
-      {activeTab === 'looking-to-hire' ? (
+      {activeTab === 'job-listings' ? (
         <div className="jobs-content">
           {userType === 'job-seeker' && (
             <JobSearch
