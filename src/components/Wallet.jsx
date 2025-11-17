@@ -40,6 +40,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   // Preference states (separate for each table)
   const [enabledInternal, setEnabledInternal] = useState([])
   const [enabledFiat, setEnabledFiat] = useState([])
+  const [enabledCrypto, setEnabledCrypto] = useState([])
 
   // Which preference modal is shown
   const [showPreferencesInternal, setShowPreferencesInternal] = useState(false)
@@ -55,6 +56,13 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
   // Fiat modal state
   const [showFiatModal, setShowFiatModal] = useState(false)
+
+  const convertBalance = (balance, fromCurrency) => {
+    // If same currency as global, return as-is
+    if (fromCurrency === globalCurrency) return balance
+    // Otherwise return the balance as total balance (already converted in parent)
+    return totalBalancePHP
+  }
 
   const fmtErr = (e) => {
     if (!e) return ''
