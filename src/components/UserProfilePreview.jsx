@@ -179,16 +179,31 @@ export default function UserProfilePreview({ userId }) {
       position: 'relative'
     }}>
       <div style={{ maxWidth: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Profile Header */}
-        <div style={{
-          display: 'flex',
-          gap: '16px',
-          alignItems: 'flex-start',
-          marginBottom: '24px',
-          paddingBottom: '20px',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
-          width: '100%'
-        }}>
+        {/* Profile Header - Clickable */}
+        <div
+          onClick={handleViewProfile}
+          style={{
+            display: 'flex',
+            gap: '16px',
+            alignItems: 'flex-start',
+            marginBottom: '24px',
+            paddingBottom: '20px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.2)',
+            width: '100%',
+            cursor: 'pointer',
+            padding: '12px',
+            margin: '-12px -12px 24px -12px',
+            borderRadius: '8px',
+            transition: 'all 0.2s ease',
+            userSelect: 'none'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.08)'
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent'
+          }}
+        >
           <div style={{
             width: '64px',
             height: '64px',
@@ -214,16 +229,43 @@ export default function UserProfilePreview({ userId }) {
             display: 'flex',
             flexDirection: 'column'
           }}>
-            <h2 style={{
-              margin: '0 0 4px 0',
-              fontSize: '1.4rem',
-              fontWeight: '700',
-              color: 'white',
-              wordBreak: 'break-word',
-              lineHeight: '1.2'
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              marginBottom: '4px',
+              flexWrap: 'wrap'
             }}>
-              {userName}
-            </h2>
+              <h2 style={{
+                margin: '0',
+                fontSize: '1.4rem',
+                fontWeight: '700',
+                color: 'white',
+                wordBreak: 'break-word',
+                lineHeight: '1.2'
+              }}>
+                {userName}
+              </h2>
+              {stats.postedJobs > 0 && (
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  color: '#667eea',
+                  padding: '4px 10px',
+                  background: 'rgba(255, 255, 255, 0.95)',
+                  border: '1px solid rgba(255, 255, 255, 0.5)',
+                  borderRadius: '12px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  💼 Employer
+                </span>
+              )}
+            </div>
             <p style={{
               margin: '0 0 6px 0',
               fontSize: '0.9rem',
@@ -233,18 +275,38 @@ export default function UserProfilePreview({ userId }) {
             }}>
               {blurEmail(userProfile.email)}
             </p>
-            <span style={{
-              display: 'inline-block',
-              fontSize: '0.85rem',
-              color: 'rgba(255, 255, 255, 0.9)',
-              padding: '6px 12px',
-              background: 'rgba(255, 255, 255, 0.25)',
-              border: '1px solid rgba(255, 255, 255, 0.3)',
-              borderRadius: '6px',
-              alignSelf: 'flex-start'
+            <div style={{
+              display: 'flex',
+              gap: '10px',
+              flexWrap: 'wrap',
+              alignItems: 'center'
             }}>
-              Member since {stats.memberSince}
-            </span>
+              <span style={{
+                display: 'inline-block',
+                fontSize: '0.85rem',
+                color: 'rgba(255, 255, 255, 0.9)',
+                padding: '6px 12px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                border: '1px solid rgba(255, 255, 255, 0.3)',
+                borderRadius: '6px'
+              }}>
+                Member since {stats.memberSince}
+              </span>
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                fontSize: '0.8rem',
+                color: 'rgba(255, 255, 255, 0.9)',
+                padding: '6px 12px',
+                background: 'rgba(255, 255, 255, 0.15)',
+                border: '1px solid rgba(255, 255, 255, 0.25)',
+                borderRadius: '6px',
+                fontWeight: '500'
+              }}>
+                👁️ Click to view profile
+              </span>
+            </div>
           </div>
 
           <div style={{
@@ -253,32 +315,10 @@ export default function UserProfilePreview({ userId }) {
             flexShrink: 0
           }}>
             <button
-              onClick={handleViewProfile}
-              style={{
-                padding: '10px 16px',
-                backgroundColor: 'rgba(255, 255, 255, 0.25)',
-                color: 'white',
-                border: '1px solid rgba(255, 255, 255, 0.4)',
-                borderRadius: '6px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '0.85rem',
-                transition: 'all 0.2s ease',
-                whiteSpace: 'nowrap'
+              onClick={(e) => {
+                e.stopPropagation()
+                handleSendMessage()
               }}
-              onMouseEnter={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.35)'
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.5)'
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.25)'
-                e.target.style.borderColor = 'rgba(255, 255, 255, 0.4)'
-              }}
-            >
-              👤 View Profile
-            </button>
-            <button
-              onClick={handleSendMessage}
               style={{
                 padding: '10px 16px',
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -298,7 +338,7 @@ export default function UserProfilePreview({ userId }) {
                 e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
               }}
             >
-              💬 Send Message
+              Send Message
             </button>
           </div>
         </div>
