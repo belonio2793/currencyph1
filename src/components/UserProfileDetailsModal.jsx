@@ -201,12 +201,16 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
 
           <div className="profile-info">
             <h2 className="profile-name">{getDisplayName(userProfile)}</h2>
-            <p className="profile-email">{userProfile.email}</p>
+            <p className="profile-email">{blurEmail(userProfile.email)}</p>
             {userProfile.biography && (
               <p className="profile-bio">{userProfile.biography}</p>
             )}
             <p className="profile-member-since">Member since {memberSince}</p>
           </div>
+
+          <button className="send-message-btn" onClick={handleSendMessage}>
+            💬 Send Message
+          </button>
         </div>
 
         {error && (
