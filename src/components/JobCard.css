@@ -334,4 +334,16 @@
     flex-wrap: wrap;
     justify-content: flex-start;
   }
+
+  .job-poster-section {
+    flex-wrap: wrap;
+  }
+
+  .poster-actions {
+    width: 100%;
+  }
+
+  .btn-view-profile-top {
+    width: 100%;
+  }
 }
