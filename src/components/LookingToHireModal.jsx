@@ -480,6 +480,7 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
                 {updatedBusinesses.map(business => (
                   <option key={business.id} value={business.id}>
                     {business.business_name}
+                    {business.currency_registration_number ? ` (${business.currency_registration_number})` : ''}
                   </option>
                 ))}
               </select>
