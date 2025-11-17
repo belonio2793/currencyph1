@@ -613,6 +613,19 @@ export default function Jobs({ userId }) {
           businessId={selectedBusiness?.id}
         />
       )}
+
+      {showEditJobModal && editingJob && (
+        <EditJobModal
+          job={editingJob}
+          onClose={() => {
+            setShowEditJobModal(false)
+            setEditingJob(null)
+          }}
+          onSubmit={handleEditJob}
+          categories={categories}
+          cities={cities}
+        />
+      )}
     </div>
   )
 }
