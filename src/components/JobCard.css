@@ -74,6 +74,30 @@
   text-transform: capitalize;
 }
 
+.poster-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-view-profile-top {
+  padding: 8px 14px;
+  background: #e8eaf6;
+  color: #667eea;
+  border: 1px solid #667eea;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-view-profile-top:hover {
+  background: #667eea;
+  color: white;
+}
+
 .job-card {
   background: white;
   border-radius: 8px;
