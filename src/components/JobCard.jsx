@@ -87,6 +87,7 @@ export default function JobCard({ job, onSelect, onApply }) {
               </div>
             </div>
             <div className="poster-actions">
+              <span className="employer-badge-top">Employer</span>
               <button
                 className="btn-view-profile-top"
                 onClick={(e) => {
