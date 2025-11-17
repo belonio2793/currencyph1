@@ -171,13 +171,13 @@ export default function EnrichmentMonitor() {
         <h3 className="font-semibold text-gray-800 mb-3">Data Fields Complete</h3>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-gray-700">⭐ Ratings</span>
+            <span className="text-gray-700">Ratings</span>
             <span className={`font-semibold ${stats.rated === stats.total ? 'text-green-600' : 'text-gray-600'}`}>
               {stats.rated}/{stats.total}
             </span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-700">📝 Descriptions</span>
+            <span className="text-gray-700">Descriptions</span>
             <span className={`font-semibold ${stats.described === stats.total ? 'text-green-600' : 'text-gray-600'}`}>
               {stats.described}/{stats.total}
             </span>
