@@ -149,15 +149,6 @@ export default function JobCard({ job, onSelect, onApply }) {
 
         <div className="job-card-footer">
           <button
-            className="btn-view-profile"
-            onClick={(e) => {
-              e.stopPropagation()
-              setShowProfileModal(true)
-            }}
-          >
-            View Profile
-          </button>
-          <button
             className="btn-view-details"
             onClick={(e) => {
               e.stopPropagation()
