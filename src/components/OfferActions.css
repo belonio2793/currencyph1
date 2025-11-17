@@ -1,0 +1,108 @@
+.offer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.offer-actions .error-text {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.offer-actions .action-buttons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.offer-actions .btn-accept {
+  padding: 8px 16px;
+  background: #10b981;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.offer-actions .btn-accept:hover:not(:disabled) {
+  background: #059669;
+}
+
+.offer-actions .btn-accept:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.offer-actions .btn-accept:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.offer-actions .btn-reject {
+  padding: 8px 16px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.offer-actions .btn-reject:hover:not(:disabled) {
+  background: #dc2626;
+}
+
+.offer-actions .btn-reject:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.offer-actions .btn-reject:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.offer-actions .status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  width: fit-content;
+}
+
+.offer-actions .status-badge.accepted {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.offer-actions .status-badge.accepted .checkmark {
+  font-weight: 700;
+}
+
+.offer-actions .status-badge.rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.offer-actions .status-badge.rejected .x {
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .offer-actions .action-buttons {
+    flex-direction: column;
+  }
+
+  .offer-actions .btn-accept,
+  .offer-actions .btn-reject {
+    width: 100%;
+  }
+}
