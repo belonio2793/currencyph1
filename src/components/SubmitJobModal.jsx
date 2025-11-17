@@ -83,6 +83,10 @@ export default function SubmitJobModal({
     registrationDate: ''
   })
   const [creatingBusiness, setCreatingBusiness] = useState(false)
+  const [showCityDropdown, setShowCityDropdown] = useState(false)
+  const [citySearchQuery, setCitySearchQuery] = useState('')
+  const [filteredCities, setFilteredCities] = useState([])
+  const cityDropdownRef = useRef(null)
 
   // Generate a unique currency registration number when the modal opens
   useEffect(() => {
