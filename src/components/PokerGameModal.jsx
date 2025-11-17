@@ -234,15 +234,15 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
   function unsubscribeFromRealtime() {
     if (handsUnsubscribeRef.current) {
-      supabase.removeChannel(handsUnsubscribeRef.current)
+      handsUnsubscribeRef.current.unsubscribe()
       handsUnsubscribeRef.current = null
     }
     if (seatsUnsubscribeRef.current) {
-      supabase.removeChannel(seatsUnsubscribeRef.current)
+      seatsUnsubscribeRef.current.unsubscribe()
       seatsUnsubscribeRef.current = null
     }
     if (betsUnsubscribeRef.current) {
-      supabase.removeChannel(betsUnsubscribeRef.current)
+      betsUnsubscribeRef.current.unsubscribe()
       betsUnsubscribeRef.current = null
     }
   }

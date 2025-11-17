@@ -14,7 +14,7 @@ export default function GameChat({ tableId, userId }) {
     
     return () => {
       if (unsubscribeRef.current) {
-        supabase.removeChannel(unsubscribeRef.current)
+        unsubscribeRef.current.unsubscribe()
       }
     }
   }, [tableId])

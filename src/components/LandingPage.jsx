@@ -423,7 +423,7 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
 
     return () => {
       try {
-        supabase.removeChannel(channel)
+        channel.unsubscribe()
       } catch (e) {
         // ignore
       }

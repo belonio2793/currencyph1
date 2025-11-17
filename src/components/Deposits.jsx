@@ -355,7 +355,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
 
     return () => {
       try {
-        supabase.removeChannel(channel)
+        channel.unsubscribe()
       } catch (e) {}
       try { window.removeEventListener('unhandledrejection', unhandledRejectionHandler) } catch (e) {}
     }
