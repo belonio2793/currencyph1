@@ -228,20 +228,32 @@ export default function SubmitJobModal({
   }
 
   const handleFetchCurrentLocation = () => {
-    if (userLocation && userLocation.latitude && userLocation.longitude && !geoLoading) {
-      const coords = [userLocation.latitude, userLocation.longitude]
-      setMapLocation(coords)
-      setFormData(prev => ({
-        ...prev,
-        latitude: userLocation.latitude,
-        longitude: userLocation.longitude,
-        city: `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}`
-      }))
+    setFetchingLocation(true)
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          const coords = [latitude, longitude]
+          setMapLocation(coords)
+          setFormData(prev => ({
+            ...prev,
+            latitude: latitude,
+            longitude: longitude,
+            city: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`
+          }))
+          setFetchingLocation(false)
+        },
+        (err) => {
+          console.error('Geolocation error:', err)
+          setError(`Location error: ${err.message}`)
+          setFetchingLocation(false)
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      )
     } else {
-      setFetchingLocation(true)
-      try {
-        window.dispatchEvent(new Event('geolocation:refresh'))
-      } catch (e) {}
+      setError('Geolocation is not supported by your browser')
+      setFetchingLocation(false)
     }
   }
 
