@@ -4,7 +4,6 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import { useGeolocation } from '../lib/useGeolocation'
-import AddBusinessModal from './AddBusinessModal'
 import './PostJobModal.css'
 
 // Fix Leaflet icon issues
@@ -76,15 +75,64 @@ export default function SubmitJobModal({
   const [skillInput, setSkillInput] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [businessFormData, setBusinessFormData] = useState({
+    businessName: '',
+    registrationType: 'sole',
+    tin: '',
+    currencyRegistrationNumber: '',
+    cityOfRegistration: '',
+    registrationDate: ''
+  })
+  const [creatingBusiness, setCreatingBusiness] = useState(false)
 
-  const handleBusinessCreated = (newBusiness) => {
-    const updatedList = [...updatedBusinesses, newBusiness]
-    setUpdatedBusinesses(updatedList)
-    setFormData({
-      ...formData,
-      business_id: newBusiness.id
-    })
-    setShowAddBusinessModal(false)
+  const handleCreateBusiness = async (e) => {
+    e.preventDefault()
+    if (!businessFormData.businessName.trim()) {
+      setError('Business name is required')
+      return
+    }
+
+    setCreatingBusiness(true)
+    try {
+      const { data, error: dbError } = await supabase
+        .from('businesses')
+        .insert([{
+          user_id: userId,
+          business_name: businessFormData.businessName,
+          registration_type: businessFormData.registrationType,
+          tin: businessFormData.tin || null,
+          currency_registration_number: businessFormData.currencyRegistrationNumber,
+          city_of_registration: businessFormData.cityOfRegistration,
+          registration_date: businessFormData.registrationDate || null,
+          status: 'active'
+        }])
+        .select()
+
+      if (dbError) throw dbError
+
+      const newBusiness = data[0]
+      const updatedList = [...updatedBusinesses, newBusiness]
+      setUpdatedBusinesses(updatedList)
+      setFormData({
+        ...formData,
+        business_id: newBusiness.id
+      })
+      setShowAddBusinessModal(false)
+      setBusinessFormData({
+        businessName: '',
+        registrationType: 'sole',
+        tin: '',
+        currencyRegistrationNumber: '',
+        cityOfRegistration: '',
+        registrationDate: ''
+      })
+      setError('')
+    } catch (err) {
+      console.error('Error creating business:', err)
+      setError(`Failed to create business: ${err.message}`)
+    } finally {
+      setCreatingBusiness(false)
+    }
   }
 
   // Load existing job titles for suggestions
