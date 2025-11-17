@@ -154,6 +154,79 @@ export const jobsService = {
     return data?.[0]
   },
 
+  // Soft delete a job (marks as deleted but keeps record for history/reputation)
+  async softDeleteJob(jobId) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .update({
+        deleted_at: new Date().toISOString(),
+        status: 'deleted'
+      })
+      .eq('id', jobId)
+      .select()
+
+    if (error) throw error
+    return data?.[0]
+  },
+
+  // Get jobs by posting type (service_offer or service_request)
+  async getJobsByType(postingType, filters = {}) {
+    let query = supabase
+      .from('jobs')
+      .select(`
+        *,
+        job_offers (
+          id,
+          status,
+          service_provider_id,
+          provider_name,
+          offered_rate
+        ),
+        job_ratings (
+          id,
+          rating_score,
+          review_text
+        )
+      `)
+      .eq('posting_type', postingType)
+      .eq('status', 'active')
+      .eq('is_public', true)
+      .is('deleted_at', null)
+      .order('created_at', { ascending: false })
+
+    // Apply filters
+    if (filters.category) query = query.eq('job_category', filters.category)
+    if (filters.city) query = query.eq('city', filters.city)
+    if (filters.search) {
+      query = query.or(`job_title.ilike.%${filters.search}%,job_description.ilike.%${filters.search}%`)
+    }
+
+    const { data, error } = await query
+    if (error) throw error
+    return data || []
+  },
+
+  // Get user's job history (including deleted jobs for reputation)
+  async getUserJobHistory(userId) {
+    const { data, error } = await supabase
+      .from('jobs')
+      .select(`
+        *,
+        job_offers (count),
+        job_ratings (
+          id,
+          rating_score,
+          review_text,
+          reviewer_name
+        )
+      `)
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
+  },
+
   // Search jobs with full text search
   async searchJobs(searchTerm, filters = {}) {
     let query = supabase
