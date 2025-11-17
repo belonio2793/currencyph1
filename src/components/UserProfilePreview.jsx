@@ -45,7 +45,7 @@ export default function UserProfilePreview({ userId }) {
     }
   }
 
-  const loadUserStats = async (uid) => {
+  const loadUserStats = async (uid, createdAt) => {
     try {
       const [
         { count: postedCount },
@@ -87,6 +87,8 @@ export default function UserProfilePreview({ userId }) {
         ? jobHistory.reduce((sum, h) => sum + (h.final_amount_paid || 0), 0)
         : 0
 
+      const memberDate = createdAt ? new Date(createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'
+
       setStats({
         postedJobs: postedCount || 0,
         acceptedOffers: acceptedCount || 0,
@@ -94,7 +96,7 @@ export default function UserProfilePreview({ userId }) {
         averageRating: avgRating,
         totalRatings: ratings?.length || 0,
         totalEarnings: totalEarnings || 0,
-        memberSince: new Date(userProfile?.created_at).toLocaleDateString()
+        memberSince: memberDate
       })
     } catch (err) {
       console.error('Error loading user stats:', err)
