@@ -404,6 +404,7 @@ export default function ChatBar({ userId, userEmail }) {
   const handleDrop = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    setIsDraggingOver(false)
     e.currentTarget.style.backgroundColor = 'white'
 
     if (!selectedConversation?.id) {
