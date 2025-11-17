@@ -38,8 +38,14 @@ export const currencyAPI = {
       const OPEN_KEY = (typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_OPEN_EXCHANGE_RATES_API || import.meta.env.OPEN_EXCHANGE_RATES_API)) || (typeof process !== 'undefined' && (process.env.VITE_OPEN_EXCHANGE_RATES_API || process.env.OPEN_EXCHANGE_RATES_API)) || null
       if (OPEN_KEY) {
         try {
+          const controller = new AbortController()
+          const timeout = setTimeout(() => controller.abort(), 5000)
           const url = `https://openexchangerates.org/api/latest.json?app_id=${OPEN_KEY}`
-          const resp = await fetch(url, { headers: { Accept: 'application/json' } })
+          const resp = await fetch(url, {
+            headers: { Accept: 'application/json' },
+            signal: controller.signal
+          })
+          clearTimeout(timeout)
           if (resp && resp.ok) {
             const json = await resp.json()
             const ratesData = json && json.rates ? json.rates : null
