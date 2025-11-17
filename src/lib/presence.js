@@ -115,7 +115,8 @@ export async function getUserPresence(userId) {
 
     return data.status || 'offline'
   } catch (err) {
-    console.warn('Get presence error:', err)
+    // Silently return offline state on any error (table missing, network issues, etc.)
+    console.debug('[presence] getUserPresence failed, returning offline:', err?.message)
     return 'offline'
   }
 }
