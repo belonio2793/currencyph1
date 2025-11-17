@@ -137,7 +137,7 @@ export default function UserProfilePreview({ userId }) {
         {/* Stats Grid */}
         <div className="profile-stats">
           <div className="stat-box">
-            <div className="stat-icon">📋</div>
+            <div className="stat-icon" data-icon="briefcase"></div>
             <div className="stat-data">
               <div className="stat-value">{stats.postedJobs}</div>
               <div className="stat-label">Jobs Posted</div>
@@ -145,7 +145,7 @@ export default function UserProfilePreview({ userId }) {
           </div>
 
           <div className="stat-box">
-            <div className="stat-icon">✅</div>
+            <div className="stat-icon" data-icon="check"></div>
             <div className="stat-data">
               <div className="stat-value">{stats.acceptedOffers}</div>
               <div className="stat-label">Accepted Offers</div>
@@ -153,7 +153,7 @@ export default function UserProfilePreview({ userId }) {
           </div>
 
           <div className="stat-box">
-            <div className="stat-icon">🏆</div>
+            <div className="stat-icon" data-icon="trophy"></div>
             <div className="stat-data">
               <div className="stat-value">{stats.completedJobs}</div>
               <div className="stat-label">Completed</div>
@@ -162,7 +162,7 @@ export default function UserProfilePreview({ userId }) {
 
           {stats.totalRatings > 0 && (
             <div className="stat-box">
-              <div className="stat-icon">⭐</div>
+              <div className="stat-icon" data-icon="star"></div>
               <div className="stat-data">
                 <div className="stat-value">{stats.averageRating}</div>
                 <div className="stat-label">Rating ({stats.totalRatings})</div>
@@ -172,7 +172,7 @@ export default function UserProfilePreview({ userId }) {
 
           {stats.totalEarnings > 0 && (
             <div className="stat-box">
-              <div className="stat-icon">💰</div>
+              <div className="stat-icon" data-icon="currency"></div>
               <div className="stat-data">
                 <div className="stat-value">₱{stats.totalEarnings.toFixed(0)}</div>
                 <div className="stat-label">Total Earnings</div>
