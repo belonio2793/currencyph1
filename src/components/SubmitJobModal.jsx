@@ -330,8 +330,11 @@ export default function SubmitJobModal({
     try {
       await onSubmit({
         ...formData,
+        posting_type: 'service_offer',
         skills_required: JSON.stringify(formData.skills_required),
-        equipment_required: JSON.stringify(equipment)
+        equipment_required: JSON.stringify(equipment),
+        latitude: locationMode === 'location' ? formData.latitude : null,
+        longitude: locationMode === 'location' ? formData.longitude : null
       })
     } catch (err) {
       console.error('Error submitting job:', err)
