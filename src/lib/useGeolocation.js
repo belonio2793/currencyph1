@@ -46,13 +46,13 @@ export function useGeolocation() {
 
                   try {
                     const resp = await fetch(url, { signal: controller.signal })
-                    if (timedOut) return
+                    if (timedOut || !isMountedRef.current) return
                     clearTimeout(timeoutId)
 
                     if (resp?.ok && isMountedRef.current) {
                       try {
                         const data = await resp.json()
-                        if (data?.features?.[0]?.properties) {
+                        if (isMountedRef.current && data?.features?.[0]?.properties) {
                           const props = data.features[0].properties
                           setCity(props.city || props.town || props.village || props.county || props.state || null)
                           return true
@@ -63,8 +63,8 @@ export function useGeolocation() {
                     if (!timedOut) {
                       clearTimeout(timeoutId)
                     }
-                    if (fetchErr?.name === 'AbortError' && !timedOut) {
-                      // Unexpected abort, silently ignore
+                    if (fetchErr?.name === 'AbortError') {
+                      // Silently ignore abort errors (timeout or cleanup)
                     }
                   }
                 } catch (e) {
