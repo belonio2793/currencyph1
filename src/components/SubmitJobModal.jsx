@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import './PostJobModal.css'
 
 // Fix Leaflet icon issues
@@ -83,10 +82,6 @@ export default function SubmitJobModal({
     registrationDate: ''
   })
   const [creatingBusiness, setCreatingBusiness] = useState(false)
-  const [showCityDropdown, setShowCityDropdown] = useState(false)
-  const [citySearchQuery, setCitySearchQuery] = useState('')
-  const [filteredCities, setFilteredCities] = useState([])
-  const cityDropdownRef = useRef(null)
 
   // Generate a unique currency registration number when the modal opens
   useEffect(() => {
@@ -101,21 +96,6 @@ export default function SubmitJobModal({
       }))
     }
   }, [showAddBusinessModal])
-
-  useEffect(() => {
-    setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
-  }, [])
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target)) {
-        setShowCityDropdown(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
 
   const handleCreateBusiness = async (e) => {
     e.preventDefault()
@@ -260,26 +240,6 @@ export default function SubmitJobModal({
       ...formData,
       skills_required: formData.skills_required.filter(s => s !== skill)
     })
-  }
-
-  const handleCitySearch = (value) => {
-    setCitySearchQuery(value)
-    if (value.trim()) {
-      const filtered = searchCities(value)
-      setFilteredCities(filtered)
-    } else {
-      setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
-    }
-  }
-
-  const handleCitySelect = (city) => {
-    setFormData({
-      ...formData,
-      city: city
-    })
-    setCitySearchQuery(city)
-    setShowCityDropdown(false)
-    setFilteredCities([city])
   }
 
   const handleLocationSelect = (coords) => {
@@ -682,7 +642,6 @@ export default function SubmitJobModal({
                   </div>
                 </div>
 
-                {/* Location Info Messages */}
                 <div style={{
                   padding: '12px 15px',
                   backgroundColor: '#e3f2fd',
@@ -716,61 +675,10 @@ export default function SubmitJobModal({
                 </p>
               </div>
               )}
-
-              <div className="form-row">
-                <div className="form-group" ref={cityDropdownRef} style={{ position: 'relative' }}>
-                  <label htmlFor="city-search">City</label>
-                  <input
-                    id="city-search"
-                    type="text"
-                    value={citySearchQuery}
-                    onChange={(e) => handleCitySearch(e.target.value)}
-                    onFocus={() => setShowCityDropdown(true)}
-                    placeholder="Type to search cities..."
-                    style={{ width: '100%' }}
-                  />
-                  {showCityDropdown && filteredCities.length > 0 && (
-                    <div style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      backgroundColor: 'white',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      maxHeight: '200px',
-                      overflowY: 'auto',
-                      zIndex: 1000,
-                      marginTop: '2px',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-                    }}>
-                      {filteredCities.map((city, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => handleCitySelect(city)}
-                          style={{
-                            padding: '8px 12px',
-                            cursor: 'pointer',
-                            borderBottom: '1px solid #eee',
-                            backgroundColor: city === formData.city ? '#f0f0f0' : 'white',
-                            ':hover': {
-                              backgroundColor: '#f5f5f5'
-                            }
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = city === formData.city ? '#f0f0f0' : 'white'}
-                        >
-                          {city}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="location">Other Location Details</label>
+              <label htmlFor="location">Detailed Location</label>
               <input
                 id="location"
                 type="text"
