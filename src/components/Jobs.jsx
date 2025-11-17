@@ -8,6 +8,7 @@ import SubmitJobModal from './SubmitJobModal'
 import LookingToHireModal from './LookingToHireModal'
 import JobDetailsModal from './JobDetailsModal'
 import SelectBusinessModal from './SelectBusinessModal'
+import UserProfilePreview from './UserProfilePreview'
 import './Jobs.css'
 
 export default function Jobs({ userId }) {
