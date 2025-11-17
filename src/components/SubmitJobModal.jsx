@@ -470,6 +470,7 @@ export default function SubmitJobModal({
               )}
             </div>
 
+            {formData.job_type !== 'remote' && (
             <div className="form-group">
               <label>Job Location *</label>
               <div style={{ height: '300px', borderRadius: '6px', overflow: 'hidden', marginBottom: '15px', border: '1px solid #e0e0e0' }}>
@@ -551,6 +552,7 @@ export default function SubmitJobModal({
                 </p>
               </div>
             </div>
+            )}
 
             <div className="form-group">
               <label htmlFor="location">Other Location Details</label>
