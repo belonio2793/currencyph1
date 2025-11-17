@@ -386,6 +386,34 @@ export default function ChatBar({ userId, userEmail }) {
     }
   }
 
+  const handleDragOver = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.style.backgroundColor = 'rgba(59, 130, 246, 0.1)'
+  }
+
+  const handleDragLeave = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.style.backgroundColor = 'white'
+  }
+
+  const handleDrop = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.currentTarget.style.backgroundColor = 'white'
+
+    if (!selectedConversation?.id) {
+      alert('Please open a chat first')
+      return
+    }
+
+    const files = e.dataTransfer.files
+    if (files?.length > 0) {
+      handleMediaUpload(files[0])
+    }
+  }
+
   const handleMediaUpload = async (file) => {
     if (!file || !selectedConversation?.id || !userId) return
 
