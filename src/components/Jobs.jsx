@@ -361,13 +361,13 @@ export default function Jobs({ userId }) {
           ) : jobs.length === 0 ? (
             <div className="empty-state">
               <h3>
-                {userType === 'employer' 
-                  ? 'No jobs posted yet' 
+                {userType === 'employer'
+                  ? 'No jobs posted yet'
                   : 'No jobs found'}
               </h3>
               <p>
-                {userType === 'employer' 
-                  ? 'Create your first job posting to start finding service providers' 
+                {userType === 'employer'
+                  ? 'Create your first job posting to start finding service providers'
                   : 'Try adjusting your search filters'}
               </p>
               {userType === 'job-seeker' && (
@@ -392,26 +392,26 @@ export default function Jobs({ userId }) {
             </div>
           )}
         </div>
-      ) : (
+      ) : activeTab === 'offers-received' ? (
         <div className="offers-content">
           {loading ? (
             <div className="loading">Loading offers...</div>
           ) : offers.length === 0 ? (
             <div className="empty-state">
               <h3>
-                {userType === 'employer' 
-                  ? 'No offers received yet' 
+                {userType === 'employer'
+                  ? 'No offers received yet'
                   : 'No offers submitted yet'}
               </h3>
               <p>
-                {userType === 'employer' 
-                  ? 'Offers will appear here when people apply for your jobs' 
+                {userType === 'employer'
+                  ? 'Offers will appear here when people apply for your jobs'
                   : 'Browse available jobs and submit your offers'}
               </p>
               {userType === 'job-seeker' && (
                 <button
                   className="btn-primary"
-                  onClick={() => setActiveTab('looking-to-hire')}
+                  onClick={() => setActiveTab('job-listings')}
                 >
                   Browse Jobs
                 </button>
@@ -441,6 +441,83 @@ export default function Jobs({ userId }) {
                       onClick={() => handleJobSelect(offer.jobs)}
                     >
                       View Details
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="my-jobs-content">
+          {loading ? (
+            <div className="loading">Loading your jobs...</div>
+          ) : userJobs.length === 0 ? (
+            <div className="empty-state">
+              <h3>No jobs posted yet</h3>
+              <p>Start by posting your first job to connect with service providers</p>
+              <button
+                className="btn-primary"
+                onClick={() => setShowSubmitModal(true)}
+              >
+                Post a Job
+              </button>
+            </div>
+          ) : (
+            <div className="user-jobs-list">
+              {userJobs.map(job => (
+                <div key={job.id} className="user-job-card">
+                  <div className="job-card-header">
+                    <div className="job-title-section">
+                      <h3>{job.job_title}</h3>
+                      <p className="job-category">{job.job_category}</p>
+                    </div>
+                    <div className="job-status-section">
+                      <span className={`job-status ${job.status}`}>{job.status}</span>
+                      {job.job_offers && job.job_offers.length > 0 && (
+                        <span className="offer-count">{job.job_offers.length} offer{job.job_offers.length !== 1 ? 's' : ''}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="job-card-details">
+                    <div className="detail-item">
+                      <span className="label">Rate:</span>
+                      <span className="value">₱{job.pay_rate?.toFixed(2)}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Type:</span>
+                      <span className="value">{job.job_type}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Location:</span>
+                      <span className="value">{job.city || job.location}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Posted:</span>
+                      <span className="value">{new Date(job.created_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+
+                  <div className="job-description">
+                    <p>{job.job_description}</p>
+                  </div>
+
+                  <div className="job-card-actions">
+                    <button
+                      className="btn-secondary"
+                      onClick={() => handleJobSelect(job)}
+                    >
+                      View Details
+                    </button>
+                    <button
+                      className="btn-edit"
+                      onClick={() => {
+                        setSelectedJob(job)
+                        setShowJobDetails(true)
+                      }}
+                    >
+                      Edit
                     </button>
                   </div>
                 </div>
