@@ -24,6 +24,7 @@ export default function ChatBar({ userId, userEmail }) {
   const [recordingVoice, setRecordingVoice] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [presenceUnsubscribe, setPresenceUnsubscribe] = useState(null)
+  const [isDraggingOver, setIsDraggingOver] = useState(false)
   const messageListRef = useRef(null)
   const subRef = useRef(null)
   const typingTimeoutRef = useRef(null)
