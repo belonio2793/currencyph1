@@ -40,7 +40,7 @@ const COUNTRIES = [
   { code: 'IN', name: 'India', flag: '🇮🇳' },
   { code: 'BR', name: 'Brazil', flag: '🇧����' },
   { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
-  { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+  { code: 'ZA', name: 'South Africa', flag: '���🇦' },
   { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
   { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
   { code: 'TW', name: 'Taiwan', flag: '🇹🇼' }
@@ -663,7 +663,7 @@ export default function Profile({ userId, onSignOut }) {
                 </div>
 
                 <button type="submit" className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">Save Changes</button>
-                {success && (<div className="mt-3 text-sm text-emerald-700" role="status" aria-live="polite">{success}</div>)}
+                {success && (<div className="mt-4 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm" role="status" aria-live="polite">{success}</div>)}
               </form>
             ) : (
               <div className="space-y-6">
