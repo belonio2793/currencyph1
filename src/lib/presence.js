@@ -140,7 +140,7 @@ export async function subscribeToUserPresence(userId, callback) {
       .subscribe()
 
     return () => {
-      try { supabase.removeChannel(channel) } catch (e) { /* silently ignore */ }
+      try { channel.unsubscribe() } catch (e) { /* silently ignore */ }
     }
   } catch (err) {
     // Silently ignore subscription errors (table may not exist, network issues, etc.)
@@ -171,7 +171,7 @@ export async function subscribeToMultiplePresence(userIds, callback) {
 
     return () => {
       channels.forEach(channel => {
-        try { supabase.removeChannel(channel) } catch (e) { /* silently ignore */ }
+        try { channel.unsubscribe() } catch (e) { /* silently ignore */ }
       })
     }
   } catch (err) {

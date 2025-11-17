@@ -122,7 +122,7 @@ export async function subscribeToIncomingCalls(userId, onIncomingCall) {
     })
     .subscribe()
 
-  return () => supabase.removeChannel(channel)
+  return () => channel.unsubscribe()
 }
 
 export async function subscribeToCallUpdates(callId, onUpdate) {
@@ -138,5 +138,5 @@ export async function subscribeToCallUpdates(callId, onUpdate) {
     })
     .subscribe()
 
-  return () => supabase.removeChannel(channel)
+  return () => channel.unsubscribe()
 }
