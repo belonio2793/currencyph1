@@ -669,6 +669,21 @@ export default function Jobs({ userId }) {
         />
       )}
 
+      {showApplyConfirmation && jobToApplyFor && (
+        <ApplyConfirmationModal
+          job={jobToApplyFor}
+          onClose={() => {
+            setShowApplyConfirmation(false)
+            setJobToApplyFor(null)
+          }}
+          onAccept={() => {
+            setShowApplyConfirmation(false)
+            setSelectedJob(jobToApplyFor)
+            setShowJobDetails(true)
+          }}
+        />
+      )}
+
       {showJobDetails && selectedJob && (
         <JobDetailsModal
           job={selectedJob}
