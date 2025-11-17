@@ -45,7 +45,7 @@ export default function SubmitJobModal({
   const [equipmentInput, setEquipmentInput] = useState('')
   const [fetchingLocation, setFetchingLocation] = useState(false)
   const [showAddBusinessModal, setShowAddBusinessModal] = useState(false)
-  const [updatedBusinesses, setUpdatedBusinesses] = useState(userBusinesses)
+  const [updatedBusinesses, setUpdatedBusinesses] = useState([])
 
   const [formData, setFormData] = useState({
     job_title: '',
