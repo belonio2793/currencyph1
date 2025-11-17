@@ -84,7 +84,7 @@
     "seed-currency-rates": "node scripts/seed-currency-rates.js",
     "populate-cryptos-and-rates": "node scripts/populate-cryptos-and-rates.js",
     "seed-all-rates": "npm run seed-currency-rates && npm run populate-cryptos-and-rates"
-    },
+  },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
     "@noble/hashes": "^2.0.1",
@@ -93,13 +93,14 @@
     "@supabase/supabase-js": "^2.38.0",
     "@thirdweb-dev/sdk": "^4.0.99",
     "@walletconnect/ethereum-provider": "^2.15.0",
-    "@walletconnect/modal": "^3.1.0",
+    "@walletconnect/modal": "^2.7.0",
     "@walletconnect/sign-client": "^2.15.0",
     "@walletconnect/universal-provider": "^2.15.0",
     "bs58": "^6.0.0",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
+    "ethers": "^6.8.0",
     "express": "^4.18.2",
     "jspdf": "^3.0.3",
     "leaflet": "^1.9.4",
@@ -109,7 +110,6 @@
     "react-dom": "^18.2.0",
     "react-leaflet": "^4.2.1",
     "three": "^0.156.0",
-    "ethers": "^6.8.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
