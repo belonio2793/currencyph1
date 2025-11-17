@@ -29,6 +29,8 @@ export default function Jobs({ userId }) {
   const [showSelectBusiness, setShowSelectBusiness] = useState(false)
   const [selectedJob, setSelectedJob] = useState(null)
   const [showJobDetails, setShowJobDetails] = useState(false)
+  const [showEditJobModal, setShowEditJobModal] = useState(false)
+  const [editingJob, setEditingJob] = useState(null)
   const [categories, setCategories] = useState([])
   const [cities, setCities] = useState([])
   const [stats, setStats] = useState({
