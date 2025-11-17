@@ -505,7 +505,6 @@ export default function Profile({ userId, onSignOut }) {
     <div className="max-w-7xl mx-auto px-6 py-6">
       <h2 className="text-3xl font-light text-slate-900 mb-6 tracking-tight">Profile</h2>
 
-      {error && <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">{error}</div>}
       {isGuestAccount && !isValidUUID(userId) && (<div className="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-lg text-sm">You are logged in as a guest. Create an account to save profile changes and access more features.</div>)}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
