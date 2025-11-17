@@ -69,12 +69,43 @@ export default function EditJobModal({
     }
   }, [job])
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target)) {
+        setShowCityDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData({
       ...formData,
       [name]: value
     })
+  }
+
+  const handleCitySearch = (value) => {
+    setCitySearchQuery(value)
+    if (value.trim()) {
+      const filtered = searchCities(value)
+      setFilteredCities(filtered)
+    } else {
+      setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
+    }
+  }
+
+  const handleCitySelect = (city) => {
+    setFormData({
+      ...formData,
+      city: city
+    })
+    setCitySearchQuery(city)
+    setShowCityDropdown(false)
+    setFilteredCities([city])
   }
 
   const handleAddSkill = () => {
