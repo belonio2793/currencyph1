@@ -474,11 +474,11 @@ export default function SubmitJobModal({
                 <button
                   type="button"
                   onClick={handleFetchCurrentLocation}
-                  disabled={geoLoading || fetchingLocation}
+                  disabled={fetchingLocation}
                   className="btn-add-skill"
                   style={{ whiteSpace: 'nowrap', padding: '8px 16px', fontSize: '0.85rem' }}
                 >
-                  {geoLoading || fetchingLocation ? 'Fetching...' : 'Fetch Location'}
+                  {fetchingLocation ? 'Fetching...' : 'Fetch Location'}
                 </button>
               </div>
 
