@@ -49,6 +49,11 @@ export default function ApplyConfirmationModal({
       return
     }
 
+    if (!offerMessage.trim()) {
+      setError('Please enter a message for your application')
+      return
+    }
+
     setLoading(true)
     setError('')
 
@@ -62,7 +67,7 @@ export default function ApplyConfirmationModal({
         provider_phone: userProfile.phone_number || '',
         provider_description: '',
         offered_rate: job.pay_rate,
-        offer_message: `I am interested in this ${job.job_title} position and am ready to start immediately.`,
+        offer_message: offerMessage,
         status: 'pending'
       })
 
