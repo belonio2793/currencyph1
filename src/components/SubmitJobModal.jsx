@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import { useGeolocation } from '../lib/useGeolocation'
+import AddBusinessModal from './AddBusinessModal'
 import './PostJobModal.css'
 
 // Fix Leaflet icon issues
@@ -46,6 +47,8 @@ export default function SubmitJobModal({
   const [equipment, setEquipment] = useState([])
   const [equipmentInput, setEquipmentInput] = useState('')
   const [fetchingLocation, setFetchingLocation] = useState(false)
+  const [showAddBusinessModal, setShowAddBusinessModal] = useState(false)
+  const [updatedBusinesses, setUpdatedBusinesses] = useState(userBusinesses)
 
   const [formData, setFormData] = useState({
     job_title: '',
@@ -73,6 +76,16 @@ export default function SubmitJobModal({
   const [skillInput, setSkillInput] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const handleBusinessCreated = (newBusiness) => {
+    const updatedList = [...updatedBusinesses, newBusiness]
+    setUpdatedBusinesses(updatedList)
+    setFormData({
+      ...formData,
+      business_id: newBusiness.id
+    })
+    setShowAddBusinessModal(false)
+  }
 
   // Load existing job titles for suggestions
   useEffect(() => {
