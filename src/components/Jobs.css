@@ -140,6 +140,18 @@
   border-bottom-color: #667eea;
 }
 
+.tab-badge {
+  display: inline-block;
+  margin-left: 6px;
+  background: #667eea;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
 /* Content */
 .jobs-content,
 .offers-content {
