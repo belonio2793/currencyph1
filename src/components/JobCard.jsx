@@ -42,17 +42,17 @@ export default function JobCard({ job, onSelect, onApply }) {
 
       <div className="job-stats">
         <div className="stat">
-          <span className="icon">👥</span>
-          <span className="text">{offersCount} offers</span>
+          <span className="label">Offers:</span>
+          <span className="text">{offersCount}</span>
         </div>
         {job.job_ratings && job.job_ratings.length > 0 && (
           <div className="stat">
-            <span className="icon">⭐</span>
-            <span className="text">{averageRating} ({job.job_ratings.length} reviews)</span>
+            <span className="label">Rating:</span>
+            <span className="text">{averageRating} ({job.job_ratings.length})</span>
           </div>
         )}
         <div className="stat">
-          <span className="icon">📅</span>
+          <span className="label">Posted:</span>
           <span className="text">{new Date(job.created_at).toLocaleDateString()}</span>
         </div>
       </div>

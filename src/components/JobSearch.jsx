@@ -128,7 +128,7 @@ export default function JobSearch({ onFilterChange, categories = [], cities = []
               className="search-input"
             />
             <button type="submit" className="search-btn">
-              🔍
+              Search
             </button>
 
             {/* Autocomplete Suggestions */}
