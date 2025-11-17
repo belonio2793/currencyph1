@@ -471,89 +471,147 @@ export default function SubmitJobModal({
               )}
             </div>
 
-            {formData.job_type !== 'remote' && (
             <div className="form-group">
-              <label>Job Location *</label>
-              <div style={{ height: '300px', borderRadius: '6px', overflow: 'hidden', marginBottom: '15px', border: '1px solid #e0e0e0' }}>
-                <MapContainer
-                  ref={mapRef}
-                  center={mapLocation}
-                  zoom={12}
-                  style={{ height: '100%', width: '100%' }}
-                  attributionControl={false}
-                >
-                  <TileLayer
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
-                </MapContainer>
-              </div>
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center' }}>
-                <p style={{ color: '#666', margin: 0, fontSize: '0.85rem', flex: 1 }}>Click on the map to select a location</p>
+              <label>Job Location Type *</label>
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '15px' }}>
                 <button
                   type="button"
-                  onClick={handleFetchCurrentLocation}
-                  disabled={fetchingLocation}
-                  className="btn-add-skill"
-                  style={{ whiteSpace: 'nowrap', padding: '8px 16px', fontSize: '0.85rem' }}
+                  onClick={() => setLocationMode('location')}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    border: locationMode === 'location' ? '2px solid #667eea' : '1px solid #e0e0e0',
+                    backgroundColor: locationMode === 'location' ? '#f0f4ff' : '#f5f5f5',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: locationMode === 'location' ? '600' : '500',
+                    color: locationMode === 'location' ? '#667eea' : '#666',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s ease'
+                  }}
                 >
-                  {fetchingLocation ? 'Fetching...' : 'Fetch Location'}
+                  📍 Specific Location
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLocationMode('remote')}
+                  style={{
+                    flex: 1,
+                    padding: '12px 16px',
+                    border: locationMode === 'remote' ? '2px solid #667eea' : '1px solid #e0e0e0',
+                    backgroundColor: locationMode === 'remote' ? '#f0f4ff' : '#f5f5f5',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: locationMode === 'remote' ? '600' : '500',
+                    color: locationMode === 'remote' ? '#667eea' : '#666',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  🌐 Remote
                 </button>
               </div>
 
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="latitude">Latitude *</label>
-                  <input
-                    id="latitude"
-                    type="number"
-                    name="latitude"
-                    value={formData.latitude}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      latitude: parseFloat(e.target.value) || 0
-                    })}
-                    placeholder="12.500000"
-                    step="0.000001"
-                    required
-                  />
+              {locationMode === 'location' && (
+              <div>
+                <div style={{ height: '300px', borderRadius: '6px', overflow: 'hidden', marginBottom: '15px', border: '1px solid #e0e0e0' }}>
+                  <MapContainer
+                    ref={mapRef}
+                    center={mapLocation}
+                    zoom={12}
+                    style={{ height: '100%', width: '100%' }}
+                    attributionControl={false}
+                  >
+                    <TileLayer
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <LocationMarker onLocationSelect={handleLocationSelect} initialPosition={mapLocation} />
+                  </MapContainer>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '15px', alignItems: 'center' }}>
+                  <p style={{ color: '#666', margin: 0, fontSize: '0.85rem', flex: 1 }}>Click on the map to select a location</p>
+                  <button
+                    type="button"
+                    onClick={handleFetchCurrentLocation}
+                    disabled={fetchingLocation}
+                    className="btn-add-skill"
+                    style={{ whiteSpace: 'nowrap', padding: '8px 16px', fontSize: '0.85rem' }}
+                  >
+                    {fetchingLocation ? 'Fetching...' : 'Fetch Location'}
+                  </button>
                 </div>
 
-                <div className="form-group">
-                  <label htmlFor="longitude">Longitude *</label>
-                  <input
-                    id="longitude"
-                    type="number"
-                    name="longitude"
-                    value={formData.longitude}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      longitude: parseFloat(e.target.value) || 0
-                    })}
-                    placeholder="121.500000"
-                    step="0.000001"
-                    required
-                  />
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="latitude">Latitude *</label>
+                    <input
+                      id="latitude"
+                      type="number"
+                      name="latitude"
+                      value={formData.latitude}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        latitude: parseFloat(e.target.value) || 0
+                      })}
+                      placeholder="12.500000"
+                      step="0.000001"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label htmlFor="longitude">Longitude *</label>
+                    <input
+                      id="longitude"
+                      type="number"
+                      name="longitude"
+                      value={formData.longitude}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        longitude: parseFloat(e.target.value) || 0
+                      })}
+                      placeholder="121.500000"
+                      step="0.000001"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Location Info Messages */}
+                <div style={{
+                  padding: '12px 15px',
+                  backgroundColor: '#e3f2fd',
+                  borderLeft: '4px solid #2196f3',
+                  borderRadius: '4px',
+                  marginTop: '15px',
+                  fontSize: '0.85rem',
+                  color: '#1565c0',
+                  lineHeight: '1.5'
+                }}>
+                  <p style={{ margin: 0 }}>
+                    📍 Make sure location services are enabled on your device. You can disable location tracking in your browser or device settings at any time. Location accuracy may vary depending on your device and connection.
+                  </p>
                 </div>
               </div>
+              )}
 
-              {/* Location Info Messages */}
+              {locationMode === 'remote' && (
               <div style={{
-                padding: '12px 15px',
-                backgroundColor: '#e3f2fd',
-                borderLeft: '4px solid #2196f3',
-                borderRadius: '4px',
-                marginTop: '15px',
-                fontSize: '0.85rem',
-                color: '#1565c0',
-                lineHeight: '1.5'
+                padding: '15px',
+                backgroundColor: '#f0f9ff',
+                borderLeft: '4px solid #0ea5e9',
+                borderRadius: '6px',
+                marginBottom: '15px'
               }}>
-                <p style={{ margin: 0 }}>
-                  📍 Make sure location services are enabled on your device. You can disable location tracking in your browser or device settings at any time. Location accuracy may vary depending on your device and connection.
+                <p style={{ margin: 0, color: '#0ea5e9', fontWeight: '600', fontSize: '0.95rem' }}>
+                  ✓ Remote Job Selected
+                </p>
+                <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '0.85rem' }}>
+                  Service providers can work from anywhere. No specific location is needed.
                 </p>
               </div>
+              )}
             </div>
-            )}
 
             <div className="form-group">
               <label htmlFor="location">Other Location Details</label>
