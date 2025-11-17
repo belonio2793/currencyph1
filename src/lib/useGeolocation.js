@@ -35,17 +35,17 @@ export function useGeolocation() {
                 try {
                   const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
                   const controller = new AbortController()
-                  let completed = false
+                  let timedOut = false
 
                   const timeoutId = setTimeout(() => {
-                    if (!completed) {
+                    timedOut = true
+                    try {
                       controller.abort()
-                    }
+                    } catch (e) {}
                   }, 3000)
 
                   try {
                     const resp = await fetch(url, { signal: controller.signal })
-                    completed = true
                     clearTimeout(timeoutId)
 
                     if (resp?.ok && isMountedRef.current) {
@@ -59,10 +59,11 @@ export function useGeolocation() {
                       } catch (parseErr) {}
                     }
                   } catch (fetchErr) {
-                    completed = true
                     clearTimeout(timeoutId)
-                    if (fetchErr.name !== 'AbortError') {
-                      // Only log non-abort errors
+                    if (fetchErr?.name === 'AbortError' && timedOut) {
+                      // Expected timeout, silently ignore
+                    } else if (fetchErr?.name !== 'AbortError') {
+                      // Unexpected error
                     }
                   }
                 } catch (e) {
