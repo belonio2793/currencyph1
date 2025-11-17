@@ -112,7 +112,7 @@ export default function Jobs({ userId }) {
         setOffers(data)
       } else if (activeTab === 'my-jobs') {
         // Get jobs posted by the user
-        const data = await jobsService.getBusinessJobs(selectedBusiness?.id)
+        const data = await jobsService.getUserJobHistory(userId)
         setUserJobs(data)
       }
     } catch (err) {
