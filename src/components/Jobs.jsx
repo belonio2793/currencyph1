@@ -464,6 +464,17 @@ export default function Jobs({ userId }) {
         />
       )}
 
+      {showLookingToHireModal && (
+        <LookingToHireModal
+          onClose={() => setShowLookingToHireModal(false)}
+          onSubmit={handleSubmitJob}
+          categories={categories}
+          cities={cities}
+          userBusinesses={userBusinesses}
+          userId={userId}
+        />
+      )}
+
       {showJobDetails && selectedJob && (
         <JobDetailsModal
           job={selectedJob}
