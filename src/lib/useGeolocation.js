@@ -36,6 +36,7 @@ export function useGeolocation() {
                 try {
                   const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
                   const controller = new AbortController()
+                  abortControllersRef.current.push(controller)
                   let timedOut = false
                   let aborted = false
 
