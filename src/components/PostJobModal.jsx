@@ -70,6 +70,26 @@ export default function PostJobModal({
     })
   }
 
+  const handleCitySearch = (value) => {
+    setCitySearchQuery(value)
+    if (value.trim()) {
+      const filtered = searchCities(value)
+      setFilteredCities(filtered)
+    } else {
+      setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
+    }
+  }
+
+  const handleCitySelect = (city) => {
+    setFormData({
+      ...formData,
+      city: city
+    })
+    setCitySearchQuery(city)
+    setShowCityDropdown(false)
+    setFilteredCities([city])
+  }
+
   const validateForm = () => {
     if (!formData.job_title.trim()) {
       setError('Job title is required')
