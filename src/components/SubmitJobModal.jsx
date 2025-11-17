@@ -241,17 +241,6 @@ export default function SubmitJobModal({
     })
   }
 
-  const handleAddEquipment = () => {
-    if (equipmentInput.trim() && !equipment.includes(equipmentInput)) {
-      setEquipment([...equipment, equipmentInput])
-      setEquipmentInput('')
-    }
-  }
-
-  const handleRemoveEquipment = (item) => {
-    setEquipment(equipment.filter(e => e !== item))
-  }
-
   const handleLocationSelect = (coords) => {
     setMapLocation(coords)
     setFormData({
