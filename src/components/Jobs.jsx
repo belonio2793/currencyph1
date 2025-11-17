@@ -794,6 +794,16 @@ export default function Jobs({ userId }) {
           cities={cities}
         />
       )}
+
+      {showProfileModal && profileUserId && (
+        <UserProfileModal
+          userId={profileUserId}
+          onClose={() => {
+            setShowProfileModal(false)
+            setProfileUserId(null)
+          }}
+        />
+      )}
     </div>
   )
 }
