@@ -982,6 +982,30 @@ export default function SubmitJobModal({
             </div>
           </div>
 
+          {/* Save to Profile Option */}
+          <div style={{ padding: '16px', backgroundColor: '#f8fafc', borderRadius: '6px', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', margin: 0 }}>
+              <input
+                type="checkbox"
+                checked={saveToProfile}
+                onChange={(e) => setSaveToProfile(e.target.checked)}
+                style={{
+                  width: '18px',
+                  height: '18px',
+                  marginRight: '10px',
+                  cursor: 'pointer',
+                  accentColor: '#667eea'
+                }}
+              />
+              <span style={{ fontWeight: '500', color: '#334155', fontSize: '0.95rem' }}>
+                Save to Profile for Future Use
+              </span>
+            </label>
+            <p style={{ margin: '8px 0 0 28px', fontSize: '0.85rem', color: '#64748b' }}>
+              Save this job template to quickly reuse it in the future. You can delete it anytime from your profile.
+            </p>
+          </div>
+
           {/* Form Actions */}
           <div className="form-actions">
             <button
