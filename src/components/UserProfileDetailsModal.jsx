@@ -414,6 +414,9 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
           {activeTab === 'account' && (
             <div className="tab-panel">
               <h3 className="section-title">Account Information</h3>
+              <button className="send-message-btn" onClick={handleSendMessage}>
+                📧 Send Message
+              </button>
               <div className="account-info-section">
                 <div className="info-group">
                   <h4>Basic Information</h4>
@@ -428,8 +431,12 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
                     </div>
                   )}
                   <div className="info-item">
+                    <span className="label">Display Name Type:</span>
+                    <span className="value">{formatDisplayNameType(userProfile.display_name_type)}</span>
+                  </div>
+                  <div className="info-item">
                     <span className="label">Email:</span>
-                    <span className="value">{userProfile.email}</span>
+                    <span className="value blurred">{blurEmail(userProfile.email)}</span>
                   </div>
                   {userProfile.phone_number && (
                     <div className="info-item">
@@ -450,7 +457,7 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
                     <span className="value">{new Date(userProfile.created_at).toLocaleString()}</span>
                   </div>
                   <div className="info-item">
-                    <span className="label">KYC Status:</span>
+                    <span className="label">Identity Verification:</span>
                     <span className={`value ${userProfile.kyc_verified ? 'verified' : ''}`}>
                       {userProfile.kyc_verified ? '✓ Verified' : '○ Not Verified'}
                     </span>
