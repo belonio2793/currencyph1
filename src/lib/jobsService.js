@@ -445,32 +445,48 @@ export const jobsService = {
 
   // Get job categories for autocomplete
   async getJobCategories() {
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('job_category')
-      .distinct()
-      .order('job_category')
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select('job_category')
 
-    if (error) throw error
-    
-    return data
-      ?.map(item => item.job_category)
-      .filter(Boolean) || []
+      if (error) throw error
+
+      // Remove duplicates and sort
+      const categories = [...new Set(
+        data
+          ?.map(item => item.job_category)
+          .filter(Boolean) || []
+      )].sort()
+
+      return categories
+    } catch (err) {
+      console.error('Error fetching job categories:', err)
+      return []
+    }
   },
 
   // Get job locations/cities
   async getJobCities() {
-    const { data, error } = await supabase
-      .from('jobs')
-      .select('city')
-      .distinct()
-      .order('city')
+    try {
+      const { data, error } = await supabase
+        .from('jobs')
+        .select('city')
 
-    if (error) throw error
-    
-    return data
-      ?.map(item => item.city)
-      .filter(Boolean) || []
+      if (error) throw error
+
+      // Remove duplicates and sort
+      const cities = [...new Set(
+        data
+          ?.map(item => item.city)
+          .filter(Boolean) || []
+      )].sort()
+
+      return cities
+    } catch (err) {
+      console.error('Error fetching job cities:', err)
+      return []
+    }
   },
 
   // Get autocomplete suggestions for job search
