@@ -348,7 +348,6 @@ export default function SubmitJobModal({
         ...formData,
         posting_type: 'service_offer',
         skills_required: JSON.stringify(formData.skills_required),
-        equipment_required: JSON.stringify(equipment),
         latitude: locationMode === 'location' ? formData.latitude : null,
         longitude: locationMode === 'location' ? formData.longitude : null
       })
