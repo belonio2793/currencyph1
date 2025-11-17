@@ -164,6 +164,10 @@ export default function UserProfilePreview({ userId }) {
     window.dispatchEvent(new CustomEvent('openChat', { detail: { userId } }))
   }
 
+  const handleViewProfile = () => {
+    window.dispatchEvent(new CustomEvent('viewUserProfile', { detail: { userId } }))
+  }
+
   return (
     <div style={{
       background: '#667eea',
