@@ -60,6 +60,15 @@ export const jobsService = {
       query = query.or(`job_title.ilike.%${filters.search}%,job_description.ilike.%${filters.search}%`)
     }
 
+    // Apply rate filters
+    if (filters.minRate) {
+      query = query.gte('pay_rate', filters.minRate)
+    }
+
+    if (filters.maxRate) {
+      query = query.lte('pay_rate', filters.maxRate)
+    }
+
     const { data, error } = await query
     
     if (error) throw error
