@@ -1514,66 +1514,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         </div>
       )}
 
-      {/* Create Manual Wallet Modal */}
-      {showCreateManualWalletModal && (
-        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-semibold text-slate-900">Create Blockchain Wallet</h3>
-              <button onClick={() => setShowCreateManualWalletModal(false)} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-sm text-slate-600">Select the blockchain network where you want to create a new wallet.</p>
-
-              <div className="space-y-1">
-                <label className="block text-xs font-semibold text-slate-700">Blockchain Network</label>
-                <select
-                  value={selectedManualChainId || ''}
-                  onChange={(e) => setSelectedManualChainId(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-sm"
-                >
-                  <option value="">Select blockchain...</option>
-                  {(() => {
-                    const all = Object.values(SUPPORTED_CHAINS)
-                    const btc = all.find(c => (c.symbol && c.symbol.toLowerCase() === 'btc') || (c.name && c.name.toLowerCase() === 'bitcoin'))
-                    const others = all.filter(c => c !== btc).sort((a, b) => a.name.localeCompare(b.name))
-                    const ordered = btc ? [btc, ...others] : others
-                    return ordered.map((chain) => (
-                      <option key={chain.chainId} value={chain.chainId}>
-                        {chain.name} ({chain.symbol})
-                      </option>
-                    ))
-                  })()}
-                </select>
-              </div>
-
-              {selectedManualChainId && (
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 text-xs text-slate-600">
-                  <strong>Network:</strong> {SUPPORTED_CHAINS[Object.keys(SUPPORTED_CHAINS).find(k => SUPPORTED_CHAINS[k].chainId === selectedManualChainId)]?.name.toUpperCase() || 'Unknown'}
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-2">
-                <button
-                  onClick={() => setShowCreateManualWalletModal(false)}
-                  className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-xs font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateManualWallet}
-                  disabled={creatingManualWallet || !selectedManualChainId}
-                  className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {creatingManualWallet ? 'Creating...' : 'Create New Wallet'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Add Funds Modal */}
       {showAddFunds && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
