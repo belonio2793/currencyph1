@@ -142,7 +142,7 @@ function initClient() {
       }
 
       _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        global: { fetch: wrappedFetch }
+        fetch: wrappedFetch
       })
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
