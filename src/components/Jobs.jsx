@@ -379,13 +379,11 @@ export default function Jobs({ userId }) {
       {/* Tab Content */}
       {activeTab === 'job-listings' ? (
         <div className="jobs-content">
-          {userType === 'job-seeker' && (
-            <JobSearch
-              onFilterChange={handleFilterChange}
-              categories={categories}
-              cities={cities}
-            />
-          )}
+          <JobSearch
+            onFilterChange={handleFilterChange}
+            categories={categories}
+            cities={cities}
+          />
 
           {loading ? (
             <div className="loading">Loading jobs...</div>
