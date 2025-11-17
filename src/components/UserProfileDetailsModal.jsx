@@ -300,6 +300,10 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
                 </div>
               </div>
 
+              <button className="send-message-btn" onClick={handleSendMessage}>
+                💬 Send Message
+              </button>
+
               {verificationStatus && (
                 <div className="verification-section">
                   <h4>Identity Verification</h4>
