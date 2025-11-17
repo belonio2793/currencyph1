@@ -282,7 +282,8 @@ export async function getUnreadMessageCount(userId) {
     if (error && error.code !== 'PGRST116') throw error
     return data?.length || 0
   } catch (err) {
-    console.warn('Get unread count error:', err)
+    // Silently return 0 on error
+    console.debug('[presence] getUnreadMessageCount failed, returning 0:', err?.message)
     return 0
   }
 }
