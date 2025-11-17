@@ -341,7 +341,7 @@ export default function Jobs({ userId }) {
                   transition: 'background 0.2s ease'
                 }}
               >
-                <span style={{ marginRight: '6px' }}>+</span> Looking To Hire
+                <span style={{ marginRight: '6px' }}>+</span> Looking For Work
               </button>
             </>
           )}
