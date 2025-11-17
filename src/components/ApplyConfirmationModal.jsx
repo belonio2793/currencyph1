@@ -164,19 +164,29 @@ export default function ApplyConfirmationModal({
           </div>
         </div>
 
+        {/* Error Message */}
+        {error && (
+          <div className="error-message" style={{ marginBottom: '12px' }}>
+            {error}
+            <button onClick={() => setError('')} className="close-error">×</button>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="confirmation-actions">
           <button
             className="btn-cancel"
             onClick={onClose}
+            disabled={loading || userLoading}
           >
             Cancel
           </button>
           <button
             className="btn-accept"
-            onClick={onAccept}
+            onClick={handleDirectSubmit}
+            disabled={loading || userLoading}
           >
-            Accept & Continue
+            {loading ? 'Starting Job...' : userLoading ? 'Loading...' : 'Accept & Continue'}
           </button>
         </div>
       </div>
