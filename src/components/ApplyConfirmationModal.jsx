@@ -167,6 +167,18 @@ export default function ApplyConfirmationModal({
                 </div>
               </div>
             )}
+
+            <div className="summary-section">
+              <h4>Your Message</h4>
+              <textarea
+                value={offerMessage}
+                onChange={(e) => setOfferMessage(e.target.value)}
+                className="message-textarea"
+                placeholder="Tell the employer about your interest in this position..."
+                rows="4"
+                disabled={loading || userLoading}
+              />
+            </div>
           </div>
         </div>
 
