@@ -721,8 +721,8 @@ export default function ChatBar({ userId, userEmail }) {
                     <button onClick={() => { setSelectedConversation(null); setMessages([]) }} className="text-slate-600 hover:text-slate-900">Close</button>
                   </div>
 
-                  <div ref={messageListRef} className="flex-1 overflow-y-auto p-3 space-y-3 bg-white">
-                    {messages.length === 0 && (<div className="text-center text-sm text-slate-500 mt-4">No messages yet. Start the conversation!</div>)}
+                  <div ref={messageListRef} className="flex-1 overflow-y-auto p-3 space-y-3 bg-white border-2 border-dashed border-slate-300 rounded-lg transition-colors" onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+                    {messages.length === 0 && (<div className="text-center text-sm text-slate-500 mt-4">No messages yet. Start the conversation!<div className="text-xs mt-2 text-slate-400">You can drag and drop files here to share</div></div>)}
                     {messages.map((msg) => (
                       <div key={msg.id} className={`flex ${msg.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
                         <div className="max-w-xs">
