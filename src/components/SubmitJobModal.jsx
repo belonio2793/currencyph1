@@ -262,6 +262,26 @@ export default function SubmitJobModal({
     })
   }
 
+  const handleCitySearch = (value) => {
+    setCitySearchQuery(value)
+    if (value.trim()) {
+      const filtered = searchCities(value)
+      setFilteredCities(filtered)
+    } else {
+      setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
+    }
+  }
+
+  const handleCitySelect = (city) => {
+    setFormData({
+      ...formData,
+      city: city
+    })
+    setCitySearchQuery(city)
+    setShowCityDropdown(false)
+    setFilteredCities([city])
+  }
+
   const handleLocationSelect = (coords) => {
     setMapLocation(coords)
     setFormData({
