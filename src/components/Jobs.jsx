@@ -30,6 +30,8 @@ export default function Jobs({ userId }) {
   const [showSelectBusiness, setShowSelectBusiness] = useState(false)
   const [selectedJob, setSelectedJob] = useState(null)
   const [showJobDetails, setShowJobDetails] = useState(false)
+  const [showApplyConfirmation, setShowApplyConfirmation] = useState(false)
+  const [jobToApplyFor, setJobToApplyFor] = useState(null)
   const [showEditJobModal, setShowEditJobModal] = useState(false)
   const [editingJob, setEditingJob] = useState(null)
   const [categories, setCategories] = useState([])
