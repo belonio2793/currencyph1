@@ -1,11 +1,86 @@
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { jobsService } from '../lib/jobsService'
 import { formatFieldValue } from '../lib/formatters'
 import './ApplyConfirmationModal.css'
 
 export default function ApplyConfirmationModal({
   job,
   onClose,
-  onAccept
+  onAccept,
+  userId
 }) {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [userProfile, setUserProfile] = useState(null)
+  const [userLoading, setUserLoading] = useState(true)
+
+  useEffect(() => {
+    if (userId) {
+      loadUserProfile()
+    } else {
+      setUserLoading(false)
+    }
+  }, [userId])
+
+  const loadUserProfile = async () => {
+    try {
+      setUserLoading(true)
+      const { data, error: queryError } = await supabase
+        .from('users')
+        .select('full_name, email, phone_number')
+        .eq('id', userId)
+        .single()
+
+      if (queryError) throw queryError
+      setUserProfile(data)
+    } catch (err) {
+      console.error('Error loading user profile:', err)
+      setError('Failed to load your profile information')
+    } finally {
+      setUserLoading(false)
+    }
+  }
+
+  const handleDirectSubmit = async () => {
+    if (!job || !userId || !userProfile) {
+      setError('Missing required information to submit application')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      await jobsService.createJobOffer({
+        job_id: job.id,
+        service_provider_id: userId,
+        business_id: job.business_id,
+        provider_name: userProfile.full_name || 'Service Provider',
+        provider_email: userProfile.email || '',
+        provider_phone: userProfile.phone_number || '',
+        provider_description: '',
+        offered_rate: job.pay_rate,
+        offer_message: `I am interested in this ${job.job_title} position and am ready to start immediately.`,
+        status: 'pending'
+      })
+
+      onClose()
+      if (onAccept) {
+        onAccept()
+      }
+    } catch (err) {
+      console.error('Error submitting application:', err)
+      let errorMessage = 'Failed to submit your application'
+      if (err?.message) {
+        errorMessage = err.message
+      }
+      setError(errorMessage)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (!job) return null
 
   const skillsList = job.skills_required ? JSON.parse(job.skills_required) : []
