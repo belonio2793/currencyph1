@@ -206,7 +206,9 @@ export const currencyAPI = {
   // Convert amount from one currency to another
   async convert(amount, fromCurrency, toCurrency) {
     // support converting between fiat (from getGlobalRates) and crypto (from getCryptoPrices)
-    const [rates, crypto] = await Promise.all([this.getGlobalRates(), this.getCryptoPrices()])
+    const results = await Promise.allSettled([this.getGlobalRates(), this.getCryptoPrices()])
+    const rates = results[0].status === 'fulfilled' ? results[0].value : this.getFallbackRates()
+    const crypto = results[1].status === 'fulfilled' ? results[1].value : null
 
     const isFromCrypto = crypto && (crypto[fromCurrency] || crypto[fromCurrency?.toLowerCase()])
     const isToCrypto = crypto && (crypto[toCurrency] || crypto[toCurrency?.toLowerCase()])
