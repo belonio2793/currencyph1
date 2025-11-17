@@ -101,12 +101,15 @@ export default function Jobs({ userId }) {
     setError('')
 
     try {
-      if (activeTab === 'looking-to-hire') {
+      if (activeTab === 'job-listings') {
         const data = await jobsService.getActiveJobs(filters)
         setJobs(data)
-      } else {
+      } else if (activeTab === 'offers-received') {
         const data = await jobsService.getProviderOffers(userId)
         setOffers(data)
+      } else if (activeTab === 'my-jobs') {
+        const data = await jobsService.getUserJobHistory(userId)
+        setUserJobs(data)
       }
     } catch (err) {
       console.error('Error loading jobs:', err)
