@@ -153,6 +153,9 @@
 .stat-data {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .stat-value {
@@ -160,6 +163,7 @@
   font-weight: 700;
   color: white;
   margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 .stat-label {
@@ -168,6 +172,7 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-weight: 500;
+  line-height: 1.2;
 }
 
 /* Responsive */
