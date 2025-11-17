@@ -28,24 +28,48 @@ const LocationMarker = ({ onLocationSelect, initialPosition }) => {
       shadowSize: [41, 41]
     })
 
-    // Create initial marker at provided position
-    markerRef.current = L.marker(initialPosition, { icon: markerIcon })
-      .addTo(map)
-      .bindPopup('Job Location')
+    // Create initial draggable marker at provided position
+    const createDraggableMarker = (lat, lng) => {
+      const marker = L.marker([lat, lng], {
+        icon: markerIcon,
+        draggable: true
+      })
+        .addTo(map)
+        .bindPopup('Job Location')
+
+      // Handle drag events to update coordinates
+      marker.on('dragend', () => {
+        const { lat: newLat, lng: newLng } = marker.getLatLng()
+        if (onLocationSelect) {
+          onLocationSelect(newLat, newLng)
+        }
+      })
+
+      // Also update while dragging for visual feedback
+      marker.on('drag', () => {
+        const { lat: newLat, lng: newLng } = marker.getLatLng()
+        if (onLocationSelect) {
+          onLocationSelect(newLat, newLng)
+        }
+      })
+
+      return marker
+    }
+
+    // Create initial marker
+    markerRef.current = createDraggableMarker(initialPosition[0], initialPosition[1])
 
     // Handle map click to place/move marker
     const handleMapClick = (e) => {
       const { lat, lng } = e.latlng
-      
+
       // Remove old marker
       if (markerRef.current) {
         map.removeLayer(markerRef.current)
       }
 
       // Add new marker at clicked location
-      markerRef.current = L.marker([lat, lng], { icon: markerIcon })
-        .addTo(map)
-        .bindPopup('Job Location')
+      markerRef.current = createDraggableMarker(lat, lng)
 
       // Call callback with coordinates
       if (onLocationSelect) {
