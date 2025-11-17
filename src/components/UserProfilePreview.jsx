@@ -152,6 +152,18 @@ export default function UserProfilePreview({ userId }) {
   const userName = getDisplayName(userProfile)
   const avatarBg = `hsl(${userName.charCodeAt(0) * 10}, 70%, 55%)`
 
+  const blurEmail = (email) => {
+    if (!email) return ''
+    const [localPart, domain] = email.split('@')
+    const visibleChars = Math.ceil(localPart.length / 3)
+    const blurred = localPart.substring(0, visibleChars) + '*'.repeat(localPart.length - visibleChars)
+    return `${blurred}@${domain}`
+  }
+
+  const handleSendMessage = () => {
+    window.dispatchEvent(new CustomEvent('openChat', { detail: { userId } }))
+  }
+
   return (
     <div style={{
       background: '#667eea',
@@ -191,7 +203,7 @@ export default function UserProfilePreview({ userId }) {
           }}>
             {userName.charAt(0).toUpperCase()}
           </div>
-          
+
           <div style={{
             flex: 1,
             minWidth: 0,
@@ -215,7 +227,7 @@ export default function UserProfilePreview({ userId }) {
               wordBreak: 'break-all',
               lineHeight: '1.3'
             }}>
-              {userProfile.email}
+              {blurEmail(userProfile.email)}
             </p>
             <span style={{
               display: 'inline-block',
@@ -230,6 +242,31 @@ export default function UserProfilePreview({ userId }) {
               Member since {stats.memberSince}
             </span>
           </div>
+
+          <button
+            onClick={handleSendMessage}
+            style={{
+              padding: '10px 16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              color: 'white',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: '600',
+              fontSize: '0.85rem',
+              transition: 'all 0.2s ease',
+              whiteSpace: 'nowrap',
+              flexShrink: 0
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'
+            }}
+          >
+            💬 Send Message
+          </button>
         </div>
 
         {/* Stats Grid */}
