@@ -260,9 +260,13 @@ export async function markMessagesAsRead(messageIds, readerId) {
       .from('message_read_receipts')
       .upsert(records)
 
-    if (error) console.warn('Mark read error:', error)
+    if (error) {
+      // Silently ignore errors - read receipts are non-critical
+      console.debug('[presence] Mark as read error (non-critical):', error.code || error.message)
+    }
   } catch (err) {
-    console.warn('Mark as read failed:', err)
+    // Silently ignore errors - read receipts are non-critical
+    console.debug('[presence] markMessagesAsRead failed (non-critical):', err?.message)
   }
 }
 
