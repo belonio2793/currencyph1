@@ -334,7 +334,6 @@ export const venlyConnection = {
  */
 export const WALLET_CONNECTIONS = {
   metamask: metamaskConnection,
-  walletconnect: walletconnectConnection,
   coinbase: coinbaseConnection,
   phantom: phantomConnection,
   venly: venlyConnection
@@ -351,7 +350,7 @@ export function getAvailableWallets() {
       icon: wallet.icon,
       isAvailable: wallet.isAvailable()
     }))
-    .filter(w => w.key === 'walletconnect' || w.isAvailable) // Always show WalletConnect
+    .filter(w => w.isAvailable)
 }
 
 /**
