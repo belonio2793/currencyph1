@@ -734,7 +734,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Recent Reviews */}
         {listing.review_details && listing.review_details.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">⭐ Recent Reviews</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Recent Reviews</h2>
             <div className="space-y-4">
               {listing.review_details.slice(0, 5).map((review, idx) => (
                 <div key={idx} className="border border-slate-200 p-4 rounded-lg">
