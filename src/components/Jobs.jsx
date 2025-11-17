@@ -57,6 +57,22 @@ export default function Jobs({ userId }) {
     myJobs: 0
   })
 
+  // Handle view profile modal
+  useEffect(() => {
+    const handleViewProfile = (event) => {
+      const profileId = event.detail?.userId
+      if (profileId) {
+        setProfileUserId(profileId)
+        setShowProfileModal(true)
+      }
+    }
+
+    window.addEventListener('viewUserProfile', handleViewProfile)
+    return () => {
+      window.removeEventListener('viewUserProfile', handleViewProfile)
+    }
+  }, [])
+
   // Load categories, cities, and user's businesses
   useEffect(() => {
     const loadInitialData = async () => {
