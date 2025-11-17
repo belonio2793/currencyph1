@@ -217,6 +217,34 @@ export default function Jobs({ userId }) {
     setFilters(newFilters)
   }
 
+  const handleEditJob = async (jobData, jobId) => {
+    try {
+      await jobsService.updateJob(jobId, jobData)
+      setShowEditJobModal(false)
+      setEditingJob(null)
+      loadJobs()
+      setError('Job updated successfully!')
+      setTimeout(() => setError(''), 3000)
+    } catch (err) {
+      console.error('Error updating job:', err)
+      setError('Failed to update job. Please try again.')
+    }
+  }
+
+  const handleDeleteJob = async (jobId) => {
+    if (window.confirm('Are you sure you want to delete this job?')) {
+      try {
+        await jobsService.softDeleteJob(jobId)
+        loadJobs()
+        setError('Job deleted successfully!')
+        setTimeout(() => setError(''), 3000)
+      } catch (err) {
+        console.error('Error deleting job:', err)
+        setError('Failed to delete job. Please try again.')
+      }
+    }
+  }
+
   return (
     <div className="jobs-container">
       {/* User Profile Preview */}
