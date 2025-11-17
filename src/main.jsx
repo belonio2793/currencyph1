@@ -8,15 +8,37 @@ window.addEventListener('unhandledrejection', (event) => {
   try {
     const reason = event && event.reason
     const msg = reason && (reason.message || reason.toString && reason.toString())
+
     // Suppress noisy network and abort-related errors which are expected when cancelling requests
     if (reason && (reason.name === 'AbortError')) {
       console.debug('[App] Suppressed AbortError unhandled rejection:', msg)
       event.preventDefault()
       return
     }
-    if (typeof msg === 'string' && (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('IFrame evaluation timeout') || msg.toLowerCase().includes('abort') || msg.toLowerCase().includes('signal is aborted'))) {
+
+    // Suppress all "Failed to fetch" errors - they're usually non-critical and logged by handlers
+    // This includes presence sync, read receipts, and other optional features from Supabase
+    if (typeof msg === 'string' && (
+      msg.includes('Failed to fetch') ||
+      msg.includes('NetworkError') ||
+      msg.includes('IFrame evaluation timeout') ||
+      msg.toLowerCase().includes('abort') ||
+      msg.toLowerCase().includes('signal is aborted')
+    )) {
       console.debug('[App] Suppressed noisy network/abort error:', msg)
       event.preventDefault()
+      return
+    }
+
+    // Suppress Supabase-specific non-critical errors
+    if (typeof msg === 'string' && (
+      msg.includes('user_presence') ||
+      msg.includes('message_read_receipts') ||
+      msg.includes('presence')
+    )) {
+      console.debug('[App] Suppressed non-critical Supabase error:', msg)
+      event.preventDefault()
+      return
     }
   } catch (e) {
     // ignore
