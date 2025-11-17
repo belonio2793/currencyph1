@@ -38,11 +38,14 @@ export default function Jobs({ userId }) {
   const [categories, setCategories] = useState([])
   const [cities, setCities] = useState([])
   const [stats, setStats] = useState({
+    jobsPosted: 0,
+    pendingOffers: 0,
+    acceptedOffers: 0,
+    completed: 0,
     totalJobs: 0,
     activeJobs: 0,
     filledJobs: 0,
-    totalOffers: 0,
-    acceptedOffers: 0
+    totalOffers: 0
   })
   const [tabCounts, setTabCounts] = useState({
     jobListings: 0,
