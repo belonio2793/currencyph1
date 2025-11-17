@@ -396,13 +396,19 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
                     <input
                       id="latitude"
                       type="number"
-                      value={formData.latitude}
-                      readOnly
-                      placeholder="Click on map to set"
-                      style={{ backgroundColor: '#f5f5f5', color: '#666', cursor: 'not-allowed' }}
+                      value={formData.latitude || ''}
+                      onChange={(e) => {
+                        const lat = parseFloat(e.target.value)
+                        if (!isNaN(lat)) {
+                          setFormData({ ...formData, latitude: lat })
+                          setMapLocation([lat, formData.longitude])
+                        }
+                      }}
+                      placeholder="Click on map or enter latitude"
+                      step="0.00001"
                     />
                     <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
-                      Auto-populated from map selection
+                      Drag the marker or enter coordinates
                     </small>
                   </div>
 
@@ -411,13 +417,19 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
                     <input
                       id="longitude"
                       type="number"
-                      value={formData.longitude}
-                      readOnly
-                      placeholder="Click on map to set"
-                      style={{ backgroundColor: '#f5f5f5', color: '#666', cursor: 'not-allowed' }}
+                      value={formData.longitude || ''}
+                      onChange={(e) => {
+                        const lng = parseFloat(e.target.value)
+                        if (!isNaN(lng)) {
+                          setFormData({ ...formData, longitude: lng })
+                          setMapLocation([formData.latitude, lng])
+                        }
+                      }}
+                      placeholder="Click on map or enter longitude"
+                      step="0.00001"
                     />
                     <small style={{ color: '#999', marginTop: '4px', display: 'block' }}>
-                      Auto-populated from map selection
+                      Drag the marker or enter coordinates
                     </small>
                   </div>
                 </div>
