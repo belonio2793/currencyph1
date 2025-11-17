@@ -151,6 +151,18 @@
   color: #616161;
 }
 
+.employer-badge {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+  background: #f0f4ff;
+  color: #667eea;
+  border: 1px solid #667eea;
+}
+
 .job-description {
   color: #555;
   font-size: 0.9rem;
