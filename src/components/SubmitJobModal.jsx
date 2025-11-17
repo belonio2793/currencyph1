@@ -765,43 +765,6 @@ export default function SubmitJobModal({
                 </div>
               )}
             </div>
-
-            <div className="form-group">
-              <label>Equipment Required</label>
-              <div className="skill-input-group">
-                <input
-                  type="text"
-                  value={equipmentInput}
-                  onChange={(e) => setEquipmentInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddEquipment())}
-                  placeholder="Add equipment and press Enter"
-                  className="skill-input"
-                />
-                <button
-                  type="button"
-                  onClick={handleAddEquipment}
-                  className="btn-add-skill"
-                >
-                  Add
-                </button>
-              </div>
-              {equipment.length > 0 && (
-                <div className="skills-list">
-                  {equipment.map((item, idx) => (
-                    <span key={idx} className="skill-tag">
-                      {item}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveEquipment(item)}
-                        className="remove-skill"
-                      >
-                        ×
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="form-section">
