@@ -64,11 +64,13 @@ export default function Jobs({ userId }) {
   // Load user's businesses
   const loadUserBusinesses = async () => {
     try {
+      console.log('Loading businesses for userId:', userId)
       const { data, error } = await supabase
         .from('businesses')
         .select('*')
         .eq('user_id', userId)
 
+      console.log('Businesses query result:', { data, error })
       if (error) throw error
       return data || []
     } catch (err) {
