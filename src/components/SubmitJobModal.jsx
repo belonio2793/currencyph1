@@ -255,7 +255,7 @@ export default function SubmitJobModal({
       setError('Job description is required')
       return false
     }
-    if (!formData.latitude || !formData.longitude) {
+    if (locationMode === 'location' && (!formData.latitude || !formData.longitude)) {
       setError('Location is required')
       return false
     }
