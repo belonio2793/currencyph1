@@ -644,7 +644,7 @@ export default function Jobs({ userId }) {
                     </div>
                     <div className="detail-item">
                       <span className="label">Type:</span>
-                      <span className="value">{job.job_type}</span>
+                      <span className="value">{formatFieldValue(job.job_type)}</span>
                     </div>
                     <div className="detail-item">
                       <span className="label">Location:</span>
