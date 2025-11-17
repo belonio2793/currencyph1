@@ -29,14 +29,26 @@ export default function UserProfilePreview({ userId }) {
       if (authError) throw authError
 
       if (user) {
+        // Fetch full user profile from users table
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, full_name, username, email, display_name_type, profile_picture_url, created_at')
+          .eq('id', user.id)
+          .single()
+
+        if (userError) throw userError
+
         setUserProfile({
           id: user.id,
-          email: user.email,
-          user_metadata: user.user_metadata || {},
-          created_at: user.created_at
+          email: userData?.email || user.email,
+          full_name: userData?.full_name || user.user_metadata?.full_name,
+          username: userData?.username,
+          display_name_type: userData?.display_name_type || 'full_name',
+          profile_picture_url: userData?.profile_picture_url,
+          created_at: userData?.created_at || user.created_at
         })
 
-        await loadUserStats(user.id, user.created_at)
+        await loadUserStats(user.id, userData?.created_at || user.created_at)
       }
     } catch (err) {
       console.error('Error loading user profile:', err)
@@ -115,7 +127,24 @@ export default function UserProfilePreview({ userId }) {
     return null
   }
 
-  const userName = userProfile.user_metadata?.full_name || userProfile.email?.split('@')[0] || 'User'
+  const getDisplayName = (profile) => {
+    if (!profile) return 'User'
+    const displayType = profile.display_name_type || 'full_name'
+
+    switch (displayType) {
+      case 'username':
+        return profile.username || profile.full_name || 'User'
+      case 'first_name':
+        return profile.full_name?.split(' ')[0] || 'User'
+      case 'last_name':
+        return profile.full_name?.split(' ').pop() || 'User'
+      case 'full_name':
+      default:
+        return profile.full_name || 'User'
+    }
+  }
+
+  const userName = getDisplayName(userProfile)
   const avatarBg = `hsl(${userName.charCodeAt(0) * 10}, 70%, 55%)`
 
   return (
