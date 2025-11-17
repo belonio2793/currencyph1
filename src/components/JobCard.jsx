@@ -83,7 +83,7 @@ export default function JobCard({ job, onSelect, onApply }) {
               </div>
               <div className="poster-info">
                 <p className="poster-name">{getDisplayName(posterProfile)}</p>
-                <p className="poster-display-type">{posterProfile.display_name_type?.replace(/_/g, ' ') || 'default'}</p>
+                <p className="poster-display-type">{posterProfile.full_name || 'User'}</p>
               </div>
             </div>
           </div>
