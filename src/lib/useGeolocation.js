@@ -74,12 +74,13 @@ export function useGeolocation() {
               // Fallback to Nominatim
               try {
                 const controller = new AbortController()
-                let completed = false
+                let timedOut = false
 
                 const timeoutId = setTimeout(() => {
-                  if (!completed) {
+                  timedOut = true
+                  try {
                     controller.abort()
-                  }
+                  } catch (e) {}
                 }, 3000)
 
                 try {
@@ -90,7 +91,6 @@ export function useGeolocation() {
                       signal: controller.signal
                     }
                   )
-                  completed = true
                   clearTimeout(timeoutId)
 
                   if (response?.ok && isMountedRef.current) {
@@ -102,10 +102,11 @@ export function useGeolocation() {
                     } catch (parseErr) {}
                   }
                 } catch (fetchErr) {
-                  completed = true
                   clearTimeout(timeoutId)
-                  if (fetchErr.name !== 'AbortError') {
-                    // Only log non-abort errors
+                  if (fetchErr?.name === 'AbortError' && timedOut) {
+                    // Expected timeout, silently ignore
+                  } else if (fetchErr?.name !== 'AbortError') {
+                    // Unexpected error
                   }
                 }
               } catch (e) {
