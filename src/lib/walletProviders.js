@@ -1,7 +1,6 @@
 import { ethers } from 'ethers'
 import {
   metamaskConnection,
-  walletconnectConnection,
   coinbaseConnection,
   phantomConnection,
   venlyConnection,
@@ -10,7 +9,6 @@ import {
 
 // Re-export wallet connections as providers for backward compatibility
 export const MetaMaskProvider = metamaskConnection
-export const WalletConnectProviderAdapter = walletconnectConnection
 export const CoinbaseWalletProvider = coinbaseConnection
 export const PhantomProvider = phantomConnection
 export const VenlyProvider = venlyConnection
@@ -18,7 +16,6 @@ export const VenlyProvider = venlyConnection
 // Export all providers
 export const WALLET_PROVIDERS = {
   metamask: metamaskConnection,
-  walletconnect: walletconnectConnection,
   coinbase: coinbaseConnection,
   phantom: phantomConnection,
   venly: venlyConnection
