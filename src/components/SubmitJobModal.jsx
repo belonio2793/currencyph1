@@ -136,11 +136,41 @@ export default function SubmitJobModal({
 
   // Initialize updatedBusinesses with userBusinesses prop when they change
   useEffect(() => {
-    if (userBusinesses && userBusinesses.length > 0) {
-      setUpdatedBusinesses(userBusinesses)
-      console.log('SubmitJobModal: Loading user businesses', userBusinesses)
+    const initializeBusinesses = async () => {
+      // First, try using the userBusinesses prop
+      if (userBusinesses && userBusinesses.length > 0) {
+        setUpdatedBusinesses(userBusinesses)
+        console.log('SubmitJobModal: Loaded businesses from prop', userBusinesses)
+        return
+      }
+
+      // Fallback: Load businesses directly from database if userId is available
+      if (userId) {
+        try {
+          const { data, error } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('user_id', userId)
+
+          if (error) {
+            console.error('SubmitJobModal: Error loading businesses from DB:', error)
+            return
+          }
+
+          if (data && data.length > 0) {
+            setUpdatedBusinesses(data)
+            console.log('SubmitJobModal: Loaded businesses from database', data)
+          } else {
+            console.log('SubmitJobModal: No businesses found for user', userId)
+          }
+        } catch (err) {
+          console.error('SubmitJobModal: Error querying businesses:', err)
+        }
+      }
     }
-  }, [userBusinesses])
+
+    initializeBusinesses()
+  }, [userBusinesses, userId])
 
   // Load existing job titles for suggestions
   useEffect(() => {
