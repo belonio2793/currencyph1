@@ -34,32 +34,27 @@ export function useGeolocation() {
               if (MAPTILER_KEY) {
                 try {
                   const url = `https://api.maptiler.com/geocoding/reverse/${longitude},${latitude}.json?key=${encodeURIComponent(MAPTILER_KEY)}`
-                  let shouldFetch = true
+                  const controller = new AbortController()
                   const timeoutId = setTimeout(() => {
-                    shouldFetch = false
+                    controller.abort()
                   }, 3000)
 
-                  let resp = null
                   try {
-                    if (shouldFetch) {
-                      const controller = new AbortController()
-                      resp = await fetch(url, { signal: controller.signal })
+                    const resp = await fetch(url, { signal: controller.signal })
+                    clearTimeout(timeoutId)
+
+                    if (resp?.ok && isMountedRef.current) {
+                      try {
+                        const data = await resp.json()
+                        if (data?.features?.[0]?.properties) {
+                          const props = data.features[0].properties
+                          setCity(props.city || props.town || props.village || props.county || props.state || null)
+                          return true
+                        }
+                      } catch (parseErr) {}
                     }
                   } catch (fetchErr) {
-                    resp = null
-                  }
-
-                  clearTimeout(timeoutId)
-
-                  if (resp?.ok && isMountedRef.current) {
-                    try {
-                      const data = await resp.json()
-                      if (data?.features?.[0]?.properties) {
-                        const props = data.features[0].properties
-                        setCity(props.city || props.town || props.village || props.county || props.state || null)
-                        return true
-                      }
-                    } catch (parseErr) {}
+                    clearTimeout(timeoutId)
                   }
                 } catch (e) {
                   // Silently fail MapTiler, try fallback
@@ -68,36 +63,31 @@ export function useGeolocation() {
 
               // Fallback to Nominatim
               try {
-                let shouldFetch = true
+                const controller = new AbortController()
                 const timeoutId = setTimeout(() => {
-                  shouldFetch = false
+                  controller.abort()
                 }, 3000)
 
-                let response = null
                 try {
-                  if (shouldFetch) {
-                    const controller = new AbortController()
-                    response = await fetch(
-                      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                      {
-                        headers: { 'Accept-Language': 'en' },
-                        signal: controller.signal
-                      }
-                    )
+                  const response = await fetch(
+                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+                    {
+                      headers: { 'Accept-Language': 'en' },
+                      signal: controller.signal
+                    }
+                  )
+                  clearTimeout(timeoutId)
+
+                  if (response?.ok && isMountedRef.current) {
+                    try {
+                      const nom = await response.json()
+                      setCity(
+                        nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
+                      )
+                    } catch (parseErr) {}
                   }
                 } catch (fetchErr) {
-                  response = null
-                }
-
-                clearTimeout(timeoutId)
-
-                if (response?.ok && isMountedRef.current) {
-                  try {
-                    const nom = await response.json()
-                    setCity(
-                      nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
-                    )
-                  } catch (parseErr) {}
+                  clearTimeout(timeoutId)
                 }
               } catch (e) {
                 // Silently fail Nominatim fallback
