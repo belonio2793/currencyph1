@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { jobsService } from '../lib/jobsService'
+import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
 import './PostJobModal.css'
 
 export default function EditJobModal({
