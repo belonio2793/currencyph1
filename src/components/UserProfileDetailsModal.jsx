@@ -79,10 +79,10 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
           .order('created_at', { ascending: false }),
         supabase
           .from('job_history')
-          .select('id, job_id, final_amount_paid, completion_status, completed_at, jobs(id, job_title, job_category, pay_rate)')
+          .select('id, job_id, final_amount_paid, completion_status, created_at, jobs(id, job_title, job_category, pay_rate)')
           .eq('service_provider_id', userId)
           .eq('completion_status', 'completed')
-          .order('completed_at', { ascending: false }),
+          .order('created_at', { ascending: false }),
         supabase
           .from('jobs')
           .select('id, job_title, job_category, pay_rate, status, created_at, job_offers(id)')
