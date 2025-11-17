@@ -132,15 +132,19 @@ export async function subscribeToUserPresence(userId, callback) {
         table: 'user_presence',
         filter: `user_id=eq.${userId}`
       }, (payload) => {
-        try { callback(payload.new.status) } catch (e) { console.error('presence callback error', e) }
+        try { callback(payload.new.status) } catch (e) {
+          // Silently ignore callback errors
+          console.debug('[presence] callback error (ignored):', e?.message)
+        }
       })
       .subscribe()
 
     return () => {
-      try { supabase.removeChannel(channel) } catch (e) { console.debug('Failed to remove presence channel', e) }
+      try { supabase.removeChannel(channel) } catch (e) { /* silently ignore */ }
     }
   } catch (err) {
-    console.debug('subscribeToUserPresence not available', err)
+    // Silently ignore subscription errors (table may not exist, network issues, etc.)
+    // Presence is non-critical
     return () => {}
   }
 }
