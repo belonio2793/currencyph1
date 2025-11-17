@@ -495,49 +495,52 @@ export default function SubmitJobModal({
             <h3>Business Details</h3>
 
             <div className="form-group">
-              <label htmlFor="currency_registration_number">Currency Registration Number (Optional)</label>
-              <div style={{ marginBottom: '10px' }}>
-                <select
-                  id="currency_registration_select"
-                  onChange={(e) => {
-                    if (e.target.value) {
-                      setFormData({
-                        ...formData,
-                        currency_registration_number: e.target.value
-                      })
-                    }
-                  }}
-                  className="form-control"
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    border: '1px solid #e0e0e0',
-                    borderRadius: '6px',
-                    fontSize: '0.9rem',
-                    marginBottom: '10px'
-                  }}
-                >
-                  <option value="">Select from existing businesses...</option>
-                  {userBusinesses && userBusinesses.map(business => (
-                    business.currency_registration_number && (
-                      <option key={business.id} value={business.currency_registration_number}>
-                        {business.business_name} ({business.currency_registration_number})
-                      </option>
-                    )
-                  ))}
-                </select>
-              </div>
-              <input
-                id="currency_registration_number"
-                type="text"
-                name="currency_registration_number"
-                value={formData.currency_registration_number}
-                onChange={handleInputChange}
-                placeholder="Or manually enter registration number"
-              />
-              <p style={{ fontSize: '0.8rem', color: '#999', marginTop: '6px' }}>
-                Link a business registration to this job (optional)
+              <label htmlFor="business_select">Link to Business (Optional)</label>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px' }}>
+                Select a registered business to associate with this job
               </p>
+              <select
+                id="business_select"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setFormData({
+                      ...formData,
+                      business_id: e.target.value
+                    })
+                  } else {
+                    setFormData({
+                      ...formData,
+                      business_id: ''
+                    })
+                  }
+                }}
+                value={formData.business_id}
+                className="form-control"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem'
+                }}
+              >
+                <option value="">No business selected</option>
+                {userBusinesses && userBusinesses.length > 0 ? (
+                  userBusinesses.map(business => (
+                    <option key={business.id} value={business.id}>
+                      {business.business_name}
+                      {business.currency_registration_number ? ` (${business.currency_registration_number})` : ''}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No businesses available</option>
+                )}
+              </select>
+              {!userBusinesses || userBusinesses.length === 0 && (
+                <p style={{ fontSize: '0.8rem', color: '#d63031', marginTop: '8px' }}>
+                  💡 Tip: Create a business first to link it to jobs
+                </p>
+              )}
             </div>
           </div>
 
