@@ -528,7 +528,6 @@ export default function App() {
             {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
             {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
             {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
-            {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
             {activeTab === 'send' && <SendMoney userId={userId} />}
             {activeTab === 'investments' && <Investments userId={userId} />}
             {activeTab === 'bills' && <BillPayments userId={userId} />}
