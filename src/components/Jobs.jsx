@@ -479,7 +479,10 @@ export default function Jobs({ userId }) {
                   key={job.id}
                   job={job}
                   onSelect={() => handleJobSelect(job)}
-                  onApply={() => handleJobSelect(job)}
+                  onApply={() => {
+                    setJobToApplyFor(job)
+                    setShowApplyConfirmation(true)
+                  }}
                 />
               ))}
             </div>
