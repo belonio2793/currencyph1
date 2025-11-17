@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import './UserProfilePreview.css'
 
 export default function UserProfilePreview({ userId }) {
   const [userProfile, setUserProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({
-    totalJobs: 0,
+    postedJobs: 0,
     acceptedOffers: 0,
+    completedJobs: 0,
     averageRating: 0,
-    totalRatings: 0
+    totalRatings: 0,
+    totalEarnings: 0,
+    memberSince: null
   })
 
   useEffect(() => {
@@ -21,7 +25,6 @@ export default function UserProfilePreview({ userId }) {
 
   const loadUserProfile = async () => {
     try {
-      // Get user profile from auth.users
       const { data: { user }, error: authError } = await supabase.auth.getUser()
       if (authError) throw authError
 
@@ -29,10 +32,10 @@ export default function UserProfilePreview({ userId }) {
         setUserProfile({
           id: user.id,
           email: user.email,
-          user_metadata: user.user_metadata || {}
+          user_metadata: user.user_metadata || {},
+          created_at: user.created_at
         })
 
-        // Load user stats
         await loadUserStats(user.id)
       }
     } catch (err) {
@@ -44,34 +47,54 @@ export default function UserProfilePreview({ userId }) {
 
   const loadUserStats = async (uid) => {
     try {
-      // Get jobs posted by user
-      const { count: jobCount } = await supabase
-        .from('jobs')
-        .select('id', { count: 'exact' })
-        .eq('posted_by_user_id', uid)
-
-      // Get accepted offers
-      const { count: acceptedCount } = await supabase
-        .from('job_offers')
-        .select('id', { count: 'exact' })
-        .eq('service_provider_id', uid)
-        .eq('status', 'accepted')
-
-      // Get average rating
-      const { data: ratings } = await supabase
-        .from('job_ratings')
-        .select('rating_score')
-        .eq('rated_user_id', uid)
+      const [
+        { count: postedCount },
+        { count: acceptedCount },
+        { count: completedCount },
+        { data: ratings },
+        { data: jobHistory }
+      ] = await Promise.all([
+        supabase
+          .from('jobs')
+          .select('id', { count: 'exact' })
+          .eq('posted_by_user_id', uid),
+        supabase
+          .from('job_offers')
+          .select('id', { count: 'exact' })
+          .eq('service_provider_id', uid)
+          .eq('status', 'accepted'),
+        supabase
+          .from('job_history')
+          .select('id', { count: 'exact' })
+          .eq('service_provider_id', uid)
+          .eq('completion_status', 'completed'),
+        supabase
+          .from('job_ratings')
+          .select('rating_score')
+          .eq('rated_user_id', uid),
+        supabase
+          .from('job_history')
+          .select('final_amount_paid')
+          .eq('service_provider_id', uid)
+          .eq('completion_status', 'completed')
+      ])
 
       const avgRating = ratings && ratings.length > 0
         ? (ratings.reduce((sum, r) => sum + r.rating_score, 0) / ratings.length).toFixed(1)
         : 0
 
+      const totalEarnings = jobHistory && jobHistory.length > 0
+        ? jobHistory.reduce((sum, h) => sum + (h.final_amount_paid || 0), 0)
+        : 0
+
       setStats({
-        totalJobs: jobCount || 0,
+        postedJobs: postedCount || 0,
         acceptedOffers: acceptedCount || 0,
+        completedJobs: completedCount || 0,
         averageRating: avgRating,
-        totalRatings: ratings?.length || 0
+        totalRatings: ratings?.length || 0,
+        totalEarnings: totalEarnings || 0,
+        memberSince: new Date(userProfile?.created_at).toLocaleDateString()
       })
     } catch (err) {
       console.error('Error loading user stats:', err)
@@ -81,9 +104,7 @@ export default function UserProfilePreview({ userId }) {
   if (loading) {
     return (
       <div className="user-profile-preview">
-        <div style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
-          Loading profile...
-        </div>
+        <div className="profile-loading">Loading profile...</div>
       </div>
     )
   }
@@ -93,99 +114,70 @@ export default function UserProfilePreview({ userId }) {
   }
 
   const userName = userProfile.user_metadata?.full_name || userProfile.email?.split('@')[0] || 'User'
+  const avatarBg = `hsl(${userName.charCodeAt(0) * 10}, 70%, 55%)`
 
   return (
-    <div className="user-profile-preview" style={{
-      backgroundColor: '#f8f9fa',
-      borderRadius: '8px',
-      padding: '16px',
-      marginBottom: '24px',
-      border: '1px solid #e0e0e0',
-      display: 'grid',
-      gridTemplateColumns: '1fr auto',
-      alignItems: 'center',
-      gap: '20px'
-    }}>
-      {/* Profile Info */}
-      <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-        <div style={{
-          width: '56px',
-          height: '56px',
-          borderRadius: '50%',
-          backgroundColor: '#667eea',
-          color: 'white',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '24px',
-          fontWeight: '600'
-        }}>
-          {userName.charAt(0).toUpperCase()}
-        </div>
-        <div>
-          <h3 style={{ margin: '0 0 4px 0', fontSize: '1.05rem', fontWeight: '600' }}>
-            {userName}
-          </h3>
-          <p style={{ margin: '0', color: '#666', fontSize: '0.9rem' }}>
-            {userProfile.email}
-          </p>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-        gap: '12px',
-        alignItems: 'center',
-        minWidth: '300px'
-      }}>
-        <div style={{
-          padding: '12px',
-          backgroundColor: 'white',
-          borderRadius: '6px',
-          border: '1px solid #e0e0e0',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#667eea' }}>
-            {stats.totalJobs}
+    <div className="user-profile-preview">
+      {/* Main Profile Card */}
+      <div className="profile-main">
+        {/* Avatar and Basic Info */}
+        <div className="profile-header">
+          <div className="profile-avatar" style={{ backgroundColor: avatarBg }}>
+            {userName.charAt(0).toUpperCase()}
           </div>
-          <div style={{ fontSize: '0.8rem', color: '#999', marginTop: '4px' }}>
-            Jobs Posted
+          <div className="profile-info">
+            <h2 className="profile-name">{userName}</h2>
+            <p className="profile-email">{userProfile.email}</p>
+            <span className="profile-member">Member since {stats.memberSince}</span>
           </div>
         </div>
 
-        <div style={{
-          padding: '12px',
-          backgroundColor: 'white',
-          borderRadius: '6px',
-          border: '1px solid #e0e0e0',
-          textAlign: 'center'
-        }}>
-          <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#667eea' }}>
-            {stats.acceptedOffers}
-          </div>
-          <div style={{ fontSize: '0.8rem', color: '#999', marginTop: '4px' }}>
-            Accepted
-          </div>
-        </div>
-
-        {stats.totalRatings > 0 && (
-          <div style={{
-            padding: '12px',
-            backgroundColor: 'white',
-            borderRadius: '6px',
-            border: '1px solid #e0e0e0',
-            textAlign: 'center'
-          }}>
-            <div style={{ fontSize: '1.2rem', fontWeight: '700', color: '#ffa500' }}>
-              {stats.averageRating} ★
-            </div>
-            <div style={{ fontSize: '0.8rem', color: '#999', marginTop: '4px' }}>
-              Rating ({stats.totalRatings})
+        {/* Stats Grid */}
+        <div className="profile-stats">
+          <div className="stat-box">
+            <div className="stat-icon">📋</div>
+            <div className="stat-data">
+              <div className="stat-value">{stats.postedJobs}</div>
+              <div className="stat-label">Jobs Posted</div>
             </div>
           </div>
-        )}
+
+          <div className="stat-box">
+            <div className="stat-icon">✅</div>
+            <div className="stat-data">
+              <div className="stat-value">{stats.acceptedOffers}</div>
+              <div className="stat-label">Accepted Offers</div>
+            </div>
+          </div>
+
+          <div className="stat-box">
+            <div className="stat-icon">🏆</div>
+            <div className="stat-data">
+              <div className="stat-value">{stats.completedJobs}</div>
+              <div className="stat-label">Completed</div>
+            </div>
+          </div>
+
+          {stats.totalRatings > 0 && (
+            <div className="stat-box">
+              <div className="stat-icon">⭐</div>
+              <div className="stat-data">
+                <div className="stat-value">{stats.averageRating}</div>
+                <div className="stat-label">Rating ({stats.totalRatings})</div>
+              </div>
+            </div>
+          )}
+
+          {stats.totalEarnings > 0 && (
+            <div className="stat-box">
+              <div className="stat-icon">💰</div>
+              <div className="stat-data">
+                <div className="stat-value">₱{stats.totalEarnings.toFixed(0)}</div>
+                <div className="stat-label">Total Earnings</div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
