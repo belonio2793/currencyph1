@@ -22,7 +22,7 @@ const CURRENCY_SYMBOLS = {
   'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
   'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
   'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
-  'MYR': 'RM', 'THB': 'THB', 'VND': '₫', 'KRW': '���', 'ZAR': 'R',
+  'MYR': 'RM', 'THB': 'THB', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
   'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': '��.إ',
   'BTC': 'BTC', 'ETH': 'ETH', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
   'DOGE': 'DOGE', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'LTC', 'BCH': 'BCH',
@@ -476,121 +476,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         </div>
       )}
 
-      {/* Crypto Modal */}
-      {showCryptoModal && selectedCryptoWallet && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-900">{cryptoAction === 'receive' ? 'Receive Crypto' : 'Send Crypto'}</h3>
-              <button onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }} className="text-slate-400 hover:text-slate-600 text-2xl font-light">×</button>
-            </div>
-
-            {/* Source Wallet Info */}
-            <div className="mb-4">
-              <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wide mb-1">From Wallet</label>
-              <div className="bg-slate-900 rounded-lg p-3 space-y-1 font-mono">
-                <p className="text-sm text-amber-400 break-all">{selectedCryptoWallet.address}</p>
-                <div className="flex items-center justify-between text-xs text-slate-400">
-                  <span>{selectedCryptoWallet.chain}</span>
-                  <span className="text-amber-400 font-semibold">{Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</span>
-                </div>
-              </div>
-            </div>
-
-            <form onSubmit={handleCryptoSubmit} className="space-y-3">
-              {/* Amount Input */}
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Total Amount ({selectedCryptoWallet.chain})</label>
-                <div className="relative">
-                  <input
-                    type="number"
-                    step="0.000001"
-                    min="0"
-                    max={selectedCryptoWallet.balance || 0}
-                    value={cryptoAmount}
-                    onChange={e => setCryptoAmount(e.target.value)}
-                    placeholder="0.000000"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-base"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setCryptoAmount(String(selectedCryptoWallet.balance || 0))}
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap"
-                  >
-                    Max
-                  </button>
-                </div>
-              </div>
-
-              {/* Recipient Address (for Send) */}
-              {cryptoAction === 'send' && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">Recipient Address</label>
-                  <input
-                    type="text"
-                    value={recipientAddress}
-                    onChange={e => setRecipientAddress(e.target.value)}
-                    placeholder="0x... or recipient address"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent text-xs font-mono"
-                  />
-                  <p className="text-xs text-slate-500 mt-1">Enter the wallet address where you want to send {selectedCryptoWallet.chain}</p>
-                </div>
-              )}
-
-              {/* Receive Display (for Receive) */}
-              {cryptoAction === 'receive' && (
-                <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-2">
-                  <p className="text-xs font-semibold text-indigo-900 uppercase tracking-wide mb-1">Your Receive Address</p>
-                  <p className="text-xs text-indigo-700 font-mono break-all mb-2 p-1 bg-white rounded border border-indigo-100">{selectedCryptoWallet.address}</p>
-                  <p className="text-xs text-indigo-600">Share this address with the sender to receive {selectedCryptoWallet.chain}</p>
-                </div>
-              )}
-
-              {/* Summary */}
-              {cryptoAmount && parseFloat(cryptoAmount) > 0 && (
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-2">
-                  <div className="space-y-1 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-600">Amount:</span>
-                      <span className="font-semibold text-slate-900">{parseFloat(cryptoAmount).toFixed(6)} {selectedCryptoWallet.chain}</span>
-                    </div>
-                    {cryptoAction === 'send' && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-600">To:</span>
-                        <span className="font-mono text-xs text-slate-700 text-right">{formatWalletAddress(recipientAddress)}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Error message if amount exceeds balance */}
-              {cryptoAmount && parseFloat(cryptoAmount) > (selectedCryptoWallet.balance || 0) && (
-                <div className="p-2 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-xs text-red-700">Insufficient balance. Available: {Number(selectedCryptoWallet.balance || 0).toFixed(6)} {selectedCryptoWallet.chain}</p>
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-1">
-                <button
-                  type="button"
-                  onClick={() => { setShowCryptoModal(false); setRecipientAddress(''); setCryptoAmount('') }}
-                  className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-100 transition-colors text-xs font-medium"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={sendingCrypto || !cryptoAmount || parseFloat(cryptoAmount) <= 0 || (cryptoAction === 'send' && !recipientAddress) || parseFloat(cryptoAmount) > (selectedCryptoWallet.balance || 0)}
-                  className="flex-1 px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-xs font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {sendingCrypto ? 'Processing...' : cryptoAction === 'send' ? 'Send' : 'Confirm Receive'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
