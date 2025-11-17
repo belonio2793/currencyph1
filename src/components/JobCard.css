@@ -102,6 +102,12 @@
   flex: 1;
 }
 
+.header-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .job-title {
   margin: 0;
   color: #1a1a1a;
