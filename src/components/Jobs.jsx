@@ -180,6 +180,12 @@ export default function Jobs({ userId }) {
 
   const handleApplyForJob = async (jobId, offerData) => {
     try {
+      // Ensure we have the business_id from selectedJob
+      if (!selectedJob || !selectedJob.business_id) {
+        setError('Job information not loaded. Please try again.')
+        return
+      }
+
       await jobsService.createJobOffer({
         job_id: jobId,
         service_provider_id: userId,
@@ -188,9 +194,19 @@ export default function Jobs({ userId }) {
       })
       loadJobs()
       setShowJobDetails(false)
+      setError('Application submitted successfully!')
+      setTimeout(() => setError(''), 3000)
     } catch (err) {
       console.error('Error applying for job:', err)
-      setError('Failed to apply for job. Please try again.')
+      let errorMessage = 'Failed to apply for job. Please try again.'
+
+      if (err?.message) {
+        errorMessage = err.message
+      } else if (err?.details) {
+        errorMessage = typeof err.details === 'string' ? err.details : JSON.stringify(err.details)
+      }
+
+      setError(errorMessage)
     }
   }
 
