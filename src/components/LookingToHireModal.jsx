@@ -253,9 +253,13 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
                   required
                 >
                   <option value="">Select a category</option>
-                  {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
+                  {categories && categories.length > 0 ? (
+                    categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))
+                  ) : (
+                    <option value="">Loading categories...</option>
+                  )}
                 </select>
               </div>
 
