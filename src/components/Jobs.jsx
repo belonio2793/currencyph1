@@ -466,21 +466,21 @@ export default function Jobs({ userId }) {
           onClick={() => setActiveTab('job-listings')}
         >
           Job Listings
-          {tabCounts.jobListings > 0 && <span className="tab-badge">({tabCounts.jobListings})</span>}
+          <span className="tab-badge">{tabCounts.jobListings}</span>
         </button>
         <button
           className={`tab ${activeTab === 'offers-received' ? 'active' : ''}`}
           onClick={() => setActiveTab('offers-received')}
         >
           Offers Received
-          {tabCounts.offersReceived > 0 && <span className="tab-badge">({tabCounts.offersReceived})</span>}
+          <span className="tab-badge">{tabCounts.offersReceived}</span>
         </button>
         <button
           className={`tab ${activeTab === 'my-jobs' ? 'active' : ''}`}
           onClick={() => setActiveTab('my-jobs')}
         >
           My Jobs
-          {tabCounts.myJobs > 0 && <span className="tab-badge">({tabCounts.myJobs})</span>}
+          <span className="tab-badge">{tabCounts.myJobs}</span>
         </button>
       </div>
 
