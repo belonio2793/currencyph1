@@ -108,6 +108,18 @@ export default function Jobs({ userId }) {
     }
   }, [selectedBusiness])
 
+  // Calculate tab counts
+  useEffect(() => {
+    const pendingOffers = offers.filter(o => o.status === 'pending').length
+    const acceptedOffers = offers.filter(o => o.status === 'accepted').length
+
+    setTabCounts({
+      jobListings: jobs.length,
+      offersReceived: offers.length,
+      myJobs: userJobs.length
+    })
+  }, [jobs, offers, userJobs])
+
   const loadJobs = async () => {
     setLoading(true)
     setError('')
