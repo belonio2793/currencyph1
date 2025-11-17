@@ -110,6 +110,28 @@ export default function EmployerJobsOverview({ businessId, currentUserId }) {
     }
   }
 
+  const handleAcceptOffer = async (offerId) => {
+    try {
+      await jobsService.acceptJobOffer(offerId)
+      setError('Offer accepted successfully!')
+      loadData()
+    } catch (err) {
+      console.error('Error accepting offer:', err)
+      throw err
+    }
+  }
+
+  const handleRejectOffer = async (offerId) => {
+    try {
+      await jobsService.rejectJobOffer(offerId)
+      setError('Offer rejected.')
+      loadData()
+    } catch (err) {
+      console.error('Error rejecting offer:', err)
+      throw err
+    }
+  }
+
   return (
     <div className="jobs-employer-container">
       <div className="jobs-header">
