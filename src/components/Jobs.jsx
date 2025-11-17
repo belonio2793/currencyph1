@@ -208,7 +208,20 @@ export default function Jobs({ userId }) {
       setTimeout(() => setError(''), 3000)
     } catch (err) {
       console.error('Error submitting job:', err)
-      const errorMessage = err?.message || err?.details || 'Unknown error occurred'
+      let errorMessage = 'Unknown error occurred'
+
+      if (err?.message) {
+        errorMessage = err.message
+      } else if (err?.details) {
+        errorMessage = typeof err.details === 'string' ? err.details : JSON.stringify(err.details)
+      } else if (err?.error_description) {
+        errorMessage = err.error_description
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      } else if (err?.toString && err.toString() !== '[object Object]') {
+        errorMessage = err.toString()
+      }
+
       setError(`Failed to submit job: ${errorMessage}`)
     }
   }
