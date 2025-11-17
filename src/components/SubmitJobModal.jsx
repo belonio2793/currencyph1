@@ -226,7 +226,8 @@ export default function SubmitJobModal({
       })
     } catch (err) {
       console.error('Error submitting job:', err)
-      setError('Failed to submit job. Please try again.')
+      const errorMessage = err?.message || err?.details || 'Failed to submit job. Please try again.'
+      setError(`Failed to submit job: ${errorMessage}`)
     } finally {
       setLoading(false)
     }
