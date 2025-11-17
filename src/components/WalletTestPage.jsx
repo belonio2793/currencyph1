@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import {
   metamaskConnection,
-  walletconnectConnection,
   coinbaseConnection,
   phantomConnection,
   venlyConnection,
