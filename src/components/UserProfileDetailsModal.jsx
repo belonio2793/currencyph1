@@ -116,7 +116,7 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
   const getDisplayName = (profile) => {
     if (!profile) return 'Unknown'
     const displayType = profile?.display_name_type || 'full_name'
-    
+
     switch (displayType) {
       case 'username':
         return profile.username || profile.full_name || 'User'
@@ -128,6 +128,27 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
       default:
         return profile.full_name || 'User'
     }
+  }
+
+  const formatDisplayNameType = (type) => {
+    if (!type) return 'Full Name'
+    return type
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
+  const blurEmail = (email) => {
+    if (!email) return ''
+    const [localPart, domain] = email.split('@')
+    const visibleChars = Math.ceil(localPart.length / 3)
+    const blurred = localPart.substring(0, visibleChars) + '*'.repeat(localPart.length - visibleChars)
+    return `${blurred}@${domain}`
+  }
+
+  const handleSendMessage = () => {
+    onClose()
+    window.dispatchEvent(new CustomEvent('openChat', { detail: { userId } }))
   }
 
   if (loading) {
