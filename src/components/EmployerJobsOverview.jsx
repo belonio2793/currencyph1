@@ -4,6 +4,7 @@ import { jobsService } from '../lib/jobsService'
 import JobCard from './JobCard'
 import PostJobModal from './PostJobModal'
 import JobDetailsModal from './JobDetailsModal'
+import OfferActions from './OfferActions'
 import './Jobs.css'
 
 export default function EmployerJobsOverview({ businessId, currentUserId }) {
