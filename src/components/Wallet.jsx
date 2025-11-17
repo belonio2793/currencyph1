@@ -161,9 +161,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       }
       setInternalWallets(internal)
 
-      // Fetch additional fiat and crypto wallets from Supabase (new tables)
+      // Fetch additional fiat wallets from Supabase (new tables)
       let fiatMapped = []
-      let cryptoMapped = []
       try {
         const { data: fData } = await supabase.from('wallets_fiat').select('*').eq('user_id', userId)
         fiatMapped = (fData || []).map(r => ({
@@ -179,41 +178,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         console.warn('Error loading wallets_fiat from Supabase:', e)
       }
 
-      try {
-        const { data: cData } = await supabase.from('wallets_crypto').select('*').eq('user_id', userId)
-        cryptoMapped = (cData || []).map(r => ({
-          id: r.id,
-          currency_code: r.chain || r.currency || 'CRYPTO',
-          chain_id: r.chain_id || null,
-          balance: Number(r.balance || 0),
-          address: r.address,
-          provider: r.provider,
-          chain: r.chain,
-          source: 'crypto',
-          tokens: []
-        }))
-        // Fetch token balances for these wallets in bulk
-        try {
-          const walletIds = cryptoMapped.map(w => w.id).filter(Boolean)
-          if (walletIds.length > 0) {
-            const { data: tokensData } = await supabase.from('wallets_tokens').select('*').in('wallet_id', walletIds)
-            const tokensByWallet = {}
-            ;(tokensData || []).forEach(t => {
-              if (!tokensByWallet[t.wallet_id]) tokensByWallet[t.wallet_id] = []
-              tokensByWallet[t.wallet_id].push({ token_address: t.token_address, balance: t.balance, metadata: t.metadata })
-            })
-            cryptoMapped = cryptoMapped.map(w => ({ ...w, tokens: tokensByWallet[w.id] || [] }))
-          }
-        } catch (tokErr) {
-          console.warn('Failed loading wallets_tokens:', tokErr)
-        }
-
-        setCryptoWallets(cryptoMapped)
-      } catch (e) {
-        console.warn('Error loading wallets_crypto from Supabase:', e)
-      }
-
-      const combined = [...internal, ...fiatMapped, ...cryptoMapped]
+      const combined = [...internal, ...fiatMapped]
       setWallets(combined)
       setError('')
 
@@ -221,7 +186,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       const prefs = preferencesManager.getAllPreferences(userId)
       if (!prefs.walletCurrencies && internal.length > 0) savePreferences('internal', internal.map(w => w.currency_code))
       if (!prefs.walletCurrencies_fiat && fiatMapped.length > 0) savePreferences('fiat', fiatMapped.map(w => w.currency_code))
-      if (!prefs.walletCurrencies_crypto && cryptoMapped.length > 0) savePreferences('crypto', cryptoMapped.map(w => w.currency_code))
 
     } catch (err) {
       console.error('Error loading wallets:', err)
@@ -232,56 +196,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
   }
 
-  // ============ Network Wallets (house) helpers ============
-  const loadNetworkWallets = async () => {
-    try {
-      const { data, error } = await supabase.from('wallets_house').select('*')
-      if (error) throw error
-      setNetworkWallets(data || [])
-    } catch (e) {
-      console.warn('Failed loading network wallets:', e)
-      setNetworkWallets([])
-    }
-  }
-
-  const generateNetworkWalletForChain = async (chain) => {
-    try {
-      const { data, error } = await supabase.functions.invoke('create-wallet-unified', {
-        body: {
-          chain_id: chain.chainId,
-          create_house: true
-        }
-      })
-      if (error) throw error
-      return data
-    } catch (e) {
-      console.error('Failed creating network wallet for', chain.name, e)
-      return null
-    }
-  }
-
-  const generateAllNetworkWallets = async () => {
-    try {
-      setGeneratingNetwork(true)
-      const chains = Object.values(SUPPORTED_CHAINS)
-      setNetworkProgress({ done: 0, total: chains.length })
-      await loadNetworkWallets()
-      for (let i = 0; i < chains.length; i++) {
-        const chain = chains[i]
-        // skip if already present
-        const exists = networkWallets.some(nw => nw.network && nw.network.toLowerCase() === chain.name.toLowerCase())
-        if (!exists) {
-          await generateNetworkWalletForChain(chain)
-        }
-        setNetworkProgress(prev => ({ ...prev, done: prev.done + 1 }))
-      }
-      await loadNetworkWallets()
-      setGeneratingNetwork(false)
-    } catch (e) {
-      console.error('generateAllNetworkWallets error:', e)
-      setGeneratingNetwork(false)
-    }
-  }
 
   const handleAddFunds = async (e) => {
     e.preventDefault()
