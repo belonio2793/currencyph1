@@ -57,8 +57,22 @@ export default function ChatBar({ userId, userEmail }) {
       setActiveTab('chats')
       startChat(otherUser)
     }
+
+    const openChatHandler = (e) => {
+      const otherUserId = e?.detail?.userId
+      if (!otherUserId) return
+      setMinimized(false)
+      setActiveTab('chats')
+      // Create a temporary user object from the userId
+      startChat({ id: otherUserId })
+    }
+
     window.addEventListener('openChatWithUser', handler)
-    return () => window.removeEventListener('openChatWithUser', handler)
+    window.addEventListener('openChat', openChatHandler)
+    return () => {
+      window.removeEventListener('openChatWithUser', handler)
+      window.removeEventListener('openChat', openChatHandler)
+    }
   }, [])
 
   useEffect(() => {
