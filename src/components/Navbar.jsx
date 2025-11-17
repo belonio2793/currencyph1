@@ -19,7 +19,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
 
   // Buttons that should appear under the Community Projects row
   const investmentsRowButtons = [
-    { id: 'network-balances', label: 'Balances', auth: true },
+    { id: 'wallet', label: 'Wallets', auth: true },
     { id: 'send', label: 'Send', auth: true },
     { id: 'bills', label: 'Bills', auth: true },
     { id: 'transactions', label: 'History', auth: true },
