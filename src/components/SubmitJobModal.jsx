@@ -875,6 +875,39 @@ export default function SubmitJobModal({
                   value={formData.end_date}
                   onChange={handleInputChange}
                 />
+                <div style={{ marginTop: '6px', fontSize: '0.85rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => setDatePreset('end_date', 0)}
+                    style={{
+                      color: '#667eea',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: '0',
+                      marginRight: '12px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Today
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDatePreset('end_date', 1)}
+                    style={{
+                      color: '#667eea',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      textDecoration: 'underline',
+                      padding: '0',
+                      fontWeight: '500'
+                    }}
+                  >
+                    Tomorrow
+                  </button>
+                </div>
               </div>
             </div>
 
