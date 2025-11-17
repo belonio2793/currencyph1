@@ -176,14 +176,6 @@
   gap: 15px;
 }
 
-.info-item.full-width {
-  flex-direction: column;
-}
-
-.info-item.full-width .label {
-  margin-bottom: 6px;
-}
-
 .info-item:last-child {
   border-bottom: none;
 }
