@@ -4,11 +4,39 @@ const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || '339554ddb254
 const rpcUrl = import.meta.env.VITE_RPC_URL_1 || 'https://eth.rpc.thirdweb.com'
 
 /**
- * Check if running in iframe
+ * Check if running in Builder.io preview iframe (not a general iframe)
+ * Only blocks wallet connections in the specific Builder preview environment
  */
-function isRunningInIframe() {
+function isBuilderPreviewIframe() {
   if (typeof window === 'undefined') return false
-  return window.self !== window.top
+
+  try {
+    // Check if we're in an iframe
+    const inIframe = window.self !== window.top
+
+    // Only treat as Builder preview if:
+    // 1. We're in an iframe AND
+    // 2. The parent window has Builder.io related properties
+    if (inIframe) {
+      try {
+        // Check if parent has Builder-specific markers
+        const parentHasBuilder = window.top?.document?.querySelector?.('[data-builder]') !== undefined ||
+                               window.top?.__BUILDER_DATA__ !== undefined ||
+                               window.parent?.location?.hostname?.includes?.('builder.io')
+
+        // Only return true if we detect Builder preview markers
+        return parentHasBuilder
+      } catch (e) {
+        // Can't access parent due to CORS - treat as production (allow connections)
+        return false
+      }
+    }
+
+    return false
+  } catch (e) {
+    // If we can't even check window.self/top (security error), assume production (allow connections)
+    return false
+  }
 }
 
 /**
