@@ -42,8 +42,8 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
 
       // Fetch verification status
       const { data: verifyData } = await supabase
-        .from('didit_verifications')
-        .select('status, document_type, didit_verified_at, is_public')
+        .from('user_verifications')
+        .select('status, document_type, verified_at, is_public')
         .eq('user_id', userId)
         .single()
 
