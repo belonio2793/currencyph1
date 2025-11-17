@@ -36,7 +36,7 @@ export default function UserProfilePreview({ userId }) {
           created_at: user.created_at
         })
 
-        await loadUserStats(user.id)
+        await loadUserStats(user.id, user.created_at)
       }
     } catch (err) {
       console.error('Error loading user profile:', err)
