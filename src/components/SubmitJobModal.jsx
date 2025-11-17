@@ -616,7 +616,7 @@ export default function SubmitJobModal({
                 marginBottom: '15px'
               }}>
                 <p style={{ margin: 0, color: '#0ea5e9', fontWeight: '600', fontSize: '0.95rem' }}>
-                  ✓ Remote Job Selected
+                  Remote Location Selected
                 </p>
                 <p style={{ margin: '8px 0 0 0', color: '#666', fontSize: '0.85rem' }}>
                   Service providers can work from anywhere. No specific location is needed.
