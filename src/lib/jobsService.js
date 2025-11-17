@@ -342,6 +342,30 @@ export const jobsService = {
     return data || []
   },
 
+  // Get offers received for a business's posted jobs
+  async getBusinessOffers(businessId) {
+    const { data, error } = await supabase
+      .from('job_offers')
+      .select(`
+        *,
+        jobs (
+          id,
+          job_title,
+          job_category,
+          pay_rate,
+          job_type,
+          location,
+          business_id,
+          created_at
+        )
+      `)
+      .eq('jobs.business_id', businessId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
+  },
+
   // Update job offer status
   async updateJobOffer(offerId, updates) {
     const { data, error } = await supabase
