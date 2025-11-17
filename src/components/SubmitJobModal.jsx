@@ -772,7 +772,42 @@ export default function SubmitJobModal({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="start_date">Start Date</label>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <label htmlFor="start_date">Start Date</label>
+                  <div style={{ fontSize: '0.85rem' }}>
+                    <button
+                      type="button"
+                      onClick={() => setDatePreset('start_date', 0)}
+                      style={{
+                        color: '#667eea',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        padding: '0',
+                        marginRight: '12px',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Today
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDatePreset('start_date', 1)}
+                      style={{
+                        color: '#667eea',
+                        background: 'none',
+                        border: 'none',
+                        cursor: 'pointer',
+                        textDecoration: 'underline',
+                        padding: '0',
+                        fontWeight: '500'
+                      }}
+                    >
+                      Tomorrow
+                    </button>
+                  </div>
+                </div>
                 <input
                   id="start_date"
                   type="date"
@@ -780,39 +815,6 @@ export default function SubmitJobModal({
                   value={formData.start_date}
                   onChange={handleInputChange}
                 />
-                <div style={{ marginTop: '6px', fontSize: '0.85rem' }}>
-                  <button
-                    type="button"
-                    onClick={() => setDatePreset('start_date', 0)}
-                    style={{
-                      color: '#667eea',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      padding: '0',
-                      marginRight: '12px',
-                      fontWeight: '500'
-                    }}
-                  >
-                    Today
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDatePreset('start_date', 1)}
-                    style={{
-                      color: '#667eea',
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                      textDecoration: 'underline',
-                      padding: '0',
-                      fontWeight: '500'
-                    }}
-                  >
-                    Tomorrow
-                  </button>
-                </div>
               </div>
 
               <div className="form-group">
