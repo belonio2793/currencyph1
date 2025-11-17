@@ -69,12 +69,23 @@ try {
       try {
         return await _origFetch(input, init)
       } catch (err) {
-        // Suppress noisy network errors for known external analytics/iframe hosts in development
+        // Check if this is a network/offline error
+        const isNetworkError = err && (err.name === 'NetworkError' || err.message?.includes('Failed to fetch'))
+
         try {
           const url = (typeof input === 'string') ? input : (input && input.url) || ''
           const host = url && url.toString().toLowerCase()
-          const suppressedHosts = ['fullstory.com', 'edge.fullstory.com', 'sentry.io', 'segment.io', 'rollbar.com']
+
+          // List of hosts that should be silently suppressed
+          const suppressedHosts = [
+            'fullstory.com', 'edge.fullstory.com',
+            'sentry.io', 'segment.io', 'rollbar.com',
+            'supabase.co', // Suppress Supabase network errors (non-critical presence sync)
+            'socket.to'
+          ]
+
           const shouldSuppress = suppressedHosts.some(h => host.includes(h))
+
           if (shouldSuppress) {
             console.debug('[safeFetch] Suppressed network error for', url, err && err.message)
             const body = JSON.stringify({ error: 'network_error', message: err && err.message })
