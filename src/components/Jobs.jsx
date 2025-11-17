@@ -41,12 +41,12 @@ export default function Jobs({ userId }) {
         const [cats, citys, businesses] = await Promise.all([
           jobsService.getJobCategories(),
           jobsService.getJobCities(),
-          loadUserBusinesses()
+          userId ? loadUserBusinesses() : Promise.resolve([])
         ])
         setCategories(cats)
         setCities(citys)
         setUserBusinesses(businesses)
-        
+
         // Determine user type based on whether they have businesses
         if (businesses && businesses.length > 0) {
           setUserType('employer')
@@ -58,7 +58,9 @@ export default function Jobs({ userId }) {
       }
     }
 
-    loadInitialData()
+    if (userId) {
+      loadInitialData()
+    }
   }, [userId])
 
   // Load user's businesses
