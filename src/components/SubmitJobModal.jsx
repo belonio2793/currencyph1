@@ -102,6 +102,21 @@ export default function SubmitJobModal({
     }
   }, [showAddBusinessModal])
 
+  useEffect(() => {
+    setFilteredCities(PHILIPPINES_CITIES.slice(0, 10))
+  }, [])
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (cityDropdownRef.current && !cityDropdownRef.current.contains(event.target)) {
+        setShowCityDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleCreateBusiness = async (e) => {
     e.preventDefault()
     if (!businessFormData.businessName.trim()) {
