@@ -84,6 +84,20 @@ export default function SubmitJobModal({
   })
   const [creatingBusiness, setCreatingBusiness] = useState(false)
 
+  // Generate a unique currency registration number when the modal opens
+  useEffect(() => {
+    if (showAddBusinessModal && !businessFormData.currencyRegistrationNumber) {
+      // Generate format: P-XXXXXXXX-XXX (Philippine registration format)
+      const randomNum1 = Math.floor(Math.random() * 100000000).toString().padStart(8, '0')
+      const randomNum2 = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
+      const generatedNumber = `P-${randomNum1}-${randomNum2}`
+      setBusinessFormData(prev => ({
+        ...prev,
+        currencyRegistrationNumber: generatedNumber
+      }))
+    }
+  }, [showAddBusinessModal])
+
   const handleCreateBusiness = async (e) => {
     e.preventDefault()
     if (!businessFormData.businessName.trim()) {
