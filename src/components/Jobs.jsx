@@ -652,6 +652,11 @@ export default function Jobs({ userId }) {
           job={selectedJob}
           onClose={() => setShowJobDetails(false)}
           onApply={handleApplyForJob}
+          onEdit={(job) => {
+            setEditingJob(job)
+            setShowEditJobModal(true)
+            setShowJobDetails(false)
+          }}
           currentUserId={userId}
           businessId={selectedBusiness?.id}
         />
