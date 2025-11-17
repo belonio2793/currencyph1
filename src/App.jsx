@@ -262,13 +262,20 @@ export default function App() {
     try {
       const wallets = await currencyAPI.getWallets(uid)
       const promises = (wallets || []).map(async (w) => {
-        const bal = Number(w.balance || 0)
-        if (!w.currency_code || w.currency_code === 'PHP') return bal
-        const rate = await currencyAPI.getExchangeRate(w.currency_code, 'PHP')
-        return rate ? bal * Number(rate) : 0
+        try {
+          const bal = Number(w.balance || 0)
+          if (!w.currency_code || w.currency_code === 'PHP') return bal
+          const rate = await currencyAPI.getExchangeRate(w.currency_code, 'PHP')
+          return rate ? bal * Number(rate) : bal
+        } catch (e) {
+          console.warn(`Failed to convert ${w.currency_code}:`, e?.message)
+          return Number(w.balance || 0)
+        }
       })
-      const values = await Promise.all(promises)
-      const total = values.reduce((s, v) => s + v, 0)
+      const values = await Promise.allSettled(promises)
+      const total = values.reduce((sum, result) => {
+        return sum + (result.status === 'fulfilled' ? (result.value || 0) : 0)
+      }, 0)
       setTotalBalancePHP(total)
     } catch (err) {
       console.warn('Could not load wallets for total balance:', err?.message)
