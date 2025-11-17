@@ -278,6 +278,9 @@ export default function EmployerJobsOverview({ businessId, currentUserId }) {
                     <span className={`status ${offer.status}`}>{offer.status}</span>
                   </div>
                   <div className="offer-details">
+                    <p><strong>Provider:</strong> {offer.provider_name}</p>
+                    <p><strong>Email:</strong> {offer.provider_email}</p>
+                    <p><strong>Phone:</strong> {offer.provider_phone}</p>
                     <p><strong>Category:</strong> {offer.jobs?.job_category}</p>
                     <p><strong>Provider Rate:</strong> ₱{offer.offered_rate?.toFixed(2)}</p>
                     <p><strong>Job Rate:</strong> ₱{offer.jobs?.pay_rate?.toFixed(2)}</p>
@@ -287,13 +290,21 @@ export default function EmployerJobsOverview({ businessId, currentUserId }) {
                     <p>{offer.offer_message}</p>
                   </div>
                   <div className="offer-footer">
-                    <span className="date">{new Date(offer.created_at).toLocaleDateString()}</span>
-                    <button
-                      className="btn-small"
-                      onClick={() => handleJobSelect(offer.jobs)}
-                    >
-                      View Details
-                    </button>
+                    <div className="footer-left">
+                      <span className="date">{new Date(offer.created_at).toLocaleDateString()}</span>
+                      <button
+                        className="btn-small"
+                        onClick={() => handleJobSelect(offer.jobs)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                    <OfferActions
+                      offer={offer}
+                      onAccept={handleAcceptOffer}
+                      onReject={handleRejectOffer}
+                      userType="employer"
+                    />
                   </div>
                 </div>
               ))}
