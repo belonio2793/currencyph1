@@ -888,15 +888,19 @@ export default function SubmitJobModal({
                     type="button"
                     onClick={() => setDatePreset('offer_expiry_date', 0)}
                     style={{
-                      color: '#667eea',
+                      color: '#64748b',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      textDecoration: 'underline',
                       padding: '0',
                       marginRight: '12px',
-                      fontWeight: '500'
+                      fontWeight: '500',
+                      fontSize: '0.875rem',
+                      opacity: '0.6',
+                      transition: 'opacity 0.2s ease'
                     }}
+                    onMouseEnter={(e) => e.target.style.opacity = '1'}
+                    onMouseLeave={(e) => e.target.style.opacity = '0.6'}
                   >
                     Today
                   </button>
@@ -904,14 +908,18 @@ export default function SubmitJobModal({
                     type="button"
                     onClick={() => setDatePreset('offer_expiry_date', 1)}
                     style={{
-                      color: '#667eea',
+                      color: '#64748b',
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      textDecoration: 'underline',
                       padding: '0',
-                      fontWeight: '500'
+                      fontWeight: '500',
+                      fontSize: '0.875rem',
+                      opacity: '0.6',
+                      transition: 'opacity 0.2s ease'
                     }}
+                    onMouseEnter={(e) => e.target.style.opacity = '1'}
+                    onMouseLeave={(e) => e.target.style.opacity = '0.6'}
                   >
                     Tomorrow
                   </button>
