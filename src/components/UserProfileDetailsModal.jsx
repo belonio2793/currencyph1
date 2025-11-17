@@ -209,7 +209,7 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
           </div>
 
           <button className="send-message-btn" onClick={handleSendMessage}>
-            💬 Send Message
+            Send Message
           </button>
         </div>
 
@@ -372,7 +372,7 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
                       <div key={idx} className="rating-item">
                         <div className="rating-header">
                           <div className="rating-stars">
-                            {'★'.repeat(Math.round(rating.rating_score))}{'☆'.repeat(5 - Math.round(rating.rating_score))}
+                            {'��'.repeat(Math.round(rating.rating_score))}{'☆'.repeat(5 - Math.round(rating.rating_score))}
                           </div>
                           <span className="rating-date">{new Date(rating.created_at).toLocaleDateString()}</span>
                         </div>
