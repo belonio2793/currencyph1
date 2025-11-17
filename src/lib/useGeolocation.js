@@ -77,6 +77,7 @@ export function useGeolocation() {
               // Fallback to Nominatim
               try {
                 const controller = new AbortController()
+                abortControllersRef.current.push(controller)
                 let timedOut = false
                 let aborted = false
 
