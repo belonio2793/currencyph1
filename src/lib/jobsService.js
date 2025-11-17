@@ -441,11 +441,21 @@ export const jobsService = {
     return data?.[0]
   },
 
-  // Get remarks for a job
+  // Get remarks for a job with user information
   async getJobRemarks(jobId, onlyPublic = false) {
     let query = supabase
       .from('job_remarks')
-      .select('*')
+      .select(`
+        id,
+        job_id,
+        job_offer_id,
+        created_by_user_id,
+        remark_text,
+        is_public,
+        remark_type,
+        created_at,
+        updated_at
+      `)
       .eq('job_id', jobId)
 
     if (onlyPublic) {
@@ -455,6 +465,32 @@ export const jobsService = {
     const { data, error } = await query.order('created_at', { ascending: false })
 
     if (error) throw error
+
+    // Fetch user information for each remark (email, names, etc.)
+    if (data && data.length > 0) {
+      const userIds = [...new Set(data.map(r => r.created_by_user_id))]
+
+      try {
+        const { data: users } = await supabase
+          .from('users')
+          .select('id, email, full_name, username, profile_picture_url')
+          .in('id', userIds)
+
+        const userMap = {}
+        users?.forEach(user => {
+          userMap[user.id] = user
+        })
+
+        return data.map(remark => ({
+          ...remark,
+          user: userMap[remark.created_by_user_id] || { id: remark.created_by_user_id, email: 'Unknown User' }
+        }))
+      } catch (err) {
+        console.warn('Could not fetch user info for remarks:', err)
+        return data
+      }
+    }
+
     return data || []
   },
 
