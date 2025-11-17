@@ -116,8 +116,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [noWalletDetected, setNoWalletDetected] = useState(false)
   const [showProviderList, setShowProviderList] = useState(false)
 
-  // Network wallets (house) UI state
-  const [showNetworkPanel, setShowNetworkPanel] = useState(false)
+  // Network wallets (house) UI state - default to showing Network Balances
+  const [showNetworkPanel, setShowNetworkPanel] = useState(true)
 
   // Currency exchange rates cache (rate to globalCurrency)
   const [currencyRates, setCurrencyRates] = useState({})
