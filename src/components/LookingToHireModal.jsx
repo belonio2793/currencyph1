@@ -155,7 +155,7 @@ export default function LookingToHireModal({ onClose, onSubmit, categories, citi
 
   const validateForm = () => {
     if (!formData.job_title.trim()) {
-      setError('Service needed is required')
+      setError('Job needed is required')
       return false
     }
     if (!formData.job_category) {
