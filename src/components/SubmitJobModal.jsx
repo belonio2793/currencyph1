@@ -72,6 +72,7 @@ export default function SubmitJobModal({
   const [skillInput, setSkillInput] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [saveToProfile, setSaveToProfile] = useState(true)
   const [businessFormData, setBusinessFormData] = useState({
     businessName: '',
     registrationType: 'sole',
