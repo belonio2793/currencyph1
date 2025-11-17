@@ -102,8 +102,38 @@
   justify-content: center;
   width: 40px;
   height: 40px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 6px;
+  font-weight: 700;
+  color: white;
+  position: relative;
+}
+
+.stat-icon[data-icon="briefcase"]::before {
+  content: "📊";
+  font-size: 18px;
+  margin: 0;
+}
+
+.stat-icon[data-icon="check"]::before {
+  content: "✓";
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.stat-icon[data-icon="trophy"]::before {
+  content: "⬆";
+  font-size: 18px;
+}
+
+.stat-icon[data-icon="star"]::before {
+  content: "★";
+  font-size: 20px;
+}
+
+.stat-icon[data-icon="currency"]::before {
+  content: "₱";
+  font-size: 20px;
 }
 
 .stat-data {
