@@ -206,7 +206,6 @@ export default function HeaderMap({ userId: headerUserId }) {
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; OpenStreetMap contributors'
                 />
 
                 {/* Always show a draggable marker at the current markerPos (falls back to displayLocation) */}
