@@ -84,42 +84,19 @@ export default function LocationModal({
     if (!address.trim()) return
 
     setLoading(true)
-    let timeoutId = null
     try {
-      const controller = new AbortController()
-      timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
-
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=20&bounded=1&viewbox=120,19,129,5&countrycodes=ph`,
-        {
-          signal: controller.signal,
-          headers: {
-            'User-Agent': 'currency-ph/1.0'
-          }
-        }
-      )
-
-      clearTimeout(timeoutId)
-
-      if (!response.ok) throw new Error(`Location search failed (${response.status})`)
-
-      const results = await response.json()
-      if (!Array.isArray(results)) {
-        setSearchResults([])
-        return
-      }
+      const results = await forwardGeocode(address, {
+        limit: 20,
+        countrycode: 'ph',
+        viewbox: '120,19,129,5'
+      })
 
       // Filter results by radius from user location (if available)
-      let filteredResults = results.map(r => ({
-        latitude: parseFloat(r.lat),
-        longitude: parseFloat(r.lon),
-        address: r.display_name
-      }))
+      let filteredResults = results
 
-      // If user location is available, filter by radius (50km default)
-      if (userLocation) {
+      if (userLocation && results.length > 0) {
         const radiusKm = 50
-        filteredResults = filteredResults.filter(result => {
+        filteredResults = results.filter(result => {
           const distance = calculateDistance(
             userLocation.latitude,
             userLocation.longitude,
@@ -132,12 +109,7 @@ export default function LocationModal({
 
       setSearchResults(filteredResults.slice(0, 10))
     } catch (error) {
-      if (timeoutId) clearTimeout(timeoutId)
-      if (error?.name === 'AbortError') {
-        console.error('Location search timeout')
-      } else {
-        console.error('Search error:', error?.message)
-      }
+      console.error('Search error:', error?.message)
       setSearchResults([])
     } finally {
       setLoading(false)
