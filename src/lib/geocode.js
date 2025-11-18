@@ -1,4 +1,5 @@
 // Reverse geocoding helper: prefers MapTiler, falls back to Nominatim (OpenStreetMap)
+import { reverseGeocode as nominatimReverse } from './nominatimService.js'
 
 const MAPTILER_KEY = typeof import.meta !== 'undefined'
   ? (import.meta.env?.VITE_MAPTILER_KEY || import.meta.env?.MAPTILER_API_KEY || import.meta.env?.MAPTILER_KEY || '')
@@ -28,34 +29,11 @@ export async function reverseGeocode(lat, lng) {
     }
   }
 
-  // Fallback to Nominatim (OpenStreetMap)
+  // Fallback to Nominatim (OpenStreetMap) with improved error handling and retries
   try {
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3s timeout
-
-    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&addressdetails=1`
-    const res = await fetch(url, {
-      headers: { 'User-Agent': 'currency-ph/1.0' },
-      signal: controller.signal
-    })
-
-    clearTimeout(timeoutId)
-
-    if (!res.ok) throw new Error(`API error ${res.status}`)
-    const json = await res.json()
-    if (json && json.address) {
-      return {
-        street: json.address.road || json.address.pedestrian || json.address.cycleway || json.address.residential || json.address.neighbourhood || null,
-        city: json.address.city || json.address.town || json.address.village || json.address.county || null,
-        display_name: json.display_name || null
-      }
-    }
+    return await nominatimReverse(lat, lng)
   } catch (err) {
-    if (err?.name === 'AbortError') {
-      console.debug('Reverse geocode timeout')
-    } else {
-      console.warn('Nominatim reverse geocode failed:', err?.message)
-    }
+    console.warn('Nominatim reverse geocode failed:', err?.message)
   }
 
   return null
