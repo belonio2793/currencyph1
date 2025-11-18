@@ -79,11 +79,9 @@ export function useGeolocation() {
                 const controller = new AbortController()
                 abortControllersRef.current.push(controller)
                 let timedOut = false
-                let aborted = false
 
                 const timeoutId = setTimeout(() => {
                   timedOut = true
-                  aborted = true
                   controller.abort()
                 }, 3000)
 
@@ -95,7 +93,10 @@ export function useGeolocation() {
                       signal: controller.signal
                     }
                   )
-                  if (timedOut || !isMountedRef.current) return
+                  if (timedOut || !isMountedRef.current) {
+                    clearTimeout(timeoutId)
+                    return
+                  }
                   clearTimeout(timeoutId)
 
                   if (response?.ok && isMountedRef.current) {
@@ -106,14 +107,15 @@ export function useGeolocation() {
                           nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
                         )
                       }
-                    } catch (parseErr) {}
+                    } catch (parseErr) {
+                      // Silently ignore JSON parse errors
+                    }
                   }
                 } catch (fetchErr) {
-                  if (!timedOut) {
-                    clearTimeout(timeoutId)
-                  }
-                  if (fetchErr?.name === 'AbortError') {
-                    // Silently ignore abort errors (timeout or cleanup)
+                  clearTimeout(timeoutId)
+                  if (fetchErr?.name !== 'AbortError') {
+                    // Only log non-abort errors
+                    console.debug('Nominatim fetch error:', fetchErr?.message)
                   }
                 }
               } catch (e) {
