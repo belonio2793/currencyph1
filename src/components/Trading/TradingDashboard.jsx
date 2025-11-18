@@ -287,6 +287,10 @@ export default function TradingDashboard({ userId, onClose }) {
 
       {/* Tab Content */}
       <div className="p-6">
+        {activeTab === 'account' && (
+          <CoinsPhAccountDetails userId={userId} />
+        )}
+
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Account Info */}
