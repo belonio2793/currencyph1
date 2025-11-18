@@ -134,8 +134,11 @@ export default function CoinsPhLogin({ onLoginSuccess }) {
 
             {/* Security Notice */}
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-xs text-yellow-800">
-                <strong>🔒 Security Note:</strong> Your credentials are stored securely in your browser session. They are only sent to coins.ph API and never stored on our servers.
+              <p className="text-xs text-yellow-800 mb-2">
+                <strong>🔒 Security Note:</strong> Your credentials are stored securely in your browser session. They are only sent to coins.ph API through our secure proxy and never stored on our servers.
+              </p>
+              <p className="text-xs text-yellow-700">
+                <strong>ℹ️ How it works:</strong> Your credentials are forwarded through a Supabase Edge Function (proxy) to avoid browser CORS restrictions.
               </p>
             </div>
 
