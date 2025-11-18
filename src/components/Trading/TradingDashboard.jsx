@@ -24,15 +24,11 @@ export default function TradingDashboard({ userId, onClose }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    // Check if user has stored credentials
-    const apiKey = sessionStorage.getItem('coinsph_api_key')
-    const apiSecret = sessionStorage.getItem('coinsph_api_secret')
+    // Check if user has connected to coins.ph
+    const isConnected = sessionStorage.getItem('coinsph_connected') === 'true'
 
-    if (apiKey && apiSecret) {
+    if (isConnected) {
       setIsAuthenticated(true)
-      // Update the global API instance
-      coinsPhApi.apiKey = apiKey
-      coinsPhApi.apiSecret = apiSecret
       loadTradingData()
     } else {
       setLoading(false)
