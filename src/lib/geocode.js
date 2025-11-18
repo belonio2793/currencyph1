@@ -30,9 +30,18 @@ export async function reverseGeocode(lat, lng) {
 
   // Fallback to Nominatim (OpenStreetMap)
   try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 3000) // 3s timeout
+
     const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${encodeURIComponent(lat)}&lon=${encodeURIComponent(lng)}&addressdetails=1`
-    const res = await fetch(url, { headers: { 'User-Agent': 'currency-ph/1.0 (contact)' } })
-    if (!res.ok) throw new Error(`Nominatim ${res.status}`)
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'currency-ph/1.0' },
+      signal: controller.signal
+    })
+
+    clearTimeout(timeoutId)
+
+    if (!res.ok) throw new Error(`API error ${res.status}`)
     const json = await res.json()
     if (json && json.address) {
       return {
@@ -42,7 +51,11 @@ export async function reverseGeocode(lat, lng) {
       }
     }
   } catch (err) {
-    console.warn('Nominatim reverse geocode failed:', err)
+    if (err?.name === 'AbortError') {
+      console.debug('Reverse geocode timeout')
+    } else {
+      console.warn('Nominatim reverse geocode failed:', err?.message)
+    }
   }
 
   return null
