@@ -38,6 +38,7 @@ import PokerPage from './components/PokerPage'
 import ChessPage from './components/ChessPage'
 import Rides from './components/Rides'
 import TradingDashboard from './components/Trading/TradingDashboard'
+import Sunshine from './components/Sunshine'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
