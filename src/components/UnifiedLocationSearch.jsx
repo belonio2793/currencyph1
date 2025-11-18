@@ -371,7 +371,7 @@ export default function UnifiedLocationSearch({
               <label className="block text-sm font-semibold text-slate-900 mb-3">
                 Where do you want to go?
               </label>
-              <form onSubmit={handleDestinationSearch} className="flex gap-2">
+              <form onSubmit={handleDestinationSearch} className="location-search-form flex gap-2">
                 <input
                   ref={searchInputRef}
                   type="text"
