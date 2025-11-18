@@ -209,6 +209,7 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution=""
         />
         <MapUpdater location={userLocation} />
 
