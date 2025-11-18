@@ -49,18 +49,18 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
         })
       })
 
-      if (!response.ok) {
-        let errorMsg = 'Failed to process rake'
-        try {
-          const data = await response.json()
-          errorMsg = data.error || errorMsg
-        } catch (e) {
-          // Could not parse JSON error response
-        }
-        throw new Error(errorMsg)
+      let data
+      try {
+        data = await response.json()
+      } catch (e) {
+        console.error('Failed to parse response:', e)
+        throw new Error('Invalid response from server')
       }
 
-      const data = await response.json()
+      if (!response.ok) {
+        const errorMsg = data?.error || `Server error: ${response.status}`
+        throw new Error(errorMsg)
+      }
 
       // Call success callback
       if (onRakeProcessed) {
