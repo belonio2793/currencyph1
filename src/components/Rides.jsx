@@ -105,10 +105,10 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
             })
           }
         }}
+        attributionControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
         />
         <MapUpdater location={userLocation} />
 
