@@ -702,14 +702,14 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 <label className="block text-sm font-medium text-slate-700 mb-3">Ride Type</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { id: 'ride-share', label: '🚗 Ride Share', icon: '🚗' },
-                    { id: 'package', label: '📦 Package', icon: '📦' },
-                    { id: 'food', label: '🍔 Food Pickup', icon: '🍔' },
-                    { id: 'laundry', label: '👕 Laundry', icon: '👕' }
+                    { id: 'ride-share', label: 'Ride Share' },
+                    { id: 'package', label: 'Package' },
+                    { id: 'food', label: 'Food Pickup' },
+                    { id: 'laundry', label: 'Laundry' }
                   ].map(type => (
                     <button
                       key={type.id}
-                      className="p-3 border-2 border-slate-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium"
+                      className="p-3 border-2 border-slate-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium text-slate-700 hover:text-blue-600"
                     >
                       {type.label}
                     </button>
@@ -784,7 +784,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   <div key={ride.id} className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-600">
                     <div className="flex items-center justify-between mb-4">
                       <h3 className="text-lg font-semibold text-slate-900">
-                        {ride.status === 'requested' && '⏳ Searching for driver...'}
+                        {ride.status === 'requested' && '��� Searching for driver...'}
                         {ride.status === 'accepted' && '✓ Driver accepted - arriving soon'}
                         {ride.status === 'in-progress' && '🚗 Ride in progress'}
                       </h3>
