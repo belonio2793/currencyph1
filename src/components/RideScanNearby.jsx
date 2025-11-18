@@ -12,11 +12,13 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
   const [riders, setRiders] = useState([])
   const [loading, setLoading] = useState(false)
   const [scanRadius, setScanRadius] = useState(50) // in km
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filteredCities, setFilteredCities] = useState(PHILIPPINE_CITIES_COMPLETE)
 
   // Auto-detect city based on current location
   useEffect(() => {
     if (location) {
-      const detected = detectCity(location.latitude, location.longitude)
+      const detected = findClosestCity(location.latitude, location.longitude)
       setDetectedCity(detected)
       if (!selectedCity) {
         setSelectedCity(detected)
@@ -24,6 +26,19 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
       }
     }
   }, [location])
+
+  // Filter cities based on search query
+  useEffect(() => {
+    if (searchQuery.trim()) {
+      const filtered = PHILIPPINE_CITIES_COMPLETE.filter((city) =>
+        city.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        city.region.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+      setFilteredCities(filtered)
+    } else {
+      setFilteredCities(PHILIPPINE_CITIES_COMPLETE)
+    }
+  }, [searchQuery])
 
   // Auto-scan when city selection changes
   useEffect(() => {
