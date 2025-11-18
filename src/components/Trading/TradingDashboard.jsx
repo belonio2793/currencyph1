@@ -139,8 +139,7 @@ export default function TradingDashboard({ userId, onClose }) {
   }
 
   const handleDisconnect = () => {
-    sessionStorage.removeItem('coinsph_api_key')
-    sessionStorage.removeItem('coinsph_api_secret')
+    sessionStorage.removeItem('coinsph_connected')
     setIsAuthenticated(false)
     setAccountBalance(null)
     setActiveOrders([])
