@@ -346,9 +346,13 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   useEffect(() => {
     if (location) {
       setUserLocation(location)
+      // Auto-set pickup location to user's current location
+      if (!startCoord) {
+        setStartCoord(location)
+      }
       updatePresenceLocation(location)
     }
-  }, [location])
+  }, [location, startCoord])
 
   // Load initial data
   useEffect(() => {
