@@ -1,11 +1,9 @@
 const PROXY_URL = import.meta.env.VITE_PROJECT_URL?.replace(/\/$/, '') + '/functions/v1/coinsph-proxy'
-const API_KEY = import.meta.env.VITE_COINSPH_API_KEY || process.env.COINSPH_API_KEY
-const API_SECRET = import.meta.env.VITE_COINSPH_API_SECRET || process.env.COINSPH_API_SECRET
 
 export class CoinsPhApi {
-  constructor(apiKey = API_KEY, apiSecret = API_SECRET) {
-    this.apiKey = apiKey
-    this.apiSecret = apiSecret
+  constructor() {
+    // Credentials are now handled by the Supabase Edge Function
+    // No need to store them on the client
   }
 
   /**
