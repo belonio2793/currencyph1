@@ -75,27 +75,39 @@ async function checkSupabaseHealth() {
 
   try {
     const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+    const timeoutId = setTimeout(() => {
+      controller.abort()
+    }, 5000) // 5 second timeout
 
-    const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
-      signal: controller.signal,
-      headers: {
-        'apikey': SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+    try {
+      const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+        signal: controller.signal,
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+        }
+      })
+
+      clearTimeout(timeoutId)
+      _supabaseHealthy = response.ok
+
+      if (!_supabaseHealthy) {
+        console.debug('[supabase-client] Health check failed with status:', response.status)
       }
-    })
-
-    clearTimeout(timeoutId)
-    _supabaseHealthy = response.ok
-
-    if (!_supabaseHealthy) {
-      console.warn('[supabase-client] Health check failed with status:', response.status)
+      return _supabaseHealthy
+    } catch (fetchErr) {
+      clearTimeout(timeoutId)
+      throw fetchErr
     }
-    return _supabaseHealthy
   } catch (err) {
     _supabaseHealthy = false
-    if (err?.name !== 'AbortError') {
-      console.warn('[supabase-client] Health check error:', err?.message || 'Unknown error')
+    // Only log network errors at debug level to avoid console spam
+    if (err?.name === 'AbortError') {
+      console.debug('[supabase-client] Health check timeout')
+    } else if (err?.name === 'TypeError' && err?.message?.includes('Failed to fetch')) {
+      console.debug('[supabase-client] Health check network error (may be CORS or connectivity issue)')
+    } else {
+      console.debug('[supabase-client] Health check error:', err?.message || 'Unknown error')
     }
     return false
   }
@@ -104,7 +116,11 @@ async function checkSupabaseHealth() {
 // Run health check if in browser environment
 if (typeof window !== 'undefined' && typeof setTimeout !== 'undefined') {
   // Run health check after a short delay to not block app startup
-  setTimeout(() => checkSupabaseHealth(), 100)
+  setTimeout(() => {
+    checkSupabaseHealth().catch(err => {
+      console.debug('[supabase-client] Health check exception (non-blocking):', err?.message)
+    })
+  }, 100)
 }
 
 // Export a Proxy that lazily initializes the real client on first access while keeping the same import shape
