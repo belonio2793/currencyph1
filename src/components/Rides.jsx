@@ -218,6 +218,16 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  // Modal states
+  const [showDriverProfileModal, setShowDriverProfileModal] = useState(false)
+  const [selectedDriver, setSelectedDriver] = useState(null)
+  const [showRideDetailsModal, setShowRideDetailsModal] = useState(false)
+  const [selectedRide, setSelectedRide] = useState(null)
+  const [showChatModal, setShowChatModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [showTransactionHistoryModal, setShowTransactionHistoryModal] = useState(false)
+
   // Get user location
   const { location, error: locationError } = useGeolocation()
 
