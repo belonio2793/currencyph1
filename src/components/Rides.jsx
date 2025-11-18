@@ -15,6 +15,7 @@ import ChatModal from './ChatModal'
 import PaymentModal from './PaymentModal'
 import RatingModal from './RatingModal'
 import TransactionHistoryModal from './TransactionHistoryModal'
+import MarkerPopup from './MarkerPopup'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
