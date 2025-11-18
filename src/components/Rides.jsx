@@ -1495,6 +1495,105 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         onSelectRideType={setSelectedRideType}
         selectedRideType={selectedRideType}
       />
+
+      {/* Vehicle Configuration Modal */}
+      {showVehicleModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Vehicle Configuration</h2>
+
+            <div className="space-y-4">
+              {/* Vehicle Type */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Vehicle Type</label>
+                <select
+                  value={driverVehicleType}
+                  onChange={(e) => setDriverVehicleType(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="car">Car</option>
+                  <option value="suv">SUV</option>
+                  <option value="van">Van</option>
+                  <option value="tricycle">Tricycle</option>
+                  <option value="truck">Truck</option>
+                  <option value="motorcycle">Motorcycle</option>
+                </select>
+              </div>
+
+              {/* Make/Model */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Make & Model</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Toyota Corolla"
+                  value={driverMakeModel}
+                  onChange={(e) => setDriverMakeModel(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Year */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Year</label>
+                <input
+                  type="number"
+                  placeholder="e.g., 2020"
+                  value={driverYear}
+                  onChange={(e) => setDriverYear(e.target.value)}
+                  min="1900"
+                  max={new Date().getFullYear() + 1}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              {/* Fuel Type */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Fuel Type</label>
+                <select
+                  value={driverFuelType}
+                  onChange={(e) => setDriverFuelType(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="gasoline">Gasoline</option>
+                  <option value="diesel">Diesel</option>
+                  <option value="hybrid">Hybrid</option>
+                  <option value="electric">Electric</option>
+                  <option value="lpg">LPG</option>
+                </select>
+              </div>
+
+              {/* Mileage */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Mileage (km)</label>
+                <input
+                  type="number"
+                  placeholder="e.g., 45000"
+                  value={driverMileage}
+                  onChange={(e) => setDriverMileage(e.target.value ? parseInt(e.target.value) : '')}
+                  min="0"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowVehicleModal(false)}
+                className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg font-medium hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setShowVehicleModal(false)}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                Save Vehicle Info
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
