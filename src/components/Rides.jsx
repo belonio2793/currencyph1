@@ -895,9 +895,13 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               )}
               <button
                 onClick={() => setUserRole(userRole === 'rider' ? 'driver' : 'rider')}
-                className="px-4 py-2 bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 text-sm font-medium"
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  userRole === 'rider'
+                    ? 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-300'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
               >
-                Switch to {userRole === 'rider' ? 'Driver' : 'Rider'}
+                {userRole === 'rider' ? '🚗 Switch to Driver' : '👤 Switch to Rider'}
               </button>
             </div>
           </div>
