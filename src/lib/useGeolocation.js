@@ -32,6 +32,7 @@ export function useGeolocation() {
 
             try {
               const MAPTILER_KEY = import.meta?.env?.VITE_MAPTILER_API_KEY || import.meta?.env?.MAPTILER_API_KEY
+              const GOOGLE_API_KEY = import.meta?.env?.VITE_GOOGLE_API_KEY || import.meta?.env?.GOOGLE_API_KEY
 
               if (MAPTILER_KEY) {
                 try {
@@ -92,10 +93,82 @@ export function useGeolocation() {
                 const result = await reverseGeocode(latitude, longitude)
                 if (isMountedRef.current && result?.city) {
                   setCity(result.city)
+                  return
                 }
               } catch (e) {
                 if (isMountedRef.current) {
                   console.debug('Nominatim fallback error:', e?.message)
+                }
+              }
+
+              // Fallback to Google Geocoding API
+              if (GOOGLE_API_KEY && isMountedRef.current) {
+                try {
+                  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${encodeURIComponent(GOOGLE_API_KEY)}`
+                  const controller = new AbortController()
+                  abortControllersRef.current.push(controller)
+                  let timedOut = false
+
+                  const timeoutId = setTimeout(() => {
+                    if (isMountedRef.current && !timedOut) {
+                      timedOut = true
+                      try {
+                        controller.abort('Google Geocoding timeout')
+                      } catch (e) {
+                        // Ignore abort errors
+                      }
+                    }
+                  }, 3000)
+
+                  try {
+                    const resp = await fetch(url, { signal: controller.signal })
+                    if (!isMountedRef.current) {
+                      clearTimeout(timeoutId)
+                      return
+                    }
+                    clearTimeout(timeoutId)
+                    if (timedOut) return
+
+                    if (resp?.ok && isMountedRef.current) {
+                      try {
+                        const data = await resp.json()
+                        if (data?.results && data.results.length > 0) {
+                          const result = data.results[0]
+                          const addressComponents = result.address_components || []
+
+                          // Try to find city/locality from address components
+                          let city = null
+                          for (const component of addressComponents) {
+                            if (component.types.includes('locality')) {
+                              city = component.long_name
+                              break
+                            }
+                            if (component.types.includes('administrative_area_level_2')) {
+                              city = component.long_name
+                              break
+                            }
+                          }
+
+                          if (isMountedRef.current && city) {
+                            setCity(city)
+                            return
+                          }
+                        }
+                      } catch (parseErr) {
+                        // Silently ignore JSON parse errors
+                      }
+                    }
+                  } catch (fetchErr) {
+                    clearTimeout(timeoutId)
+                    if (fetchErr?.name === 'AbortError' || timedOut) {
+                      return
+                    }
+                    if (isMountedRef.current) {
+                      console.debug('Google Geocoding fetch error:', fetchErr?.message)
+                    }
+                  }
+                } catch (e) {
+                  // Silently fail Google geocoding
                 }
               }
             } catch (e) {
