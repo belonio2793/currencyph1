@@ -414,15 +414,24 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         .eq('user_id', userId)
         .single()
 
-      if (error && error.code !== 'PGRST116') {
-        console.warn('Could not load profile:', error)
+      if (error) {
+        if (error.code === 'PGRST116') {
+          // Record not found, which is okay for new users
+          console.debug('Profile not found for user (new user)')
+        } else {
+          console.debug('Could not load profile:', error?.code || error?.message)
+        }
       } else if (data) {
         setUserRole(data.role || 'rider')
         setDriverVehicleType(data.vehicle_type || 'car')
+        setDriverMakeModel(data.vehicle_make_model || '')
+        setDriverYear(data.vehicle_year || '')
+        setDriverMileage(data.vehicle_mileage || '')
+        setDriverFuelType(data.vehicle_fuel_type || 'gasoline')
         setDriverCity(data.city || '')
       }
     } catch (err) {
-      console.warn('Profile load error:', err)
+      console.debug('Profile load error:', err?.message)
     } finally {
       setLoading(false)
     }
