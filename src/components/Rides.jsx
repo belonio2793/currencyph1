@@ -9,6 +9,12 @@ import { updatePresenceLocation } from '../lib/presence'
 import RideListings from './RideListings'
 import FareEstimate from './FareEstimate'
 import RideScanNearby from './RideScanNearby'
+import DriverProfileModal from './DriverProfileModal'
+import RideDetailsModal from './RideDetailsModal'
+import ChatModal from './ChatModal'
+import PaymentModal from './PaymentModal'
+import RatingModal from './RatingModal'
+import TransactionHistoryModal from './TransactionHistoryModal'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
