@@ -25,18 +25,32 @@ const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_A
 let _client = null
 
 function createDummyClient() {
-  console.warn('Supabase not fully configured. SUPABASE_URL or SUPABASE_ANON_KEY is missing. Some features will be disabled.')
+  // Silent initialization - don't spam console on startup
   const missingError = (method) => () => { throw new Error(`Supabase not configured. Called ${method} but SUPABASE_URL or SUPABASE_ANON_KEY is missing.`) }
   return {
-    from: () => ({ select: missingError('from().select'), insert: missingError('from().insert'), update: missingError('from().update'), upsert: missingError('from().upsert'), eq: missingError('from().eq'), order: missingError('from().order') }),
+    from: () => ({
+      select: missingError('from().select'),
+      insert: missingError('from().insert'),
+      update: missingError('from().update'),
+      upsert: missingError('from().upsert'),
+      eq: missingError('from().eq'),
+      order: missingError('from().order'),
+      limit: missingError('from().limit'),
+      or: missingError('from().or'),
+      in: missingError('from().in'),
+      not: missingError('from().not'),
+      single: missingError('from().single'),
+      delete: missingError('from().delete')
+    }),
     auth: {
       signInWithPassword: missingError('auth.signInWithPassword'),
       signUp: missingError('auth.signUp'),
-      getUser: async () => ({ data: { user: null }, error: null })
+      getUser: async () => ({ data: { user: null }, error: null }),
+      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
     },
     channel: (name) => ({
-      on: () => ({ subscribe: missingError('channel().on().subscribe') }),
-      subscribe: missingError('channel().subscribe')
+      on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
+      subscribe: () => ({ unsubscribe: () => {} })
     }),
     removeChannel: (c) => { /* noop when supabase not configured */ },
     rpc: missingError('rpc')
