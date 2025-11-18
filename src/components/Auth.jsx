@@ -210,7 +210,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
 
       if (signInError) {
         // If the error indicates email not confirmed, keep error but allow resend
-        const msg = String(signInError.message || '')
+        let msg = String(signInError.message || '')
         // Map technical errors to user-friendly messages
         if (msg.includes('body stream already read')) {
           msg = 'Invalid login credentials. Please check your email/phone and password.'
