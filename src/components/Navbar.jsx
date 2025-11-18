@@ -27,7 +27,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'profile', label: 'Profile', auth: true },
     { id: 'inbox', label: 'Inbox', auth: true },
     { id: 'my-business', label: 'My Business', auth: true },
-    { id: 'trading', label: '🤖 Trading Bot', auth: true }
+    { id: 'sunshine', label: 'Sunshine', auth: true }
   ]
 
   // Loans dropdown options
