@@ -150,51 +150,41 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
         </p>
       </div>
 
-      {/* Cities Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-        {filteredCities.map((city) => (
-          <button
-            key={city.name}
-            onClick={() => setSelectedCity(city)}
-            className={`p-3 rounded-lg border-2 font-medium transition-all text-sm ${
-              selectedCity?.name === city.name
-                ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-md'
-                : detectedCity?.name === city.name
-                ? 'border-blue-400 bg-blue-50 text-slate-900 hover:border-blue-600'
-                : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50'
-            }`}
-          >
-            <div className="text-left">
-              <p className="font-semibold text-xs">{city.name}</p>
-              <p className="text-xs text-slate-500">{city.region}</p>
-            </div>
-          </button>
-        ))}
-      </div>
-
-      {/* City Selector */}
+      {/* Cities Grid - Unified with Drivers & Riders Count */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Select City</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {filteredCities.map(city => (
-            <button
-              key={city.name}
-              onClick={() => setSelectedCity(city)}
-              className={`p-3 rounded-lg border-2 transition-all ${
-                selectedCity?.name === city.name
-                  ? 'border-blue-600 bg-blue-50'
-                  : 'border-slate-200 hover:border-blue-400'
-              }`}
-            >
-              <p className="text-sm font-medium text-slate-900">{city.name}</p>
-              <p className="text-xs text-slate-600 mt-1">
-                {drivers.filter(d => {
-                  const dist = calculateDistance(city.latitude, city.longitude, d.latitude, d.longitude)
-                  return dist <= scanRadius
-                }).length} drivers
-              </p>
-            </button>
-          ))}
+          {filteredCities.map(city => {
+            const cityDrivers = drivers.filter(d => {
+              const dist = calculateDistance(city.latitude, city.longitude, d.latitude, d.longitude)
+              return dist <= scanRadius
+            }).length
+            const cityRiders = riders.filter(r => {
+              const dist = calculateDistance(city.latitude, city.longitude, r.latitude, r.longitude)
+              return dist <= scanRadius
+            }).length
+
+            return (
+              <button
+                key={city.name}
+                onClick={() => setSelectedCity(city)}
+                className={`p-3 rounded-lg border-2 transition-all ${
+                  selectedCity?.name === city.name
+                    ? 'border-blue-600 bg-blue-50'
+                    : detectedCity?.name === city.name
+                    ? 'border-blue-400 bg-blue-50 hover:border-blue-600'
+                    : 'border-slate-200 hover:border-blue-400'
+                }`}
+              >
+                <p className="text-sm font-semibold text-slate-900">{city.name}</p>
+                <p className="text-xs text-slate-500 mt-1">{city.region}</p>
+                <div className="flex gap-2 mt-2 text-xs">
+                  <span className="text-purple-600 font-medium">🚗 {cityDrivers}</span>
+                  <span className="text-orange-600 font-medium">👥 {cityRiders}</span>
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
 
