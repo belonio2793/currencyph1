@@ -600,14 +600,27 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* Find Ride Tab */}
         {activeTab === 'find-ride' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Find a Ride</h2>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">Find a Ride</h2>
+              <p className="text-slate-600">Select your pickup and destination locations on the map or enter coordinates directly</p>
+            </div>
 
             {/* Map */}
             <div className="mb-6">
-              <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  {selectingCoord ? `Click on map or drag marker to select ${selectingCoord === 'start' ? 'pickup' : 'destination'} location` : 'Interactive Map'}
-                </h3>
+              <div className="bg-white rounded-lg shadow-lg p-4 mb-4 border border-slate-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                    </svg>
+                    Interactive Map
+                  </h3>
+                  {selectingCoord && (
+                    <span className="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                      Selecting {selectingCoord === 'start' ? 'pickup' : 'destination'}
+                    </span>
+                  )}
+                </div>
                 <MapComponent
                   userLocation={userLocation}
                   drivers={drivers}
