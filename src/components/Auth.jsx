@@ -323,7 +323,14 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
         onAuthSuccess(data.user)
       }, 1000)
     } catch (err) {
-      setError(err.message || 'Login failed')
+      let errorMsg = err.message || 'Login failed'
+      // Ensure any remaining technical errors are converted to user-friendly messages
+      if (errorMsg.includes('body stream already read')) {
+        errorMsg = 'Invalid login credentials. Please check your email/phone and password.'
+      } else if (errorMsg.includes('Failed to fetch')) {
+        errorMsg = 'Cannot connect to authentication service. Please check your internet connection and try again.'
+      }
+      setError(errorMsg)
     } finally {
       setLoading(false)
     }
