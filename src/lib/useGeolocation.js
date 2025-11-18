@@ -173,6 +173,17 @@ export function useGeolocation() {
 
     return () => {
       isMountedRef.current = false
+
+      // Abort all pending fetch requests
+      try {
+        abortControllersRef.current.forEach(controller => {
+          try {
+            controller.abort()
+          } catch (e) {}
+        })
+        abortControllersRef.current = []
+      } catch (e) {}
+
       try {
         navigator.geolocation.clearWatch(watchId)
       } catch (e) {}
