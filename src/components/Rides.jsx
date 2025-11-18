@@ -982,6 +982,9 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   selectingCoord={selectingCoord}
                   onStartCoordDrag={setStartCoord}
                   onEndCoordDrag={setEndCoord}
+                  routeGeometry={routeDetails?.geometry}
+                  routeDistance={routeDetails?.distance}
+                  routeDuration={routeDetails?.duration}
                 />
               </div>
             </div>
@@ -1152,6 +1155,17 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   </button>
                 )}
               </div>
+
+              {/* Ride Details Card */}
+              {startCoord && endCoord && (
+                <RideDetailsCard
+                  startCoord={startCoord}
+                  endCoord={endCoord}
+                  rideType={selectedRideType || 'ride-share'}
+                  onDetailsUpdate={setRouteDetails}
+                  loading={loading}
+                />
+              )}
 
               {/* Fare Estimate */}
               {startCoord && endCoord && (
