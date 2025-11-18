@@ -2,22 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { useGeolocation } from '../lib/useGeolocation'
 import { calculateDistance } from '../lib/rideCalculations'
-
-// Philippines major cities with coordinates
-const PHILIPPINE_CITIES = [
-  { name: 'Metro Manila', lat: 14.5995, lng: 120.9842, radius: 50 },
-  { name: 'Cebu', lat: 10.3157, lng: 123.8854, radius: 40 },
-  { name: 'Davao', lat: 7.0731, lng: 125.6121, radius: 35 },
-  { name: 'Quezon City', lat: 14.6349, lng: 121.0388, radius: 30 },
-  { name: 'Caloocan', lat: 14.6414, lng: 120.9801, radius: 20 },
-  { name: 'Las Piñas', lat: 14.3569, lng: 120.9234, radius: 20 },
-  { name: 'Paranaque', lat: 14.3520, lng: 120.9842, radius: 20 },
-  { name: 'Makati', lat: 14.5547, lng: 121.0244, radius: 15 },
-  { name: 'Pasig', lat: 14.5794, lng: 121.0583, radius: 25 },
-  { name: 'Taguig', lat: 14.5326, lng: 121.0585, radius: 20 },
-  { name: 'Cagayan de Oro', lat: 8.4866, lng: 124.6527, radius: 30 },
-  { name: 'Iloilo', lat: 10.6960, lng: 122.5631, radius: 30 }
-]
+import { PHILIPPINE_CITIES_COMPLETE, findClosestCity } from '../data/philippineCitiesComplete'
 
 export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, onSelectCity }) {
   const { location } = useGeolocation()
