@@ -137,9 +137,7 @@ function initClient() {
         return null
       }
 
-      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-        fetch: wrappedFetch
-      })
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
       _client = createDummyClient()
