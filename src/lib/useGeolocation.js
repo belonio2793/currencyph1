@@ -107,7 +107,10 @@ export function useGeolocation() {
                   const response = await fetch(
                     `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
                     {
-                      headers: { 'Accept-Language': 'en' },
+                      headers: {
+                        'Accept-Language': 'en',
+                        'User-Agent': 'currency-ph/1.0'
+                      },
                       signal: controller.signal
                     }
                   )
