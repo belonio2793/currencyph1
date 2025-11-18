@@ -64,7 +64,24 @@ export default function RidesHistoryView({ userId, userRole }) {
       setRides(data || [])
       calculateNetworkStats(data || [])
     } catch (err) {
-      console.error('Error loading rides:', err?.message || err?.details?.message || JSON.stringify(err))
+      // Handle various error types without reading response body multiple times
+      let errorMsg = 'Failed to load ride history'
+
+      if (err?.message) {
+        errorMsg = err.message
+      } else if (err?.details?.message) {
+        errorMsg = err.details.message
+      } else if (err?.code) {
+        errorMsg = `Database error: ${err.code}`
+      }
+
+      // Only log network-critical errors, not all errors
+      if (errorMsg.includes('Failed to fetch') || errorMsg.includes('network')) {
+        console.debug('Network error loading rides (may be connectivity issue):', errorMsg)
+      } else {
+        console.warn('Error loading rides:', errorMsg)
+      }
+
       setError('Failed to load ride history')
     } finally {
       setLoading(false)
