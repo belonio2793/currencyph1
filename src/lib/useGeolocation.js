@@ -198,15 +198,23 @@ export function useGeolocation() {
       try {
         abortControllersRef.current.forEach(controller => {
           try {
-            controller.abort()
-          } catch (e) {}
+            if (controller && typeof controller.abort === 'function') {
+              controller.abort('Component unmounted')
+            }
+          } catch (e) {
+            // Ignore abort errors during cleanup
+          }
         })
         abortControllersRef.current = []
-      } catch (e) {}
+      } catch (e) {
+        // Ignore cleanup errors
+      }
 
       try {
         navigator.geolocation.clearWatch(watchId)
-      } catch (e) {}
+      } catch (e) {
+        // Ignore clearWatch errors
+      }
       window.removeEventListener('geolocation:refresh', handler)
     }
   }, [])
