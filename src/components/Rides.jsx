@@ -1343,9 +1343,38 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   </div>
                   {userRole === 'driver' && (
                     <>
-                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
-                        <span className="text-slate-600 font-medium">Vehicle:</span>
-                        <span className="text-slate-900 font-medium capitalize">{driverVehicleType}</span>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-semibold text-slate-900">Vehicle Information</h4>
+                          <button
+                            onClick={() => setShowVehicleModal(true)}
+                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
+                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm">Vehicle Type:</span>
+                            <span className="text-slate-900 font-medium capitalize text-sm">{driverVehicleType || 'Not set'}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm">Make/Model:</span>
+                            <span className="text-slate-900 font-medium text-sm">{driverMakeModel || 'Not set'}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm">Year:</span>
+                            <span className="text-slate-900 font-medium text-sm">{driverYear || 'Not set'}</span>
+                          </div>
+                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm">Fuel Type:</span>
+                            <span className="text-slate-900 font-medium text-sm capitalize">{driverFuelType || 'Not set'}</span>
+                          </div>
+                          <div className="col-span-2 flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm">Mileage:</span>
+                            <span className="text-slate-900 font-medium text-sm">{driverMileage ? `${driverMileage.toLocaleString()} km` : 'Not set'}</span>
+                          </div>
+                        </div>
                       </div>
                       <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
                         <span className="text-slate-600 font-medium">City:</span>
