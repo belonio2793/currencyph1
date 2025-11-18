@@ -8,6 +8,7 @@ import { useGeolocation } from '../lib/useGeolocation'
 import { updatePresenceLocation } from '../lib/presence'
 import RideListings from './RideListings'
 import FareEstimate from './FareEstimate'
+import RideScanNearby from './RideScanNearby'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
