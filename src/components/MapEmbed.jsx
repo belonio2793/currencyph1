@@ -32,7 +32,7 @@ export default function MapEmbed({ latitude, longitude }) {
           <MapContainer center={center} zoom={15} scrollWheelZoom={false} className="w-full h-full">
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; OpenStreetMap contributors'
+              attribution=""
             />
             {(!isNaN(lat) && !isNaN(lng)) && (
               <Marker position={[lat, lng]} icon={DEFAULT_LEAFLET_ICON} />
