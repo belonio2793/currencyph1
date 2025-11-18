@@ -114,8 +114,8 @@ export default function RideListings({ riders, drivers, startCoord, endCoord, on
               driver.latitude,
               driver.longitude
             )
-            const time = calculateTime(distance)
-            const fare = calculateFare(distance, driver.vehicle_type)
+            const time = calculateEstimatedTime(distance)
+            const fare = calculateBaseFare(distance, driver.vehicle_type)
 
             return (
               <div
