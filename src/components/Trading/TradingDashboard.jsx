@@ -150,21 +150,32 @@ export default function TradingDashboard({ userId, onClose }) {
   return (
     <div className="bg-white rounded-lg shadow-lg">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 rounded-t-lg">
-        <div className="flex justify-between items-center">
-          <div>
+      <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 text-white p-6 rounded-t-lg">
+        <div className="flex justify-between items-center mb-4">
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">Trading Bot Dashboard</h1>
-            <p className="text-blue-100">
-              {paperTradingMode ? 'Paper Trading Mode' : 'REAL TRADING MODE'}
+            <p className="text-blue-100 mt-1">
+              {paperTradingMode ? '📄 Paper Trading Mode' : '🔴 REAL TRADING MODE'}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:bg-blue-500 p-2 rounded-lg"
+            className="text-white hover:bg-blue-500 p-2 rounded-lg font-medium"
           >
-            Close
+            ✕ Close
           </button>
         </div>
+
+        {accountBalance?.email && (
+          <div className="bg-blue-500 bg-opacity-50 rounded-lg p-3 border border-blue-400">
+            <p className="text-blue-100 text-sm">Logged in as</p>
+            <p className="font-bold text-white flex items-center gap-2">
+              <span className="text-lg">👤</span>
+              {accountBalance.email}
+              <span className="text-xs ml-auto text-green-300">✓ Connected</span>
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Alerts */}
