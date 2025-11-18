@@ -198,6 +198,8 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
           signInResult = { error: new Error('Login request timed out. Check your internet connection.') }
         } else if (err?.message?.includes('Failed to fetch')) {
           signInResult = { error: new Error('Cannot connect to authentication service. Check your internet connection or try again later.') }
+        } else if (err?.message?.includes('body stream already read')) {
+          signInResult = { error: new Error('Invalid login credentials. Please check your email/phone and password.') }
         } else {
           signInResult = { error: err }
         }
@@ -209,6 +211,10 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
       if (signInError) {
         // If the error indicates email not confirmed, keep error but allow resend
         const msg = String(signInError.message || '')
+        // Map technical errors to user-friendly messages
+        if (msg.includes('body stream already read')) {
+          msg = 'Invalid login credentials. Please check your email/phone and password.'
+        }
         if (/confirm/i.test(msg)) {
           setError(msg)
           // do not throw; allow user to resend confirmation
