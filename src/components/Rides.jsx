@@ -186,16 +186,16 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
   const mapRef = useRef(null)
 
   return (
-    <div style={{ height: '500px', width: '100%', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
+    <div style={{ height: '450px', width: '100%', borderRadius: '8px', overflow: 'hidden', position: 'relative', zIndex: 0 }}>
       {selectingCoord && (
-        <div className="absolute top-0 left-0 right-0 z-20 bg-blue-500 text-white p-2 text-center text-sm font-medium">
+        <div className="absolute top-0 left-0 right-0 z-30 bg-blue-500 text-white p-2 text-center text-sm font-medium">
           Click on the map or drag a marker to select {selectingCoord === 'start' ? 'pickup location' : 'destination'}
         </div>
       )}
       <MapContainer
         center={[userLocation?.latitude || 14.5995, userLocation?.longitude || 120.9842]}
         zoom={14}
-        style={{ height: '100%', width: '100%' }}
+        style={{ height: '100%', width: '100%', zIndex: 0 }}
         ref={mapRef}
         onClick={(e) => {
           if (onMapClick) {
