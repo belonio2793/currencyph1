@@ -571,6 +571,11 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           start_longitude: startCoord.longitude,
           end_latitude: endCoord.latitude,
           end_longitude: endCoord.longitude,
+          ride_type: selectedRideType || 'ride-share',
+          estimated_distance: routeDetails?.distance || null,
+          estimated_duration: routeDetails?.duration || null,
+          estimated_fare: routeDetails?.fare?.total || null,
+          route_geometry: routeDetails?.geometry ? JSON.stringify(routeDetails.geometry) : null,
           status: 'requested',
           created_at: new Date().toISOString()
         })
@@ -580,6 +585,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         setStartCoord(null)
         setEndCoord(null)
         setSelectingCoord(null)
+        setRouteDetails(null)
+        setSelectedRideType(null)
         setActiveTab('my-rides')
         loadActiveRides()
         setError('')
