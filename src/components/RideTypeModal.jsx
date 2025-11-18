@@ -1,12 +1,12 @@
 import React, { useState } from 'react'
 
-const RIDE_TYPES = [
+const VEHICLE_TYPES = [
   {
-    id: 'ride-share',
-    label: 'Ride Share',
+    id: 'car',
+    label: 'Car',
     icon: '🚗',
     color: 'from-blue-500 to-blue-600',
-    description: 'Share a ride with other passengers',
+    description: 'Ride sharing with a comfortable car',
     criteria: [
       { label: 'Passengers', icon: '👥', hint: '1-4 people' },
       { label: 'Luggage', icon: '🧳', hint: 'Small bags' },
@@ -34,7 +34,10 @@ const RIDE_TYPES = [
       baseFare: 1,
       perKm: 1
     }
-  },
+  }
+]
+
+const SERVICES = [
   {
     id: 'package',
     label: 'Package Delivery',
@@ -131,14 +134,33 @@ export default function RideTypeModal({
   onSelectRideType,
   selectedRideType = null
 }) {
-  const [expandedType, setExpandedType] = useState(selectedRideType || 'ride-share')
-  const selectedTypeData = RIDE_TYPES.find(t => t.id === expandedType)
+  const [expandedType, setExpandedType] = useState(selectedRideType || 'car')
+  const [activeCategory, setActiveCategory] = useState('vehicle') // 'vehicle' or 'service'
+  
+  const allTypes = activeCategory === 'vehicle' ? VEHICLE_TYPES : SERVICES
+  const selectedTypeData = allTypes.find(t => t.id === expandedType)
 
   if (!isOpen) return null
 
   const handleSelect = () => {
     onSelectRideType(expandedType)
     onClose()
+  }
+
+  const getBackgroundColor = (typeId) => {
+    const type = [...VEHICLE_TYPES, ...SERVICES].find(t => t.id === typeId)
+    if (!type) return 'bg-slate-600'
+    
+    switch(typeId) {
+      case 'car': return 'bg-blue-600'
+      case 'tricycle': return 'bg-yellow-600'
+      case 'package': return 'bg-purple-600'
+      case 'food': return 'bg-orange-600'
+      case 'laundry': return 'bg-pink-600'
+      case 'medical': return 'bg-red-600'
+      case 'documents': return 'bg-green-600'
+      default: return 'bg-slate-600'
+    }
   }
 
   return (
@@ -162,14 +184,46 @@ export default function RideTypeModal({
           </button>
         </div>
 
+        {/* Category Tabs */}
+        <div className="flex gap-2 border-b border-slate-200 bg-slate-50 p-4">
+          <button
+            onClick={() => {
+              setActiveCategory('vehicle')
+              setExpandedType('car')
+            }}
+            className={`px-4 py-2 font-medium rounded-lg transition-colors ${
+              activeCategory === 'vehicle'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            🚗 Vehicle Type
+          </button>
+          <button
+            onClick={() => {
+              setActiveCategory('service')
+              setExpandedType('package')
+            }}
+            className={`px-4 py-2 font-medium rounded-lg transition-colors ${
+              activeCategory === 'service'
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
+            }`}
+          >
+            📦 Available Services
+          </button>
+        </div>
+
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Ride Type Selection List */}
+            {/* Type Selection List */}
             <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Available Services</h3>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">
+                {activeCategory === 'vehicle' ? 'Choose Vehicle Type' : 'Choose Service'}
+              </h3>
               <div className="space-y-2">
-                {RIDE_TYPES.map((type) => (
+                {allTypes.map((type) => (
                   <button
                     key={type.id}
                     onClick={() => setExpandedType(type.id)}
@@ -196,17 +250,9 @@ export default function RideTypeModal({
               </div>
             </div>
 
-            {/* Ride Type Details */}
+            {/* Type Details */}
             {selectedTypeData && (
-              <div className={`rounded-lg p-6 text-white space-y-6 ${
-                selectedTypeData.id === 'ride-share' ? 'bg-blue-600' :
-                selectedTypeData.id === 'tricycle' ? 'bg-yellow-600' :
-                selectedTypeData.id === 'package' ? 'bg-purple-600' :
-                selectedTypeData.id === 'food' ? 'bg-orange-600' :
-                selectedTypeData.id === 'laundry' ? 'bg-pink-600' :
-                selectedTypeData.id === 'medical' ? 'bg-red-600' :
-                'bg-green-600'
-              }`}>
+              <div className={`rounded-lg p-6 text-white space-y-6 ${getBackgroundColor(expandedType)}`}>
                 {/* Type Header */}
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -221,7 +267,7 @@ export default function RideTypeModal({
                 {/* Criteria */}
                 <div>
                   <h4 className="text-sm font-semibold text-white text-opacity-90 mb-3 uppercase tracking-wide">
-                    Service Criteria
+                    {activeCategory === 'vehicle' ? 'Features' : 'Service Criteria'}
                   </h4>
                   <div className="space-y-2">
                     {selectedTypeData.criteria.map((criterion, idx) => (
