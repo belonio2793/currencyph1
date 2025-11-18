@@ -64,6 +64,9 @@ function MapUpdater({ location }) {
 
 function DraggableMarker({ position, color, label, onDrag }) {
   const markerRef = useRef(null)
+  const [isOpen, setIsOpen] = useState(false)
+  const [editLat, setEditLat] = useState(position ? position[0].toString() : '')
+  const [editLng, setEditLng] = useState(position ? position[1].toString() : '')
 
   const eventHandlers = {
     dragend() {
@@ -72,9 +75,28 @@ function DraggableMarker({ position, color, label, onDrag }) {
         const newLat = marker.getLatLng().lat
         const newLng = marker.getLatLng().lng
         onDrag({ latitude: newLat, longitude: newLng })
+        setEditLat(newLat.toString())
+        setEditLng(newLng.toString())
       }
     },
   }
+
+  const handleCoordinateUpdate = () => {
+    const newLat = parseFloat(editLat)
+    const newLng = parseFloat(editLng)
+
+    if (!isNaN(newLat) && !isNaN(newLng)) {
+      onDrag({ latitude: newLat, longitude: newLng })
+      setIsOpen(false)
+    }
+  }
+
+  useEffect(() => {
+    if (position) {
+      setEditLat(position[0].toString())
+      setEditLng(position[1].toString())
+    }
+  }, [position])
 
   if (!position) return null
 
@@ -85,7 +107,73 @@ function DraggableMarker({ position, color, label, onDrag }) {
       position={position}
       ref={markerRef}
       icon={createCustomIcon(color, label, false)}
-    />
+    >
+      <Popup
+        maxWidth={280}
+        minWidth={250}
+        closeButton={true}
+        onOpen={() => setIsOpen(true)}
+        onClose={() => setIsOpen(false)}
+      >
+        <div className="p-3 space-y-3">
+          <div className="font-semibold text-slate-900 text-sm border-b border-slate-200 pb-2">
+            {label === 'P' ? 'Pickup Location' : 'Destination'}
+          </div>
+
+          <div className="space-y-2">
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Latitude
+              </label>
+              <input
+                type="number"
+                step="0.000001"
+                value={editLat}
+                onChange={(e) => setEditLat(e.target.value)}
+                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-medium text-slate-700 mb-1">
+                Longitude
+              </label>
+              <input
+                type="number"
+                step="0.000001"
+                value={editLng}
+                onChange={(e) => setEditLng(e.target.value)}
+                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2 pt-2">
+            <button
+              onClick={handleCoordinateUpdate}
+              className="flex-1 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
+            >
+              Update
+            </button>
+            <button
+              onClick={() => {
+                setEditLat(position[0].toString())
+                setEditLng(position[1].toString())
+              }}
+              className="flex-1 px-3 py-1 bg-slate-200 text-slate-700 text-xs font-medium rounded hover:bg-slate-300 transition-colors"
+            >
+              Reset
+            </button>
+          </div>
+
+          <div className="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200">
+            <p className="font-medium mb-1">Current:</p>
+            <p className="font-mono">Lat: {position[0].toFixed(6)}</p>
+            <p className="font-mono">Lng: {position[1].toFixed(6)}</p>
+          </div>
+        </div>
+      </Popup>
+    </Marker>
   )
 }
 
