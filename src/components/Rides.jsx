@@ -261,6 +261,55 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  const loadAvailableDrivers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ride_profiles')
+        .select('id, user_id, full_name, vehicle_type, status, latitude, longitude, average_rating')
+        .eq('role', 'driver')
+        .eq('status', 'available')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null)
+
+      if (!error && data) {
+        const driversData = data.map(d => ({
+          id: d.user_id,
+          driver_name: d.full_name || 'Driver',
+          vehicle_type: d.vehicle_type || 'Car',
+          latitude: parseFloat(d.latitude),
+          longitude: parseFloat(d.longitude),
+          rating: d.average_rating || 5.0
+        }))
+        setDrivers(driversData)
+      }
+    } catch (err) {
+      console.warn('Could not load drivers:', err)
+    }
+  }
+
+  const loadActiveRiders = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('rides')
+        .select('id, rider_id, start_latitude, start_longitude, status')
+        .in('status', ['requested', 'accepted'])
+        .limit(20)
+
+      if (!error && data) {
+        const ridersData = data.map(r => ({
+          id: r.rider_id,
+          latitude: parseFloat(r.start_latitude),
+          longitude: parseFloat(r.start_longitude),
+          passenger_name: 'Passenger',
+          rating: 5.0
+        }))
+        setRiders(ridersData)
+      }
+    } catch (err) {
+      console.warn('Could not load riders:', err)
+    }
+  }
+
   const subscribeToRides = () => {
     if (!userId) return
 
@@ -282,6 +331,51 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
       }
     } catch (err) {
       console.warn('Subscription error:', err)
+    }
+  }
+
+  const subscribeToDrivers = () => {
+    try {
+      const subscription = supabase
+        .channel('drivers:available')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'ride_profiles',
+          filter: 'role=eq.driver'
+        }, (payload) => {
+          loadAvailableDrivers()
+        })
+        .subscribe()
+
+      return () => {
+        subscription.unsubscribe()
+      }
+    } catch (err) {
+      console.warn('Driver subscription error:', err)
+      return () => {}
+    }
+  }
+
+  const subscribeToRiders = () => {
+    try {
+      const subscription = supabase
+        .channel('riders:searching')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'rides'
+        }, (payload) => {
+          loadActiveRiders()
+        })
+        .subscribe()
+
+      return () => {
+        subscription.unsubscribe()
+      }
+    } catch (err) {
+      console.warn('Rider subscription error:', err)
+      return () => {}
     }
   }
 
