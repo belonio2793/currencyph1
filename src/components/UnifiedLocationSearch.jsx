@@ -285,12 +285,6 @@ export default function UnifiedLocationSearch({
       // If no POI results or it's an address search, try Nominatim
       if (results.length === 0) {
         const nominatimResults = await searchNominatim(searchType.query || destinationSearch)
-        if (nominatimResults === null) {
-          // Nominatim timed out
-          setError('Location search took too long. Please try again or use the map to select your destination.')
-          setLoading(false)
-          return
-        }
         results = nominatimResults
       }
 
