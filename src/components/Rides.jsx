@@ -347,7 +347,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   // Driver status
   const [driverStatus, setDriverStatus] = useState('offline') // 'offline', 'available', 'on-job'
   const [driverVehicleType, setDriverVehicleType] = useState('car') // 'car', 'tricycle'
+  const [driverMakeModel, setDriverMakeModel] = useState('')
+  const [driverYear, setDriverYear] = useState('')
+  const [driverMileage, setDriverMileage] = useState('')
+  const [driverFuelType, setDriverFuelType] = useState('gasoline') // 'gasoline', 'diesel', 'electric', 'hybrid'
   const [driverCity, setDriverCity] = useState('')
+  const [showVehicleModal, setShowVehicleModal] = useState(false)
 
   // UI state
   const [selectedMarker, setSelectedMarker] = useState(null)
