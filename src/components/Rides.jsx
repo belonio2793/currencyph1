@@ -235,6 +235,7 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution=""
         />
+        <ZoomControls />
         <MapUpdater location={userLocation} />
 
         {/* Route Polyline */}
