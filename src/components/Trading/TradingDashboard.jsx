@@ -21,9 +21,22 @@ export default function TradingDashboard({ userId, onClose }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    loadTradingData()
+    // Check if user has stored credentials
+    const apiKey = sessionStorage.getItem('coinsph_api_key')
+    const apiSecret = sessionStorage.getItem('coinsph_api_secret')
+
+    if (apiKey && apiSecret) {
+      setIsAuthenticated(true)
+      // Update the global API instance
+      coinsPhApi.apiKey = apiKey
+      coinsPhApi.apiSecret = apiSecret
+      loadTradingData()
+    } else {
+      setLoading(false)
+    }
   }, [userId])
 
   const loadTradingData = async () => {
