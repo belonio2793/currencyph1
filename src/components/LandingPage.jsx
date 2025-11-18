@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 import { supabase } from '../lib/supabaseClient'
 import Rates from './Rates'
+import { reverseGeocode } from '../lib/nominatimService.js'
 
 // Searchable Select Component
 function SearchableSelect({ value, onChange, options, placeholder, label }) {
