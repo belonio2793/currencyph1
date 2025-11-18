@@ -168,7 +168,15 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           const { latitude, longitude } = position.coords
           // try reverse geocode via nominatim
           try {
-            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`)
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), 3000)
+
+            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`, {
+              headers: { 'User-Agent': 'currency-ph/1.0' },
+              signal: controller.signal
+            })
+            clearTimeout(timeoutId)
+
             if (r.ok) {
               const data = await r.json()
               setGeo({
