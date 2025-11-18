@@ -20,6 +20,7 @@ import RideTypeModal from './RideTypeModal'
 import RideDetailsCard from './RideDetailsCard'
 import RoutePolyline from './RoutePolyline'
 import UnifiedLocationSearch from './UnifiedLocationSearch'
+import RidesHistoryView from './RidesHistoryView'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
