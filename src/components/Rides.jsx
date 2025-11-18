@@ -577,7 +577,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             <div className="mb-6">
               <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  {selectingCoord ? `Click on map to select ${selectingCoord === 'start' ? 'pickup' : 'destination'} location` : 'Interactive Map'}
+                  {selectingCoord ? `Click on map or drag marker to select ${selectingCoord === 'start' ? 'pickup' : 'destination'} location` : 'Interactive Map'}
                 </h3>
                 <MapComponent
                   userLocation={userLocation}
@@ -597,6 +597,9 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   selectedMarker={selectedMarker}
                   onSelectMarker={setSelectedMarker}
                   userRole={userRole}
+                  selectingCoord={selectingCoord}
+                  onStartCoordDrag={setStartCoord}
+                  onEndCoordDrag={setEndCoord}
                 />
               </div>
             </div>
