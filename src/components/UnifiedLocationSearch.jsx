@@ -7,58 +7,8 @@ import { requestLocationPermission } from '../lib/locationHelpers'
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.GOOGLE_API_KEY || ''
 
-// Debug helper to verify Google Places API is configured and working
-const debugGoogleAPI = async () => {
-  if (!GOOGLE_API_KEY) {
-    console.debug('Google API key not configured - searches will use Nominatim fallback')
-    return false
-  }
-
-  try {
-    // Test the Places API with a simple nearby search (timeout after 5s)
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000)
-
-    const testUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
-    testUrl.searchParams.set('location', '14.5995,120.9842') // Manila
-    testUrl.searchParams.set('radius', '5000')
-    testUrl.searchParams.set('type', 'restaurant')
-    testUrl.searchParams.set('key', GOOGLE_API_KEY)
-
-    const response = await fetch(testUrl.toString(), { signal: controller.signal })
-    clearTimeout(timeoutId)
-
-    const data = await response.json()
-
-    if (data.error_message) {
-      console.debug('Google Places API config issue:', data.error_message)
-      return false
-    }
-
-    if (response.ok) {
-      console.debug('✅ Google Places API verified')
-      return true
-    }
-  } catch (err) {
-    // Silently ignore fetch errors during health check
-    if (err?.name !== 'AbortError') {
-      console.debug('Google Places API check skipped')
-    }
-  }
-
-  return false
-}
-
-// Check API on load (only in development)
-if (typeof import.meta !== 'undefined' && import.meta.env.DEV) {
-  setTimeout(() => {
-    try {
-      debugGoogleAPI().catch(() => {})
-    } catch (e) {
-      // Silently ignore
-    }
-  }, 2000)
-}
+// Note: Google Places API test is skipped to avoid CORS issues on startup
+// API will be tested on first use instead
 
 // Map POI keywords to Google Places API types
 const POI_KEYWORD_MAP = {
