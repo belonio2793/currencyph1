@@ -23,7 +23,6 @@ export default function SupremacyFund({ userId }) {
     { id: 'risk-management', label: 'Risk Management', icon: '🛡️' }
   ]
 
-  // Fetch market data from external APIs
   useEffect(() => {
     if (activeTab === 'market-analysis') {
       fetchMarketData()
@@ -33,11 +32,9 @@ export default function SupremacyFund({ userId }) {
   const fetchMarketData = async () => {
     setLoading(true)
     try {
-      // Fetch BTC price
       const btcRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true')
       const btcData = await btcRes.json()
 
-      // Fetch ETH price
       const ethRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true')
       const ethData = await ethRes.json()
 
@@ -235,11 +232,11 @@ export default function SupremacyFund({ userId }) {
       <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-6">
         <h4 className="font-semibold text-amber-900 mb-3">Key Market Indicators</h4>
         <ul className="space-y-2 text-sm text-amber-800">
-          <li>✓ <strong>RSI (Relative Strength Index):</strong> Shows if assets are overbought (>70) or oversold (<30)</li>
+          <li>✓ <strong>RSI (Relative Strength Index):</strong> Shows if assets are overbought or oversold</li>
           <li>✓ <strong>MACD:</strong> Detects momentum changes and trend reversals</li>
           <li>✓ <strong>OBV (On-Balance Volume):</strong> Reveals if money is flowing in or out</li>
           <li>✓ <strong>Support/Resistance:</strong> Price levels where bounces or breaks happen</li>
-          <li>✓ <strong>Volume:</strong> Higher volume = stronger price moves</li>
+          <li>✓ <strong>Volume:</strong> Higher volume means stronger price moves</li>
         </ul>
       </div>
     </div>
@@ -258,7 +255,7 @@ export default function SupremacyFund({ userId }) {
         />
         <SignalCard
           title="RSI + MACD Confirmation"
-          description="Buy when RSI < 30 (oversold) AND MACD shows bullish cross"
+          description="Buy when RSI is very low (oversold) AND MACD shows bullish cross"
           signal="STRONG BUY"
           accuracy="82%"
         />
@@ -415,12 +412,9 @@ export default function SupremacyFund({ userId }) {
     </div>
   )
 
-  const currentTab = tabs.find(t => t.id === activeTab)
-
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Tabs */}
         <div className="flex overflow-x-auto gap-2 mb-8 pb-4">
           {tabs.map(tab => (
             <button
@@ -437,7 +431,6 @@ export default function SupremacyFund({ userId }) {
           ))}
         </div>
 
-        {/* Content */}
         <div className="bg-white rounded-lg shadow-sm p-8">
           {activeTab === 'overview' && renderOverview()}
           {activeTab === 'market-analysis' && renderMarketAnalysis()}
