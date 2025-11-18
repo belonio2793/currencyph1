@@ -477,16 +477,34 @@ export default function UnifiedLocationSearch({
               Click on the map to select your destination
             </p>
 
-            <div style={{ height: mapHeight, width: '100%', borderRadius: '8px', overflow: 'hidden', border: '2px solid #e2e8f0' }}>
+            <div style={{
+              height: mapHeight,
+              width: '100%',
+              borderRadius: '8px',
+              overflow: 'hidden',
+              border: '2px solid #e2e8f0',
+              position: 'relative',
+              zIndex: 1,
+              flexShrink: 0
+            }}>
               <MapContainer
                 center={[
                   mapLocation?.latitude || userLocation.latitude || 14.5995,
                   mapLocation?.longitude || userLocation.longitude || 120.9842
                 ]}
                 zoom={14}
-                style={{ height: '100%', width: '100%' }}
+                style={{
+                  height: '100%',
+                  width: '100%',
+                  position: 'relative',
+                  zIndex: 1
+                }}
+                className="leaflet-map-container"
               >
-                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution=""
+                />
                 <MapClickHandler onLocationSelect={handleMapSelect} />
                 <Marker
                   position={[userLocation.latitude, userLocation.longitude]}
