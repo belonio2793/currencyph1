@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { coinsPhApi } from '../../lib/coinsPhApi'
 
 export default function CoinsPhAccountDetails({ userId }) {
-  const [accountData, accountData] = useState(null)
+  const [accountData, setAccountData] = useState(null)
   const [balances, setBalances] = useState([])
   const [openOrders, setOpenOrders] = useState([])
   const [prices, setPrices] = useState({})
