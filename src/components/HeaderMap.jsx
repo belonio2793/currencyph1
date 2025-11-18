@@ -266,7 +266,7 @@ export default function HeaderMap({ userId: headerUserId }) {
                     </div>
                   )}
                   {error && shareEnabled && (
-                    <>
+                    <div className="flex flex-col items-center gap-3">
                       <svg
                         className="w-8 h-8 text-red-500"
                         fill="none"
@@ -280,9 +280,21 @@ export default function HeaderMap({ userId: headerUserId }) {
                           d="M12 9v2m0 4v2m0 4v2m0-10a9 9 0 110-18 9 9 0 010 18z"
                         />
                       </svg>
-                      <p className="text-slate-600 text-sm">{error}</p>
-                      <p className="text-slate-500 text-xs">Enable location services in your browser settings</p>
-                    </>
+                      <div className="text-center">
+                        <p className="text-slate-600 text-sm font-medium mb-1">{error}</p>
+                        <p className="text-slate-500 text-xs mb-2">Enable location services in your browser settings</p>
+                        <button
+                          onClick={() => requestLocationPermission()}
+                          className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-medium transition-colors"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          Enable Location Sharing
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
               )}
