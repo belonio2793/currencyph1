@@ -136,6 +136,22 @@ export default function TradingDashboard({ userId, onClose }) {
     }
   }
 
+  const handleLoginSuccess = () => {
+    setIsAuthenticated(true)
+    setLoading(true)
+    loadTradingData()
+  }
+
+  const handleDisconnect = () => {
+    sessionStorage.removeItem('coinsph_api_key')
+    sessionStorage.removeItem('coinsph_api_secret')
+    setIsAuthenticated(false)
+    setAccountBalance(null)
+    setActiveOrders([])
+    setOpenPositions([])
+    setBot(null)
+  }
+
   const executeBot = async () => {
     try {
       if (!bot) return
