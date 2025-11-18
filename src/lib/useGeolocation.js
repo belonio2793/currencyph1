@@ -93,10 +93,10 @@ export function useGeolocation() {
                 let timedOut = false
 
                 const timeoutId = setTimeout(() => {
-                  if (isMountedRef.current) {
+                  if (isMountedRef.current && !timedOut) {
                     timedOut = true
                     try {
-                      controller.abort()
+                      controller.abort('Nominatim timeout')
                     } catch (e) {
                       // Ignore abort errors
                     }
@@ -111,11 +111,12 @@ export function useGeolocation() {
                       signal: controller.signal
                     }
                   )
-                  if (timedOut || !isMountedRef.current) {
+                  if (!isMountedRef.current) {
                     clearTimeout(timeoutId)
                     return
                   }
                   clearTimeout(timeoutId)
+                  if (timedOut) return
 
                   if (response?.ok && isMountedRef.current) {
                     try {
