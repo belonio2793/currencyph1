@@ -311,8 +311,6 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [selectingCoord, setSelectingCoord] = useState(null) // 'start' or 'end'
 
   // Modal states
-  const [showLocationModal, setShowLocationModal] = useState(false)
-  const [locationModalType, setLocationModalType] = useState('pickup') // 'pickup' or 'destination'
   const [showRideTypeModal, setShowRideTypeModal] = useState(false)
   const [selectedRideType, setSelectedRideType] = useState(null)
 
