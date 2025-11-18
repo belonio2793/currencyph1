@@ -117,7 +117,6 @@ export default function LocationModal({
 
   const markerColor = locationType === 'pickup' ? '#22C55E' : '#EF4444'
   const headerText = locationType === 'pickup' ? 'Select Pickup Location' : 'Select Destination'
-  const headerColor = locationType === 'pickup' ? 'from-green-600 to-green-700' : 'from-red-600 to-red-700'
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
@@ -240,7 +239,7 @@ export default function LocationModal({
               </div>
 
               {selectedLocation && (
-                <div className="bg-slate-50 rounded-lg p-4 space-y-2">
+                <div className="bg-white rounded-lg p-4 space-y-2 border border-slate-200">
                   <p className="text-sm font-semibold text-slate-900">Selected Location:</p>
                   <div className="font-mono text-sm space-y-1">
                     <p className="text-slate-700">Lat: <span className="text-blue-600">{selectedLocation.latitude.toFixed(6)}</span></p>
@@ -356,9 +355,9 @@ export default function LocationModal({
               </button>
 
               {selectedLocation && (
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <p className="text-sm font-semibold text-green-900 mb-2">✓ Location Selected</p>
-                  <p className="text-xs text-green-700 font-mono">
+                <div className="bg-white rounded-lg p-4 border-2 border-green-600">
+                  <p className="text-sm font-semibold text-green-700 mb-2">✓ Location Selected</p>
+                  <p className="text-xs text-slate-700 font-mono">
                     Lat: {selectedLocation.latitude.toFixed(6)} | Lng: {selectedLocation.longitude.toFixed(6)}
                   </p>
                 </div>
