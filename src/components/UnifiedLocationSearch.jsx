@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './UnifiedLocationSearch.css'
 import { requestLocationPermission } from '../lib/locationHelpers'
+import { forwardGeocode } from '../lib/nominatimService.js'
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.GOOGLE_API_KEY || ''
 
