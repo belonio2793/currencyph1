@@ -470,9 +470,11 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           rating: d.average_rating || 5.0
         }))
         setDrivers(driversData)
+      } else if (error) {
+        console.debug('Load drivers error:', error?.code || error?.message)
       }
     } catch (err) {
-      console.warn('Could not load drivers:', err)
+      console.debug('Could not load drivers:', err?.message)
     }
   }
 
