@@ -182,6 +182,30 @@ function DraggableMarker({ position, color, label, onDrag }) {
   )
 }
 
+function ZoomControls() {
+  const map = useMap()
+
+  return (
+    <div className="absolute bottom-4 right-4 z-40 flex flex-col gap-2 bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden">
+      <button
+        onClick={() => map.zoomIn()}
+        className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-blue-50 transition-colors font-semibold text-lg"
+        title="Zoom in"
+      >
+        +
+      </button>
+      <div className="h-px bg-slate-200"></div>
+      <button
+        onClick={() => map.zoomOut()}
+        className="w-10 h-10 flex items-center justify-center text-slate-700 hover:bg-blue-50 transition-colors font-semibold text-lg"
+        title="Zoom out"
+      >
+        −
+      </button>
+    </div>
+  )
+}
+
 function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole, onStartCoordDrag, onEndCoordDrag, selectingCoord, routeGeometry, routeDistance, routeDuration }) {
   const mapRef = useRef(null)
 
