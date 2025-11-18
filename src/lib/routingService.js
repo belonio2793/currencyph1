@@ -104,3 +104,12 @@ export function formatDuration(minutes) {
   const mins = minutes % 60
   return `${hours}h ${mins}m`
 }
+
+// Convert GeoJSON coordinates to Leaflet format
+export function createRoutePolyline(coordinates) {
+  if (!coordinates || !Array.isArray(coordinates)) {
+    return []
+  }
+  // Convert [lon, lat] to [lat, lon]
+  return coordinates.map(coord => [coord[1], coord[0]])
+}
