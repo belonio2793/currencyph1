@@ -1165,6 +1165,22 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                           </div>
                         </div>
                       </div>
+                      <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
+                        <button
+                          onClick={() => handleViewRideDetails(ride)}
+                          className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        >
+                          View Details
+                        </button>
+                        {ride.status !== 'requested' && (
+                          <button
+                            onClick={() => handleOpenChat(ride)}
+                            className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                          >
+                            Chat
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )
                 })}
