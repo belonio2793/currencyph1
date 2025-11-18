@@ -30,17 +30,13 @@ export default function RideListings({ riders, drivers, startCoord, endCoord, on
         b.longitude
       )
 
-      const calculateFare = (distance, vehicleType = 'car') => {
-        return calculateBaseFare(distance, vehicleType)
-      }
-
       if (sortBy === 'distance') {
         return distA - distB
       } else if (sortBy === 'rating') {
         return (b.rating || 5) - (a.rating || 5)
       } else if (sortBy === 'price') {
-        const fareA = calculateFare(distA, a.vehicle_type)
-        const fareB = calculateFare(distB, b.vehicle_type)
+        const fareA = calculateBaseFare(distA, a.vehicle_type)
+        const fareB = calculateBaseFare(distB, b.vehicle_type)
         return fareA - fareB
       }
       return 0
