@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { requestLocationPermission } from '../lib/locationHelpers'
 
 const createCustomIcon = (color, label) => {
   return L.divIcon({
