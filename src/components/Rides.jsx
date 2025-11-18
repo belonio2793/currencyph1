@@ -15,13 +15,16 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Custom marker icons
-const createCustomIcon = (color, label) => {
-  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${color}" width="32" height="32">
-    <path d="M12 2C7.58 2 4 5.58 4 10c0 5.25 8 13 8 13s8-7.75 8-13c0-4.42-3.58-8-8-8z"/>
-  </svg>`
+// Custom marker icons with animation
+const createCustomIcon = (color, label, animated = true) => {
+  const animationClass = animated ? 'marker-pulse-blue' : ''
+  const colorClass = color === '#3B82F6' ? 'marker-pulse-blue' :
+                    color === '#22C55E' ? 'marker-pulse-green' :
+                    color === '#F59E0B' ? 'marker-pulse-orange' :
+                    color === '#8B5CF6' ? 'marker-pulse-purple' : ''
+
   return L.divIcon({
-    html: `<div style="background-color: ${color}; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${label}</div>`,
+    html: `<div class="${colorClass}" style="background-color: ${color}; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${label}</div>`,
     iconSize: [32, 32],
     className: 'custom-icon'
   })
