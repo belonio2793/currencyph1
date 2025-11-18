@@ -1010,45 +1010,34 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
             {/* Ride Request Form */}
             <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6 space-y-6">
-              <div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                Request a Ride
+              </h3>
+
+              {/* Unified Location Search */}
+              <UnifiedLocationSearch
+                userLocation={userLocation}
+                onDestinationSelect={setEndCoord}
+                selectedDestination={endCoord}
+                mapHeight="300px"
+              />
+
+              {startCoord && endCoord && (
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200 flex items-start gap-3">
+                  <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Request a Ride
-                </h3>
-
-                {/* Unified Location Search */}
-                <UnifiedLocationSearch
-                  userLocation={userLocation}
-                  onDestinationSelect={setEndCoord}
-                  selectedDestination={endCoord}
-                  mapHeight="300px"
-                />
-
-                {/* Auto-set pickup to user location */}
-                {userLocation && !startCoord && (
-                  <div className="mt-4 text-center">
-                    <button
-                      onClick={() => setStartCoord(userLocation)}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium py-2"
-                    >
-                      Confirm Your Location as Pickup Point
-                    </button>
-                  </div>
-                )}
-
-                {startCoord && endCoord && (
-                  <div className="mt-4 bg-blue-50 rounded-lg p-3 border border-blue-200">
-                    <p className="text-sm text-blue-900 font-semibold flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      Route is ready for your ride request
+                  <div>
+                    <p className="font-semibold text-green-900">Route Ready</p>
+                    <p className="text-sm text-green-800 mt-1">
+                      Your pickup and destination locations are set. Complete your ride details below.
                     </p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Ride Type Selection */}
               <div className="mb-6">
