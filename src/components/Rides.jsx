@@ -787,6 +787,25 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           </div>
         )}
 
+        {/* Scan Nearby Tab */}
+        {activeTab === 'scan-nearby' && (
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 mb-6">Scan Nearby</h2>
+            <RideScanNearby
+              userId={userId}
+              onSelectDriver={(driver) => {
+                setSelectedMarker({ type: 'driver', id: driver.id, data: driver })
+              }}
+              onSelectRider={(rider) => {
+                setSelectedMarker({ type: 'rider', id: rider.id, data: rider })
+              }}
+              onSelectCity={(city) => {
+                // City selected
+              }}
+            />
+          </div>
+        )}
+
         {/* History Tab */}
         {activeTab === 'history' && (
           <div>
