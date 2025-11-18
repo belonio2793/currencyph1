@@ -113,21 +113,64 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
 
   return (
     <div className="space-y-6">
-      {/* Auto-detected Location */}
+      {/* Auto-detected Location Badge */}
       {detectedCity && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-2xl">📍</span>
-            <div>
-              <p className="text-sm font-medium text-slate-900">Current Location Detected</p>
-              <p className="text-xs text-slate-600">{detectedCity.name}</p>
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-10 h-10 bg-blue-600 text-white rounded-full">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-slate-900">📍 Auto-Detected Location</p>
+                <p className="text-lg font-bold text-blue-700">{detectedCity.name}</p>
+                <p className="text-xs text-slate-600">{detectedCity.region}</p>
+              </div>
             </div>
+            <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">Selected</span>
           </div>
-          <p className="text-xs text-blue-700">
-            Automatically showing nearby drivers and riders in {detectedCity.name}
-          </p>
         </div>
       )}
+
+      {/* City Search */}
+      <div className="space-y-3">
+        <label className="block text-sm font-semibold text-slate-900">Select City or Search</label>
+        <input
+          type="text"
+          placeholder="Search cities, regions..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <p className="text-xs text-slate-500">
+          Showing {filteredCities.length} cities
+        </p>
+      </div>
+
+      {/* Cities Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+        {filteredCities.map((city) => (
+          <button
+            key={city.name}
+            onClick={() => setSelectedCity(city)}
+            className={`p-3 rounded-lg border-2 font-medium transition-all text-sm ${
+              selectedCity?.name === city.name
+                ? 'border-blue-600 bg-blue-50 text-blue-900 shadow-md'
+                : detectedCity?.name === city.name
+                ? 'border-blue-400 bg-blue-50 text-slate-900 hover:border-blue-600'
+                : 'border-slate-200 bg-white text-slate-700 hover:border-blue-300 hover:bg-slate-50'
+            }`}
+          >
+            <div className="text-left">
+              <p className="font-semibold text-xs">{city.name}</p>
+              <p className="text-xs text-slate-500">{city.region}</p>
+            </div>
+          </button>
+        ))}
+      </div>
 
       {/* City Selector */}
       <div className="bg-white rounded-lg shadow-sm p-6">
