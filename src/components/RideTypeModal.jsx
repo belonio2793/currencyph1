@@ -125,10 +125,10 @@ export default function RideTypeModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col relative z-[10000]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 flex items-center justify-between">
+        <div className="bg-slate-900 text-white p-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -181,7 +181,14 @@ export default function RideTypeModal({
 
             {/* Ride Type Details */}
             {selectedTypeData && (
-              <div className={`bg-gradient-to-br ${selectedTypeData.color} rounded-lg p-6 text-white space-y-6`}>
+              <div className={`rounded-lg p-6 text-white space-y-6 ${
+                selectedTypeData.id === 'ride-share' ? 'bg-blue-600' :
+                selectedTypeData.id === 'package' ? 'bg-purple-600' :
+                selectedTypeData.id === 'food' ? 'bg-orange-600' :
+                selectedTypeData.id === 'laundry' ? 'bg-pink-600' :
+                selectedTypeData.id === 'medical' ? 'bg-red-600' :
+                'bg-green-600'
+              }`}>
                 {/* Type Header */}
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -286,7 +293,7 @@ export default function RideTypeModal({
           </button>
           <button
             onClick={handleSelect}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium hover:shadow-lg transition-all flex items-center gap-2"
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg transition-all flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
