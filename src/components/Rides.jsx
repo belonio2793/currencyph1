@@ -125,38 +125,24 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
           </Marker>
         )}
 
-        {/* Start coordinate marker */}
+        {/* Start coordinate marker - draggable */}
         {startCoord && (
-          <CircleMarker
-            center={[startCoord.latitude, startCoord.longitude]}
-            radius={8}
-            fillColor="#22C55E"
-            color="#16A34A"
-            weight={2}
-            opacity={1}
-            fillOpacity={0.8}
-          >
-            <Popup>
-              <div className="text-sm font-semibold">Pickup Point</div>
-            </Popup>
-          </CircleMarker>
+          <DraggableMarker
+            position={[startCoord.latitude, startCoord.longitude]}
+            color="#22C55E"
+            label="P"
+            onDrag={onStartCoordDrag}
+          />
         )}
 
-        {/* End coordinate marker */}
+        {/* End coordinate marker - draggable */}
         {endCoord && (
-          <CircleMarker
-            center={[endCoord.latitude, endCoord.longitude]}
-            radius={8}
-            fillColor="#EF4444"
-            color="#DC2626"
-            weight={2}
-            opacity={1}
-            fillOpacity={0.8}
-          >
-            <Popup>
-              <div className="text-sm font-semibold">Destination</div>
-            </Popup>
-          </CircleMarker>
+          <DraggableMarker
+            position={[endCoord.latitude, endCoord.longitude]}
+            color="#EF4444"
+            label="D"
+            onDrag={onEndCoordDrag}
+          />
         )}
 
         {/* Active drivers */}
