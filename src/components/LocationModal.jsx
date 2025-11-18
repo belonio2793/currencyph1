@@ -478,7 +478,15 @@ export default function LocationModal({
 
               {searchResults.length === 0 && address && !loading && (
                 <div className="text-center py-8">
-                  <p className="text-slate-500">No results found</p>
+                  <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0 4v2M6.75 15H4.5A2.25 2.25 0 012.25 12.75V11.006a2.25 2.25 0 012.25-2.25h2.25m0 0H9a2.25 2.25 0 012.25 2.25v1.006A2.25 2.25 0 0111.25 15m0 0v4.5A2.25 2.25 0 019 21.5H4.5A2.25 2.25 0 012.25 19.25V15m0 0h17.5A2.25 2.25 0 0122 12.75v-1.006a2.25 2.25 0 00-2.25-2.25H19.5m0 0V9A2.25 2.25 0 0017.25 6.75H12.75m0 0H9a2.25 2.25 0 00-2.25 2.25v2.25m0 0V12a2.25 2.25 0 002.25 2.25h2.25" />
+                  </svg>
+                  <p className="text-slate-500 text-sm mb-1">No nearby locations found</p>
+                  <p className="text-xs text-slate-400">
+                    {userLocation
+                      ? 'Try searching for places within 50 km of your location'
+                      : 'Enable location access to search nearby places'}
+                  </p>
                 </div>
               )}
             </div>
