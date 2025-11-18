@@ -300,9 +300,15 @@ export default function UnifiedLocationSearch({
   // Search using Nominatim for addresses
   const searchNominatim = async (query) => {
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8s timeout
+
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=20&countrycodes=ph&bounded=1&viewbox=120,19,129,5`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=20&countrycodes=ph&bounded=1&viewbox=120,19,129,5`,
+        { signal: controller.signal }
       )
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) throw new Error(`Nominatim ${response.status}`)
 
@@ -315,7 +321,11 @@ export default function UnifiedLocationSearch({
         type: 'address'
       }))
     } catch (err) {
-      console.warn('Nominatim search failed:', err)
+      if (err?.name === 'AbortError') {
+        console.debug('Nominatim timeout')
+        return []
+      }
+      console.debug('Nominatim search failed:', err?.message)
       return []
     }
   }
