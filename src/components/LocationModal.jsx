@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import philippineCities from '../data/philippineCities.json'
+import { requestLocationPermission } from '../lib/locationHelpers'
 
 const createCustomIcon = (color) => {
   return L.divIcon({
