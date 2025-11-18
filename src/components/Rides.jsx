@@ -9,6 +9,13 @@ import { updatePresenceLocation } from '../lib/presence'
 import RideListings from './RideListings'
 import FareEstimate from './FareEstimate'
 import RideScanNearby from './RideScanNearby'
+import DriverProfileModal from './DriverProfileModal'
+import RideDetailsModal from './RideDetailsModal'
+import ChatModal from './ChatModal'
+import PaymentModal from './PaymentModal'
+import RatingModal from './RatingModal'
+import TransactionHistoryModal from './TransactionHistoryModal'
+import MarkerPopup from './MarkerPopup'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
@@ -105,10 +112,10 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
             })
           }
         }}
+        attributionControl={false}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; OpenStreetMap contributors'
         />
         <MapUpdater location={userLocation} />
 
@@ -211,6 +218,16 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [selectedMarker, setSelectedMarker] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  // Modal states
+  const [showDriverProfileModal, setShowDriverProfileModal] = useState(false)
+  const [selectedDriver, setSelectedDriver] = useState(null)
+  const [showRideDetailsModal, setShowRideDetailsModal] = useState(false)
+  const [selectedRide, setSelectedRide] = useState(null)
+  const [showChatModal, setShowChatModal] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [showRatingModal, setShowRatingModal] = useState(false)
+  const [showTransactionHistoryModal, setShowTransactionHistoryModal] = useState(false)
 
   // Get user location
   const { location, error: locationError } = useGeolocation()
@@ -464,6 +481,219 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  // Modal handlers
+  const handleSelectDriver = (driver) => {
+    setSelectedDriver(driver)
+    setShowDriverProfileModal(true)
+  }
+
+  const handleRequestRideFromDriver = async (driverId, customOffer) => {
+    if (!userId || !startCoord || !endCoord) {
+      setError('Please select both locations')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('rides')
+        .insert({
+          rider_id: userId,
+          driver_id: driverId,
+          start_latitude: startCoord.latitude,
+          start_longitude: startCoord.longitude,
+          end_latitude: endCoord.latitude,
+          end_longitude: endCoord.longitude,
+          rider_offered_amount: customOffer ? parseFloat(customOffer) : null,
+          status: 'requested',
+          created_at: new Date().toISOString()
+        })
+        .select()
+
+      if (!error) {
+        setShowDriverProfileModal(false)
+        setStartCoord(null)
+        setEndCoord(null)
+        setActiveTab('my-rides')
+        loadActiveRides()
+      } else {
+        setError('Failed to request ride')
+      }
+    } catch (err) {
+      setError('Error requesting ride')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleViewRideDetails = (ride) => {
+    setSelectedRide(ride)
+    setShowRideDetailsModal(true)
+  }
+
+  const handleOpenChat = (ride) => {
+    setSelectedRide(ride)
+    setShowChatModal(true)
+  }
+
+  const handleSendMessage = async (rideId, message) => {
+    try {
+      const { error } = await supabase
+        .from('ride_chat_messages')
+        .insert({
+          ride_id: rideId,
+          sender_id: userId,
+          sender_type: userRole,
+          message: message,
+          message_type: 'text',
+          created_at: new Date().toISOString()
+        })
+
+      if (error) {
+        setError('Failed to send message')
+      }
+    } catch (err) {
+      setError('Error sending message')
+    }
+  }
+
+  const handleCompletePayment = async (paymentData) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('ride_transactions')
+        .insert({
+          ride_id: paymentData.ride_id,
+          transaction_type: 'fare_payment',
+          amount: paymentData.amount,
+          currency: 'PHP',
+          from_user_id: userId,
+          to_user_id: selectedRide?.driver_id,
+          payment_method: paymentData.payment_method,
+          status: 'completed',
+          created_at: new Date().toISOString(),
+          completed_at: new Date().toISOString()
+        })
+
+      if (!error && paymentData.tip > 0) {
+        await supabase
+          .from('ride_transactions')
+          .insert({
+            ride_id: paymentData.ride_id,
+            transaction_type: 'tip',
+            amount: paymentData.tip,
+            currency: 'PHP',
+            from_user_id: userId,
+            to_user_id: selectedRide?.driver_id,
+            payment_method: paymentData.payment_method,
+            status: 'completed',
+            created_at: new Date().toISOString(),
+            completed_at: new Date().toISOString()
+          })
+      }
+
+      if (!error) {
+        setShowPaymentModal(false)
+        setShowRatingModal(true)
+      } else {
+        setError('Failed to process payment')
+      }
+    } catch (err) {
+      setError('Error processing payment')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmitRating = async (ratingData) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('ride_ratings')
+        .insert({
+          ride_id: ratingData.ride_id,
+          rater_id: userId,
+          ratee_id: selectedRide?.driver_id,
+          rating_type: 'driver-for-rider',
+          rating_score: ratingData.rating_score,
+          review_text: ratingData.review_text,
+          cleanliness_rating: ratingData.cleanliness_rating,
+          safety_rating: ratingData.safety_rating,
+          friendliness_rating: ratingData.friendliness_rating,
+          tags: ratingData.tags,
+          created_at: new Date().toISOString()
+        })
+
+      if (!error) {
+        setShowRatingModal(false)
+        loadActiveRides()
+      } else {
+        setError('Failed to submit rating')
+      }
+    } catch (err) {
+      setError('Error submitting rating')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelRide = async (rideId) => {
+    if (!confirm('Are you sure you want to cancel this ride?')) return
+
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('rides')
+        .update({
+          status: 'cancelled',
+          cancelled_by: userRole,
+          cancellation_reason: 'User requested cancellation',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', rideId)
+
+      if (!error) {
+        setShowRideDetailsModal(false)
+        loadActiveRides()
+      } else {
+        setError('Failed to cancel ride')
+      }
+    } catch (err) {
+      setError('Error cancelling ride')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUpdateRideStatus = async (rideId, newStatus) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('rides')
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString(),
+          ...(newStatus === 'completed' && { dropoff_time: new Date().toISOString() }),
+          ...(newStatus === 'picked-up' && { pickup_time: new Date().toISOString() })
+        })
+        .eq('id', rideId)
+
+      if (!error) {
+        if (newStatus === 'completed') {
+          setShowRideDetailsModal(false)
+          setShowPaymentModal(true)
+        }
+        loadActiveRides()
+      } else {
+        setError('Failed to update ride status')
+      }
+    } catch (err) {
+      setError('Error updating ride status')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (!userId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -518,53 +748,69 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           <div className="flex gap-2 overflow-x-auto">
             <button
               onClick={() => setActiveTab('find-ride')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'find-ride'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              🗺️ Find Ride
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 003 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+              </svg>
+              Find Ride
             </button>
             <button
               onClick={() => setActiveTab('scan-nearby')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'scan-nearby'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              📍 Scan Nearby
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Scan Nearby
             </button>
             <button
               onClick={() => setActiveTab('my-rides')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'my-rides'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              🚗 My Rides ({activeRides.length})
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              My Rides ({activeRides.length})
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'history'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              📋 History
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              History
             </button>
             <button
               onClick={() => setActiveTab('profile')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
+              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
                 activeTab === 'profile'
                   ? 'bg-blue-600 text-white'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
               }`}
             >
-              👤 Profile
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Profile
             </button>
           </div>
         </div>
@@ -584,14 +830,27 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* Find Ride Tab */}
         {activeTab === 'find-ride' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Find a Ride</h2>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">Find a Ride</h2>
+              <p className="text-slate-600">Select your pickup and destination locations on the map or enter coordinates directly</p>
+            </div>
 
             {/* Map */}
             <div className="mb-6">
-              <div className="bg-white rounded-lg shadow-sm p-4 mb-4">
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">
-                  {selectingCoord ? `Click on map or drag marker to select ${selectingCoord === 'start' ? 'pickup' : 'destination'} location` : 'Interactive Map'}
-                </h3>
+              <div className="bg-white rounded-lg shadow-lg p-4 mb-4 border border-slate-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                    </svg>
+                    Interactive Map
+                  </h3>
+                  {selectingCoord && (
+                    <span className="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                      Selecting {selectingCoord === 'start' ? 'pickup' : 'destination'}
+                    </span>
+                  )}
+                </div>
                 <MapComponent
                   userLocation={userLocation}
                   drivers={drivers}
@@ -618,25 +877,58 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             </div>
 
             {/* Ride Request Form */}
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Request a Ride</h3>
+            <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6">
+              <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+                Request a Ride
+              </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 {/* Pickup Location */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Pickup Location</label>
+                <div className="bg-gradient-to-br from-green-50 to-white rounded-lg border-2 border-green-200 p-4">
+                  <label className="block text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Pickup Location
+                  </label>
                   {startCoord ? (
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm font-medium text-green-900">✓ Selected</p>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Lat: {startCoord.latitude.toFixed(4)}, Lng: {startCoord.longitude.toFixed(4)}
-                      </p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-green-700 font-medium mb-3">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Location Selected
+                      </div>
+                      <div className="bg-white rounded-lg p-3 space-y-2 border border-green-200">
+                        <div>
+                          <p className="text-xs text-slate-600 font-medium">Latitude</p>
+                          <input
+                            type="text"
+                            readOnly
+                            value={startCoord.latitude.toFixed(6)}
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-600 font-medium">Longitude</p>
+                          <input
+                            type="text"
+                            readOnly
+                            value={startCoord.longitude.toFixed(6)}
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
+                          />
+                        </div>
+                      </div>
                       <button
                         onClick={() => {
                           setStartCoord(null)
                           setSelectingCoord('start')
                         }}
-                        className="text-xs text-green-600 hover:text-green-700 mt-2 font-medium"
+                        className="w-full text-sm text-green-600 hover:text-green-700 font-medium py-2 hover:bg-green-50 rounded-lg transition-colors"
                       >
                         Change Location
                       </button>
@@ -644,28 +936,58 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   ) : (
                     <button
                       onClick={() => setSelectingCoord('start')}
-                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium"
+                      className="w-full py-4 border-2 border-dashed border-green-300 rounded-lg text-green-700 hover:border-green-500 hover:bg-green-100 font-semibold transition-colors flex items-center justify-center gap-2"
                     >
-                      Click to select pickup location
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Select Pickup Location
                     </button>
                   )}
                 </div>
 
                 {/* Destination */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Destination</label>
+                <div className="bg-gradient-to-br from-red-50 to-white rounded-lg border-2 border-red-200 p-4">
+                  <label className="block text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                    </svg>
+                    Destination
+                  </label>
                   {endCoord ? (
-                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-sm font-medium text-red-900">✓ Selected</p>
-                      <p className="text-xs text-slate-600 mt-1">
-                        Lat: {endCoord.latitude.toFixed(4)}, Lng: {endCoord.longitude.toFixed(4)}
-                      </p>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2 text-red-700 font-medium mb-3">
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Location Selected
+                      </div>
+                      <div className="bg-white rounded-lg p-3 space-y-2 border border-red-200">
+                        <div>
+                          <p className="text-xs text-slate-600 font-medium">Latitude</p>
+                          <input
+                            type="text"
+                            readOnly
+                            value={endCoord.latitude.toFixed(6)}
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
+                          />
+                        </div>
+                        <div>
+                          <p className="text-xs text-slate-600 font-medium">Longitude</p>
+                          <input
+                            type="text"
+                            readOnly
+                            value={endCoord.longitude.toFixed(6)}
+                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
+                          />
+                        </div>
+                      </div>
                       <button
                         onClick={() => {
                           setEndCoord(null)
                           setSelectingCoord('end')
                         }}
-                        className="text-xs text-red-600 hover:text-red-700 mt-2 font-medium"
+                        className="w-full text-sm text-red-600 hover:text-red-700 font-medium py-2 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         Change Location
                       </button>
@@ -673,9 +995,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   ) : (
                     <button
                       onClick={() => setSelectingCoord('end')}
-                      className="w-full p-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium"
+                      className="w-full py-4 border-2 border-dashed border-red-300 rounded-lg text-red-700 hover:border-red-500 hover:bg-red-100 font-semibold transition-colors flex items-center justify-center gap-2"
                     >
-                      Click to select destination
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Select Destination
                     </button>
                   )}
                 </div>
@@ -686,14 +1011,14 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 <label className="block text-sm font-medium text-slate-700 mb-3">Ride Type</label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {[
-                    { id: 'ride-share', label: '🚗 Ride Share', icon: '🚗' },
-                    { id: 'package', label: '📦 Package', icon: '📦' },
-                    { id: 'food', label: '🍔 Food Pickup', icon: '🍔' },
-                    { id: 'laundry', label: '👕 Laundry', icon: '👕' }
+                    { id: 'ride-share', label: 'Ride Share' },
+                    { id: 'package', label: 'Package' },
+                    { id: 'food', label: 'Food Pickup' },
+                    { id: 'laundry', label: 'Laundry' }
                   ].map(type => (
                     <button
                       key={type.id}
-                      className="p-3 border-2 border-slate-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium"
+                      className="p-3 border-2 border-slate-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium text-slate-700 hover:text-blue-600"
                     >
                       {type.label}
                     </button>
@@ -727,7 +1052,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             {/* Available Drivers Listing */}
             {startCoord && endCoord && (
               <div className="mt-8">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Available Drivers Nearby</h3>
+                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Available Drivers Nearby
+                </h3>
                 <RideListings
                   drivers={drivers}
                   riders={riders}
@@ -737,7 +1067,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   userId={userId}
                   loading={loading}
                   onSelectDriver={(driver) => {
-                    setSelectedMarker({ type: 'driver', id: driver.id, data: driver })
+                    handleSelectDriver(driver)
                   }}
                   onSelectRider={(rider) => {
                     setSelectedMarker({ type: 'rider', id: rider.id, data: rider })
@@ -751,37 +1081,110 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* My Rides Tab */}
         {activeTab === 'my-rides' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Active Rides</h2>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Active Rides
+              </h2>
+              <p className="text-slate-600">Track your current rides and their status</p>
+            </div>
             {activeRides.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <p className="text-slate-600 text-lg mb-4">No active rides</p>
+              <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg shadow-lg border border-slate-200 p-12 text-center">
+                <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <p className="text-slate-600 text-lg mb-6 font-medium">No active rides</p>
                 <button
                   onClick={() => setActiveTab('find-ride')}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors shadow-md hover:shadow-lg"
                 >
                   Request a Ride
                 </button>
               </div>
             ) : (
               <div className="grid gap-4">
-                {activeRides.map(ride => (
-                  <div key={ride.id} className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-600">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {ride.status === 'requested' && '⏳ Searching for driver...'}
-                        {ride.status === 'accepted' && '✓ Driver accepted - arriving soon'}
-                        {ride.status === 'in-progress' && '🚗 Ride in progress'}
-                      </h3>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold uppercase">
-                        {ride.status}
-                      </span>
+                {activeRides.map(ride => {
+                  const getStatusIcon = (status) => {
+                    switch(status) {
+                      case 'requested': return <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v2m0-10a9 9 0 110-18 9 9 0 010 18z" /></svg>
+                      case 'accepted': return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      case 'in-progress': return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      default: return null
+                    }
+                  }
+
+                  const getStatusColor = (status) => {
+                    switch(status) {
+                      case 'requested': return 'border-yellow-300 bg-yellow-50'
+                      case 'accepted': return 'border-green-300 bg-green-50'
+                      case 'in-progress': return 'border-blue-300 bg-blue-50'
+                      default: return 'border-slate-300'
+                    }
+                  }
+
+                  const getStatusLabel = (status) => {
+                    switch(status) {
+                      case 'requested': return 'Searching for driver...'
+                      case 'accepted': return 'Driver accepted - arriving soon'
+                      case 'in-progress': return 'Ride in progress'
+                      default: return status
+                    }
+                  }
+
+                  return (
+                    <div key={ride.id} className={`bg-white rounded-lg shadow-sm p-6 border-l-4 transition-all hover:shadow-md ${getStatusColor(ride.status)}`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="text-blue-600">
+                            {getStatusIcon(ride.status)}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-slate-900">
+                              {getStatusLabel(ride.status)}
+                            </h3>
+                          </div>
+                        </div>
+                        <span className="px-3 py-1 bg-white text-slate-700 rounded-full text-xs font-semibold uppercase border border-current">
+                          {ride.status}
+                        </span>
+                      </div>
+                      <div className="text-sm text-slate-600 space-y-2 mt-4">
+                        <div className="flex items-start gap-3">
+                          <span className="font-medium text-slate-700 min-w-fit">From:</span>
+                          <div className="flex-1">
+                            <p className="text-slate-800 font-medium">Latitude: {ride.start_latitude.toFixed(6)}</p>
+                            <p className="text-slate-800 font-medium">Longitude: {ride.start_longitude.toFixed(6)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <span className="font-medium text-slate-700 min-w-fit">To:</span>
+                          <div className="flex-1">
+                            <p className="text-slate-800 font-medium">Latitude: {ride.end_latitude.toFixed(6)}</p>
+                            <p className="text-slate-800 font-medium">Longitude: {ride.end_longitude.toFixed(6)}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
+                        <button
+                          onClick={() => handleViewRideDetails(ride)}
+                          className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                        >
+                          View Details
+                        </button>
+                        {ride.status !== 'requested' && (
+                          <button
+                            onClick={() => handleOpenChat(ride)}
+                            className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                          >
+                            Chat
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-sm text-slate-600 space-y-1">
-                      <p>From: Lat {ride.start_latitude.toFixed(4)}, Lng {ride.start_longitude.toFixed(4)}</p>
-                      <p>To: Lat {ride.end_latitude.toFixed(4)}, Lng {ride.end_longitude.toFixed(4)}</p>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
@@ -790,7 +1193,16 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* Scan Nearby Tab */}
         {activeTab === 'scan-nearby' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Scan Nearby</h2>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Scan Nearby
+              </h2>
+              <p className="text-slate-600">Discover riders and drivers in your area</p>
+            </div>
             <RideScanNearby
               userId={userId}
               onSelectDriver={(driver) => {
@@ -809,9 +1221,20 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* History Tab */}
         {activeTab === 'history' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Ride History</h2>
-            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-              <p className="text-slate-600 text-lg">Ride history will appear here</p>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Ride History
+              </h2>
+              <p className="text-slate-600">View your past rides and details</p>
+            </div>
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg shadow-lg border border-slate-200 p-12 text-center">
+              <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-slate-600 text-lg font-medium">Ride history will appear here</p>
             </div>
           </div>
         )}
@@ -819,45 +1242,150 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* Profile Tab */}
         {activeTab === 'profile' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Rider Profile</h2>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Profile
+              </h2>
+              <p className="text-slate-600">Manage your account and preferences</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Profile Card */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Information</h3>
-                <div className="space-y-3 text-sm">
-                  <p><span className="text-slate-600">Email:</span> <span className="font-medium">{userEmail}</span></p>
-                  <p><span className="text-slate-600">Account Type:</span> <span className="font-medium">{userRole === 'rider' ? 'Rider' : 'Driver'}</span></p>
+              <div className="bg-gradient-to-br from-blue-50 to-white rounded-lg shadow-lg border border-blue-200 p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Your Information
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <span className="text-slate-600 font-medium">Email:</span>
+                    <span className="text-slate-900 font-mono text-sm">{userEmail}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <span className="text-slate-600 font-medium">Account Type:</span>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold">{userRole === 'rider' ? 'Rider' : 'Driver'}</span>
+                  </div>
                   {userRole === 'driver' && (
                     <>
-                      <p><span className="text-slate-600">Vehicle:</span> <span className="font-medium">{driverVehicleType}</span></p>
-                      <p><span className="text-slate-600">City:</span> <span className="font-medium">{driverCity || 'Not specified'}</span></p>
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                        <span className="text-slate-600 font-medium">Vehicle:</span>
+                        <span className="text-slate-900 font-medium capitalize">{driverVehicleType}</span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                        <span className="text-slate-600 font-medium">City:</span>
+                        <span className="text-slate-900 font-medium">{driverCity || 'Not specified'}</span>
+                      </div>
                     </>
                   )}
                 </div>
               </div>
 
               {/* Stats Card */}
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Statistics</h3>
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Total Rides:</span>
-                    <span className="font-medium text-slate-900">0</span>
+              <div className="bg-gradient-to-br from-green-50 to-white rounded-lg shadow-lg border border-green-200 p-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                  Your Statistics
+                </h3>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <span className="text-slate-600 font-medium">Total Rides:</span>
+                    <span className="text-2xl font-bold text-green-600">0</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Rating:</span>
-                    <span className="font-medium text-yellow-600">★ 5.0</span>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <span className="text-slate-600 font-medium">Rating:</span>
+                    <div className="flex items-center gap-1">
+                      <span className="text-2xl font-bold text-amber-500">5.0</span>
+                      <svg className="w-5 h-5 text-amber-400 fill-current" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    </div>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-600">Member Since:</span>
-                    <span className="font-medium text-slate-900">{new Date().toLocaleDateString()}</span>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-slate-200">
+                    <span className="text-slate-600 font-medium">Member Since:</span>
+                    <span className="text-slate-900 font-medium">{new Date().toLocaleDateString()}</span>
                   </div>
                 </div>
               </div>
             </div>
+
+            {/* Transaction History Button */}
+            <button
+              onClick={() => setShowTransactionHistoryModal(true)}
+              className="w-full mt-6 px-6 py-3 bg-gradient-to-r from-slate-600 to-slate-700 text-white rounded-lg font-semibold hover:shadow-lg transition-shadow flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              View Transaction History
+            </button>
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {showDriverProfileModal && selectedDriver && (
+        <DriverProfileModal
+          driver={selectedDriver}
+          onClose={() => setShowDriverProfileModal(false)}
+          onRequestRide={handleRequestRideFromDriver}
+          loading={loading}
+        />
+      )}
+
+      {showRideDetailsModal && selectedRide && (
+        <RideDetailsModal
+          ride={selectedRide}
+          driver={drivers.find(d => d.id === selectedRide.driver_id)}
+          onClose={() => setShowRideDetailsModal(false)}
+          onCancelRide={handleCancelRide}
+          onUpdateStatus={handleUpdateRideStatus}
+          loading={loading}
+        />
+      )}
+
+      {showChatModal && selectedRide && (
+        <ChatModal
+          ride={selectedRide}
+          currentUserId={userId}
+          otherUserName={selectedRide.driver_id ? drivers.find(d => d.id === selectedRide.driver_id)?.driver_name || 'Driver' : 'Rider'}
+          onClose={() => setShowChatModal(false)}
+          onSendMessage={handleSendMessage}
+          loading={loading}
+        />
+      )}
+
+      {showPaymentModal && selectedRide && (
+        <PaymentModal
+          ride={selectedRide}
+          onClose={() => setShowPaymentModal(false)}
+          onCompletePayment={handleCompletePayment}
+          loading={loading}
+        />
+      )}
+
+      {showRatingModal && selectedRide && (
+        <RatingModal
+          ride={selectedRide}
+          otherUserName={selectedRide.driver_id ? drivers.find(d => d.id === selectedRide.driver_id)?.driver_name || 'Driver' : 'Rider'}
+          onClose={() => setShowRatingModal(false)}
+          onSubmitRating={handleSubmitRating}
+          loading={loading}
+        />
+      )}
+
+      {showTransactionHistoryModal && (
+        <TransactionHistoryModal
+          userId={userId}
+          onClose={() => setShowTransactionHistoryModal(false)}
+          loading={loading}
+        />
+      )}
     </div>
   )
 }
