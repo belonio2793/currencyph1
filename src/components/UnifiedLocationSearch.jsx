@@ -98,6 +98,103 @@ export default function UnifiedLocationSearch({
     return R * c
   }
 
+  // Detect if search is for POI (keyword) vs address
+  const detectSearchType = (query) => {
+    const lowerQuery = query.toLowerCase().trim()
+
+    // Check if it matches any POI keywords
+    for (const keyword of Object.keys(POI_KEYWORD_MAP)) {
+      if (lowerQuery.includes(keyword)) {
+        return { type: 'poi', keyword: lowerQuery }
+      }
+    }
+
+    // Check for explicit address patterns
+    if (lowerQuery.match(/\d+\s+|street|ave|st\.|rd\.|blvd|drive|lane|road|barangay|village/i)) {
+      return { type: 'address', query: lowerQuery }
+    }
+
+    // Default to mixed search (try both)
+    return { type: 'mixed', query: lowerQuery }
+  }
+
+  // Search using Google Places API for POI
+  const searchGooglePlaces = async (keyword) => {
+    if (!GOOGLE_API_KEY) {
+      console.warn('Google API key not configured')
+      return []
+    }
+
+    try {
+      const types = POI_KEYWORD_MAP[keyword.toLowerCase()] || [keyword.toLowerCase()]
+      const typeString = types.join('|')
+
+      // Use nearby search centered on user location
+      const location = userLocation
+        ? `${userLocation.latitude},${userLocation.longitude}`
+        : '14.5995,120.9842' // Manila fallback
+
+      const radius = userLocation ? 50000 : 100000 // 50km or 100km
+
+      const url = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
+      url.searchParams.set('location', location)
+      url.searchParams.set('radius', radius)
+      url.searchParams.set('keyword', keyword)
+      url.searchParams.set('type', typeString)
+      url.searchParams.set('key', GOOGLE_API_KEY)
+      url.searchParams.set('language', 'en')
+
+      const response = await fetch(url.toString())
+
+      if (!response.ok) {
+        console.warn('Google Places API error:', response.status)
+        return []
+      }
+
+      const data = await response.json()
+
+      if (!data.results || data.results.length === 0) {
+        return []
+      }
+
+      return data.results.slice(0, 15).map(place => ({
+        latitude: place.geometry.location.lat,
+        longitude: place.geometry.location.lng,
+        address: place.name + (place.vicinity ? ', ' + place.vicinity : ''),
+        placeId: place.place_id,
+        type: 'poi',
+        rating: place.rating,
+        openNow: place.opening_hours?.open_now
+      }))
+    } catch (err) {
+      console.warn('Google Places search failed:', err)
+      return []
+    }
+  }
+
+  // Search using Nominatim for addresses
+  const searchNominatim = async (query) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=20&countrycodes=ph&bounded=1&viewbox=120,19,129,5`
+      )
+
+      if (!response.ok) throw new Error(`Nominatim ${response.status}`)
+
+      const results = await response.json()
+
+      return results.map(r => ({
+        latitude: parseFloat(r.lat),
+        longitude: parseFloat(r.lon),
+        address: r.display_name,
+        type: 'address'
+      }))
+    } catch (err) {
+      console.warn('Nominatim search failed:', err)
+      return []
+    }
+  }
+
   const handleDestinationSearch = async (e) => {
     e.preventDefault()
     if (!destinationSearch.trim()) {
@@ -108,20 +205,26 @@ export default function UnifiedLocationSearch({
     setLoading(true)
     setError('')
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(destinationSearch)}&limit=20&countrycodes=ph&bounded=1&viewbox=120,19,129,5`
-      )
-      const results = await response.json()
+      const searchType = detectSearchType(destinationSearch)
+      let results = []
 
-      let filteredResults = results.map(r => ({
-        latitude: parseFloat(r.lat),
-        longitude: parseFloat(r.lon),
-        address: r.display_name
-      }))
+      // For POI searches, use Google Places first
+      if (searchType.type === 'poi' || searchType.type === 'mixed') {
+        const poiKeyword = searchType.keyword || destinationSearch
+        results = await searchGooglePlaces(poiKeyword)
+      }
 
+      // If no POI results or it's an address search, try Nominatim
+      if (results.length === 0) {
+        const nominatimResults = await searchNominatim(searchType.query || destinationSearch)
+        results = nominatimResults
+      }
+
+      // Filter by radius from user location
+      let filteredResults = results
       if (userLocation) {
-        const radiusKm = 50
-        filteredResults = filteredResults.filter(result => {
+        const radiusKm = 100 // Increased from 50km to 100km
+        filteredResults = results.filter(result => {
           const distance = calculateDistance(
             userLocation.latitude,
             userLocation.longitude,
@@ -132,8 +235,32 @@ export default function UnifiedLocationSearch({
         })
       }
 
+      // Sort by distance if we have user location
+      if (userLocation && filteredResults.length > 0) {
+        filteredResults.sort((a, b) => {
+          const distA = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            a.latitude,
+            a.longitude
+          )
+          const distB = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            b.latitude,
+            b.longitude
+          )
+          return distA - distB
+        })
+      }
+
+      if (filteredResults.length === 0) {
+        setError(`No locations found matching "${destinationSearch}". Try a different search or use the map.`)
+      }
+
       setSearchResults(filteredResults.slice(0, 15))
     } catch (err) {
+      console.error('Search error:', err)
       setError('Failed to search locations. Please try again.')
       setSearchResults([])
     } finally {
