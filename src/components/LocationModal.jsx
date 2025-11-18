@@ -434,27 +434,44 @@ export default function LocationModal({
 
               {searchResults.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold text-slate-700">Results:</p>
+                  <p className="text-sm font-semibold text-slate-700">Nearby Results ({searchResults.length}):</p>
                   <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {searchResults.map((result, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => {
-                          handleMapSelect(result)
-                          setActiveTab('map')
-                        }}
-                        className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
-                          selectedLocation?.latitude === result.latitude && selectedLocation?.longitude === result.longitude
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-slate-200 hover:border-blue-400 hover:bg-slate-50'
-                        }`}
-                      >
-                        <p className="font-medium text-slate-900 text-sm">{result.address}</p>
-                        <p className="text-xs text-slate-500 mt-1">
-                          {result.latitude.toFixed(4)}, {result.longitude.toFixed(4)}
-                        </p>
-                      </button>
-                    ))}
+                    {searchResults.map((result, idx) => {
+                      const distance = userLocation ? calculateDistance(
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        result.latitude,
+                        result.longitude
+                      ) : null
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            handleMapSelect(result)
+                            setActiveTab('map')
+                          }}
+                          className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
+                            selectedLocation?.latitude === result.latitude && selectedLocation?.longitude === result.longitude
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-slate-200 hover:border-blue-400 hover:bg-slate-50'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <p className="font-medium text-slate-900 text-sm">{result.address}</p>
+                              <p className="text-xs text-slate-500 mt-1">
+                                {result.latitude.toFixed(4)}, {result.longitude.toFixed(4)}
+                              </p>
+                            </div>
+                            {distance !== null && (
+                              <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                                {distance < 1 ? '< 1 km' : `${distance.toFixed(1)} km`}
+                              </span>
+                            )}
+                          </div>
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
               )}
