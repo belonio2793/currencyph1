@@ -19,6 +19,23 @@ const RIDE_TYPES = [
     }
   },
   {
+    id: 'tricycle',
+    label: 'Tricycle',
+    icon: '🛺',
+    color: 'from-yellow-500 to-yellow-600',
+    description: 'Budget-friendly three-wheeled transportation',
+    criteria: [
+      { label: 'Passengers', icon: '👥', hint: '1-3 people' },
+      { label: 'Distance', icon: '📍', hint: 'Short to medium' },
+      { label: 'Cost', icon: '💰', hint: 'Most affordable' }
+    ],
+    details: {
+      maxPassengers: 3,
+      baseFare: 1,
+      perKm: 1
+    }
+  },
+  {
     id: 'package',
     label: 'Package Delivery',
     icon: '📦',
@@ -183,6 +200,7 @@ export default function RideTypeModal({
             {selectedTypeData && (
               <div className={`rounded-lg p-6 text-white space-y-6 ${
                 selectedTypeData.id === 'ride-share' ? 'bg-blue-600' :
+                selectedTypeData.id === 'tricycle' ? 'bg-yellow-600' :
                 selectedTypeData.id === 'package' ? 'bg-purple-600' :
                 selectedTypeData.id === 'food' ? 'bg-orange-600' :
                 selectedTypeData.id === 'laundry' ? 'bg-pink-600' :
