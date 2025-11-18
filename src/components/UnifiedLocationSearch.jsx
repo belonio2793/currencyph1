@@ -406,7 +406,7 @@ export default function UnifiedLocationSearch({
             {searchResults.length > 0 && (
               <div className="space-y-2">
                 <p className="text-sm font-semibold text-slate-700">Results ({searchResults.length}):</p>
-                <div className="space-y-2 max-h-64 overflow-y-auto border border-slate-200 rounded-lg bg-slate-50 p-3">
+                <div className="location-search-results space-y-2 max-h-64 overflow-y-auto border border-slate-200 rounded-lg bg-slate-50 p-3">
                   {searchResults.map((result, idx) => {
                     const distance = calculateDistance(
                       userLocation.latitude,
