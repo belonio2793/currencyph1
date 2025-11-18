@@ -1,0 +1,349 @@
+/* ============================================================================
+   RIDES FEATURE - ANIMATIONS AND STYLING
+   ============================================================================ */
+
+/* Pulse animation for active markers */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes pulse-green {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+@keyframes pulse-orange {
+  0% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(245, 158, 11, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(245, 158, 11, 0);
+  }
+}
+
+@keyframes pulse-purple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+  }
+}
+
+/* Marker pulse animations */
+.marker-pulse-blue {
+  animation: pulse 2s infinite;
+}
+
+.marker-pulse-green {
+  animation: pulse-green 2s infinite;
+}
+
+.marker-pulse-orange {
+  animation: pulse-orange 2s infinite;
+}
+
+.marker-pulse-purple {
+  animation: pulse-purple 2s infinite;
+}
+
+/* Breathing animation for status indicators */
+@keyframes breathing {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.status-breathing {
+  animation: breathing 2s infinite;
+}
+
+/* Ride card animations */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ride-card-animate {
+  animation: slide-in 0.3s ease-out;
+}
+
+/* Tab transition animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.tab-content-animate {
+  animation: fade-in 0.2s ease-in;
+}
+
+/* Driver badge styling */
+.driver-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  background-color: rgba(139, 92, 246, 0.1);
+  color: #8B5CF6;
+  border: 1px solid #8B5CF6;
+}
+
+.driver-badge.available {
+  background-color: rgba(34, 197, 94, 0.1);
+  color: #22C55E;
+  border-color: #22C55E;
+}
+
+.driver-badge.on-job {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #F59E0B;
+  border-color: #F59E0B;
+}
+
+.driver-badge.offline {
+  background-color: rgba(107, 114, 128, 0.1);
+  color: #6B7280;
+  border-color: #6B7280;
+}
+
+/* Rating star styling */
+.rating-stars {
+  display: inline-flex;
+  gap: 2px;
+}
+
+.star {
+  color: #F59E0B;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.star.empty {
+  color: #E5E7EB;
+}
+
+/* Heatmap-like marker density visualization */
+.marker-cluster {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  border-radius: 50%;
+}
+
+/* Custom tooltip styling */
+.marker-tooltip {
+  background-color: #1F2937;
+  color: #F3F4F6;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  white-space: nowrap;
+}
+
+/* Route line styling */
+.route-polyline {
+  stroke-width: 3;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.route-polyline.primary {
+  stroke: #3B82F6;
+  opacity: 0.8;
+}
+
+.route-polyline.optimal {
+  stroke: #22C55E;
+  opacity: 0.8;
+}
+
+/* Price card styling */
+.price-breakdown {
+  background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+  color: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.price-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+}
+
+.price-item.total {
+  border-bottom: none;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+/* Status indicator with animation */
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-indicator.online {
+  background-color: #22C55E;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.on-job {
+  background-color: #F59E0B;
+  animation: pulse-orange 2s infinite;
+}
+
+.status-indicator.offline {
+  background-color: #9CA3AF;
+}
+
+/* Ride status badge animations */
+@keyframes badge-blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.badge-status-requested {
+  background-color: #FEF3C7;
+  color: #92400E;
+  animation: badge-blink 2s infinite;
+}
+
+.badge-status-accepted {
+  background-color: #D1FAE5;
+  color: #065F46;
+}
+
+.badge-status-in-progress {
+  background-color: #DBEAFE;
+  color: #0C4A6E;
+}
+
+.badge-status-completed {
+  background-color: #DCFCE7;
+  color: #166534;
+}
+
+/* Location selection mode styling */
+.location-select-active {
+  cursor: crosshair !important;
+  position: relative;
+}
+
+.location-select-active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  animation: breathing 1.5s infinite;
+}
+
+/* Driver availability heat map */
+.heatmap-layer {
+  opacity: 0.6;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-loading {
+  0% {
+    background-color: #E5E7EB;
+  }
+  50% {
+    background-color: #F3F4F6;
+  }
+  100% {
+    background-color: #E5E7EB;
+  }
+}
+
+.skeleton {
+  animation: skeleton-loading 1s infinite;
+  border-radius: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .price-breakdown {
+    padding: 12px;
+  }
+
+  .marker-tooltip {
+    font-size: 11px;
+  }
+
+  .driver-badge {
+    font-size: 10px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .marker-tooltip {
+    background-color: #111827;
+    color: #F9FAFB;
+  }
+
+  .price-breakdown {
+    background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  }
+}
