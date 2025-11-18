@@ -8,72 +8,68 @@ const COINS_PH_API_SECRET = "vtdLuUyRlJxaCImSXSQi7HHvLTpsm1fttAGiM5eys7enu63yrnq
  * HMAC-SHA256 signing helper
  */
 async function signRequest(params: Record<string, any>, secret: string): Promise<string> {
-  try {
-    const queryString = Object.entries(params)
-      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
-      .map(([key, value]) => `${key}=${value}`)
-      .join("&")
+  const queryString = Object.entries(params)
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&")
 
-    const encoder = new TextEncoder()
-    const data = encoder.encode(queryString)
+  const encoder = new TextEncoder()
+  const data = encoder.encode(queryString)
 
-    const key = await crypto.subtle.importKey(
-      "raw",
-      encoder.encode(secret),
-      { name: "HMAC", hash: "SHA-256" },
-      false,
-      ["sign"]
-    )
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  )
 
-    const signature = await crypto.subtle.sign("HMAC", key, data)
-    const hashArray = Array.from(new Uint8Array(signature))
-    
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("")
-  } catch (e) {
-    console.error("[signRequest] Error:", e)
-    throw e
-  }
+  const signature = await crypto.subtle.sign("HMAC", key, data)
+  const hashArray = Array.from(new Uint8Array(signature))
+  
+  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("")
 }
 
 /**
  * Main handler
  */
 serve(async (req) => {
-  console.log("[coinsph-proxy] New request:", {
-    method: req.method,
-    url: req.url,
-    contentType: req.headers.get("content-type"),
-  })
-
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
-    console.log("[coinsph-proxy] Handling OPTIONS request")
     return new Response(null, {
       status: 200,
       headers: {
         "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, DELETE, PUT, OPTIONS",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
       },
     })
   }
 
+  // Only accept POST requests
+  if (req.method !== "POST") {
+    return new Response(
+      JSON.stringify({ error: "Only POST requests are supported" }),
+      { 
+        status: 405,
+        headers: { 
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        } 
+      }
+    )
+  }
+
   try {
-    // Parse request body
-    let body: any
-    try {
-      const text = await req.text()
-      console.log("[coinsph-proxy] Raw body:", text)
-      body = text ? JSON.parse(text) : {}
-    } catch (parseError) {
-      console.error("[coinsph-proxy] Failed to parse JSON:", parseError)
+    // Read and parse request body
+    const rawBody = await req.text()
+    console.log("[coinsph-proxy] Raw request body:", rawBody)
+
+    if (!rawBody) {
       return new Response(
-        JSON.stringify({ 
-          error: "Invalid JSON in request body",
-          received: await req.text(),
-        }),
+        JSON.stringify({ error: "Empty request body" }),
         { 
-          status: 400, 
+          status: 400,
           headers: { 
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
@@ -82,17 +78,16 @@ serve(async (req) => {
       )
     }
 
+    const body = JSON.parse(rawBody)
     const { method, path, params = {}, isPublic = false } = body
 
-    console.log("[coinsph-proxy] Parsed request:", { method, path, isPublic })
+    console.log("[coinsph-proxy] Parsed request:", { method, path, isPublic, paramsKeys: Object.keys(params) })
 
-    // Validate required fields
     if (!method) {
-      console.error("[coinsph-proxy] Missing method")
       return new Response(
         JSON.stringify({ error: "Missing required field: method" }),
         { 
-          status: 400, 
+          status: 400,
           headers: { 
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
@@ -102,11 +97,10 @@ serve(async (req) => {
     }
 
     if (!path) {
-      console.error("[coinsph-proxy] Missing path")
       return new Response(
         JSON.stringify({ error: "Missing required field: path" }),
         { 
-          status: 400, 
+          status: 400,
           headers: { 
             "Content-Type": "application/json",
             "Access-Control-Allow-Origin": "*",
@@ -115,55 +109,37 @@ serve(async (req) => {
       )
     }
 
+    // Build the request
     let url = `${COINS_PH_API_BASE}${path}`
     let options: RequestInit = {
       method,
       headers: {
         "Content-Type": "application/json",
+        "X-MBX-APIKEY": COINS_PH_API_KEY,
       } as Record<string, string>,
     }
 
     if (!isPublic) {
-      // Add timestamp
+      // Add timestamp and sign
       const requestParams = {
         ...params,
         timestamp: Math.floor(Date.now()),
       }
 
-      try {
-        // Sign request
-        const signature = await signRequest(requestParams, COINS_PH_API_SECRET)
-        requestParams.signature = signature
+      const signature = await signRequest(requestParams, COINS_PH_API_SECRET)
+      requestParams.signature = signature
 
-        // Set API key header
-        options.headers["X-MBX-APIKEY"] = COINS_PH_API_KEY
-
-        if (method === "GET") {
-          const queryString = new URLSearchParams(
-            requestParams as Record<string, string>
-          ).toString()
-          url += `?${queryString}`
-        } else {
-          options.body = JSON.stringify(requestParams)
-        }
-      } catch (signError) {
-        console.error("[coinsph-proxy] Signing failed:", signError)
-        return new Response(
-          JSON.stringify({ 
-            error: "Failed to sign request",
-            details: signError instanceof Error ? signError.message : String(signError),
-          }),
-          { 
-            status: 500, 
-            headers: { 
-              "Content-Type": "application/json",
-              "Access-Control-Allow-Origin": "*",
-            } 
-          }
-        )
+      if (method === "GET") {
+        const queryString = new URLSearchParams(
+          requestParams as Record<string, string>
+        ).toString()
+        url += `?${queryString}`
+        console.log("[coinsph-proxy] GET URL:", url.substring(0, 150))
+      } else {
+        options.body = JSON.stringify(requestParams)
       }
     } else {
-      // Public endpoints
+      // Public endpoints - no signing
       if (method === "GET") {
         const queryString = new URLSearchParams(
           params as Record<string, string>
@@ -176,30 +152,19 @@ serve(async (req) => {
       }
     }
 
-    console.log("[coinsph-proxy] Making request:", { 
-      method, 
-      url: url.substring(0, 100),
-      hasBody: !!options.body,
-    })
+    console.log("[coinsph-proxy] Making request to Coins.ph:", method, url.substring(0, 150))
 
-    // Make the request to Coins.ph API
+    // Make the request to Coins.ph
     const response = await fetch(url, options)
     const responseData = await response.json()
 
-    console.log("[coinsph-proxy] Response:", { 
-      status: response.status,
-      hasData: !!responseData,
-    })
+    console.log("[coinsph-proxy] Response status:", response.status)
 
     if (!response.ok) {
-      console.error("[coinsph-proxy] API Error:", { 
-        status: response.status, 
-        data: responseData 
-      })
+      console.error("[coinsph-proxy] API Error:", response.status, responseData)
       return new Response(
         JSON.stringify({
-          error: responseData.msg || responseData.error || `API Error: ${response.status}`,
-          status: response.status,
+          error: responseData.msg || responseData.error || `Coins.ph API error: ${response.status}`,
           details: responseData,
         }),
         {
@@ -212,8 +177,7 @@ serve(async (req) => {
       )
     }
 
-    console.log("[coinsph-proxy] Success")
-    // Return successful response
+    // Success
     return new Response(JSON.stringify(responseData), {
       status: 200,
       headers: {
@@ -223,12 +187,12 @@ serve(async (req) => {
     })
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error("[coinsph-proxy] Unhandled error:", errorMessage, error)
+    console.error("[coinsph-proxy] Error:", errorMessage)
 
     return new Response(
       JSON.stringify({
         error: errorMessage,
-        details: "Unhandled error in proxy function",
+        type: "proxy_error",
       }),
       {
         status: 500,
