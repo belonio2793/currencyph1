@@ -79,7 +79,10 @@ async function checkSupabaseHealth() {
 
     const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
       signal: controller.signal,
-      headers: { 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` }
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
     })
 
     clearTimeout(timeoutId)
