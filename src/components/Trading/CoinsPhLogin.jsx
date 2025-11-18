@@ -10,7 +10,7 @@ export default function CoinsPhLogin({ onLoginSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    
+
     if (!apiKey.trim() || !apiSecret.trim()) {
       setError('Both API Key and Secret are required')
       return
@@ -20,20 +20,40 @@ export default function CoinsPhLogin({ onLoginSuccess }) {
       setLoading(true)
       setError(null)
 
-      // Test the credentials by making an API call
-      const testApi = new (await import('../../lib/coinsPhApi')).CoinsPhApi(apiKey, apiSecret)
-      const account = await testApi.getAccount()
+      // Test the credentials by making an API call through the proxy
+      const { CoinsPhApi } = await import('../../lib/coinsPhApi')
+      const testApi = new CoinsPhApi(apiKey, apiSecret)
 
-      if (account && account.email) {
-        // Store credentials securely
-        sessionStorage.setItem('coinsph_api_key', apiKey)
-        sessionStorage.setItem('coinsph_api_secret', apiSecret)
-        
-        // Also update the global API instance
-        coinsPhApi.apiKey = apiKey
-        coinsPhApi.apiSecret = apiSecret
+      try {
+        const account = await testApi.getAccount()
 
-        onLoginSuccess()
+        if (account && account.email) {
+          // Store credentials securely
+          sessionStorage.setItem('coinsph_api_key', apiKey)
+          sessionStorage.setItem('coinsph_api_secret', apiSecret)
+
+          // Update the global API instance
+          coinsPhApi.apiKey = apiKey
+          coinsPhApi.apiSecret = apiSecret
+
+          setLoading(false)
+          onLoginSuccess()
+        } else {
+          throw new Error('Invalid response from API - no account email found')
+        }
+      } catch (apiError) {
+        // Provide specific error messages
+        const errorMsg = apiError.message || 'API request failed'
+
+        if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
+          setError('Invalid API credentials. Please check your Key and Secret.')
+        } else if (errorMsg.includes('403') || errorMsg.includes('Forbidden')) {
+          setError('Your API credentials do not have the required permissions. Enable all permissions in your API settings.')
+        } else if (errorMsg.includes('Failed to fetch') || errorMsg.includes('network')) {
+          setError('Network error. Please check your internet connection.')
+        } else {
+          setError(errorMsg)
+        }
         setLoading(false)
       }
     } catch (err) {
