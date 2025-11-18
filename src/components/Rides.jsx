@@ -52,11 +52,43 @@ function MapUpdater({ location }) {
   return null
 }
 
-function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole }) {
+function DraggableMarker({ position, color, label, onDrag }) {
+  const markerRef = useRef(null)
+
+  const eventHandlers = {
+    dragend() {
+      const marker = markerRef.current
+      if (marker != null) {
+        const newLat = marker.getLatLng().lat
+        const newLng = marker.getLatLng().lng
+        onDrag({ latitude: newLat, longitude: newLng })
+      }
+    },
+  }
+
+  if (!position) return null
+
+  return (
+    <Marker
+      draggable={true}
+      eventHandlers={eventHandlers}
+      position={position}
+      ref={markerRef}
+      icon={createCustomIcon(color, label, false)}
+    />
+  )
+}
+
+function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole, onStartCoordDrag, onEndCoordDrag, selectingCoord }) {
   const mapRef = useRef(null)
 
   return (
-    <div style={{ height: '500px', width: '100%', borderRadius: '8px', overflow: 'hidden' }}>
+    <div style={{ height: '500px', width: '100%', borderRadius: '8px', overflow: 'hidden', position: 'relative' }}>
+      {selectingCoord && (
+        <div className="absolute top-0 left-0 right-0 z-20 bg-blue-500 text-white p-2 text-center text-sm font-medium">
+          Click on the map or drag a marker to select {selectingCoord === 'start' ? 'pickup location' : 'destination'}
+        </div>
+      )}
       <MapContainer
         center={[userLocation?.latitude || 14.5995, userLocation?.longitude || 120.9842]}
         zoom={14}
