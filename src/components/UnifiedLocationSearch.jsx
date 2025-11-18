@@ -353,16 +353,13 @@ export default function UnifiedLocationSearch({
 
       if (filteredResults.length === 0) {
         const suggestions = []
-        if (!GOOGLE_API_KEY) {
-          suggestions.push('Google API key not configured')
-        }
         if (!userLocation) {
           suggestions.push('Enable location sharing for better results')
         }
-        suggestions.push('Try searching for a nearby city or address instead')
-        suggestions.push('Use the map to select your destination')
+        suggestions.push('Try searching for a nearby city or barangay name')
+        suggestions.push('Or use the map to select your destination')
 
-        const errorMsg = `No locations found matching "${destinationSearch}". ${suggestions.join('. ')}.`
+        const errorMsg = `No locations found for "${destinationSearch}". ${suggestions.join('. ')}.`
         setError(errorMsg)
       }
 
