@@ -321,6 +321,16 @@
   border-radius: 4px;
 }
 
+/* Map container fixes for scrolling */
+.leaflet-container {
+  position: relative !important;
+  z-index: 0 !important;
+}
+
+.leaflet-control-container {
+  z-index: 10 !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .price-breakdown {
