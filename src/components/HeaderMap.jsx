@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css'
 import SendLocationModal from './SendLocationModal'
 import { preferencesManager } from '../lib/preferencesManager'
 import { updatePresenceLocation } from '../lib/presence'
+import { requestLocationPermission } from '../lib/locationHelpers'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
