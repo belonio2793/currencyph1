@@ -255,7 +255,7 @@ export default function TradingDashboard({ userId, onClose }) {
         </button>
         <button
           onClick={() => setActiveTab('strategies')}
-          className={`px-6 py-4 font-medium transition ${
+          className={`px-6 py-4 font-medium transition whitespace-nowrap ${
             activeTab === 'strategies'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-slate-600 hover:text-slate-900'
@@ -265,7 +265,7 @@ export default function TradingDashboard({ userId, onClose }) {
         </button>
         <button
           onClick={() => setActiveTab('positions')}
-          className={`px-6 py-4 font-medium transition ${
+          className={`px-6 py-4 font-medium transition whitespace-nowrap ${
             activeTab === 'positions'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-slate-600 hover:text-slate-900'
@@ -275,7 +275,7 @@ export default function TradingDashboard({ userId, onClose }) {
         </button>
         <button
           onClick={() => setActiveTab('performance')}
-          className={`px-6 py-4 font-medium transition ${
+          className={`px-6 py-4 font-medium transition whitespace-nowrap ${
             activeTab === 'performance'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-slate-600 hover:text-slate-900'
