@@ -325,7 +325,7 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
 
 export default function Rides({ userId, userEmail, onShowAuth }) {
   const [activeTab, setActiveTab] = useState('find-ride')
-  const [userRole, setUserRole] = useState('rider') // 'rider' or 'driver'
+  const [userRole, setUserRole] = useState('driver') // 'rider' or 'driver'
   const [userLocation, setUserLocation] = useState(null)
   const [drivers, setDrivers] = useState([])
   const [riders, setRiders] = useState([])
