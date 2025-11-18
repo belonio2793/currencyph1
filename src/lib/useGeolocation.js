@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { reverseGeocode } from './nominatimService.js'
 
 export function useGeolocation() {
   const [location, setLocation] = useState(null)
