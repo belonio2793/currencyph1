@@ -59,7 +59,7 @@ export class CoinsPhApi {
 
       if (!isPublic) {
         params.timestamp = Math.floor(Date.now())
-        const signed = this.signRequest(params)
+        const signed = await this.signRequest(params)
         options.headers['X-MBX-APIKEY'] = this.apiKey
 
         if (method === 'GET') {
