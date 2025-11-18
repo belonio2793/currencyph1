@@ -40,23 +40,24 @@ export function useGeolocation() {
                   let timedOut = false
 
                   const timeoutId = setTimeout(() => {
-                    if (isMountedRef.current) {
-                      timedOut = true
-                      try {
-                        controller.abort()
-                      } catch (e) {
-                        // Ignore abort errors
-                      }
+                  if (isMountedRef.current && !timedOut) {
+                    timedOut = true
+                    try {
+                      controller.abort('Geocoding timeout')
+                    } catch (e) {
+                      // Ignore abort errors
                     }
-                  }, 3000)
+                  }
+                }, 3000)
 
-                  try {
-                    const resp = await fetch(url, { signal: controller.signal })
-                    if (timedOut || !isMountedRef.current) {
-                      clearTimeout(timeoutId)
-                      return
-                    }
+                try {
+                  const resp = await fetch(url, { signal: controller.signal })
+                  if (!isMountedRef.current) {
                     clearTimeout(timeoutId)
+                    return
+                  }
+                  clearTimeout(timeoutId)
+                  if (timedOut) return
 
                     if (resp?.ok && isMountedRef.current) {
                       try {
