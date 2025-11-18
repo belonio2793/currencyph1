@@ -413,7 +413,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         setActiveRides(data)
       }
     } catch (err) {
-      console.warn('Could not load active rides:', err)
+      console.warn('Could not load active rides:', err?.message || err?.details?.message || JSON.stringify(err))
     }
   }
 
