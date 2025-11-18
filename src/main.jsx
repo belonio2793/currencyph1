@@ -110,8 +110,8 @@ try {
 
           if (shouldSuppress) {
             console.debug('[safeFetch] Suppressed network error for', url, err && err.message)
-            const body = JSON.stringify({ error: 'network_error', message: err && err.message })
-            return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
+            // Return error response without body to avoid stream consumption issues
+            return new Response(null, { status: 503, headers: { 'Content-Type': 'application/json' } })
           }
         } catch (e) {}
 
