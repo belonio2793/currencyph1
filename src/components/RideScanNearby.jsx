@@ -176,7 +176,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Select City</h3>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {PHILIPPINE_CITIES.map(city => (
+          {filteredCities.map(city => (
             <button
               key={city.name}
               onClick={() => setSelectedCity(city)}
@@ -189,7 +189,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
               <p className="text-sm font-medium text-slate-900">{city.name}</p>
               <p className="text-xs text-slate-600 mt-1">
                 {drivers.filter(d => {
-                  const dist = calculateDistance(city.lat, city.lng, d.latitude, d.longitude)
+                  const dist = calculateDistance(city.latitude, city.longitude, d.latitude, d.longitude)
                   return dist <= scanRadius
                 }).length} drivers
               </p>
