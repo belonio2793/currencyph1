@@ -1299,6 +1299,65 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           </div>
         )}
       </div>
+
+      {/* Modals */}
+      {showDriverProfileModal && selectedDriver && (
+        <DriverProfileModal
+          driver={selectedDriver}
+          onClose={() => setShowDriverProfileModal(false)}
+          onRequestRide={handleRequestRideFromDriver}
+          loading={loading}
+        />
+      )}
+
+      {showRideDetailsModal && selectedRide && (
+        <RideDetailsModal
+          ride={selectedRide}
+          driver={drivers.find(d => d.id === selectedRide.driver_id)}
+          onClose={() => setShowRideDetailsModal(false)}
+          onCancelRide={handleCancelRide}
+          onUpdateStatus={handleUpdateRideStatus}
+          loading={loading}
+        />
+      )}
+
+      {showChatModal && selectedRide && (
+        <ChatModal
+          ride={selectedRide}
+          currentUserId={userId}
+          otherUserName={selectedRide.driver_id ? drivers.find(d => d.id === selectedRide.driver_id)?.driver_name || 'Driver' : 'Rider'}
+          onClose={() => setShowChatModal(false)}
+          onSendMessage={handleSendMessage}
+          loading={loading}
+        />
+      )}
+
+      {showPaymentModal && selectedRide && (
+        <PaymentModal
+          ride={selectedRide}
+          onClose={() => setShowPaymentModal(false)}
+          onCompletePayment={handleCompletePayment}
+          loading={loading}
+        />
+      )}
+
+      {showRatingModal && selectedRide && (
+        <RatingModal
+          ride={selectedRide}
+          otherUserName={selectedRide.driver_id ? drivers.find(d => d.id === selectedRide.driver_id)?.driver_name || 'Driver' : 'Rider'}
+          onClose={() => setShowRatingModal(false)}
+          onSubmitRating={handleSubmitRating}
+          loading={loading}
+        />
+      )}
+
+      {showTransactionHistoryModal && (
+        <TransactionHistoryModal
+          userId={userId}
+          onClose={() => setShowTransactionHistoryModal(false)}
+          loading={loading}
+        />
+      )}
     </div>
   )
 }
