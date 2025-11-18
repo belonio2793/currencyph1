@@ -690,6 +690,19 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 </div>
               </div>
 
+              {/* Fare Estimate */}
+              {startCoord && endCoord && (
+                <div className="mb-6">
+                  <FareEstimate
+                    startCoord={startCoord}
+                    endCoord={endCoord}
+                    vehicleType={driverVehicleType}
+                    activeDemand={activeRides.length}
+                    activeSupply={drivers.length}
+                  />
+                </div>
+              )}
+
               {/* Request Button */}
               <button
                 onClick={requestRide}
