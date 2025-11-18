@@ -4,16 +4,26 @@ const MAPTILER_KEY = import.meta?.env?.VITE_MAPTILER_API_KEY || ''
 
 export async function getRoute(startLat, startLng, endLat, endLng) {
   try {
+    // If no API key, use direct calculation immediately
+    if (!MAPTILER_KEY) {
+      return calculateDirectRoute(startLat, startLng, endLat, endLng)
+    }
+
     const url = `https://api.maptiler.com/routing/v1/directions/driving/${startLng},${startLat};${endLng},${endLat}?key=${MAPTILER_KEY}&steps=true&alternatives=false&overview=full&geometries=geojson`
 
     const response = await fetch(url)
     if (!response.ok) {
+      // For 404/401 errors, use fallback. For others, try anyway
+      if (response.status === 404 || response.status === 401) {
+        console.debug('MapTiler API not available, using direct calculation')
+        return calculateDirectRoute(startLat, startLng, endLat, endLng)
+      }
       throw new Error(`Routing API error: ${response.status}`)
     }
 
     const data = await response.json()
     if (!data.routes || data.routes.length === 0) {
-      throw new Error('No route found')
+      return calculateDirectRoute(startLat, startLng, endLat, endLng)
     }
 
     const route = data.routes[0]
@@ -26,18 +36,22 @@ export async function getRoute(startLat, startLng, endLat, endLng) {
       steps: route.steps || []
     }
   } catch (error) {
-    console.error('Routing error:', error)
+    console.debug('Routing error:', error?.message)
     // Fallback to direct distance calculation
-    const distance = calculateHaversineDistance(startLat, startLng, endLat, endLng)
-    const duration = Math.ceil((distance / 40) * 60) // Assume 40 km/h average
-    return {
-      success: true,
-      distance,
-      duration,
-      geometry: [[startLng, startLat], [endLng, endLat]],
-      coordinates: [[startLng, startLat], [endLng, endLat]], // For compatibility
-      steps: []
-    }
+    return calculateDirectRoute(startLat, startLng, endLat, endLng)
+  }
+}
+
+function calculateDirectRoute(startLat, startLng, endLat, endLng) {
+  const distance = calculateHaversineDistance(startLat, startLng, endLat, endLng)
+  const duration = Math.ceil((distance / 40) * 60) // Assume 40 km/h average
+  return {
+    success: true,
+    distance,
+    duration,
+    geometry: [[startLng, startLat], [endLng, endLat]],
+    coordinates: [[startLng, startLat], [endLng, endLat]], // For compatibility
+    steps: []
   }
 }
 
