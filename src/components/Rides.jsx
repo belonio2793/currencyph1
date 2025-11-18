@@ -1066,7 +1066,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   userId={userId}
                   loading={loading}
                   onSelectDriver={(driver) => {
-                    setSelectedMarker({ type: 'driver', id: driver.id, data: driver })
+                    handleSelectDriver(driver)
                   }}
                   onSelectRider={(rider) => {
                     setSelectedMarker({ type: 'rider', id: rider.id, data: rider })
