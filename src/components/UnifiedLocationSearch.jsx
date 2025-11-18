@@ -127,48 +127,77 @@ export default function UnifiedLocationSearch({
     }
 
     try {
-      const types = POI_KEYWORD_MAP[keyword.toLowerCase()] || [keyword.toLowerCase()]
-      const typeString = types.join('|')
-
-      // Use nearby search centered on user location
       const location = userLocation
         ? `${userLocation.latitude},${userLocation.longitude}`
         : '14.5995,120.9842' // Manila fallback
 
       const radius = userLocation ? 50000 : 100000 // 50km or 100km
 
-      const url = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
-      url.searchParams.set('location', location)
-      url.searchParams.set('radius', radius)
-      url.searchParams.set('keyword', keyword)
-      url.searchParams.set('type', typeString)
-      url.searchParams.set('key', GOOGLE_API_KEY)
-      url.searchParams.set('language', 'en')
+      // Try nearby search first (type-based)
+      const types = POI_KEYWORD_MAP[keyword.toLowerCase()] || []
+      if (types.length > 0) {
+        const typeString = types.join('|')
+        const nearbyUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
+        nearbyUrl.searchParams.set('location', location)
+        nearbyUrl.searchParams.set('radius', radius)
+        nearbyUrl.searchParams.set('type', typeString)
+        nearbyUrl.searchParams.set('key', GOOGLE_API_KEY)
+        nearbyUrl.searchParams.set('language', 'en')
 
-      const response = await fetch(url.toString())
+        try {
+          const response = await fetch(nearbyUrl.toString())
+          if (response.ok) {
+            const data = await response.json()
+            if (data.results && data.results.length > 0) {
+              return data.results.slice(0, 15).map(place => ({
+                latitude: place.geometry.location.lat,
+                longitude: place.geometry.location.lng,
+                address: place.name + (place.vicinity ? ', ' + place.vicinity : ''),
+                placeId: place.place_id,
+                type: 'poi',
+                rating: place.rating,
+                openNow: place.opening_hours?.open_now
+              }))
+            }
+          }
+        } catch (err) {
+          console.debug('Google nearby search failed, trying text search:', err?.message)
+        }
+      }
+
+      // Fallback to text search for broader results
+      const textSearchUrl = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json')
+      textSearchUrl.searchParams.set('query', keyword)
+      textSearchUrl.searchParams.set('location', location)
+      textSearchUrl.searchParams.set('radius', radius)
+      textSearchUrl.searchParams.set('key', GOOGLE_API_KEY)
+      textSearchUrl.searchParams.set('language', 'en')
+
+      const response = await fetch(textSearchUrl.toString())
 
       if (!response.ok) {
-        console.warn('Google Places API error:', response.status)
+        console.warn('Google Places text search API error:', response.status)
         return []
       }
 
       const data = await response.json()
 
-      if (!data.results || data.results.length === 0) {
+      if (data.status === 'ZERO_RESULTS' || !data.results || data.results.length === 0) {
+        console.debug('No Google Places results for:', keyword)
         return []
       }
 
       return data.results.slice(0, 15).map(place => ({
         latitude: place.geometry.location.lat,
         longitude: place.geometry.location.lng,
-        address: place.name + (place.vicinity ? ', ' + place.vicinity : ''),
+        address: place.name + (place.formatted_address ? ', ' + place.formatted_address : ''),
         placeId: place.place_id,
         type: 'poi',
         rating: place.rating,
         openNow: place.opening_hours?.open_now
       }))
     } catch (err) {
-      console.warn('Google Places search failed:', err)
+      console.warn('Google Places search error:', err?.message || err)
       return []
     }
   }
