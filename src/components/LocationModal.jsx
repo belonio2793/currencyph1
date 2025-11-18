@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import philippineCities from '../data/philippineCities.json'
 
 const createCustomIcon = (color) => {
   return L.divIcon({
@@ -23,22 +24,24 @@ function MapClickHandler({ onLocationSelect }) {
   return null
 }
 
-export default function LocationModal({ 
-  isOpen, 
-  onClose, 
-  onSelectLocation, 
+export default function LocationModal({
+  isOpen,
+  onClose,
+  onSelectLocation,
   locationType = 'pickup',
   currentLocation,
   userLocation,
   savedLocations = []
 }) {
-  const [activeTab, setActiveTab] = useState('map') // 'map', 'address', 'coordinates', 'saved'
+  const [activeTab, setActiveTab] = useState('city') // 'city', 'map', 'address', 'coordinates', 'saved'
   const [selectedLocation, setSelectedLocation] = useState(null)
   const [address, setAddress] = useState('')
   const [latitude, setLatitude] = useState('')
   const [longitude, setLongitude] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [loading, setLoading] = useState(false)
+  const [citySearch, setCitySearch] = useState('')
+  const [filteredCities, setFilteredCities] = useState([])
   const mapRef = useRef(null)
 
   useEffect(() => {
@@ -48,6 +51,18 @@ export default function LocationModal({
       setLongitude(currentLocation.longitude.toString())
     }
   }, [currentLocation, isOpen])
+
+  // City search filter
+  useEffect(() => {
+    if (citySearch.trim()) {
+      const filtered = philippineCities.cities.filter(city =>
+        city.name.toLowerCase().includes(citySearch.toLowerCase())
+      ).slice(0, 10) // Limit to 10 results
+      setFilteredCities(filtered)
+    } else {
+      setFilteredCities([])
+    }
+  }, [citySearch])
 
   const handleMapSelect = (location) => {
     setSelectedLocation(location)
@@ -141,10 +156,23 @@ export default function LocationModal({
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-slate-200 bg-slate-50">
+        <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto">
+          <button
+            onClick={() => setActiveTab('city')}
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-w-fit ${
+              activeTab === 'city'
+                ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            City
+          </button>
           <button
             onClick={() => setActiveTab('map')}
-            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+            className={`flex-1 px-4 py-3 text-sm font-medium transition-colors min-w-fit ${
               activeTab === 'map'
                 ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
                 : 'text-slate-600 hover:text-slate-900'
@@ -200,6 +228,85 @@ export default function LocationModal({
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-6">
+          {/* City Search Tab */}
+          {activeTab === 'city' && (
+            <div className="space-y-4">
+              <form onSubmit={(e) => e.preventDefault()} className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Search Philippine Cities
+                  </label>
+                  <input
+                    type="text"
+                    value={citySearch}
+                    onChange={(e) => setCitySearch(e.target.value)}
+                    placeholder="Type city name (e.g., Manila, Cebu, Davao)..."
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    autoFocus
+                  />
+                </div>
+              </form>
+
+              {filteredCities.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-slate-700">Available Cities:</p>
+                  <div className="space-y-2 max-h-96 overflow-y-auto border border-slate-200 rounded-lg p-3 bg-slate-50">
+                    {filteredCities.map((city) => (
+                      <button
+                        key={city.name}
+                        onClick={() => {
+                          setSelectedLocation({ latitude: city.latitude, longitude: city.longitude })
+                          setLatitude(city.latitude.toString())
+                          setLongitude(city.longitude.toString())
+                          setCitySearch('')
+                          setFilteredCities([])
+                          setActiveTab('map')
+                        }}
+                        className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
+                          selectedLocation?.latitude === city.latitude && selectedLocation?.longitude === city.longitude
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-slate-200 hover:border-blue-400 hover:bg-white'
+                        }`}
+                      >
+                        <p className="font-medium text-slate-900 text-sm">{city.name}</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {city.latitude.toFixed(4)}, {city.longitude.toFixed(4)}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {citySearch && filteredCities.length === 0 && (
+                <div className="text-center py-8">
+                  <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10a4 4 0 018 0" />
+                  </svg>
+                  <p className="text-slate-500 text-sm">No cities found matching "{citySearch}"</p>
+                </div>
+              )}
+
+              {!citySearch && (
+                <div className="text-center py-8">
+                  <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                  <p className="text-slate-600 text-sm">Start typing to search for a city</p>
+                </div>
+              )}
+
+              {selectedLocation && (
+                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                  <p className="text-sm font-semibold text-green-900 mb-2">✓ Location Selected</p>
+                  <p className="text-xs text-slate-700 font-mono">
+                    Lat: {selectedLocation.latitude.toFixed(6)} | Lng: {selectedLocation.longitude.toFixed(6)}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Map Tab */}
           {activeTab === 'map' && (
             <div className="space-y-4">
