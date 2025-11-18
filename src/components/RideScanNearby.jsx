@@ -48,25 +48,6 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
     }
   }, [selectedCity, scanRadius])
 
-  const detectCity = (latitude, longitude) => {
-    let closestCity = null
-    let closestDistance = Infinity
-
-    PHILIPPINE_CITIES.forEach(city => {
-      const dist = calculateDistance(latitude, longitude, city.lat, city.lng)
-      if (dist < closestDistance) {
-        closestDistance = dist
-        closestCity = city
-      }
-    })
-
-    // Only return city if within reasonable distance
-    if (closestCity && closestDistance < 100) {
-      return closestCity
-    }
-    return null
-  }
-
   const scanCity = async (city) => {
     if (!city) return
 
@@ -84,9 +65,9 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
         .limit(50)
 
       if (!driverError && driversData) {
-        // Filter by radius
+        // Filter by radius from city center
         const filtered = driversData.filter(d => {
-          const dist = calculateDistance(city.lat, city.lng, parseFloat(d.latitude), parseFloat(d.longitude))
+          const dist = calculateDistance(city.latitude, city.longitude, parseFloat(d.latitude), parseFloat(d.longitude))
           return dist <= scanRadius
         }).map(d => ({
           id: d.user_id,
@@ -95,7 +76,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
           latitude: parseFloat(d.latitude),
           longitude: parseFloat(d.longitude),
           rating: d.average_rating || 5.0,
-          distance: calculateDistance(city.lat, city.lng, parseFloat(d.latitude), parseFloat(d.longitude))
+          distance: calculateDistance(city.latitude, city.longitude, parseFloat(d.latitude), parseFloat(d.longitude))
         }))
 
         setDrivers(filtered.sort((a, b) => a.distance - b.distance))
@@ -110,7 +91,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
 
       if (!ridesError && ridesData) {
         const filtered = ridesData.filter(r => {
-          const dist = calculateDistance(city.lat, city.lng, parseFloat(r.start_latitude), parseFloat(r.start_longitude))
+          const dist = calculateDistance(city.latitude, city.longitude, parseFloat(r.start_latitude), parseFloat(r.start_longitude))
           return dist <= scanRadius
         }).map(r => ({
           id: r.rider_id,
@@ -118,7 +99,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
           longitude: parseFloat(r.start_longitude),
           passenger_name: 'Passenger',
           rating: 5.0,
-          distance: calculateDistance(city.lat, city.lng, parseFloat(r.start_latitude), parseFloat(r.start_longitude))
+          distance: calculateDistance(city.latitude, city.longitude, parseFloat(r.start_latitude), parseFloat(r.start_longitude))
         }))
 
         setRiders(filtered.sort((a, b) => a.distance - b.distance))
