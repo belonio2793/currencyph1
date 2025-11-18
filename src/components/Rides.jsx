@@ -18,6 +18,8 @@ import TransactionHistoryModal from './TransactionHistoryModal'
 import MarkerPopup from './MarkerPopup'
 import LocationModal from './LocationModal'
 import RideTypeModal from './RideTypeModal'
+import RideDetailsCard from './RideDetailsCard'
+import RoutePolyline from './RoutePolyline'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
@@ -179,7 +181,7 @@ function DraggableMarker({ position, color, label, onDrag }) {
   )
 }
 
-function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole, onStartCoordDrag, onEndCoordDrag, selectingCoord }) {
+function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole, onStartCoordDrag, onEndCoordDrag, selectingCoord, routeGeometry, routeDistance, routeDuration }) {
   const mapRef = useRef(null)
 
   return (
@@ -208,6 +210,15 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapUpdater location={userLocation} />
+
+        {/* Route Polyline */}
+        {routeGeometry && (
+          <RoutePolyline
+            geometry={routeGeometry}
+            distance={routeDistance}
+            duration={routeDuration}
+          />
+        )}
 
         {/* User's current location */}
         {userLocation && (
@@ -304,6 +315,9 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [locationModalType, setLocationModalType] = useState('pickup') // 'pickup' or 'destination'
   const [showRideTypeModal, setShowRideTypeModal] = useState(false)
   const [selectedRideType, setSelectedRideType] = useState(null)
+
+  // Route details
+  const [routeDetails, setRouteDetails] = useState(null)
 
   // Driver status
   const [driverStatus, setDriverStatus] = useState('offline') // 'offline', 'available', 'on-job'
