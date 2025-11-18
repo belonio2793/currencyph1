@@ -83,9 +83,10 @@ export default function LocationModal({
     if (!address.trim()) return
 
     setLoading(true)
+    let timeoutId = null
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
+      timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
 
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=20&bounded=1&viewbox=120,19,129,5&countrycodes=ph`,
@@ -130,7 +131,7 @@ export default function LocationModal({
 
       setSearchResults(filteredResults.slice(0, 10))
     } catch (error) {
-      clearTimeout(timeoutId)
+      if (timeoutId) clearTimeout(timeoutId)
       if (error?.name === 'AbortError') {
         console.error('Location search timeout')
       } else {
