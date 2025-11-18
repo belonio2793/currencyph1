@@ -964,8 +964,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             </div>
 
             {/* Map */}
-            <div className="mb-6">
-              <div className="bg-white rounded-lg shadow-lg p-4 mb-4 border border-slate-200">
+            <div className="mb-6" style={{ position: 'relative', zIndex: 0 }}>
+              <div className="bg-white rounded-lg shadow-lg p-4 mb-4 border border-slate-200" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
