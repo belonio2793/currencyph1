@@ -698,6 +698,28 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 Request Ride
               </button>
             </div>
+
+            {/* Available Drivers Listing */}
+            {startCoord && endCoord && (
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Available Drivers Nearby</h3>
+                <RideListings
+                  drivers={drivers}
+                  riders={riders}
+                  startCoord={startCoord}
+                  endCoord={endCoord}
+                  userRole={userRole}
+                  userId={userId}
+                  loading={loading}
+                  onSelectDriver={(driver) => {
+                    setSelectedMarker({ type: 'driver', id: driver.id, data: driver })
+                  }}
+                  onSelectRider={(rider) => {
+                    setSelectedMarker({ type: 'rider', id: rider.id, data: rider })
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
 
