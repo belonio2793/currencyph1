@@ -120,10 +120,10 @@ export default function LocationModal({
   const headerColor = locationType === 'pickup' ? 'from-green-600 to-green-700' : 'from-red-600 to-red-700'
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4">
+      <div className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col relative z-[10000]">
         {/* Header */}
-        <div className={`bg-gradient-to-r ${headerColor} text-white p-6 flex items-center justify-between`}>
+        <div className={`${locationType === 'pickup' ? 'bg-green-600' : 'bg-red-600'} text-white p-6 flex items-center justify-between`}>
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
