@@ -303,7 +303,7 @@ export default function SendLocationModal({ open, onClose, location, city, sende
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    attribution='&copy; OpenStreetMap'
+                    attribution=""
                   />
                   
                   {/* Route polyline */}
