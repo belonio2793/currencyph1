@@ -251,18 +251,24 @@ export default function UnifiedLocationSearch({
   const searchNominatim = async (query) => {
     try {
       const controller = new AbortController()
-      const timeoutId = setTimeout(() => controller.abort(), 8000) // 8s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout (reduced from 8s)
 
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=20&countrycodes=ph&bounded=1&viewbox=120,19,129,5`,
-        { signal: controller.signal }
+        {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'currency-ph/1.0'
+          }
+        }
       )
 
       clearTimeout(timeoutId)
 
-      if (!response.ok) throw new Error(`Nominatim ${response.status}`)
+      if (!response.ok) throw new Error(`API error ${response.status}`)
 
       const results = await response.json()
+      if (!Array.isArray(results)) return []
 
       return results.map(r => ({
         latitude: parseFloat(r.lat),
@@ -272,10 +278,10 @@ export default function UnifiedLocationSearch({
       }))
     } catch (err) {
       if (err?.name === 'AbortError') {
-        console.debug('Nominatim timeout')
-        return []
+        console.debug('Location search timeout')
+        return null // Return null to indicate timeout, not empty array
       }
-      console.debug('Nominatim search failed:', err?.message)
+      console.debug('Location search failed:', err?.message)
       return []
     }
   }
