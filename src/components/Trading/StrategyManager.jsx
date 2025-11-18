@@ -288,10 +288,10 @@ export default function StrategyManager({ userId, bot, onRefresh }) {
                   <h4 className="font-bold text-slate-900">{strategy.name}</h4>
                   <p className="text-sm text-slate-600 mb-2">{strategy.description}</p>
                   <div className="flex gap-4 text-xs text-slate-600">
-                    <span>📊 {strategy.strategy_type}</span>
-                    <span>⏱️ {strategy.timeframe}</span>
-                    <span>💰 ₱{strategy.position_size_php}</span>
-                    <span>📈 Max {strategy.max_open_positions} positions</span>
+                    <span>{strategy.strategy_type}</span>
+                    <span>{strategy.timeframe}</span>
+                    <span>₱{strategy.position_size_php}</span>
+                    <span>Max {strategy.max_open_positions} positions</span>
                   </div>
                 </div>
                 <div className="flex gap-2">

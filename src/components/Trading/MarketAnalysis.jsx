@@ -83,7 +83,7 @@ export default function MarketAnalysis({ userId }) {
           disabled={loading}
           className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
         >
-          🔄 Refresh
+          Refresh
         </button>
       </div>
 

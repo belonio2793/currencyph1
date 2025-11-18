@@ -154,14 +154,14 @@ export default function TradingDashboard({ userId, onClose }) {
           <div>
             <h1 className="text-3xl font-bold">Trading Bot Dashboard</h1>
             <p className="text-blue-100">
-              {paperTradingMode ? '📝 Paper Trading Mode' : '💰 REAL TRADING MODE'}
+              {paperTradingMode ? 'Paper Trading Mode' : 'REAL TRADING MODE'}
             </p>
           </div>
           <button
             onClick={onClose}
             className="text-white hover:bg-blue-500 p-2 rounded-lg"
           >
-            ✕ Close
+            Close
           </button>
         </div>
       </div>
@@ -189,7 +189,7 @@ export default function TradingDashboard({ userId, onClose }) {
                 : 'bg-gray-400 text-white hover:bg-gray-500'
             }`}
           >
-            {tradingEnabled ? '✓ Trading ON' : '✕ Trading OFF'}
+            {tradingEnabled ? 'Trading ON' : 'Trading OFF'}
           </button>
 
           <button
@@ -200,7 +200,7 @@ export default function TradingDashboard({ userId, onClose }) {
                 : 'bg-red-600 text-white hover:bg-red-700'
             }`}
           >
-            {paperTradingMode ? '📝 Paper Trading' : '💰 Real Trading'}
+            {paperTradingMode ? 'Paper Trading' : 'Real Trading'}
           </button>
 
           <button
