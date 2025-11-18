@@ -83,45 +83,9 @@ try {
   // ignore
 }
 
-// Global safe fetch wrapper to catch 'Failed to fetch' network errors from third-party scripts
-try {
-  if (typeof window !== 'undefined' && typeof window.fetch === 'function') {
-    const _origFetch = window.fetch.bind(window)
-    window.fetch = async (input, init) => {
-      try {
-        return await _origFetch(input, init)
-      } catch (err) {
-        // Check if this is a network/offline error
-        const isNetworkError = err && (err.name === 'NetworkError' || err.message?.includes('Failed to fetch'))
-
-        try {
-          const url = (typeof input === 'string') ? input : (input && input.url) || ''
-          const host = url && url.toString().toLowerCase()
-
-          // List of hosts that should be silently suppressed
-          const suppressedHosts = [
-            'fullstory.com', 'edge.fullstory.com',
-            'sentry.io', 'segment.io', 'rollbar.com',
-            'socket.to'
-          ]
-
-          const shouldSuppress = suppressedHosts.some(h => host.includes(h))
-
-          if (shouldSuppress) {
-            console.debug('[safeFetch] Suppressed network error for', url, err && err.message)
-            // Return error response without body to avoid stream consumption issues
-            return new Response(null, { status: 503, headers: { 'Content-Type': 'application/json' } })
-          }
-        } catch (e) {}
-
-        // For other errors, rethrow so callers can handle them
-        throw err
-      }
-    }
-  }
-} catch (e) {
-  // ignore
-}
+// Note: Global fetch wrapper disabled to avoid response body stream consumption issues
+// Response bodies can only be read once, and synthetic Responses can cause issues with
+// libraries like Supabase that expect real response objects
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
