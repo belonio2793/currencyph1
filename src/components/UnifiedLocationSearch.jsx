@@ -464,7 +464,8 @@ export default function UnifiedLocationSearch({
                 <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10a4 4 0 018 0" />
                 </svg>
-                <p className="text-slate-500 text-sm">No locations found matching "{destinationSearch}"</p>
+                <p className="text-slate-500 text-sm mb-2">No locations found matching "{destinationSearch}"</p>
+                <p className="text-xs text-slate-400">Try searching for specific addresses or place types like "church", "restaurant", "hospital", "school", etc.</p>
               </div>
             )}
 
