@@ -6,6 +6,7 @@ import MarketAnalysis from './MarketAnalysis'
 import StrategyManager from './StrategyManager'
 import PositionsMonitor from './PositionsMonitor'
 import PerformanceMetrics from './PerformanceMetrics'
+import CoinsPhAccountDetails from './CoinsPhAccountDetails'
 
 export default function TradingDashboard({ userId, onClose }) {
   const [activeTab, setActiveTab] = useState('overview')
