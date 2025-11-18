@@ -780,24 +780,70 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               </div>
             ) : (
               <div className="grid gap-4">
-                {activeRides.map(ride => (
-                  <div key={ride.id} className="bg-white rounded-lg shadow-sm p-6 border-l-4 border-blue-600">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold text-slate-900">
-                        {ride.status === 'requested' && '��� Searching for driver...'}
-                        {ride.status === 'accepted' && '✓ Driver accepted - arriving soon'}
-                        {ride.status === 'in-progress' && '🚗 Ride in progress'}
-                      </h3>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold uppercase">
-                        {ride.status}
-                      </span>
+                {activeRides.map(ride => {
+                  const getStatusIcon = (status) => {
+                    switch(status) {
+                      case 'requested': return <svg className="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v2m0-10a9 9 0 110-18 9 9 0 010 18z" /></svg>
+                      case 'accepted': return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                      case 'in-progress': return <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                      default: return null
+                    }
+                  }
+
+                  const getStatusColor = (status) => {
+                    switch(status) {
+                      case 'requested': return 'border-yellow-300 bg-yellow-50'
+                      case 'accepted': return 'border-green-300 bg-green-50'
+                      case 'in-progress': return 'border-blue-300 bg-blue-50'
+                      default: return 'border-slate-300'
+                    }
+                  }
+
+                  const getStatusLabel = (status) => {
+                    switch(status) {
+                      case 'requested': return 'Searching for driver...'
+                      case 'accepted': return 'Driver accepted - arriving soon'
+                      case 'in-progress': return 'Ride in progress'
+                      default: return status
+                    }
+                  }
+
+                  return (
+                    <div key={ride.id} className={`bg-white rounded-lg shadow-sm p-6 border-l-4 transition-all hover:shadow-md ${getStatusColor(ride.status)}`}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="text-blue-600">
+                            {getStatusIcon(ride.status)}
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-slate-900">
+                              {getStatusLabel(ride.status)}
+                            </h3>
+                          </div>
+                        </div>
+                        <span className="px-3 py-1 bg-white text-slate-700 rounded-full text-xs font-semibold uppercase border border-current">
+                          {ride.status}
+                        </span>
+                      </div>
+                      <div className="text-sm text-slate-600 space-y-2 mt-4">
+                        <div className="flex items-start gap-3">
+                          <span className="font-medium text-slate-700 min-w-fit">From:</span>
+                          <div className="flex-1">
+                            <p className="text-slate-800 font-medium">Latitude: {ride.start_latitude.toFixed(6)}</p>
+                            <p className="text-slate-800 font-medium">Longitude: {ride.start_longitude.toFixed(6)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-start gap-3">
+                          <span className="font-medium text-slate-700 min-w-fit">To:</span>
+                          <div className="flex-1">
+                            <p className="text-slate-800 font-medium">Latitude: {ride.end_latitude.toFixed(6)}</p>
+                            <p className="text-slate-800 font-medium">Longitude: {ride.end_longitude.toFixed(6)}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm text-slate-600 space-y-1">
-                      <p>From: Lat {ride.start_latitude.toFixed(4)}, Lng {ride.start_longitude.toFixed(4)}</p>
-                      <p>To: Lat {ride.end_latitude.toFixed(4)}, Lng {ride.end_longitude.toFixed(4)}</p>
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </div>
