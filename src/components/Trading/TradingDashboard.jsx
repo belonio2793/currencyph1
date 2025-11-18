@@ -166,6 +166,10 @@ export default function TradingDashboard({ userId, onClose }) {
     }
   }
 
+  if (!isAuthenticated) {
+    return <CoinsPhLogin onLoginSuccess={handleLoginSuccess} />
+  }
+
   if (loading && !bot) {
     return (
       <div className="flex justify-center items-center h-96">
