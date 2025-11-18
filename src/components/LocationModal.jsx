@@ -483,11 +483,27 @@ export default function LocationModal({
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0 4v2M6.75 15H4.5A2.25 2.25 0 012.25 12.75V11.006a2.25 2.25 0 012.25-2.25h2.25m0 0H9a2.25 2.25 0 012.25 2.25v1.006A2.25 2.25 0 0111.25 15m0 0v4.5A2.25 2.25 0 019 21.5H4.5A2.25 2.25 0 012.25 19.25V15m0 0h17.5A2.25 2.25 0 0122 12.75v-1.006a2.25 2.25 0 00-2.25-2.25H19.5m0 0V9A2.25 2.25 0 0017.25 6.75H12.75m0 0H9a2.25 2.25 0 00-2.25 2.25v2.25m0 0V12a2.25 2.25 0 002.25 2.25h2.25" />
                   </svg>
                   <p className="text-slate-500 text-sm mb-1">No nearby locations found</p>
-                  <p className="text-xs text-slate-400">
-                    {userLocation
-                      ? 'Try searching for places within 50 km of your location'
-                      : 'Enable location access to search nearby places'}
-                  </p>
+                  {userLocation ? (
+                    <p className="text-xs text-slate-400">
+                      Try searching for places within 50 km of your location
+                    </p>
+                  ) : (
+                    <div className="space-y-2">
+                      <p className="text-xs text-slate-400">
+                        Enable location access to search nearby places
+                      </p>
+                      <button
+                        onClick={() => requestLocationPermission()}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Enable Location Sharing
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
