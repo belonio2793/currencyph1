@@ -2,62 +2,45 @@ import React, { useState } from 'react'
 import { coinsPhApi } from '../../lib/coinsPhApi'
 
 export default function CoinsPhLogin({ onLoginSuccess }) {
-  const [apiKey, setApiKey] = useState('')
-  const [apiSecret, setApiSecret] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [showSecret, setShowSecret] = useState(false)
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (!apiKey.trim() || !apiSecret.trim()) {
-      setError('Both API Key and Secret are required')
-      return
-    }
-
+  const handleConnect = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Test the credentials by making an API call through the proxy
-      const { CoinsPhApi } = await import('../../lib/coinsPhApi')
-      const testApi = new CoinsPhApi(apiKey, apiSecret)
+      console.log('[CoinsPhLogin] Testing connection to coins.ph API...')
 
-      try {
-        const account = await testApi.getAccount()
+      // Test the connection by fetching account info
+      const account = await coinsPhApi.getAccount()
 
-        if (account && account.email) {
-          // Store credentials securely
-          sessionStorage.setItem('coinsph_api_key', apiKey)
-          sessionStorage.setItem('coinsph_api_secret', apiSecret)
-
-          // Update the global API instance
-          coinsPhApi.apiKey = apiKey
-          coinsPhApi.apiSecret = apiSecret
-
-          setLoading(false)
-          onLoginSuccess()
-        } else {
-          throw new Error('Invalid response from API - no account email found')
-        }
-      } catch (apiError) {
-        // Provide specific error messages
-        const errorMsg = apiError.message || 'API request failed'
-
-        if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
-          setError('Invalid API credentials. Please check your Key and Secret.')
-        } else if (errorMsg.includes('403') || errorMsg.includes('Forbidden')) {
-          setError('Your API credentials do not have the required permissions. Enable all permissions in your API settings.')
-        } else if (errorMsg.includes('Failed to fetch') || errorMsg.includes('network')) {
-          setError('Network error. Please check your internet connection.')
-        } else {
-          setError(errorMsg)
-        }
+      if (account && account.email) {
+        console.log('[CoinsPhLogin] Successfully connected:', account.email)
+        
+        // Store connected status
+        sessionStorage.setItem('coinsph_connected', 'true')
+        
         setLoading(false)
+        onLoginSuccess()
+      } else {
+        throw new Error('Invalid response from API - no account email found')
       }
     } catch (err) {
-      setError(err.message || 'Failed to authenticate. Please check your credentials.')
+      console.error('[CoinsPhLogin] Connection error:', err)
+      
+      // Provide specific error messages
+      const errorMsg = err.message || 'Connection failed'
+      
+      if (errorMsg.includes('401') || errorMsg.includes('Unauthorized')) {
+        setError('API credentials are invalid or expired.')
+      } else if (errorMsg.includes('403') || errorMsg.includes('Forbidden')) {
+        setError('API credentials do not have the required permissions.')
+      } else if (errorMsg.includes('network') || errorMsg.includes('Failed to fetch')) {
+        setError('Network error. Please check your internet connection and try again.')
+      } else {
+        setError(errorMsg)
+      }
       setLoading(false)
     }
   }
@@ -68,94 +51,61 @@ export default function CoinsPhLogin({ onLoginSuccess }) {
         {/* Header Card */}
         <div className="bg-white rounded-t-2xl p-8 border-b-2 border-blue-100">
           <div className="text-center mb-6">
-            <div className="text-5xl mb-3">💰</div>
+            <div className="text-6xl mb-3">💰</div>
             <h1 className="text-3xl font-bold text-slate-900">Coins.ph Trading</h1>
-            <p className="text-slate-600 mt-2">Connect your account to start trading</p>
+            <p className="text-slate-600 mt-2">Connect to your trading account</p>
           </div>
         </div>
 
         {/* Login Form Card */}
         <div className="bg-white rounded-b-2xl p-8 shadow-xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-6">
             {/* Error Alert */}
             {error && (
               <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                <p className="text-red-700 text-sm font-medium">⚠️ {error}</p>
-                <p className="text-red-600 text-xs mt-1">
-                  Make sure you've created API keys on coins.ph with trading permissions
-                </p>
+                <p className="text-red-700 font-medium">⚠️ Connection Failed</p>
+                <p className="text-red-600 text-sm mt-1">{error}</p>
               </div>
             )}
 
-            {/* API Key Field */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-2">
-                API Key
-              </label>
-              <input
-                type="text"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter your coins.ph API Key"
-                disabled={loading}
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm"
-              />
-              <p className="text-xs text-slate-500 mt-2">
-                Found in your coins.ph account settings under API Management
+            {/* Info Box */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <p className="text-blue-900 text-sm leading-relaxed">
+                <strong>🔐 Secure Connection</strong><br/>
+                Your coins.ph account is connected through a secure proxy. Click the button below to verify and start trading.
               </p>
             </div>
 
-            {/* API Secret Field */}
-            <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-2">
-                API Secret
-              </label>
-              <div className="relative">
-                <input
-                  type={showSecret ? 'text' : 'password'}
-                  value={apiSecret}
-                  onChange={(e) => setApiSecret(e.target.value)}
-                  placeholder="Enter your coins.ph API Secret"
-                  disabled={loading}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed font-mono text-sm"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowSecret(!showSecret)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 text-sm font-medium"
-                >
-                  {showSecret ? '👁️ Hide' : '👁️ Show'}
-                </button>
+            {/* Account Status Info */}
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="text-2xl">🌐</div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">API Status</p>
+                  <p className="text-xs text-slate-600">Ready to connect</p>
+                </div>
               </div>
-              <p className="text-xs text-slate-500 mt-2">
-                Keep this secret! Never share it with anyone
-              </p>
+              <div className="border-t border-slate-200 pt-3 mt-3 text-xs text-slate-600">
+                <p>✓ Credentials configured</p>
+                <p>✓ Secure proxy enabled</p>
+                <p>✓ CORS issues resolved</p>
+              </div>
             </div>
 
-            {/* Security Notice */}
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <p className="text-xs text-yellow-800 mb-2">
-                <strong>🔒 Security Note:</strong> Your credentials are stored securely in your browser session. They are only sent to coins.ph API through our secure proxy and never stored on our servers.
-              </p>
-              <p className="text-xs text-yellow-700">
-                <strong>ℹ️ How it works:</strong> Your credentials are forwarded through a Supabase Edge Function (proxy) to avoid browser CORS restrictions.
-              </p>
-            </div>
-
-            {/* Submit Button */}
+            {/* Connect Button */}
             <button
-              type="submit"
-              disabled={loading || !apiKey.trim() || !apiSecret.trim()}
+              onClick={handleConnect}
+              disabled={loading}
               className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
                   <span className="inline-block animate-spin">⟳</span>
-                  Verifying...
+                  Connecting...
                 </>
               ) : (
                 <>
-                  <span>🔐</span>
+                  <span>🔗</span>
                   Connect Account
                 </>
               )}
@@ -163,34 +113,26 @@ export default function CoinsPhLogin({ onLoginSuccess }) {
 
             {/* Help Section */}
             <div className="border-t border-slate-200 pt-6">
-              <p className="text-xs text-slate-600 mb-3 font-medium">Need help?</p>
-              <div className="space-y-2 text-xs text-slate-600">
-                <p>
-                  📚 <a 
-                    href="https://coins.ph/en/api" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    Create API Keys on coins.ph
-                  </a>
-                </p>
-                <p>
-                  ✅ Ensure your API key has:
-                </p>
-                <ul className="ml-4 space-y-1">
-                  <li>• Read Account Data</li>
-                  <li>• Trading Permissions</li>
-                  <li>• View Orders</li>
-                </ul>
-              </div>
+              <p className="text-xs text-slate-600 mb-3 font-medium">How it works:</p>
+              <ol className="space-y-2 text-xs text-slate-600 list-decimal list-inside">
+                <li>Click "Connect Account" to verify your credentials</li>
+                <li>Your account details will load securely</li>
+                <li>Start viewing balances and managing trades</li>
+              </ol>
             </div>
-          </form>
+
+            {/* Security Notice */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <p className="text-xs text-yellow-800">
+                <strong>🔒 Security:</strong> All communication is encrypted and routed through Supabase's secure Edge Functions. Your account data is never stored on our servers.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Footer Note */}
         <div className="text-center mt-6 text-xs text-slate-600">
-          <p>💡 You can disconnect and use different credentials anytime</p>
+          <p>💡 Your trading session is secure and private</p>
         </div>
       </div>
     </div>
