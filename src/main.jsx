@@ -102,7 +102,6 @@ try {
           const suppressedHosts = [
             'fullstory.com', 'edge.fullstory.com',
             'sentry.io', 'segment.io', 'rollbar.com',
-            'supabase.co', // Suppress Supabase network errors (non-critical presence sync)
             'socket.to'
           ]
 
