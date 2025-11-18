@@ -1439,23 +1439,6 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         />
       )}
 
-      {/* Location Selection Modal */}
-      <LocationModal
-        isOpen={showLocationModal}
-        onClose={() => setShowLocationModal(false)}
-        onSelectLocation={(location) => {
-          if (locationModalType === 'pickup') {
-            setStartCoord(location)
-          } else {
-            setEndCoord(location)
-          }
-        }}
-        locationType={locationModalType}
-        currentLocation={locationModalType === 'pickup' ? startCoord : endCoord}
-        userLocation={userLocation}
-        savedLocations={[]}
-      />
-
       {/* Ride Type Selection Modal */}
       <RideTypeModal
         isOpen={showRideTypeModal}
