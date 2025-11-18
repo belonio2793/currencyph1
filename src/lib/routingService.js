@@ -113,3 +113,20 @@ export function createRoutePolyline(coordinates) {
   // Convert [lon, lat] to [lat, lon]
   return coordinates.map(coord => [coord[1], coord[0]])
 }
+
+// Parse direction steps from route response
+export function parseDirectionSteps(steps) {
+  if (!steps || !Array.isArray(steps)) {
+    return []
+  }
+  return steps.map(step => ({
+    instruction: step.name || 'Continue',
+    distance: step.distance ? (step.distance / 1000).toFixed(1) : '0',
+    duration: step.duration ? Math.ceil(step.duration / 60) : 0
+  }))
+}
+
+// Get distance between two points (legacy function for compatibility)
+export function getDistance(lat1, lon1, lat2, lon2) {
+  return calculateHaversineDistance(lat1, lon1, lat2, lon2)
+}
