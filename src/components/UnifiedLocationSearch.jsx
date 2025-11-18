@@ -333,7 +333,7 @@ export default function UnifiedLocationSearch({
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex border-b border-slate-200 bg-slate-50">
+      <div className="location-search-tabs flex border-b border-slate-200 bg-slate-50">
         <button
           onClick={() => setActiveTab('search')}
           className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
