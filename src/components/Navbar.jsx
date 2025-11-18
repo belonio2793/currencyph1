@@ -108,7 +108,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 </div>
               )}
 
-              {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail) && !['home','nearby','rates','online-users'].includes(btn.id)).map(btn => (
+              {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail) && !['home','nearby','rates','online-users','rides'].includes(btn.id)).map(btn => (
                 <button
                   key={btn.id}
                   onClick={() => { onTabChange(btn.id); setMobileMenuOpen(false) }}
