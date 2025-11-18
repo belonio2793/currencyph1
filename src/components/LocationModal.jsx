@@ -83,21 +83,56 @@ export default function LocationModal({
 
     setLoading(true)
     try {
+      // Use Nominatim with bounded search restricted to Philippines
+      // Philippines bounding box: roughly 5°N to 19°N, 120°E to 129°E
+      const boundingBox = '5,120,19,129' // south, west, north, east
+
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=5`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=20&bounded=1&viewbox=120,19,129,5&countrycodes=ph`
       )
       const results = await response.json()
-      setSearchResults(results.map(r => ({
+
+      // Filter results by radius from user location (if available)
+      let filteredResults = results.map(r => ({
         latitude: parseFloat(r.lat),
         longitude: parseFloat(r.lon),
         address: r.display_name
-      })))
+      }))
+
+      // If user location is available, filter by radius (50km default)
+      if (userLocation) {
+        const radiusKm = 50
+        filteredResults = filteredResults.filter(result => {
+          const distance = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            result.latitude,
+            result.longitude
+          )
+          return distance <= radiusKm
+        })
+      }
+
+      setSearchResults(filteredResults.slice(0, 10))
     } catch (error) {
       console.error('Search error:', error)
       setSearchResults([])
     } finally {
       setLoading(false)
     }
+  }
+
+  // Calculate distance between two coordinates in km
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const R = 6371 // Earth's radius in km
+    const dLat = (lat2 - lat1) * (Math.PI / 180)
+    const dLon = (lon2 - lon1) * (Math.PI / 180)
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return R * c
   }
 
   const handleCoordinateSubmit = () => {
