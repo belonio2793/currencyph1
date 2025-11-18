@@ -16,6 +16,8 @@ import PaymentModal from './PaymentModal'
 import RatingModal from './RatingModal'
 import TransactionHistoryModal from './TransactionHistoryModal'
 import MarkerPopup from './MarkerPopup'
+import LocationModal from './LocationModal'
+import RideTypeModal from './RideTypeModal'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
@@ -297,6 +299,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [endCoord, setEndCoord] = useState(null)
   const [selectingCoord, setSelectingCoord] = useState(null) // 'start' or 'end'
 
+  // Modal states
+  const [showLocationModal, setShowLocationModal] = useState(false)
+  const [locationModalType, setLocationModalType] = useState('pickup') // 'pickup' or 'destination'
+  const [showRideTypeModal, setShowRideTypeModal] = useState(false)
+  const [selectedRideType, setSelectedRideType] = useState(null)
+
   // Driver status
   const [driverStatus, setDriverStatus] = useState('offline') // 'offline', 'available', 'on-job'
   const [driverVehicleType, setDriverVehicleType] = useState('car') // 'car', 'tricycle'
@@ -307,7 +315,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
-  // Modal states
+  // Modal states - ride process
   const [showDriverProfileModal, setShowDriverProfileModal] = useState(false)
   const [selectedDriver, setSelectedDriver] = useState(null)
   const [showRideDetailsModal, setShowRideDetailsModal] = useState(false)
@@ -1013,8 +1021,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       </div>
                       <button
                         onClick={() => {
-                          setStartCoord(null)
-                          setSelectingCoord('start')
+                          setLocationModalType('pickup')
+                          setShowLocationModal(true)
                         }}
                         className="w-full text-sm text-green-600 hover:text-green-700 font-medium py-2 hover:bg-green-50 rounded-lg transition-colors"
                       >
@@ -1023,7 +1031,10 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     </div>
                   ) : (
                     <button
-                      onClick={() => setSelectingCoord('start')}
+                      onClick={() => {
+                        setLocationModalType('pickup')
+                        setShowLocationModal(true)
+                      }}
                       className="w-full py-4 border-2 border-dashed border-green-300 rounded-lg text-green-700 hover:border-green-500 hover:bg-green-100 font-semibold transition-colors flex items-center justify-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1072,8 +1083,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       </div>
                       <button
                         onClick={() => {
-                          setEndCoord(null)
-                          setSelectingCoord('end')
+                          setLocationModalType('destination')
+                          setShowLocationModal(true)
                         }}
                         className="w-full text-sm text-red-600 hover:text-red-700 font-medium py-2 hover:bg-red-50 rounded-lg transition-colors"
                       >
@@ -1082,7 +1093,10 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     </div>
                   ) : (
                     <button
-                      onClick={() => setSelectingCoord('end')}
+                      onClick={() => {
+                        setLocationModalType('destination')
+                        setShowLocationModal(true)
+                      }}
                       className="w-full py-4 border-2 border-dashed border-red-300 rounded-lg text-red-700 hover:border-red-500 hover:bg-red-100 font-semibold transition-colors flex items-center justify-center gap-2"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1097,21 +1111,32 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               {/* Ride Type Selection */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-3">Ride Type</label>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  {[
-                    { id: 'ride-share', label: 'Ride Share' },
-                    { id: 'package', label: 'Package' },
-                    { id: 'food', label: 'Food Pickup' },
-                    { id: 'laundry', label: 'Laundry' }
-                  ].map(type => (
+                {selectedRideType ? (
+                  <div className="flex items-center justify-between p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
+                    <div>
+                      <p className="font-semibold text-slate-900">
+                        {selectedRideType.charAt(0).toUpperCase() + selectedRideType.slice(1).replace('-', ' ')}
+                      </p>
+                      <p className="text-xs text-slate-600 mt-1">Selected ride type</p>
+                    </div>
                     <button
-                      key={type.id}
-                      className="p-3 border-2 border-slate-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-sm font-medium text-slate-700 hover:text-blue-600"
+                      onClick={() => setShowRideTypeModal(true)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                     >
-                      {type.label}
+                      Change
                     </button>
-                  ))}
-                </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowRideTypeModal(true)}
+                    className="w-full py-4 border-2 border-dashed border-slate-300 rounded-lg text-slate-700 hover:border-blue-500 hover:bg-blue-50 font-semibold transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Select Ride Type
+                  </button>
+                )}
               </div>
 
               {/* Fare Estimate */}
@@ -1474,6 +1499,31 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           loading={loading}
         />
       )}
+
+      {/* Location Selection Modal */}
+      <LocationModal
+        isOpen={showLocationModal}
+        onClose={() => setShowLocationModal(false)}
+        onSelectLocation={(location) => {
+          if (locationModalType === 'pickup') {
+            setStartCoord(location)
+          } else {
+            setEndCoord(location)
+          }
+        }}
+        locationType={locationModalType}
+        currentLocation={locationModalType === 'pickup' ? startCoord : endCoord}
+        userLocation={userLocation}
+        savedLocations={[]}
+      />
+
+      {/* Ride Type Selection Modal */}
+      <RideTypeModal
+        isOpen={showRideTypeModal}
+        onClose={() => setShowRideTypeModal(false)}
+        onSelectRideType={setSelectedRideType}
+        selectedRideType={selectedRideType}
+      />
     </div>
   )
 }
