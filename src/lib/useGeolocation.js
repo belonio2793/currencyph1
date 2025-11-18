@@ -92,8 +92,14 @@ export function useGeolocation() {
                 let timedOut = false
 
                 const timeoutId = setTimeout(() => {
-                  timedOut = true
-                  controller.abort()
+                  if (isMountedRef.current) {
+                    timedOut = true
+                    try {
+                      controller.abort()
+                    } catch (e) {
+                      // Ignore abort errors
+                    }
+                  }
                 }, 3000)
 
                 try {
@@ -124,8 +130,11 @@ export function useGeolocation() {
                   }
                 } catch (fetchErr) {
                   clearTimeout(timeoutId)
-                  if (fetchErr?.name !== 'AbortError') {
-                    // Only log non-abort errors
+                  // Check if it's an AbortError from timeout or component unmount
+                  if (fetchErr?.name === 'AbortError' || timedOut) {
+                    return
+                  }
+                  if (isMountedRef.current) {
                     console.debug('Nominatim fetch error:', fetchErr?.message)
                   }
                 }
