@@ -38,17 +38,18 @@ export function useGeolocation() {
                   const controller = new AbortController()
                   abortControllersRef.current.push(controller)
                   let timedOut = false
-                  let aborted = false
 
                   const timeoutId = setTimeout(() => {
                     timedOut = true
-                    aborted = true
                     controller.abort()
                   }, 3000)
 
                   try {
                     const resp = await fetch(url, { signal: controller.signal })
-                    if (timedOut || !isMountedRef.current) return
+                    if (timedOut || !isMountedRef.current) {
+                      clearTimeout(timeoutId)
+                      return
+                    }
                     clearTimeout(timeoutId)
 
                     if (resp?.ok && isMountedRef.current) {
@@ -59,14 +60,15 @@ export function useGeolocation() {
                           setCity(props.city || props.town || props.village || props.county || props.state || null)
                           return true
                         }
-                      } catch (parseErr) {}
+                      } catch (parseErr) {
+                        // Silently ignore JSON parse errors
+                      }
                     }
                   } catch (fetchErr) {
-                    if (!timedOut) {
-                      clearTimeout(timeoutId)
-                    }
-                    if (fetchErr?.name === 'AbortError') {
-                      // Silently ignore abort errors (timeout or cleanup)
+                    clearTimeout(timeoutId)
+                    if (fetchErr?.name !== 'AbortError') {
+                      // Only log non-abort errors
+                      console.debug('MapTiler fetch error:', fetchErr?.message)
                     }
                   }
                 } catch (e) {
