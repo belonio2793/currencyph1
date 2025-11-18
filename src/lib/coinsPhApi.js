@@ -17,10 +17,6 @@ export class CoinsPhApi {
         throw new Error('Supabase project URL not configured (VITE_PROJECT_URL)')
       }
 
-      if (!this.apiKey || !this.apiSecret) {
-        throw new Error('API credentials not set')
-      }
-
       // Prepare request payload
       const payload = {
         method,
@@ -29,13 +25,13 @@ export class CoinsPhApi {
         isPublic,
       }
 
+      console.log('[CoinsPhApi] Calling proxy:', { method, path })
+
       // Call the proxy function
       const response = await fetch(PROXY_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-API-Key': this.apiKey,
-          'X-API-Secret': this.apiSecret,
         },
         body: JSON.stringify(payload),
       })
@@ -43,7 +39,7 @@ export class CoinsPhApi {
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.error || `API Error: ${response.status}`)
+        throw new Error(data.error || data.details || `API Error: ${response.status}`)
       }
 
       return data
