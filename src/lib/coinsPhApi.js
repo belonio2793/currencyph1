@@ -1,87 +1,49 @@
-const BASE_URL = 'https://api.pro.coins.ph'
+const PROXY_URL = import.meta.env.VITE_PROJECT_URL?.replace(/\/$/, '') + '/functions/v1/coinsph-proxy'
 const API_KEY = import.meta.env.VITE_COINSPH_API_KEY || process.env.COINSPH_API_KEY
 const API_SECRET = import.meta.env.VITE_COINSPH_API_SECRET || process.env.COINSPH_API_SECRET
-
-/**
- * Sign message with HMAC-SHA256 using Web Crypto API
- */
-async function hmacSign(message, secret) {
-  const encoder = new TextEncoder()
-  const keyData = encoder.encode(secret)
-  const messageData = encoder.encode(message)
-
-  const key = await crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  )
-
-  const signature = await crypto.subtle.sign('HMAC', key, messageData)
-
-  // Convert to hex string
-  const hashArray = Array.from(new Uint8Array(signature))
-  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-}
 
 export class CoinsPhApi {
   constructor(apiKey = API_KEY, apiSecret = API_SECRET) {
     this.apiKey = apiKey
     this.apiSecret = apiSecret
-    this.baseUrl = BASE_URL
   }
 
   /**
-   * Sign request with HMAC-SHA256 (async)
-   */
-  async signRequest(params) {
-    const queryString = Object.entries(params)
-      .map(([key, value]) => `${key}=${value}`)
-      .sort()
-      .join('&')
-
-    const signature = await hmacSign(queryString, this.apiSecret)
-
-    return { ...params, signature }
-  }
-
-  /**
-   * Make authenticated request
+   * Make request through Supabase Edge Function proxy
    */
   async request(method, path, params = {}, isPublic = false) {
     try {
-      let url = `${this.baseUrl}${path}`
-      let options = {
+      if (!PROXY_URL) {
+        throw new Error('Supabase project URL not configured (VITE_PROJECT_URL)')
+      }
+
+      if (!this.apiKey || !this.apiSecret) {
+        throw new Error('API credentials not set')
+      }
+
+      // Prepare request payload
+      const payload = {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        path,
+        params,
+        isPublic,
       }
 
-      if (!isPublic) {
-        params.timestamp = Math.floor(Date.now())
-        const signed = await this.signRequest(params)
-        options.headers['X-MBX-APIKEY'] = this.apiKey
+      // Call the proxy function
+      const response = await fetch(PROXY_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-Key': this.apiKey,
+          'X-API-Secret': this.apiSecret,
+        },
+        body: JSON.stringify(payload),
+      })
 
-        if (method === 'GET') {
-          const queryString = new URLSearchParams(signed).toString()
-          url += `?${queryString}`
-        } else {
-          options.body = JSON.stringify(signed)
-        }
-      } else {
-        if (method === 'GET') {
-          const queryString = new URLSearchParams(params).toString()
-          url += `?${queryString}`
-        } else {
-          options.body = JSON.stringify(params)
-        }
-      }
-
-      const response = await fetch(url, options)
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.msg || `API Error: ${response.status}`)
+        throw new Error(data.error || `API Error: ${response.status}`)
       }
 
       return data
