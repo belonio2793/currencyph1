@@ -130,9 +130,9 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
         {/* Active drivers */}
         {drivers && drivers.map((driver) => (
           <Marker
-            key={driver.id}
+            key={`driver-${driver.id}`}
             position={[driver.latitude, driver.longitude]}
-            icon={createCustomIcon('#8B5CF6', 'D')}
+            icon={createCustomIcon('#8B5CF6', 'D', true)}
             onClick={() => onSelectMarker?.({ type: 'driver', id: driver.id, data: driver })}
           >
             <Popup>
@@ -148,9 +148,9 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
         {/* Active riders */}
         {riders && riders.map((rider) => (
           <Marker
-            key={rider.id}
+            key={`rider-${rider.id}`}
             position={[rider.latitude, rider.longitude]}
-            icon={createCustomIcon('#F59E0B', 'R')}
+            icon={createCustomIcon('#F59E0B', 'R', true)}
             onClick={() => onSelectMarker?.({ type: 'rider', id: rider.id, data: rider })}
           >
             <Popup>
