@@ -314,7 +314,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
             return
           }
         } else {
-          throw signInError
+          throw new Error(msg)
         }
       }
 
