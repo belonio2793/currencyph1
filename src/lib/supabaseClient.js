@@ -91,7 +91,9 @@ async function checkSupabaseHealth() {
     return _supabaseHealthy
   } catch (err) {
     _supabaseHealthy = false
-    console.warn('[supabase-client] Health check error:', err?.message || 'Unknown error')
+    if (err?.name !== 'AbortError') {
+      console.warn('[supabase-client] Health check error:', err?.message || 'Unknown error')
+    }
     return false
   }
 }
