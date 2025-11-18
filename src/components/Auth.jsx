@@ -210,16 +210,18 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
 
       if (signInError) {
         // If the error indicates email not confirmed, keep error but allow resend
-        let msg = String(signInError.message || '')
+        let msg = String(signInError.message || signInError.error_description || signInError.error || '')
 
         // Map Supabase error messages to user-friendly messages
-        if (msg.includes('Invalid login credentials')) {
+        if (msg.toLowerCase().includes('invalid login credentials') || msg.toLowerCase().includes('credentials')) {
           msg = 'Invalid login credentials. Please check your email/phone and password.'
-        } else if (msg.includes('User not found') || msg.includes('user_not_found')) {
+        } else if (msg.toLowerCase().includes('user not found') || msg.toLowerCase().includes('user_not_found')) {
           msg = 'Email address does not exist.'
-        } else if (msg.includes('Wrong password') || msg.includes('wrong_password')) {
+        } else if (msg.toLowerCase().includes('wrong password') || msg.toLowerCase().includes('wrong_password')) {
           msg = 'Wrong password.'
         } else if (msg.includes('body stream already read')) {
+          msg = 'Invalid login credentials. Please check your email/phone and password.'
+        } else if (!msg) {
           msg = 'Invalid login credentials. Please check your email/phone and password.'
         }
         if (/confirm/i.test(msg)) {
