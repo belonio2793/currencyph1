@@ -1,8 +1,48 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { requestLocationPermission } from '../lib/locationHelpers'
+
+const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.GOOGLE_API_KEY || ''
+
+// Map POI keywords to Google Places API types
+const POI_KEYWORD_MAP = {
+  'church': ['church'],
+  'churches': ['church'],
+  'mcdonalds': ['restaurant', 'food'],
+  'mcdonald': ['restaurant', 'food'],
+  'restaurant': ['restaurant', 'food'],
+  'restaurants': ['restaurant', 'food'],
+  'fast food': ['restaurant', 'food'],
+  'hotel': ['lodging'],
+  'hotels': ['lodging'],
+  'hospital': ['hospital', 'health'],
+  'clinic': ['doctor', 'health'],
+  'pharmacy': ['pharmacy', 'health'],
+  'gas station': ['gas_station'],
+  'fuel': ['gas_station'],
+  'atm': ['atm', 'bank'],
+  'bank': ['bank', 'atm'],
+  'grocery': ['grocery_or_supermarket', 'supermarket'],
+  'supermarket': ['grocery_or_supermarket', 'supermarket'],
+  'mall': ['shopping_mall'],
+  'shopping': ['shopping_mall'],
+  'school': ['school', 'university'],
+  'university': ['school', 'university'],
+  'park': ['park'],
+  'coffee': ['cafe', 'restaurant'],
+  'cafe': ['cafe', 'restaurant'],
+  'bar': ['bar', 'restaurant'],
+  'gym': ['gym', 'health'],
+  'fitness': ['gym', 'health'],
+  'police': ['police'],
+  'fire': ['fire_station'],
+  'temple': ['place_of_worship'],
+  'mosque': ['mosque', 'place_of_worship'],
+  'barangay': ['administrative_area_level_4', 'administrative_area_level_3'],
+  'district': ['administrative_area_level_3']
+}
 
 const createCustomIcon = (color, label) => {
   return L.divIcon({
