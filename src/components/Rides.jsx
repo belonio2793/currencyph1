@@ -6,6 +6,7 @@ import '../styles/rides.css'
 import { supabase } from '../lib/supabaseClient'
 import { useGeolocation } from '../lib/useGeolocation'
 import { updatePresenceLocation } from '../lib/presence'
+import RideListings from './RideListings'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
