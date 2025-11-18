@@ -81,7 +81,7 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
         {userLocation && (
           <Marker
             position={[userLocation.latitude, userLocation.longitude]}
-            icon={createCustomIcon('#3B82F6', 'YOU')}
+            icon={createCustomIcon('#3B82F6', 'YOU', true)}
           >
             <Popup>
               <div className="text-sm">
