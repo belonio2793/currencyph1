@@ -172,7 +172,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
           <div className="hidden md:flex flex-wrap items-center gap-1">
             {mainNav
               .filter(btn => (btn.public || (!btn.auth) || userEmail))
-              .filter(btn => !['deposit', 'rides'].includes(btn.id))
+              .filter(btn => btn.id !== 'deposit')
               .map(btn => (
                 <button
                   key={btn.id}
