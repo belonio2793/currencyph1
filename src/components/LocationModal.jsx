@@ -4,6 +4,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import philippineCities from '../data/philippineCities.json'
 import { requestLocationPermission } from '../lib/locationHelpers'
+import { forwardGeocode } from '../lib/nominatimService.js'
 
 const createCustomIcon = (color) => {
   return L.divIcon({
