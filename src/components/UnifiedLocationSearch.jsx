@@ -478,7 +478,7 @@ export default function UnifiedLocationSearch({
               Click on the map to select your destination
             </p>
 
-            <div style={{
+            <div className="map-container-wrapper unified-location-search-map" style={{
               height: mapHeight,
               width: '100%',
               borderRadius: '8px',
