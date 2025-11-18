@@ -432,17 +432,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     if (!userId) return
 
     try {
-      const { data, error } = await Promise.race([
-        supabase
-          .from('rides')
-          .select('*')
-          .or(`rider_id.eq.${userId},driver_id.eq.${userId}`)
-          .in('status', ['requested', 'accepted', 'in-progress'])
-          .order('created_at', { ascending: false }),
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Query timeout')), 15000)
-        )
-      ])
+      const { data, error } = await supabase
+        .from('rides')
+        .select('*')
+        .or(`rider_id.eq.${userId},driver_id.eq.${userId}`)
+        .in('status', ['requested', 'accepted', 'in-progress'])
+        .order('created_at', { ascending: false })
 
       if (!error && data) {
         setActiveRides(data)
@@ -451,9 +446,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
       }
     } catch (err) {
       // Silently handle network errors as they're expected in some environments
-      if (!err?.message?.includes('timeout') && !err?.message?.includes('Failed to fetch')) {
-        console.debug('Could not load active rides:', err?.message)
-      }
+      console.debug('Could not load active rides:', err?.message)
     }
   }
 
