@@ -9,7 +9,7 @@ import PerformanceMetrics from './PerformanceMetrics'
 import CoinsPhAccountDetails from './CoinsPhAccountDetails'
 
 export default function TradingDashboard({ userId, onClose }) {
-  const [activeTab, setActiveTab] = useState('overview')
+  const [activeTab, setActiveTab] = useState('account')
   const [bot, setBot] = useState(null)
   const [tradingEnabled, setTradingEnabled] = useState(false)
   const [paperTradingMode, setPaperTradingMode] = useState(true)
