@@ -87,65 +87,16 @@ export function useGeolocation() {
                 }
               }
 
-              // Fallback to Nominatim
+              // Fallback to Nominatim with improved error handling and retries
               try {
-                const controller = new AbortController()
-                abortControllersRef.current.push(controller)
-                let timedOut = false
-
-                const timeoutId = setTimeout(() => {
-                  if (isMountedRef.current && !timedOut) {
-                    timedOut = true
-                    try {
-                      controller.abort('Nominatim timeout')
-                    } catch (e) {
-                      // Ignore abort errors
-                    }
-                  }
-                }, 3000)
-
-                try {
-                  const response = await fetch(
-                    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-                    {
-                      headers: {
-                        'Accept-Language': 'en',
-                        'User-Agent': 'currency-ph/1.0'
-                      },
-                      signal: controller.signal
-                    }
-                  )
-                  if (!isMountedRef.current) {
-                    clearTimeout(timeoutId)
-                    return
-                  }
-                  clearTimeout(timeoutId)
-                  if (timedOut) return
-
-                  if (response?.ok && isMountedRef.current) {
-                    try {
-                      const nom = await response.json()
-                      if (isMountedRef.current) {
-                        setCity(
-                          nom.address?.city || nom.address?.town || nom.address?.village || nom.address?.county || null
-                        )
-                      }
-                    } catch (parseErr) {
-                      // Silently ignore JSON parse errors
-                    }
-                  }
-                } catch (fetchErr) {
-                  clearTimeout(timeoutId)
-                  // Check if it's an AbortError from timeout or component unmount
-                  if (fetchErr?.name === 'AbortError' || timedOut) {
-                    return
-                  }
-                  if (isMountedRef.current) {
-                    console.debug('Nominatim fetch error:', fetchErr?.message)
-                  }
+                const result = await reverseGeocode(latitude, longitude)
+                if (isMountedRef.current && result?.city) {
+                  setCity(result.city)
                 }
               } catch (e) {
-                // Silently fail Nominatim fallback
+                if (isMountedRef.current) {
+                  console.debug('Nominatim fallback error:', e?.message)
+                }
               }
             } catch (e) {
               // Silently fail reverse geocoding
