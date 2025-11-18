@@ -7,6 +7,47 @@ import { requestLocationPermission } from '../lib/locationHelpers'
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.GOOGLE_API_KEY || ''
 
+// Debug helper to verify Google Places API is configured and working
+const debugGoogleAPI = async () => {
+  if (!GOOGLE_API_KEY) {
+    console.warn('❌ Google API key is not configured. Add VITE_GOOGLE_API_KEY to your environment variables.')
+    return false
+  }
+
+  try {
+    // Test the Places API with a simple nearby search
+    const testUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
+    testUrl.searchParams.set('location', '14.5995,120.9842') // Manila
+    testUrl.searchParams.set('radius', '5000')
+    testUrl.searchParams.set('type', 'restaurant')
+    testUrl.searchParams.set('key', GOOGLE_API_KEY)
+
+    const response = await fetch(testUrl.toString())
+    const data = await response.json()
+
+    if (data.error_message) {
+      console.warn('❌ Google Places API error:', data.error_message)
+      console.warn('���️ Make sure "Places API" is enabled in your Google Cloud Console')
+      return false
+    }
+
+    if (response.ok) {
+      console.log('✅ Google Places API is working correctly')
+      console.log(`Found ${data.results?.length || 0} test results`)
+      return true
+    }
+  } catch (err) {
+    console.warn('❌ Google Places API test failed:', err?.message)
+  }
+
+  return false
+}
+
+// Check API on load (only in development)
+if (typeof import.meta !== 'undefined' && import.meta.env.DEV) {
+  setTimeout(() => debugGoogleAPI(), 2000)
+}
+
 // Map POI keywords to Google Places API types
 const POI_KEYWORD_MAP = {
   'church': ['church', 'place_of_worship'],
