@@ -5,7 +5,7 @@ const MAPTILER_KEY = import.meta?.env?.VITE_MAPTILER_API_KEY || ''
 export async function getRoute(startLat, startLng, endLat, endLng) {
   try {
     const url = `https://api.maptiler.com/routing/v1/directions/driving/${startLng},${startLat};${endLng},${endLat}?key=${MAPTILER_KEY}&steps=true&alternatives=false&overview=full&geometries=geojson`
-    
+
     const response = await fetch(url)
     if (!response.ok) {
       throw new Error(`Routing API error: ${response.status}`)
@@ -18,9 +18,11 @@ export async function getRoute(startLat, startLng, endLat, endLng) {
 
     const route = data.routes[0]
     return {
+      success: true,
       distance: route.distance / 1000, // Convert to km
       duration: Math.ceil(route.duration / 60), // Convert to minutes
       geometry: route.geometry.coordinates,
+      coordinates: route.geometry.coordinates, // For compatibility
       steps: route.steps || []
     }
   } catch (error) {
@@ -29,9 +31,11 @@ export async function getRoute(startLat, startLng, endLat, endLng) {
     const distance = calculateHaversineDistance(startLat, startLng, endLat, endLng)
     const duration = Math.ceil((distance / 40) * 60) // Assume 40 km/h average
     return {
+      success: true,
       distance,
       duration,
       geometry: [[startLng, startLat], [endLng, endLat]],
+      coordinates: [[startLng, startLat], [endLng, endLat]], // For compatibility
       steps: []
     }
   }
