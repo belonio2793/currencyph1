@@ -480,6 +480,219 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  // Modal handlers
+  const handleSelectDriver = (driver) => {
+    setSelectedDriver(driver)
+    setShowDriverProfileModal(true)
+  }
+
+  const handleRequestRideFromDriver = async (driverId, customOffer) => {
+    if (!userId || !startCoord || !endCoord) {
+      setError('Please select both locations')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('rides')
+        .insert({
+          rider_id: userId,
+          driver_id: driverId,
+          start_latitude: startCoord.latitude,
+          start_longitude: startCoord.longitude,
+          end_latitude: endCoord.latitude,
+          end_longitude: endCoord.longitude,
+          rider_offered_amount: customOffer ? parseFloat(customOffer) : null,
+          status: 'requested',
+          created_at: new Date().toISOString()
+        })
+        .select()
+
+      if (!error) {
+        setShowDriverProfileModal(false)
+        setStartCoord(null)
+        setEndCoord(null)
+        setActiveTab('my-rides')
+        loadActiveRides()
+      } else {
+        setError('Failed to request ride')
+      }
+    } catch (err) {
+      setError('Error requesting ride')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleViewRideDetails = (ride) => {
+    setSelectedRide(ride)
+    setShowRideDetailsModal(true)
+  }
+
+  const handleOpenChat = (ride) => {
+    setSelectedRide(ride)
+    setShowChatModal(true)
+  }
+
+  const handleSendMessage = async (rideId, message) => {
+    try {
+      const { error } = await supabase
+        .from('ride_chat_messages')
+        .insert({
+          ride_id: rideId,
+          sender_id: userId,
+          sender_type: userRole,
+          message: message,
+          message_type: 'text',
+          created_at: new Date().toISOString()
+        })
+
+      if (error) {
+        setError('Failed to send message')
+      }
+    } catch (err) {
+      setError('Error sending message')
+    }
+  }
+
+  const handleCompletePayment = async (paymentData) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('ride_transactions')
+        .insert({
+          ride_id: paymentData.ride_id,
+          transaction_type: 'fare_payment',
+          amount: paymentData.amount,
+          currency: 'PHP',
+          from_user_id: userId,
+          to_user_id: selectedRide?.driver_id,
+          payment_method: paymentData.payment_method,
+          status: 'completed',
+          created_at: new Date().toISOString(),
+          completed_at: new Date().toISOString()
+        })
+
+      if (!error && paymentData.tip > 0) {
+        await supabase
+          .from('ride_transactions')
+          .insert({
+            ride_id: paymentData.ride_id,
+            transaction_type: 'tip',
+            amount: paymentData.tip,
+            currency: 'PHP',
+            from_user_id: userId,
+            to_user_id: selectedRide?.driver_id,
+            payment_method: paymentData.payment_method,
+            status: 'completed',
+            created_at: new Date().toISOString(),
+            completed_at: new Date().toISOString()
+          })
+      }
+
+      if (!error) {
+        setShowPaymentModal(false)
+        setShowRatingModal(true)
+      } else {
+        setError('Failed to process payment')
+      }
+    } catch (err) {
+      setError('Error processing payment')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmitRating = async (ratingData) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('ride_ratings')
+        .insert({
+          ride_id: ratingData.ride_id,
+          rater_id: userId,
+          ratee_id: selectedRide?.driver_id,
+          rating_type: 'driver-for-rider',
+          rating_score: ratingData.rating_score,
+          review_text: ratingData.review_text,
+          cleanliness_rating: ratingData.cleanliness_rating,
+          safety_rating: ratingData.safety_rating,
+          friendliness_rating: ratingData.friendliness_rating,
+          tags: ratingData.tags,
+          created_at: new Date().toISOString()
+        })
+
+      if (!error) {
+        setShowRatingModal(false)
+        loadActiveRides()
+      } else {
+        setError('Failed to submit rating')
+      }
+    } catch (err) {
+      setError('Error submitting rating')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelRide = async (rideId) => {
+    if (!confirm('Are you sure you want to cancel this ride?')) return
+
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('rides')
+        .update({
+          status: 'cancelled',
+          cancelled_by: userRole,
+          cancellation_reason: 'User requested cancellation',
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', rideId)
+
+      if (!error) {
+        setShowRideDetailsModal(false)
+        loadActiveRides()
+      } else {
+        setError('Failed to cancel ride')
+      }
+    } catch (err) {
+      setError('Error cancelling ride')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleUpdateRideStatus = async (rideId, newStatus) => {
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from('rides')
+        .update({
+          status: newStatus,
+          updated_at: new Date().toISOString(),
+          ...(newStatus === 'completed' && { dropoff_time: new Date().toISOString() }),
+          ...(newStatus === 'picked-up' && { pickup_time: new Date().toISOString() })
+        })
+        .eq('id', rideId)
+
+      if (!error) {
+        if (newStatus === 'completed') {
+          setShowRideDetailsModal(false)
+          setShowPaymentModal(true)
+        }
+        loadActiveRides()
+      } else {
+        setError('Failed to update ride status')
+      }
+    } catch (err) {
+      setError('Error updating ride status')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (!userId) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
