@@ -14,6 +14,15 @@ export default function CoinsPhAccountDetails({ userId }) {
   const [isRefreshing, setIsRefreshing] = useState(false)
 
   useEffect(() => {
+    // Ensure API instance has current credentials from storage
+    const apiKey = sessionStorage.getItem('coinsph_api_key')
+    const apiSecret = sessionStorage.getItem('coinsph_api_secret')
+
+    if (apiKey && apiSecret) {
+      coinsPhApi.apiKey = apiKey
+      coinsPhApi.apiSecret = apiSecret
+    }
+
     fetchAccountDetails()
     const interval = setInterval(fetchAccountDetails, 30000) // Refresh every 30 seconds
     return () => clearInterval(interval)
