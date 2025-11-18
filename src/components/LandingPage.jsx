@@ -169,30 +169,21 @@ export default function LandingPage({ userId, userEmail, globalCurrency = 'PHP' 
           const { latitude, longitude } = position.coords
           // try reverse geocode via nominatim
           try {
-            const controller = new AbortController()
-            const timeoutId = setTimeout(() => controller.abort(), 3000)
-
-            const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`, {
-              headers: { 'User-Agent': 'currency-ph/1.0' },
-              signal: controller.signal
-            })
-            clearTimeout(timeoutId)
-
-            if (r.ok) {
-              const data = await r.json()
+            const result = await reverseGeocode(latitude, longitude)
+            if (result) {
               setGeo({
                 lat: latitude,
                 lon: longitude,
-                city: data.address?.city || data.address?.town || data.address?.village || null,
-                region: data.address?.state || null,
-                country: data.address?.country || null,
+                city: result.city,
+                region: null,
+                country: null,
                 ip: null,
                 source: 'geo'
               })
               return
             }
           } catch (e) {
-            // fallback: set coords only
+            console.debug('Reverse geocode error:', e?.message)
           }
           setGeo({ lat: latitude, lon: longitude, city: null, region: null, country: null, ip: null, source: 'geo' })
         },
