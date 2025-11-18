@@ -6,31 +6,6 @@ export default function RideListings({ riders, drivers, startCoord, endCoord, on
   const [sortBy, setSortBy] = useState('distance') // 'distance', 'price', 'rating'
   const [filterVehicle, setFilterVehicle] = useState('all') // 'all', 'car', 'tricycle'
 
-  // Calculate distance between two coordinates
-  const calculateDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371 // Earth's radius in km
-    const dLat = (lat2 - lat1) * Math.PI / 180
-    const dLon = (lon2 - lon1) * Math.PI / 180
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2)
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
-    return R * c
-  }
-
-  // Calculate estimated time (roughly 40 km/h average speed)
-  const calculateTime = (distance) => {
-    return Math.ceil((distance / 40) * 60)
-  }
-
-  // Calculate fare based on vehicle type and distance
-  const calculateFare = (distance, vehicleType = 'car') => {
-    const baseFare = 50
-    const perKm = 20
-    const multiplier = vehicleType === 'tricycle' ? 0.7 : 1.0
-    return Math.ceil((baseFare + distance * perKm) * multiplier)
-  }
 
   // Filter and sort drivers
   const getFilteredAndSortedDrivers = () => {
