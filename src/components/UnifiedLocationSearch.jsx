@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import './UnifiedLocationSearch.css'
 import { requestLocationPermission } from '../lib/locationHelpers'
 
 const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.GOOGLE_API_KEY || ''
