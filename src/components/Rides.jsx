@@ -851,13 +851,24 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         {/* My Rides Tab */}
         {activeTab === 'my-rides' && (
           <div>
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">Active Rides</h2>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                Active Rides
+              </h2>
+              <p className="text-slate-600">Track your current rides and their status</p>
+            </div>
             {activeRides.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-sm p-12 text-center">
-                <p className="text-slate-600 text-lg mb-4">No active rides</p>
+              <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-lg shadow-lg border border-slate-200 p-12 text-center">
+                <svg className="w-16 h-16 text-slate-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+                <p className="text-slate-600 text-lg mb-6 font-medium">No active rides</p>
                 <button
                   onClick={() => setActiveTab('find-ride')}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors shadow-md hover:shadow-lg"
                 >
                   Request a Ride
                 </button>
