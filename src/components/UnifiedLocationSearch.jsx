@@ -10,34 +10,40 @@ const GOOGLE_API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || import.meta.env.GO
 // Debug helper to verify Google Places API is configured and working
 const debugGoogleAPI = async () => {
   if (!GOOGLE_API_KEY) {
-    console.warn('❌ Google API key is not configured. Add VITE_GOOGLE_API_KEY to your environment variables.')
+    console.debug('Google API key not configured - searches will use Nominatim fallback')
     return false
   }
 
   try {
-    // Test the Places API with a simple nearby search
+    // Test the Places API with a simple nearby search (timeout after 5s)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
+
     const testUrl = new URL('https://maps.googleapis.com/maps/api/place/nearbysearch/json')
     testUrl.searchParams.set('location', '14.5995,120.9842') // Manila
     testUrl.searchParams.set('radius', '5000')
     testUrl.searchParams.set('type', 'restaurant')
     testUrl.searchParams.set('key', GOOGLE_API_KEY)
 
-    const response = await fetch(testUrl.toString())
+    const response = await fetch(testUrl.toString(), { signal: controller.signal })
+    clearTimeout(timeoutId)
+
     const data = await response.json()
 
     if (data.error_message) {
-      console.warn('❌ Google Places API error:', data.error_message)
-      console.warn('���️ Make sure "Places API" is enabled in your Google Cloud Console')
+      console.debug('Google Places API config issue:', data.error_message)
       return false
     }
 
     if (response.ok) {
-      console.log('✅ Google Places API is working correctly')
-      console.log(`Found ${data.results?.length || 0} test results`)
+      console.debug('✅ Google Places API verified')
       return true
     }
   } catch (err) {
-    console.warn('❌ Google Places API test failed:', err?.message)
+    // Silently ignore fetch errors during health check
+    if (err?.name !== 'AbortError') {
+      console.debug('Google Places API check skipped')
+    }
   }
 
   return false
@@ -45,7 +51,13 @@ const debugGoogleAPI = async () => {
 
 // Check API on load (only in development)
 if (typeof import.meta !== 'undefined' && import.meta.env.DEV) {
-  setTimeout(() => debugGoogleAPI(), 2000)
+  setTimeout(() => {
+    try {
+      debugGoogleAPI().catch(() => {})
+    } catch (e) {
+      // Silently ignore
+    }
+  }, 2000)
 }
 
 // Map POI keywords to Google Places API types
