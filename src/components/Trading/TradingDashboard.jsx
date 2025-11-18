@@ -192,12 +192,21 @@ export default function TradingDashboard({ userId, onClose }) {
               {paperTradingMode ? '📄 Paper Trading Mode' : '🔴 REAL TRADING MODE'}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:bg-blue-500 p-2 rounded-lg font-medium"
-          >
-            ✕ Close
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={handleDisconnect}
+              className="text-white hover:bg-red-600 px-4 py-2 rounded-lg font-medium transition"
+              title="Disconnect and switch account"
+            >
+              🔄 Switch Account
+            </button>
+            <button
+              onClick={onClose}
+              className="text-white hover:bg-blue-500 px-4 py-2 rounded-lg font-medium transition"
+            >
+              ✕ Close
+            </button>
+          </div>
         </div>
 
         {accountBalance?.email && (
