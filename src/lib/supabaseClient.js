@@ -69,8 +69,7 @@ function initClient() {
             if (typeof navigator !== 'undefined' && !navigator.onLine) {
               console.warn('[supabase-client] Browser is offline')
               try {
-                const body = JSON.stringify({ error: 'offline', message: 'Network appears to be offline' })
-                return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
+                return new Response(JSON.stringify({ error: 'offline', message: 'Network appears to be offline' }), { status: 503, headers: { 'Content-Type': 'application/json' } })
               } catch (e) {
                 const offlineErr = new Error('Network appears to be offline')
                 offlineErr.name = 'NetworkError'
@@ -80,8 +79,7 @@ function initClient() {
 
             if (!originalFetch) {
               // No fetch available in this runtime - return synthetic response
-              const body = JSON.stringify({ error: 'no_fetch', message: 'Fetch API not available' })
-              return new Response(body, { status: 500, headers: { 'Content-Type': 'application/json' } })
+              return new Response(JSON.stringify({ error: 'no_fetch', message: 'Fetch API not available' }), { status: 500, headers: { 'Content-Type': 'application/json' } })
             }
 
             // ensure we await and capture errors
@@ -94,8 +92,7 @@ function initClient() {
             if (err && err.name === 'AbortError') {
               console.debug('[supabase-client] fetch aborted:', err && err.message)
               try {
-                const body = JSON.stringify({ error: 'aborted', message: err && err.message })
-                return new Response(body, { status: 499, headers: { 'Content-Type': 'application/json' } })
+                return new Response(JSON.stringify({ error: 'aborted', message: err && err.message }), { status: 499, headers: { 'Content-Type': 'application/json' } })
               } catch (e) {
                 // can't construct Response - break loop and return null
                 console.warn('[supabase-client] could not construct aborted response fallback', e)
@@ -122,8 +119,7 @@ function initClient() {
 
               try {
                 // create a simple Response-like fallback
-                const body = JSON.stringify({ error: 'network_error', message: err && err.message })
-                return new Response(body, { status: 503, headers: { 'Content-Type': 'application/json' } })
+                return new Response(JSON.stringify({ error: 'network_error', message: err && err.message }), { status: 503, headers: { 'Content-Type': 'application/json' } })
               } catch (e) {
                 // If Response isn't available, return null to avoid throwing
                 console.warn('[supabase-client] could not construct response fallback', e)
