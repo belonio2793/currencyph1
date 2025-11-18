@@ -201,7 +201,18 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   useEffect(() => {
     loadUserProfile()
     loadActiveRides()
-    subscribeToRides()
+    loadAvailableDrivers()
+    loadActiveRiders()
+
+    const unsubscribeRides = subscribeToRides()
+    const unsubscribeDrivers = subscribeToDrivers()
+    const unsubscribeRiders = subscribeToRiders()
+
+    return () => {
+      unsubscribeRides?.()
+      unsubscribeDrivers?.()
+      unsubscribeRiders?.()
+    }
   }, [userId])
 
   const loadUserProfile = async () => {
