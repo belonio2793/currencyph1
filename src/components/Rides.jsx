@@ -1005,139 +1005,45 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             </div>
 
             {/* Ride Request Form */}
-            <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6">
-              <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-                Request a Ride
-              </h3>
+            <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6 space-y-6">
+              <div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                  </svg>
+                  Request a Ride
+                </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                {/* Pickup Location */}
-                <div className="bg-gradient-to-br from-green-50 to-white rounded-lg border-2 border-green-200 p-4">
-                  <label className="block text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Pickup Location
-                  </label>
-                  {startCoord ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-green-700 font-medium mb-3">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Location Selected
-                      </div>
-                      <div className="bg-white rounded-lg p-3 space-y-2 border border-green-200">
-                        <div>
-                          <p className="text-xs text-slate-600 font-medium">Latitude</p>
-                          <input
-                            type="text"
-                            readOnly
-                            value={startCoord.latitude.toFixed(6)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
-                          />
-                        </div>
-                        <div>
-                          <p className="text-xs text-slate-600 font-medium">Longitude</p>
-                          <input
-                            type="text"
-                            readOnly
-                            value={startCoord.longitude.toFixed(6)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setLocationModalType('pickup')
-                          setShowLocationModal(true)
-                        }}
-                        className="w-full text-sm text-green-600 hover:text-green-700 font-medium py-2 hover:bg-green-50 rounded-lg transition-colors"
-                      >
-                        Change Location
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => {
-                        setLocationModalType('pickup')
-                        setShowLocationModal(true)
-                      }}
-                      className="w-full py-4 border-2 border-dashed border-green-300 rounded-lg text-green-700 hover:border-green-500 hover:bg-green-100 font-semibold transition-colors flex items-center justify-center gap-2"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Select Pickup Location
-                    </button>
-                  )}
-                </div>
+                {/* Unified Location Search */}
+                <UnifiedLocationSearch
+                  userLocation={userLocation}
+                  onDestinationSelect={setEndCoord}
+                  selectedDestination={endCoord}
+                  mapHeight="300px"
+                />
 
-                {/* Destination */}
-                <div className="bg-gradient-to-br from-red-50 to-white rounded-lg border-2 border-red-200 p-4">
-                  <label className="block text-sm font-semibold text-slate-900 mb-4 flex items-center gap-2">
-                    <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
-                    </svg>
-                    Destination
-                  </label>
-                  {endCoord ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-red-700 font-medium mb-3">
-                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                        </svg>
-                        Location Selected
-                      </div>
-                      <div className="bg-white rounded-lg p-3 space-y-2 border border-red-200">
-                        <div>
-                          <p className="text-xs text-slate-600 font-medium">Latitude</p>
-                          <input
-                            type="text"
-                            readOnly
-                            value={endCoord.latitude.toFixed(6)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
-                          />
-                        </div>
-                        <div>
-                          <p className="text-xs text-slate-600 font-medium">Longitude</p>
-                          <input
-                            type="text"
-                            readOnly
-                            value={endCoord.longitude.toFixed(6)}
-                            className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm font-mono text-slate-800 bg-slate-50"
-                          />
-                        </div>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setLocationModalType('destination')
-                          setShowLocationModal(true)
-                        }}
-                        className="w-full text-sm text-red-600 hover:text-red-700 font-medium py-2 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        Change Location
-                      </button>
-                    </div>
-                  ) : (
+                {/* Auto-set pickup to user location */}
+                {userLocation && !startCoord && (
+                  <div className="mt-4 text-center">
                     <button
-                      onClick={() => {
-                        setLocationModalType('destination')
-                        setShowLocationModal(true)
-                      }}
-                      className="w-full py-4 border-2 border-dashed border-red-300 rounded-lg text-red-700 hover:border-red-500 hover:bg-red-100 font-semibold transition-colors flex items-center justify-center gap-2"
+                      onClick={() => setStartCoord(userLocation)}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium py-2"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                      </svg>
-                      Select Destination
+                      Confirm Your Location as Pickup Point
                     </button>
-                  )}
-                </div>
+                  </div>
+                )}
+
+                {startCoord && endCoord && (
+                  <div className="mt-4 bg-blue-50 rounded-lg p-3 border border-blue-200">
+                    <p className="text-sm text-blue-900 font-semibold flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      Route is ready for your ride request
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Ride Type Selection */}
