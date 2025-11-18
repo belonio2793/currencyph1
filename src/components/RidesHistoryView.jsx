@@ -64,7 +64,7 @@ export default function RidesHistoryView({ userId, userRole }) {
       setRides(data || [])
       calculateNetworkStats(data || [])
     } catch (err) {
-      console.error('Error loading rides:', err)
+      console.error('Error loading rides:', err?.message || err?.details?.message || JSON.stringify(err))
       setError('Failed to load ride history')
     } finally {
       setLoading(false)
