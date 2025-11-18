@@ -1,0 +1,304 @@
+import crypto from 'crypto'
+
+const BASE_URL = 'https://api.pro.coins.ph'
+const API_KEY = import.meta.env.VITE_COINSPH_API_KEY || process.env.COINSPH_API_KEY
+const API_SECRET = import.meta.env.VITE_COINSPH_API_SECRET || process.env.COINSPH_API_SECRET
+
+export class CoinsPhApi {
+  constructor(apiKey = API_KEY, apiSecret = API_SECRET) {
+    this.apiKey = apiKey
+    this.apiSecret = apiSecret
+    this.baseUrl = BASE_URL
+  }
+
+  /**
+   * Sign request with HMAC-SHA256
+   */
+  signRequest(params) {
+    const queryString = Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .sort()
+      .join('&')
+
+    const signature = crypto
+      .createHmac('sha256', this.apiSecret)
+      .update(queryString)
+      .digest('hex')
+
+    return { ...params, signature }
+  }
+
+  /**
+   * Make authenticated request
+   */
+  async request(method, path, params = {}, isPublic = false) {
+    try {
+      let url = `${this.baseUrl}${path}`
+      let options = {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+      }
+
+      if (!isPublic) {
+        params.timestamp = Math.floor(Date.now())
+        const signed = this.signRequest(params)
+        options.headers['X-MBX-APIKEY'] = this.apiKey
+
+        if (method === 'GET') {
+          const queryString = new URLSearchParams(signed).toString()
+          url += `?${queryString}`
+        } else {
+          options.body = JSON.stringify(signed)
+        }
+      } else {
+        if (method === 'GET') {
+          const queryString = new URLSearchParams(params).toString()
+          url += `?${queryString}`
+        } else {
+          options.body = JSON.stringify(params)
+        }
+      }
+
+      const response = await fetch(url, options)
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.msg || `API Error: ${response.status}`)
+      }
+
+      return data
+    } catch (error) {
+      console.error(`[CoinsPhApi] ${method} ${path}:`, error.message)
+      throw error
+    }
+  }
+
+  // ==================== PUBLIC ENDPOINTS ====================
+
+  /**
+   * Get current price of a symbol
+   */
+  async getPrice(symbol) {
+    return this.request('GET', '/openapi/quote/v1/ticker/price', { symbol }, true)
+  }
+
+  /**
+   * Get ticker info (24h stats)
+   */
+  async getTicker(symbol) {
+    return this.request('GET', '/openapi/quote/v1/ticker/24hr', { symbol }, true)
+  }
+
+  /**
+   * Get klines/candlestick data
+   */
+  async getKlines(symbol, interval = '1h', limit = 100, startTime = null, endTime = null) {
+    const params = { symbol, interval, limit }
+    if (startTime) params.startTime = startTime
+    if (endTime) params.endTime = endTime
+    return this.request('GET', '/openapi/quote/v1/klines', params, true)
+  }
+
+  /**
+   * Get order book
+   */
+  async getOrderBook(symbol, limit = 20) {
+    return this.request('GET', '/openapi/quote/v1/depth', { symbol, limit }, true)
+  }
+
+  /**
+   * Get recent trades
+   */
+  async getRecentTrades(symbol, limit = 100) {
+    return this.request('GET', '/openapi/quote/v1/trades', { symbol, limit }, true)
+  }
+
+  /**
+   * Get exchange info
+   */
+  async getExchangeInfo() {
+    return this.request('GET', '/openapi/v1/exchangeInfo', {}, true)
+  }
+
+  // ==================== AUTHENTICATED ENDPOINTS ====================
+
+  /**
+   * Get account information and balances
+   */
+  async getAccount() {
+    return this.request('GET', '/openapi/v3/account', {})
+  }
+
+  /**
+   * Get balance of specific asset
+   */
+  async getBalance(asset) {
+    const account = await this.getAccount()
+    const balance = account.balances?.find(b => b.asset === asset)
+    return balance || { asset, free: '0', locked: '0' }
+  }
+
+  /**
+   * Get list of open orders
+   */
+  async getOpenOrders(symbol = null) {
+    const params = {}
+    if (symbol) params.symbol = symbol
+    return this.request('GET', '/openapi/v3/openOrders', params)
+  }
+
+  /**
+   * Get order history
+   */
+  async getOrderHistory(symbol, limit = 100) {
+    return this.request('GET', '/openapi/v3/allOrders', { symbol, limit })
+  }
+
+  /**
+   * Get specific order details
+   */
+  async getOrder(symbol, orderId = null, origClientOrderId = null) {
+    const params = { symbol }
+    if (orderId) params.orderId = orderId
+    if (origClientOrderId) params.origClientOrderId = origClientOrderId
+    return this.request('GET', '/openapi/v3/order', params)
+  }
+
+  /**
+   * Place a new order
+   */
+  async placeOrder(symbol, side, type, quantity = null, price = null, quoteOrderQty = null, options = {}) {
+    const params = {
+      symbol,
+      side: side.toUpperCase(), // BUY or SELL
+      type: type.toUpperCase(), // MARKET, LIMIT, STOP_LOSS, TAKE_PROFIT
+      ...options
+    }
+
+    if (quantity) params.quantity = quantity
+    if (price) params.price = price
+    if (quoteOrderQty) params.quoteOrderQty = quoteOrderQty // For MARKET orders: spend this much PHP
+
+    return this.request('POST', '/openapi/v3/order', params)
+  }
+
+  /**
+   * Market BUY order
+   */
+  async buyMarket(symbol, quoteOrderQty) {
+    return this.placeOrder(symbol, 'BUY', 'MARKET', null, null, quoteOrderQty)
+  }
+
+  /**
+   * Market SELL order
+   */
+  async sellMarket(symbol, quantity) {
+    return this.placeOrder(symbol, 'SELL', 'MARKET', quantity)
+  }
+
+  /**
+   * Limit BUY order
+   */
+  async buyLimit(symbol, quantity, price) {
+    return this.placeOrder(symbol, 'BUY', 'LIMIT', quantity, price, null, {
+      timeInForce: 'GTC' // Good Till Cancel
+    })
+  }
+
+  /**
+   * Limit SELL order
+   */
+  async sellLimit(symbol, quantity, price) {
+    return this.placeOrder(symbol, 'SELL', 'LIMIT', quantity, price, null, {
+      timeInForce: 'GTC'
+    })
+  }
+
+  /**
+   * Stop Loss order
+   */
+  async stopLoss(symbol, side, quantity, stopPrice) {
+    return this.placeOrder(symbol, side, 'STOP_LOSS', quantity, stopPrice)
+  }
+
+  /**
+   * Take Profit order
+   */
+  async takeProfit(symbol, side, quantity, stopPrice) {
+    return this.placeOrder(symbol, side, 'TAKE_PROFIT', quantity, stopPrice)
+  }
+
+  /**
+   * Cancel order
+   */
+  async cancelOrder(symbol, orderId = null, origClientOrderId = null) {
+    const params = { symbol }
+    if (orderId) params.orderId = orderId
+    if (origClientOrderId) params.origClientOrderId = origClientOrderId
+    return this.request('DELETE', '/openapi/v3/order', params)
+  }
+
+  /**
+   * Get trade history
+   */
+  async getMyTrades(symbol, limit = 500) {
+    return this.request('GET', '/openapi/v3/myTrades', { symbol, limit })
+  }
+
+  /**
+   * Get account trades with filters
+   */
+  async getAccountTrades(options = {}) {
+    return this.request('GET', '/openapi/v3/myTrades', options)
+  }
+
+  /**
+   * Ping server (test connectivity)
+   */
+  async ping() {
+    return this.request('GET', '/openapi/v1/ping', {}, true)
+  }
+
+  /**
+   * Get server time
+   */
+  async getServerTime() {
+    const response = await this.request('GET', '/openapi/v1/time', {}, true)
+    return response.serverTime
+  }
+
+  /**
+   * Get trading rules and limits
+   */
+  async getTradingRules() {
+    const info = await this.getExchangeInfo()
+    const symbols = {}
+    
+    info.symbols?.forEach(symbol => {
+      symbols[symbol.symbol] = {
+        baseAsset: symbol.baseAsset,
+        quoteAsset: symbol.quoteAsset,
+        minPrice: this.getFilter(symbol, 'PRICE_FILTER')?.minPrice,
+        maxPrice: this.getFilter(symbol, 'PRICE_FILTER')?.maxPrice,
+        minQty: this.getFilter(symbol, 'LOT_SIZE')?.minQty,
+        maxQty: this.getFilter(symbol, 'LOT_SIZE')?.maxQty,
+        minNotional: this.getFilter(symbol, 'MIN_NOTIONAL')?.minNotional,
+        status: symbol.status
+      }
+    })
+
+    return symbols
+  }
+
+  /**
+   * Helper to get filter from symbol info
+   */
+  getFilter(symbol, filterType) {
+    return symbol.filters?.find(f => f.filterType === filterType)
+  }
+}
+
+// Export singleton instance
+export const coinsPhApi = new CoinsPhApi()
+
+export default coinsPhApi
