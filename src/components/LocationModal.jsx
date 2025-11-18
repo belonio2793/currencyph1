@@ -84,14 +84,28 @@ export default function LocationModal({
 
     setLoading(true)
     try {
-      // Use Nominatim with bounded search restricted to Philippines
-      // Philippines bounding box: roughly 5°N to 19°N, 120°E to 129°E
-      const boundingBox = '5,120,19,129' // south, west, north, east
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 5000) // 5s timeout
 
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=20&bounded=1&viewbox=120,19,129,5&countrycodes=ph`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=20&bounded=1&viewbox=120,19,129,5&countrycodes=ph`,
+        {
+          signal: controller.signal,
+          headers: {
+            'User-Agent': 'currency-ph/1.0'
+          }
+        }
       )
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) throw new Error(`Location search failed (${response.status})`)
+
       const results = await response.json()
+      if (!Array.isArray(results)) {
+        setSearchResults([])
+        return
+      }
 
       // Filter results by radius from user location (if available)
       let filteredResults = results.map(r => ({
@@ -116,7 +130,12 @@ export default function LocationModal({
 
       setSearchResults(filteredResults.slice(0, 10))
     } catch (error) {
-      console.error('Search error:', error)
+      clearTimeout(timeoutId)
+      if (error?.name === 'AbortError') {
+        console.error('Location search timeout')
+      } else {
+        console.error('Search error:', error?.message)
+      }
       setSearchResults([])
     } finally {
       setLoading(false)
