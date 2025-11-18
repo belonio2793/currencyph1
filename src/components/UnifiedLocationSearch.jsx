@@ -285,13 +285,25 @@ export default function UnifiedLocationSearch({
       }
 
       if (filteredResults.length === 0) {
-        setError(`No locations found matching "${destinationSearch}". Try a different search or use the map.`)
+        const suggestions = []
+        if (!GOOGLE_API_KEY) {
+          suggestions.push('Google API key not configured')
+        }
+        if (!userLocation) {
+          suggestions.push('Enable location sharing for better results')
+        }
+        suggestions.push('Try searching for a nearby city or address instead')
+        suggestions.push('Use the map to select your destination')
+
+        const errorMsg = `No locations found matching "${destinationSearch}". ${suggestions.join('. ')}.`
+        setError(errorMsg)
       }
 
       setSearchResults(filteredResults.slice(0, 15))
     } catch (err) {
       console.error('Search error:', err)
-      setError('Failed to search locations. Please try again.')
+      const errorMsg = err?.message || 'Failed to search locations'
+      setError(`Search error: ${errorMsg}. Try using the map or searching for a city name.`)
       setSearchResults([])
     } finally {
       setLoading(false)
