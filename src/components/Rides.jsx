@@ -220,7 +220,7 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
       <MapContainer
         center={[userLocation?.latitude || 14.5995, userLocation?.longitude || 120.9842]}
         zoom={14}
-        style={{ height: '100%', width: '100%', zIndex: 0 }}
+        style={{ height: '100%', width: '100%', zIndex: 0, minHeight: '600px' }}
         ref={mapRef}
         onClick={(e) => {
           if (onMapClick) {
