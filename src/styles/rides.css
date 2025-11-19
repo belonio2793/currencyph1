@@ -435,11 +435,6 @@
   transform: scale(1.1) !important;
 }
 
-.enhanced-marker-container:hover .marker-label {
-  opacity: 1 !important;
-  pointer-events: auto !important;
-}
-
 .enhanced-marker-container .marker-icon:hover {
   filter: brightness(1.2) drop-shadow(0 3px 8px rgba(0, 0, 0, 0.5)) !important;
   transform: scale(1.15) !important;
