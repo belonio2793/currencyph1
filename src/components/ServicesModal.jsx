@@ -109,7 +109,7 @@ const SERVICES = [
     category: 'logistics',
     criteria: [
       { label: 'Weight', icon: '⚖️', hint: 'Up to 25kg' },
-      { label: 'Size', icon: '���', hint: 'Standard boxes' },
+      { label: 'Size', icon: '����', hint: 'Standard boxes' },
       { label: 'Fragility', icon: '🛡️', hint: 'Handle with care' }
     ],
     details: {
@@ -902,10 +902,30 @@ export default function ServicesModal({
   }
 
   const handleSelect = () => {
+    // Validate service data before submitting
+    const validation = validateServiceData(expandedService, formData)
+
+    if (!validation.isValid) {
+      // Show validation errors (user should see them via alert)
+      const errorMessage = formatValidationErrors(validation.errors)
+      alert(errorMessage)
+      return
+    }
+
+    // Data is valid, proceed with selection
     onSelectService(expandedService, formData)
     setFormData({})
     onClose()
   }
+
+  // Get validation status for the current service
+  const getValidationStatus = () => {
+    if (!selectedServiceData) return null
+    const validation = validateServiceData(expandedService, formData)
+    return validation
+  }
+
+  const validationStatus = getValidationStatus()
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-[9999] flex items-center justify-center p-4 overflow-y-auto">
