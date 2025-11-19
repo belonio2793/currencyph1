@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient'
+import { supabase, isSupabaseHealthy } from './supabaseClient'
 
 const PRESENCE_UPDATE_INTERVAL = 30000 // 30 seconds
 const OFFLINE_TIMEOUT = 120000 // 2 minutes
@@ -16,20 +16,33 @@ export function initializePresence(userId) {
   currentUserId = userId
   if (!userId) return
 
+  // Only initialize presence if Supabase is healthy
+  if (!isSupabaseHealthy()) {
+    return
+  }
+
   // Fire-and-forget; silently ignore all errors since presence is non-critical
   updatePresence('online').catch(() => {})
 
   presenceIntervalId = setInterval(() => {
-    updatePresence('online').catch(() => {})
+    // Skip updates if Supabase is not healthy
+    if (isSupabaseHealthy()) {
+      updatePresence('online').catch(() => {})
+    }
   }, PRESENCE_UPDATE_INTERVAL)
 
   window.addEventListener('beforeunload', () => {
     // best-effort update; don't await in unload handlers
-    try { updatePresence('offline').catch(() => {}) } catch (e) {}
+    if (isSupabaseHealthy()) {
+      try { updatePresence('offline').catch(() => {}) } catch (e) {}
+    }
     clearInterval(presenceIntervalId)
   })
 
   document.addEventListener('visibilitychange', () => {
+    // Only update presence if Supabase is healthy
+    if (!isSupabaseHealthy()) return
+
     if (document.hidden) {
       updatePresence('away').catch(() => {})
     } else {
