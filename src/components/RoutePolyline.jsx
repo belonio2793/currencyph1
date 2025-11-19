@@ -34,45 +34,12 @@ export default function RoutePolyline({ geometry, distance, duration, fare = nul
         lineCap="round"
         lineJoin="round"
       >
-        <Popup>
-          <div className="space-y-2 p-2" style={{ minWidth: '200px' }}>
-            <div className="bg-blue-600 text-white rounded-t p-2">
-              <p className="font-bold text-sm">Trip Summary</p>
-            </div>
-
-            <div className="space-y-2 px-2 py-1">
-              {/* Distance */}
-              <div className="flex justify-between items-center">
-                <span className="text-slate-700 text-xs font-medium">Distance:</span>
-                <span className="text-slate-900 font-bold text-sm">{distance ? distance.toFixed(1) : '?'} km</span>
-              </div>
-
-              {/* Duration */}
-              <div className="flex justify-between items-center">
-                <span className="text-slate-700 text-xs font-medium">Duration:</span>
-                <span className="text-slate-900 font-bold text-sm">{duration || '?'} min</span>
-              </div>
-
-              {/* ETA */}
-              <div className="flex justify-between items-center">
-                <span className="text-slate-700 text-xs font-medium">ETA:</span>
-                <span className="text-slate-900 font-bold text-sm">{etaTime}</span>
-              </div>
-
-              {/* Fare if available */}
-              {totalFare && (
-                <div className="border-t border-slate-200 pt-1 mt-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-700 text-xs font-medium">Estimated Fare:</span>
-                    <span className="text-green-600 font-bold text-sm">₱{totalFare}</span>
-                  </div>
-                  {fare && fare.demandMultiplier > 1.0 && (
-                    <p className="text-orange-600 text-xs mt-1">
-                      Surge: {(fare.demandMultiplier * 100).toFixed(0)}%
-                    </p>
-                  )}
-                </div>
-              )}
+        <Popup maxWidth={200} minWidth={180} closeButton={false}>
+          <div style={{ padding: '8px', textAlign: 'center' }}>
+            <p className="font-bold text-sm text-slate-900 mb-2">Route</p>
+            <div className="text-xs text-slate-700 space-y-1">
+              <p><span className="font-medium">Distance:</span> {distance ? distance.toFixed(1) : '?'} km</p>
+              <p><span className="font-medium">Duration:</span> {duration || '?'} min</p>
             </div>
           </div>
         </Popup>
