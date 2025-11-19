@@ -334,6 +334,7 @@
   width: 20px;
   height: 20px;
   flex-shrink: 0;
+  fill: currentColor;
 }
 
 .location-confirmation p {
