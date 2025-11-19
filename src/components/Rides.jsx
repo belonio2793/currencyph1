@@ -614,6 +614,40 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     }
   }
 
+  const saveVehicleInfo = async () => {
+    if (!userId) return
+
+    try {
+      const { error } = await supabase
+        .from('ride_profiles')
+        .upsert({
+          user_id: userId,
+          role: 'driver',
+          vehicle_type: driverVehicleType,
+          vehicle_make_model: driverMakeModel,
+          vehicle_year: driverYear ? parseInt(driverYear) : null,
+          vehicle_fuel_type: driverFuelType,
+          vehicle_mileage: driverMileage ? parseInt(driverMileage) : null,
+          city: driverCity,
+          latitude: userLocation?.latitude,
+          longitude: userLocation?.longitude,
+          updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
+        })
+
+      if (!error) {
+        setShowVehicleModal(false)
+      } else {
+        console.error('Vehicle info save error:', error)
+        setError('Failed to save vehicle information')
+      }
+    } catch (err) {
+      console.error('Vehicle info save exception:', err)
+      setError('Failed to save vehicle information')
+    }
+  }
+
   const requestRide = async () => {
     if (!userId || !startCoord || !endCoord) {
       setError('Please select both pickup and destination locations')
