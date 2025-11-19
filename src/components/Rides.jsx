@@ -390,6 +390,48 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     }
   }, [location, startCoord])
 
+  // Calculate route when coordinates change
+  useEffect(() => {
+    const calculateRoute = async () => {
+      if (!startCoord || !endCoord) {
+        setRouteDetails(null)
+        return
+      }
+
+      try {
+        const routeData = await getRoute(
+          startCoord.latitude,
+          startCoord.longitude,
+          endCoord.latitude,
+          endCoord.longitude
+        )
+
+        if (routeData.success) {
+          const fareEstimate = calculateFare(
+            routeData.distance,
+            routeData.duration,
+            selectedRideType || 'ride-share',
+            1.0 // No demand multiplier for estimation
+          )
+
+          setRouteDetails({
+            distance: routeData.distance,
+            duration: routeData.duration,
+            geometry: routeData.geometry,
+            coordinates: routeData.coordinates,
+            steps: routeData.steps || [],
+            fare: fareEstimate
+          })
+        }
+      } catch (err) {
+        console.debug('Route calculation error:', err?.message)
+        setError('Failed to calculate route')
+      }
+    }
+
+    calculateRoute()
+  }, [startCoord, endCoord, selectedRideType])
+
   // Load initial data
   useEffect(() => {
     loadUserProfile()
