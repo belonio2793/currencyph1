@@ -1239,9 +1239,6 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       <p className="text-sm font-medium text-slate-900">Your Location</p>
                     </div>
 
-                    {/* Arrow */}
-                    <div className="text-center text-slate-400 text-sm mb-4">↓</div>
-
                     {/* Destination Summary */}
                     <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
                       <p className="text-xs text-slate-700 uppercase font-bold mb-2">To</p>
