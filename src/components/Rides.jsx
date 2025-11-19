@@ -1160,7 +1160,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     drivers={drivers}
                     riders={riders}
                     routeGeometry={routeDetails?.geometry}
+                    routeDistance={routeDetails?.distance || 0}
+                    routeDuration={routeDetails?.duration || 0}
                     routeSource={routeSource}
+                    showZoomControls={true}
+                    showRouteSource={true}
+                    showDirections={true}
                     onMapClick={(coord) => {
                       if (selectingCoord === 'start') {
                         setStartCoord(coord)
