@@ -29,7 +29,9 @@ if (typeof window !== 'undefined') {
     return originalFetch.apply(this, args).catch(err => {
       // Log network errors with diagnostics
       const isSupabaseUrl = typeof url === 'string' && url.includes('supabase')
-      if (isSupabaseUrl) {
+      const isHealthCheck = typeof url === 'string' && url.includes('/auth/v1/health')
+
+      if (isSupabaseUrl && !isHealthCheck) {
         console.warn('[supabase-fetch-error]', {
           url: typeof url === 'string' ? url.split('?')[0] : url,
           error: err?.message,
@@ -37,6 +39,12 @@ if (typeof window !== 'undefined') {
           timestamp: new Date().toISOString()
         })
       }
+
+      if (isHealthCheck) {
+        console.debug('[supabase-health-check-error]', err?.message)
+        throw err
+      }
+
       throw err
     })
   }
