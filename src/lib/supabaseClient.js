@@ -201,6 +201,47 @@ export { supabase }
 
 export const isSupabaseConfigured = !!(SUPABASE_URL && SUPABASE_ANON_KEY)
 export const isSupabaseHealthy = () => _supabaseHealthy
+export const getSupabaseStatus = () => ({
+  configured: isSupabaseConfigured(),
+  healthy: isSupabaseHealthy(),
+  connectionRetries: _connectionRetries,
+  supabaseUrl: SUPABASE_URL ? '✓' : '✗',
+  anonKey: SUPABASE_ANON_KEY ? '✓' : '✗'
+})
+
+/**
+ * Retry wrapper for Supabase queries with exponential backoff
+ * @param {Function} queryFn - Async function that performs the query
+ * @param {number} maxRetries - Maximum number of retry attempts (default 3)
+ * @returns {Promise} Result of the query
+ */
+export async function executeWithRetry(queryFn, maxRetries = 3) {
+  let lastError = null
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await queryFn()
+    } catch (error) {
+      lastError = error
+
+      // Don't retry on validation errors or permission errors
+      if (error?.status >= 400 && error?.status < 500) {
+        throw error
+      }
+
+      // Only retry on network errors
+      if (attempt < maxRetries) {
+        const delay = 1000 * Math.pow(2, attempt) // 1s, 2s, 4s, 8s
+        console.debug(`[supabase] Query failed (attempt ${attempt + 1}/${maxRetries + 1}), retrying in ${delay}ms...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
+      }
+    }
+  }
+
+  // If we get here, all retries failed
+  console.error('[supabase] Query failed after all retries:', lastError)
+  throw lastError
+}
 
 // Generic Token API utilities (replacing deprecated dog token API)
 export const tokenAPI = {
