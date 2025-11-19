@@ -21,6 +21,9 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
   const dotSize = size * 0.45
   const pulseColorUsed = pulseColor || color
 
+  // Create a unique style ID to avoid conflicts
+  const styleId = `marker-style-${Math.random().toString(36).substr(2, 9)}`
+
   const html = `
     <div class="enhanced-marker-container" style="
       position: relative;
@@ -31,27 +34,24 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
       justify-content: center;
     ">
       <!-- Animated ping circles -->
-      <div class="marker-ping" style="
+      <div class="marker-ping marker-ping-outer" data-marker-color="${pulseColorUsed}" style="
         position: absolute;
         width: ${pinSize}px;
         height: ${pinSize}px;
         border-radius: 50%;
         background-color: ${pulseColorUsed}15;
         border: 2px solid ${pulseColorUsed}40;
-        animation: ping-expand 2s ease-out infinite;
         z-index: 1;
       "></div>
-      
-      <div class="marker-ping-secondary" style="
+
+      <div class="marker-ping marker-ping-inner" data-marker-color="${pulseColorUsed}" style="
         position: absolute;
         width: ${pinSize * 0.75}px;
         height: ${pinSize * 0.75}px;
         border-radius: 50%;
         background-color: ${pulseColorUsed}25;
         border: 2px solid ${pulseColorUsed}60;
-        animation: ping-expand-secondary 2s ease-out infinite;
         z-index: 2;
-        animation-delay: 0.3s;
       "></div>
 
       <!-- Main marker icon -->
@@ -63,9 +63,9 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
       ">
         <svg viewBox="0 0 30 40" width="${pinSize}" height="${pinSize}" style="display: block;">
           <!-- Map pin shape -->
-          <path d="M 15 0 C 8 0 2 6 2 13 C 2 22 15 40 15 40 C 15 40 28 22 28 13 C 28 6 22 0 15 0 Z" 
-                fill="${color}" 
-                stroke="white" 
+          <path d="M 15 0 C 8 0 2 6 2 13 C 2 22 15 40 15 40 C 15 40 28 22 28 13 C 28 6 22 0 15 0 Z"
+                fill="${color}"
+                stroke="white"
                 stroke-width="2"
                 filter="drop-shadow(0 1px 2px rgba(0,0,0,0.2))"/>
           <!-- Center dot -->
@@ -90,60 +90,8 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
         pointer-events: none;
         transition: opacity 0.2s;
         z-index: 4;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
       ">${label}</div>
-
-      <style>
-        @keyframes ping-expand {
-          0% {
-            width: ${pinSize}px;
-            height: ${pinSize}px;
-            opacity: 1;
-            border-width: 2px;
-          }
-          70% {
-            width: ${pinSize * 2}px;
-            height: ${pinSize * 2}px;
-            opacity: 0;
-            border-width: 1px;
-          }
-          100% {
-            width: ${pinSize * 2.5}px;
-            height: ${pinSize * 2.5}px;
-            opacity: 0;
-            border-width: 0px;
-          }
-        }
-
-        @keyframes ping-expand-secondary {
-          0% {
-            width: ${pinSize * 0.75}px;
-            height: ${pinSize * 0.75}px;
-            opacity: 1;
-            border-width: 2px;
-          }
-          70% {
-            width: ${pinSize * 1.8}px;
-            height: ${pinSize * 1.8}px;
-            opacity: 0;
-            border-width: 1px;
-          }
-          100% {
-            width: ${pinSize * 2.3}px;
-            height: ${pinSize * 2.3}px;
-            opacity: 0;
-            border-width: 0px;
-          }
-        }
-
-        .enhanced-marker-container:hover .marker-label {
-          opacity: 1;
-        }
-
-        .marker-icon:hover {
-          filter: brightness(1.15) drop-shadow(0 2px 6px rgba(0,0,0,0.4));
-          transform: scale(1.1);
-        }
-      </style>
     </div>
   `
 
