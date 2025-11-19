@@ -301,7 +301,9 @@ export default function MapComponent({
   mapHeight = '100%',
   mapWidth = '100%',
   minZoom = 10,
-  defaultZoom = 14
+  defaultZoom = 14,
+  isLocating = false,
+  locationError = null
 }) {
   const mapRef = useRef(null)
   const [mapBounds, setMapBounds] = useState(null)
