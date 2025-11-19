@@ -1151,7 +1151,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
                   {/* Pickup Location Selector */}
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Pickup Location</label>
+                    <label className="block text-sm font-medium text-white mb-2">Pickup Location</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
