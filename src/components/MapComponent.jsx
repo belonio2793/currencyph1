@@ -14,84 +14,203 @@ L.Icon.Default.mergeOptions({
 })
 
 /**
- * Create enhanced custom markers with map pin style
+ * Create enhanced custom markers with animated pinging circles
  */
-export const createEnhancedMarker = (color, label, status = 'active', size = 40) => {
-  const animationClass = status === 'active' ? 'marker-pulse' : ''
+export const createEnhancedMarker = (color, label, status = 'active', size = 40, pulseColor = null) => {
   const pinSize = size * 1.5
   const dotSize = size * 0.45
+  const pulseColorUsed = pulseColor || color
 
-  // SVG map pin icon
   const html = `
-    <div class="custom-marker ${animationClass}" style="
+    <div class="enhanced-marker-container" style="
       position: relative;
-      width: ${pinSize}px;
-      height: ${pinSize}px;
-      cursor: pointer;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
-    " title="${label}">
-      <svg viewBox="0 0 30 40" width="${pinSize}" height="${pinSize}" style="position: absolute; top: 0; left: -${pinSize/2}px;">
-        <defs>
-          <style>
-            @keyframes markerPulse {
-              0%, 100% { opacity: 1; }
-              50% { opacity: 0.7; }
-            }
-            .marker-svg {
-              animation: ${status === 'active' ? 'markerPulse 2s infinite' : 'none'};
-            }
-          </style>
-        </defs>
-        <!-- Map pin shape -->
-        <path d="M 15 0 C 8 0 2 6 2 13 C 2 22 15 40 15 40 C 15 40 28 22 28 13 C 28 6 22 0 15 0 Z" fill="${color}" class="marker-svg" stroke="white" stroke-width="1.5"/>
-        <!-- Center dot -->
-        <circle cx="15" cy="13" r="5" fill="white" class="marker-svg"/>
-      </svg>
+      width: ${pinSize * 1.8}px;
+      height: ${pinSize * 1.8}px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <!-- Animated ping circles -->
+      <div class="marker-ping" style="
+        position: absolute;
+        width: ${pinSize}px;
+        height: ${pinSize}px;
+        border-radius: 50%;
+        background-color: ${pulseColorUsed}15;
+        border: 2px solid ${pulseColorUsed}40;
+        animation: ping-expand 2s ease-out infinite;
+        z-index: 1;
+      "></div>
+      
+      <div class="marker-ping-secondary" style="
+        position: absolute;
+        width: ${pinSize * 0.75}px;
+        height: ${pinSize * 0.75}px;
+        border-radius: 50%;
+        background-color: ${pulseColorUsed}25;
+        border: 2px solid ${pulseColorUsed}60;
+        animation: ping-expand-secondary 2s ease-out infinite;
+        z-index: 2;
+        animation-delay: 0.3s;
+      "></div>
+
+      <!-- Main marker icon -->
+      <div class="marker-icon" style="
+        position: relative;
+        z-index: 3;
+        cursor: pointer;
+        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+      ">
+        <svg viewBox="0 0 30 40" width="${pinSize}" height="${pinSize}" style="display: block;">
+          <!-- Map pin shape -->
+          <path d="M 15 0 C 8 0 2 6 2 13 C 2 22 15 40 15 40 C 15 40 28 22 28 13 C 28 6 22 0 15 0 Z" 
+                fill="${color}" 
+                stroke="white" 
+                stroke-width="2"
+                filter="drop-shadow(0 1px 2px rgba(0,0,0,0.2))"/>
+          <!-- Center dot -->
+          <circle cx="15" cy="13" r="6" fill="white" stroke="${color}" stroke-width="1.5"/>
+        </svg>
+      </div>
+
+      <!-- Tooltip label -->
+      <div class="marker-label" style="
+        position: absolute;
+        bottom: -25px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: ${color};
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+        z-index: 4;
+      ">${label}</div>
+
+      <style>
+        @keyframes ping-expand {
+          0% {
+            width: ${pinSize}px;
+            height: ${pinSize}px;
+            opacity: 1;
+            border-width: 2px;
+          }
+          70% {
+            width: ${pinSize * 2}px;
+            height: ${pinSize * 2}px;
+            opacity: 0;
+            border-width: 1px;
+          }
+          100% {
+            width: ${pinSize * 2.5}px;
+            height: ${pinSize * 2.5}px;
+            opacity: 0;
+            border-width: 0px;
+          }
+        }
+
+        @keyframes ping-expand-secondary {
+          0% {
+            width: ${pinSize * 0.75}px;
+            height: ${pinSize * 0.75}px;
+            opacity: 1;
+            border-width: 2px;
+          }
+          70% {
+            width: ${pinSize * 1.8}px;
+            height: ${pinSize * 1.8}px;
+            opacity: 0;
+            border-width: 1px;
+          }
+          100% {
+            width: ${pinSize * 2.3}px;
+            height: ${pinSize * 2.3}px;
+            opacity: 0;
+            border-width: 0px;
+          }
+        }
+
+        .enhanced-marker-container:hover .marker-label {
+          opacity: 1;
+        }
+
+        .marker-icon:hover {
+          filter: brightness(1.15) drop-shadow(0 2px 6px rgba(0,0,0,0.4));
+          transform: scale(1.1);
+        }
+      </style>
     </div>
   `
 
   return L.divIcon({
     html: html,
-    iconSize: [pinSize, pinSize * 1.3],
-    iconAnchor: [pinSize / 2, pinSize * 1.3],
+    iconSize: [pinSize * 1.8, pinSize * 1.8],
+    iconAnchor: [pinSize * 0.9, pinSize * 1.8],
     popupAnchor: [0, -pinSize],
     className: 'enhanced-marker'
   })
 }
 
 /**
- * Create pickup location marker (Green)
+ * Create pickup location marker (Green with animated ping)
  */
 export const createPickupMarker = (status = 'active') => {
-  return createEnhancedMarker('#10B981', 'P', status, 40)
+  return createEnhancedMarker('#10B981', '📍', status, 40, '#10B981')
 }
 
 /**
- * Create destination marker (Red)
+ * Create destination marker (Red with animated ping)
  */
 export const createDestinationMarker = (status = 'active') => {
-  return createEnhancedMarker('#EF4444', 'D', status, 40)
+  return createEnhancedMarker('#EF4444', '📌', status, 40, '#EF4444')
 }
 
 /**
- * Create user location marker (Blue)
+ * Create user location marker (Blue with animated ping)
  */
 export const createUserMarker = () => {
-  return createEnhancedMarker('#3B82F6', 'U', 'active', 38)
+  return createEnhancedMarker('#3B82F6', '👤', 'active', 38, '#3B82F6')
 }
 
 /**
- * Create driver marker (Purple)
+ * Create driver marker (Purple with animated ping)
  */
 export const createDriverMarker = () => {
-  return createEnhancedMarker('#8B5CF6', 'DR', 'active', 38)
+  return createEnhancedMarker('#8B5CF6', '🚗', 'active', 38, '#8B5CF6')
 }
 
 /**
- * Create rider marker (Orange)
+ * Create rider marker (Orange with animated ping)
  */
 export const createRiderMarker = () => {
-  return createEnhancedMarker('#F59E0B', 'R', 'active', 38)
+  return createEnhancedMarker('#F59E0B', '👥', 'active', 38, '#F59E0B')
+}
+
+/**
+ * Enhanced tooltip component for markers
+ */
+function EnhancedMarkerTooltip({ children, position = 'top' }) {
+  const [isVisible, setIsVisible] = useState(false)
+
+  return (
+    <div
+      className="relative inline-block"
+      onMouseEnter={() => setIsVisible(true)}
+      onMouseLeave={() => setIsVisible(false)}
+    >
+      {children}
+      {isVisible && (
+        <div className={`absolute left-1/2 transform -translate-x-1/2 ${position === 'top' ? '-translate-y-full -top-2' : 'top-full mt-2'} bg-slate-900 text-white px-3 py-2 rounded-lg shadow-lg whitespace-nowrap text-xs z-50 pointer-events-none`}>
+          <div className="font-semibold">{children?.props?.title}</div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 /**
@@ -151,7 +270,7 @@ function MapLocationUpdater({ location, centerOnLocation = true }) {
 /**
  * Route source indicator badge
  */
-function RouteSourceIndicator({ source, position = 'top-right' }) {
+function RouteSourceIndicator({ source, position = 'top-left' }) {
   if (!source) return null
 
   const sourceInfo = getRouteSourceInfo(source)
@@ -160,10 +279,10 @@ function RouteSourceIndicator({ source, position = 'top-right' }) {
     'top-right': 'top-4 right-4',
     'bottom-left': 'bottom-4 left-4',
     'bottom-right': 'bottom-4 right-4'
-  }[position] || 'top-right'
+  }[position] || 'top-left'
 
   return (
-    <div className={`absolute ${positionClass} z-40 bg-white rounded-lg shadow-lg border border-slate-200 px-3 py-2`}>
+    <div className={`absolute ${positionClass} z-40 bg-white rounded-lg shadow-lg border border-slate-200 px-3 py-2 hover:shadow-xl transition-all`}>
       <div className="flex items-center gap-2">
         <span className="text-lg">{sourceInfo.icon}</span>
         <div className="flex flex-col">
@@ -176,7 +295,53 @@ function RouteSourceIndicator({ source, position = 'top-right' }) {
 }
 
 /**
- * Main MapComponent
+ * Directions summary display
+ */
+function DirectionsSummary({ distance, duration, startAddress, endAddress }) {
+  return (
+    <div className="absolute bottom-4 left-4 z-40 bg-white rounded-lg shadow-lg border border-slate-200 p-3 max-w-xs">
+      <div className="space-y-2 text-sm">
+        <div className="font-semibold text-slate-900 flex items-center gap-2">
+          <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Trip Details
+        </div>
+        
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-blue-50 p-2 rounded">
+            <div className="text-xs text-slate-600 font-medium">Distance</div>
+            <div className="text-sm font-bold text-slate-900">{distance ? distance.toFixed(1) : '0'} km</div>
+          </div>
+          <div className="bg-blue-50 p-2 rounded">
+            <div className="text-xs text-slate-600 font-medium">Duration</div>
+            <div className="text-sm font-bold text-slate-900">{duration ? Math.ceil(duration) : '0'} min</div>
+          </div>
+          <div className="bg-green-50 p-2 rounded">
+            <div className="text-xs text-slate-600 font-medium">ETA</div>
+            <div className="text-sm font-bold text-green-600">{new Date(Date.now() + (duration || 0) * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-200 pt-2 mt-2">
+          <div className="text-xs text-slate-600">
+            <div className="flex items-start gap-2 mb-1">
+              <span className="text-green-600 font-bold">From:</span>
+              <span className="text-slate-900">{startAddress || 'Pickup Location'}</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-red-600 font-bold">To:</span>
+              <span className="text-slate-900">{endAddress || 'Destination'}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/**
+ * Main MapComponent with enhanced markers and routing
  */
 export default function MapComponent({
   userLocation,
@@ -185,9 +350,12 @@ export default function MapComponent({
   drivers = [],
   riders = [],
   routeGeometry = null,
+  routeDistance = 0,
+  routeDuration = 0,
   routeSource = null,
   showZoomControls = true,
   showRouteSource = true,
+  showDirections = true,
   onMapClick = null,
   onPickupDrag = null,
   onDestinationDrag = null,
@@ -199,18 +367,20 @@ export default function MapComponent({
 }) {
   const mapRef = useRef(null)
   const [mapBounds, setMapBounds] = useState(null)
+  const [hoveredMarker, setHoveredMarker] = useState(null)
 
   // Auto-fit bounds when route changes
   useEffect(() => {
-    if (!mapRef.current || !routeGeometry) return
+    if (!mapRef.current || !routeGeometry || routeGeometry.length < 2) return
 
     try {
       const bounds = L.latLngBounds(
         routeGeometry.map(coord => [coord[1], coord[0]])
       )
 
-      // Add padding
-      mapRef.current.fitBounds(bounds, { padding: [50, 50] })
+      if (bounds.isValid()) {
+        mapRef.current.fitBounds(bounds, { padding: [80, 80], maxZoom: 15 })
+      }
     } catch (e) {
       console.debug('Bounds fit error:', e)
     }
@@ -229,6 +399,14 @@ export default function MapComponent({
     ? [userLocation.latitude, userLocation.longitude]
     : [14.5995, 120.9842] // Default to Manila
 
+  // Calculate center between pickup and destination if available
+  const calculatedCenter = pickupLocation && destinationLocation
+    ? [
+        (pickupLocation.latitude + destinationLocation.latitude) / 2,
+        (pickupLocation.longitude + destinationLocation.longitude) / 2
+      ]
+    : defaultCenter
+
   return (
     <div
       style={{
@@ -243,7 +421,7 @@ export default function MapComponent({
       }}
     >
       <MapContainer
-        center={defaultCenter}
+        center={calculatedCenter}
         zoom={defaultZoom}
         style={{ height: '100%', width: '100%', zIndex: 0, minHeight: '400px' }}
         ref={mapRef}
@@ -263,15 +441,53 @@ export default function MapComponent({
         {showZoomControls && <MapZoomControls />}
 
         {/* Route Source Indicator */}
-        {showRouteSource && routeSource && <RouteSourceIndicator source={routeSource} />}
+        {showRouteSource && routeSource && <RouteSourceIndicator source={routeSource} position="top-left" />}
 
-        {/* Route Polyline */}
-        {routeGeometry && routeGeometry.length > 0 && (
-          <RoutePolyline
-            geometry={routeGeometry}
-            distance={0}
-            duration={0}
+        {/* Directions Summary */}
+        {showDirections && (pickupLocation && destinationLocation) && (
+          <DirectionsSummary 
+            distance={routeDistance}
+            duration={routeDuration}
+            startAddress={pickupLocation.address}
+            endAddress={destinationLocation.address}
           />
+        )}
+
+        {/* Route Polyline - Blue solid line */}
+        {routeGeometry && routeGeometry.length > 0 && (
+          <Polyline
+            positions={routeGeometry.map(coord => [coord[1], coord[0]])}
+            color="#3B82F6"
+            weight={5}
+            opacity={0.85}
+            lineCap="round"
+            lineJoin="round"
+          >
+            <Popup>
+              <div className="space-y-2 p-2" style={{ minWidth: '200px' }}>
+                <div className="bg-blue-600 text-white rounded-t p-2">
+                  <p className="font-bold text-sm">🗺️ Trip Summary</p>
+                </div>
+
+                <div className="space-y-2 px-2 py-1 text-sm">
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <span className="text-slate-700 font-medium">📏 Distance:</span>
+                    <span className="text-slate-900 font-bold">{routeDistance ? routeDistance.toFixed(1) : '?'} km</span>
+                  </div>
+
+                  <div className="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <span className="text-slate-700 font-medium">⏱️ Duration:</span>
+                    <span className="text-slate-900 font-bold">{Math.ceil(routeDuration) || '?'} min</span>
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-700 font-medium">🕐 ETA:</span>
+                    <span className="text-slate-900 font-bold">{new Date(Date.now() + (routeDuration || 0) * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                </div>
+              </div>
+            </Popup>
+          </Polyline>
         )}
 
         {/* User's current location marker */}
@@ -279,14 +495,21 @@ export default function MapComponent({
           <Marker
             position={[userLocation.latitude, userLocation.longitude]}
             icon={createUserMarker()}
-            title="Your Location"
+            title="📍 Your Location"
+            eventHandlers={{
+              mouseover: () => setHoveredMarker('user'),
+              mouseout: () => setHoveredMarker(null)
+            }}
           >
-            <Popup className="location-popup">
-              <div className="p-2 space-y-1">
-                <p className="font-semibold text-sm text-slate-900">Your Location</p>
-                <div className="text-xs text-slate-600 space-y-0.5">
-                  <p>Lat: {userLocation.latitude.toFixed(6)}</p>
-                  <p>Lng: {userLocation.longitude.toFixed(6)}</p>
+            <Popup className="location-popup" maxWidth={280} minWidth={240}>
+              <div className="p-3 space-y-2">
+                <p className="font-semibold text-sm text-slate-900 border-b border-slate-200 pb-2">📍 Your Current Location</p>
+                <div className="text-xs text-slate-600 space-y-1 font-mono">
+                  <p><span className="font-medium">Latitude:</span> {userLocation.latitude.toFixed(6)}</p>
+                  <p><span className="font-medium">Longitude:</span> {userLocation.longitude.toFixed(6)}</p>
+                </div>
+                <div className="text-xs text-slate-500 pt-2 border-t border-slate-200">
+                  This is your current location based on GPS. Accuracy may vary.
                 </div>
               </div>
             </Popup>
@@ -300,7 +523,10 @@ export default function MapComponent({
             type="pickup"
             onDrag={onPickupDrag}
             icon={createPickupMarker()}
-            label="Pickup Location"
+            label="📍 Pickup Location"
+            description="Where you'll be picked up from"
+            hovered={hoveredMarker === 'pickup'}
+            onHoverChange={(isHovered) => setHoveredMarker(isHovered ? 'pickup' : null)}
           />
         )}
 
@@ -311,7 +537,10 @@ export default function MapComponent({
             type="destination"
             onDrag={onDestinationDrag}
             icon={createDestinationMarker()}
-            label="Destination"
+            label="📌 Destination"
+            description="Where you want to go"
+            hovered={hoveredMarker === 'destination'}
+            onHoverChange={(isHovered) => setHoveredMarker(isHovered ? 'destination' : null)}
           />
         )}
 
@@ -321,13 +550,29 @@ export default function MapComponent({
             key={`driver-${driver.id}`}
             position={[driver.latitude, driver.longitude]}
             icon={createDriverMarker()}
-            title={driver.driver_name || 'Driver'}
+            title={`🚗 ${driver.driver_name}`}
+            eventHandlers={{
+              mouseover: () => setHoveredMarker(`driver-${driver.id}`),
+              mouseout: () => setHoveredMarker(null)
+            }}
           >
-            <Popup className="driver-popup">
-              <div className="p-2 space-y-1">
-                <p className="font-semibold text-sm text-slate-900">{driver.vehicle_type || 'Car'}</p>
-                <p className="text-xs text-slate-600">{driver.driver_name}</p>
-                <p className="text-xs text-yellow-600">★ {(driver.rating || 5).toFixed(1)}</p>
+            <Popup className="driver-popup" maxWidth={280} minWidth={240}>
+              <div className="p-3 space-y-2">
+                <p className="font-semibold text-sm text-slate-900 border-b border-slate-200 pb-2">🚗 Available Driver</p>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-700 font-medium">Name:</span>
+                    <span className="text-sm font-semibold text-slate-900">{driver.driver_name}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-700 font-medium">Vehicle:</span>
+                    <span className="text-sm font-semibold text-slate-900 capitalize">{driver.vehicle_type || 'Car'}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-t border-slate-200 pt-1 mt-1">
+                    <span className="text-xs text-slate-700 font-medium">Rating:</span>
+                    <span className="text-sm font-bold text-amber-500">⭐ {(driver.rating || 5).toFixed(1)}</span>
+                  </div>
+                </div>
               </div>
             </Popup>
           </Marker>
@@ -339,13 +584,25 @@ export default function MapComponent({
             key={`rider-${rider.id}`}
             position={[rider.latitude, rider.longitude]}
             icon={createRiderMarker()}
-            title={rider.passenger_name || 'Rider'}
+            title={`👥 ${rider.passenger_name}`}
+            eventHandlers={{
+              mouseover: () => setHoveredMarker(`rider-${rider.id}`),
+              mouseout: () => setHoveredMarker(null)
+            }}
           >
-            <Popup className="rider-popup">
-              <div className="p-2 space-y-1">
-                <p className="font-semibold text-sm text-slate-900">{rider.passenger_name}</p>
-                <p className="text-xs text-slate-600">Looking for ride</p>
-                <p className="text-xs text-yellow-600">★ {(rider.rating || 5).toFixed(1)}</p>
+            <Popup className="rider-popup" maxWidth={280} minWidth={240}>
+              <div className="p-3 space-y-2">
+                <p className="font-semibold text-sm text-slate-900 border-b border-slate-200 pb-2">👥 Passenger Looking for Ride</p>
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-slate-700 font-medium">Name:</span>
+                    <span className="text-sm font-semibold text-slate-900">{rider.passenger_name}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-t border-slate-200 pt-1 mt-1">
+                    <span className="text-xs text-slate-700 font-medium">Rating:</span>
+                    <span className="text-sm font-bold text-amber-500">⭐ {(rider.rating || 5).toFixed(1)}</span>
+                  </div>
+                </div>
               </div>
             </Popup>
           </Marker>
@@ -356,9 +613,9 @@ export default function MapComponent({
 }
 
 /**
- * Draggable location marker component
+ * Draggable location marker component with enhanced tooltips
  */
-function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
+function DraggableLocationMarker({ position, type, onDrag, icon, label, description, hovered, onHoverChange }) {
   const markerRef = useRef(null)
   const [isOpen, setIsOpen] = useState(false)
   const [editLat, setEditLat] = useState(position[0].toString())
@@ -381,6 +638,12 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
           onDrag({ latitude: newLat, longitude: newLng })
         }
       }
+    },
+    mouseover() {
+      if (onHoverChange) onHoverChange(true)
+    },
+    mouseout() {
+      if (onHoverChange) onHoverChange(false)
     }
   }
 
@@ -396,6 +659,9 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
     }
   }
 
+  const typeColor = type === 'pickup' ? '#10B981' : '#EF4444'
+  const typeEmoji = type === 'pickup' ? '✅' : '📍'
+
   return (
     <Marker
       draggable={true}
@@ -406,18 +672,20 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
       title={label}
     >
       <Popup
-        maxWidth={280}
-        minWidth={250}
+        maxWidth={300}
+        minWidth={260}
         closeButton={true}
         onOpen={() => setIsOpen(true)}
         onClose={() => setIsOpen(false)}
       >
         <div className="p-3 space-y-3">
-          <div className="font-semibold text-slate-900 text-sm border-b border-slate-200 pb-2">
-            {label}
+          <div className="font-semibold text-slate-900 text-sm border-b pb-2" style={{ borderColor: typeColor + '30' }}>
+            <span style={{ color: typeColor }}>{typeEmoji}</span> {label}
           </div>
 
-          <div className="space-y-2">
+          <p className="text-xs text-slate-600">{description}</p>
+
+          <div className="space-y-2 bg-slate-50 p-2 rounded border border-slate-200">
             <div>
               <label className="block text-xs font-medium text-slate-700 mb-1">
                 Latitude
@@ -427,7 +695,7 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
                 step="0.000001"
                 value={editLat}
                 onChange={(e) => setEditLat(e.target.value)}
-                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
 
@@ -440,7 +708,7 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
                 step="0.000001"
                 value={editLng}
                 onChange={(e) => setEditLng(e.target.value)}
-                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
               />
             </div>
           </div>
@@ -448,25 +716,26 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label }) {
           <div className="flex gap-2 pt-2">
             <button
               onClick={handleCoordinateUpdate}
-              className="flex-1 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition-colors"
+              className="flex-1 px-3 py-1.5 text-white text-xs font-medium rounded transition-colors"
+              style={{ backgroundColor: typeColor }}
             >
-              Update
+              Update Location
             </button>
             <button
               onClick={() => {
                 setEditLat(position[0].toString())
                 setEditLng(position[1].toString())
               }}
-              className="flex-1 px-3 py-1 bg-slate-200 text-slate-700 text-xs font-medium rounded hover:bg-slate-300 transition-colors"
+              className="flex-1 px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-medium rounded hover:bg-slate-300 transition-colors"
             >
               Reset
             </button>
           </div>
 
-          <div className="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200">
-            <p className="font-medium mb-1">Current:</p>
-            <p className="font-mono">Lat: {position[0].toFixed(6)}</p>
-            <p className="font-mono">Lng: {position[1].toFixed(6)}</p>
+          <div className="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200 bg-slate-50 p-2 rounded">
+            <p className="font-medium mb-1">📍 Current Coordinates:</p>
+            <p className="font-mono text-slate-700">Lat: {position[0].toFixed(6)}</p>
+            <p className="font-mono text-slate-700">Lng: {position[1].toFixed(6)}</p>
           </div>
         </div>
       </Popup>
