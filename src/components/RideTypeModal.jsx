@@ -164,7 +164,7 @@ export default function RideTypeModal({
                 {/* Criteria */}
                 <div>
                   <h4 className="text-sm font-semibold text-white text-opacity-90 mb-3 uppercase tracking-wide">
-                    {activeCategory === 'vehicle' ? 'Features' : 'Service Criteria'}
+                    Features
                   </h4>
                   <div className="space-y-2">
                     {selectedTypeData.criteria.map((criterion, idx) => (
