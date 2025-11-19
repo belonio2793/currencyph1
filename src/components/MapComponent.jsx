@@ -14,7 +14,7 @@ L.Icon.Default.mergeOptions({
 })
 
 /**
- * Create enhanced custom markers with animated pinging circles
+ * Create enhanced custom markers with animated pinging circles (3-5 second delay)
  */
 export const createEnhancedMarker = (color, label, status = 'active', size = 40, pulseColor = null) => {
   const pinSize = size * 1.5
@@ -27,39 +27,49 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
   const html = `
     <div class="enhanced-marker-container" style="
       position: relative;
-      width: ${pinSize * 1.8}px;
-      height: ${pinSize * 1.8}px;
+      width: ${pinSize * 2.2}px;
+      height: ${pinSize * 2.2}px;
       display: flex;
       align-items: center;
       justify-content: center;
     ">
-      <!-- Animated ping circles -->
+      <!-- Animated ping circles - outermost ring -->
       <div class="marker-ping marker-ping-outer" data-marker-color="${pulseColorUsed}" style="
         position: absolute;
-        width: ${pinSize}px;
-        height: ${pinSize}px;
+        width: ${pinSize * 1.8}px;
+        height: ${pinSize * 1.8}px;
         border-radius: 50%;
-        background-color: ${pulseColorUsed}15;
-        border: 2px solid ${pulseColorUsed}40;
+        background-color: ${pulseColorUsed}10;
+        border: 2px solid ${pulseColorUsed}30;
         z-index: 1;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       "></div>
 
+      <!-- Animated ping circles - middle ring -->
       <div class="marker-ping marker-ping-inner" data-marker-color="${pulseColorUsed}" style="
         position: absolute;
-        width: ${pinSize * 0.75}px;
-        height: ${pinSize * 0.75}px;
+        width: ${pinSize * 1.3}px;
+        height: ${pinSize * 1.3}px;
         border-radius: 50%;
-        background-color: ${pulseColorUsed}25;
-        border: 2px solid ${pulseColorUsed}60;
+        background-color: ${pulseColorUsed}15;
+        border: 2px solid ${pulseColorUsed}50;
         z-index: 2;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       "></div>
 
-      <!-- Main marker icon -->
+      <!-- Main marker icon - centered -->
       <div class="marker-icon" style="
         position: relative;
         z-index: 3;
         cursor: pointer;
-        filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
       ">
         <svg viewBox="0 0 30 40" width="${pinSize}" height="${pinSize}" style="display: block;">
           <!-- Map pin shape -->
@@ -67,7 +77,7 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
                 fill="${color}"
                 stroke="white"
                 stroke-width="2"
-                filter="drop-shadow(0 1px 2px rgba(0,0,0,0.2))"/>
+                filter="drop-shadow(0 2px 3px rgba(0,0,0,0.3))"/>
           <!-- Center dot -->
           <circle cx="15" cy="13" r="6" fill="white" stroke="${color}" stroke-width="1.5"/>
         </svg>
@@ -77,9 +87,9 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
 
   return L.divIcon({
     html: html,
-    iconSize: [pinSize * 1.8, pinSize * 1.8],
-    iconAnchor: [pinSize * 0.9, pinSize * 1.8],
-    popupAnchor: [0, -pinSize],
+    iconSize: [pinSize * 2.2, pinSize * 2.2],
+    iconAnchor: [pinSize * 1.1, pinSize * 2.2],
+    popupAnchor: [0, -pinSize * 1.5],
     className: 'enhanced-marker'
   })
 }
