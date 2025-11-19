@@ -262,22 +262,24 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
           </Marker>
         )}
 
-        {/* Start coordinate marker - draggable */}
+        {/* Start coordinate marker - draggable (Green for Pickup) */}
         {startCoord && (
           <DraggableMarker
             position={[startCoord.latitude, startCoord.longitude]}
             color="#22C55E"
             label="P"
+            title="Pickup Location"
             onDrag={onStartCoordDrag}
           />
         )}
 
-        {/* End coordinate marker - draggable */}
+        {/* End coordinate marker - draggable (Red for Destination) */}
         {endCoord && (
           <DraggableMarker
             position={[endCoord.latitude, endCoord.longitude]}
             color="#EF4444"
             label="D"
+            title="Destination"
             onDrag={onEndCoordDrag}
           />
         )}
