@@ -31,7 +31,7 @@ const VEHICLE_TYPES = [
     ],
     details: {
       maxPassengers: 3,
-      baseFare: 1,
+      baseFare: 10,
       perKm: 1
     }
   }
