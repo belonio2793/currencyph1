@@ -80,6 +80,7 @@
     "ml-orchestrator": "node scripts/ml/orchestrator.js",
     "backup-bucket": "node scripts/backup-bucket-simple.js",
     "delete-bucket": "node scripts/delete-bucket.js",
+    "migrate-rides": "node scripts/run-ride-migrations.js",
     "test": "vitest",
     "seed-currency-rates": "node scripts/seed-currency-rates.js",
     "populate-cryptos-and-rates": "node scripts/populate-cryptos-and-rates.js",
