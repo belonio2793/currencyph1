@@ -408,41 +408,11 @@ export default function UnifiedLocationSearch({
         </p>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="location-search-tabs flex border-b border-slate-200 bg-slate-50">
-        <button
-          onClick={() => setActiveTab('search')}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-            activeTab === 'search'
-              ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          Search Address
-        </button>
-        <button
-          onClick={() => setActiveTab('map')}
-          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
-            activeTab === 'map'
-              ? 'border-b-2 border-blue-600 text-blue-600 bg-white'
-              : 'text-slate-600 hover:text-slate-900'
-          }`}
-        >
-          <svg className="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
-          </svg>
-          Pick on Map
-        </button>
-      </div>
 
       {/* Content */}
-      <div className="p-6">
-        {/* Search Tab */}
-        {activeTab === 'search' && (
-          <div className="space-y-4">
+      <div className="p-6 space-y-4">
+        {/* Search Section */}
+        <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-slate-900 mb-3">
                 Where do you want to go?
@@ -562,78 +532,19 @@ export default function UnifiedLocationSearch({
                 </button>
               </div>
             )}
-          </div>
-        )}
+        </div>
 
-        {/* Map Tab */}
-        {activeTab === 'map' && (
-          <div className="space-y-4">
-            <p className="text-sm text-slate-600 font-medium">
-              Click on the map to select your destination
-            </p>
-
-            <div className="map-container-wrapper unified-location-search-map" style={{
-              height: mapHeight,
-              width: '100%',
-              borderRadius: '8px',
-              overflow: 'hidden',
-              border: '2px solid #e2e8f0',
-              position: 'relative',
-              zIndex: 1,
-              flexShrink: 0
-            }}>
-              <MapContainer
-                center={[
-                  mapLocation?.latitude || userLocation.latitude || 14.5995,
-                  mapLocation?.longitude || userLocation.longitude || 120.9842
-                ]}
-                zoom={14}
-                style={{
-                  height: '100%',
-                  width: '100%',
-                  position: 'relative',
-                  zIndex: 1
-                }}
-                className="leaflet-map-container"
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution=""
-                />
-                <MapClickHandler onLocationSelect={handleMapSelect} />
-                <Marker
-                  position={[userLocation.latitude, userLocation.longitude]}
-                  icon={createCustomIcon('#22C55E', '📍')}
-                />
-                {mapLocation && !(mapLocation.latitude === userLocation.latitude && mapLocation.longitude === userLocation.longitude) && (
-                  <Marker
-                    position={[mapLocation.latitude, mapLocation.longitude]}
-                    icon={createCustomIcon('#EF4444', '📍')}
-                  />
-                )}
-              </MapContainer>
-            </div>
-
-            {mapLocation && !(mapLocation.latitude === userLocation.latitude && mapLocation.longitude === userLocation.longitude) && (
-              <div className="location-confirmation bg-green-50 rounded-lg p-4 border border-green-200 space-y-2">
-                <div className="flex items-center gap-2 text-green-700 font-semibold">
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Destination Selected
-                </div>
-                <p className="text-xs font-mono text-slate-700">
-                  Lat: {mapLocation.latitude.toFixed(6)} | Lng: {mapLocation.longitude.toFixed(6)}
-                </p>
-                <button
-                  onClick={handleClearDestination}
-                  className="text-sm text-green-600 hover:text-green-700 font-medium py-2 hover:bg-green-100 rounded-lg w-full transition-colors"
-                >
-                  Clear Destination
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Pick on Map Button */}
+        {onPickOnMap && (
+          <button
+            onClick={onPickOnMap}
+            className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+            </svg>
+            Pick on Map
+          </button>
         )}
       </div>
     </div>
