@@ -426,6 +426,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         }
       } else if (data) {
         setUserRole(data.role || 'rider')
+        setDriverStatus(data.status || 'offline')
         setDriverVehicleType(data.vehicle_type || 'car')
         setDriverMakeModel(data.vehicle_make_model || '')
         setDriverYear(data.vehicle_year || '')
