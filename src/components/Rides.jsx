@@ -598,12 +598,18 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           latitude: userLocation?.latitude,
           longitude: userLocation?.longitude,
           updated_at: new Date().toISOString()
+        }, {
+          onConflict: 'user_id'
         })
 
       if (!error) {
         setDriverStatus(newStatus)
+      } else {
+        console.error('Driver status update error:', error)
+        setError('Failed to update driver status')
       }
     } catch (err) {
+      console.error('Driver status update exception:', err)
       setError('Failed to update driver status')
     }
   }
