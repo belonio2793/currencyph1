@@ -9,8 +9,8 @@
  * 3. Shows before/after statistics
  */
 
-const { createClient } = require('@supabase/supabase-js')
-const readline = require('readline')
+import { createClient } from '@supabase/supabase-js'
+import readline from 'readline'
 
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.VITE_PROJECT_URL
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
