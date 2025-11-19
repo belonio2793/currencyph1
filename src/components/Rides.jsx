@@ -1053,10 +1053,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 <div style={{ position: 'relative', zIndex: 0, height: '100%' }}>
                   <MapComponent
                     userLocation={userLocation}
+                    pickupLocation={startCoord}
+                    destinationLocation={endCoord}
                     drivers={drivers}
                     riders={riders}
-                    startCoord={startCoord}
-                    endCoord={endCoord}
+                    routeGeometry={routeDetails?.geometry}
+                    routeSource={routeSource}
                     onMapClick={(coord) => {
                       if (selectingCoord === 'start') {
                         setStartCoord(coord)
@@ -1069,16 +1071,11 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                         setSelectingCoord('end')
                       }
                     }}
-                    selectedMarker={selectedMarker}
-                    onSelectMarker={setSelectedMarker}
-                    userRole={userRole}
-                    selectingCoord={selectingCoord}
-                    onStartCoordDrag={setStartCoord}
-                    onEndCoordDrag={setEndCoord}
-                    routeGeometry={routeDetails?.geometry}
-                    routeDistance={routeDetails?.distance}
-                    routeDuration={routeDetails?.duration}
-                    routeDetails={routeDetails}
+                    onPickupDrag={setStartCoord}
+                    onDestinationDrag={setEndCoord}
+                    centerOnUser={true}
+                    mapHeight="500px"
+                    mapWidth="100%"
                   />
                 </div>
               </div>
