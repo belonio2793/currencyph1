@@ -82,48 +82,81 @@ function initClient() {
   return _client
 }
 
-// Verify Supabase connectivity on module load (optional, non-blocking)
+// Verify Supabase connectivity on module load (with retry logic)
 let _supabaseHealthy = true
-async function checkSupabaseHealth() {
+let _connectionRetries = 0
+const MAX_HEALTH_CHECK_RETRIES = 3
+
+async function checkSupabaseHealth(retryCount = 0) {
   if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
     _supabaseHealthy = false
     return false
   }
 
-  // Use a very short timeout to fail fast if network is unavailable
-  const HEALTH_CHECK_TIMEOUT = 2000 // 2 seconds
+  // Use exponential backoff: 2s, 4s, 8s
+  const HEALTH_CHECK_TIMEOUT = 2000 * Math.pow(2, retryCount)
+  const MAX_TIMEOUT = 8000
 
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
       controller.abort()
-    }, HEALTH_CHECK_TIMEOUT)
+    }, Math.min(HEALTH_CHECK_TIMEOUT, MAX_TIMEOUT))
 
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
         signal: controller.signal,
         headers: {
           'apikey': SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-        }
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json'
+        },
+        method: 'GET',
+        credentials: 'include'
       })
 
       clearTimeout(timeoutId)
       _supabaseHealthy = response.ok
+      _connectionRetries = 0
 
       if (!_supabaseHealthy) {
-        console.debug('[supabase-client] Health check failed with status:', response.status)
+        console.warn('[supabase-client] Health check failed with status:', response.status)
+      } else {
+        console.debug('[supabase-client] Health check passed')
       }
       return _supabaseHealthy
     } catch (fetchErr) {
       clearTimeout(timeoutId)
+
+      // Retry on network errors
+      if (retryCount < MAX_HEALTH_CHECK_RETRIES && fetchErr.name === 'AbortError') {
+        console.debug(`[supabase-client] Health check timeout, retrying (${retryCount + 1}/${MAX_HEALTH_CHECK_RETRIES})...`)
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, retryCount)))
+        return checkSupabaseHealth(retryCount + 1)
+      }
+
       throw fetchErr
     }
   } catch (err) {
-    // Network errors are expected and harmless - the app will use the dummy client
+    // Network errors - try to reconnect
     _supabaseHealthy = false
-    // Completely silent - health check failures are normal in offline or misconfigured environments
-    // No logging needed; errors will be silently handled by presence and other modules
+    _connectionRetries = retryCount
+
+    const errorMsg = err instanceof Error ? err.message : String(err)
+    console.warn(`[supabase-client] Health check failed: ${errorMsg}`)
+
+    // Attempt to retry if we haven't exceeded max retries
+    if (retryCount < MAX_HEALTH_CHECK_RETRIES) {
+      console.debug(`[supabase-client] Scheduling retry (${retryCount + 1}/${MAX_HEALTH_CHECK_RETRIES})...`)
+      // Retry after delay
+      setTimeout(() => {
+        checkSupabaseHealth(retryCount + 1).catch(e => {
+          console.debug('[supabase-client] Retry failed:', e?.message)
+        })
+      }, 3000 * Math.pow(2, retryCount))
+    }
+
     return false
   }
 }
