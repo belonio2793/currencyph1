@@ -426,19 +426,30 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     }
 
     try {
+      // Build service data object with service ID and form values
+      const serviceData = selectedService ? {
+        serviceId: selectedService,
+        ...serviceFormData
+      } : null
+
       const { data, error } = await supabase
         .from('rides')
         .insert({
           rider_id: userId,
           start_latitude: startCoord.latitude,
           start_longitude: startCoord.longitude,
+          start_address: startCoord.address,
           end_latitude: endCoord.latitude,
           end_longitude: endCoord.longitude,
+          end_address: endCoord.address,
           ride_type: selectedRideType || 'ride-share',
+          service_type: selectedService,
           estimated_distance: routeDetails?.distance || null,
           estimated_duration: routeDetails?.duration || null,
           estimated_fare: routeDetails?.fare?.total || null,
           route_geometry: routeDetails?.geometry ? JSON.stringify(routeDetails.geometry) : null,
+          service_data: serviceData,
+          passenger_count: serviceFormData?.passengerCount || 1,
           status: 'requested',
           created_at: new Date().toISOString()
         })
@@ -450,6 +461,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         setSelectingCoord(null)
         setRouteDetails(null)
         setSelectedRideType(null)
+        setSelectedService(null)
+        setServiceFormData({})
         setActiveTab('my-rides')
         loadActiveRides()
         setError('')
