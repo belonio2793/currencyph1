@@ -2,6 +2,23 @@ import React, { useState } from 'react'
 
 const VEHICLE_TYPES = [
   {
+    id: 'ride-share',
+    label: 'Ride Share',
+    icon: '🚙',
+    color: 'from-cyan-500 to-cyan-600',
+    description: 'Share a ride with other passengers',
+    criteria: [
+      { label: 'Passengers', icon: '👥', hint: '1-4 people' },
+      { label: 'Route', icon: '🗺️', hint: 'Shared route' },
+      { label: 'Cost', icon: '💰', hint: 'Split fare' }
+    ],
+    details: {
+      maxPassengers: 4,
+      baseFare: 40,
+      perKm: 10
+    }
+  },
+  {
     id: 'car',
     label: 'Car',
     icon: '🚗',
@@ -80,7 +97,7 @@ const SERVICES = [
     color: 'from-pink-500 to-pink-600',
     description: 'Laundry pickup and delivery',
     criteria: [
-      { label: 'Weight', icon: '⚖️', hint: 'Up to 10kg' },
+      { label: 'Weight', icon: '���️', hint: 'Up to 10kg' },
       { label: 'Type', icon: '👔', hint: 'Clothes & fabric' },
       { label: 'Cleaning', icon: '✨', hint: 'Same-day service' }
     ],
