@@ -340,3 +340,118 @@ export function parseDirectionSteps(steps) {
 export function getDistance(lat1, lon1, lat2, lon2) {
   return calculateHaversineDistance(lat1, lon1, lat2, lon2)
 }
+
+/**
+ * Get route source information for display
+ */
+export function getRouteSourceInfo(source) {
+  const sourceMap = {
+    [ROUTE_SOURCES.GOOGLE]: { name: 'Google Maps', color: '#4285F4', icon: '🗺️' },
+    [ROUTE_SOURCES.MAPTILER]: { name: 'MapTiler', color: '#00BCD4', icon: '🧭' },
+    [ROUTE_SOURCES.LEAFLET]: { name: 'Leaflet', color: '#199900', icon: '🌐' },
+    [ROUTE_SOURCES.DIRECT]: { name: 'Direct Calculation', color: '#757575', icon: '📍' }
+  }
+
+  return sourceMap[source] || { name: 'Unknown', color: '#9E9E9E', icon: '❓' }
+}
+
+/**
+ * Batch route requests for multiple destination pairs
+ */
+export async function getMultipleRoutes(waypoints, options = {}) {
+  const results = []
+
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const start = waypoints[i]
+    const end = waypoints[i + 1]
+
+    try {
+      const route = await getRoute(start.lat, start.lng, end.lat, end.lng, options)
+      results.push({
+        from: start,
+        to: end,
+        route: route
+      })
+    } catch (error) {
+      results.push({
+        from: start,
+        to: end,
+        error: error?.message
+      })
+    }
+
+    // Add small delay to avoid rate limiting
+    if (i < waypoints.length - 2) {
+      await new Promise(r => setTimeout(r, 100))
+    }
+  }
+
+  return results
+}
+
+/**
+ * Format route summary for display
+ */
+export function formatRouteSummary(route) {
+  if (!route || !route.success) {
+    return 'Route unavailable'
+  }
+
+  const distance = formatDistance(route.distance)
+  const duration = formatDuration(route.duration)
+  const source = getRouteSourceInfo(route.source || ROUTE_SOURCES.LEAFLET)
+
+  return {
+    text: `${distance} • ${duration}`,
+    shortText: `${distance}`,
+    distance: distance,
+    duration: duration,
+    source: source.name,
+    sourceColor: source.color
+  }
+}
+
+/**
+ * Calculate alternative routes comparison
+ */
+export async function compareRoutes(startLat, startLng, endLat, endLng) {
+  const routes = []
+
+  // Try Google Maps
+  if (GOOGLE_API_KEY) {
+    try {
+      const googleRoute = await tryGoogleMapsRoute(startLat, startLng, endLat, endLng, 8000)
+      if (googleRoute) {
+        routes.push({
+          ...googleRoute,
+          provider: 'Google Maps'
+        })
+      }
+    } catch (e) {
+      console.debug('Google comparison failed:', e?.message)
+    }
+  }
+
+  // Try MapTiler
+  if (MAPTILER_KEY) {
+    try {
+      const mapTilerRoute = await tryMapTilerRoute(startLat, startLng, endLat, endLng, 8000)
+      if (mapTilerRoute) {
+        routes.push({
+          ...mapTilerRoute,
+          provider: 'MapTiler'
+        })
+      }
+    } catch (e) {
+      console.debug('MapTiler comparison failed:', e?.message)
+    }
+  }
+
+  // Always include Haversine as baseline
+  routes.push({
+    ...calculateDirectRoute(startLat, startLng, endLat, endLng),
+    provider: 'Haversine (Fallback)'
+  })
+
+  return routes
+}
