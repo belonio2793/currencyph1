@@ -82,16 +82,22 @@ function initClient() {
   return _client
 }
 
-// Verify Supabase connectivity on module load
+// Verify Supabase connectivity on module load (optional, non-blocking)
 let _supabaseHealthy = true
 async function checkSupabaseHealth() {
-  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) return false
+  if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+    _supabaseHealthy = false
+    return false
+  }
+
+  // Use a very short timeout to fail fast if network is unavailable
+  const HEALTH_CHECK_TIMEOUT = 2000 // 2 seconds
 
   try {
     const controller = new AbortController()
     const timeoutId = setTimeout(() => {
       controller.abort()
-    }, 5000) // 5 second timeout
+    }, HEALTH_CHECK_TIMEOUT)
 
     try {
       const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
@@ -114,14 +120,22 @@ async function checkSupabaseHealth() {
       throw fetchErr
     }
   } catch (err) {
+    // Network errors are expected and harmless - the app will use the dummy client
     _supabaseHealthy = false
-    // Only log network errors at debug level to avoid console spam
-    if (err?.name === 'AbortError') {
-      console.debug('[supabase-client] Health check timeout')
-    } else if (err?.name === 'TypeError' && err?.message?.includes('Failed to fetch')) {
-      console.debug('[supabase-client] Health check network error (may be CORS or connectivity issue)')
+
+    // Silent handling - only log at debug level for diagnosis if needed
+    const errMsg = err?.message || 'Unknown error'
+    const errName = err?.name || 'Error'
+
+    // Log only specific useful info
+    if (errName === 'AbortError') {
+      console.debug('[supabase-client] Health check timed out (network unavailable)')
+    } else if (errName === 'TypeError' && errMsg.includes('Failed to fetch')) {
+      console.debug('[supabase-client] Cannot reach Supabase (using offline mode)')
+    } else if (errName === 'TypeError' && errMsg.includes('CORS')) {
+      console.debug('[supabase-client] CORS issue with Supabase endpoint')
     } else {
-      console.debug('[supabase-client] Health check error:', err?.message || 'Unknown error')
+      console.debug('[supabase-client] Health check skipped:', errName)
     }
     return false
   }
