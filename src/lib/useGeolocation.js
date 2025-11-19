@@ -256,5 +256,9 @@ export function useGeolocation() {
     }
   }, [])
 
-  return { location, error, loading, city }
+  const refresh = () => {
+    requestLocation(true)
+  }
+
+  return { location, error, loading, city, isRefreshing, refresh }
 }
