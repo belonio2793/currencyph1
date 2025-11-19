@@ -416,11 +416,11 @@ export default function UnifiedLocationSearch({
             </div>
 
             {error && (
-              <div className="bg-red-50 rounded-lg p-3 border border-red-200 flex gap-2">
-                <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="error-message">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-sm text-red-800">{error}</p>
+                <p>{error}</p>
               </div>
             )}
 
