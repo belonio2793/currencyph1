@@ -139,8 +139,8 @@ export const ridesMatchingService = {
         .from('ride_matches')
         .select(`
           *,
-          rider:users!ride_matches_rider_id(id, email, full_name, display_name, average_rating, profile_image),
-          driver:users!ride_matches_driver_id(id, email, full_name, display_name, average_rating, profile_image)
+          rider:users!ride_matches_rider_id(id, email, full_name),
+          driver:users!ride_matches_driver_id(id, email, full_name)
         `)
         .or(`rider_id.eq.${userId},driver_id.eq.${userId}`)
         .eq('status', status)
@@ -161,8 +161,8 @@ export const ridesMatchingService = {
         .from('ride_matches')
         .select(`
           *,
-          rider:users!ride_matches_rider_id(id, email, full_name, display_name, average_rating, profile_image),
-          driver:users!ride_matches_driver_id(id, email, full_name, display_name, average_rating, profile_image)
+          rider:users!ride_matches_rider_id(id, email, full_name),
+          driver:users!ride_matches_driver_id(id, email, full_name)
         `)
         .or(`rider_id.eq.${userId},driver_id.eq.${userId}`)
         .in('status', ['pending', 'accepted_by_driver', 'accepted_by_rider'])
