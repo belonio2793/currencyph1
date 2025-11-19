@@ -34,21 +34,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Custom marker icons with animation
-const createCustomIcon = (color, label, animated = true) => {
-  const animationClass = animated ? 'marker-pulse-blue' : ''
-  const colorClass = color === '#3B82F6' ? 'marker-pulse-blue' :
-                    color === '#22C55E' ? 'marker-pulse-green' :
-                    color === '#F59E0B' ? 'marker-pulse-orange' :
-                    color === '#8B5CF6' ? 'marker-pulse-purple' : ''
-
-  return L.divIcon({
-    html: `<div class="${colorClass}" style="background-color: ${color}; color: white; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 10px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">${label}</div>`,
-    iconSize: [32, 32],
-    className: 'custom-icon'
-  })
-}
-
 function MapUpdater({ location }) {
   const map = useMap()
 
