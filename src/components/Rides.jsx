@@ -1136,7 +1136,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               {/* Split Layout Container */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
                 {/* Left Side: Form */}
-                <div className="p-6 space-y-5 border-r border-slate-200 lg:border-r">
+                <div className="p-6 space-y-5 lg:border-r border-slate-200">
                   {/* Location Selection Status */}
                   {selectingCoord && (
                     <div className="bg-blue-50 rounded-lg p-3 border border-blue-200 flex items-start gap-2">
