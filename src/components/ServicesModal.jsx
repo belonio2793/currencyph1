@@ -776,8 +776,8 @@ const SERVICES = [
   }
 ]
 
-function FormField({ field, value, onChange, service }) {
-  const shouldShow = !field.conditional || (service.formData?.[field.conditional] === true)
+function FormField({ field, value, onChange, formData }) {
+  const shouldShow = !field.conditional || (formData?.[field.conditional] === true)
 
   if (!shouldShow) return null
 
