@@ -240,6 +240,7 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
             geometry={routeGeometry}
             distance={routeDistance}
             duration={routeDuration}
+            fare={routeDetails?.fare}
           />
         )}
 
