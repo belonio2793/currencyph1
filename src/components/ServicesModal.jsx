@@ -989,7 +989,7 @@ export default function ServicesModal({
                             field={field}
                             value={formData[field.name]}
                             onChange={handleFieldChange}
-                            service={selectedServiceData}
+                            formData={formData}
                           />
                         </div>
                       ))}
