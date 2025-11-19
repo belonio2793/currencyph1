@@ -51,18 +51,24 @@ export default function DriverInterface({ userId, userLocation }) {
   }
 
   const loadMatches = async () => {
-    let { data, error } = null
+    try {
+      let { data, error } = null
 
-    if (activeTab === 'pending') {
-      ({ data, error } = await ridesMatchingService.getPendingMatches(userId))
-    } else {
-      ({ data, error } = await ridesMatchingService.getUserMatches(userId, activeTab === 'active' ? 'in_progress' : 'confirmed'))
-    }
+      if (activeTab === 'pending') {
+        ({ data, error } = await ridesMatchingService.getPendingMatches(userId))
+      } else {
+        ({ data, error } = await ridesMatchingService.getUserMatches(userId, activeTab === 'active' ? 'in_progress' : 'confirmed'))
+      }
 
-    if (error) {
-      console.error('Error loading matches:', error)
-    } else {
-      setMatches(data || [])
+      if (error) {
+        console.debug('Error loading matches:', error)
+      } else {
+        setMatches(data || [])
+      }
+    } catch (err) {
+      // Network errors or other exceptions - silently set to empty
+      console.debug('Exception loading matches:', err?.message)
+      setMatches([])
     }
   }
 
