@@ -197,19 +197,27 @@ async function checkSupabaseHealth(retryCount = 0) {
 if (typeof window !== 'undefined' && typeof setTimeout !== 'undefined') {
   // Run health check after a short delay to not block app startup
   setTimeout(() => {
-    checkSupabaseHealth().catch(err => {
-      console.debug('[supabase-client] Health check exception (non-blocking):', err?.message)
-    })
+    try {
+      checkSupabaseHealth().catch(err => {
+        console.debug('[supabase-client] Health check exception (non-blocking):', err?.message)
+      })
+    } catch (err) {
+      console.debug('[supabase-client] Health check startup error:', err?.message)
+    }
   }, 100)
 
   // Periodically check health and attempt reconnection if offline
   const HEALTH_CHECK_INTERVAL = 30000 // 30 seconds
   setInterval(() => {
     if (!_supabaseHealthy) {
-      console.debug('[supabase-client] Attempting reconnection...')
-      checkSupabaseHealth().catch(err => {
-        console.debug('[supabase-client] Reconnection attempt failed:', err?.message)
-      })
+      try {
+        console.debug('[supabase-client] Attempting reconnection...')
+        checkSupabaseHealth().catch(err => {
+          console.debug('[supabase-client] Reconnection attempt failed:', err?.message)
+        })
+      } catch (err) {
+        console.debug('[supabase-client] Reconnection error:', err?.message)
+      }
     }
   }, HEALTH_CHECK_INTERVAL)
 }
