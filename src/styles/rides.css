@@ -374,6 +374,52 @@
   animation: marker-pulse 2s infinite;
 }
 
+/* Marker Ping Animations */
+@keyframes marker-ping-outer {
+  0% {
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+  }
+  70% {
+    width: 200%;
+    height: 200%;
+    opacity: 0;
+  }
+  100% {
+    width: 250%;
+    height: 250%;
+    opacity: 0;
+  }
+}
+
+@keyframes marker-ping-inner {
+  0% {
+    width: 75%;
+    height: 75%;
+    opacity: 1;
+  }
+  70% {
+    width: 180%;
+    height: 180%;
+    opacity: 0;
+  }
+  100% {
+    width: 230%;
+    height: 230%;
+    opacity: 0;
+  }
+}
+
+.marker-ping-outer {
+  animation: marker-ping-outer 2s ease-out infinite !important;
+}
+
+.marker-ping-inner {
+  animation: marker-ping-inner 2s ease-out infinite !important;
+  animation-delay: 0.3s !important;
+}
+
 /* Enhanced Marker Container Styles */
 .enhanced-marker-container {
   position: relative;
