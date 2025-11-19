@@ -115,14 +115,14 @@ export default function UnifiedLocationSearch({
   userLocation,
   onDestinationSelect,
   selectedDestination,
-  mapHeight = '300px'
+  mapHeight = '300px',
+  onPickOnMap
 }) {
   const [destinationSearch, setDestinationSearch] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [activeTab, setActiveTab] = useState('search')
-  const [mapLocation, setMapLocation] = useState(selectedDestination || userLocation)
 
   // Auto-focus on search input
   const searchInputRef = React.useRef(null)
