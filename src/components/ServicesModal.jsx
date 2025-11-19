@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react'
+import { validateServiceData, formatValidationErrors } from '../lib/serviceValidation'
 
 const SERVICES = [
   {
