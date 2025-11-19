@@ -4,6 +4,12 @@ export const ridesMatchingService = {
   // Create a ride request (rider looking for driver or driver offering ride)
   async createRideRequest(userId, userType, pickupLocation, dropoffLocation, rideDetails) {
     try {
+      // Build service data from rideDetails if available
+      const serviceData = rideDetails.serviceType ? {
+        serviceId: rideDetails.serviceType,
+        ...(rideDetails.serviceData || {})
+      } : null
+
       const { data, error } = await supabase
         .from('ride_requests')
         .insert([{
@@ -21,7 +27,8 @@ export const ridesMatchingService = {
           vehicle_type: rideDetails.vehicleType,
           service_type: rideDetails.serviceType,
           passengers_count: rideDetails.passengersCount || 1,
-          notes: rideDetails.notes
+          notes: rideDetails.notes,
+          service_data: serviceData
         }])
         .select()
         .single()
