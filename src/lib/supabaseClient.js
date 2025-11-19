@@ -245,21 +245,23 @@ export async function executeWithRetry(queryFn, maxRetries = 3) {
 
 // Generic Token API utilities (replacing deprecated dog token API)
 export const tokenAPI = {
-  // Get current user balance
+  // Get current user balance with retry
   async getUserBalance(userId) {
     try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('balance')
-        .eq('id', userId)
-        .single()
-      if (error) {
-        console.error('[tokenAPI] getUserBalance error', error)
-        throw error
-      }
-      return data?.balance || 0
+      return await executeWithRetry(async () => {
+        const { data, error } = await supabase
+          .from('users')
+          .select('balance')
+          .eq('id', userId)
+          .single()
+        if (error) {
+          console.error('[tokenAPI] getUserBalance error', error)
+          throw error
+        }
+        return data?.balance || 0
+      }, 2)
     } catch (err) {
-      console.error('[tokenAPI] getUserBalance failed', err)
+      console.warn('[tokenAPI] getUserBalance failed after retries:', err?.message)
       // return safe fallback when network issues occur
       return 0
     }
