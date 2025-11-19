@@ -18,6 +18,30 @@ const getEnv = (name) => {
   return undefined
 }
 
+// Enhanced fetch wrapper with better error logging
+const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
+let _fetchWrapper = originalFetch
+
+if (typeof window !== 'undefined') {
+  window.fetch = function(...args) {
+    const [url, options] = args
+
+    return originalFetch.apply(this, args).catch(err => {
+      // Log network errors with diagnostics
+      const isSupabaseUrl = typeof url === 'string' && url.includes('supabase')
+      if (isSupabaseUrl) {
+        console.warn('[supabase-fetch-error]', {
+          url: typeof url === 'string' ? url.split('?')[0] : url,
+          error: err?.message,
+          type: err?.name,
+          timestamp: new Date().toISOString()
+        })
+      }
+      throw err
+    })
+  }
+}
+
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_PUBLISHABLE_KEY') || ''
 
