@@ -561,18 +561,10 @@ export default function MapComponent({
 }
 
 /**
- * Draggable location marker component with enhanced tooltips
+ * Draggable location marker component with simple tooltip
  */
 function DraggableLocationMarker({ position, type, onDrag, icon, label, description, hovered, onHoverChange }) {
   const markerRef = useRef(null)
-  const [isOpen, setIsOpen] = useState(false)
-  const [editLat, setEditLat] = useState(position[0].toString())
-  const [editLng, setEditLng] = useState(position[1].toString())
-
-  useEffect(() => {
-    setEditLat(position[0].toString())
-    setEditLng(position[1].toString())
-  }, [position])
 
   const eventHandlers = {
     dragend() {
@@ -580,8 +572,6 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label, descript
       if (marker != null) {
         const newLat = marker.getLatLng().lat
         const newLng = marker.getLatLng().lng
-        setEditLat(newLat.toString())
-        setEditLng(newLng.toString())
         if (onDrag) {
           onDrag({ latitude: newLat, longitude: newLng })
         }
@@ -595,20 +585,7 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label, descript
     }
   }
 
-  const handleCoordinateUpdate = () => {
-    const newLat = parseFloat(editLat)
-    const newLng = parseFloat(editLng)
-
-    if (!isNaN(newLat) && !isNaN(newLng)) {
-      if (onDrag) {
-        onDrag({ latitude: newLat, longitude: newLng })
-      }
-      setIsOpen(false)
-    }
-  }
-
   const typeColor = type === 'pickup' ? '#10B981' : '#EF4444'
-  const typeEmoji = type === 'pickup' ? '✅' : '📍'
 
   return (
     <Marker
@@ -620,71 +597,13 @@ function DraggableLocationMarker({ position, type, onDrag, icon, label, descript
       title={label}
     >
       <Popup
-        maxWidth={300}
-        minWidth={260}
-        closeButton={true}
-        onOpen={() => setIsOpen(true)}
-        onClose={() => setIsOpen(false)}
+        maxWidth={180}
+        minWidth={160}
+        closeButton={false}
+        className="location-label-popup"
       >
-        <div className="p-3 space-y-3">
-          <div className="font-semibold text-slate-900 text-sm border-b pb-2" style={{ borderColor: typeColor + '30' }}>
-            <span style={{ color: typeColor }}>{typeEmoji}</span> {label}
-          </div>
-
-          <p className="text-xs text-slate-600">{description}</p>
-
-          <div className="space-y-2 bg-slate-50 p-2 rounded border border-slate-200">
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Latitude
-              </label>
-              <input
-                type="number"
-                step="0.000001"
-                value={editLat}
-                onChange={(e) => setEditLat(e.target.value)}
-                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-medium text-slate-700 mb-1">
-                Longitude
-              </label>
-              <input
-                type="number"
-                step="0.000001"
-                value={editLng}
-                onChange={(e) => setEditLng(e.target.value)}
-                className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-mono focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-              />
-            </div>
-          </div>
-
-          <div className="flex gap-2 pt-2">
-            <button
-              onClick={handleCoordinateUpdate}
-              className="flex-1 px-3 py-1.5 text-white text-xs font-medium rounded transition-colors"
-              style={{ backgroundColor: typeColor }}
-            >
-              Update Location
-            </button>
-            <button
-              onClick={() => {
-                setEditLat(position[0].toString())
-                setEditLng(position[1].toString())
-              }}
-              className="flex-1 px-3 py-1.5 bg-slate-200 text-slate-700 text-xs font-medium rounded hover:bg-slate-300 transition-colors"
-            >
-              Reset
-            </button>
-          </div>
-
-          <div className="text-xs text-slate-500 mt-2 pt-2 border-t border-slate-200 bg-slate-50 p-2 rounded">
-            <p className="font-medium mb-1">📍 Current Coordinates:</p>
-            <p className="font-mono text-slate-700">Lat: {position[0].toFixed(6)}</p>
-            <p className="font-mono text-slate-700">Lng: {position[1].toFixed(6)}</p>
-          </div>
+        <div className="text-center" style={{ padding: '6px 8px' }}>
+          <p className="font-semibold text-sm text-slate-900">{label}</p>
         </div>
       </Popup>
     </Marker>
