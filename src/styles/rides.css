@@ -374,6 +374,84 @@
   animation: marker-pulse 2s infinite;
 }
 
+/* Enhanced Marker Container Styles */
+.enhanced-marker-container {
+  position: relative;
+}
+
+.enhanced-marker-container .marker-icon {
+  transition: all 0.2s ease;
+}
+
+.enhanced-marker-container:hover .marker-icon {
+  filter: brightness(1.15) drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4));
+  transform: scale(1.1);
+}
+
+.enhanced-marker-container:hover .marker-label {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Ping animation styles */
+.marker-ping {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+.marker-ping-secondary {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 1;
+  will-change: transform, opacity;
+}
+
+/* Leaflet popup customization for ride markers */
+.leaflet-popup-content {
+  max-width: 300px;
+  font-family: inherit;
+}
+
+.leaflet-popup-content .location-popup,
+.leaflet-popup-content .driver-popup,
+.leaflet-popup-content .rider-popup {
+  width: 100%;
+  word-wrap: break-word;
+}
+
+/* Route line styling - solid blue */
+.route-polyline {
+  stroke: #3B82F6 !important;
+  stroke-width: 5 !important;
+  stroke-opacity: 0.85 !important;
+  fill: none !important;
+  stroke-linecap: round !important;
+  stroke-linejoin: round !important;
+}
+
+/* Directions summary card */
+.directions-summary-card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 12px;
+  font-size: 14px;
+  color: #1F2937;
+}
+
+.directions-summary-card .direction-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid #E5E7EB;
+}
+
+.directions-summary-card .direction-item:last-child {
+  border-bottom: none;
+}
+
 /* Enhanced location markers - Green (Pickup) */
 .pickup-marker {
   background-color: #10B981 !important;
