@@ -1018,7 +1018,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Ride Type Selection */}
               <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6">
-                <label className="block text-sm font-medium text-slate-700 mb-3">Ride Type</label>
+                <label className="block text-sm font-medium text-slate-700 mb-3">Vehicle Type</label>
                 {selectedRideType ? (
                   <div className="flex items-center justify-between p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
                     <div>
