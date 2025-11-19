@@ -1299,6 +1299,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       routeGeometry={routeDetails?.geometry}
                       routeDistance={routeDetails?.distance}
                       routeDuration={routeDetails?.duration}
+                      routeDetails={routeDetails}
                     />
                   </div>
                 </div>
