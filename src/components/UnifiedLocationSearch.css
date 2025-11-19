@@ -290,6 +290,7 @@
 .location-search-no-results svg {
   width: 48px;
   height: 48px;
+  stroke: currentColor;
   color: #cbd5e1;
   margin: 0 auto 16px;
   display: block;
