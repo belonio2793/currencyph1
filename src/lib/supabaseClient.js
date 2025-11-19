@@ -122,21 +122,8 @@ async function checkSupabaseHealth() {
   } catch (err) {
     // Network errors are expected and harmless - the app will use the dummy client
     _supabaseHealthy = false
-
-    // Silent handling - only log at debug level for diagnosis if needed
-    const errMsg = err?.message || 'Unknown error'
-    const errName = err?.name || 'Error'
-
-    // Log only specific useful info
-    if (errName === 'AbortError') {
-      console.debug('[supabase-client] Health check timed out (network unavailable)')
-    } else if (errName === 'TypeError' && errMsg.includes('Failed to fetch')) {
-      console.debug('[supabase-client] Cannot reach Supabase (using offline mode)')
-    } else if (errName === 'TypeError' && errMsg.includes('CORS')) {
-      console.debug('[supabase-client] CORS issue with Supabase endpoint')
-    } else {
-      console.debug('[supabase-client] Health check skipped:', errName)
-    }
+    // Completely silent - health check failures are normal in offline or misconfigured environments
+    // No logging needed; errors will be silently handled by presence and other modules
     return false
   }
 }
