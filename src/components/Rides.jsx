@@ -833,7 +833,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             {/* Ride Type and Services Selection - Single Container */}
             <div className="bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden mb-6">
               {/* Ride Type Selection */}
-              <div className="p-6 border-b border-slate-200">
+              <div className="p-6 pb-3">
                 <label className="block text-sm font-medium text-slate-700 mb-3">Vehicle Type</label>
                 {selectedRideType ? (
                   <div className="flex items-center justify-between p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
