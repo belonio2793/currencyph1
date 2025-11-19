@@ -168,14 +168,13 @@
 
 /* Results Header */
 .location-search-results-header {
-  padding: 8px 12px;
-  font-size: 13px;
-  font-weight: 600;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
   color: #475569;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 1px solid #e2e8f0;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 /* Individual Result Item */
