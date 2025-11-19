@@ -1120,50 +1120,6 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               </div>
             </div>
 
-            {/* Map */}
-            <div className="mb-6" style={{ position: 'relative', zIndex: 0 }}>
-              <div className="bg-white rounded-lg shadow-lg p-4 mb-4 border border-slate-200" style={{ position: 'relative', zIndex: 1 }}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
-                    </svg>
-                    Interactive Map
-                  </h3>
-                  {selectingCoord && (
-                    <span className="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
-                      Selecting {selectingCoord === 'start' ? 'pickup' : 'destination'}
-                    </span>
-                  )}
-                </div>
-                <MapComponent
-                  userLocation={userLocation}
-                  drivers={drivers}
-                  riders={riders}
-                  startCoord={startCoord}
-                  endCoord={endCoord}
-                  onMapClick={(coord) => {
-                    if (selectingCoord === 'start') {
-                      setStartCoord(coord)
-                      setSelectingCoord('end')
-                    } else if (selectingCoord === 'end') {
-                      setEndCoord(coord)
-                      setSelectingCoord(null)
-                    }
-                  }}
-                  selectedMarker={selectedMarker}
-                  onSelectMarker={setSelectedMarker}
-                  userRole={userRole}
-                  selectingCoord={selectingCoord}
-                  onStartCoordDrag={setStartCoord}
-                  onEndCoordDrag={setEndCoord}
-                  routeGeometry={routeDetails?.geometry}
-                  routeDistance={routeDetails?.distance}
-                  routeDuration={routeDetails?.duration}
-                />
-              </div>
-            </div>
-
             {/* Ride Request Form */}
             <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6 space-y-6">
               <h3 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
@@ -1172,6 +1128,18 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 </svg>
                 Request a Ride
               </h3>
+
+              {/* City Selection */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">City</label>
+                <input
+                  type="text"
+                  placeholder="Enter city or area (e.g., Manila, Makati)"
+                  value={driverCity}
+                  onChange={(e) => setDriverCity(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
 
               {/* Unified Location Search */}
               <UnifiedLocationSearch
