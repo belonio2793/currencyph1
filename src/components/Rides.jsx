@@ -1157,82 +1157,24 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     onPickOnMap={() => setSelectingCoord('end')}
                   />
 
+                  {/* Pick on Map Button */}
+                  <button
+                    onClick={() => setSelectingCoord('end')}
+                    className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                    </svg>
+                    Pick on Map
+                  </button>
 
-                  {/* Route Ready Confirmation */}
-                  {startCoord && endCoord && (
-                    <div className="bg-green-50 rounded-lg p-4 border border-green-200 flex items-start gap-3">
-                      <svg className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
-                      <div>
-                        <p className="font-semibold text-green-900">Route Ready</p>
-                        <p className="text-sm text-green-800 mt-1">
-                          Your pickup and destination locations are set. Complete your ride details below.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Ride Details Card */}
-                  {startCoord && endCoord && (
-                    <>
-                      <RideDetailsCard
-                        startCoord={startCoord}
-                        endCoord={endCoord}
-                        rideType={selectedRideType || 'ride-share'}
-                        onDetailsUpdate={setRouteDetails}
-                        loading={loading}
-                      />
-
-                      {/* Trip Summary */}
-                      {routeDetails && routeDetails.fare && (
-                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-3">
-                          <h4 className="font-semibold text-blue-900 text-sm">Trip Summary</h4>
-                          <div className="grid grid-cols-3 gap-4">
-                            <div className="text-center">
-                              <p className="text-xs text-blue-700 font-medium uppercase">Distance</p>
-                              <p className="text-lg font-bold text-blue-900">{(routeDetails.distance || 0).toFixed(1)}km</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-xs text-blue-700 font-medium uppercase">Time</p>
-                              <p className="text-lg font-bold text-blue-900">{routeDetails.duration || 0}min</p>
-                            </div>
-                            <div className="text-center">
-                              <p className="text-xs text-blue-700 font-medium uppercase">Fare Est.</p>
-                              <p className="text-lg font-bold text-blue-900">
-                                ₱{(() => {
-                                  const fare = routeDetails.fare
-                                  const total = (fare.baseFare || 0) + (fare.distanceFare || 0) + (fare.timeFare || 0)
-                                  return (total * (fare.demandMultiplier || 1)).toFixed(0)
-                                })()}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-
-                  {/* Fare Estimate */}
-                  {startCoord && endCoord && (
-                    <div className="mb-4">
-                      <FareEstimate
-                        startCoord={startCoord}
-                        endCoord={endCoord}
-                        vehicleType={driverVehicleType}
-                        activeDemand={activeRides.length}
-                        activeSupply={drivers.length}
-                      />
-                    </div>
-                  )}
-
-                  {/* Request Button */}
+                  {/* Request Ride Button */}
                   <button
                     onClick={requestRide}
-                    disabled={!startCoord || !endCoord}
-                    className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+                    disabled={!startCoord || !endCoord || loading}
+                    className="w-full py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
                   >
-                    Request Ride
+                    {loading ? 'Requesting...' : 'Request Ride'}
                   </button>
                 </div>
 
