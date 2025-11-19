@@ -780,8 +780,9 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <p className={`text-xs font-semibold ${activeTab === 'my-rides' ? 'text-purple-600' : 'text-slate-700'}`}>My Rides</p>
-              <p className="text-xs text-slate-500 mt-1">({activeRides.length})</p>
+              <p className={`text-xs font-semibold ${activeTab === 'my-rides' ? 'text-purple-600' : 'text-slate-700'}`}>
+                My Rides <span className="text-slate-500">({activeRides.length})</span>
+              </p>
             </button>
             <button
               onClick={() => setActiveTab('history')}
