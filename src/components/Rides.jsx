@@ -1197,6 +1197,52 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               </button>
             </div>
 
+            {/* Interactive Route Map */}
+            <div className="mt-8">
+              <div className="bg-white rounded-lg shadow-lg p-4 border border-slate-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                    </svg>
+                    Route Map
+                  </h3>
+                  {selectingCoord && (
+                    <span className="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
+                      Selecting {selectingCoord === 'start' ? 'pickup' : 'destination'}
+                    </span>
+                  )}
+                </div>
+                <div style={{ position: 'relative', zIndex: 0 }}>
+                  <MapComponent
+                    userLocation={userLocation}
+                    drivers={drivers}
+                    riders={riders}
+                    startCoord={startCoord}
+                    endCoord={endCoord}
+                    onMapClick={(coord) => {
+                      if (selectingCoord === 'start') {
+                        setStartCoord(coord)
+                        setSelectingCoord('end')
+                      } else if (selectingCoord === 'end') {
+                        setEndCoord(coord)
+                        setSelectingCoord(null)
+                      }
+                    }}
+                    selectedMarker={selectedMarker}
+                    onSelectMarker={setSelectedMarker}
+                    userRole={userRole}
+                    selectingCoord={selectingCoord}
+                    onStartCoordDrag={setStartCoord}
+                    onEndCoordDrag={setEndCoord}
+                    routeGeometry={routeDetails?.geometry}
+                    routeDistance={routeDetails?.distance}
+                    routeDuration={routeDetails?.duration}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Available Drivers Listing */}
             {startCoord && endCoord && (
               <div className="mt-8">
