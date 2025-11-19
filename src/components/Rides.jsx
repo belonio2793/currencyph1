@@ -1547,6 +1547,14 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         selectedRideType={selectedRideType}
       />
 
+      {/* Services Selection Modal */}
+      <ServicesModal
+        isOpen={showServicesModal}
+        onClose={() => setShowServicesModal(false)}
+        onSelectService={setSelectedService}
+        selectedService={selectedService}
+      />
+
       {/* Vehicle Configuration Modal */}
       {showVehicleModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
