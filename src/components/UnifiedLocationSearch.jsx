@@ -367,23 +367,6 @@ export default function UnifiedLocationSearch({
 
   return (
     <div className="unified-location-search-wrapper space-y-4">
-      {/* Pickup Location - Always shown as confirmed */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-lg">
-        <label className="text-sm font-semibold flex items-center gap-2 mb-3">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Pickup Location (Your Current Location)
-        </label>
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-mono opacity-90">
-            {userLocation.latitude.toFixed(6)}, {userLocation.longitude.toFixed(6)}
-          </p>
-          <span className="text-xs bg-white bg-opacity-20 px-2 py-1 rounded-full">Confirmed</span>
-        </div>
-      </div>
-
-
       {/* Content */}
       <div className="space-y-4">
         {/* Search Section */}
