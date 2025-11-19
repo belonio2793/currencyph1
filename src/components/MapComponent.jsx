@@ -443,22 +443,15 @@ export default function MapComponent({
           <Marker
             position={[userLocation.latitude, userLocation.longitude]}
             icon={createUserMarker()}
-            title="📍 Your Location"
+            title="Your Location"
             eventHandlers={{
               mouseover: () => setHoveredMarker('user'),
               mouseout: () => setHoveredMarker(null)
             }}
           >
-            <Popup className="location-popup" maxWidth={280} minWidth={240}>
-              <div className="p-3 space-y-2">
-                <p className="font-semibold text-sm text-slate-900 border-b border-slate-200 pb-2">📍 Your Current Location</p>
-                <div className="text-xs text-slate-600 space-y-1 font-mono">
-                  <p><span className="font-medium">Latitude:</span> {userLocation.latitude.toFixed(6)}</p>
-                  <p><span className="font-medium">Longitude:</span> {userLocation.longitude.toFixed(6)}</p>
-                </div>
-                <div className="text-xs text-slate-500 pt-2 border-t border-slate-200">
-                  This is your current location based on GPS. Accuracy may vary.
-                </div>
+            <Popup className="location-popup" maxWidth={160} minWidth={140} closeButton={false}>
+              <div style={{ padding: '6px 8px', textAlign: 'center' }}>
+                <p className="font-semibold text-sm text-slate-900">Your Location</p>
               </div>
             </Popup>
           </Marker>
