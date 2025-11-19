@@ -72,26 +72,6 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
           <circle cx="15" cy="13" r="6" fill="white" stroke="${color}" stroke-width="1.5"/>
         </svg>
       </div>
-
-      <!-- Tooltip label -->
-      <div class="marker-label" style="
-        position: absolute;
-        bottom: -25px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: ${color};
-        color: white;
-        padding: 4px 8px;
-        border-radius: 4px;
-        font-size: 11px;
-        font-weight: 600;
-        white-space: nowrap;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s;
-        z-index: 4;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      ">${label}</div>
     </div>
   `
 
