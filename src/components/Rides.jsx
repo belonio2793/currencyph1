@@ -1685,7 +1685,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 Cancel
               </button>
               <button
-                onClick={() => setShowVehicleModal(false)}
+                onClick={saveVehicleInfo}
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
               >
                 Save Vehicle Info
