@@ -1137,7 +1137,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 userLocation={userLocation}
                 onDestinationSelect={setEndCoord}
                 selectedDestination={endCoord}
-                mapHeight="300px"
+                onPickOnMap={() => setSelectingCoord('end')}
               />
 
               {startCoord && endCoord && (
