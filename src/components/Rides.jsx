@@ -1050,6 +1050,11 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
       {/* Main content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Driver Mode */}
+        {userRole === 'driver' ? (
+          <DriverInterface userId={userId} userLocation={userLocation} />
+        ) : (
+          <>
         {/* Find Ride Tab */}
         {activeTab === 'find-ride' && (
           <div>
@@ -1604,6 +1609,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               View Transaction History
             </button>
           </div>
+        )}
+          </>
         )}
       </div>
 
