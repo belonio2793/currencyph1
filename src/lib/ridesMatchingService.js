@@ -42,7 +42,7 @@ export const ridesMatchingService = {
         .from('ride_requests')
         .select(`
           *,
-          user:users(id, email, full_name, display_name, average_rating, profile_image)
+          user:users(id, email, full_name)
         `)
         .eq('user_type', oppositeType)
         .eq('status', 'active')
