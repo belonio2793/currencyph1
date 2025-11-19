@@ -1217,6 +1217,21 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               </div>
             </div>
 
+            {/* Trip Details Summary Card */}
+            {startCoord && endCoord && (
+              <div className="mt-8">
+                <TripDetailsSummary
+                  startCoord={startCoord}
+                  endCoord={endCoord}
+                  routeDetails={routeDetails}
+                  selectedRideType={selectedRideType}
+                  selectedService={selectedService}
+                  serviceFormData={serviceFormData}
+                  rideClass="bg-white border border-slate-200"
+                />
+              </div>
+            )}
+
             {/* Available Drivers Listing */}
             {startCoord && endCoord && (
               <div className="mt-8">
