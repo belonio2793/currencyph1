@@ -14,40 +14,47 @@ L.Icon.Default.mergeOptions({
 })
 
 /**
- * Create enhanced custom markers with colors and animations
+ * Create enhanced custom markers with map pin style
  */
 export const createEnhancedMarker = (color, label, status = 'active', size = 40) => {
-  const statusIcon = status === 'active' ? '●' : '○'
   const animationClass = status === 'active' ? 'marker-pulse' : ''
+  const pinSize = size * 1.5
+  const dotSize = size * 0.45
 
+  // SVG map pin icon
   const html = `
     <div class="custom-marker ${animationClass}" style="
-      background-color: ${color};
-      color: white;
-      border-radius: 50%;
-      width: ${size}px;
-      height: ${size}px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: ${size * 0.35}px;
-      border: 3px solid white;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 2px ${color};
+      position: relative;
+      width: ${pinSize}px;
+      height: ${pinSize}px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
     " title="${label}">
-      <span>${label}</span>
-      <span style="font-size: ${size * 0.2}px; line-height: 0.8;">${statusIcon}</span>
+      <svg viewBox="0 0 30 40" width="${pinSize}" height="${pinSize}" style="position: absolute; top: 0; left: -${pinSize/2}px;">
+        <defs>
+          <style>
+            @keyframes markerPulse {
+              0%, 100% { opacity: 1; }
+              50% { opacity: 0.7; }
+            }
+            .marker-svg {
+              animation: ${status === 'active' ? 'markerPulse 2s infinite' : 'none'};
+            }
+          </style>
+        </defs>
+        <!-- Map pin shape -->
+        <path d="M 15 0 C 8 0 2 6 2 13 C 2 22 15 40 15 40 C 15 40 28 22 28 13 C 28 6 22 0 15 0 Z" fill="${color}" class="marker-svg" stroke="white" stroke-width="1.5"/>
+        <!-- Center dot -->
+        <circle cx="15" cy="13" r="5" fill="white" class="marker-svg"/>
+      </svg>
     </div>
   `
 
   return L.divIcon({
     html: html,
-    iconSize: [size, size],
-    iconAnchor: [size / 2, size / 2],
-    popupAnchor: [0, -size / 2 - 10],
+    iconSize: [pinSize, pinSize * 1.3],
+    iconAnchor: [pinSize / 2, pinSize * 1.3],
+    popupAnchor: [0, -pinSize],
     className: 'enhanced-marker'
   })
 }
