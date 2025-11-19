@@ -87,7 +87,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [showTransactionHistoryModal, setShowTransactionHistoryModal] = useState(false)
 
   // Get user location
-  const { location, error: locationError } = useGeolocation()
+  const { location, error: locationError, isRefreshing, refresh: refreshLocation } = useGeolocation()
 
   useEffect(() => {
     if (location) {
