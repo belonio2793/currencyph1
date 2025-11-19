@@ -366,9 +366,9 @@ export default function UnifiedLocationSearch({
   }
 
   return (
-    <div className="unified-location-search-wrapper bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden">
+    <div className="unified-location-search-wrapper space-y-4">
       {/* Pickup Location - Always shown as confirmed */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4">
+      <div className="bg-gradient-to-r from-green-600 to-green-700 text-white p-4 rounded-lg">
         <label className="text-sm font-semibold flex items-center gap-2 mb-3">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -385,7 +385,7 @@ export default function UnifiedLocationSearch({
 
 
       {/* Content */}
-      <div className="p-6 space-y-4">
+      <div className="space-y-4">
         {/* Search Section */}
         <div className="space-y-4">
             <div>
