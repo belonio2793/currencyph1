@@ -91,14 +91,13 @@ async function updatePresence(status) {
         return
       }
       // Silently skip other errors as presence is non-critical
-      // Only log at debug level to avoid noisy console warnings
-      console.debug('[presence] Supabase upsert error (non-critical):', error.code || error.message)
+      // Do not log - presence is optional functionality
     }
   } catch (err) {
-    // Network errors, table might not exist, or other issues - silently ignore
-    // Presence is non-critical, so we don't log or propagate these errors
-    // Only uncomment for debugging:
-    // console.debug('[presence] updatePresence failed:', err?.message)
+    // Network errors, fetch failures, table might not exist, or other issues - silently ignore
+    // Presence is non-critical functionality and should not produce console errors
+    // This covers: TypeError: Failed to fetch, CORS errors, connection timeouts, etc.
+    // No logging needed as this is expected in offline or misconfigured environments
   }
 }
 
