@@ -29,9 +29,10 @@ export default function RoutePolyline({ geometry, distance, duration, fare = nul
       <Polyline
         positions={coordinates}
         color="#3B82F6"
-        weight={4}
-        opacity={0.8}
-        dashArray="5, 5"
+        weight={5}
+        opacity={0.85}
+        lineCap="round"
+        lineJoin="round"
       >
         <Popup>
           <div className="space-y-2 p-2" style={{ minWidth: '200px' }}>
