@@ -114,7 +114,7 @@ export default function ServicesModal({
   onSelectService,
   selectedService = null
 }) {
-  const [expandedService, setExpandedService] = useState(selectedService || 'package')
+  const [expandedService, setExpandedService] = useState(selectedService || 'ride-share')
   
   const selectedServiceData = SERVICES.find(s => s.id === expandedService)
 
@@ -127,6 +127,7 @@ export default function ServicesModal({
 
   const getBackgroundColor = (serviceId) => {
     switch(serviceId) {
+      case 'ride-share': return 'bg-cyan-600'
       case 'package': return 'bg-purple-600'
       case 'food': return 'bg-orange-600'
       case 'laundry': return 'bg-pink-600'
