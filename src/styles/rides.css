@@ -346,6 +346,90 @@
   }
 }
 
+/* Enhanced marker animations for new MapComponent */
+.custom-marker {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.custom-marker:hover {
+  filter: brightness(1.1);
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5) !important;
+}
+
+@keyframes marker-pulse {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+  }
+}
+
+.marker-pulse {
+  animation: marker-pulse 2s infinite;
+}
+
+/* Enhanced location markers - Green (Pickup) */
+.pickup-marker {
+  background-color: #10B981 !important;
+  border-color: #059669 !important;
+}
+
+.pickup-marker.pulse {
+  animation: pulse-green 2s infinite;
+}
+
+/* Enhanced location markers - Red (Destination) */
+.destination-marker {
+  background-color: #EF4444 !important;
+  border-color: #DC2626 !important;
+}
+
+.destination-marker.pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Route source indicator styles */
+.route-source-badge {
+  background-color: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.route-source-badge.google {
+  border-color: #4285F4;
+  background: linear-gradient(135deg, #4285F4 0%, #EA4335 100%);
+  color: white;
+}
+
+.route-source-badge.maptiler {
+  border-color: #00BCD4;
+  background-color: #E0F7FA;
+  color: #00695C;
+}
+
+.route-source-badge.leaflet {
+  border-color: #199900;
+  background-color: #E8F5E9;
+  color: #1B5E20;
+}
+
+.route-source-badge.direct {
+  border-color: #9CA3AF;
+  background-color: #F3F4F6;
+  color: #4B5563;
+}
+
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
   .marker-tooltip {
@@ -355,5 +439,34 @@
 
   .price-breakdown {
     background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+  }
+
+  .route-source-badge {
+    background-color: #1F2937;
+    border-color: #4B5563;
+    color: #F3F4F6;
+  }
+
+  .route-source-badge.google {
+    background: linear-gradient(135deg, #4285F4 0%, #EA4335 100%);
+    color: white;
+  }
+
+  .route-source-badge.maptiler {
+    background-color: #004D5C;
+    border-color: #00BCD4;
+    color: #80DEEA;
+  }
+
+  .route-source-badge.leaflet {
+    background-color: #1B5E20;
+    border-color: #199900;
+    color: #81C784;
+  }
+
+  .route-source-badge.direct {
+    background-color: #374151;
+    border-color: #6B7280;
+    color: #D1D5DB;
   }
 }
