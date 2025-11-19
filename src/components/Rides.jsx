@@ -702,7 +702,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <div className="bg-white border-b border-slate-100 sticky top-20 z-40">
+      <div className="bg-white border-b border-slate-100 z-40">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex items-center justify-between mb-6">
             <h1 className="text-3xl font-bold text-slate-900">Rides</h1>
