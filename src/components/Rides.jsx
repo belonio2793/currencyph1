@@ -1166,6 +1166,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     showZoomControls={true}
                     showRouteSource={true}
                     showDirections={true}
+                    isLocating={loading && !userLocation}
+                    locationError={locationError}
                     onMapClick={(coord) => {
                       if (selectingCoord === 'start') {
                         setStartCoord(coord)
