@@ -389,8 +389,8 @@ export default function UnifiedLocationSearch({
         {/* Search Section */}
         <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-3">
-                Where do you want to go?
+              <label className="block text-sm font-semibold text-white mb-3">
+                Destination
               </label>
               <form onSubmit={handleDestinationSearch} className="location-search-form flex gap-2">
                 <input
