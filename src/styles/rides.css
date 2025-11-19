@@ -464,11 +464,22 @@
 .leaflet-popup-content {
   max-width: 300px;
   font-family: inherit;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
-.leaflet-popup-content .location-popup,
-.leaflet-popup-content .driver-popup,
-.leaflet-popup-content .rider-popup {
+.leaflet-popup-content-wrapper {
+  border-radius: 6px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+}
+
+.location-label-popup .leaflet-popup-content {
+  padding: 0 !important;
+}
+
+.location-popup,
+.driver-popup,
+.rider-popup {
   width: 100%;
   word-wrap: break-word;
 }
