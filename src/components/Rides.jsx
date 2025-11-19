@@ -1009,37 +1009,90 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   {/* Right Panel: Summary & Map */}
                   <div className="p-6 bg-white">
                     {/* Trip Summary */}
-                    <h4 className="text-lg font-bold text-slate-900 mb-6">Summary</h4>
+                    <h4 className="text-lg font-bold text-slate-900 mb-6">Trip Summary</h4>
 
                     {/* Pickup Summary */}
-                    <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
-                      <p className="text-xs text-slate-700 uppercase font-bold mb-2">From</p>
-                      <p className="text-sm font-medium text-slate-900">Your Location</p>
+                    <div className="bg-green-50 rounded-lg p-4 mb-3 border border-green-200">
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-green-500 text-white flex-shrink-0 mt-0.5">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-green-700 uppercase font-bold mb-1">Pickup Location</p>
+                          <p className="text-sm font-medium text-slate-900">Your Current Location</p>
+                          {startCoord && (
+                            <p className="text-xs text-slate-600 mt-1">{startCoord.latitude.toFixed(4)}, {startCoord.longitude.toFixed(4)}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Destination Summary */}
-                    <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
-                      <p className="text-xs text-slate-700 uppercase font-bold mb-2">To</p>
-                      <p className="text-sm font-medium text-slate-900">{endCoord ? endCoord.address || 'Selected' : 'Not selected'}</p>
+                    <div className="bg-red-50 rounded-lg p-4 mb-3 border border-red-200">
+                      <div className="flex items-start gap-3">
+                        <div className="flex items-center justify-center w-6 h-6 rounded-full bg-red-500 text-white flex-shrink-0 mt-0.5">
+                          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5.951-1.429 5.951 1.429a1 1 0 001.169-1.409l-7-14z" />
+                          </svg>
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs text-red-700 uppercase font-bold mb-1">Destination</p>
+                          <p className="text-sm font-medium text-slate-900">{endCoord ? endCoord.address || 'Selected Location' : 'Not selected'}</p>
+                          {endCoord && (
+                            <p className="text-xs text-slate-600 mt-1">{endCoord.latitude.toFixed(4)}, {endCoord.longitude.toFixed(4)}</p>
+                          )}
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Trip Details - Distance, Duration, Fare */}
+                    {routeDetails && (
+                      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-lg p-4 mb-4 border border-blue-200">
+                        <p className="text-xs text-indigo-700 uppercase font-bold mb-4">Trip Details</p>
+                        <div className="grid grid-cols-3 gap-3">
+                          {/* Distance */}
+                          <div className="bg-white rounded-lg p-3 border border-blue-100">
+                            <p className="text-xs text-slate-600 font-semibold uppercase mb-1">Distance</p>
+                            <p className="text-lg font-bold text-slate-900">{routeDetails.distance ? routeDetails.distance.toFixed(1) : '0'} km</p>
+                          </div>
+                          {/* Duration */}
+                          <div className="bg-white rounded-lg p-3 border border-blue-100">
+                            <p className="text-xs text-slate-600 font-semibold uppercase mb-1">Duration</p>
+                            <p className="text-lg font-bold text-slate-900">{routeDetails.duration ? Math.ceil(routeDetails.duration) : '0'} min</p>
+                          </div>
+                          {/* Estimated Fare */}
+                          <div className="bg-white rounded-lg p-3 border border-blue-100">
+                            <p className="text-xs text-slate-600 font-semibold uppercase mb-1">Est. Fare</p>
+                            <p className="text-lg font-bold text-emerald-600">₱{routeDetails.fare?.total ? routeDetails.fare.total.toFixed(2) : '0.00'}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Service Summary */}
                     {selectedRideType && (
-                      <div className="bg-white rounded-lg p-4 mb-6 border border-slate-200">
-                        <p className="text-xs text-slate-700 uppercase font-bold mb-2">Service</p>
-                        <p className="text-sm font-medium text-slate-900 capitalize">{selectedRideType.replace('-', ' ')}</p>
+                      <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
+                        <p className="text-xs text-slate-700 uppercase font-bold mb-2">Service Type</p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+                          <p className="text-sm font-medium text-slate-900 capitalize">{selectedRideType.replace('-', ' ')}</p>
+                        </div>
                       </div>
                     )}
 
                     {/* Route Source Information */}
                     {routeSource && (
-                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{getRouteSourceInfo(routeSource).icon}</span>
-                          <p className="text-xs text-slate-700 uppercase font-bold">Route Source</p>
+                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-4 mb-6 border border-amber-200">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl">{getRouteSourceInfo(routeSource).icon}</span>
+                          <div>
+                            <p className="text-xs text-amber-700 uppercase font-bold">Route Source</p>
+                            <p className="text-sm font-semibold text-slate-900">{getRouteSourceInfo(routeSource).name}</p>
+                            <p className="text-xs text-slate-600 mt-1">Real-time routing & navigation data</p>
+                          </div>
                         </div>
-                        <p className="text-sm font-medium text-slate-900">{getRouteSourceInfo(routeSource).name}</p>
-                        <p className="text-xs text-slate-600 mt-1">Real-time routing & navigation</p>
                       </div>
                     )}
 
