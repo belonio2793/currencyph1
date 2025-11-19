@@ -915,7 +915,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
-                {userRole === 'rider' ? '🚗 Switch to Driver' : '👤 Switch to Rider'}
+                {userRole === 'rider' ? 'Switch To Driver Mode' : 'Switch To Rider'}
               </button>
             </div>
           </div>
