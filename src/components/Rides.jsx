@@ -1143,22 +1143,22 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   {/* Left Panel: Location & Type Selection */}
                   <div className="lg:col-span-2 p-6 space-y-6 lg:border-r border-slate-200">
                     {/* Pickup Display */}
-                    <div className="bg-blue-500 rounded-lg p-4 flex items-center justify-between">
+                    <div className="bg-white rounded-lg p-4 flex items-center justify-between border border-slate-200">
                       <div className="flex items-center gap-4 flex-1">
-                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white bg-white bg-opacity-30">
-                          <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24">
+                        <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-slate-600 bg-slate-100">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-bold text-white">Pickup Location (Your Current Location)</p>
-                          <p className="text-white text-opacity-90 text-xs mt-1">{userLocation ? `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : 'Getting location...'}</p>
+                          <p className="text-sm font-bold text-slate-900">Pickup Location (Your Current Location)</p>
+                          <p className="text-slate-600 text-xs mt-1">{userLocation ? `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : 'Getting location...'}</p>
                         </div>
                       </div>
                       <button
                         onClick={() => setStartCoord(userLocation)}
-                        className="px-4 py-2 bg-white text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors whitespace-nowrap ml-4"
+                        className="px-4 py-2 bg-slate-100 text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors whitespace-nowrap ml-4 border border-slate-300"
                       >
                         Confirm
                       </button>
