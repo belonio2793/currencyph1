@@ -1151,7 +1151,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
                   {/* Pickup Location Selector */}
                   <div>
-                    <label className="block text-sm font-medium text-white mb-2">Pickup Location</label>
+                    {startCoord && (
+                      <p className="text-sm font-medium text-white mb-2">
+                        {startCoord.latitude.toFixed(4)}, {startCoord.longitude.toFixed(4)}
+                      </p>
+                    )}
+                    <label className="block text-sm font-medium text-white mb-2">Destination</label>
                     <div className="flex gap-2">
                       <input
                         type="text"
