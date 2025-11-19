@@ -322,19 +322,12 @@ export default function UnifiedLocationSearch({
   }
 
   const handleSelectDestination = (location) => {
-    setMapLocation(location)
     onDestinationSelect(location)
     setDestinationSearch('')
     setSearchResults([])
   }
 
-  const handleMapSelect = (location) => {
-    setMapLocation(location)
-    onDestinationSelect(location)
-  }
-
   const handleClearDestination = () => {
-    setMapLocation(null)
     onDestinationSelect(null)
     setDestinationSearch('')
     setSearchResults([])
