@@ -258,6 +258,15 @@ export default function MapComponent({
         {/* Route Source Indicator */}
         {showRouteSource && routeSource && <RouteSourceIndicator source={routeSource} />}
 
+        {/* Route Polyline */}
+        {routeGeometry && routeGeometry.length > 0 && (
+          <RoutePolyline
+            geometry={routeGeometry}
+            distance={0}
+            duration={0}
+          />
+        )}
+
         {/* User's current location marker */}
         {userLocation && (
           <Marker
