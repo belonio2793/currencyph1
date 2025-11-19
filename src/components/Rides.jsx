@@ -934,12 +934,36 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                           <p className="text-slate-600 text-xs mt-1">{userLocation ? `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : 'Getting location...'}</p>
                         </div>
                       </div>
-                      <button
-                        onClick={() => setStartCoord(userLocation)}
-                        className="px-4 py-2 bg-slate-100 text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors whitespace-nowrap ml-4 border border-slate-300"
-                      >
-                        Confirm
-                      </button>
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={refreshLocation}
+                          disabled={isRefreshing}
+                          title="Refresh your current location"
+                          className="px-3 py-2 bg-blue-50 text-blue-600 rounded-lg text-xs font-semibold hover:bg-blue-100 transition-colors border border-blue-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                        >
+                          {isRefreshing ? (
+                            <>
+                              <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              Locating...
+                            </>
+                          ) : (
+                            <>
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                              </svg>
+                              Refresh
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={() => setStartCoord(userLocation)}
+                          className="px-4 py-2 bg-slate-100 text-slate-900 rounded-lg text-xs font-bold hover:bg-slate-200 transition-colors whitespace-nowrap border border-slate-300"
+                        >
+                          Confirm
+                        </button>
+                      </div>
                     </div>
 
                     {/* Destination Selection */}
