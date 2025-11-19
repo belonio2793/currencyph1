@@ -259,8 +259,8 @@ export default function DriverInterface({ userId, userLocation }) {
                     {request.user?.display_name?.charAt(0) || 'U'}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900">{request.user?.display_name || 'Rider'}</p>
-                    <p className="text-xs text-slate-500">★ {request.user?.average_rating?.toFixed(1) || '5.0'}</p>
+                    <p className="text-sm font-medium text-slate-900">{request.user?.full_name || 'Rider'}</p>
+                    <p className="text-xs text-slate-500">★ 5.0</p>
                   </div>
                   <button
                     onClick={(e) => {
@@ -373,11 +373,11 @@ export default function DriverInterface({ userId, userLocation }) {
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-sm font-bold">
-                      {match.rider?.display_name?.charAt(0) || 'R'}
+                      {match.rider?.full_name?.charAt(0) || 'R'}
                     </div>
                     <div>
-                      <p className="font-medium text-slate-900">{match.rider?.display_name || 'Rider'}</p>
-                      <p className="text-xs text-slate-500">★ {match.rider?.average_rating?.toFixed(1) || '5.0'}</p>
+                      <p className="font-medium text-slate-900">{match.rider?.full_name || 'Rider'}</p>
+                      <p className="text-xs text-slate-500">★ 5.0</p>
                     </div>
                   </div>
                 </div>
