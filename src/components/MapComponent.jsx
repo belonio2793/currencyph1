@@ -511,25 +511,15 @@ export default function MapComponent({
             key={`rider-${rider.id}`}
             position={[rider.latitude, rider.longitude]}
             icon={createRiderMarker()}
-            title={`👥 ${rider.passenger_name}`}
+            title={`Passenger: ${rider.passenger_name}`}
             eventHandlers={{
               mouseover: () => setHoveredMarker(`rider-${rider.id}`),
               mouseout: () => setHoveredMarker(null)
             }}
           >
-            <Popup className="rider-popup" maxWidth={280} minWidth={240}>
-              <div className="p-3 space-y-2">
-                <p className="font-semibold text-sm text-slate-900 border-b border-slate-200 pb-2">👥 Passenger Looking for Ride</p>
-                <div className="space-y-1">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-slate-700 font-medium">Name:</span>
-                    <span className="text-sm font-semibold text-slate-900">{rider.passenger_name}</span>
-                  </div>
-                  <div className="flex justify-between items-center border-t border-slate-200 pt-1 mt-1">
-                    <span className="text-xs text-slate-700 font-medium">Rating:</span>
-                    <span className="text-sm font-bold text-amber-500">⭐ {(rider.rating || 5).toFixed(1)}</span>
-                  </div>
-                </div>
+            <Popup className="rider-popup" maxWidth={160} minWidth={140} closeButton={false}>
+              <div style={{ padding: '6px 8px', textAlign: 'center' }}>
+                <p className="font-semibold text-sm text-slate-900">Looking for Ride</p>
               </div>
             </Popup>
           </Marker>
