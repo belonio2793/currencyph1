@@ -28,6 +28,8 @@ export function useGeolocation() {
           const { latitude, longitude } = position.coords
           setLocation({ latitude, longitude })
           setError(null)
+          if (isRefresh) setIsRefreshing(false)
+          else setLoading(false)
 
           // Try reverse geocoding to get city name - with full isolation
           const reverseGeocode = async () => {
