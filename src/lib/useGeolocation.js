@@ -181,7 +181,8 @@ export function useGeolocation() {
             } finally {
               try {
                 if (isMountedRef.current) {
-                  setLoading(false)
+                  if (isRefresh) setIsRefreshing(false)
+                  else setLoading(false)
                 }
               } catch (e) {}
             }
