@@ -1133,7 +1133,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               {/* Main Request Card */}
               <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-5">
+                <div className="bg-blue-600 px-6 py-5">
                   <h3 className="text-2xl font-bold text-white">Plan Your Ride</h3>
                   <p className="text-blue-100 text-sm mt-1">Select locations and ride type to get started</p>
                 </div>
@@ -1143,7 +1143,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   {/* Left Panel: Location & Type Selection */}
                   <div className="lg:col-span-2 p-6 space-y-6 lg:border-r border-slate-200">
                     {/* Pickup Display */}
-                    <div className="bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg p-4 flex items-center justify-between">
+                    <div className="bg-blue-500 rounded-lg p-4 flex items-center justify-between">
                       <div className="flex items-center gap-4 flex-1">
                         <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-white bg-white bg-opacity-30">
                           <svg className="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24">
@@ -1158,7 +1158,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       </div>
                       <button
                         onClick={() => setStartCoord(userLocation)}
-                        className="px-4 py-2 bg-white text-green-600 rounded-lg text-xs font-bold hover:bg-green-50 transition-colors whitespace-nowrap ml-4"
+                        className="px-4 py-2 bg-white text-blue-600 rounded-lg text-xs font-bold hover:bg-blue-50 transition-colors whitespace-nowrap ml-4"
                       >
                         Confirm
                       </button>
@@ -1167,7 +1167,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     {/* Destination Selection */}
                     <div className="border-t border-slate-200 pt-6">
                       <div className="flex items-center gap-4 mb-4">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white ${endCoord ? 'bg-green-500' : 'bg-slate-300'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-white ${endCoord ? 'bg-blue-600' : 'bg-slate-300'}`}>
                           {endCoord ? '✓' : '2'}
                         </div>
                         <div>
@@ -1188,7 +1188,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       <div className="grid grid-cols-2 gap-3 pt-4">
                         <button
                           onClick={() => setSelectingCoord('end')}
-                          className="py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-blue-700 transition-all flex items-center justify-center gap-2"
+                          className="py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all flex items-center justify-center gap-2"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
@@ -1197,7 +1197,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                         </button>
                         <button
                           onClick={() => setSelectingCoord(null)}
-                          className="py-3 bg-gradient-to-r from-slate-200 to-slate-300 text-slate-900 rounded-lg font-medium hover:from-slate-300 hover:to-slate-400 transition-all"
+                          className="py-3 bg-slate-200 text-slate-900 rounded-lg font-medium hover:bg-slate-300 transition-all"
                         >
                           Search
                         </button>
@@ -1229,12 +1229,12 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   </div>
 
                   {/* Right Panel: Summary & Map */}
-                  <div className="p-6 bg-gradient-to-b from-slate-50 to-slate-100">
+                  <div className="p-6 bg-slate-50">
                     {/* Trip Summary */}
                     <h4 className="text-lg font-bold text-slate-900 mb-4">Summary</h4>
 
                     {/* Pickup Summary */}
-                    <div className={`bg-white rounded-lg p-3 mb-3 border border-slate-200 ${startCoord ? 'border-green-300 bg-green-50' : ''}`}>
+                    <div className={`bg-white rounded-lg p-3 mb-3 border border-slate-200 ${startCoord ? 'border-blue-300 bg-blue-50' : ''}`}>
                       <p className="text-xs text-slate-600 uppercase font-bold mb-1">From</p>
                       <p className="text-xs font-medium text-slate-900">Your Location</p>
                     </div>
@@ -1243,7 +1243,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     <div className="text-center text-slate-400 text-sm mb-3">↓</div>
 
                     {/* Destination Summary */}
-                    <div className={`bg-white rounded-lg p-3 mb-4 border border-slate-200 ${endCoord ? 'border-green-300 bg-green-50' : ''}`}>
+                    <div className={`bg-white rounded-lg p-3 mb-4 border border-slate-200 ${endCoord ? 'border-blue-300 bg-blue-50' : ''}`}>
                       <p className="text-xs text-slate-600 uppercase font-bold mb-1">To</p>
                       <p className="text-xs font-medium text-slate-900">{endCoord ? endCoord.address || 'Selected' : 'Not selected'}</p>
                     </div>
@@ -1260,7 +1260,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     <button
                       onClick={requestRide}
                       disabled={!startCoord || !endCoord || loading}
-                      className="w-full mt-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-bold hover:from-green-600 hover:to-emerald-700 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
+                      className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
                     >
                       {loading ? 'Requesting...' : 'Request Ride'}
                     </button>
