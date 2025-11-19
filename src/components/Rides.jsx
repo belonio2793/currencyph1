@@ -1548,7 +1548,10 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
       <ServicesModal
         isOpen={showServicesModal}
         onClose={() => setShowServicesModal(false)}
-        onSelectService={setSelectedService}
+        onSelectService={(serviceId, formData) => {
+          setSelectedService(serviceId)
+          setServiceFormData(formData || {})
+        }}
         selectedService={selectedService}
       />
 
