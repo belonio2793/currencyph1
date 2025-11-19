@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { getRouteSourceInfo } from '../lib/routingService'
+import RoutePolyline from './RoutePolyline'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
