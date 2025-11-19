@@ -12,13 +12,14 @@
 
 /* Location Detection Banner */
 .unified-location-search-wrapper > div:first-child {
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: white;
   padding: 16px;
-  color: white;
+  color: #1e293b;
   border-radius: 12px 12px 0 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .unified-location-search-wrapper > div:first-child svg {
@@ -82,9 +83,9 @@
 /* Search Button */
 .location-search-form button {
   padding: 12px 20px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  border: none;
+  background: #e2e8f0;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
   border-radius: 10px;
   font-size: 14px;
   font-weight: 600;
@@ -93,13 +94,13 @@
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: none;
 }
 
 .location-search-form button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  transform: translateY(-2px);
+  background: #cbd5e1;
+  box-shadow: none;
+  transform: none;
 }
 
 .location-search-form button:disabled {
@@ -272,12 +273,13 @@
 .location-search-results button > div > span {
   font-size: 12px;
   font-weight: 700;
-  color: white;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: #1e293b;
+  background: #e2e8f0;
   padding: 4px 10px;
   border-radius: 6px;
   white-space: nowrap;
   flex-shrink: 0;
+  border: 1px solid #cbd5e1;
 }
 
 /* No Results Message */
@@ -311,8 +313,8 @@
 
 /* Destination Confirmation */
 .location-confirmation {
-  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-  border: 1px solid #86efac;
+  background: white;
+  border: 1px solid #e2e8f0;
   border-radius: 10px;
   padding: 16px;
   display: flex;
@@ -325,7 +327,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #15803d;
+  color: #1e293b;
   font-weight: 600;
   font-size: 14px;
 }
@@ -339,7 +341,7 @@
 
 .location-confirmation p {
   font-size: 13px;
-  color: #166534;
+  color: #475569;
   margin: 0;
 }
 
@@ -347,9 +349,9 @@
   width: 100%;
   padding: 10px 16px;
   background: white;
-  border: 1px solid #86efac;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
-  color: #16a34a;
+  color: #1e293b;
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
@@ -357,9 +359,9 @@
 }
 
 .location-confirmation button:hover {
-  background: #f0fdf4;
-  border-color: #65a30d;
-  color: #65a30d;
+  background: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
 }
 
 /* Pick on Map Button Wrapper */
@@ -371,9 +373,9 @@
 .location-search-wrapper button {
   width: 100%;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  border: none;
+  background: #e2e8f0;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
   border-radius: 10px;
   font-weight: 600;
   font-size: 14px;
@@ -384,7 +386,7 @@
   gap: 8px;
   margin-top: 12px;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  box-shadow: none;
 }
 
 .location-search-wrapper button svg {
@@ -393,9 +395,9 @@
 }
 
 .location-search-wrapper button:hover {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-  transform: translateY(-2px);
+  background: #cbd5e1;
+  box-shadow: none;
+  transform: none;
 }
 
 /* Responsive Design */
