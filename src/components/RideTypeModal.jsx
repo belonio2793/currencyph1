@@ -2,23 +2,6 @@ import React, { useState } from 'react'
 
 const VEHICLE_TYPES = [
   {
-    id: 'ride-share',
-    label: 'Ride Share',
-    icon: '🚙',
-    color: 'from-cyan-500 to-cyan-600',
-    description: 'Share a ride with other passengers',
-    criteria: [
-      { label: 'Passengers', icon: '👥', hint: '1-4 people' },
-      { label: 'Route', icon: '🗺️', hint: 'Shared route' },
-      { label: 'Cost', icon: '💰', hint: 'Split fare' }
-    ],
-    details: {
-      maxPassengers: 4,
-      baseFare: 40,
-      perKm: 10
-    }
-  },
-  {
     id: 'car',
     label: 'Car',
     icon: '🚗',
@@ -60,7 +43,7 @@ export default function RideTypeModal({
   onSelectRideType,
   selectedRideType = null
 }) {
-  const [expandedType, setExpandedType] = useState(selectedRideType || 'ride-share')
+  const [expandedType, setExpandedType] = useState(selectedRideType || 'car')
 
   const selectedTypeData = VEHICLE_TYPES.find(t => t.id === expandedType)
 
@@ -73,7 +56,6 @@ export default function RideTypeModal({
 
   const getBackgroundColor = (typeId) => {
     switch(typeId) {
-      case 'ride-share': return 'bg-cyan-600'
       case 'car': return 'bg-blue-600'
       case 'tricycle': return 'bg-yellow-600'
       case 'package': return 'bg-purple-600'
@@ -94,7 +76,7 @@ export default function RideTypeModal({
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Select Ride Type
+            Select Vehicle Type
           </h2>
           <button
             onClick={onClose}
@@ -113,7 +95,7 @@ export default function RideTypeModal({
             <div className="space-y-6">
               {/* Vehicle Types Section */}
               <div className="space-y-3">
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Ride Type</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Vehicle Type</h3>
                 <div className="space-y-2">
                   {VEHICLE_TYPES.map((type) => (
                     <button
