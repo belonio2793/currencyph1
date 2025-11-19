@@ -1219,13 +1219,36 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
                   {/* Ride Details Card */}
                   {startCoord && endCoord && (
-                    <RideDetailsCard
-                      startCoord={startCoord}
-                      endCoord={endCoord}
-                      rideType={selectedRideType || 'ride-share'}
-                      onDetailsUpdate={setRouteDetails}
-                      loading={loading}
-                    />
+                    <>
+                      <RideDetailsCard
+                        startCoord={startCoord}
+                        endCoord={endCoord}
+                        rideType={selectedRideType || 'ride-share'}
+                        onDetailsUpdate={setRouteDetails}
+                        loading={loading}
+                      />
+
+                      {/* Trip Summary */}
+                      {routeDetails && (
+                        <div className="bg-blue-50 rounded-lg p-4 border border-blue-200 space-y-3">
+                          <h4 className="font-semibold text-blue-900 text-sm">Trip Summary</h4>
+                          <div className="grid grid-cols-3 gap-4">
+                            <div className="text-center">
+                              <p className="text-xs text-blue-700 font-medium uppercase">Distance</p>
+                              <p className="text-lg font-bold text-blue-900">{routeDetails.distance?.toFixed(1) || '0'}km</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs text-blue-700 font-medium uppercase">Time</p>
+                              <p className="text-lg font-bold text-blue-900">{routeDetails.duration || '0'}min</p>
+                            </div>
+                            <div className="text-center">
+                              <p className="text-xs text-blue-700 font-medium uppercase">Fare Est.</p>
+                              <p className="text-lg font-bold text-blue-900">₱{routeDetails.fare?.baseFare?.toFixed(0) || '0'}</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
 
                   {/* Fare Estimate */}
