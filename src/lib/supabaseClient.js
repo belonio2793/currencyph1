@@ -168,7 +168,7 @@ async function checkSupabaseHealth(retryCount = 0) {
     _connectionRetries = retryCount
 
     const errorMsg = err instanceof Error ? err.message : String(err)
-    console.warn(`[supabase-client] Health check failed: ${errorMsg}`)
+    console.debug(`[supabase-client] Health check failed: ${errorMsg}`)
 
     // Attempt to retry if we haven't exceeded max retries
     if (retryCount < MAX_HEALTH_CHECK_RETRIES) {
