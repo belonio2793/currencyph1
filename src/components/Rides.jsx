@@ -207,7 +207,7 @@ function ZoomControls() {
   )
 }
 
-function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole, onStartCoordDrag, onEndCoordDrag, selectingCoord, routeGeometry, routeDistance, routeDuration }) {
+function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onMapClick, selectedMarker, onSelectMarker, userRole, onStartCoordDrag, onEndCoordDrag, selectingCoord, routeGeometry, routeDistance, routeDuration, routeDetails }) {
   const mapRef = useRef(null)
 
   return (
