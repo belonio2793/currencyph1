@@ -419,9 +419,11 @@ export default function UnifiedLocationSearch({
             )}
 
             {searchResults.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-sm font-semibold text-slate-700">Results ({searchResults.length}):</p>
-                <div className="location-search-results space-y-2 max-h-64 overflow-y-auto border border-slate-200 rounded-lg bg-slate-50 p-3">
+              <div className="space-y-3">
+                <div className="location-search-results-header">
+                  {searchResults.length} Result{searchResults.length !== 1 ? 's' : ''} Found
+                </div>
+                <div className="location-search-results">
                   {searchResults.map((result, idx) => {
                     const distance = calculateDistance(
                       userLocation.latitude,
@@ -429,41 +431,33 @@ export default function UnifiedLocationSearch({
                       result.latitude,
                       result.longitude
                     )
+                    const isSelected = selectedDestination?.latitude === result.latitude && selectedDestination?.longitude === result.longitude
+
                     return (
                       <button
                         key={idx}
                         onClick={() => handleSelectDestination(result)}
-                        className={`w-full text-left p-3 rounded-lg border-2 transition-colors ${
-                          selectedDestination?.latitude === result.latitude && selectedDestination?.longitude === result.longitude
-                            ? 'border-blue-500 bg-blue-50'
-                            : 'border-slate-200 hover:border-blue-400 hover:bg-white'
-                        }`}
+                        className={`text-left transition-all ${isSelected ? 'selected' : ''}`}
                       >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-slate-900 text-sm break-words">{result.address}</p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <p className="text-xs text-slate-500">
-                                {result.latitude.toFixed(4)}, {result.longitude.toFixed(4)}
-                              </p>
+                        <div>
+                          <div>
+                            <p>{result.address}</p>
+                            <div>
+                              <p>{result.latitude.toFixed(4)}, {result.longitude.toFixed(4)}</p>
                               {result.rating && (
-                                <span className="text-xs text-amber-600 font-semibold">
+                                <span className="rating">
                                   ★ {result.rating.toFixed(1)}
                                 </span>
                               )}
                               {result.openNow === true && (
-                                <span className="text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
-                                  Open
-                                </span>
+                                <span className="status-open">Open</span>
                               )}
                               {result.openNow === false && (
-                                <span className="text-xs bg-red-100 text-red-700 px-1.5 py-0.5 rounded">
-                                  Closed
-                                </span>
+                                <span className="status-closed">Closed</span>
                               )}
                             </div>
                           </div>
-                          <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded whitespace-nowrap flex-shrink-0">
+                          <span>
                             {distance < 1 ? '< 1 km' : `${distance.toFixed(1)} km`}
                           </span>
                         </div>
