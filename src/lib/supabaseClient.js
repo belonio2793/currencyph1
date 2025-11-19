@@ -136,7 +136,8 @@ async function checkSupabaseHealth(retryCount = 0) {
     }, Math.min(HEALTH_CHECK_TIMEOUT, MAX_TIMEOUT))
 
     try {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/health`, {
+      // Use original fetch directly to avoid wrapper interference
+      const response = await originalFetch.call(window, `${SUPABASE_URL}/auth/v1/health`, {
         signal: controller.signal,
         headers: {
           'apikey': SUPABASE_ANON_KEY,
