@@ -1138,7 +1138,8 @@ export default function ServicesModal({
           </button>
           <button
             onClick={handleSelect}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg transition-all flex items-center gap-2"
+            disabled={validationStatus && !validationStatus.isValid && selectedServiceData?.formFields?.length > 0}
+            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 hover:shadow-lg transition-all flex items-center gap-2 disabled:bg-slate-400 disabled:cursor-not-allowed disabled:hover:bg-slate-400 disabled:shadow-none"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
