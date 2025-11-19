@@ -53,7 +53,8 @@ export const ridesMatchingService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      console.error('[ridesMatchingService] getActiveRequests failed:', err)
+      // Silently log network errors as they're expected in some environments
+      console.debug('[ridesMatchingService] getActiveRequests failed:', err?.message)
       return { data: null, error: err }
     }
   },
