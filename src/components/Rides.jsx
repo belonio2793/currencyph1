@@ -105,6 +105,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
     const calculateRoute = async () => {
       if (!startCoord || !endCoord) {
         setRouteDetails(null)
+        setRouteSource(null)
         return
       }
 
@@ -132,6 +133,9 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             steps: routeData.steps || [],
             fare: fareEstimate
           })
+
+          // Track route source
+          setRouteSource(routeData.source)
         }
       } catch (err) {
         console.debug('Route calculation error:', err?.message)
@@ -141,6 +145,16 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
     calculateRoute()
   }, [startCoord, endCoord, selectedRideType])
+
+  // Cleanup route monitoring on unmount
+  useEffect(() => {
+    return () => {
+      if (routeMonitoringId) {
+        routeEstimationService.stopMonitoring(routeMonitoringId)
+      }
+      routeEstimationService.stopAllMonitoring()
+    }
+  }, [])
 
   // Load initial data
   useEffect(() => {
