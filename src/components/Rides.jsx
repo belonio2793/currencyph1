@@ -1229,30 +1229,30 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                   </div>
 
                   {/* Right Panel: Summary & Map */}
-                  <div className="p-6 bg-slate-50">
+                  <div className="p-6 bg-white">
                     {/* Trip Summary */}
-                    <h4 className="text-lg font-bold text-slate-900 mb-4">Summary</h4>
+                    <h4 className="text-lg font-bold text-slate-900 mb-6">Summary</h4>
 
                     {/* Pickup Summary */}
-                    <div className={`bg-white rounded-lg p-3 mb-3 border border-slate-200 ${startCoord ? 'border-blue-300 bg-blue-50' : ''}`}>
-                      <p className="text-xs text-slate-600 uppercase font-bold mb-1">From</p>
-                      <p className="text-xs font-medium text-slate-900">Your Location</p>
+                    <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
+                      <p className="text-xs text-slate-700 uppercase font-bold mb-2">From</p>
+                      <p className="text-sm font-medium text-slate-900">Your Location</p>
                     </div>
 
                     {/* Arrow */}
-                    <div className="text-center text-slate-400 text-sm mb-3">↓</div>
+                    <div className="text-center text-slate-400 text-sm mb-4">↓</div>
 
                     {/* Destination Summary */}
-                    <div className={`bg-white rounded-lg p-3 mb-4 border border-slate-200 ${endCoord ? 'border-blue-300 bg-blue-50' : ''}`}>
-                      <p className="text-xs text-slate-600 uppercase font-bold mb-1">To</p>
-                      <p className="text-xs font-medium text-slate-900">{endCoord ? endCoord.address || 'Selected' : 'Not selected'}</p>
+                    <div className="bg-white rounded-lg p-4 mb-4 border border-slate-200">
+                      <p className="text-xs text-slate-700 uppercase font-bold mb-2">To</p>
+                      <p className="text-sm font-medium text-slate-900">{endCoord ? endCoord.address || 'Selected' : 'Not selected'}</p>
                     </div>
 
                     {/* Service Summary */}
                     {selectedRideType && (
-                      <div className="bg-white rounded-lg p-3 mb-4 border border-slate-200">
-                        <p className="text-xs text-slate-600 uppercase font-bold mb-1">Service</p>
-                        <p className="text-xs font-medium text-slate-900 capitalize">{selectedRideType.replace('-', ' ')}</p>
+                      <div className="bg-white rounded-lg p-4 mb-6 border border-slate-200">
+                        <p className="text-xs text-slate-700 uppercase font-bold mb-2">Service</p>
+                        <p className="text-sm font-medium text-slate-900 capitalize">{selectedRideType.replace('-', ' ')}</p>
                       </div>
                     )}
 
@@ -1260,7 +1260,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     <button
                       onClick={requestRide}
                       disabled={!startCoord || !endCoord || loading}
-                      className="w-full mt-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
+                      className="w-full py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl disabled:shadow-none"
                     >
                       {loading ? 'Requesting...' : 'Request Ride'}
                     </button>
