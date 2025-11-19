@@ -735,72 +735,83 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           </div>
 
           {/* Tab Navigation */}
-          <div className="flex gap-2 overflow-x-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             <button
               onClick={() => setActiveTab('find-ride')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all text-center ${
                 activeTab === 'find-ride'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-blue-50 border-blue-300 shadow-md hover:shadow-lg'
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 003 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
-              </svg>
-              Find Ride
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg mx-auto mb-2 ${activeTab === 'find-ride' ? 'bg-blue-100 text-blue-600' : 'bg-slate-100 text-slate-600'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 003 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                </svg>
+              </div>
+              <p className={`text-xs font-semibold ${activeTab === 'find-ride' ? 'text-blue-600' : 'text-slate-700'}`}>Find Ride</p>
             </button>
             <button
               onClick={() => setActiveTab('scan-nearby')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all text-center ${
                 activeTab === 'scan-nearby'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-green-50 border-green-300 shadow-md hover:shadow-lg'
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              Scan Nearby
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg mx-auto mb-2 ${activeTab === 'scan-nearby' ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-600'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <p className={`text-xs font-semibold ${activeTab === 'scan-nearby' ? 'text-green-600' : 'text-slate-700'}`}>Scan Nearby</p>
             </button>
             <button
               onClick={() => setActiveTab('my-rides')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all text-center ${
                 activeTab === 'my-rides'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-purple-50 border-purple-300 shadow-md hover:shadow-lg'
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              My Rides ({activeRides.length})
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg mx-auto mb-2 ${activeTab === 'my-rides' ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-600'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className={`text-xs font-semibold ${activeTab === 'my-rides' ? 'text-purple-600' : 'text-slate-700'}`}>My Rides</p>
+              <p className="text-xs text-slate-500 mt-1">({activeRides.length})</p>
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all text-center ${
                 activeTab === 'history'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-amber-50 border-amber-300 shadow-md hover:shadow-lg'
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              History
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg mx-auto mb-2 ${activeTab === 'history' ? 'bg-amber-100 text-amber-600' : 'bg-slate-100 text-slate-600'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 2m6-11a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <p className={`text-xs font-semibold ${activeTab === 'history' ? 'text-amber-600' : 'text-slate-700'}`}>History</p>
             </button>
             <button
               onClick={() => setActiveTab('profile')}
-              className={`px-4 py-2 text-sm font-medium whitespace-nowrap rounded-lg transition-colors flex items-center gap-2 ${
+              className={`p-4 rounded-xl border transition-all text-center ${
                 activeTab === 'profile'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-teal-50 border-teal-300 shadow-md hover:shadow-lg'
+                  : 'bg-white border-slate-200 hover:border-slate-300 hover:shadow-md'
               }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              Profile
+              <div className={`flex items-center justify-center w-8 h-8 rounded-lg mx-auto mb-2 ${activeTab === 'profile' ? 'bg-teal-100 text-teal-600' : 'bg-slate-100 text-slate-600'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <p className={`text-xs font-semibold ${activeTab === 'profile' ? 'text-teal-600' : 'text-slate-700'}`}>Profile</p>
             </button>
           </div>
         </div>
