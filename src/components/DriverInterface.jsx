@@ -33,12 +33,19 @@ export default function DriverInterface({ userId, userLocation }) {
   const loadActiveRequests = async () => {
     setLoading(true)
     setError(null)
-    const { data, error } = await ridesMatchingService.getActiveRequests('driver', 50)
-    if (error) {
+    try {
+      const { data, error } = await ridesMatchingService.getActiveRequests('driver', 50)
+      if (error) {
+        setError('Failed to load requests')
+        console.debug('Error loading requests:', error)
+      } else {
+        setActiveRequests(data || [])
+      }
+    } catch (err) {
+      // Network errors or other exceptions - silently set to empty
       setError('Failed to load requests')
-      console.error('Error loading requests:', error)
-    } else {
-      setActiveRequests(data || [])
+      console.debug('Exception loading requests:', err?.message)
+      setActiveRequests([])
     }
     setLoading(false)
   }
