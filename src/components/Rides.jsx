@@ -58,6 +58,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
 
   // Route details
   const [routeDetails, setRouteDetails] = useState(null)
+  const [routeSource, setRouteSource] = useState(null)
+  const [routeMonitoringId, setRouteMonitoringId] = useState(null)
 
   // Driver status
   const [driverStatus, setDriverStatus] = useState('offline') // 'offline', 'available', 'on-job'
