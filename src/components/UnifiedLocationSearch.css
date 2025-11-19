@@ -360,8 +360,13 @@
   color: #65a30d;
 }
 
+/* Pick on Map Button Wrapper */
+.location-search-wrapper {
+  width: 100%;
+}
+
 /* Pick on Map Button */
-.location-search-wrapper button:last-child {
+.location-search-wrapper button {
   width: 100%;
   padding: 14px 16px;
   background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
@@ -380,7 +385,12 @@
   box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
-.location-search-wrapper button:last-child:hover {
+.location-search-wrapper button svg {
+  width: 20px;
+  height: 20px;
+}
+
+.location-search-wrapper button:hover {
   background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
   box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
   transform: translateY(-2px);
