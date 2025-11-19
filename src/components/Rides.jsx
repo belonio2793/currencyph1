@@ -1063,10 +1063,10 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               <p className="text-slate-600">Select your pickup and destination locations on the map or enter coordinates directly</p>
             </div>
 
-            {/* Ride Type and Services Selection - Two Rows */}
-            <div className="grid grid-cols-1 gap-6 mb-6">
+            {/* Ride Type and Services Selection - Single Container */}
+            <div className="bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden mb-6">
               {/* Ride Type Selection */}
-              <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6">
+              <div className="p-6 border-b border-slate-200">
                 <label className="block text-sm font-medium text-slate-700 mb-3">Vehicle Type</label>
                 {selectedRideType ? (
                   <div className="flex items-center justify-between p-4 bg-blue-50 border-2 border-blue-300 rounded-lg">
@@ -1097,7 +1097,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               </div>
 
               {/* Available Services Selection */}
-              <div className="bg-white rounded-lg shadow-lg border border-slate-200 p-6">
+              <div className="p-6">
                 <label className="block text-sm font-medium text-slate-700 mb-3">Available Services</label>
                 {selectedService ? (
                   <div className="flex items-center justify-between p-4 bg-purple-50 border-2 border-purple-300 rounded-lg">
