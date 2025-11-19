@@ -1150,7 +1150,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
             </div>
 
             {/* Map Section */}
-            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+            <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden mt-8">
               <div className="relative bg-slate-100 overflow-hidden" style={{ minHeight: '500px' }}>
                 <div style={{ position: 'relative', zIndex: 0, height: '100%' }}>
                   <MapComponent
