@@ -864,7 +864,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               </div>
 
               {/* Available Services Selection */}
-              <div className="p-6">
+              <div className="p-6 pt-3">
                 <label className="block text-sm font-medium text-slate-700 mb-3">Available Services</label>
                 {selectedService ? (
                   <div className="flex items-center justify-between p-4 bg-purple-50 border-2 border-purple-300 rounded-lg">
