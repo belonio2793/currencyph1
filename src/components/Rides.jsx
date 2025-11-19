@@ -593,7 +593,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
         .from('ride_profiles')
         .upsert({
           user_id: userId,
-          role: 'driver',
+          role: userRole,
           status: newStatus,
           vehicle_type: driverVehicleType,
           city: driverCity,
