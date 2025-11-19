@@ -200,9 +200,51 @@ function calculateDirectRoute(startLat, startLng, endLat, endLng) {
     distance,
     duration,
     geometry: [[startLng, startLat], [endLng, endLat]],
-    coordinates: [[startLng, startLat], [endLng, endLat]], // For compatibility
-    steps: []
+    coordinates: [[startLng, startLat], [endLng, endLat]],
+    steps: [],
+    source: ROUTE_SOURCES.DIRECT
   }
+}
+
+/**
+ * Decode Google Maps polyline (encoded polyline format)
+ */
+function decodePolyline(encoded) {
+  const poly = []
+  let index = 0,
+    lat = 0,
+    lng = 0
+
+  while (index < encoded.length) {
+    let result = 0,
+      shift = 0
+    let b
+
+    do {
+      b = encoded.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1
+    lat += dlat
+
+    result = 0
+    shift = 0
+
+    do {
+      b = encoded.charCodeAt(index++) - 63
+      result |= (b & 0x1f) << shift
+      shift += 5
+    } while (b >= 0x20)
+
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1
+    lng += dlng
+
+    poly.push([lat / 1e5, lng / 1e5])
+  }
+
+  return poly
 }
 
 // Haversine formula for direct distance calculation (fallback)
