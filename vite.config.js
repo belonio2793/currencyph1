@@ -5,13 +5,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    host: true,
-    proxy: {
-      '/api/supabase': {
-        target: 'https://corcofbmafdxehvlbesx.supabase.co',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/supabase/, '')
-      }
-    }
+    host: true
   }
 })
