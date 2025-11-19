@@ -62,7 +62,7 @@ export default function RideTypeModal({
 }) {
   const [expandedType, setExpandedType] = useState(selectedRideType || 'ride-share')
 
-  const selectedTypeData = [...VEHICLE_TYPES, ...SERVICES].find(t => t.id === expandedType)
+  const selectedTypeData = VEHICLE_TYPES.find(t => t.id === expandedType)
 
   if (!isOpen) return null
 
