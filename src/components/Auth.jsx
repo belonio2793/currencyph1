@@ -375,6 +375,23 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
         throw signUpError
       }
 
+      if (data?.user?.id) {
+        const { error: profileError } = await supabase
+          .from('ride_profiles')
+          .upsert({
+            user_id: data.user.id,
+            full_name: fullName,
+            role: 'rider',
+            status: 'offline',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' })
+
+        if (profileError) {
+          console.debug('Could not create ride profile at signup:', profileError)
+        }
+      }
+
       setSuccess('Registration successful! Please check your email to confirm your account.')
       setIdentifier('')
       setPassword('')
