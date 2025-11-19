@@ -110,33 +110,63 @@ export async function getCallHistory(userId, limit = 50) {
 }
 
 export async function subscribeToIncomingCalls(userId, onIncomingCall) {
-  const channel = supabase
-    .channel(`incoming_calls:${userId}`)
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'voice_calls',
-      filter: `recipient_id=eq.${userId}`
-    }, (payload) => {
-      onIncomingCall(payload.new)
-    })
-    .subscribe()
+  try {
+    const channel = supabase
+      .channel(`incoming_calls:${userId}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'voice_calls',
+        filter: `recipient_id=eq.${userId}`
+      }, (payload) => {
+        try {
+          onIncomingCall(payload.new)
+        } catch (e) {
+          console.error('[voiceCalls] Callback error:', e)
+        }
+      })
+      .subscribe()
 
-  return () => channel.unsubscribe()
+    return () => {
+      try {
+        channel.unsubscribe()
+      } catch (e) {
+        console.debug('[voiceCalls] Unsubscribe error:', e)
+      }
+    }
+  } catch (err) {
+    console.error('[voiceCalls] subscribeToIncomingCalls failed:', err)
+    return () => {}
+  }
 }
 
 export async function subscribeToCallUpdates(callId, onUpdate) {
-  const channel = supabase
-    .channel(`call_updates:${callId}`)
-    .on('postgres_changes', {
-      event: 'UPDATE',
-      schema: 'public',
-      table: 'voice_calls',
-      filter: `id=eq.${callId}`
-    }, (payload) => {
-      onUpdate(payload.new)
-    })
-    .subscribe()
+  try {
+    const channel = supabase
+      .channel(`call_updates:${callId}`)
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'voice_calls',
+        filter: `id=eq.${callId}`
+      }, (payload) => {
+        try {
+          onUpdate(payload.new)
+        } catch (e) {
+          console.error('[voiceCalls] Callback error:', e)
+        }
+      })
+      .subscribe()
 
-  return () => channel.unsubscribe()
+    return () => {
+      try {
+        channel.unsubscribe()
+      } catch (e) {
+        console.debug('[voiceCalls] Unsubscribe error:', e)
+      }
+    }
+  } catch (err) {
+    console.error('[voiceCalls] subscribeToCallUpdates failed:', err)
+    return () => {}
+  }
 }
