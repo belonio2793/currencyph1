@@ -178,7 +178,10 @@ export default function UnifiedLocationSearch({
                 placeId: place.place_id,
                 type: 'poi',
                 rating: place.rating,
-                openNow: place.opening_hours?.open_now
+                userRatingsTotal: place.user_ratings_total,
+                openNow: place.opening_hours?.open_now,
+                businessStatus: place.business_status,
+                types: place.types || []
               }))
             }
           }
@@ -216,7 +219,10 @@ export default function UnifiedLocationSearch({
         placeId: place.place_id,
         type: 'poi',
         rating: place.rating,
-        openNow: place.opening_hours?.open_now
+        userRatingsTotal: place.user_ratings_total,
+        openNow: place.opening_hours?.open_now,
+        businessStatus: place.business_status,
+        types: place.types || []
       }))
     } catch (err) {
       console.warn('Google Places search error:', err?.message || err)
