@@ -55,6 +55,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   const [selectedRideType, setSelectedRideType] = useState('car')
   const [showServicesModal, setShowServicesModal] = useState(false)
   const [selectedService, setSelectedService] = useState('ride-share')
+  const [serviceFormData, setServiceFormData] = useState({})
 
   // Route details
   const [routeDetails, setRouteDetails] = useState(null)
