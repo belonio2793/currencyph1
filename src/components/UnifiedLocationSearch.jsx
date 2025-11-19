@@ -88,26 +88,6 @@ const POI_KEYWORD_MAP = {
   'post office': ['post_office']
 }
 
-const createCustomIcon = (color, label) => {
-  return L.divIcon({
-    html: `<div style="background-color: ${color}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 16px; border: 3px solid white; box-shadow: 0 2px 8px rgba(0,0,0,0.4);">${label}</div>`,
-    iconSize: [40, 40],
-    className: 'custom-location-icon'
-  })
-}
-
-function MapClickHandler({ onLocationSelect }) {
-  useMapEvents({
-    click(e) {
-      onLocationSelect({
-        latitude: e.latlng.lat,
-        longitude: e.latlng.lng
-      })
-    }
-  })
-  return null
-}
-
 export default function UnifiedLocationSearch({
   userLocation,
   onDestinationSelect,
