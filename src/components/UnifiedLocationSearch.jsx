@@ -99,16 +99,15 @@ export default function UnifiedLocationSearch({
   const [searchResults, setSearchResults] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [activeTab, setActiveTab] = useState('search')
 
   // Auto-focus on search input
   const searchInputRef = React.useRef(null)
 
   useEffect(() => {
-    if (activeTab === 'search' && searchInputRef.current) {
+    if (searchInputRef.current) {
       searchInputRef.current.focus()
     }
-  }, [activeTab])
+  }, [])
 
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371
