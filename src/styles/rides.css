@@ -507,11 +507,17 @@
 /* Enhanced Marker Container Styles */
 .enhanced-marker-container {
   position: relative;
-  transition: all 0.2s ease;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .enhanced-marker-container .marker-icon {
   transition: all 0.2s ease;
+  z-index: 10;
+  position: relative;
 }
 
 .enhanced-marker-container:hover .marker-icon {
@@ -529,14 +535,20 @@
   position: absolute;
   border-radius: 50%;
   opacity: 1;
-  will-change: transform, opacity;
+  will-change: box-shadow, opacity;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .marker-ping-secondary {
   position: absolute;
   border-radius: 50%;
   opacity: 1;
-  will-change: transform, opacity;
+  will-change: box-shadow, opacity;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* Leaflet popup customization for ride markers */
