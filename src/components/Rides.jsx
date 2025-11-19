@@ -1057,6 +1057,57 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
               <p className="text-slate-600">Select your pickup and destination locations on the map or enter coordinates directly</p>
             </div>
 
+            {/* Location Selection Card */}
+            <div className="bg-white rounded-lg shadow-lg border border-slate-200 overflow-hidden mb-6">
+              {/* Pickup Location Header */}
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4 flex items-center justify-between">
+                <div>
+                  <p className="text-white text-sm font-semibold">Pickup Location (Your Current Location)</p>
+                  <p className="text-green-50 text-xs mt-1">{userLocation ? `${userLocation.latitude.toFixed(4)}, ${userLocation.longitude.toFixed(4)}` : 'Getting location...'}</p>
+                </div>
+                <button
+                  onClick={() => setStartCoord(userLocation)}
+                  className="px-4 py-2 bg-white text-green-600 rounded-lg text-sm font-semibold hover:bg-green-50 transition-colors"
+                >
+                  Confirm
+                </button>
+              </div>
+
+              {/* Destination Section */}
+              <div className="p-6 space-y-4">
+                <label className="block text-sm font-semibold text-slate-700">Destination</label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Search for destination, address, or place..."
+                    className="flex-1 px-4 py-3 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        // Handle search
+                      }
+                    }}
+                  />
+                  <button className="px-6 py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    Search
+                  </button>
+                </div>
+
+                {/* Pick on Map Button */}
+                <button
+                  onClick={() => setSelectingCoord('end')}
+                  className="w-full py-3 bg-blue-600 text-white rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.553-.894L9 7m0 13l6.447 3.268A1 1 0 0021 17.382V6.618a1 1 0 00-1.553-.894L15 8m0 13V8m0 0L9 5m6 8v8m0-13L9 5" />
+                  </svg>
+                  Pick on Map
+                </button>
+              </div>
+            </div>
+
             {/* Ride Type and Services Selection - Two Rows */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
               {/* Ride Type Selection */}
