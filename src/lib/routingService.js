@@ -1,45 +1,195 @@
-// Service for calculating routes, distances, and fare estimates using MapTiler Directions API
+// Service for calculating routes, distances, and fare estimates using multiple APIs with fallbacks
+// Supports: Google Maps API, MapTiler, and Leaflet (Haversine) fallback
 
 const MAPTILER_KEY = import.meta?.env?.VITE_MAPTILER_API_KEY || ''
+const GOOGLE_API_KEY = import.meta?.env?.VITE_GOOGLE_API_KEY || ''
 
-export async function getRoute(startLat, startLng, endLat, endLng) {
+// Route source tracking
+const ROUTE_SOURCES = {
+  GOOGLE: 'Google Maps Directions API',
+  MAPTILER: 'MapTiler Directions API',
+  LEAFLET: 'Leaflet (Haversine fallback)',
+  DIRECT: 'Direct calculation'
+}
+
+/**
+ * Get route with multi-source support and real-time estimation
+ * Tries Google Maps first, then MapTiler, then Leaflet fallback
+ */
+export async function getRoute(startLat, startLng, endLat, endLng, options = {}) {
+  const { preferredSource = null, timeout = 10000 } = options
+
   try {
-    // If no API key, use direct calculation immediately
-    if (!MAPTILER_KEY) {
-      return calculateDirectRoute(startLat, startLng, endLat, endLng)
+    let result = null
+
+    // Try preferred source first
+    if (preferredSource === 'google' && GOOGLE_API_KEY) {
+      result = await tryGoogleMapsRoute(startLat, startLng, endLat, endLng, timeout)
+      if (result) return result
     }
 
-    const url = `https://api.maptiler.com/routing/v1/directions/driving/${startLng},${startLat};${endLng},${endLat}?key=${MAPTILER_KEY}&steps=true&alternatives=false&overview=full&geometries=geojson`
+    // Try MapTiler
+    if (MAPTILER_KEY) {
+      result = await tryMapTilerRoute(startLat, startLng, endLat, endLng, timeout)
+      if (result) return result
+    }
 
-    const response = await fetch(url)
+    // Try Google Maps as secondary option
+    if (!preferredSource && GOOGLE_API_KEY) {
+      result = await tryGoogleMapsRoute(startLat, startLng, endLat, endLng, timeout)
+      if (result) return result
+    }
+
+    // Fallback to Leaflet (Haversine calculation)
+    return calculateDirectRoute(startLat, startLng, endLat, endLng)
+  } catch (error) {
+    console.debug('Routing error:', error?.message)
+    return calculateDirectRoute(startLat, startLng, endLat, endLng)
+  }
+}
+
+/**
+ * Try Google Maps Directions API
+ */
+async function tryGoogleMapsRoute(startLat, startLng, endLat, endLng, timeout) {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+    const url = new URL('https://maps.googleapis.com/maps/api/directions/json')
+    url.searchParams.set('origin', `${startLat},${startLng}`)
+    url.searchParams.set('destination', `${endLat},${endLng}`)
+    url.searchParams.set('key', GOOGLE_API_KEY)
+    url.searchParams.set('mode', 'driving')
+    url.searchParams.set('alternatives', 'false')
+
+    const response = await fetch(url, { signal: controller.signal })
+    clearTimeout(timeoutId)
+
     if (!response.ok) {
-      // For 404/401 errors, use fallback. For others, try anyway
+      console.debug(`Google Maps API error: ${response.status}`)
+      return null
+    }
+
+    const data = await response.json()
+    if (data.status !== 'OK' || !data.routes || data.routes.length === 0) {
+      console.debug(`Google Maps returned status: ${data.status}`)
+      return null
+    }
+
+    const route = data.routes[0]
+    const leg = route.legs[0]
+
+    // Decode polyline
+    const coordinates = decodePolyline(route.overview_polyline.points)
+
+    // Parse steps
+    const steps = leg.steps.map(step => ({
+      instruction: step.html_instructions?.replace(/<[^>]*>/g, '') || 'Continue',
+      distance: (step.distance.value / 1000).toFixed(1),
+      duration: Math.ceil(step.duration.value / 60),
+      location: [step.end_location.lat, step.end_location.lng]
+    }))
+
+    return {
+      success: true,
+      distance: leg.distance.value / 1000,
+      duration: Math.ceil(leg.duration.value / 60),
+      geometry: coordinates.map(c => [c[1], c[0]]), // Convert to [lng, lat]
+      coordinates: coordinates.map(c => [c[1], c[0]]),
+      steps: steps,
+      source: ROUTE_SOURCES.GOOGLE,
+      rawData: { route, leg }
+    }
+  } catch (error) {
+    console.debug('Google Maps route error:', error?.message)
+    return null
+  }
+}
+
+/**
+ * Try MapTiler Directions API
+ */
+async function tryMapTilerRoute(startLat, startLng, endLat, endLng, timeout) {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+    const url = `https://api.maptiler.com/routing/v1/directions/driving/${startLng},${startLat};${endLng},${endLat}?key=${MAPTILER_KEY}&steps=true&alternatives=false&overview=full&geometries=geojson&language=en`
+
+    const response = await fetch(url, { signal: controller.signal })
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
       if (response.status === 404 || response.status === 401) {
-        console.debug('MapTiler API not available, using direct calculation')
-        return calculateDirectRoute(startLat, startLng, endLat, endLng)
+        console.debug('MapTiler API not available')
+        return null
       }
-      throw new Error(`Routing API error: ${response.status}`)
+      throw new Error(`MapTiler API error: ${response.status}`)
     }
 
     const data = await response.json()
     if (!data.routes || data.routes.length === 0) {
-      return calculateDirectRoute(startLat, startLng, endLat, endLng)
+      console.debug('MapTiler returned no routes')
+      return null
     }
 
     const route = data.routes[0]
     return {
       success: true,
-      distance: route.distance / 1000, // Convert to km
-      duration: Math.ceil(route.duration / 60), // Convert to minutes
+      distance: route.distance / 1000,
+      duration: Math.ceil(route.duration / 60),
       geometry: route.geometry.coordinates,
-      coordinates: route.geometry.coordinates, // For compatibility
-      steps: route.steps || []
+      coordinates: route.geometry.coordinates,
+      steps: (route.steps || []).map(step => ({
+        instruction: step.name || 'Continue',
+        distance: (step.distance / 1000).toFixed(1),
+        duration: Math.ceil(step.duration / 60),
+        location: step.geometry ? step.geometry.coordinates : null
+      })),
+      source: ROUTE_SOURCES.MAPTILER,
+      rawData: { route }
     }
   } catch (error) {
-    console.debug('Routing error:', error?.message)
-    // Fallback to direct distance calculation
-    return calculateDirectRoute(startLat, startLng, endLat, endLng)
+    console.debug('MapTiler route error:', error?.message)
+    return null
   }
+}
+
+/**
+ * Get real-time route updates and ETA monitoring
+ */
+export async function monitorRouteRealtime(startLat, startLng, endLat, endLng, callback, interval = 30000) {
+  const updateRoute = async () => {
+    try {
+      const route = await getRoute(startLat, startLng, endLat, endLng)
+      if (route.success) {
+        callback({
+          success: true,
+          distance: route.distance,
+          duration: route.duration,
+          geometry: route.geometry,
+          source: route.source || ROUTE_SOURCES.LEAFLET,
+          updatedAt: new Date().toISOString()
+        })
+      }
+    } catch (err) {
+      callback({
+        success: false,
+        error: err?.message,
+        updatedAt: new Date().toISOString()
+      })
+    }
+  }
+
+  // Initial update
+  await updateRoute()
+
+  // Set up interval for updates
+  const intervalId = setInterval(updateRoute, interval)
+
+  // Return unsubscribe function
+  return () => clearInterval(intervalId)
 }
 
 function calculateDirectRoute(startLat, startLng, endLat, endLng) {
