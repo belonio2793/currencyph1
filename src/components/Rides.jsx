@@ -341,6 +341,8 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
   // Modal states
   const [showRideTypeModal, setShowRideTypeModal] = useState(false)
   const [selectedRideType, setSelectedRideType] = useState(null)
+  const [showServicesModal, setShowServicesModal] = useState(false)
+  const [selectedService, setSelectedService] = useState(null)
 
   // Route details
   const [routeDetails, setRouteDetails] = useState(null)
