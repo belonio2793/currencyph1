@@ -360,10 +360,117 @@ export default function MapComponent({
         flexDirection: 'column'
       }}
     >
+      {/* Location Loading/Error Overlay */}
+      {(isLocating || locationError) && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            zIndex: 1000,
+            backdropFilter: 'blur(2px)'
+          }}
+        >
+          {isLocating ? (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <svg
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    margin: '0 auto',
+                    display: 'block',
+                    animation: 'spin 1s linear infinite'
+                  }}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  className="text-blue-600"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1F2937', marginBottom: '8px' }}>
+                📍 Finding Your Location
+              </h3>
+              <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', maxWidth: '320px' }}>
+                Please allow location access when prompted to continue
+              </p>
+              <div style={{
+                display: 'inline-block',
+                padding: '8px 16px',
+                backgroundColor: '#DBEAFE',
+                color: '#0C4A6E',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: '500'
+              }}>
+                Searching for your GPS signal...
+              </div>
+            </div>
+          ) : (
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ marginBottom: '24px' }}>
+                <svg
+                  style={{
+                    width: '64px',
+                    height: '64px',
+                    margin: '0 auto',
+                    display: 'block'
+                  }}
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  className="text-red-600"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4v2m0 4v2m0-18a9 9 0 110 18 9 9 0 010-18z"
+                  />
+                </svg>
+              </div>
+              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1F2937', marginBottom: '8px' }}>
+                ⚠️ Location Unavailable
+              </h3>
+              <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', maxWidth: '320px' }}>
+                {locationError || 'Please enable location services to use this feature'}
+              </p>
+              <div style={{
+                display: 'inline-block',
+                padding: '8px 16px',
+                backgroundColor: '#FEE2E2',
+                color: '#7F1D1D',
+                borderRadius: '6px',
+                fontSize: '12px',
+                fontWeight: '500'
+              }}>
+                Check your browser location settings
+              </div>
+            </div>
+          )}
+          <style>{`
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
+
       <MapContainer
         center={calculatedCenter}
         zoom={defaultZoom}
-        style={{ height: '100%', width: '100%', zIndex: 0, minHeight: '400px' }}
+        style={{ height: '100%', width: '100%', zIndex: 0, minHeight: '400px', opacity: isLocating || locationError ? 0.5 : 1 }}
         ref={mapRef}
         onClick={handleMapClick}
         attributionControl={false}
@@ -385,7 +492,7 @@ export default function MapComponent({
 
         {/* Directions Summary */}
         {showDirections && (pickupLocation && destinationLocation) && (
-          <DirectionsSummary 
+          <DirectionsSummary
             distance={routeDistance}
             duration={routeDuration}
             startAddress={pickupLocation.address}
