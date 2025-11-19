@@ -1020,6 +1020,18 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                       </div>
                     )}
 
+                    {/* Route Source Information */}
+                    {routeSource && (
+                      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-4 mb-6 border border-blue-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{getRouteSourceInfo(routeSource).icon}</span>
+                          <p className="text-xs text-slate-700 uppercase font-bold">Route Source</p>
+                        </div>
+                        <p className="text-sm font-medium text-slate-900">{getRouteSourceInfo(routeSource).name}</p>
+                        <p className="text-xs text-slate-600 mt-1">Real-time routing & navigation</p>
+                      </div>
+                    )}
+
                     {/* Request Button */}
                     <button
                       onClick={requestRide}
