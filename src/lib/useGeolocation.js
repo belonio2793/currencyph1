@@ -10,15 +10,17 @@ export function useGeolocation() {
   const isMountedRef = useRef(true)
   const abortControllersRef = useRef([])
 
-  const requestLocation = () => {
+  const requestLocation = (isRefresh = false) => {
     try {
       if (!navigator.geolocation) {
         setError('Geolocation not supported')
-        setLoading(false)
+        if (!isRefresh) setLoading(false)
+        else setIsRefreshing(false)
         return
       }
 
-      setLoading(true)
+      if (isRefresh) setIsRefreshing(true)
+      else setLoading(true)
       navigator.geolocation.getCurrentPosition(
         (position) => {
           if (!isMountedRef.current) return
