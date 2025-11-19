@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap, CircleMarker } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import '../styles/rides.css'
@@ -23,7 +22,9 @@ import RoutePolyline from './RoutePolyline'
 import UnifiedLocationSearch from './UnifiedLocationSearch'
 import RidesHistoryView from './RidesHistoryView'
 import DriverInterface from './DriverInterface'
-import { getRoute, calculateFare } from '../lib/routingService'
+import MapComponent from './MapComponent'
+import { getRoute, calculateFare, getRouteSourceInfo, formatRouteSummary } from '../lib/routingService'
+import { routeEstimationService } from '../lib/routeEstimationService'
 
 // Fix Leaflet icon issues
 delete L.Icon.Default.prototype._getIconUrl
