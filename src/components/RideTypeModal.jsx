@@ -97,7 +97,7 @@ const SERVICES = [
     color: 'from-pink-500 to-pink-600',
     description: 'Laundry pickup and delivery',
     criteria: [
-      { label: 'Weight', icon: '���️', hint: 'Up to 10kg' },
+      { label: 'Weight', icon: '⚖️', hint: 'Up to 10kg' },
       { label: 'Type', icon: '👔', hint: 'Clothes & fabric' },
       { label: 'Cleaning', icon: '✨', hint: 'Same-day service' }
     ],
@@ -167,8 +167,9 @@ export default function RideTypeModal({
   const getBackgroundColor = (typeId) => {
     const type = [...VEHICLE_TYPES, ...SERVICES].find(t => t.id === typeId)
     if (!type) return 'bg-slate-600'
-    
+
     switch(typeId) {
+      case 'ride-share': return 'bg-cyan-600'
       case 'car': return 'bg-blue-600'
       case 'tricycle': return 'bg-yellow-600'
       case 'package': return 'bg-purple-600'
