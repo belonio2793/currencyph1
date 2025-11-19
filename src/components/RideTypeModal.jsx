@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 const VEHICLE_TYPES = [
   {
@@ -72,9 +72,6 @@ export default function RideTypeModal({
   }
 
   const getBackgroundColor = (typeId) => {
-    const type = [...VEHICLE_TYPES, ...SERVICES].find(t => t.id === typeId)
-    if (!type) return 'bg-slate-600'
-
     switch(typeId) {
       case 'ride-share': return 'bg-cyan-600'
       case 'car': return 'bg-blue-600'
