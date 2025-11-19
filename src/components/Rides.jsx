@@ -1281,7 +1281,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 </div>
 
                 {/* Right Side: Map */}
-                <div className="relative bg-slate-100 overflow-hidden" style={{ minHeight: '600px' }}>
+                <div className="relative bg-slate-100 overflow-hidden lg:block hidden" style={{ minHeight: '600px' }}>
                   <div style={{ position: 'relative', zIndex: 0, height: '100%' }}>
                     <MapComponent
                       userLocation={userLocation}
