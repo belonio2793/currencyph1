@@ -193,7 +193,8 @@ export function useGeolocation() {
           if (isMountedRef.current) {
             console.debug('Geolocation error:', err?.message || 'Unknown error')
             setError(err?.message || 'Location not available')
-            setLoading(false)
+            if (isRefresh) setIsRefreshing(false)
+            else setLoading(false)
           }
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
