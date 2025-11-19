@@ -55,13 +55,16 @@ export function stopPresence() {
   if (presenceIntervalId) {
     clearInterval(presenceIntervalId)
   }
-  if (currentUserId) {
+  if (currentUserId && isSupabaseHealthy()) {
     updatePresence('offline').catch(() => {})
   }
 }
 
 async function updatePresence(status) {
   if (!currentUserId) return
+
+  // Skip presence updates if Supabase is not healthy
+  if (!isSupabaseHealthy()) return
 
   try {
     const updateData = {
