@@ -374,50 +374,134 @@
   animation: marker-pulse 2s infinite;
 }
 
-/* Marker Ping Animations */
+/* Marker Ping Animations - 4 second cycle for visible beacon effect */
 @keyframes marker-ping-outer {
   0% {
-    width: 100%;
-    height: 100%;
+    box-shadow: 0 0 0 0 currentColor;
     opacity: 1;
   }
-  70% {
-    width: 200%;
-    height: 200%;
-    opacity: 0;
+  50% {
+    opacity: 0.8;
   }
   100% {
-    width: 250%;
-    height: 250%;
+    box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
     opacity: 0;
   }
 }
 
 @keyframes marker-ping-inner {
   0% {
-    width: 75%;
-    height: 75%;
+    box-shadow: 0 0 0 0 currentColor;
     opacity: 1;
   }
+  50% {
+    opacity: 0.9;
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+    opacity: 0;
+  }
+}
+
+/* Separate animations for different marker colors */
+@keyframes marker-ping-outer-green {
+  0% {
+    box-shadow: 0 0 0 0 #10B981;
+    opacity: 0.8;
+  }
   70% {
-    width: 180%;
-    height: 180%;
+    box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
     opacity: 0;
   }
   100% {
-    width: 230%;
-    height: 230%;
+    box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
     opacity: 0;
   }
 }
 
+@keyframes marker-ping-inner-green {
+  0% {
+    box-shadow: 0 0 0 0 #10B981;
+    opacity: 0.9;
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(16, 185, 129, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes marker-ping-outer-red {
+  0% {
+    box-shadow: 0 0 0 0 #EF4444;
+    opacity: 0.8;
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes marker-ping-inner-red {
+  0% {
+    box-shadow: 0 0 0 0 #EF4444;
+    opacity: 0.9;
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(239, 68, 68, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes marker-ping-outer-blue {
+  0% {
+    box-shadow: 0 0 0 0 #3B82F6;
+    opacity: 0.8;
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(59, 130, 246, 0);
+    opacity: 0;
+  }
+}
+
+@keyframes marker-ping-inner-blue {
+  0% {
+    box-shadow: 0 0 0 0 #3B82F6;
+    opacity: 0.9;
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+    opacity: 0;
+  }
+  100% {
+    box-shadow: 0 0 0 15px rgba(59, 130, 246, 0);
+    opacity: 0;
+  }
+}
+
+/* Base ping animations - 4 second duration */
 .marker-ping-outer {
-  animation: marker-ping-outer 2s ease-out infinite !important;
+  animation: marker-ping-outer 4s ease-out infinite !important;
 }
 
 .marker-ping-inner {
-  animation: marker-ping-inner 2s ease-out infinite !important;
-  animation-delay: 0.3s !important;
+  animation: marker-ping-inner 4s ease-out infinite !important;
+  animation-delay: 0.8s !important;
 }
 
 /* Enhanced Marker Container Styles */
