@@ -109,7 +109,7 @@
 }
 
 /* Error Message */
-.location-search-form ~ div:has(svg[viewBox="0 0 24 24"]) {
+.error-message {
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 10px;
@@ -117,6 +117,19 @@
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+}
+
+.error-message svg {
+  width: 20px;
+  height: 20px;
+  color: #dc2626;
+  flex-shrink: 0;
+}
+
+.error-message p {
+  font-size: 13px;
+  color: #991b1b;
+  margin: 0;
 }
 
 /* Search Results Container */
