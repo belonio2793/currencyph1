@@ -315,6 +315,11 @@ function MapComponent({ userLocation, drivers, riders, startCoord, endCoord, onM
           </Marker>
         ))}
       </MapContainer>
+      {selectingCoord && (
+        <div className="bg-blue-500 text-white p-3 text-center text-sm font-medium">
+          Click on the map or drag a marker to select {selectingCoord === 'start' ? 'pickup location' : 'destination'}
+        </div>
+      )}
     </div>
   )
 }
