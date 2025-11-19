@@ -957,11 +957,11 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                 onClick={() => setUserRole(userRole === 'rider' ? 'driver' : 'rider')}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   userRole === 'rider'
-                    ? 'bg-yellow-400 text-slate-900 hover:bg-yellow-500 border border-yellow-500'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-yellow-400 text-slate-900 hover:bg-yellow-500 border border-yellow-500'
                 }`}
               >
-                {userRole === 'rider' ? 'Switch To Driver Mode' : 'Switch To Rider'}
+                {userRole === 'rider' ? 'Switch To Driver' : 'Switch To Rider'}
               </button>
             </div>
           </div>
