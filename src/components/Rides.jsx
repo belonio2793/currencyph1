@@ -1446,24 +1446,24 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                           </button>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
-                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
-                            <span className="text-slate-600 font-medium text-sm">Vehicle Type:</span>
+                          <div className="flex flex-col p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm mb-2">Vehicle Type:</span>
                             <span className="text-slate-900 font-medium capitalize text-sm">{driverVehicleType || 'Not set'}</span>
                           </div>
-                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
-                            <span className="text-slate-600 font-medium text-sm">Make/Model:</span>
+                          <div className="flex flex-col p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm mb-2">Make/Model:</span>
                             <span className="text-slate-900 font-medium text-sm">{driverMakeModel || 'Not set'}</span>
                           </div>
-                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
-                            <span className="text-slate-600 font-medium text-sm">Year:</span>
+                          <div className="flex flex-col p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm mb-2">Year:</span>
                             <span className="text-slate-900 font-medium text-sm">{driverYear || 'Not set'}</span>
                           </div>
-                          <div className="flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
-                            <span className="text-slate-600 font-medium text-sm">Fuel Type:</span>
+                          <div className="flex flex-col p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm mb-2">Fuel Type:</span>
                             <span className="text-slate-900 font-medium text-sm capitalize">{driverFuelType || 'Not set'}</span>
                           </div>
-                          <div className="col-span-2 flex items-center justify-between p-3 bg-white rounded-lg border border-amber-100">
-                            <span className="text-slate-600 font-medium text-sm">Mileage:</span>
+                          <div className="col-span-2 flex flex-col p-3 bg-white rounded-lg border border-amber-100">
+                            <span className="text-slate-600 font-medium text-sm mb-2">Mileage:</span>
                             <span className="text-slate-900 font-medium text-sm">{driverMileage ? `${driverMileage.toLocaleString()} km` : 'Not set'}</span>
                           </div>
                         </div>
