@@ -427,7 +427,7 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
           console.debug('Could not load profile:', error?.code || error?.message)
         }
       } else if (data) {
-        setUserRole(data.role || 'rider')
+        setUserRole('rider')
         setDriverStatus(data.status || 'offline')
         setDriverVehicleType(data.vehicle_type || 'car')
         setDriverMakeModel(data.vehicle_make_model || '')
