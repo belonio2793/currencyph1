@@ -200,69 +200,71 @@ export default function RideTypeModal({
           </button>
         </div>
 
-        {/* Category Tabs */}
-        <div className="flex gap-2 border-b border-slate-200 bg-slate-50 p-4">
-          <button
-            onClick={() => {
-              setActiveCategory('vehicle')
-              setExpandedType('car')
-            }}
-            className={`px-4 py-2 font-medium rounded-lg transition-colors ${
-              activeCategory === 'vehicle'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
-            }`}
-          >
-            🚗 Vehicle Type
-          </button>
-          <button
-            onClick={() => {
-              setActiveCategory('service')
-              setExpandedType('package')
-            }}
-            className={`px-4 py-2 font-medium rounded-lg transition-colors ${
-              activeCategory === 'service'
-                ? 'bg-blue-600 text-white'
-                : 'bg-white text-slate-700 border border-slate-200 hover:border-slate-300'
-            }`}
-          >
-            📦 Available Services
-          </button>
-        </div>
-
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Type Selection List */}
-            <div className="space-y-3">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">
-                {activeCategory === 'vehicle' ? 'Choose Vehicle Type' : 'Choose Service'}
-              </h3>
-              <div className="space-y-2">
-                {allTypes.map((type) => (
-                  <button
-                    key={type.id}
-                    onClick={() => setExpandedType(type.id)}
-                    className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
-                      expandedType === type.id
-                        ? 'border-blue-500 bg-blue-50 shadow-md'
-                        : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-3xl">{type.icon}</span>
-                      <div className="flex-1">
-                        <p className="font-semibold text-slate-900">{type.label}</p>
-                        <p className="text-xs text-slate-500 mt-0.5">{type.description}</p>
+            <div className="space-y-6">
+              {/* Vehicle Types Section */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Ride Type</h3>
+                <div className="space-y-2">
+                  {VEHICLE_TYPES.map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setExpandedType(type.id)}
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                        expandedType === type.id
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{type.icon}</span>
+                        <div className="flex-1">
+                          <p className="font-semibold text-slate-900">{type.label}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{type.description}</p>
+                        </div>
+                        {expandedType === type.id && (
+                          <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
                       </div>
-                      {expandedType === type.id && (
-                        <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      )}
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Available Services Section */}
+              <div className="space-y-3">
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Available Services</h3>
+                <div className="space-y-2">
+                  {SERVICES.map((type) => (
+                    <button
+                      key={type.id}
+                      onClick={() => setExpandedType(type.id)}
+                      className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
+                        expandedType === type.id
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{type.icon}</span>
+                        <div className="flex-1">
+                          <p className="font-semibold text-slate-900">{type.label}</p>
+                          <p className="text-xs text-slate-500 mt-0.5">{type.description}</p>
+                        </div>
+                        {expandedType === type.id && (
+                          <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
