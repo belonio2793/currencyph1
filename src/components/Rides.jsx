@@ -1201,37 +1201,6 @@ export default function Rides({ userId, userEmail, onShowAuth }) {
                     </div>
                   </div>
 
-                  {/* Pickup Location Display */}
-                  {startCoord && (
-                    <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                      <p className="text-xs font-semibold text-green-900 uppercase">Pickup Location</p>
-                      <p className="text-sm text-green-800 mt-1">
-                        {startCoord.latitude.toFixed(4)}, {startCoord.longitude.toFixed(4)}
-                      </p>
-                      <button
-                        onClick={() => setSelectingCoord('start')}
-                        className="text-xs text-green-700 hover:text-green-900 font-medium mt-2 underline"
-                      >
-                        Change Location
-                      </button>
-                    </div>
-                  )}
-
-                  {/* Destination Location Display */}
-                  {endCoord && (
-                    <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                      <p className="text-xs font-semibold text-red-900 uppercase">Destination</p>
-                      <p className="text-sm text-red-800 mt-1">
-                        {endCoord.latitude.toFixed(4)}, {endCoord.longitude.toFixed(4)}
-                      </p>
-                      <button
-                        onClick={() => setSelectingCoord('end')}
-                        className="text-xs text-red-700 hover:text-red-900 font-medium mt-2 underline"
-                      >
-                        Change Location
-                      </button>
-                    </div>
-                  )}
 
                   {/* Route Ready Confirmation */}
                   {startCoord && endCoord && (
