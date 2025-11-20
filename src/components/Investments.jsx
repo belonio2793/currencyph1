@@ -441,7 +441,7 @@ export default function Investments({ userId }) {
                       onClick={() => setDetailTab(tab.id)}
                       className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                         detailTab === tab.id
-                          ? 'border-blue-600 text-blue-600'
+                          ? 'border-slate-400 text-slate-900'
                           : 'border-transparent text-slate-600 hover:text-slate-900'
                       }`}
                     >
@@ -456,7 +456,7 @@ export default function Investments({ userId }) {
                         <button
                           onClick={() => saveChanges(detailTab)}
                           disabled={saving}
-                          className="px-3 py-2 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 disabled:opacity-50"
+                          className="px-3 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800 disabled:opacity-50"
                         >
                           {saving ? 'Saving...' : 'Save'}
                         </button>
@@ -470,7 +470,7 @@ export default function Investments({ userId }) {
                     ) : (
                       <button
                         onClick={() => toggleEditMode(detailTab)}
-                        className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="px-3 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800"
                       >
                         ✎ Edit
                       </button>
@@ -491,18 +491,18 @@ export default function Investments({ userId }) {
                     </div>
                     <div className="bg-slate-50 p-4 rounded-lg">
                       <div className="text-xs text-slate-600 mb-1">Funded</div>
-                      <div className="text-xl font-semibold text-emerald-600">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(fundedMap[selectedProject.id] || 0).toLocaleString()}</div>
+                      <div className="text-xl font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(fundedMap[selectedProject.id] || 0).toLocaleString()}</div>
                     </div>
                     <div className="bg-slate-50 p-4 rounded-lg">
                       <div className="text-xs text-slate-600 mb-1">Remaining</div>
-                      <div className="text-xl font-semibold text-orange-600">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0)).toLocaleString()}</div>
+                      <div className="text-xl font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0)).toLocaleString()}</div>
                     </div>
                   </div>
 
                   <div>
                     <div className="text-xs uppercase text-slate-500 mb-2 font-semibold">Funding Progress</div>
                     <div className="w-full bg-slate-200 rounded-full h-4">
-                      <div className="bg-blue-600 h-4 rounded-full transition-all" style={{ width: `${selectedProject.total_cost > 0 ? ((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost) * 100) : 0}%` }} />
+                      <div className="bg-slate-400 h-4 rounded-full transition-all" style={{ width: `${selectedProject.total_cost > 0 ? ((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost) * 100) : 0}%` }} />
                     </div>
                     <div className="text-sm text-slate-600 mt-2">{selectedProject.total_cost > 0 ? (((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost)) * 100).toFixed(2) : '0.00'}%</div>
                   </div>
@@ -532,7 +532,7 @@ export default function Investments({ userId }) {
                     )}
                   </div>
 
-                  <button onClick={() => openInvestModal(selectedProject)} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium">Invest in this Project</button>
+                  <button onClick={() => openInvestModal(selectedProject)} className="w-full bg-slate-700 text-white py-3 rounded-lg font-medium hover:bg-slate-800">Invest in this Project</button>
                 </div>
               )}
 
@@ -541,7 +541,7 @@ export default function Investments({ userId }) {
                 <div className="space-y-4">
                   <button
                     onClick={() => setShowEquipmentManager(true)}
-                    className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-lg"
+                    className="w-full px-6 py-4 bg-slate-700 text-white rounded-lg hover:bg-slate-800 font-medium text-lg"
                   >
                     Manage Equipment
                   </button>
@@ -575,7 +575,7 @@ export default function Investments({ userId }) {
                                 <td className="py-4 px-4 text-sm">
                                   <div className="font-medium">{formatUsd(eq.unit_cost_usd || 0)}</div>
                                 </td>
-                                <td className="py-4 px-4 font-semibold text-sm text-blue-600">
+                                <td className="py-4 px-4 font-semibold text-sm text-slate-900">
                                   {formatUsd((eq.unit_cost_usd || 0) * (eq.quantity || 1))}
                                 </td>
                               </tr>
@@ -584,10 +584,10 @@ export default function Investments({ userId }) {
                         </table>
                       </div>
 
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="text-sm text-blue-900">
+                      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                        <div className="text-sm text-slate-900">
                           <span className="font-semibold">Total Equipment Cost: </span>
-                          <span className="text-lg font-bold text-blue-600">
+                          <span className="text-lg font-bold text-slate-900">
                             {formatUsd(projectEquipment.reduce((sum, eq) => sum + ((eq.unit_cost_usd || 0) * (eq.quantity || 1)), 0))}
                           </span>
                         </div>
@@ -602,7 +602,7 @@ export default function Investments({ userId }) {
                         {projectSuppliers.map(sup => (
                           <div key={sup.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                             <div className="font-medium text-slate-900">{sup.supplier_name}</div>
-                            {sup.supplier_type && <div className="text-xs font-medium text-blue-600 mt-1">Type: {sup.supplier_type}</div>}
+                            {sup.supplier_type && <div className="text-xs font-medium text-slate-700 mt-1">Type: {sup.supplier_type}</div>}
                             <div className="text-xs text-slate-600 mt-2 space-y-1">
                               {sup.contact_person && <div>👤 {sup.contact_person}</div>}
                               {sup.email && <div>📧 {sup.email}</div>}
