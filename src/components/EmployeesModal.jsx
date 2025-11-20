@@ -802,13 +802,18 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
                     >
                       {/* Status Badges - Top Right */}
                       <div className="absolute top-3 right-3 flex flex-col gap-1">
-                        {/* Employment Status Badge */}
-                        <div className="px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 bg-white border border-slate-200">
-                          <span className={`w-2 h-2 rounded-full ${employee.status === 'active' ? 'bg-green-500' : 'bg-slate-400'}`}></span>
-                          <span className={employee.status === 'active' ? 'text-green-700' : 'text-slate-600'}>
-                            {employee.status === 'active' ? 'Active' : 'Inactive'}
-                          </span>
-                        </div>
+                        {/* User Status Badge (Online/Idle/Offline) */}
+                        {(() => {
+                          const statusColor = getStatusColor(userStatuses[employee.id] || 'offline')
+                          return (
+                            <div className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 ${statusColor.bg} border ${statusColor.border}`}>
+                              <span className={`w-2 h-2 rounded-full ${statusColor.dot}`}></span>
+                              <span className={statusColor.text}>
+                                {(userStatuses[employee.id] || 'offline').charAt(0).toUpperCase() + (userStatuses[employee.id] || 'offline').slice(1)}
+                              </span>
+                            </div>
+                          )
+                        })()}
                         {/* Registration Status Badge */}
                         <div className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 border ${
                           registrationStatus[employee.id]
