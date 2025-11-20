@@ -634,19 +634,21 @@ export default function Investments({ userId }) {
       {showDetail && selectedProject && (
         <Modal onClose={() => setShowDetail(false)} className="">
           <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
-              <div>
-                <h3 className="text-2xl font-semibold text-slate-900">{toTitleCase(selectedProject.name) || selectedProject.name}</h3>
-                <p className="text-sm text-slate-600 mt-1">{toTitleCase(selectedProject.description) || selectedProject.description}</p>
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h3 className="text-2xl font-semibold text-slate-900">{toTitleCase(selectedProject.name) || selectedProject.name}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{toTitleCase(selectedProject.description) || selectedProject.description}</p>
+                </div>
+                <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800 ml-4">Close</button>
               </div>
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2">
                 <button
                   onClick={() => exportProjectPdf()}
-                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                 >
-                  📄 Export PDF
+                  Export PDF
                 </button>
-                <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">✕ Close</button>
               </div>
             </div>
 
