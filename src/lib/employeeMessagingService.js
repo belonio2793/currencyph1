@@ -98,7 +98,7 @@ export const employeeMessagingService = {
         .eq('employee_id', employeeId)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
       if (error && error.code !== 'PGRST116') throw error
       return { data, error: null }
