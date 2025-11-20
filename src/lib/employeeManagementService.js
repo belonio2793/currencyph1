@@ -55,7 +55,7 @@ class EmployeeManagementService {
   static async getEmployee(employeeId) {
     const { data, error } = await supabase
       .from('employees')
-      .select('*')
+      .select('id,business_id,first_name,last_name,email,phone,position,department,employment_status,base_salary,hire_date,tin,sss_number,philhealth_number,pagibig_number,emergency_contact,emergency_contact_phone,created_at,updated_at')
       .eq('id', employeeId)
       .single()
 
