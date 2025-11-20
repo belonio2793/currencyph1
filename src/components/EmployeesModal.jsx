@@ -95,6 +95,7 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       const data = await EmployeeManagementService.getEmployees(businessId)
       setEmployees(data)
       checkRegistrationStatus(data)
+      loadUserStatuses(data)
     } catch (error) {
       console.error('Error loading employees:', error?.message || error)
       if (error?.details) console.error('Error details:', error.details)
@@ -103,6 +104,24 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadUserStatuses = async (employeeList) => {
+    const statusMap = {}
+    for (const employee of employeeList) {
+      try {
+        const { data } = await employeeMessagingService.getLastMessageTime(businessId, employee.id)
+        if (data && data.created_at) {
+          statusMap[employee.id] = employeeMessagingService.getStatusFromLastMessage(data.created_at)
+        } else {
+          statusMap[employee.id] = 'offline'
+        }
+      } catch (error) {
+        console.error('Error loading user status:', error)
+        statusMap[employee.id] = 'offline'
+      }
+    }
+    setUserStatuses(statusMap)
   }
 
   const checkRegistrationStatus = async (employeeList) => {
