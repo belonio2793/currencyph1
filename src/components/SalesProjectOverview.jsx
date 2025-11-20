@@ -76,7 +76,7 @@ export default function SalesProjectOverview({
         keyBenefits: [
           { icon: '🥥', title: '15+ Product Lines', desc: 'VCO, bottled water, coir fiber, activated carbon, coco peat, desiccated coconut, animal feed, fertilizer' },
           { icon: '♻️', title: 'True Zero-Waste Model', desc: 'Every part of coconut becomes revenue. Shell → fuel. Husk → fiber. Residues → fertilizer.' },
-          { icon: '��', title: 'Premium Export Markets', desc: 'Direct access to EU, Japan, North America markets. Organic & HACCP certifications.' },
+          { icon: '🌍', title: 'Premium Export Markets', desc: 'Direct access to EU, Japan, North America markets. Organic & HACCP certifications.' },
           { icon: '💎', title: 'VCO Premium Pricing', desc: 'Virgin Coconut Oil commands $5-7/L wholesale vs. $2-3 for commodity oil' },
           { icon: '📦', title: 'Scalable Production', desc: '500L/hour base capacity with expansion potential to 1,000+ L/hour' },
           { icon: '🤝', title: 'Farmer Cooperative Ties', desc: 'Secure supply chain. 30-40% higher prices than commodity buyers support farmer loyalty' }
@@ -171,11 +171,13 @@ export default function SalesProjectOverview({
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                 <div className="text-xs text-slate-600 font-semibold mb-1 uppercase">Year 1 Revenue</div>
-                <div className="text-2xl font-bold text-green-600">${summary.roi.year1Revenue.toLocaleString()}</div>
+                <div className="text-xl font-bold text-green-600">₱{(summary.roi.year1Revenue / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>
+                <div className="text-xs text-slate-500 mt-1">${summary.roi.year1Revenue.toLocaleString()}</div>
               </div>
               <div className="bg-white rounded-lg p-4 border border-emerald-200 shadow-sm">
                 <div className="text-xs text-slate-600 font-semibold mb-1 uppercase">Year 1 Profit</div>
-                <div className="text-2xl font-bold text-emerald-600">${summary.roi.year1Profit.toLocaleString()}</div>
+                <div className="text-xl font-bold text-emerald-600">₱{(summary.roi.year1Profit / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}</div>
+                <div className="text-xs text-slate-500 mt-1">${summary.roi.year1Profit.toLocaleString()}</div>
               </div>
               <div className="bg-white rounded-lg p-4 border border-blue-200 shadow-sm">
                 <div className="text-xs text-slate-600 font-semibold mb-1 uppercase">Payback Period</div>
@@ -312,7 +314,7 @@ export default function SalesProjectOverview({
           </div>
 
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-300 rounded-lg p-6">
-            <h4 className="font-bold text-slate-900 mb-3 text-lg">📋 Investor Protections</h4>
+            <h4 className="font-bold text-slate-900 mb-3 text-lg">�� Investor Protections</h4>
             <ul className="space-y-2 text-sm text-slate-700">
               <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Quarterly financial updates & transparency reports</li>
               <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Clear profit-sharing model based on investment amount</li>
