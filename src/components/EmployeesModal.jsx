@@ -167,25 +167,6 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     }
   }, [selectedEmployee, activeTab])
 
-  const loadAttendance = async () => {
-    try {
-      setLoadingAttendance(true)
-      const startDate = new Date()
-      startDate.setMonth(startDate.getMonth() - 1)
-      const data = await EmployeeManagementService.getAttendanceRecords(
-        selectedEmployee.id,
-        startDate.toISOString().split('T')[0],
-        new Date().toISOString().split('T')[0]
-      )
-      setAttendanceRecords(data)
-    } catch (error) {
-      const errorMsg = error?.message || JSON.stringify(error)
-      console.error('Error loading attendance:', errorMsg)
-    } finally {
-      setLoadingAttendance(false)
-    }
-  }
-
   const loadMedicalRecords = async () => {
     try {
       const data = await EmployeeManagementService.getMedicalRecords(selectedEmployee.id)
