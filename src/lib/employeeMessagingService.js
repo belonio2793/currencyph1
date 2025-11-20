@@ -56,7 +56,8 @@ export const employeeMessagingService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      console.error('[employeeMessagingService] sendMessage failed:', err)
+      const errorMsg = err?.message || JSON.stringify(err)
+      console.error('[employeeMessagingService] sendMessage failed:', errorMsg)
       return { data: null, error: err }
     }
   },
@@ -78,7 +79,11 @@ export const employeeMessagingService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      console.error('[employeeMessagingService] getMessages failed:', err)
+      const errorMsg = err?.message || JSON.stringify(err)
+      console.error('[employeeMessagingService] getMessages failed:', errorMsg)
+      if (err?.code === '42P01') {
+        console.warn('Note: employee_messages table does not exist. Please create it in Supabase.')
+      }
       return { data: null, error: err }
     }
   },
@@ -98,7 +103,11 @@ export const employeeMessagingService = {
       if (error && error.code !== 'PGRST116') throw error
       return { data, error: null }
     } catch (err) {
-      console.error('[employeeMessagingService] getLastMessageTime failed:', err)
+      const errorMsg = err?.message || JSON.stringify(err)
+      console.error('[employeeMessagingService] getLastMessageTime failed:', errorMsg)
+      if (err?.code === '42P01') {
+        console.warn('Note: employee_messages table does not exist. Please create it in Supabase.')
+      }
       return { data: null, error: err }
     }
   },
@@ -124,7 +133,8 @@ export const employeeMessagingService = {
         }
       }
     } catch (err) {
-      console.error('[employeeMessagingService] subscribeToEmployeeMessages failed:', err)
+      const errorMsg = err?.message || JSON.stringify(err)
+      console.error('[employeeMessagingService] subscribeToEmployeeMessages failed:', errorMsg)
       return { unsubscribe: () => {} }
     }
   },
