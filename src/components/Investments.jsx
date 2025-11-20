@@ -506,11 +506,28 @@ export default function Investments({ userId }) {
         return
       }
 
-      const filename = `${selectedProject.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
-      const pdfUrl = doc.output('bloburi')
-      window.open(pdfUrl, '_blank')
+      try {
+        // Use blob method for better compatibility
+        const pdfBlob = doc.output('blob')
+        const pdfUrl = URL.createObjectURL(pdfBlob)
+        window.open(pdfUrl, '_blank')
 
-      setSuccess(`Professional report generated and opened successfully`)
+        // Clean up the object URL after a delay
+        setTimeout(() => URL.revokeObjectURL(pdfUrl), 100)
+
+        setSuccess(`Professional report generated and opened successfully`)
+      } catch (blobErr) {
+        console.error('Blob method failed, trying datauristring:', blobErr)
+        try {
+          // Fallback: use data URI
+          const dataUri = doc.output('datauristring')
+          window.open(dataUri, '_blank')
+          setSuccess(`Professional report generated and opened successfully`)
+        } catch (fallbackErr) {
+          console.error('All PDF methods failed:', fallbackErr)
+          setError(`Failed to open PDF. Please try again.`)
+        }
+      }
     } catch (err) {
       console.error('Failed to export PDF:', err)
       setError(`Failed to export PDF: ${err.message}`)
