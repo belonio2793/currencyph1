@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getCurrencySymbol, formatCurrency } from '../lib/currency'
-import { getPhpToUsdRate, phpToUsd, usdToPhp, formatPhp, formatUsd, CurrencyInput } from '../lib/currencyConversion.jsx'
+import { getPhpToUsdRate, phpToUsd, usdToPhp, formatPhp, formatUsd, CurrencyInput } from '../lib/currencyConversion'
 import { createPortal } from 'react-dom'
 
 function Modal({ children, onClose, className = '' }) {
