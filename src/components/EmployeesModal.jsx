@@ -628,9 +628,8 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {employees.map(employee => (
-                    <button
+                    <div
                       key={employee.id}
-                      onClick={() => setSelectedEmployee(employee)}
                       className={`text-left p-4 rounded-lg border-2 transition-all ${
                         selectedEmployee?.id === employee.id
                           ? 'border-purple-600 bg-purple-50'
@@ -646,14 +645,37 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                           <p className="text-sm text-slate-600">{employee.position}</p>
                         </div>
                       </div>
-                      <div className="text-sm text-slate-600">
+                      <div className="text-sm text-slate-600 mb-3">
                         <p>{employee.email}</p>
                         {employee.department && <p>{employee.department}</p>}
-                        <p className={`mt-2 font-medium ${employee.employment_status === 'active' ? 'text-green-600' : 'text-slate-600'}`}>
-                          {employee.employment_status}
+                        <p className={`mt-2 font-medium ${employee.status === 'active' ? 'text-green-600' : 'text-slate-600'}`}>
+                          {employee.status}
                         </p>
                       </div>
-                    </button>
+
+                      <div className="mb-3 px-2 py-1 rounded bg-slate-100 text-xs font-medium">
+                        {registrationStatus[employee.id] ? (
+                          <span className="text-green-700">✓ Registered</span>
+                        ) : (
+                          <span className="text-amber-700">⚠ Not Registered</span>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2 pt-2 border-t border-slate-200">
+                        <button
+                          onClick={() => setSelectedEmployee(employee)}
+                          className="flex-1 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={() => handleEditEmployee(employee)}
+                          className="flex-1 px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium"
+                        >
+                          Edit
+                        </button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
