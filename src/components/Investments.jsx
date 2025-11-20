@@ -6,6 +6,43 @@ import { createPortal } from 'react-dom'
 import EquipmentManager from './EquipmentManager'
 import PaginatedProjectOverview from './PaginatedProjectOverview'
 
+// Utility function to convert snake_case to Title Case
+function toTitleCase(str) {
+  if (!str) return ''
+  return str
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ')
+}
+
+// Function to calculate total cost dynamically from equipment and costs
+function calculateTotalCost(equipment, costs, exchangeRate) {
+  let equipmentTotal = 0
+  let costsTotal = 0
+
+  // Sum equipment costs: (unit_cost_usd * quantity) for each item
+  if (equipment && equipment.length > 0) {
+    equipmentTotal = equipment.reduce((sum, eq) => {
+      const unitCost = Number(eq.unit_cost_usd || 0)
+      const quantity = Number(eq.quantity || 1)
+      return sum + (unitCost * quantity)
+    }, 0)
+  }
+
+  // Sum project costs: budgeted_amount_usd for each cost item
+  if (costs && costs.length > 0) {
+    costsTotal = costs.reduce((sum, cost) => {
+      return sum + (Number(cost.budgeted_amount_usd || 0))
+    }, 0)
+  }
+
+  // Total in USD, convert to PHP
+  const totalUsd = equipmentTotal + costsTotal
+  const totalPhp = usdToPhp(totalUsd, exchangeRate)
+
+  return { totalUsd, totalPhp, equipmentTotal, costsTotal }
+}
+
 function Modal({ children, onClose, className = '' }) {
   if (typeof document === 'undefined') return null
   return createPortal(
