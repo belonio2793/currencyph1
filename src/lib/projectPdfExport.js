@@ -220,14 +220,12 @@ function addDivider(doc, yPos) {
 
 export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
   const doc = new jsPDF('p', 'mm', 'a4')
-  let pageNum = 0
+  let pageNum = 1
   let totalPages = 12
-
-  const getTotalPages = () => totalPages
 
   const projectName = project.name || 'Project Report'
 
-  yPos = MARGINS.top + MARGINS.headerFooter + 4
+  let yPos = MARGINS.top + MARGINS.headerFooter + 4
 
   doc.setFillColor(...COLORS.primary)
   doc.rect(0, 0, PAGE_WIDTH, 70, 'F')
