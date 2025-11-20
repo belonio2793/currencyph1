@@ -407,28 +407,58 @@ export default function Investments({ userId }) {
             </div>
 
             <div className="border-b border-slate-200">
-              <div className="flex gap-1 px-6 overflow-x-auto">
-                {[
-                  { id: 'overview', label: 'Overview' },
-                  { id: 'equipment', label: 'Equipment' },
-                  { id: 'costs', label: 'Costs' },
-                  { id: 'production', label: 'Production' },
-                  { id: 'financials', label: 'Financials' },
-                  { id: 'timeline', label: 'Timeline' },
-                  { id: 'risks', label: 'Risks' }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setDetailTab(tab.id)}
-                    className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                      detailTab === tab.id
-                        ? 'border-blue-600 text-blue-600'
-                        : 'border-transparent text-slate-600 hover:text-slate-900'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
+              <div className="flex justify-between items-center px-6">
+                <div className="flex gap-1 overflow-x-auto">
+                  {[
+                    { id: 'overview', label: 'Overview' },
+                    { id: 'equipment', label: 'Equipment' },
+                    { id: 'costs', label: 'Costs' },
+                    { id: 'production', label: 'Production' },
+                    { id: 'financials', label: 'Financials' },
+                    { id: 'timeline', label: 'Timeline' },
+                    { id: 'risks', label: 'Risks' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setDetailTab(tab.id)}
+                      className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                        detailTab === tab.id
+                          ? 'border-blue-600 text-blue-600'
+                          : 'border-transparent text-slate-600 hover:text-slate-900'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </div>
+                {detailTab !== 'overview' && (
+                  <div className="flex gap-2">
+                    {editMode[detailTab] ? (
+                      <>
+                        <button
+                          onClick={() => saveChanges(detailTab)}
+                          disabled={saving}
+                          className="px-3 py-2 bg-emerald-600 text-white text-sm rounded hover:bg-emerald-700 disabled:opacity-50"
+                        >
+                          {saving ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={() => toggleEditMode(detailTab)}
+                          className="px-3 py-2 bg-slate-300 text-slate-900 text-sm rounded hover:bg-slate-400"
+                        >
+                          Cancel
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => toggleEditMode(detailTab)}
+                        className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      >
+                        ✎ Edit
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
