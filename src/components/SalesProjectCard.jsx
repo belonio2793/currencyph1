@@ -1,6 +1,7 @@
 import React from 'react'
 import { formatCurrency, formatPhp, formatUsd } from '../lib/currency'
 import { phpToUsd } from '../lib/currencyConversion'
+import { cleanProjectName, cleanDescription } from '../lib/textSanitizer'
 
 export default function SalesProjectCard({
   project,
