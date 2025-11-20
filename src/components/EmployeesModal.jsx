@@ -105,7 +105,7 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
     for (const employee of employeeList) {
       try {
         const { data } = await supabase
-          .from('auth.users')
+          .from('users')
           .select('id, email')
           .eq('email', employee.email)
           .single()
