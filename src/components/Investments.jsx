@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getCurrencySymbol, formatCurrency } from '../lib/currency'
 import { getPhpToUsdRate, phpToUsd, usdToPhp, formatPhp, formatUsd } from '../lib/currencyConversion'
@@ -922,7 +921,7 @@ export default function Investments({ userId }) {
                                       <div>{formatPhp(cost.actual_amount_php || phpToUsd(cost.actual_amount_usd || 0, exchangeRate))}</div>
                                       <div className="text-xs text-slate-500">{formatUsd(cost.actual_amount_usd)}</div>
                                     </>
-                                  ) : '—'}
+                                  ) : '��'}
                                 </td>
                                 <td className="py-3 px-2">{cost.percentage_of_total ? `${cost.percentage_of_total.toFixed(1)}%` : '—'}</td>
                               </tr>
