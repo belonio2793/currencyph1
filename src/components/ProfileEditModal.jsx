@@ -803,7 +803,7 @@ export default function ProfileEditModal({ onClose }) {
                         <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
                           <div>
                             <p className="text-sm font-medium text-slate-900">Hide my profile from the All users list</p>
-                            <p className="text-xs text-slate-500">When enabled, your account will not appear in Messages > All.</p>
+                            <p className="text-xs text-slate-500">When enabled, your account will not appear in Messages &gt; All.</p>
                           </div>
                           <div>
                             <input type="checkbox" checked={isAccountPrivate()} onChange={(e) => setPrivacy('listed_in_all', e.target.checked ? 'only_me' : 'everyone')} className="w-4 h-4" />
