@@ -237,6 +237,11 @@ export default function Investments({ userId }) {
     setEditMode(prev => ({ ...prev, [tab]: !prev[tab] }))
     if (!editMode[tab]) {
       // Initialize edit data when entering edit mode
+      if (tab === 'suppliers') {
+        setSupplierEditPage(1)
+      } else if (tab === 'partnerships') {
+        setPartnerEditPage(1)
+      }
       switch (tab) {
         case 'equipment':
           setEditData(prev => ({ ...prev, equipment: JSON.parse(JSON.stringify(projectEquipment)) }))
