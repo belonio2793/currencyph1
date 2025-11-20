@@ -290,8 +290,34 @@ export default function Investments({ userId }) {
         metrics: 'financial_metrics'
       }[tab]
 
+      // Get original data to detect deletions
+      const originalData = {
+        equipment: projectEquipment,
+        suppliers: projectSuppliers,
+        partnerships: projectPartners,
+        costs: projectCosts,
+        production: productionCapacity,
+        revenues: revenueForecast,
+        milestones: projectMilestones,
+        risks: riskAssessment,
+        metrics: financialMetrics
+      }[tab] || []
+
       const data = editData[tab]
 
+      // Delete items that were removed
+      const deletedItems = originalData.filter(
+        orig => orig.id && !data.find(item => item.id === orig.id)
+      )
+      for (const item of deletedItems) {
+        const { error } = await supabase
+          .from(table)
+          .delete()
+          .eq('id', item.id)
+        if (error) throw error
+      }
+
+      // Update or insert items
       for (const item of data) {
         if (item.id) {
           // Update existing
