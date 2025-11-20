@@ -204,7 +204,7 @@ function createProductPortfolio(doc) {
 
   const items = [
     {
-      title: '🥛 Virgin Coconut Oil (VCO)',
+      title: 'Virgin Coconut Oil (VCO)',
       text: 'Cold-extracted, premium product commanding $6/liter in export markets. Year 1: 28,800 liters = $172,800 revenue. Margin: 60%+. Uses: Food, cosmetics, pharmaceutical.',
       metrics: [
         { label: 'Year 1 Volume', value: '28,800 L' },
@@ -214,7 +214,7 @@ function createProductPortfolio(doc) {
       ]
     },
     {
-      title: '💧 Bottled Coconut Water',
+      title: 'Bottled Coconut Water',
       text: 'Functional beverage trending +18% CAGR globally. Our facility sterilizes and bottles young coconut water for export and domestic retail. Year 1: 144,000 liters = $144,000 revenue. Premium branding possible.',
       metrics: [
         { label: 'Year 1 Volume', value: '144,000 L' },
@@ -224,7 +224,7 @@ function createProductPortfolio(doc) {
       ]
     },
     {
-      title: '🍶 Coconut Milk & Cream',
+      title: 'Coconut Milk & Cream',
       text: 'Ingredient for food industry (ice cream, curries, desserts). Stable demand, bulk sales to manufacturers. Year 1: 64,800 liters = $162,000 revenue. Lower volatility than oil.',
       metrics: [
         { label: 'Year 1 Volume', value: '64,800 L' },
@@ -234,7 +234,7 @@ function createProductPortfolio(doc) {
       ]
     },
     {
-      title: '🌱 Coir Fiber (Husk)',
+      title: 'Coir Fiber (Husk)',
       text: 'Converted to mats, ropes, erosion control products. Growing demand from sustainable agriculture and construction. Year 1: 43,200 kg = $12,960 revenue.',
       metrics: [
         { label: 'Year 1 Volume', value: '43,200 kg' },
@@ -244,7 +244,7 @@ function createProductPortfolio(doc) {
       ]
     },
     {
-      title: '🌿 Coco-Peat Substrate',
+      title: 'Coco-Peat Substrate',
       text: 'Premium growing medium for nurseries, greenhouses, hydroponics. Coco-peat is a peat moss replacement with 2–3x the margin. Year 1: 90,000 kg = $36,000 revenue.',
       metrics: [
         { label: 'Year 1 Volume', value: '90,000 kg' },
@@ -254,7 +254,7 @@ function createProductPortfolio(doc) {
       ]
     },
     {
-      title: '🔥 Shell Charcoal',
+      title: 'Shell Charcoal',
       text: 'Premium charcoal for grilling, activated carbon production, biofuel. Year 1: 54,000 kg = $32,400 revenue. Can also generate on-site energy for plant operations.',
       metrics: [
         { label: 'Year 1 Volume', value: '54,000 kg' },
@@ -264,7 +264,7 @@ function createProductPortfolio(doc) {
       ]
     },
     {
-      title: '🌾 Organic Fertilizer & Feed',
+      title: 'Organic Fertilizer & Feed',
       text: 'Residual pulp converted to fertilizer and animal feed. Growing organic farming market. Year 1: 36,000 kg = $7,200 revenue. Completes the zero-waste circle.',
       metrics: [
         { label: 'Year 1 Volume', value: '36,000 kg' },
