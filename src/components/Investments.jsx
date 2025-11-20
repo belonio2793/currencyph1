@@ -623,8 +623,9 @@ export default function Investments({ userId }) {
                                 <div className="text-xs text-slate-500">{c.email}</div>
                               </div>
                               <div className="text-right">
-                                <div className="text-sm font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(c.total).toLocaleString()}</div>
-                                <div className="text-xs text-slate-500">{pct.toFixed(2)}%</div>
+                                <div className="text-sm font-semibold text-slate-900">{formatPhp(Number(c.total))}</div>
+                                <div className="text-xs text-slate-600">{formatUsd(phpToUsd(Number(c.total), exchangeRate))}</div>
+                                <div className="text-xs text-slate-500 mt-1">{pct.toFixed(2)}%</div>
                               </div>
                             </div>
                           )
