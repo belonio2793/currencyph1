@@ -273,6 +273,7 @@ export default function Investments({ userId }) {
       const table = {
         equipment: 'project_equipment',
         suppliers: 'project_suppliers',
+        partnerships: 'project_partnerships',
         costs: 'project_costs',
         production: 'production_capacity',
         revenues: 'revenue_projections',
