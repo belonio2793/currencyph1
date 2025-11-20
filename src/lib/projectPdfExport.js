@@ -171,11 +171,11 @@ function createExecutiveSummary(doc) {
 
   const items = [
     {
-      title: '🎯 The Opportunity',
+      title: 'The Opportunity',
       text: 'We are creating a sustainable, zero-waste processing facility that monetizes 100% of the coconut. Every fiber, every drop of water, every shell becomes a product. This is not a commodity business—it\'s a vertically-integrated value creation machine with 7 distinct revenue streams, all operating in high-margin markets.'
     },
     {
-      title: '💰 The Numbers',
+      title: 'The Numbers',
       text: 'Year 1 revenue of $567,360 against operating costs of just $407,000 delivers $160,000+ in annual profit. With capital investment of $280,000, this achieves cash payback in 2.3 years and 5-year ROI of 185%. In optimistic scenarios, daily profit reaches $1,026 ($376,000/year).',
       metrics: [
         { label: 'Capital Investment', value: '$280,000' },
@@ -186,11 +186,11 @@ function createExecutiveSummary(doc) {
       ]
     },
     {
-      title: '🌍 The Market',
+      title: 'The Market',
       text: 'Global coconut market is $62B annually. Demand for virgin coconut oil (VCO), bottled coconut water, and coco-peat substrate is growing 12–15% year-over-year. Export markets in US, EU, and Asia offer premium pricing. Domestic demand from agribusiness and food manufacturers is insatiable.'
     },
     {
-      title: '♻️ The Difference',
+      title: 'The Difference',
       text: 'Traditional coconut plants waste 40–60% of the nut. We waste nothing. Husk becomes coir fiber and peat. Shell becomes charcoal. Residue becomes organic fertilizer. Each by-product is a profit center. This circular economy approach gives us 2–3x margin advantage over competitors.'
     }
   ]
