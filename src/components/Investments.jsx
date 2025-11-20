@@ -677,6 +677,12 @@ export default function Investments({ userId }) {
                 >
                   Export PDF
                 </button>
+                <button
+                  onClick={() => exportComprehensivePdf()}
+                  className="px-4 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700"
+                >
+                  Export Professional Report
+                </button>
               </div>
             </div>
 
