@@ -906,7 +906,17 @@ export default function Investments({ userId }) {
                         <h4 className="text-sm font-semibold text-slate-900 mb-4">Edit Partnerships</h4>
                         <div className="space-y-4">
                           {editData.partnerships.length > 0 ? (
-                            editData.partnerships.map((partner, idx) => (
+                            (() => {
+                              const itemsPerPage = 1
+                              const totalPages = Math.ceil(editData.partnerships.length / itemsPerPage)
+                              const startIdx = (partnerEditPage - 1) * itemsPerPage
+                              const endIdx = startIdx + itemsPerPage
+                              const paginatedPartners = editData.partnerships.slice(startIdx, endIdx)
+                              return (
+                                <>
+                                  {paginatedPartners.map((partner, idx) => {
+                                    const actualIdx = startIdx + idx
+                                    return (
                               <div key={partner.id || idx} className="p-4 border border-slate-200 rounded-lg">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div>
@@ -1156,7 +1166,32 @@ export default function Investments({ userId }) {
                                   </button>
                                 </div>
                               </div>
-                            ))
+                                    )
+                                  })}
+                                  {totalPages > 1 && (
+                                    <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                                      <div className="text-sm text-slate-600">Page {partnerEditPage} of {totalPages}</div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setPartnerEditPage(Math.max(1, partnerEditPage - 1))}
+                                          disabled={partnerEditPage === 1}
+                                          className="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          ← Previous
+                                        </button>
+                                        <button
+                                          onClick={() => setPartnerEditPage(Math.min(totalPages, partnerEditPage + 1))}
+                                          disabled={partnerEditPage === totalPages}
+                                          className="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          Next →
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
+                              )
+                            })()
                           ) : (
                             <div className="p-4 border border-dashed border-slate-300 rounded-lg text-center">
                               <p className="text-slate-600 text-sm mb-3">No partnerships added yet</p>
@@ -1195,7 +1230,17 @@ export default function Investments({ userId }) {
                         <h4 className="text-sm font-semibold text-slate-900 mb-4">Edit Suppliers</h4>
                         <div className="space-y-4">
                           {editData.suppliers.length > 0 ? (
-                            editData.suppliers.map((sup, idx) => (
+                            (() => {
+                              const itemsPerPage = 1
+                              const totalPages = Math.ceil(editData.suppliers.length / itemsPerPage)
+                              const startIdx = (supplierEditPage - 1) * itemsPerPage
+                              const endIdx = startIdx + itemsPerPage
+                              const paginatedSuppliers = editData.suppliers.slice(startIdx, endIdx)
+                              return (
+                                <>
+                                  {paginatedSuppliers.map((sup, idx) => {
+                                    const actualIdx = startIdx + idx
+                                    return (
                               <div key={sup.id || idx} className="p-4 border border-slate-200 rounded-lg">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div>
@@ -1380,7 +1425,32 @@ export default function Investments({ userId }) {
                                   </button>
                                 </div>
                               </div>
-                            ))
+                                    )
+                                  })}
+                                  {totalPages > 1 && (
+                                    <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+                                      <div className="text-sm text-slate-600">Page {supplierEditPage} of {totalPages}</div>
+                                      <div className="flex gap-2">
+                                        <button
+                                          onClick={() => setSupplierEditPage(Math.max(1, supplierEditPage - 1))}
+                                          disabled={supplierEditPage === 1}
+                                          className="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          ← Previous
+                                        </button>
+                                        <button
+                                          onClick={() => setSupplierEditPage(Math.min(totalPages, supplierEditPage + 1))}
+                                          disabled={supplierEditPage === totalPages}
+                                          className="px-3 py-1 text-sm border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                          Next →
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
+                                </>
+                              )
+                            })()
                           ) : (
                             <div className="p-4 border border-dashed border-slate-300 rounded-lg text-center">
                               <p className="text-slate-600 text-sm mb-3">No suppliers added yet</p>
