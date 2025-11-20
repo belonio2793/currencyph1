@@ -223,16 +223,13 @@ function addPageFooter(doc) {
   doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, footerY)
 }
 
-function checkAndAddPage(doc, yPos, minSpace = 40, projectName = '') {
-  const pageHeight = doc.internal.pageSize.getHeight()
-  const maxYPos = pageHeight - MARGINS.bottom - 5
-
-  if (yPos > maxYPos - minSpace) {
+function checkAndAddPage(doc, yPos, minSpace = 35, projectName = '') {
+  if (yPos > MAX_Y_POS - minSpace) {
     doc.addPage()
     if (projectName) {
       addPageHeader(doc, projectName)
     }
-    return MARGINS.top + MARGINS.headerFooter + 10
+    return MARGINS.top + MARGINS.headerFooter + 8
   }
   return yPos
 }
