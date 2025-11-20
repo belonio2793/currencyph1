@@ -221,7 +221,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
         })
       }
     } catch (error) {
-      console.error('Error loading benefits:', error)
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error loading benefits:', errorMsg)
     }
   }
 
@@ -230,7 +231,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       const data = await EmployeeManagementService.getPerformanceReviews(selectedEmployee.id)
       setPerformanceRecords(data)
     } catch (error) {
-      console.error('Error loading performance:', error)
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error loading performance:', errorMsg)
     }
   }
 
@@ -239,7 +241,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       const data = await EmployeeManagementService.getPayrollRecords(businessId, selectedEmployee.id)
       setPayrollRecords(data)
     } catch (error) {
-      console.error('Error loading payroll:', error)
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error loading payroll:', errorMsg)
     }
   }
 
@@ -273,8 +276,9 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
         emergencyContactPhone: ''
       })
     } catch (error) {
-      console.error('Error saving employee:', error)
-      alert('Failed to save employee')
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error saving employee:', errorMsg)
+      alert(`Failed to save employee: ${errorMsg}`)
     } finally {
       setSavingEmployee(false)
     }
