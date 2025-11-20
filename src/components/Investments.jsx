@@ -57,6 +57,7 @@ export default function Investments({ userId }) {
   const [saving, setSaving] = useState(false)
   const [exchangeRate, setExchangeRate] = useState(0.018)
   const [loadingRate, setLoadingRate] = useState(true)
+  const [showEquipmentManager, setShowEquipmentManager] = useState(false)
 
   useEffect(() => {
     loadExchangeRate()
