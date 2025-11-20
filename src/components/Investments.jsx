@@ -9,6 +9,7 @@ import PaginatedSuppliersPartners from './PaginatedSuppliersPartners'
 import SalesProjectCard from './SalesProjectCard'
 import SalesProjectOverview from './SalesProjectOverview'
 import { generateDynamicProjectPdf } from '../lib/dynamicProjectPdfExport'
+import { generateHydrogenWaterPdf } from '../lib/hydrogenWaterPdfExport'
 import { cleanProjectName, cleanDescription } from '../lib/textSanitizer'
 
 // Utility function to convert snake_case to Title Case
@@ -471,16 +472,34 @@ export default function Investments({ userId }) {
     if (!selectedProject) return
     try {
       setError('')
-      const doc = generateDynamicProjectPdf(
-        selectedProject,
-        projectEquipment,
-        projectCosts,
-        productionCapacity,
-        revenueForecast,
-        projectMilestones,
-        riskAssessment,
-        financialMetrics
-      )
+
+      // Use specialized PDF generator for hydrogen water projects
+      const isHydrogenProject = (selectedProject.name || '').toLowerCase().includes('hydrogen')
+
+      let doc
+      if (isHydrogenProject) {
+        doc = generateHydrogenWaterPdf(
+          selectedProject,
+          projectEquipment,
+          projectCosts,
+          productionCapacity,
+          revenueForecast,
+          projectMilestones,
+          riskAssessment,
+          financialMetrics
+        )
+      } else {
+        doc = generateDynamicProjectPdf(
+          selectedProject,
+          projectEquipment,
+          projectCosts,
+          productionCapacity,
+          revenueForecast,
+          projectMilestones,
+          riskAssessment,
+          financialMetrics
+        )
+      }
 
       if (!doc) {
         setError('Failed to generate PDF. Please try again.')
@@ -491,7 +510,7 @@ export default function Investments({ userId }) {
       const pdfUrl = doc.output('bloburi')
       window.open(pdfUrl, '_blank')
 
-      setSuccess(`PDF generated and opened successfully`)
+      setSuccess(`Professional report generated and opened successfully`)
     } catch (err) {
       console.error('Failed to export PDF:', err)
       setError(`Failed to export PDF: ${err.message}`)
