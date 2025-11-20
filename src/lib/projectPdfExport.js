@@ -250,7 +250,8 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
   yPos += 8
   doc.setFontSize(11)
   doc.setTextColor(...COLORS.textLight)
-  doc.text(project.description || 'Project Details', 20, yPos)
+  const descriptionLines = doc.splitTextToSize(project.description || 'Project Details', CONTENT_WIDTH)
+  doc.text(descriptionLines, MARGINS.left, yPos)
   
   yPos += 15
   
