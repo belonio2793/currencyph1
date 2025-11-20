@@ -48,7 +48,7 @@ class EmployeeManagementService {
   static async getEmployees(businessId) {
     const { data, error } = await supabase
       .from('employees')
-      .select('id,business_id,first_name,last_name,email,phone,position,department,employment_status,base_salary,hire_date,tin,sss_number,philhealth_number,pagibig_number,emergency_contact,emergency_contact_phone,created_at,updated_at')
+      .select('*')
       .eq('business_id', businessId)
       .order('created_at', { ascending: false })
 
