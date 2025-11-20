@@ -611,7 +611,7 @@ export default function Investments({ userId }) {
                                 />
                               </div>
                               <CurrencyInput
-                                label="Unit Cost (PHP → USD)"
+                                label="Unit Cost (PHP ⇄ USD)"
                                 value={eq.unit_cost_php || eq.unit_cost_usd || 0}
                                 onChange={(phpVal) => {
                                   const updated = [...editData.equipment]
@@ -620,6 +620,7 @@ export default function Investments({ userId }) {
                                   setEditData(prev => ({ ...prev, equipment: updated }))
                                 }}
                                 exchangeRate={exchangeRate}
+                                invertible={true}
                               />
                               <div>
                                 <label className="text-xs font-medium text-slate-700">Quantity</label>
