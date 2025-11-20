@@ -389,8 +389,9 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       await EmployeeManagementService.recordAttendance(selectedEmployee.id, 'check-out')
       loadAttendance()
     } catch (error) {
-      console.error('Error recording check-out:', error)
-      alert('Failed to record check-out')
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error recording check-out:', errorMsg)
+      alert(`Failed to record check-out: ${errorMsg}`)
     }
   }
 
