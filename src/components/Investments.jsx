@@ -647,6 +647,12 @@ export default function Investments({ userId }) {
               </div>
             </div>
 
+            {(error || success) && (
+              <div className="px-6 pt-6">
+                {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-3">{error}</div>}
+                {success && <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm mb-3">{success}</div>}
+              </div>
+            )}
             <div className="p-6">
               {/* Overview Tab */}
               {detailTab === 'overview' && (
