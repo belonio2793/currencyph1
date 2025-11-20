@@ -339,21 +339,94 @@ Return ONLY the JSON array:`
       {success && <div className="bg-emerald-50 border-b border-emerald-200 text-emerald-700 p-4 text-sm">{success}</div>}
 
       <div className="overflow-y-auto" style={{ maxHeight: 'calc(90vh - 200px)' }}>
-        {equipment.length === 0 ? (
-          <div className="p-12 text-center">
-            <p className="text-slate-600 mb-4">No equipment added yet</p>
-            <div className="flex gap-3 justify-center flex-wrap">
+        {!showRawInput && equipment.length === 0 ? (
+          <div className="p-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+              <h3 className="text-lg font-semibold text-slate-900 mb-3">Add Equipment</h3>
+              <p className="text-slate-700 mb-4">
+                Paste any equipment information below. The AI will automatically extract and organize the data into the proper fields.
+              </p>
               <button
-                onClick={addNewEquipment}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                onClick={() => setShowRawInput(true)}
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
               >
-                + Add Equipment
+                Paste Equipment Data
               </button>
+            </div>
+            <div className="text-center text-slate-500 text-sm">
+              or
+            </div>
+            <button
+              onClick={addNewEquipment}
+              className="w-full mt-4 px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50 font-medium"
+            >
+              Add Manually
+            </button>
+          </div>
+        ) : showRawInput ? (
+          <div className="p-8 space-y-4">
+            <div>
+              <label className="text-sm font-semibold text-slate-900 block mb-2">Equipment Information</label>
+              <textarea
+                value={pasteText}
+                onChange={(e) => setPasteText(e.target.value)}
+                placeholder="Paste any equipment details here. Examples:
+- washing machine, stainless steel, 10L capacity, 1.5kW power, $500
+- grinding machine 5kg/h, aluminum, 2.2kW, $1000, 50kg weight
+- centrifuge SUS 304, 20 L/h capacity, 3kW, installation 15 days, $2000
+
+The AI will intelligently parse and extract all data."
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                rows="10"
+              />
+              <p className="text-xs text-slate-500 mt-2">Paste any format - CSV, bullet points, natural text, or structured data. AI will understand it.</p>
+            </div>
+
+            {parsePreview && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                <h4 className="font-semibold text-emerald-900 mb-3">Preview - {parsePreview.length} item(s) parsed</h4>
+                <div className="space-y-3 max-h-48 overflow-y-auto">
+                  {parsePreview.map((item, idx) => (
+                    <div key={idx} className="bg-white p-3 rounded border border-emerald-100 text-sm">
+                      <div className="font-medium text-slate-900">{item.equipment_name}</div>
+                      <div className="text-slate-600 grid grid-cols-2 gap-2 mt-1 text-xs">
+                        {item.equipment_type && <div>Type: {item.equipment_type}</div>}
+                        {item.capacity_value && <div>Capacity: {item.capacity_value} {item.capacity_unit}</div>}
+                        {item.unit_cost_usd && <div>Cost: ${item.unit_cost_usd}</div>}
+                        {item.power_consumption_kw && <div>Power: {item.power_consumption_kw}kW</div>}
+                        {item.weight_kg && <div>Weight: {item.weight_kg}kg</div>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3">
               <button
-                onClick={() => setShowBulkImport(true)}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+                onClick={parseEquipmentText}
+                disabled={parseLoading || !pasteText.trim()}
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
-                📋 Bulk Import (AI)
+                {parseLoading ? 'Parsing with AI...' : 'Parse with AI'}
+              </button>
+              {parsePreview && (
+                <button
+                  onClick={acceptParsedData}
+                  className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium"
+                >
+                  Accept and Add
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setShowRawInput(false)
+                  setPasteText('')
+                  setParsePreview(null)
+                }}
+                className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50"
+              >
+                Cancel
               </button>
             </div>
           </div>
