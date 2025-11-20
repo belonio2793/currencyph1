@@ -234,14 +234,19 @@ export default function Investments({ userId }) {
   }
 
   function toggleEditMode(tab) {
-    setEditMode(prev => ({ ...prev, [tab]: !prev[tab] }))
-    if (!editMode[tab]) {
-      // Initialize edit data when entering edit mode
+    const willEnterEditMode = !editMode[tab]
+
+    if (willEnterEditMode) {
+      // Initialize edit data when entering edit mode - deep copy to avoid mutations
+      setError('')
+      setSuccess('')
+
       if (tab === 'suppliers') {
         setSupplierEditPage(1)
       } else if (tab === 'partnerships') {
         setPartnerEditPage(1)
       }
+
       switch (tab) {
         case 'equipment':
           setEditData(prev => ({ ...prev, equipment: JSON.parse(JSON.stringify(projectEquipment)) }))
@@ -271,7 +276,13 @@ export default function Investments({ userId }) {
           setEditData(prev => ({ ...prev, metrics: JSON.parse(JSON.stringify(financialMetrics)) }))
           break
       }
+    } else {
+      // Exiting edit mode - clear messages
+      setError('')
+      setSuccess('')
     }
+
+    setEditMode(prev => ({ ...prev, [tab]: !prev[tab] }))
   }
 
   async function saveChanges(tab) {
