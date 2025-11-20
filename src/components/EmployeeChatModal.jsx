@@ -54,7 +54,11 @@ export default function EmployeeChatModal({
       if (error) throw error
       setMessages(data || [])
     } catch (error) {
-      console.error('Error loading messages:', error)
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error loading messages:', errorMsg)
+      if (error?.code === '42P01') {
+        alert('Messaging system not set up yet. Please create the required database tables.')
+      }
     } finally {
       setLoading(false)
     }
