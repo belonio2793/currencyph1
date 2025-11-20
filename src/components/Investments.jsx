@@ -737,7 +737,7 @@ export default function Investments({ userId }) {
                             <div className="font-medium text-slate-900">{sup.supplier_name}</div>
                             {sup.supplier_type && <div className="text-xs font-medium text-slate-700 mt-1">Type: {sup.supplier_type}</div>}
                             <div className="text-xs text-slate-600 mt-2 space-y-1">
-                              {sup.contact_person && <div>👤 {sup.contact_person}</div>}
+                              {sup.contact_person && <div>�� {sup.contact_person}</div>}
                               {sup.email && <div>📧 {sup.email}</div>}
                               {sup.phone && <div>📞 {sup.phone}</div>}
                               {sup.city && sup.country && <div>📍 {sup.city}, {sup.country}</div>}
@@ -976,7 +976,7 @@ export default function Investments({ userId }) {
                               <tbody>
                                 {revenueForecast.map(rev => (
                                   <tr key={rev.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="py-3 px-2 font-medium text-sm">{rev.product_type}</td>
+                                    <td className="py-3 px-2 font-medium text-sm">{toTitleCase(rev.product_type) || rev.product_type}</td>
                                     <td className="py-3 px-2 text-sm">Year {rev.year_number}</td>
                                     <td className="py-3 px-2 text-sm">{Number(rev.projected_annual_volume).toLocaleString()} {rev.volume_unit}</td>
                                     <td className="py-3 px-2 text-sm">
