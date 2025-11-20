@@ -926,7 +926,7 @@ export default function Investments({ userId }) {
                                       value={partner.partner_name || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].partner_name = e.target.value
+                                        updated[actualIdx].partner_name = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -939,7 +939,7 @@ export default function Investments({ userId }) {
                                       value={partner.partnership_type || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].partnership_type = e.target.value
+                                        updated[actualIdx].partnership_type = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -961,7 +961,7 @@ export default function Investments({ userId }) {
                                       value={partner.contact_person || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].contact_person = e.target.value
+                                        updated[actualIdx].contact_person = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -975,7 +975,7 @@ export default function Investments({ userId }) {
                                       value={partner.email || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].email = e.target.value
+                                        updated[actualIdx].email = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -989,7 +989,7 @@ export default function Investments({ userId }) {
                                       value={partner.phone || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].phone = e.target.value
+                                        updated[actualIdx].phone = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1003,7 +1003,7 @@ export default function Investments({ userId }) {
                                       value={partner.city || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].city = e.target.value
+                                        updated[actualIdx].city = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1017,7 +1017,7 @@ export default function Investments({ userId }) {
                                       value={partner.country || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].country = e.target.value
+                                        updated[actualIdx].country = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1030,7 +1030,7 @@ export default function Investments({ userId }) {
                                       value={partner.partnership_status || 'active'}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].partnership_status = e.target.value
+                                        updated[actualIdx].partnership_status = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1048,7 +1048,7 @@ export default function Investments({ userId }) {
                                       value={partner.start_date || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].start_date = e.target.value
+                                        updated[actualIdx].start_date = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1061,7 +1061,7 @@ export default function Investments({ userId }) {
                                       value={partner.end_date || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].end_date = e.target.value
+                                        updated[actualIdx].end_date = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1075,7 +1075,7 @@ export default function Investments({ userId }) {
                                       value={partner.revenue_share_percentage || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].revenue_share_percentage = parseFloat(e.target.value) || null
+                                        updated[actualIdx].revenue_share_percentage = parseFloat(e.target.value) || null
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1090,7 +1090,7 @@ export default function Investments({ userId }) {
                                       value={partner.investment_amount_usd || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].investment_amount_usd = parseFloat(e.target.value) || null
+                                        updated[actualIdx].investment_amount_usd = parseFloat(e.target.value) || null
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1104,7 +1104,7 @@ export default function Investments({ userId }) {
                                       value={partner.contract_duration_months || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].contract_duration_months = parseInt(e.target.value) || null
+                                        updated[actualIdx].contract_duration_months = parseInt(e.target.value) || null
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1118,7 +1118,7 @@ export default function Investments({ userId }) {
                                       value={partner.payment_terms || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].payment_terms = e.target.value
+                                        updated[actualIdx].payment_terms = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1131,7 +1131,7 @@ export default function Investments({ userId }) {
                                       value={partner.key_terms || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].key_terms = e.target.value
+                                        updated[actualIdx].key_terms = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1145,7 +1145,7 @@ export default function Investments({ userId }) {
                                       value={partner.notes || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.partnerships]
-                                        updated[idx].notes = e.target.value
+                                        updated[actualIdx].notes = e.target.value
                                         setEditData(prev => ({ ...prev, partnerships: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1157,7 +1157,7 @@ export default function Investments({ userId }) {
                                 <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
                                   <button
                                     onClick={() => {
-                                      const updated = editData.partnerships.filter((_, i) => i !== idx)
+                                      const updated = editData.partnerships.filter((_, i) => i !== actualIdx)
                                       setEditData(prev => ({ ...prev, partnerships: updated }))
                                     }}
                                     className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
