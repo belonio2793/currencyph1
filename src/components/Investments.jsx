@@ -611,7 +611,15 @@ export default function Investments({ userId }) {
                 <h3 className="text-2xl font-semibold text-slate-900">{toTitleCase(selectedProject.name) || selectedProject.name}</h3>
                 <p className="text-sm text-slate-600 mt-1">{toTitleCase(selectedProject.description) || selectedProject.description}</p>
               </div>
-              <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">✕ Close</button>
+              <div className="flex gap-2 items-center">
+                <button
+                  onClick={() => exportProjectPdf()}
+                  className="px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                >
+                  📄 Export PDF
+                </button>
+                <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">✕ Close</button>
+              </div>
             </div>
 
             <div className="border-b border-slate-200">
