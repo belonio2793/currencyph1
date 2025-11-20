@@ -144,12 +144,6 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
 
   // Load employee details when selected
   useEffect(() => {
-    if (selectedEmployee && activeTab === 'attendance') {
-      loadAttendance()
-    }
-  }, [selectedEmployee, activeTab])
-
-  useEffect(() => {
     if (selectedEmployee && activeTab === 'medical') {
       loadMedicalRecords()
     }
