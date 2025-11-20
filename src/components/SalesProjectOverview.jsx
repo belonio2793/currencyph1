@@ -89,7 +89,7 @@ export default function SalesProjectOverview({
           { risk: 'Market Competition', mitigation: 'Strong branding; direct export relationships; vertical integration provides cost advantage' }
         ],
         trustFactors: [
-          '��� 12+ months equipment warranty from GENYOND',
+          '✓ 12+ months equipment warranty from GENYOND',
           '✓ HACCP-certified processing protocols',
           '✓ 4 dedicated production lines',
           '✓ On-site QA laboratory',
@@ -120,11 +120,11 @@ export default function SalesProjectOverview({
       {/* Tab Navigation */}
       <div className="flex gap-1 border-b border-slate-200 mb-6 overflow-x-auto">
         {[
-          { id: 'executive-summary', label: '🎯 Executive Summary' },
-          { id: 'benefits', label: '💡 Key Benefits' },
-          { id: 'financials', label: '💰 Financial Highlights' },
-          { id: 'risks', label: '⚠️ Risk Mitigation' },
-          { id: 'trust', label: '✓ Trust Factors' }
+          { id: 'executive-summary', label: 'Executive Summary' },
+          { id: 'benefits', label: 'Key Benefits' },
+          { id: 'financials', label: 'Financial Highlights' },
+          { id: 'risks', label: 'Risk Mitigation' },
+          { id: 'trust', label: 'Trust Factors' }
         ].map(tab => (
           <button
             key={tab.id}
@@ -146,28 +146,28 @@ export default function SalesProjectOverview({
           {/* Problem - Solution - Opportunity */}
           <div className="grid md:grid-cols-3 gap-4">
             <div className="border-l-4 border-red-500 bg-red-50 p-4 rounded">
-              <h4 className="font-bold text-slate-900 mb-2">🚨 The Problem</h4>
+              <h4 className="font-bold text-slate-900 mb-2">The Problem</h4>
               <p className="text-sm text-slate-700">{summary.problemStatement}</p>
             </div>
             <div className="border-l-4 border-blue-500 bg-blue-50 p-4 rounded">
-              <h4 className="font-bold text-slate-900 mb-2">💡 Our Solution</h4>
+              <h4 className="font-bold text-slate-900 mb-2">Our Solution</h4>
               <p className="text-sm text-slate-700">{summary.solution}</p>
             </div>
             <div className="border-l-4 border-green-500 bg-green-50 p-4 rounded">
-              <h4 className="font-bold text-slate-900 mb-2">🎯 The Opportunity</h4>
+              <h4 className="font-bold text-slate-900 mb-2">The Opportunity</h4>
               <p className="text-sm text-slate-700">{summary.marketOpportunity}</p>
             </div>
           </div>
 
           {/* Competitive Advantage */}
           <div className="bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-200 rounded-lg p-6">
-            <h4 className="text-lg font-bold text-slate-900 mb-3">🏆 Competitive Advantage</h4>
+            <h4 className="text-lg font-bold text-slate-900 mb-3">Competitive Advantage</h4>
             <p className="text-slate-700 text-base leading-relaxed">{summary.competitiveAdvantage}</p>
           </div>
 
           {/* ROI Highlights with Psychology */}
           <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-6 border border-slate-200">
-            <h4 className="text-lg font-bold text-slate-900 mb-4">📊 Investment Returns At a Glance</h4>
+            <h4 className="text-lg font-bold text-slate-900 mb-4">Investment Returns At a Glance</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-lg p-4 border border-green-200 shadow-sm">
                 <div className="text-xs text-slate-600 font-semibold mb-1 uppercase">Year 1 Revenue</div>
@@ -192,10 +192,10 @@ export default function SalesProjectOverview({
 
           {/* Key Metrics */}
           <div className="bg-slate-800 text-white rounded-lg p-6">
-            <h4 className="text-lg font-bold mb-4">✨ Why This Investment Works</h4>
+            <h4 className="text-lg font-bold mb-4">Why This Investment Works</h4>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="text-green-400 font-bold text-lg">���</span>
+                <span className="text-green-400 font-bold text-lg">✓</span>
                 <span><strong>Clear Market Demand</strong> - Proven consumer demand with growing market segments (health-conscious, eco-aware, premium buyers)</span>
               </li>
               <li className="flex items-start gap-3">
@@ -314,7 +314,7 @@ export default function SalesProjectOverview({
           </div>
 
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-300 rounded-lg p-6">
-            <h4 className="font-bold text-slate-900 mb-3 text-lg">�� Investor Protections</h4>
+            <h4 className="font-bold text-slate-900 mb-3 text-lg">Investor Protections</h4>
             <ul className="space-y-2 text-sm text-slate-700">
               <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Quarterly financial updates & transparency reports</li>
               <li className="flex gap-2"><span className="text-blue-600 font-bold">✓</span> Clear profit-sharing model based on investment amount</li>
