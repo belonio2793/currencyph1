@@ -1006,6 +1006,22 @@ export default function Investments({ userId }) {
           </div>
         </Modal>
       )}
+
+      {showEquipmentManager && selectedProject && (
+        <Modal onClose={() => {
+          setShowEquipmentManager(false)
+          loadProjectDetails(selectedProject.id)
+        }}>
+          <EquipmentManager
+            projectId={selectedProject.id}
+            onClose={() => {
+              setShowEquipmentManager(false)
+              loadProjectDetails(selectedProject.id)
+            }}
+            exchangeRate={exchangeRate}
+          />
+        </Modal>
+      )}
     </div>
   )
 }
