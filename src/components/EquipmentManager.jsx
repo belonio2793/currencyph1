@@ -318,7 +318,7 @@ Return ONLY the JSON array:`
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="w-full max-w-5xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
       {/* Header */}
       <div className="sticky top-0 bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6 flex items-center justify-between">
         <div>
@@ -331,7 +331,7 @@ Return ONLY the JSON array:`
           onClick={onClose}
           className="text-white hover:bg-white/20 rounded-lg p-2 text-2xl"
         >
-          ✕
+          x
         </button>
       </div>
 
