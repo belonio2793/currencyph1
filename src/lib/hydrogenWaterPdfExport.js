@@ -854,19 +854,40 @@ export function generateHydrogenWaterPdf(project, equipment = [], costs = [], pr
   try {
     const doc = new jsPDF('p', 'mm', 'a4')
 
-    addCoverPage(doc, project)
-    addProblemStatement(doc, project)
-    addSolution(doc, project)
-    addMarketOpportunity(doc, project, revenues)
-    addFinancialProjections(doc, project)
-    addRiskMitigation(doc)
-    addProjectTimeline(doc)
-    addInvestmentTerms(doc)
-    addClosing(doc)
+    console.log('Starting PDF generation...')
 
+    addCoverPage(doc, project)
+    console.log('Added cover page')
+
+    addProblemStatement(doc, project)
+    console.log('Added problem statement')
+
+    addSolution(doc, project)
+    console.log('Added solution')
+
+    addMarketOpportunity(doc, project, revenues)
+    console.log('Added market opportunity')
+
+    addFinancialProjections(doc, project)
+    console.log('Added financial projections')
+
+    addRiskMitigation(doc)
+    console.log('Added risk mitigation')
+
+    addProjectTimeline(doc)
+    console.log('Added timeline')
+
+    addInvestmentTerms(doc)
+    console.log('Added investment terms')
+
+    addClosing(doc)
+    console.log('Added closing')
+
+    console.log('PDF generation complete')
     return doc
   } catch (error) {
     console.error('Error generating Hydrogen Water PDF:', error)
+    console.error('Stack:', error.stack)
     return null
   }
 }
