@@ -968,24 +968,32 @@ export default function Investments({ userId }) {
                         <div className="mt-6">
                           <h4 className="text-sm font-semibold text-slate-900 mb-3">Key Metrics</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {financialMetrics.map(metric => (
-                              <div key={metric.id} className="p-3 bg-slate-50 rounded-lg">
-                                <div className="text-xs text-slate-600 mb-1">{metric.metric_name}</div>
-                                <div className="text-lg font-semibold text-slate-900">
-                                  {Number(metric.base_case_value).toLocaleString()} {metric.unit_of_measure}
+                            {financialMetrics.map(metric => {
+                              const isCurrencyMetric = metric.unit_of_measure === 'USD' || metric.unit_of_measure?.includes('USD')
+                              return (
+                                <div key={metric.id} className="p-3 bg-slate-50 rounded-lg">
+                                  <div className="text-xs text-slate-600 mb-1">{metric.metric_name.replace(/_/g, ' ')}</div>
+                                  <div className="text-lg font-semibold text-slate-900">
+                                    {isCurrencyMetric ? formatUsd(Number(metric.base_case_value)) : `${Number(metric.base_case_value).toLocaleString()} ${metric.unit_of_measure}`}
+                                  </div>
+                                  {isCurrencyMetric && (
+                                    <div className="text-sm text-slate-600 mt-1">
+                                      {formatPhp(usdToPhp(Number(metric.base_case_value), exchangeRate))}
+                                    </div>
+                                  )}
+                                  {metric.conservative_case_value && (
+                                    <div className="text-xs text-slate-600 mt-1">
+                                      Conservative: {isCurrencyMetric ? formatUsd(Number(metric.conservative_case_value)) : Number(metric.conservative_case_value).toLocaleString()}
+                                    </div>
+                                  )}
+                                  {metric.optimistic_case_value && (
+                                    <div className="text-xs text-slate-600">
+                                      Optimistic: {isCurrencyMetric ? formatUsd(Number(metric.optimistic_case_value)) : Number(metric.optimistic_case_value).toLocaleString()}
+                                    </div>
+                                  )}
                                 </div>
-                                {metric.conservative_case_value && (
-                                  <div className="text-xs text-slate-600 mt-1">
-                                    Conservative: {Number(metric.conservative_case_value).toLocaleString()}
-                                  </div>
-                                )}
-                                {metric.optimistic_case_value && (
-                                  <div className="text-xs text-slate-600">
-                                    Optimistic: {Number(metric.optimistic_case_value).toLocaleString()}
-                                  </div>
-                                )}
-                              </div>
-                            ))}
+                              )
+                            })}
                           </div>
                         </div>
                       )}
