@@ -812,37 +812,6 @@ function addClosing(doc) {
     mainYPos += 6
   })
 
-  // Call to action box
-  doc.setFillColor(...COLORS.white)
-  doc.rect(MARGINS.left, 170, CONTENT_WIDTH, 50, 'F')
-
-  doc.setFontSize(12)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.primary)
-  doc.text('Next Steps', PAGE_WIDTH / 2, 182, { align: 'center' })
-
-  const steps = [
-    '1. Review this prospectus',
-    '2. Schedule facility tour',
-    '3. Conduct due diligence',
-    '4. Execute investment agreement'
-  ]
-
-  let stepYPos = 192
-  doc.setFontSize(9)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.text)
-  steps.forEach((step, idx) => {
-    doc.text(step, PAGE_WIDTH / 2 + (idx % 2 === 0 ? -30 : 0), stepYPos, { align: idx % 2 === 0 ? 'left' : 'center' })
-    if (idx % 2 === 1) stepYPos += 8
-  })
-
-  // Contact info
-  doc.setFontSize(8)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.white)
-  doc.text('For more information, contact the project team', PAGE_WIDTH / 2, 240, { align: 'center' })
-
   // Footer
   doc.setFontSize(7)
   doc.setTextColor(...COLORS.subtext)
