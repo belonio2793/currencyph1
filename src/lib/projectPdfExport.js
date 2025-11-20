@@ -248,19 +248,16 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
   doc.text(`Prepared: ${new Date().toLocaleDateString()}`, MARGINS.left + 4, PAGE_HEIGHT - 12)
   doc.text('Confidential - For Internal Review Only', PAGE_WIDTH - MARGINS.right - 45, PAGE_HEIGHT - 12)
 
-  let yPos = MARGINS.top + MARGINS.headerFooter + 6
-
-  doc.addPage()
-  pageNum = 2
-  addPageHeader(doc, projectName, pageNum, totalPages)
-  yPos = MARGINS.top + MARGINS.headerFooter + 6
-
-  yPos = addSectionTitle(doc, 'Executive Summary', yPos)
-
   const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
   const totalRaised = project.funded_amount_usd || 0
   const remaining = totalCost - totalRaised
   const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
+
+  doc.addPage()
+  addPageHeader(doc, projectName, 2, totalPages)
+  yPos = MARGINS.top + MARGINS.headerFooter + 6
+
+  yPos = addSectionTitle(doc, 'Executive Summary', yPos)
 
   yPos = addInfoBox(doc, yPos, 'Project Financials', [
     { label: 'Total Project Cost', value: `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
@@ -270,7 +267,6 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
   ])
 
   yPos += 6
-  yPos = checkAndAddPage(doc, yPos, 35, projectName, pageNum, totalPages)
 
   if (project.long_description) {
     yPos = addSubsectionTitle(doc, 'Project Overview', yPos)
@@ -278,8 +274,6 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
     yPos = addBodyText(doc, project.long_description, yPos, 2)
     yPos = addDivider(doc, yPos) + 2
   }
-
-  yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
 
   doc.addPage()
   pageNum = 3
