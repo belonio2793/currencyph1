@@ -449,7 +449,7 @@ export default function Investments({ userId }) {
                     </button>
                   ))}
                 </div>
-                {detailTab !== 'overview' && (
+                {detailTab !== 'overview' && detailTab !== 'equipment' && (
                   <div className="flex gap-2">
                     {editMode[detailTab] ? (
                       <>
