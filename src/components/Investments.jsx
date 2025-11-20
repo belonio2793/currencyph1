@@ -687,14 +687,14 @@ export default function Investments({ userId }) {
                           disabled={saving}
                           className="px-3 py-2 bg-green-700 text-white text-sm rounded hover:bg-green-800 disabled:opacity-50"
                         >
-                          {saving ? 'Saving...' : '✓ Save'}
+                          {saving ? 'Saving...' : 'Save'}
                         </button>
                         <button
                           onClick={() => toggleEditMode(detailTab)}
                           disabled={saving}
                           className="px-3 py-2 bg-slate-300 text-slate-900 text-sm rounded hover:bg-slate-400 disabled:opacity-50"
                         >
-                          ✕ Cancel
+                          Cancel
                         </button>
                       </>
                     ) : (
@@ -702,7 +702,7 @@ export default function Investments({ userId }) {
                         onClick={() => toggleEditMode(detailTab)}
                         className="px-3 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800"
                       >
-                        ✎ Edit
+                        Edit
                       </button>
                     )}
                   </div>
