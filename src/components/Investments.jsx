@@ -808,34 +808,28 @@ export default function Investments({ userId }) {
                                   placeholder="e.g., equipment, labor, permits"
                                 />
                               </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Budgeted Amount (USD)</label>
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  value={cost.budgeted_amount_usd || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.costs]
-                                    updated[idx].budgeted_amount_usd = parseFloat(e.target.value) || 0
-                                    setEditData(prev => ({ ...prev, costs: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Actual Amount (USD)</label>
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  value={cost.actual_amount_usd || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.costs]
-                                    updated[idx].actual_amount_usd = parseFloat(e.target.value) || null
-                                    setEditData(prev => ({ ...prev, costs: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
+                              <CurrencyInput
+                                label="Budgeted Amount (PHP → USD)"
+                                value={cost.budgeted_amount_php || cost.budgeted_amount_usd || 0}
+                                onChange={(phpVal) => {
+                                  const updated = [...editData.costs]
+                                  updated[idx].budgeted_amount_php = phpVal
+                                  updated[idx].budgeted_amount_usd = phpToUsd(phpVal, exchangeRate)
+                                  setEditData(prev => ({ ...prev, costs: updated }))
+                                }}
+                                exchangeRate={exchangeRate}
+                              />
+                              <CurrencyInput
+                                label="Actual Amount (PHP → USD)"
+                                value={cost.actual_amount_php || cost.actual_amount_usd || 0}
+                                onChange={(phpVal) => {
+                                  const updated = [...editData.costs]
+                                  updated[idx].actual_amount_php = phpVal
+                                  updated[idx].actual_amount_usd = phpToUsd(phpVal, exchangeRate)
+                                  setEditData(prev => ({ ...prev, costs: updated }))
+                                }}
+                                exchangeRate={exchangeRate}
+                              />
                               <div>
                                 <label className="text-xs font-medium text-slate-700">% of Total</label>
                                 <input
