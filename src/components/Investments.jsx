@@ -584,16 +584,19 @@ export default function Investments({ userId }) {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="text-xs text-slate-600 mb-1">Total Cost</div>
-                      <div className="text-xl font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(selectedProject.total_cost || 0).toLocaleString()}</div>
+                      <div className="text-xs text-slate-600 mb-2">Total Cost</div>
+                      <div className="text-lg font-semibold text-slate-900">{formatPhp(Number(selectedProject.total_cost || 0))}</div>
+                      <div className="text-sm text-slate-600 mt-1">{formatUsd(phpToUsd(Number(selectedProject.total_cost || 0), exchangeRate))}</div>
                     </div>
                     <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="text-xs text-slate-600 mb-1">Funded</div>
-                      <div className="text-xl font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(fundedMap[selectedProject.id] || 0).toLocaleString()}</div>
+                      <div className="text-xs text-slate-600 mb-2">Funded</div>
+                      <div className="text-lg font-semibold text-slate-900">{formatPhp(Number(fundedMap[selectedProject.id] || 0))}</div>
+                      <div className="text-sm text-slate-600 mt-1">{formatUsd(phpToUsd(Number(fundedMap[selectedProject.id] || 0), exchangeRate))}</div>
                     </div>
                     <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="text-xs text-slate-600 mb-1">Remaining</div>
-                      <div className="text-xl font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0)).toLocaleString()}</div>
+                      <div className="text-xs text-slate-600 mb-2">Remaining</div>
+                      <div className="text-lg font-semibold text-slate-900">{formatPhp(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0))}</div>
+                      <div className="text-sm text-slate-600 mt-1">{formatUsd(phpToUsd(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0), exchangeRate))}</div>
                     </div>
                   </div>
 
