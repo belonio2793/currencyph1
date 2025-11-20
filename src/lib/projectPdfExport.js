@@ -59,8 +59,8 @@ function addPageFooter(doc, totalPages) {
 function checkAndAddPage(doc, yPos, minSpace = 30, projectName = '', pageNum = 1, totalPages = 1) {
   if (yPos > MAX_Y_POS - minSpace) {
     doc.addPage()
-    pageNum++
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    const newPageNum = doc.internal.getNumberOfPages()
+    addPageHeader(doc, projectName, newPageNum, totalPages)
     return MARGINS.top + MARGINS.headerFooter + 6
   }
   return yPos
