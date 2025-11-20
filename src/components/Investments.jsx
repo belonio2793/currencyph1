@@ -737,7 +737,7 @@ export default function Investments({ userId }) {
                             <div className="font-medium text-slate-900">{sup.supplier_name}</div>
                             {sup.supplier_type && <div className="text-xs font-medium text-slate-700 mt-1">Type: {sup.supplier_type}</div>}
                             <div className="text-xs text-slate-600 mt-2 space-y-1">
-                              {sup.contact_person && <div>�� {sup.contact_person}</div>}
+                              {sup.contact_person && <div>👤 {sup.contact_person}</div>}
                               {sup.email && <div>📧 {sup.email}</div>}
                               {sup.phone && <div>📞 {sup.phone}</div>}
                               {sup.city && sup.country && <div>📍 {sup.city}, {sup.country}</div>}
@@ -1010,7 +1010,7 @@ export default function Investments({ userId }) {
                               const isCurrencyMetric = metric.unit_of_measure === 'USD' || metric.unit_of_measure?.includes('USD')
                               return (
                                 <div key={metric.id} className="p-3 bg-slate-50 rounded-lg">
-                                  <div className="text-xs text-slate-600 mb-1">{metric.metric_name.replace(/_/g, ' ')}</div>
+                                  <div className="text-xs text-slate-600 mb-1">{toTitleCase(metric.metric_name) || metric.metric_name}</div>
                                   <div className="text-lg font-semibold text-slate-900">
                                     {isCurrencyMetric ? formatPhp(usdToPhp(Number(metric.base_case_value), exchangeRate)) : `${Number(metric.base_case_value).toLocaleString()} ${metric.unit_of_measure}`}
                                 </div>
