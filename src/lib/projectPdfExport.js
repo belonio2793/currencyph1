@@ -527,7 +527,7 @@ function createInvestmentStructure(doc) {
 
   const items = [
     {
-      title: '💵 Capital Allocation ($280,000)',
+      title: 'Capital Allocation ($280,000)',
       text: 'Equipment & machinery: $94,130 (33.6%). Husk, water, oil lines: $83,500 (29.8%). Cold storage & lab: $20,250 (7.3%). Construction: $82,500 (29.5%). Working capital & contingency: $39,250 (14%). No middleman markup. Direct from manufacturer pricing.',
       metrics: [
         { label: 'Equipment', value: '$94,130 (34%)' },
@@ -537,7 +537,7 @@ function createInvestmentStructure(doc) {
       ]
     },
     {
-      title: '📊 Return on Investment',
+      title: 'Return on Investment',
       text: 'Base case: $120,000 annual profit from Year 1. Cumulative 5-year profit: $600,000. Less capex $280,000 = net return $320,000 = 114% 5-year ROI. Optimistic case: 168% ROI. Conservative: 45% 3-year ROI. All scenarios generate positive cash from month 4.',
       metrics: [
         { label: 'Annual Profit (Y1)', value: '$120,000–$160,000' },
@@ -547,7 +547,7 @@ function createInvestmentStructure(doc) {
       ]
     },
     {
-      title: '🎁 Investor Benefits',
+      title: 'Investor Benefits',
       text: '(1) Fixed-term profit share (50/50 or per agreement). (2) Quarterly cash distributions. (3) Option to sell stake to operating partner after year 3. (4) Management transparency via real-time dashboards. (5) Asset buyback guarantee if exiting early.',
       metrics: [
         { label: 'Distributions', value: 'Quarterly cash' },
@@ -557,7 +557,7 @@ function createInvestmentStructure(doc) {
       ]
     },
     {
-      title: '🔐 Risk Mitigation',
+      title: 'Risk Mitigation',
       text: 'Equipment backed by GENYOND warranty (12 months + 24-month extended). Facility registered as operating agricultural cooperative (legal protections). Operating partner has 10+ years agribusiness experience. Insurance: property, liability, business interruption. Contingency reserve: $20K (7% of capex).',
       metrics: [
         { label: 'Equipment Warranty', value: '12+24 months' },
@@ -567,13 +567,13 @@ function createInvestmentStructure(doc) {
       ]
     },
     {
-      title: '🚀 Growth Optionality',
+      title: 'Growth Optionality',
       text: 'Year 2: Expansion into charcoal briquettes, VCO cosmetic line, organic peat distribution. Year 3: Second facility (lower capex, proven playbook). Year 5: Acquisition target for major agribusiness. Exit at 10–15x EBITDA multiple is realistic (comparable facilities valued $4–6M).',
       metrics: [
         { label: 'Year 2 Expansion', value: '3 new product lines' },
         { label: 'Year 3 Playbook', value: 'Second facility' },
         { label: 'Exit Multiple', value: '10–15x EBITDA' },
-        { label: 'Facility Valuation', value: '$4–6M (est.)' }
+        { label: 'Facility Valuation', value: '$4���6M (est.)' }
       ]
     }
   ]
