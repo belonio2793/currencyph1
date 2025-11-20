@@ -195,43 +195,61 @@ export default function EquipmentManager({ projectId, onClose, exchangeRate = 0.
     setCurrentIndex(equipment.length)
   }
 
-  async function parseGrokBulkData() {
-    if (!bulkText.trim()) {
-      setParseError('Please enter some equipment data')
+  async function parseEquipmentText() {
+    if (!pasteText.trim()) {
+      setError('Please enter equipment data')
       return
     }
 
     setParseLoading(true)
-    setParseError('')
+    setError('')
 
     try {
       const xApiKey = process.env.VITE_X_API_KEY || 'xai-qe0lzba8kfDmccd5EBClqO7ELZXxYG3hyyetV1b5D4dISqjStXLHcFElnYfmRD3ddy0gV4sHxnR3XZT3'
 
-      const prompt = `Parse the following equipment data and extract individual equipment items. For each item, extract:
-- equipment_name (required)
-- equipment_type
-- capacity_value
-- capacity_unit (L, kg, T, etc.)
-- quantity (default 1)
-- unit_cost_usd (if in PHP, convert at rate ${rate})
-- power_consumption_kw
-- material_of_construction
-- length_mm, width_mm, height_mm
-- weight_kg
-- installation_days
-- installation_cost_usd
-- lead_time_days
-- expected_lifespan_years
-- maintenance_cost_annual_usd
-- expected_efficiency_percentage
-- notes
+      const schema = {
+        fields: [
+          'equipment_name (required)',
+          'equipment_type',
+          'capacity_value',
+          'capacity_unit (L, kg, T, L/h, kg/h, T/h, etc.)',
+          'quantity (default 1)',
+          'unit_cost_usd (extract numeric value, convert from PHP if needed at rate ${rate})',
+          'power_consumption_kw',
+          'material_of_construction',
+          'length_mm',
+          'width_mm',
+          'height_mm',
+          'weight_kg',
+          'installation_days',
+          'installation_cost_usd',
+          'lead_time_days',
+          'expected_lifespan_years',
+          'maintenance_cost_annual_usd',
+          'expected_efficiency_percentage',
+          'notes'
+        ]
+      }
 
-Return ONLY valid JSON array of objects with these fields. Each item must have at least equipment_name. Omit null values.
+      const prompt = `You are an expert at parsing equipment specifications from unstructured text.
 
-Data to parse:
-${bulkText}
+Parse this equipment data and extract structured information. Return ONLY a valid JSON array.
 
-Return only valid JSON, no markdown or extra text.`
+SCHEMA: Extract these fields for each equipment item:
+${schema.fields.join('\n')}
+
+RULES:
+1. equipment_name is REQUIRED for each item
+2. Omit any field that is not mentioned or cannot be determined
+3. Convert currency to USD (PHP to USD multiply by ${rate})
+4. Extract numeric values only for numeric fields
+5. For capacity_unit, use standard units (L, kg, T, L/h, kg/h, etc.)
+6. Return ONLY valid JSON array with no markdown, no code blocks, no extra text
+
+INPUT TEXT:
+${pasteText}
+
+Return ONLY the JSON array:`
 
       const response = await fetch('https://api.x.ai/chat/completions', {
         method: 'POST',
@@ -242,7 +260,7 @@ Return only valid JSON, no markdown or extra text.`
         body: JSON.stringify({
           model: 'grok-2',
           messages: [{ role: 'user', content: prompt }],
-          temperature: 0.3,
+          temperature: 0.2,
           max_tokens: 4096
         })
       })
@@ -252,35 +270,43 @@ Return only valid JSON, no markdown or extra text.`
       }
 
       const data = await response.json()
-      const content = data.choices?.[0]?.message?.content || ''
+      let content = data.choices?.[0]?.message?.content || ''
 
       let parsed = []
       try {
         parsed = JSON.parse(content)
       } catch (e) {
-        const jsonMatch = content.match(/\[[\s\S]*\]/)
+        const jsonMatch = content.match(/\[[\s\S]*\]/m)
         if (jsonMatch) {
           parsed = JSON.parse(jsonMatch[0])
         } else {
-          throw new Error('Could not extract JSON from response')
+          throw new Error('Could not extract valid JSON from response')
         }
       }
 
       if (!Array.isArray(parsed)) {
-        throw new Error('Response is not an array')
+        parsed = [parsed]
       }
 
-      setEquipment([...equipment, ...parsed])
-      setBulkText('')
-      setShowBulkImport(false)
-      setSuccess(`Added ${parsed.length} equipment items`)
-      setCurrentIndex(equipment.length)
+      setParsePreview(parsed)
+      setSuccess(`Parsed ${parsed.length} equipment item(s)`)
     } catch (err) {
       console.error('Parse error:', err)
-      setParseError(`Failed to parse: ${err.message}`)
+      setError(`Parse failed: ${err.message}`)
+      setParsePreview(null)
     } finally {
       setParseLoading(false)
     }
+  }
+
+  function acceptParsedData() {
+    if (!parsePreview) return
+    setEquipment([...equipment, ...parsePreview])
+    setPasteText('')
+    setParsePreview(null)
+    setShowRawInput(false)
+    setSuccess(`Added ${parsePreview.length} equipment item(s)`)
+    setCurrentIndex(equipment.length)
   }
 
   if (loading) {
