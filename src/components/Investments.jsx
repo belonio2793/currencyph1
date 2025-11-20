@@ -648,10 +648,12 @@ export default function Investments({ userId }) {
                                 <td className="py-4 px-4 text-sm">{eq.capacity_value ? `${eq.capacity_value} ${eq.capacity_unit}` : '—'}</td>
                                 <td className="py-4 px-4 text-sm">{eq.power_consumption_kw || '—'}</td>
                                 <td className="py-4 px-4 text-sm">
-                                  <div className="font-medium">{formatUsd(eq.unit_cost_usd || 0)}</div>
+                                  <div className="font-medium">{formatPhp(usdToPhp(eq.unit_cost_usd || 0, exchangeRate))}</div>
+                                  <div className="text-xs text-slate-500">{formatUsd(eq.unit_cost_usd || 0)}</div>
                                 </td>
                                 <td className="py-4 px-4 font-semibold text-sm text-slate-900">
-                                  {formatUsd((eq.unit_cost_usd || 0) * (eq.quantity || 1))}
+                                  <div>{formatPhp(usdToPhp((eq.unit_cost_usd || 0) * (eq.quantity || 1), exchangeRate))}</div>
+                                  <div className="text-xs text-slate-500">{formatUsd((eq.unit_cost_usd || 0) * (eq.quantity || 1))}</div>
                                 </td>
                               </tr>
                             ))}
@@ -662,9 +664,10 @@ export default function Investments({ userId }) {
                       <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
                         <div className="text-sm text-slate-900">
                           <span className="font-semibold">Total Equipment Cost: </span>
-                          <span className="text-lg font-bold text-slate-900">
-                            {formatUsd(projectEquipment.reduce((sum, eq) => sum + ((eq.unit_cost_usd || 0) * (eq.quantity || 1)), 0))}
-                          </span>
+                          <div className="text-lg font-bold text-slate-900 mt-2">
+                            <div>{formatPhp(usdToPhp(projectEquipment.reduce((sum, eq) => sum + ((eq.unit_cost_usd || 0) * (eq.quantity || 1)), 0), exchangeRate))}</div>
+                            <div className="text-sm text-slate-600 mt-1">{formatUsd(projectEquipment.reduce((sum, eq) => sum + ((eq.unit_cost_usd || 0) * (eq.quantity || 1)), 0))}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -817,13 +820,13 @@ export default function Investments({ userId }) {
                               <tr key={cost.id} className="border-b border-slate-100 hover:bg-slate-50">
                                 <td className="py-3 px-2 font-medium text-sm">{cost.cost_category}</td>
                                 <td className="py-3 px-2 text-sm">
-                                  <div>{formatPhp(cost.budgeted_amount_php || phpToUsd(cost.budgeted_amount_usd || 0, exchangeRate))}</div>
+                                  <div>{formatPhp(cost.budgeted_amount_php || usdToPhp(cost.budgeted_amount_usd || 0, exchangeRate))}</div>
                                   <div className="text-xs text-slate-500">{formatUsd(cost.budgeted_amount_usd || 0)}</div>
                                 </td>
                                 <td className="py-3 px-2 text-sm">
                                   {cost.actual_amount_usd ? (
                                     <>
-                                      <div>{formatPhp(cost.actual_amount_php || phpToUsd(cost.actual_amount_usd || 0, exchangeRate))}</div>
+                                      <div>{formatPhp(cost.actual_amount_php || usdToPhp(cost.actual_amount_usd || 0, exchangeRate))}</div>
                                       <div className="text-xs text-slate-500">{formatUsd(cost.actual_amount_usd)}</div>
                                     </>
                                   ) : '—'}
@@ -837,8 +840,8 @@ export default function Investments({ userId }) {
                       <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
                         <div className="text-sm font-semibold text-slate-900">Total Project Cost</div>
                         <div className="text-lg font-bold text-slate-900">
-                          <div>{formatPhp(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_php) || phpToUsd(c.budgeted_amount_usd || 0, exchangeRate)), 0))}</div>
-                          <div className="text-sm text-slate-700 mt-1">{formatUsd(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0))}</div>
+                          <div>{formatPhp(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_php) || usdToPhp(c.budgeted_amount_usd || 0, exchangeRate)), 0))}</div>
+                          <div className="text-sm text-slate-600 mt-1">{formatUsd(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0))}</div>
                         </div>
                       </div>
                     </div>
@@ -954,13 +957,13 @@ export default function Investments({ userId }) {
                                 <div key={metric.id} className="p-3 bg-slate-50 rounded-lg">
                                   <div className="text-xs text-slate-600 mb-1">{metric.metric_name.replace(/_/g, ' ')}</div>
                                   <div className="text-lg font-semibold text-slate-900">
-                                    {isCurrencyMetric ? formatUsd(Number(metric.base_case_value)) : `${Number(metric.base_case_value).toLocaleString()} ${metric.unit_of_measure}`}
+                                    {isCurrencyMetric ? formatPhp(usdToPhp(Number(metric.base_case_value), exchangeRate)) : `${Number(metric.base_case_value).toLocaleString()} ${metric.unit_of_measure}`}
+                                </div>
+                                {isCurrencyMetric && (
+                                  <div className="text-sm text-slate-600 mt-1">
+                                    {formatUsd(Number(metric.base_case_value))}
                                   </div>
-                                  {isCurrencyMetric && (
-                                    <div className="text-sm text-slate-600 mt-1">
-                                      {formatPhp(usdToPhp(Number(metric.base_case_value), exchangeRate))}
-                                    </div>
-                                  )}
+                                )}
                                   {metric.conservative_case_value && (
                                     <div className="text-xs text-slate-600 mt-1">
                                       Conservative: {isCurrencyMetric ? formatUsd(Number(metric.conservative_case_value)) : Number(metric.conservative_case_value).toLocaleString()}
