@@ -86,7 +86,10 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
       const data = await EmployeeManagementService.getEmployees(businessId)
       setEmployees(data)
     } catch (error) {
-      console.error('Error loading employees:', error)
+      console.error('Error loading employees:', error?.message || error)
+      if (error?.details) console.error('Error details:', error.details)
+      if (error?.hint) console.error('Error hint:', error.hint)
+      alert(`Failed to load employees: ${error?.message || 'Unknown error'}`)
     } finally {
       setLoading(false)
     }
