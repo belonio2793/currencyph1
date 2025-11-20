@@ -511,23 +511,23 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
   // ===== COVER PAGE =====
   doc.setFillColor(25, 118, 210)
-  doc.rect(0, 0, pageWidth, pageHeight, 'F')
+  doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F')
 
   doc.setFontSize(36)
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
   const titleLines = doc.splitTextToSize(project.name, CONTENT_WIDTH)
-  doc.text(titleLines, MARGINS.left, pageHeight / 3)
+  doc.text(titleLines, MARGINS.left, PAGE_HEIGHT / 3)
 
   doc.setFontSize(14)
   doc.setFont('helvetica', 'normal')
   const descLines = doc.splitTextToSize(project.description || '', CONTENT_WIDTH)
-  doc.text(descLines, MARGINS.left, pageHeight / 3 + 30)
+  doc.text(descLines, MARGINS.left, PAGE_HEIGHT / 3 + 30)
 
   doc.setFontSize(11)
   doc.setFont('helvetica', 'normal')
-  doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, pageHeight - 30)
-  doc.text(`Project Documentation`, MARGINS.left, pageHeight - 20)
+  doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, PAGE_HEIGHT - 30)
+  doc.text(`Project Documentation`, MARGINS.left, PAGE_HEIGHT - 20)
 
   // ===== TABLE OF CONTENTS PAGE =====
   doc.addPage()
