@@ -1186,6 +1186,230 @@ export default function Investments({ userId }) {
                         </div>
                       </div>
                     </div>
+                  ) : editMode.suppliers ? (
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4">Edit Suppliers</h4>
+                        <div className="space-y-4">
+                          {editData.suppliers.length > 0 ? (
+                            editData.suppliers.map((sup, idx) => (
+                              <div key={sup.id || idx} className="p-4 border border-slate-200 rounded-lg">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Supplier Name *</label>
+                                    <input
+                                      type="text"
+                                      value={sup.supplier_name || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].supplier_name = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="e.g., ABC Equipment Supplies"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Supplier Type</label>
+                                    <input
+                                      type="text"
+                                      value={sup.supplier_type || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].supplier_type = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="e.g., Equipment, Raw Materials"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Contact Person</label>
+                                    <input
+                                      type="text"
+                                      value={sup.contact_person || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].contact_person = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="John Smith"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Email</label>
+                                    <input
+                                      type="email"
+                                      value={sup.email || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].email = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="john@supplier.com"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Phone</label>
+                                    <input
+                                      type="tel"
+                                      value={sup.phone || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].phone = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="+63 2 1234 5678"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">City</label>
+                                    <input
+                                      type="text"
+                                      value={sup.city || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].city = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Metro Manila"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Country</label>
+                                    <input
+                                      type="text"
+                                      value={sup.country || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].country = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Philippines"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Delivery Timeline (days)</label>
+                                    <input
+                                      type="number"
+                                      value={sup.delivery_timeline_days || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].delivery_timeline_days = parseInt(e.target.value) || null
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="30"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Warranty (months)</label>
+                                    <input
+                                      type="number"
+                                      value={sup.warranty_months || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].warranty_months = parseInt(e.target.value) || null
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="12"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700 flex items-center gap-2">
+                                      <input
+                                        type="checkbox"
+                                        checked={sup.is_primary || false}
+                                        onChange={(e) => {
+                                          const updated = [...editData.suppliers]
+                                          updated[idx].is_primary = e.target.checked
+                                          setEditData(prev => ({ ...prev, suppliers: updated }))
+                                        }}
+                                        className="rounded"
+                                      />
+                                      Mark as Primary
+                                    </label>
+                                  </div>
+                                  <div className="md:col-span-2">
+                                    <label className="text-xs font-medium text-slate-700">Payment Terms</label>
+                                    <input
+                                      type="text"
+                                      value={sup.payment_terms || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].payment_terms = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Net 30, FOB"
+                                    />
+                                  </div>
+                                  <div className="md:col-span-2">
+                                    <label className="text-xs font-medium text-slate-700">Notes</label>
+                                    <textarea
+                                      value={sup.notes || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.suppliers]
+                                        updated[idx].notes = e.target.value
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Additional notes about supplier"
+                                      rows="2"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
+                                  <button
+                                    onClick={() => {
+                                      const updated = editData.suppliers.filter((_, i) => i !== idx)
+                                      setEditData(prev => ({ ...prev, suppliers: updated }))
+                                    }}
+                                    className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-4 border border-dashed border-slate-300 rounded-lg text-center">
+                              <p className="text-slate-600 text-sm mb-3">No suppliers added yet</p>
+                              <button
+                                onClick={() => {
+                                  setEditData(prev => ({
+                                    ...prev,
+                                    suppliers: [...prev.suppliers, {}]
+                                  }))
+                                }}
+                                className="px-4 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800"
+                              >
+                                + Add Supplier
+                              </button>
+                            </div>
+                          )}
+                          {editData.suppliers.length > 0 && (
+                            <button
+                              onClick={() => {
+                                setEditData(prev => ({
+                                  ...prev,
+                                  suppliers: [...prev.suppliers, {}]
+                                }))
+                              }}
+                              className="px-4 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800 w-full"
+                            >
+                              + Add More Suppliers
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
                   ) : projectSuppliers.length === 0 && projectPartners.length === 0 ? (
                     <p className="text-slate-500">No suppliers or partnerships data available</p>
                   ) : (
