@@ -507,3 +507,324 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
 
   return doc
 }
+
+export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
+  const doc = new jsPDF()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const pageWidth = doc.internal.pageSize.getWidth()
+
+  let yPos = MARGINS.top + 10
+
+  // ===== COVER PAGE =====
+  doc.setFillColor(25, 118, 210)
+  doc.rect(0, 0, pageWidth, pageHeight, 'F')
+
+  doc.setFontSize(36)
+  doc.setTextColor(255, 255, 255)
+  doc.setFont('helvetica', 'bold')
+  const titleLines = doc.splitTextToSize(project.name, CONTENT_WIDTH)
+  doc.text(titleLines, MARGINS.left, pageHeight / 3)
+
+  doc.setFontSize(14)
+  doc.setFont('helvetica', 'normal')
+  const descLines = doc.splitTextToSize(project.description || '', CONTENT_WIDTH)
+  doc.text(descLines, MARGINS.left, pageHeight / 3 + 30)
+
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'normal')
+  doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, pageHeight - 30)
+  doc.text(`Project Documentation`, MARGINS.left, pageHeight - 20)
+
+  // ===== TABLE OF CONTENTS PAGE =====
+  doc.addPage()
+  addPageHeader(doc, project.name)
+  yPos = MARGINS.top + MARGINS.headerFooter + 10
+
+  yPos = addSectionTitle(doc, 'Table of Contents', yPos)
+  yPos += 5
+
+  doc.setFontSize(10)
+  doc.setTextColor(...COLORS.textDark)
+  doc.setFont('helvetica', 'normal')
+
+  const contents = [
+    'Executive Summary',
+    'Project Overview',
+    'Key Financial Metrics',
+    'Equipment & Resources',
+    'Suppliers',
+    'Strategic Partnerships',
+    'Cost Breakdown',
+    'Revenue Projections',
+    'Production Capacity',
+    'Project Timeline',
+    'Risk Assessment',
+    'Financial Analysis'
+  ]
+
+  contents.forEach(item => {
+    doc.text(`• ${item}`, MARGINS.left + 5, yPos)
+    yPos += 6
+  })
+
+  // ===== EXECUTIVE SUMMARY PAGE =====
+  doc.addPage()
+  addPageHeader(doc, project.name)
+  yPos = MARGINS.top + MARGINS.headerFooter + 10
+
+  yPos = addSectionTitle(doc, 'Executive Summary', yPos)
+  yPos += 5
+
+  const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
+  const totalRaised = project.funded_amount_usd || 0
+  const remaining = totalCost - totalRaised
+  const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
+
+  doc.setFillColor(...COLORS.lightGray)
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 40, 'F')
+  yPos += 2
+
+  yPos = addTwoColumnValues(doc, 'Total Project Cost', `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Funding Status', `${fundingPercent}%`, yPos)
+  yPos = addTwoColumnValues(doc, 'Amount Funded', `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Amount Remaining', `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
+  yPos += 5
+
+  if (project.long_description) {
+    yPos = addSubsectionTitle(doc, 'Project Description', yPos)
+    yPos += 2
+    doc.setFontSize(10)
+    doc.setTextColor(...COLORS.textDark)
+    const longDescLines = doc.splitTextToSize(project.long_description, CONTENT_WIDTH - 10)
+    doc.text(longDescLines, MARGINS.left + 5, yPos)
+    yPos += (longDescLines.length * 5) + 5
+  }
+
+  yPos = checkAndAddPage(doc, yPos, 40, project.name)
+
+  // ===== KEY FINANCIAL METRICS =====
+  yPos = addSectionTitle(doc, 'Key Financial Metrics', yPos)
+  yPos += 5
+
+  if (metrics.length > 0) {
+    const metricHeaders = ['Metric Name', 'Value', 'Notes']
+    const metricRows = metrics.map(m => [
+      m.metric_name || '',
+      String(m.metric_value || ''),
+      m.notes || ''
+    ])
+    yPos = addTable(doc, metricHeaders, metricRows, yPos)
+  }
+
+  yPos = checkAndAddPage(doc, yPos, 40, project.name)
+
+  // ===== EQUIPMENT & RESOURCES =====
+  if (equipment.length > 0) {
+    yPos = addSectionTitle(doc, 'Equipment & Resources', yPos)
+    yPos += 5
+
+    const equipmentHeaders = ['Equipment', 'Type', 'Qty', 'Unit Cost', 'Total']
+    const equipmentRows = equipment.map(e => [
+      (e.equipment_name || '').substring(0, 20),
+      (e.equipment_type || '').substring(0, 15),
+      String(e.quantity || 1),
+      `$${(e.unit_cost_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      `$${(e.total_cost_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+    ])
+
+    yPos = addTable(doc, equipmentHeaders, equipmentRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== SUPPLIERS =====
+  if (suppliers.length > 0) {
+    yPos = addSectionTitle(doc, 'Suppliers', yPos)
+    yPos += 5
+
+    const supplierHeaders = ['Supplier', 'Type', 'Contact', 'Delivery', 'Warranty']
+    const supplierRows = suppliers.map(s => [
+      (s.supplier_name || '').substring(0, 18),
+      (s.supplier_type || '').substring(0, 12),
+      (s.phone || s.email || '').substring(0, 15),
+      `${s.delivery_timeline_days || 'N/A'} days`,
+      `${s.warranty_months || 'N/A'} mo`
+    ])
+
+    yPos = addTable(doc, supplierHeaders, supplierRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== PARTNERSHIPS =====
+  if (partnerships.length > 0) {
+    yPos = addSectionTitle(doc, 'Strategic Partnerships', yPos)
+    yPos += 5
+
+    const partnerHeaders = ['Partner', 'Type', 'Status', 'Revenue Share', 'Investment']
+    const partnerRows = partnerships.map(p => [
+      (p.partner_name || '').substring(0, 18),
+      (p.partnership_type || '').substring(0, 12),
+      (p.partnership_status || '').substring(0, 10),
+      `${p.revenue_share_percentage || 0}%`,
+      `$${(p.investment_amount_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+    ])
+
+    yPos = addTable(doc, partnerHeaders, partnerRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== COST BREAKDOWN =====
+  if (costs.length > 0) {
+    yPos = addSectionTitle(doc, 'Cost Breakdown', yPos)
+    yPos += 5
+
+    const costHeaders = ['Category', 'Budgeted Amount', 'Percentage']
+    const costRows = costs.map(c => [
+      (c.cost_category || '').substring(0, 20),
+      `$${(c.budgeted_amount_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      `${c.percentage_of_total || 0}%`
+    ])
+
+    yPos = addTable(doc, costHeaders, costRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== REVENUE PROJECTIONS =====
+  if (revenues.length > 0) {
+    yPos = addSectionTitle(doc, 'Revenue Projections', yPos)
+    yPos += 5
+
+    const revenueHeaders = ['Product', 'Annual Volume', 'Unit Price', 'Annual Revenue', 'Year']
+    const revenueRows = revenues.map(r => [
+      (r.product_type || '').substring(0, 15),
+      String(r.projected_annual_volume || 0).substring(0, 12),
+      `$${(r.unit_price_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      `$${(r.projected_annual_revenue_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      `Y${r.year_number || ''}`
+    ])
+
+    yPos = addTable(doc, revenueHeaders, revenueRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== PRODUCTION CAPACITY =====
+  if (production.length > 0) {
+    yPos = addSectionTitle(doc, 'Production Capacity', yPos)
+    yPos += 5
+
+    const productionHeaders = ['Phase', 'Product', 'Annual Capacity', 'Utilization', 'Effective Output']
+    const productionRows = production.map(p => [
+      (p.phase_name || '').substring(0, 15),
+      (p.product_type || '').substring(0, 12),
+      `${(p.capacity_per_year || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })}`,
+      `${p.utilization_percentage || 80}%`,
+      `${(p.effective_annual_output || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })}`
+    ])
+
+    yPos = addTable(doc, productionHeaders, productionRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== PROJECT TIMELINE =====
+  if (milestones.length > 0) {
+    yPos = addSectionTitle(doc, 'Project Timeline', yPos)
+    yPos += 5
+
+    const milestoneHeaders = ['Milestone', 'Type', 'Planned Date', 'Status', 'Progress']
+    const milestoneRows = milestones.map(m => [
+      (m.milestone_name || '').substring(0, 18),
+      (m.milestone_type || '').substring(0, 12),
+      (m.planned_date || '').substring(0, 12),
+      (m.status || '').substring(0, 10),
+      `${m.progress_percentage || 0}%`
+    ])
+
+    yPos = addTable(doc, milestoneHeaders, milestoneRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== RISK ASSESSMENT =====
+  if (risks.length > 0) {
+    yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
+    yPos += 5
+
+    const riskHeaders = ['Risk Category', 'Probability', 'Impact', 'Status', 'Notes']
+    const riskRows = risks.map(r => [
+      (r.risk_category || '').substring(0, 18),
+      `${r.probability_percentage || 0}%`,
+      (r.impact_severity || '').substring(0, 12),
+      (r.status || '').substring(0, 10),
+      (r.risk_description || '').substring(0, 20)
+    ])
+
+    yPos = addTable(doc, riskHeaders, riskRows, yPos)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  }
+
+  // ===== FINANCIAL SUMMARY PAGE =====
+  doc.addPage()
+  addPageHeader(doc, project.name)
+  yPos = MARGINS.top + MARGINS.headerFooter + 10
+
+  yPos = addSectionTitle(doc, 'Financial Summary & Analysis', yPos)
+  yPos += 8
+
+  // Summary Box
+  doc.setFillColor(...COLORS.lightGray)
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 45, 'F')
+  yPos += 3
+
+  doc.setFontSize(9)
+  doc.setTextColor(...COLORS.textDark)
+  doc.setFont('helvetica', 'bold')
+  doc.text('Project Financial Overview', MARGINS.left + 5, yPos)
+  yPos += 5
+
+  const equipmentTotal = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
+  const costTotal = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
+  const revenueTotal = revenues.reduce((sum, r) => sum + (r.projected_annual_revenue_usd || 0), 0)
+
+  doc.setFontSize(9)
+  doc.setTextColor(...COLORS.textLight)
+  doc.setFont('helvetica', 'normal')
+  doc.text(`Equipment Cost: $${equipmentTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
+  yPos += 5
+  doc.text(`Other Costs: $${costTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
+  yPos += 5
+  doc.text(`Total Project Cost: $${(equipmentTotal + costTotal).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
+  yPos += 5
+  doc.setTextColor(...COLORS.green)
+  doc.setFont('helvetica', 'bold')
+  doc.text(`Projected Annual Revenue: $${revenueTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
+
+  yPos += 20
+
+  yPos = addSubsectionTitle(doc, 'Funding Status', yPos)
+  yPos += 2
+
+  const fundingBar = CONTENT_WIDTH * 0.6
+  const fundedWidth = fundingBar * (fundingPercent / 100)
+
+  doc.setDrawColor(...COLORS.border)
+  doc.setLineWidth(0.5)
+  doc.rect(MARGINS.left, yPos, fundingBar, 8)
+
+  doc.setFillColor(...COLORS.green)
+  doc.rect(MARGINS.left, yPos, fundedWidth, 8, 'F')
+
+  doc.setFontSize(8)
+  doc.setTextColor(...COLORS.textDark)
+  doc.setFont('helvetica', 'bold')
+  doc.text(`${fundingPercent}% Funded`, MARGINS.left + fundingBar + 5, yPos + 4)
+
+  yPos += 15
+  yPos = addValue(doc, 'Total Target', `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
+  yPos = addValue(doc, 'Currently Funded', `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
+  yPos = addValue(doc, 'Remaining', `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
+
+  // Add footer to all pages
+  const totalPages = doc.internal.getNumberOfPages()
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i)
+    if (i > 1) addPageFooter(doc)
+  }
+
+  return doc
+}
