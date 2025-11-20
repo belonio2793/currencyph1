@@ -543,7 +543,7 @@ export default function Investments({ userId }) {
                     onClick={() => setShowEquipmentManager(true)}
                     className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-lg"
                   >
-                    ⚙️ Manage Equipment
+                    Manage Equipment
                   </button>
 
                   {projectEquipment.length === 0 ? (
