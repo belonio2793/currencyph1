@@ -72,6 +72,7 @@ export default function Investments({ userId }) {
   // Extended project details
   const [projectEquipment, setProjectEquipment] = useState([])
   const [projectSuppliers, setProjectSuppliers] = useState([])
+  const [projectPartners, setProjectPartners] = useState([])
   const [projectCosts, setProjectCosts] = useState([])
   const [productionCapacity, setProductionCapacity] = useState([])
   const [revenueForecast, setRevenueForecast] = useState([])
