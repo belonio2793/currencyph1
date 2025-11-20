@@ -271,12 +271,12 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
   doc.text(`Funding Progress: ${fundingPercent}%`, 25, yPos + 8)
   
   yPos += 35
-  yPos = checkAndAddPage(doc, yPos, 50)
-  
+  yPos = checkAndAddPage(doc, yPos, 50, project.name)
+
   // ===== PROJECT OVERVIEW =====
   yPos = addSectionTitle(doc, 'Project Overview', yPos)
   yPos += 5
-  
+
   if (project.long_description) {
     doc.setFontSize(10)
     doc.setTextColor(...COLORS.textDark)
@@ -284,8 +284,8 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     doc.text(descLines, 25, yPos)
     yPos += (descLines.length * 5) + 5
   }
-  
-  yPos = checkAndAddPage(doc, yPos, 40)
+
+  yPos = checkAndAddPage(doc, yPos, 40, project.name)
   
   // ===== EQUIPMENT SECTION =====
   if (equipment.length > 0) {
