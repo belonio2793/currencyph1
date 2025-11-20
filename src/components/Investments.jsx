@@ -1059,7 +1059,7 @@ export default function Investments({ userId }) {
                             mile.status === 'delayed' ? 'bg-slate-200 text-slate-700' :
                             'bg-slate-100 text-slate-700'
                           }`}>
-                            {mile.status}
+                            {toTitleCase(mile.status) || mile.status}
                           </div>
                         </div>
                         {mile.description && <p className="text-sm text-slate-600 mb-2">{mile.description}</p>}
