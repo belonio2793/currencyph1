@@ -922,11 +922,11 @@ export default function Investments({ userId }) {
                                     <td className="py-3 px-2 text-sm">Year {rev.year_number}</td>
                                     <td className="py-3 px-2 text-sm">{Number(rev.projected_annual_volume).toLocaleString()} {rev.volume_unit}</td>
                                     <td className="py-3 px-2 text-sm">
-                                      <div>{formatPhp(rev.unit_price_php || phpToUsd(rev.unit_price_usd || 0, exchangeRate))}</div>
+                                      <div>{formatPhp(rev.unit_price_php || usdToPhp(rev.unit_price_usd || 0, exchangeRate))}</div>
                                       <div className="text-xs text-slate-500">{formatUsd(rev.unit_price_usd || 0)}</div>
                                     </td>
                                     <td className="py-3 px-2 font-semibold text-sm">
-                                      <div>{formatPhp(rev.projected_annual_revenue_php || phpToUsd(rev.projected_annual_revenue_usd || 0, exchangeRate))}</div>
+                                      <div>{formatPhp(rev.projected_annual_revenue_php || usdToPhp(rev.projected_annual_revenue_usd || 0, exchangeRate))}</div>
                                       <div className="text-xs text-slate-500">{formatUsd(rev.projected_annual_revenue_usd || 0)}</div>
                                     </td>
                                   </tr>
