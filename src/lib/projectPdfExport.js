@@ -230,10 +230,8 @@ function checkAndAddPage(doc, yPos, minSpace = 40, projectName = '') {
 
 export function generateProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
   const doc = new jsPDF()
-  const pageWidth = doc.internal.pageSize.getWidth()
-  const pageHeight = doc.internal.pageSize.getHeight()
-  
-  let yPos = 15
+
+  let yPos = MARGINS.top + MARGINS.headerFooter + 5
   
   // ===== TITLE PAGE =====
   yPos = addTitle(doc, project.name, yPos)
