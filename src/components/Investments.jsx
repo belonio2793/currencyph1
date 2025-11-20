@@ -40,6 +40,20 @@ export default function Investments({ userId }) {
   const [financialMetrics, setFinancialMetrics] = useState([])
   const [detailTab, setDetailTab] = useState('overview')
 
+  // Edit mode states
+  const [editMode, setEditMode] = useState({})
+  const [editData, setEditData] = useState({
+    equipment: [],
+    suppliers: [],
+    costs: [],
+    production: [],
+    revenues: [],
+    milestones: [],
+    risks: [],
+    metrics: []
+  })
+  const [saving, setSaving] = useState(false)
+
   useEffect(() => {
     loadProjects()
     loadWallets()
