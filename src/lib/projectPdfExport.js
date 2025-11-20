@@ -1,15 +1,17 @@
 import jsPDF from 'jspdf'
 
 const MARGINS = {
-  top: 25,
-  bottom: 25,
-  left: 20,
-  right: 20,
-  headerFooter: 15
+  top: 20,
+  bottom: 20,
+  left: 15,
+  right: 15,
+  headerFooter: 12
 }
 
 const PAGE_WIDTH = 210 // A4 width in mm
+const PAGE_HEIGHT = 297 // A4 height in mm
 const CONTENT_WIDTH = PAGE_WIDTH - MARGINS.left - MARGINS.right
+const MAX_Y_POS = PAGE_HEIGHT - MARGINS.bottom - 5
 
 const COLORS = {
   primary: [25, 118, 210],
