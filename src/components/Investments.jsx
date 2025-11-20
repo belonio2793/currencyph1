@@ -87,6 +87,7 @@ export default function Investments({ userId }) {
   const [editData, setEditData] = useState({
     equipment: [],
     suppliers: [],
+    partnerships: [],
     costs: [],
     production: [],
     revenues: [],
