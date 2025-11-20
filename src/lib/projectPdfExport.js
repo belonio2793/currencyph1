@@ -1,824 +1,507 @@
 import jsPDF from 'jspdf'
 
 const MARGINS = {
-  top: 20,
-  bottom: 20,
-  left: 15,
-  right: 15,
-  headerFooter: 12
+  top: 18,
+  bottom: 16,
+  left: 16,
+  right: 16,
+  headerFooter: 10
 }
 
-const PAGE_WIDTH = 210 // A4 width in mm
-const PAGE_HEIGHT = 297 // A4 height in mm
+const PAGE_WIDTH = 210
+const PAGE_HEIGHT = 297
 const CONTENT_WIDTH = PAGE_WIDTH - MARGINS.left - MARGINS.right
-const MAX_Y_POS = PAGE_HEIGHT - MARGINS.bottom - 5
+const MAX_Y_POS = PAGE_HEIGHT - MARGINS.bottom - 3
 
 const COLORS = {
-  primary: [25, 118, 210],
-  secondary: [66, 133, 244],
-  accent: [66, 200, 124],
-  lightGray: [245, 245, 245],
-  darkGray: [51, 51, 51],
-  textDark: [33, 33, 33],
-  textLight: [119, 119, 119],
-  border: [224, 224, 224],
-  red: [229, 57, 53],
-  orange: [251, 140, 0],
-  green: [56, 142, 60]
+  primary: [31, 78, 121],
+  secondary: [52, 120, 170],
+  accent: [54, 169, 225],
+  darkText: [26, 32, 44],
+  lightText: [113, 128, 150],
+  lightBg: [247, 249, 251],
+  border: [203, 213, 225],
+  highlight: [249, 250, 251]
 }
 
-function addTitle(doc, text, yPos) {
-  doc.setFontSize(24)
+function addPageHeader(doc, projectName, pageNum, totalPages) {
+  const headerY = MARGINS.headerFooter - 2
+  
+  doc.setFontSize(10)
+  doc.setFont('helvetica', 'bold')
   doc.setTextColor(...COLORS.primary)
-  doc.setFont('helvetica', 'bold')
-  const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
-  doc.text(lines, MARGINS.left, yPos)
-  return yPos + (lines.length * 8) + 4
+  const title = projectName.length > 45 ? projectName.substring(0, 42) + '...' : projectName
+  doc.text(title, MARGINS.left, headerY)
+
+  doc.setFontSize(8)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.lightText)
+  doc.text(`Page ${pageNum} of ${totalPages}`, PAGE_WIDTH - MARGINS.right - 15, headerY, { align: 'right' })
+
+  doc.setDrawColor(...COLORS.border)
+  doc.setLineWidth(0.3)
+  doc.line(MARGINS.left, headerY + 3, PAGE_WIDTH - MARGINS.right, headerY + 3)
 }
 
-function addSectionTitle(doc, text, yPos) {
-  doc.setFontSize(14)
-  doc.setTextColor(...COLORS.primary)
-  doc.setFont('helvetica', 'bold')
-  const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
-  doc.text(lines, MARGINS.left, yPos)
+function addPageFooter(doc, totalPages) {
+  const footerY = PAGE_HEIGHT - MARGINS.headerFooter + 2
 
-  doc.setDrawColor(...COLORS.secondary)
-  doc.setLineWidth(0.5)
-  doc.line(MARGINS.left, yPos + (lines.length * 4) + 2, PAGE_WIDTH - MARGINS.right, yPos + (lines.length * 4) + 2)
+  doc.setDrawColor(...COLORS.border)
+  doc.setLineWidth(0.3)
+  doc.line(MARGINS.left, footerY - 5, PAGE_WIDTH - MARGINS.right, footerY - 5)
 
-  return yPos + (lines.length * 4) + 8
+  doc.setFontSize(7)
+  doc.setTextColor(...COLORS.lightText)
+  doc.setFont('helvetica', 'normal')
+  doc.text(`© ${new Date().getFullYear()} Project Report. Confidential.`, MARGINS.left, footerY)
 }
 
-function addSubsectionTitle(doc, text, yPos) {
-  doc.setFontSize(11)
-  doc.setTextColor(...COLORS.secondary)
-  doc.setFont('helvetica', 'bold')
-  const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 5)
-  doc.text(lines, MARGINS.left + 5, yPos)
-  return yPos + (lines.length * 4) + 4
-}
-
-function addLabel(doc, text, yPos, fontSize = 10, bold = false) {
-  doc.setFontSize(fontSize)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', bold ? 'bold' : 'normal')
+function checkAndAddPage(doc, yPos, minSpace = 30, projectName = '', pageNum = 1, totalPages = 1) {
+  if (yPos > MAX_Y_POS - minSpace) {
+    doc.addPage()
+    pageNum++
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    return MARGINS.top + MARGINS.headerFooter + 6
+  }
   return yPos
 }
 
-function addValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
-  doc.setFontSize(9)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`${label}:`, xOffset, yPos)
-
-  doc.setTextColor(...COLORS.textDark)
+function addSectionTitle(doc, text, yPos) {
+  doc.setFontSize(13)
   doc.setFont('helvetica', 'bold')
-  const valueStr = String(value || 'N/A')
-  const valueWidth = Math.max(CONTENT_WIDTH - 55, 40)
-  const valueLines = doc.splitTextToSize(valueStr, valueWidth)
-  doc.text(valueLines, xOffset + 45, yPos)
+  doc.setTextColor(...COLORS.primary)
+  
+  const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 4)
+  doc.text(lines, MARGINS.left, yPos)
+  
+  const lineHeight = lines.length * 5
+  yPos += lineHeight + 2
 
-  return yPos + (valueLines.length * 5) + 2
+  doc.setDrawColor(...COLORS.secondary)
+  doc.setLineWidth(0.8)
+  doc.line(MARGINS.left, yPos, PAGE_WIDTH - MARGINS.right, yPos)
+
+  return yPos + 6
 }
 
-function addMultilineValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
-  doc.setFontSize(9)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`${label}:`, xOffset, yPos)
-
-  doc.setTextColor(...COLORS.textDark)
-  doc.setFont('helvetica', 'normal')
-  const valueWidth = Math.max(CONTENT_WIDTH - 55, 40)
-  const lines = doc.splitTextToSize(String(value || 'N/A'), valueWidth)
-  doc.text(lines, xOffset + 45, yPos)
-
-  return yPos + (lines.length * 5) + 2
-}
-
-function addTwoColumnValues(doc, label1, value1, label2, value2, yPos) {
+function addSubsectionTitle(doc, text, yPos) {
   doc.setFontSize(10)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', 'normal')
-
-  const leftX = MARGINS.left + 5
-  const rightX = MARGINS.left + (CONTENT_WIDTH / 2) + 5
-
-  doc.text(`${label1}:`, leftX, yPos)
-  doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'bold')
-  const val1 = String(value1 || 'N/A')
-  const val1Lines = doc.splitTextToSize(val1, (CONTENT_WIDTH / 2) - 60)
-  doc.text(val1Lines, leftX + 45, yPos)
+  doc.setTextColor(...COLORS.secondary)
+  
+  const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 4)
+  doc.text(lines, MARGINS.left + 2, yPos)
+  
+  return yPos + (lines.length * 4) + 2
+}
 
-  doc.setTextColor(...COLORS.textLight)
+function addBodyText(doc, text, yPos, indent = 0) {
+  doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
-  doc.text(`${label2}:`, rightX, yPos)
+  doc.setTextColor(...COLORS.darkText)
+  
+  const xPos = MARGINS.left + indent
+  const lineWidth = CONTENT_WIDTH - indent
+  const lines = doc.splitTextToSize(text, lineWidth)
+  doc.text(lines, xPos, yPos)
+  
+  return yPos + (lines.length * 4.5) + 2
+}
 
-  doc.setTextColor(...COLORS.textDark)
+function addKeyValuePair(doc, label, value, yPos, indent = 2) {
+  const xPos = MARGINS.left + indent
+  const labelWidth = 35
+  const valueWidth = CONTENT_WIDTH - labelWidth - indent - 2
+
+  doc.setFontSize(9)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.lightText)
+  doc.text(label + ':', xPos, yPos)
+
   doc.setFont('helvetica', 'bold')
-  const val2 = String(value2 || 'N/A')
-  const val2Lines = doc.splitTextToSize(val2, (CONTENT_WIDTH / 2) - 60)
-  doc.text(val2Lines, rightX + 45, yPos)
+  doc.setTextColor(...COLORS.darkText)
+  const valueLines = doc.splitTextToSize(String(value || 'N/A'), valueWidth)
+  doc.text(valueLines, xPos + labelWidth, yPos)
 
-  return yPos + (Math.max(val1Lines.length, val2Lines.length) * 5)
+  return yPos + (valueLines.length * 4) + 3
+}
+
+function addInfoBox(doc, yPos, title, items) {
+  doc.setFillColor(...COLORS.highlight)
+  const boxHeight = items.length * 7 + 14
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, boxHeight, 'F')
+
+  doc.setDrawColor(...COLORS.border)
+  doc.setLineWidth(0.5)
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, boxHeight)
+
+  yPos += 4
+  doc.setFontSize(9)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.primary)
+  doc.text(title, MARGINS.left + 4, yPos)
+
+  yPos += 6
+  items.forEach(item => {
+    yPos = addKeyValuePair(doc, item.label, item.value, yPos, 4)
+  })
+
+  return yPos + 4
 }
 
 function addTable(doc, headers, rows, yPos) {
   if (rows.length === 0) return yPos
 
+  const colCount = headers.length
   const tableWidth = CONTENT_WIDTH
-  const colWidth = tableWidth / headers.length
+  const colWidth = tableWidth / colCount
+  const rowHeight = 6.5
+  const headerHeight = 7
   const cellPadding = 1.5
-  const rowHeight = 7
-  const startXPos = MARGINS.left
+  const startX = MARGINS.left
 
   doc.setFontSize(8)
-
-  // Header
-  doc.setFillColor(...COLORS.primary)
-  doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold')
+  doc.setTextColor(255, 255, 255)
+  doc.setFillColor(...COLORS.primary)
 
-  let xPos = startXPos
-  for (let i = 0; i < headers.length; i++) {
-    doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
-    const headerText = doc.splitTextToSize(String(headers[i] || ''), colWidth - 2 * cellPadding)
-    const displayHeader = (headerText[0] || '').substring(0, 14)
-    doc.text(displayHeader, xPos + cellPadding, yPos + cellPadding + 1)
+  let xPos = startX
+  for (let i = 0; i < colCount; i++) {
+    doc.rect(xPos, yPos, colWidth, headerHeight, 'F')
+    const headerText = String(headers[i] || '').substring(0, 16)
+    doc.text(headerText, xPos + cellPadding + 0.5, yPos + cellPadding + 1.8, { maxWidth: colWidth - 2 * cellPadding })
     xPos += colWidth
   }
 
-  yPos += rowHeight
+  yPos += headerHeight
   const headerYPos = yPos
 
-  // Rows
-  doc.setTextColor(...COLORS.textDark)
+  doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.darkText)
 
-  let alternateColor = false
+  let rowIndex = 0
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
 
-    if (alternateColor) {
-      doc.setFillColor(...COLORS.lightGray)
-      xPos = startXPos
-      for (let j = 0; j < headers.length; j++) {
+    if (rowIndex % 2 === 1) {
+      doc.setFillColor(...COLORS.lightBg)
+      xPos = startX
+      for (let j = 0; j < colCount; j++) {
         doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
         xPos += colWidth
       }
-      doc.setTextColor(...COLORS.textDark)
     }
 
-    xPos = startXPos
+    xPos = startX
     for (let j = 0; j < row.length; j++) {
-      const cellValue = String(row[j] || '')
-      const cellText = doc.splitTextToSize(cellValue, colWidth - 2 * cellPadding)
-      const displayText = (cellText[0] || '').substring(0, 16)
-      doc.text(displayText, xPos + cellPadding, yPos + cellPadding + 1)
+      const cellValue = String(row[j] || '').substring(0, 18)
+      doc.text(cellValue, xPos + cellPadding + 0.5, yPos + cellPadding + 1.5, { maxWidth: colWidth - 2 * cellPadding })
       xPos += colWidth
     }
 
-    alternateColor = !alternateColor
     yPos += rowHeight
+    rowIndex++
   }
 
-  // Border
   doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.15)
-  doc.rect(startXPos, headerYPos - rowHeight, tableWidth, rowHeight + (rowHeight * rows.length))
+  doc.setLineWidth(0.3)
+  doc.rect(startX, headerYPos - headerHeight, tableWidth, headerHeight + (rowHeight * rows.length))
 
-  return yPos + 3
+  return yPos + 4
 }
 
-function addPageHeader(doc, projectName) {
-  doc.setFontSize(9)
-  doc.setTextColor(...COLORS.primary)
-  doc.setFont('helvetica', 'bold')
-  const headerTitle = projectName.length > 40 ? projectName.substring(0, 37) + '...' : projectName
-  doc.text(headerTitle, MARGINS.left, MARGINS.headerFooter)
-
-  doc.setFontSize(8)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', 'normal')
-  const pageNum = doc.internal.getCurrentPageInfo().pageNumber
-  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right - 15, MARGINS.headerFooter, { align: 'right' })
-
+function addDivider(doc, yPos) {
   doc.setDrawColor(...COLORS.border)
   doc.setLineWidth(0.2)
-  doc.line(MARGINS.left, MARGINS.headerFooter + 5, PAGE_WIDTH - MARGINS.right, MARGINS.headerFooter + 5)
-}
-
-function addPageFooter(doc) {
-  const footerY = PAGE_HEIGHT - MARGINS.headerFooter + 3
-
-  doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.2)
-  doc.line(MARGINS.left, footerY - 8, PAGE_WIDTH - MARGINS.right, footerY - 8)
-
-  doc.setFontSize(7)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', 'normal')
-  const generatedText = `Generated on ${new Date().toLocaleDateString()}`
-  doc.text(generatedText, MARGINS.left, footerY)
-}
-
-function checkAndAddPage(doc, yPos, minSpace = 35, projectName = '') {
-  if (yPos > MAX_Y_POS - minSpace) {
-    doc.addPage()
-    if (projectName) {
-      addPageHeader(doc, projectName)
-    }
-    return MARGINS.top + MARGINS.headerFooter + 8
-  }
-  return yPos
-}
-
-export function generateProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
-  const doc = new jsPDF('p', 'mm', 'a4')
-
-  let yPos = MARGINS.top + MARGINS.headerFooter + 8
-
-  // ===== TITLE PAGE =====
-  yPos = addTitle(doc, project.name, yPos)
-  
-  yPos += 8
-  doc.setFontSize(11)
-  doc.setTextColor(...COLORS.textLight)
-  const descriptionLines = doc.splitTextToSize(project.description || 'Project Details', CONTENT_WIDTH)
-  doc.text(descriptionLines, MARGINS.left, yPos)
-  
-  yPos += 15
-  
-  // Key Metrics Box
-  doc.setFillColor(...COLORS.lightGray)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 50, 'F')
-
-  yPos += 5
-  const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-  const totalRaised = project.funded_amount_usd || 0
-  const remaining = totalCost - totalRaised
-
-  yPos = addValue(doc, 'Total Project Cost', `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-  yPos = addValue(doc, 'Amount Funded', `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-  yPos = addValue(doc, 'Remaining to Fund', `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-
-  const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
-  doc.setFontSize(10)
-  doc.setTextColor(...COLORS.green)
-  doc.setFont('helvetica', 'bold')
-  doc.text(`Funding Progress: ${fundingPercent}%`, MARGINS.left + 5, yPos + 8)
-  
-  yPos += 35
-  yPos = checkAndAddPage(doc, yPos, 50, project.name)
-
-  // ===== PROJECT OVERVIEW =====
-  yPos = addSectionTitle(doc, 'Project Overview', yPos)
-  yPos += 5
-
-  if (project.long_description) {
-    doc.setFontSize(10)
-    doc.setTextColor(...COLORS.textDark)
-    const descLines = doc.splitTextToSize(project.long_description, CONTENT_WIDTH)
-    doc.text(descLines, MARGINS.left, yPos)
-    yPos += (descLines.length * 5) + 5
-  }
-
-  yPos = checkAndAddPage(doc, yPos, 40, project.name)
-  
-  // ===== EQUIPMENT SECTION =====
-  if (equipment.length > 0) {
-    yPos = addSectionTitle(doc, 'Equipment', yPos)
-    yPos += 5
-    
-    const equipmentHeaders = ['Equipment Name', 'Type', 'Quantity', 'Unit Cost', 'Total Cost']
-    const equipmentRows = equipment.map(e => [
-      e.equipment_name || '',
-      e.equipment_type || '',
-      String(e.quantity || 1),
-      `$${(e.unit_cost_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `$${(e.total_cost_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-    ])
-    
-    yPos = addTable(doc, equipmentHeaders, equipmentRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
-  }
-
-  // ===== SUPPLIERS SECTION =====
-  if (suppliers.length > 0) {
-    yPos = addSectionTitle(doc, 'Suppliers', yPos)
-    yPos += 5
-    
-    for (let i = 0; i < suppliers.length; i++) {
-      const sup = suppliers[i]
-      
-      yPos = addSubsectionTitle(doc, sup.supplier_name, yPos)
-      yPos += 2
-      
-      yPos = addValue(doc, 'Type', sup.supplier_type, yPos)
-      yPos = addValue(doc, 'Contact Person', sup.contact_person, yPos)
-      yPos = addValue(doc, 'Email', sup.email, yPos)
-      yPos = addValue(doc, 'Phone', sup.phone, yPos)
-      
-      if (sup.city || sup.country) {
-        yPos = addValue(doc, 'Location', `${sup.city || ''}, ${sup.country || ''}`, yPos)
-      }
-      
-      yPos = addValue(doc, 'Delivery Timeline', `${sup.delivery_timeline_days || 'N/A'} days`, yPos)
-      yPos = addValue(doc, 'Warranty', `${sup.warranty_months || 'N/A'} months`, yPos)
-      
-      if (sup.payment_terms) {
-        yPos = addMultilineValue(doc, 'Payment Terms', sup.payment_terms, yPos)
-      }
-      
-      if (sup.notes) {
-        yPos = addMultilineValue(doc, 'Notes', sup.notes, yPos)
-      }
-      
-      yPos += 3
-      yPos = checkAndAddPage(doc, yPos, 40, project.name)
-    }
-  }
-
-  // ===== PARTNERSHIPS SECTION =====
-  if (partnerships.length > 0) {
-    yPos = addSectionTitle(doc, 'Partnerships', yPos)
-    yPos += 5
-    
-    for (let i = 0; i < partnerships.length; i++) {
-      const partner = partnerships[i]
-      
-      yPos = addSubsectionTitle(doc, partner.partner_name, yPos)
-      yPos += 2
-      
-      yPos = addValue(doc, 'Type', partner.partnership_type, yPos)
-      yPos = addValue(doc, 'Status', partner.partnership_status, yPos)
-      yPos = addValue(doc, 'Contact Person', partner.contact_person, yPos)
-      yPos = addValue(doc, 'Email', partner.email, yPos)
-      yPos = addValue(doc, 'Phone', partner.phone, yPos)
-      
-      if (partner.city || partner.country) {
-        yPos = addValue(doc, 'Location', `${partner.city || ''}, ${partner.country || ''}`, yPos)
-      }
-      
-      if (partner.start_date || partner.end_date) {
-        yPos = addTwoColumnValues(doc, 'Start Date', partner.start_date, 'End Date', partner.end_date, yPos)
-      }
-      
-      if (partner.revenue_share_percentage || partner.investment_amount_usd) {
-        yPos = addTwoColumnValues(
-          doc,
-          'Revenue Share',
-          `${partner.revenue_share_percentage || 0}%`,
-          'Investment',
-          `$${(partner.investment_amount_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-          yPos
-        )
-      }
-      
-      yPos = addValue(doc, 'Contract Duration', `${partner.contract_duration_months || 'N/A'} months`, yPos)
-      
-      if (partner.key_terms) {
-        yPos = addMultilineValue(doc, 'Key Terms', partner.key_terms, yPos)
-      }
-      
-      if (partner.notes) {
-        yPos = addMultilineValue(doc, 'Notes', partner.notes, yPos)
-      }
-      
-      yPos += 3
-      yPos = checkAndAddPage(doc, yPos, 40, project.name)
-    }
-  }
-
-  // ===== FINANCIAL SUMMARY =====
-  yPos = addSectionTitle(doc, 'Financial Summary', yPos)
-  yPos += 5
-  
-  if (costs.length > 0) {
-    yPos = addSubsectionTitle(doc, 'Project Costs by Category', yPos)
-    yPos += 2
-    
-    const costHeaders = ['Category', 'Budgeted Amount', '% of Total']
-    const costRows = costs.map(c => [
-      c.cost_category,
-      `$${(c.budgeted_amount_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `${c.percentage_of_total || 0}%`
-    ])
-    
-    yPos = addTable(doc, costHeaders, costRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
-  }
-
-  // ===== REVENUE PROJECTIONS =====
-  if (revenues.length > 0) {
-    yPos = addSectionTitle(doc, 'Revenue Projections', yPos)
-    yPos += 5
-    
-    const revenueHeaders = ['Product Type', 'Annual Volume', 'Unit Price', 'Annual Revenue', 'Year']
-    const revenueRows = revenues.map(r => [
-      r.product_type || '',
-      `${(r.projected_annual_volume || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })} ${r.volume_unit || 'units'}`,
-      `$${(r.unit_price_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `$${(r.projected_annual_revenue_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `Year ${r.year_number || ''}`
-    ])
-    
-    yPos = addTable(doc, revenueHeaders, revenueRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
-  }
-
-  // ===== PRODUCTION CAPACITY =====
-  if (production.length > 0) {
-    yPos = addSectionTitle(doc, 'Production Capacity', yPos)
-    yPos += 5
-    
-    for (let i = 0; i < production.length; i++) {
-      const prod = production[i]
-      
-      yPos = addSubsectionTitle(doc, prod.phase_name, yPos)
-      yPos += 2
-      
-      yPos = addValue(doc, 'Product Type', prod.product_type, yPos)
-      yPos = addValue(doc, 'Capacity per Year', `${(prod.capacity_per_year || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} ${prod.capacity_unit || 'units'}`, yPos)
-      yPos = addValue(doc, 'Utilization Target', `${prod.utilization_percentage || 80}%`, yPos)
-      yPos = addValue(doc, 'Effective Annual Output', `${(prod.effective_annual_output || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })} ${prod.capacity_unit || 'units'}`, yPos)
-      
-      if (prod.phase_start_date || prod.phase_end_date) {
-        yPos = addTwoColumnValues(doc, 'Start Date', prod.phase_start_date, 'End Date', prod.phase_end_date, yPos)
-      }
-      
-      if (prod.notes) {
-        yPos = addMultilineValue(doc, 'Notes', prod.notes, yPos)
-      }
-      
-      yPos += 3
-      yPos = checkAndAddPage(doc, yPos, 40, project.name)
-    }
-  }
-
-  // ===== MILESTONES =====
-  if (milestones.length > 0) {
-    yPos = addSectionTitle(doc, 'Project Milestones', yPos)
-    yPos += 5
-    
-    const milestoneHeaders = ['Milestone', 'Type', 'Planned Date', 'Status', 'Progress']
-    const milestoneRows = milestones.map(m => [
-      m.milestone_name || '',
-      m.milestone_type || '',
-      m.planned_date || '',
-      m.status || '',
-      `${m.progress_percentage || 0}%`
-    ])
-    
-    yPos = addTable(doc, milestoneHeaders, milestoneRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
-  }
-
-  // ===== RISK ASSESSMENT =====
-  if (risks.length > 0) {
-    yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
-    yPos += 5
-    
-    const riskHeaders = ['Risk Category', 'Description', 'Probability', 'Impact', 'Status']
-    const riskRows = risks.map(r => [
-      r.risk_category || '',
-      (r.risk_description || '').substring(0, 30) + '...',
-      `${r.probability_percentage || 0}%`,
-      r.impact_severity || '',
-      r.status || ''
-    ])
-    
-    yPos = addTable(doc, riskHeaders, riskRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
-  }
-  
-  // Add footer to all pages
-  const totalPages = doc.internal.getNumberOfPages()
-  for (let i = 1; i <= totalPages; i++) {
-    doc.setPage(i)
-    addPageFooter(doc)
-  }
-
-  return doc
+  doc.line(MARGINS.left, yPos, PAGE_WIDTH - MARGINS.right, yPos)
+  return yPos + 5
 }
 
 export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
   const doc = new jsPDF('p', 'mm', 'a4')
+  let pageNum = 0
+  let totalPages = 12
 
-  let yPos = MARGINS.top + 10
+  const getTotalPages = () => totalPages
 
-  // ===== COVER PAGE =====
-  doc.setFillColor(25, 118, 210)
-  doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F')
+  const projectName = project.name || 'Project Report'
 
-  doc.setFontSize(36)
-  doc.setTextColor(255, 255, 255)
+  yPos = MARGINS.top + MARGINS.headerFooter + 4
+
+  doc.setFillColor(...COLORS.primary)
+  doc.rect(0, 0, PAGE_WIDTH, 70, 'F')
+
+  doc.setFontSize(32)
   doc.setFont('helvetica', 'bold')
-  const titleLines = doc.splitTextToSize(project.name, CONTENT_WIDTH)
-  doc.text(titleLines, MARGINS.left, PAGE_HEIGHT / 3)
-
-  doc.setFontSize(14)
-  doc.setFont('helvetica', 'normal')
-  const descLines = doc.splitTextToSize(project.description || '', CONTENT_WIDTH)
-  doc.text(descLines, MARGINS.left, PAGE_HEIGHT / 3 + 30)
+  doc.setTextColor(255, 255, 255)
+  const titleLines = doc.splitTextToSize(projectName, CONTENT_WIDTH - 8)
+  doc.text(titleLines, MARGINS.left + 4, 25)
 
   doc.setFontSize(11)
   doc.setFont('helvetica', 'normal')
-  doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, PAGE_HEIGHT - 30)
-  doc.text(`Project Documentation`, MARGINS.left, PAGE_HEIGHT - 20)
+  doc.setTextColor(210, 220, 230)
+  const subLines = doc.splitTextToSize(project.description || 'Project Documentation', CONTENT_WIDTH - 8)
+  doc.text(subLines, MARGINS.left + 4, 28 + titleLines.length * 8)
 
-  // ===== TABLE OF CONTENTS PAGE =====
-  doc.addPage()
-  addPageHeader(doc, project.name)
-  yPos = MARGINS.top + MARGINS.headerFooter + 10
-
-  yPos = addSectionTitle(doc, 'Table of Contents', yPos)
-  yPos += 5
-
-  doc.setFontSize(10)
-  doc.setTextColor(...COLORS.textDark)
+  doc.setFontSize(8)
+  doc.setTextColor(210, 220, 230)
   doc.setFont('helvetica', 'normal')
+  doc.text(`Prepared: ${new Date().toLocaleDateString()}`, MARGINS.left + 4, PAGE_HEIGHT - 12)
+  doc.text('Confidential - For Internal Review Only', PAGE_WIDTH - MARGINS.right - 45, PAGE_HEIGHT - 12)
 
-  const contents = [
-    'Executive Summary',
-    'Project Overview',
-    'Key Financial Metrics',
-    'Equipment & Resources',
-    'Suppliers',
-    'Strategic Partnerships',
-    'Cost Breakdown',
-    'Revenue Projections',
-    'Production Capacity',
-    'Project Timeline',
-    'Risk Assessment',
-    'Financial Analysis'
-  ]
+  let yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-  contents.forEach(item => {
-    doc.text(`• ${item}`, MARGINS.left + 5, yPos)
-    yPos += 6
-  })
-
-  // ===== EXECUTIVE SUMMARY PAGE =====
   doc.addPage()
-  addPageHeader(doc, project.name)
-  yPos = MARGINS.top + MARGINS.headerFooter + 10
+  pageNum = 2
+  addPageHeader(doc, projectName, pageNum, totalPages)
+  yPos = MARGINS.top + MARGINS.headerFooter + 6
 
   yPos = addSectionTitle(doc, 'Executive Summary', yPos)
-  yPos += 5
 
   const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
   const totalRaised = project.funded_amount_usd || 0
   const remaining = totalCost - totalRaised
   const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
 
-  doc.setFillColor(...COLORS.lightGray)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 40, 'F')
-  yPos += 2
+  yPos = addInfoBox(doc, yPos, 'Project Financials', [
+    { label: 'Total Project Cost', value: `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { label: 'Current Funding', value: `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
+    { label: 'Funding Progress', value: `${fundingPercent}% Complete` },
+    { label: 'Amount Required', value: `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` }
+  ])
 
-  yPos = addTwoColumnValues(doc, 'Total Project Cost', `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Funding Status', `${fundingPercent}%`, yPos)
-  yPos = addTwoColumnValues(doc, 'Amount Funded', `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, 'Amount Remaining', `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-  yPos += 5
+  yPos += 6
+  yPos = checkAndAddPage(doc, yPos, 35, projectName, pageNum, totalPages)
 
   if (project.long_description) {
-    yPos = addSubsectionTitle(doc, 'Project Description', yPos)
+    yPos = addSubsectionTitle(doc, 'Project Overview', yPos)
     yPos += 2
-    doc.setFontSize(10)
-    doc.setTextColor(...COLORS.textDark)
-    const longDescLines = doc.splitTextToSize(project.long_description, CONTENT_WIDTH - 10)
-    doc.text(longDescLines, MARGINS.left + 5, yPos)
-    yPos += (longDescLines.length * 5) + 5
+    yPos = addBodyText(doc, project.long_description, yPos, 2)
+    yPos = addDivider(doc, yPos) + 2
   }
 
-  yPos = checkAndAddPage(doc, yPos, 40, project.name)
+  yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
 
-  // ===== KEY FINANCIAL METRICS =====
-  yPos = addSectionTitle(doc, 'Key Financial Metrics', yPos)
-  yPos += 5
+  doc.addPage()
+  pageNum = 3
+  addPageHeader(doc, projectName, pageNum, totalPages)
+  yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-  if (metrics.length > 0) {
-    const metricHeaders = ['Metric Name', 'Value', 'Notes']
-    const metricRows = metrics.map(m => [
-      m.metric_name || '',
-      String(m.metric_value || ''),
-      m.notes || ''
-    ])
-    yPos = addTable(doc, metricHeaders, metricRows, yPos)
-  }
-
-  yPos = checkAndAddPage(doc, yPos, 40, project.name)
-
-  // ===== EQUIPMENT & RESOURCES =====
   if (equipment.length > 0) {
-    yPos = addSectionTitle(doc, 'Equipment & Resources', yPos)
-    yPos += 5
+    yPos = addSectionTitle(doc, 'Equipment & Infrastructure', yPos)
 
-    const equipmentHeaders = ['Equipment', 'Type', 'Qty', 'Unit Cost', 'Total']
+    const equipmentHeaders = ['Equipment', 'Qty', 'Unit Cost', 'Total Cost']
     const equipmentRows = equipment.map(e => [
       (e.equipment_name || '').substring(0, 20),
-      (e.equipment_type || '').substring(0, 15),
       String(e.quantity || 1),
-      `$${(e.unit_cost_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `$${(e.total_cost_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
+      `$${(e.unit_cost_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      `$${(e.total_cost_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
     ])
 
     yPos = addTable(doc, equipmentHeaders, equipmentRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+    yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
   }
 
-  // ===== SUPPLIERS =====
   if (suppliers.length > 0) {
-    yPos = addSectionTitle(doc, 'Suppliers', yPos)
-    yPos += 5
+    doc.addPage()
+    pageNum = 4
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-    const supplierHeaders = ['Supplier', 'Type', 'Contact', 'Delivery', 'Warranty']
-    const supplierRows = suppliers.map(s => [
-      (s.supplier_name || '').substring(0, 18),
-      (s.supplier_type || '').substring(0, 12),
-      (s.phone || s.email || '').substring(0, 15),
-      `${s.delivery_timeline_days || 'N/A'} days`,
-      `${s.warranty_months || 'N/A'} mo`
-    ])
+    yPos = addSectionTitle(doc, 'Suppliers & Vendors', yPos)
 
-    yPos = addTable(doc, supplierHeaders, supplierRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+    for (let i = 0; i < Math.min(suppliers.length, 2); i++) {
+      const sup = suppliers[i]
+      yPos = addSubsectionTitle(doc, sup.supplier_name || 'Supplier', yPos)
+      yPos += 2
+
+      yPos = addKeyValuePair(doc, 'Type', sup.supplier_type || 'N/A', yPos)
+      yPos = addKeyValuePair(doc, 'Contact', sup.contact_person || 'N/A', yPos)
+      if (sup.email) yPos = addKeyValuePair(doc, 'Email', sup.email, yPos)
+      if (sup.phone) yPos = addKeyValuePair(doc, 'Phone', sup.phone, yPos)
+      yPos = addKeyValuePair(doc, 'Delivery Timeline', `${sup.delivery_timeline_days || 'N/A'} days`, yPos)
+      yPos = addKeyValuePair(doc, 'Warranty Period', `${sup.warranty_months || 'N/A'} months`, yPos)
+
+      if (i < suppliers.length - 1) {
+        yPos = addDivider(doc, yPos) + 2
+        yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
+      }
+    }
   }
 
-  // ===== PARTNERSHIPS =====
   if (partnerships.length > 0) {
+    doc.addPage()
+    pageNum = 5
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
+
     yPos = addSectionTitle(doc, 'Strategic Partnerships', yPos)
-    yPos += 5
 
-    const partnerHeaders = ['Partner', 'Type', 'Status', 'Revenue Share', 'Investment']
-    const partnerRows = partnerships.map(p => [
-      (p.partner_name || '').substring(0, 18),
-      (p.partnership_type || '').substring(0, 12),
-      (p.partnership_status || '').substring(0, 10),
-      `${p.revenue_share_percentage || 0}%`,
-      `$${(p.investment_amount_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`
-    ])
+    for (let i = 0; i < Math.min(partnerships.length, 2); i++) {
+      const partner = partnerships[i]
+      yPos = addSubsectionTitle(doc, partner.partner_name || 'Partner', yPos)
+      yPos += 2
 
-    yPos = addTable(doc, partnerHeaders, partnerRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
+      yPos = addKeyValuePair(doc, 'Type', partner.partnership_type || 'N/A', yPos)
+      yPos = addKeyValuePair(doc, 'Status', partner.partnership_status || 'N/A', yPos)
+      yPos = addKeyValuePair(doc, 'Contact', partner.contact_person || 'N/A', yPos)
+      yPos = addKeyValuePair(doc, 'Revenue Share', `${partner.revenue_share_percentage || 0}%`, yPos)
+      yPos = addKeyValuePair(doc, 'Investment Amount', `$${(partner.investment_amount_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, yPos)
+
+      if (i < partnerships.length - 1) {
+        yPos = addDivider(doc, yPos) + 2
+        yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
+      }
+    }
   }
 
-  // ===== COST BREAKDOWN =====
   if (costs.length > 0) {
-    yPos = addSectionTitle(doc, 'Cost Breakdown', yPos)
-    yPos += 5
+    doc.addPage()
+    pageNum = 6
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-    const costHeaders = ['Category', 'Budgeted Amount', 'Percentage']
+    yPos = addSectionTitle(doc, 'Financial Breakdown', yPos)
+
+    const costHeaders = ['Cost Category', 'Amount', 'Percentage']
     const costRows = costs.map(c => [
-      (c.cost_category || '').substring(0, 20),
-      `$${(c.budgeted_amount_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
+      (c.cost_category || '').substring(0, 25),
+      `$${(c.budgeted_amount_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
       `${c.percentage_of_total || 0}%`
     ])
 
     yPos = addTable(doc, costHeaders, costRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
 
-  // ===== REVENUE PROJECTIONS =====
   if (revenues.length > 0) {
-    yPos = addSectionTitle(doc, 'Revenue Projections', yPos)
-    yPos += 5
+    doc.addPage()
+    pageNum = 7
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-    const revenueHeaders = ['Product', 'Annual Volume', 'Unit Price', 'Annual Revenue', 'Year']
+    yPos = addSectionTitle(doc, 'Revenue Projections', yPos)
+
+    const revenueHeaders = ['Product', 'Annual Volume', 'Unit Price', 'Annual Revenue']
     const revenueRows = revenues.map(r => [
-      (r.product_type || '').substring(0, 15),
-      String(r.projected_annual_volume || 0).substring(0, 12),
-      `$${(r.unit_price_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `$${(r.projected_annual_revenue_usd || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}`,
-      `Y${r.year_number || ''}`
+      (r.product_type || '').substring(0, 20),
+      String(r.projected_annual_volume || 0),
+      `$${(r.unit_price_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+      `$${(r.projected_annual_revenue_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
     ])
 
     yPos = addTable(doc, revenueHeaders, revenueRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
 
-  // ===== PRODUCTION CAPACITY =====
   if (production.length > 0) {
-    yPos = addSectionTitle(doc, 'Production Capacity', yPos)
-    yPos += 5
+    doc.addPage()
+    pageNum = 8
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-    const productionHeaders = ['Phase', 'Product', 'Annual Capacity', 'Utilization', 'Effective Output']
+    yPos = addSectionTitle(doc, 'Production Capacity', yPos)
+
+    const productionHeaders = ['Phase', 'Product Type', 'Annual Capacity', 'Utilization']
     const productionRows = production.map(p => [
-      (p.phase_name || '').substring(0, 15),
-      (p.product_type || '').substring(0, 12),
-      `${(p.capacity_per_year || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })}`,
-      `${p.utilization_percentage || 80}%`,
-      `${(p.effective_annual_output || 0).toLocaleString('en-US', { minimumFractionDigits: 0 })}`
+      (p.phase_name || '').substring(0, 20),
+      (p.product_type || '').substring(0, 18),
+      String(p.capacity_per_year || 0),
+      `${p.utilization_percentage || 80}%`
     ])
 
     yPos = addTable(doc, productionHeaders, productionRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
 
-  // ===== PROJECT TIMELINE =====
   if (milestones.length > 0) {
-    yPos = addSectionTitle(doc, 'Project Timeline', yPos)
-    yPos += 5
+    doc.addPage()
+    pageNum = 9
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-    const milestoneHeaders = ['Milestone', 'Type', 'Planned Date', 'Status', 'Progress']
+    yPos = addSectionTitle(doc, 'Project Timeline', yPos)
+
+    const milestoneHeaders = ['Milestone', 'Type', 'Target Date', 'Status']
     const milestoneRows = milestones.map(m => [
-      (m.milestone_name || '').substring(0, 18),
-      (m.milestone_type || '').substring(0, 12),
+      (m.milestone_name || '').substring(0, 20),
+      (m.milestone_type || '').substring(0, 15),
       (m.planned_date || '').substring(0, 12),
-      (m.status || '').substring(0, 10),
-      `${m.progress_percentage || 0}%`
+      (m.status || '').substring(0, 15)
     ])
 
     yPos = addTable(doc, milestoneHeaders, milestoneRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
 
-  // ===== RISK ASSESSMENT =====
   if (risks.length > 0) {
-    yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
-    yPos += 5
+    doc.addPage()
+    pageNum = 10
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-    const riskHeaders = ['Risk Category', 'Probability', 'Impact', 'Status', 'Notes']
+    yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
+
+    const riskHeaders = ['Risk Category', 'Probability', 'Impact', 'Status']
     const riskRows = risks.map(r => [
-      (r.risk_category || '').substring(0, 18),
+      (r.risk_category || '').substring(0, 20),
       `${r.probability_percentage || 0}%`,
-      (r.impact_severity || '').substring(0, 12),
-      (r.status || '').substring(0, 10),
-      (r.risk_description || '').substring(0, 20)
+      (r.impact_severity || '').substring(0, 15),
+      (r.status || '').substring(0, 12)
     ])
 
     yPos = addTable(doc, riskHeaders, riskRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
 
-  // ===== FINANCIAL SUMMARY PAGE =====
+  if (metrics.length > 0) {
+    doc.addPage()
+    pageNum = 11
+    addPageHeader(doc, projectName, pageNum, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
+
+    yPos = addSectionTitle(doc, 'Key Performance Metrics', yPos)
+
+    const metricHeaders = ['Metric', 'Value', 'Target']
+    const metricRows = metrics.map(m => [
+      (m.metric_name || '').substring(0, 25),
+      String(m.metric_value || 'N/A').substring(0, 20),
+      (m.notes || '').substring(0, 20)
+    ])
+
+    yPos = addTable(doc, metricHeaders, metricRows, yPos)
+  }
+
   doc.addPage()
-  addPageHeader(doc, project.name)
-  yPos = MARGINS.top + MARGINS.headerFooter + 10
+  pageNum = 12
+  addPageHeader(doc, projectName, pageNum, totalPages)
+  yPos = MARGINS.top + MARGINS.headerFooter + 6
 
-  yPos = addSectionTitle(doc, 'Financial Summary & Analysis', yPos)
-  yPos += 8
+  yPos = addSectionTitle(doc, 'Financial Summary', yPos)
 
-  // Summary Box
-  doc.setFillColor(...COLORS.lightGray)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 45, 'F')
-  yPos += 3
-
-  doc.setFontSize(9)
-  doc.setTextColor(...COLORS.textDark)
-  doc.setFont('helvetica', 'bold')
-  doc.text('Project Financial Overview', MARGINS.left + 5, yPos)
-  yPos += 5
+  yPos = addInfoBox(doc, yPos, 'Investment Overview', [
+    { label: 'Total Capital Required', value: `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
+    { label: 'Current Commitments', value: `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
+    { label: 'Remaining to Raise', value: `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}` },
+    { label: 'Funding Status', value: `${fundingPercent}% Complete` }
+  ])
 
   const equipmentTotal = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
-  const costTotal = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
   const revenueTotal = revenues.reduce((sum, r) => sum + (r.projected_annual_revenue_usd || 0), 0)
 
-  doc.setFontSize(9)
-  doc.setTextColor(...COLORS.textLight)
-  doc.setFont('helvetica', 'normal')
-  doc.text(`Equipment Cost: $${equipmentTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
-  yPos += 5
-  doc.text(`Other Costs: $${costTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
-  yPos += 5
-  doc.text(`Total Project Cost: $${(equipmentTotal + costTotal).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
-  yPos += 5
-  doc.setTextColor(...COLORS.green)
-  doc.setFont('helvetica', 'bold')
-  doc.text(`Projected Annual Revenue: $${revenueTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, MARGINS.left + 5, yPos)
-
-  yPos += 20
-
-  yPos = addSubsectionTitle(doc, 'Funding Status', yPos)
+  yPos += 8
+  yPos = addSubsectionTitle(doc, 'Investment Highlights', yPos)
   yPos += 2
 
-  const fundingBar = CONTENT_WIDTH * 0.6
-  const fundedWidth = fundingBar * (fundingPercent / 100)
+  yPos = addKeyValuePair(doc, 'Equipment Investment', `$${equipmentTotal.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, yPos, 2)
+  yPos = addKeyValuePair(doc, 'Operating Costs', `$${totalCost.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, yPos, 2)
+  yPos = addKeyValuePair(doc, 'Projected Annual Revenue', `$${revenueTotal.toLocaleString('en-US', { maximumFractionDigits: 0 })}`, yPos, 2)
 
-  doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.5)
-  doc.rect(MARGINS.left, yPos, fundingBar, 8)
-
-  doc.setFillColor(...COLORS.green)
-  doc.rect(MARGINS.left, yPos, fundedWidth, 8, 'F')
-
-  doc.setFontSize(8)
-  doc.setTextColor(...COLORS.textDark)
-  doc.setFont('helvetica', 'bold')
-  doc.text(`${fundingPercent}% Funded`, MARGINS.left + fundingBar + 5, yPos + 4)
-
-  yPos += 15
-  yPos = addValue(doc, 'Total Target', `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-  yPos = addValue(doc, 'Currently Funded', `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-  yPos = addValue(doc, 'Remaining', `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-
-  // Add footer to all pages
-  const totalPages = doc.internal.getNumberOfPages()
-  for (let i = 1; i <= totalPages; i++) {
+  const totalPages_real = doc.internal.getNumberOfPages()
+  for (let i = 2; i <= totalPages_real; i++) {
     doc.setPage(i)
-    if (i > 1) addPageFooter(doc)
+    addPageFooter(doc, totalPages_real)
   }
 
   return doc
+}
+
+export function generateProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
+  return generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics)
 }
