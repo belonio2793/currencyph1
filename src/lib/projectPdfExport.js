@@ -29,29 +29,32 @@ function addTitle(doc, text, yPos) {
   doc.setFontSize(24)
   doc.setTextColor(...COLORS.primary)
   doc.setFont('helvetica', 'bold')
-  doc.text(text, 20, yPos)
-  return yPos + 12
+  const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
+  doc.text(lines, MARGINS.left, yPos)
+  return yPos + (lines.length * 8) + 4
 }
 
 function addSectionTitle(doc, text, yPos) {
   doc.setFontSize(14)
   doc.setTextColor(...COLORS.primary)
   doc.setFont('helvetica', 'bold')
-  doc.text(text, 20, yPos)
-  
+  const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
+  doc.text(lines, MARGINS.left, yPos)
+
   doc.setDrawColor(...COLORS.secondary)
   doc.setLineWidth(0.5)
-  doc.line(20, yPos + 2, 190, yPos + 2)
-  
-  return yPos + 10
+  doc.line(MARGINS.left, yPos + (lines.length * 4) + 2, PAGE_WIDTH - MARGINS.right, yPos + (lines.length * 4) + 2)
+
+  return yPos + (lines.length * 4) + 8
 }
 
 function addSubsectionTitle(doc, text, yPos) {
   doc.setFontSize(11)
   doc.setTextColor(...COLORS.secondary)
   doc.setFont('helvetica', 'bold')
-  doc.text(text, 25, yPos)
-  return yPos + 7
+  const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 5)
+  doc.text(lines, MARGINS.left + 5, yPos)
+  return yPos + (lines.length * 4) + 4
 }
 
 function addLabel(doc, text, yPos, fontSize = 10, bold = false) {
@@ -61,52 +64,61 @@ function addLabel(doc, text, yPos, fontSize = 10, bold = false) {
   return yPos
 }
 
-function addValue(doc, label, value, yPos, xOffset = 25) {
+function addValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
   doc.setFontSize(10)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
   doc.text(`${label}:`, xOffset, yPos)
-  
+
   doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'bold')
-  doc.text(String(value || 'N/A'), xOffset + 60, yPos)
-  
-  return yPos + 6
+  const valueStr = String(value || 'N/A')
+  const valueLines = doc.splitTextToSize(valueStr, CONTENT_WIDTH - 60)
+  doc.text(valueLines, xOffset + 50, yPos)
+
+  return yPos + (valueLines.length * 5)
 }
 
-function addMultilineValue(doc, label, value, yPos, xOffset = 25) {
+function addMultilineValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
   doc.setFontSize(10)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
   doc.text(`${label}:`, xOffset, yPos)
-  
+
   doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'normal')
-  const lines = doc.splitTextToSize(String(value || 'N/A'), 100)
-  doc.text(lines, xOffset + 60, yPos)
-  
-  return yPos + (lines.length * 4) + 2
+  const lines = doc.splitTextToSize(String(value || 'N/A'), CONTENT_WIDTH - 60)
+  doc.text(lines, xOffset + 50, yPos)
+
+  return yPos + (lines.length * 5) + 2
 }
 
 function addTwoColumnValues(doc, label1, value1, label2, value2, yPos) {
   doc.setFontSize(10)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
-  doc.text(`${label1}:`, 25, yPos)
-  
+
+  const leftX = MARGINS.left + 5
+  const rightX = MARGINS.left + (CONTENT_WIDTH / 2) + 5
+
+  doc.text(`${label1}:`, leftX, yPos)
   doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'bold')
-  doc.text(String(value1 || 'N/A'), 75, yPos)
-  
+  const val1 = String(value1 || 'N/A')
+  const val1Lines = doc.splitTextToSize(val1, (CONTENT_WIDTH / 2) - 60)
+  doc.text(val1Lines, leftX + 45, yPos)
+
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
-  doc.text(`${label2}:`, 110, yPos)
-  
+  doc.text(`${label2}:`, rightX, yPos)
+
   doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'bold')
-  doc.text(String(value2 || 'N/A'), 160, yPos)
-  
-  return yPos + 6
+  const val2 = String(value2 || 'N/A')
+  const val2Lines = doc.splitTextToSize(val2, (CONTENT_WIDTH / 2) - 60)
+  doc.text(val2Lines, rightX + 45, yPos)
+
+  return yPos + (Math.max(val1Lines.length, val2Lines.length) * 5)
 }
 
 function addTable(doc, headers, rows, yPos) {
