@@ -526,6 +526,7 @@ export default function Investments({ userId }) {
                     { id: 'overview', label: 'Overview' },
                     { id: 'equipment', label: 'Equipment' },
                     { id: 'costs', label: 'Costs' },
+                    { id: 'suppliers', label: 'Suppliers & Partnerships' },
                     { id: 'production', label: 'Production' },
                     { id: 'financials', label: 'Financials' },
                     { id: 'timeline', label: 'Timeline' },
