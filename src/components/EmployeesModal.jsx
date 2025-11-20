@@ -8,6 +8,9 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
   const [selectedEmployee, setSelectedEmployee] = useState(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [savingEmployee, setSavingEmployee] = useState(false)
+  const [showEditForm, setShowEditForm] = useState(false)
+  const [editingEmployeeId, setEditingEmployeeId] = useState(null)
+  const [registrationStatus, setRegistrationStatus] = useState({})
 
   // Form states
   const [employeeForm, setEmployeeForm] = useState({
