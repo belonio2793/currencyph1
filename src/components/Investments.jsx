@@ -278,57 +278,84 @@ export default function Investments({ userId }) {
 
       {showDetail && selectedProject && (
         <Modal onClose={() => setShowDetail(false)} className="">
-          <div className="w-full max-w-4xl bg-white rounded-xl p-6 shadow-lg">
-            <div className="flex items-start justify-between">
+          <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
               <div>
                 <h3 className="text-2xl font-semibold text-slate-900">{selectedProject.name}</h3>
                 <p className="text-sm text-slate-600 mt-1">{selectedProject.description}</p>
               </div>
-              <div>
-                <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">Close</button>
+              <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">✕ Close</button>
+            </div>
+
+            <div className="border-b border-slate-200">
+              <div className="flex gap-1 px-6 overflow-x-auto">
+                {[
+                  { id: 'overview', label: 'Overview' },
+                  { id: 'equipment', label: 'Equipment' },
+                  { id: 'costs', label: 'Costs' },
+                  { id: 'production', label: 'Production' },
+                  { id: 'financials', label: 'Financials' },
+                  { id: 'timeline', label: 'Timeline' },
+                  { id: 'risks', label: 'Risks' }
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setDetailTab(tab.id)}
+                    className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+                      detailTab === tab.id
+                        ? 'border-blue-600 text-blue-600'
+                        : 'border-transparent text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="md:col-span-2">
-                <div className="bg-slate-50 p-4 rounded-lg">
-                  <div className="flex justify-between mb-2">
-                    <div className="text-sm text-slate-600">Total Cost</div>
-                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(selectedProject.total_cost || 0).toLocaleString()}</div>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <div className="text-sm text-slate-600">Funded</div>
-                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(fundedMap[selectedProject.id] || 0).toLocaleString()}</div>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <div className="text-sm text-slate-600">Remaining</div>
-                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0)).toLocaleString()}</div>
-                  </div>
-
-                  <div className="mt-4">
-                    <div className="text-xs uppercase text-slate-500 mb-2">Funding Progress</div>
-                    <div className="w-full bg-slate-200 rounded-full h-3">
-                      <div className="bg-emerald-600 h-3 rounded-full" style={{ width: `${selectedProject.total_cost > 0 ? ((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost) * 100) : 0}%` }} />
+            <div className="p-6">
+              {/* Overview Tab */}
+              {detailTab === 'overview' && (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="bg-slate-50 p-4 rounded-lg">
+                      <div className="text-xs text-slate-600 mb-1">Total Cost</div>
+                      <div className="text-xl font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(selectedProject.total_cost || 0).toLocaleString()}</div>
                     </div>
-                    <div className="text-xs text-slate-600 mt-2">{selectedProject.total_cost > 0 ? (((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost)) * 100).toFixed(2) : '0.00'}%</div>
+                    <div className="bg-slate-50 p-4 rounded-lg">
+                      <div className="text-xs text-slate-600 mb-1">Funded</div>
+                      <div className="text-xl font-semibold text-emerald-600">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(fundedMap[selectedProject.id] || 0).toLocaleString()}</div>
+                    </div>
+                    <div className="bg-slate-50 p-4 rounded-lg">
+                      <div className="text-xs text-slate-600 mb-1">Remaining</div>
+                      <div className="text-xl font-semibold text-orange-600">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0)).toLocaleString()}</div>
+                    </div>
                   </div>
 
-                  <div className="mt-6">
-                    <h4 className="text-sm font-medium text-slate-900 mb-2">Contribution Distribution</h4>
+                  <div>
+                    <div className="text-xs uppercase text-slate-500 mb-2 font-semibold">Funding Progress</div>
+                    <div className="w-full bg-slate-200 rounded-full h-4">
+                      <div className="bg-blue-600 h-4 rounded-full transition-all" style={{ width: `${selectedProject.total_cost > 0 ? ((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost) * 100) : 0}%` }} />
+                    </div>
+                    <div className="text-sm text-slate-600 mt-2">{selectedProject.total_cost > 0 ? (((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost)) * 100).toFixed(2) : '0.00'}%</div>
+                  </div>
+
+                  <div>
+                    <h4 className="text-sm font-semibold text-slate-900 mb-3">Investor Distribution</h4>
                     {projectContributions.length === 0 ? (
                       <p className="text-sm text-slate-500">No contributions yet</p>
                     ) : (
-                      <div className="space-y-2 text-sm">
+                      <div className="space-y-2">
                         {projectContributions.map(c => {
                           const pct = (c.total / (fundedMap[selectedProject.id] || 1)) * 100
                           return (
-                            <div key={c.user_id} className="flex justify-between items-center">
+                            <div key={c.user_id} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
                               <div>
-                                <div className="font-medium">{c.full_name}</div>
+                                <div className="text-sm font-medium text-slate-900">{c.full_name}</div>
                                 <div className="text-xs text-slate-500">{c.email}</div>
                               </div>
                               <div className="text-right">
-                                <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(c.total).toLocaleString()}</div>
+                                <div className="text-sm font-semibold text-slate-900">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{Number(c.total).toLocaleString()}</div>
                                 <div className="text-xs text-slate-500">{pct.toFixed(2)}%</div>
                               </div>
                             </div>
@@ -337,27 +364,300 @@ export default function Investments({ userId }) {
                       </div>
                     )}
                   </div>
-                </div>
-              </div>
 
-              <div>
-                <div className="bg-white border border-slate-100 rounded-lg p-4">
-                  <div className="mb-4">
-                    <div className="text-sm text-slate-600">Status</div>
-                    <div className="font-medium">{selectedProject.status || 'funding'}</div>
-                  </div>
-                  <div className="mb-4">
-                    <div className="text-sm text-slate-600">Min Investment</div>
-                    <div className="font-medium">{getCurrencySymbol(selectedProject.currency_code || 'PHP')}{selectedProject.min_investment || 0}</div>
-                  </div>
-
-                  <div>
-                    <button onClick={(e) => { e.stopPropagation(); openInvestModal(selectedProject) }} className="w-full bg-blue-600 text-white py-2 rounded-lg">Invest in this project</button>
-                  </div>
+                  <button onClick={() => openInvestModal(selectedProject)} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium">Invest in this Project</button>
                 </div>
-              </div>
+              )}
+
+              {/* Equipment Tab */}
+              {detailTab === 'equipment' && (
+                <div className="space-y-4">
+                  {projectEquipment.length === 0 ? (
+                    <p className="text-slate-500">No equipment details available</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead className="border-b border-slate-200">
+                          <tr className="text-left text-slate-600 font-semibold">
+                            <th className="pb-3 px-2">Equipment</th>
+                            <th className="pb-3 px-2">Type</th>
+                            <th className="pb-3 px-2">Capacity</th>
+                            <th className="pb-3 px-2">Power (kW)</th>
+                            <th className="pb-3 px-2">Unit Cost (USD)</th>
+                            <th className="pb-3 px-2">Total Cost</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {projectEquipment.map(eq => (
+                            <tr key={eq.id} className="border-b border-slate-100 hover:bg-slate-50">
+                              <td className="py-3 px-2 font-medium">{eq.equipment_name}</td>
+                              <td className="py-3 px-2">{eq.equipment_type}</td>
+                              <td className="py-3 px-2">{eq.capacity_value} {eq.capacity_unit}</td>
+                              <td className="py-3 px-2">{eq.power_consumption_kw || '—'}</td>
+                              <td className="py-3 px-2">${Number(eq.unit_cost_usd).toLocaleString()}</td>
+                              <td className="py-3 px-2 font-semibold">${Number(eq.total_cost_usd || 0).toLocaleString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {projectSuppliers.length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-sm font-semibold text-slate-900 mb-3">Suppliers</h4>
+                      <div className="space-y-3">
+                        {projectSuppliers.map(sup => (
+                          <div key={sup.id} className="p-3 bg-slate-50 rounded-lg">
+                            <div className="font-medium text-slate-900">{sup.supplier_name}</div>
+                            <div className="text-xs text-slate-600 mt-1">
+                              {sup.contact_person && <div>Contact: {sup.contact_person}</div>}
+                              {sup.email && <div>Email: {sup.email}</div>}
+                              {sup.phone && <div>Phone: {sup.phone}</div>}
+                              {sup.country && <div>Location: {sup.city}, {sup.country}</div>}
+                              {sup.delivery_timeline_days && <div>Delivery: {sup.delivery_timeline_days} days</div>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Costs Tab */}
+              {detailTab === 'costs' && (
+                <div className="space-y-4">
+                  {projectCosts.length === 0 ? (
+                    <p className="text-slate-500">No cost breakdown available</p>
+                  ) : (
+                    <div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead className="border-b border-slate-200">
+                            <tr className="text-left text-slate-600 font-semibold">
+                              <th className="pb-3 px-2">Category</th>
+                              <th className="pb-3 px-2">Budgeted (USD)</th>
+                              <th className="pb-3 px-2">Actual (USD)</th>
+                              <th className="pb-3 px-2">% of Total</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {projectCosts.map(cost => (
+                              <tr key={cost.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                <td className="py-3 px-2 font-medium">{cost.cost_category}</td>
+                                <td className="py-3 px-2">${Number(cost.budgeted_amount_usd || 0).toLocaleString()}</td>
+                                <td className="py-3 px-2">{cost.actual_amount_usd ? `$${Number(cost.actual_amount_usd).toLocaleString()}` : '—'}</td>
+                                <td className="py-3 px-2">{cost.percentage_of_total ? `${cost.percentage_of_total.toFixed(1)}%` : '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                        <div className="text-sm font-semibold text-slate-900">Total Project Cost</div>
+                        <div className="text-xl font-bold text-blue-600">${projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0).toLocaleString()}</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Production Tab */}
+              {detailTab === 'production' && (
+                <div className="space-y-4">
+                  {productionCapacity.length === 0 ? (
+                    <p className="text-slate-500">No production capacity data available</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {productionCapacity.map(cap => (
+                        <div key={cap.id} className="p-4 border border-slate-200 rounded-lg">
+                          <div className="flex justify-between items-start mb-3">
+                            <div>
+                              <div className="font-semibold text-slate-900">{cap.phase_name}</div>
+                              <div className="text-sm text-slate-600">{cap.product_type}</div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-sm font-semibold text-slate-900">{cap.utilization_percentage}% Utilization</div>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                            <div>
+                              <div className="text-xs text-slate-600">Per Hour</div>
+                              <div className="font-medium">{cap.capacity_per_hour} {cap.capacity_unit}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-slate-600">Per Day</div>
+                              <div className="font-medium">{cap.capacity_per_day} {cap.capacity_unit}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-slate-600">Per Month</div>
+                              <div className="font-medium">{cap.capacity_per_month} {cap.capacity_unit}</div>
+                            </div>
+                            <div>
+                              <div className="text-xs text-slate-600">Per Year</div>
+                              <div className="font-medium">{cap.capacity_per_year} {cap.capacity_unit}</div>
+                            </div>
+                          </div>
+                          {cap.phase_start_date && (
+                            <div className="mt-3 text-xs text-slate-600">
+                              {cap.phase_start_date} to {cap.phase_end_date || 'ongoing'}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Financials Tab */}
+              {detailTab === 'financials' && (
+                <div className="space-y-4">
+                  {revenueForecast.length === 0 && financialMetrics.length === 0 ? (
+                    <p className="text-slate-500">No financial data available</p>
+                  ) : (
+                    <>
+                      {revenueForecast.length > 0 && (
+                        <div>
+                          <h4 className="text-sm font-semibold text-slate-900 mb-3">Revenue Projections</h4>
+                          <div className="overflow-x-auto">
+                            <table className="w-full text-sm">
+                              <thead className="border-b border-slate-200">
+                                <tr className="text-left text-slate-600 font-semibold">
+                                  <th className="pb-3 px-2">Product</th>
+                                  <th className="pb-3 px-2">Year</th>
+                                  <th className="pb-3 px-2">Annual Volume</th>
+                                  <th className="pb-3 px-2">Unit Price</th>
+                                  <th className="pb-3 px-2">Annual Revenue</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {revenueForecast.map(rev => (
+                                  <tr key={rev.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                    <td className="py-3 px-2 font-medium">{rev.product_type}</td>
+                                    <td className="py-3 px-2">Year {rev.year_number}</td>
+                                    <td className="py-3 px-2">{Number(rev.projected_annual_volume).toLocaleString()} {rev.volume_unit}</td>
+                                    <td className="py-3 px-2">${Number(rev.unit_price_usd).toLocaleString()}</td>
+                                    <td className="py-3 px-2 font-semibold">${Number(rev.projected_annual_revenue_usd || 0).toLocaleString()}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {financialMetrics.length > 0 && (
+                        <div className="mt-6">
+                          <h4 className="text-sm font-semibold text-slate-900 mb-3">Key Metrics</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {financialMetrics.map(metric => (
+                              <div key={metric.id} className="p-3 bg-slate-50 rounded-lg">
+                                <div className="text-xs text-slate-600 mb-1">{metric.metric_name}</div>
+                                <div className="text-lg font-semibold text-slate-900">
+                                  {Number(metric.base_case_value).toLocaleString()} {metric.unit_of_measure}
+                                </div>
+                                {metric.conservative_case_value && (
+                                  <div className="text-xs text-slate-600 mt-1">
+                                    Conservative: {Number(metric.conservative_case_value).toLocaleString()}
+                                  </div>
+                                )}
+                                {metric.optimistic_case_value && (
+                                  <div className="text-xs text-slate-600">
+                                    Optimistic: {Number(metric.optimistic_case_value).toLocaleString()}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Timeline Tab */}
+              {detailTab === 'timeline' && (
+                <div className="space-y-3">
+                  {projectMilestones.length === 0 ? (
+                    <p className="text-slate-500">No timeline data available</p>
+                  ) : (
+                    projectMilestones.map(mile => (
+                      <div key={mile.id} className="p-4 border border-slate-200 rounded-lg">
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <div className="font-semibold text-slate-900">{mile.milestone_name}</div>
+                            <div className="text-xs text-slate-600 mt-1">{mile.milestone_type}</div>
+                          </div>
+                          <div className={`px-2 py-1 rounded text-xs font-medium ${
+                            mile.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                            mile.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
+                            mile.status === 'delayed' ? 'bg-red-100 text-red-700' :
+                            'bg-slate-100 text-slate-700'
+                          }`}>
+                            {mile.status}
+                          </div>
+                        </div>
+                        {mile.description && <p className="text-sm text-slate-600 mb-2">{mile.description}</p>}
+                        <div className="text-xs text-slate-600">
+                          Planned: {mile.planned_date} {mile.actual_date && `• Actual: ${mile.actual_date}`}
+                        </div>
+                        {mile.progress_percentage > 0 && (
+                          <div className="mt-2">
+                            <div className="w-full bg-slate-200 rounded h-2">
+                              <div className="bg-blue-600 h-2 rounded" style={{ width: `${mile.progress_percentage}%` }} />
+                            </div>
+                            <div className="text-xs text-slate-600 mt-1">{mile.progress_percentage}%</div>
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+
+              {/* Risks Tab */}
+              {detailTab === 'risks' && (
+                <div className="space-y-3">
+                  {riskAssessment.length === 0 ? (
+                    <p className="text-slate-500">No risk assessment data available</p>
+                  ) : (
+                    riskAssessment.map(risk => (
+                      <div key={risk.id} className={`p-4 border rounded-lg ${
+                        risk.impact_severity === 'critical' ? 'border-red-300 bg-red-50' :
+                        risk.impact_severity === 'high' ? 'border-orange-300 bg-orange-50' :
+                        'border-slate-200 bg-slate-50'
+                      }`}>
+                        <div className="flex justify-between items-start mb-2">
+                          <div>
+                            <div className="font-semibold text-slate-900">{risk.risk_description}</div>
+                            <div className="text-xs text-slate-600 mt-1">{risk.risk_category}</div>
+                          </div>
+                          <div className={`px-2 py-1 rounded text-xs font-bold ${
+                            risk.impact_severity === 'critical' ? 'bg-red-200 text-red-700' :
+                            risk.impact_severity === 'high' ? 'bg-orange-200 text-orange-700' :
+                            risk.impact_severity === 'medium' ? 'bg-yellow-200 text-yellow-700' :
+                            'bg-green-200 text-green-700'
+                          }`}>
+                            {risk.impact_severity?.toUpperCase()}
+                          </div>
+                        </div>
+                        <div className="text-sm mb-2">
+                          Probability: {risk.probability_percentage}% | Risk Score: {risk.risk_score?.toFixed(1) || 'N/A'}
+                        </div>
+                        {risk.mitigation_strategy && (
+                          <div className="text-sm text-slate-700 bg-white/50 p-2 rounded">
+                            <strong>Mitigation:</strong> {risk.mitigation_strategy}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
-
           </div>
         </Modal>
       )}
