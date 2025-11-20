@@ -732,26 +732,6 @@ export default function Investments({ userId }) {
                     </div>
                   )}
 
-                  {projectSuppliers.length > 0 && (
-                    <div className="mt-6 border-t pt-6">
-                      <h4 className="text-sm font-semibold text-slate-900 mb-3">Suppliers</h4>
-                      <div className="space-y-3">
-                        {projectSuppliers.map(sup => (
-                          <div key={sup.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-                            <div className="font-medium text-slate-900">{sup.supplier_name}</div>
-                            {sup.supplier_type && <div className="text-xs font-medium text-slate-700 mt-1">Type: {sup.supplier_type}</div>}
-                            <div className="text-xs text-slate-600 mt-2 space-y-1">
-                              {sup.contact_person && <div>👤 {sup.contact_person}</div>}
-                              {sup.email && <div>📧 {sup.email}</div>}
-                              {sup.phone && <div>📞 {sup.phone}</div>}
-                              {sup.city && sup.country && <div>📍 {sup.city}, {sup.country}</div>}
-                              {sup.delivery_timeline_days && <div>🚚 Delivery: {sup.delivery_timeline_days} days</div>}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
 
