@@ -4,6 +4,7 @@ import { getCurrencySymbol, formatCurrency } from '../lib/currency'
 import { getPhpToUsdRate, phpToUsd, usdToPhp, formatPhp, formatUsd, CurrencyInput } from '../lib/currencyConversion'
 import { createPortal } from 'react-dom'
 import EquipmentManager from './EquipmentManager'
+import PaginatedProjectOverview from './PaginatedProjectOverview'
 
 function Modal({ children, onClose, className = '' }) {
   if (typeof document === 'undefined') return null
