@@ -209,17 +209,17 @@ function addPageHeader(doc, projectName) {
 }
 
 function addPageFooter(doc) {
-  const pageHeight = doc.internal.pageSize.getHeight()
-  const footerY = pageHeight - MARGINS.headerFooter + 5
+  const footerY = PAGE_HEIGHT - MARGINS.headerFooter + 3
 
   doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.3)
-  doc.line(MARGINS.left, footerY - 3, PAGE_WIDTH - MARGINS.right, footerY - 3)
+  doc.setLineWidth(0.2)
+  doc.line(MARGINS.left, footerY - 8, PAGE_WIDTH - MARGINS.right, footerY - 8)
 
-  doc.setFontSize(8)
+  doc.setFontSize(7)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
-  doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, footerY)
+  const generatedText = `Generated on ${new Date().toLocaleDateString()}`
+  doc.text(generatedText, MARGINS.left, footerY)
 }
 
 function checkAndAddPage(doc, yPos, minSpace = 35, projectName = '') {
