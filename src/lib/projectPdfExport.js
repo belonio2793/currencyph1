@@ -302,9 +302,9 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     ])
     
     yPos = addTable(doc, equipmentHeaders, equipmentRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
-  
+
   // ===== SUPPLIERS SECTION =====
   if (suppliers.length > 0) {
     yPos = addSectionTitle(doc, 'Suppliers', yPos)
