@@ -160,9 +160,11 @@ export default function Investments({ userId }) {
     setShowInvestModal(false)
     setSelectedProject(project)
     setShowDetail(true)
+    setDetailTab('overview')
     setError('')
     setSuccess('')
     loadProjectContributions(project.id)
+    loadProjectDetails(project.id)
   }
 
   async function handleInvest(e) {
