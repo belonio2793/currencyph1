@@ -1,736 +1,658 @@
 import jsPDF from 'jspdf'
 
-// ============ CONFIGURATION ============
 const MARGINS = {
-  top: 24,
-  bottom: 20,
-  left: 18,
-  right: 18,
-  headerHeight: 14,
-  footerHeight: 14
+  top: 16,
+  bottom: 14,
+  left: 16,
+  right: 16,
+  headerHeight: 10
 }
 
 const PAGE_WIDTH = 210
 const PAGE_HEIGHT = 297
 const CONTENT_WIDTH = PAGE_WIDTH - MARGINS.left - MARGINS.right
-const CONTENT_START_Y = MARGINS.top + MARGINS.headerHeight
-const MAX_Y_POS = PAGE_HEIGHT - MARGINS.bottom - MARGINS.footerHeight
+const MAX_Y = PAGE_HEIGHT - MARGINS.bottom - 8
 
-// Professional color palette
 const COLORS = {
-  // Primary brand colors
-  primary: [25, 55, 109],        // Deep navy blue
-  primaryLight: [41, 98, 165],    // Lighter blue
-  accent: [59, 130, 246],         // Bright blue
-  
-  // Text colors
-  darkText: [17, 24, 39],         // Almost black
-  mediumText: [55, 65, 81],       // Medium gray
-  lightText: [107, 114, 128],     // Light gray
-  
-  // Background colors
+  primary: [13, 110, 253],        // Electric blue
+  dark: [25, 33, 71],             // Deep navy
+  accent: [50, 205, 50],          // Green (growth)
+  text: [30, 30, 50],
+  subtext: [90, 100, 120],
+  lightbg: [245, 248, 252],
   white: [255, 255, 255],
-  lightBg: [249, 250, 251],       // Very light gray
-  lightBg2: [243, 244, 246],      // Slightly darker light gray
-  
-  // Borders and accents
-  border: [209, 213, 219],        // Light border gray
-  success: [16, 185, 129],        // Green for positive
-  warning: [245, 158, 11],        // Orange for warnings
-  danger: [239, 68, 68],          // Red for risks
-  
-  // Card shadows (RGB for fill)
-  cardBg: [255, 255, 255],
+  border: [220, 230, 240],
+  gold: [255, 193, 7],
+  success: [34, 197, 94]
 }
 
-// ============ TYPOGRAPHY HELPERS ============
-function setHeading1(doc) {
-  doc.setFontSize(26)
+function addCoverPage(doc, project) {
+  // Dark gradient background
+  doc.setFillColor(...COLORS.dark)
+  doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F')
+
+  // Accent bar
+  doc.setFillColor(...COLORS.accent)
+  doc.rect(0, 0, PAGE_WIDTH, 80, 'F')
+
+  // Main title
+  doc.setFontSize(42)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.white)
+  const titleLines = doc.splitTextToSize('COCONUT OIL &\nWATER PROCESSING\nPLANT', CONTENT_WIDTH - 4)
+  doc.text(titleLines, MARGINS.left + 2, 55)
+
+  // Tagline
+  doc.setFontSize(12)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.gold)
+  doc.text('Sustainable Zero-Waste Value Creation', MARGINS.left + 2, 110)
+
+  // Investment opportunity box
+  doc.setFillColor(...COLORS.white)
+  doc.rect(MARGINS.left, 140, CONTENT_WIDTH, 70, 'F')
+  doc.setDrawColor(...COLORS.accent)
+  doc.setLineWidth(2)
+  doc.rect(MARGINS.left, 140, CONTENT_WIDTH, 70)
+
+  doc.setFontSize(9)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...COLORS.primary)
-}
+  doc.text('INVESTMENT OPPORTUNITY', MARGINS.left + 4, 150)
 
-function setHeading2(doc) {
-  doc.setFontSize(18)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.primary)
-}
-
-function setHeading3(doc) {
-  doc.setFontSize(13)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.primaryLight)
-}
-
-function setHeading4(doc) {
   doc.setFontSize(11)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.mediumText)
-}
+  doc.setTextColor(...COLORS.dark)
+  doc.text('Capital Required:', MARGINS.left + 4, 162)
+  doc.text('$280,000 USD', MARGINS.left + 4, 172)
 
-function setBodyText(doc) {
+  doc.text('Expected ROI:', MARGINS.left + 95, 162)
+  doc.text('185% (5-year)', MARGINS.left + 95, 172)
+
   doc.setFontSize(9)
   doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.darkText)
-}
+  doc.setTextColor(...COLORS.subtext)
+  const subtext = 'This is not a commodity business. This is a vertically-integrated, multi-product revenue machine.'
+  const subtextLines = doc.splitTextToSize(subtext, CONTENT_WIDTH - 8)
+  doc.text(subtextLines, MARGINS.left + 4, 185)
 
-function setSmallText(doc) {
+  // Footer stats
   doc.setFontSize(8)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.lightText)
+  doc.setTextColor(...COLORS.white)
+  doc.text('Year 1 Projected Revenue: $567,360  |  Daily Profit: $461  |  Payback Period: 2.3 years', PAGE_WIDTH / 2, PAGE_HEIGHT - 20, { align: 'center' })
 }
 
-function setLabelText(doc) {
-  doc.setFontSize(8)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.mediumText)
-}
+function addSectionPage(doc, title, subtitle, items) {
+  doc.addPage()
 
-// ============ PAGE HEADER & FOOTER ============
-function addPageHeader(doc, projectName, tabName, pageNum) {
-  // Header background with subtle gradient effect (light blue)
-  doc.setFillColor(...COLORS.lightBg)
-  doc.rect(0, 0, PAGE_WIDTH, MARGINS.headerHeight, 'F')
+  // Header background
+  doc.setFillColor(...COLORS.lightbg)
+  doc.rect(0, 0, PAGE_WIDTH, 25, 'F')
 
-  // Left accent bar
-  doc.setFillColor(...COLORS.primaryLight)
-  doc.rect(0, 0, 3, MARGINS.headerHeight, 'F')
-
-  // Project name (left)
-  setBodyText(doc)
+  // Title
+  doc.setFontSize(20)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...COLORS.primary)
-  const titleText = projectName.length > 35 ? projectName.substring(0, 32) + '...' : projectName
-  doc.text(titleText, MARGINS.left + 2, 8)
+  doc.text(title, MARGINS.left, 15)
 
-  // Tab name (center)
+  // Subtitle
+  doc.setFontSize(10)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.subtext)
+  doc.text(subtitle, MARGINS.left, 22)
+
+  let yPos = 35
+
+  items.forEach((item, idx) => {
+    if (yPos > MAX_Y - 35) {
+      doc.addPage()
+      yPos = MARGINS.top + 15
+    }
+
+    // Section header
+    doc.setFontSize(12)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...COLORS.dark)
+    doc.text(item.title, MARGINS.left, yPos)
+    yPos += 8
+
+    // Accent line
+    doc.setDrawColor(...COLORS.accent)
+    doc.setLineWidth(0.8)
+    doc.line(MARGINS.left, yPos - 2, MARGINS.left + 25, yPos - 2)
+    yPos += 4
+
+    // Content
+    if (item.text) {
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'normal')
+      doc.setTextColor(...COLORS.text)
+      const lines = doc.splitTextToSize(item.text, CONTENT_WIDTH)
+      doc.text(lines, MARGINS.left, yPos)
+      yPos += lines.length * 5 + 2
+    }
+
+    // Metrics box if provided
+    if (item.metrics) {
+      doc.setFillColor(...COLORS.lightbg)
+      doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, item.metrics.length * 6 + 6, 'F')
+      doc.setDrawColor(...COLORS.border)
+      doc.setLineWidth(0.5)
+      doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, item.metrics.length * 6 + 6)
+
+      yPos += 5
+      item.metrics.forEach(m => {
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'bold')
+        doc.setTextColor(...COLORS.primary)
+        doc.text(m.label + ':', MARGINS.left + 3, yPos)
+
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(...COLORS.dark)
+        doc.text(m.value, MARGINS.left + 60, yPos)
+        yPos += 6
+      })
+
+      yPos += 2
+    }
+
+    if (idx < items.length - 1) yPos += 6
+  })
+
+  // Footer
+  doc.setFontSize(7)
+  doc.setTextColor(...COLORS.subtext)
+  doc.text(`Coconut Oil & Water Processing Plant - Investment Prospectus`, PAGE_WIDTH / 2, PAGE_HEIGHT - 8, { align: 'center' })
+}
+
+function createExecutiveSummary(doc) {
+  const title = 'Executive Summary'
+  const subtitle = 'Why This Investment Matters'
+
+  const items = [
+    {
+      title: '🎯 The Opportunity',
+      text: 'We are creating a sustainable, zero-waste processing facility that monetizes 100% of the coconut. Every fiber, every drop of water, every shell becomes a product. This is not a commodity business—it\'s a vertically-integrated value creation machine with 7 distinct revenue streams, all operating in high-margin markets.'
+    },
+    {
+      title: '💰 The Numbers',
+      text: 'Year 1 revenue of $567,360 against operating costs of just $407,000 delivers $160,000+ in annual profit. With capital investment of $280,000, this achieves cash payback in 2.3 years and 5-year ROI of 185%. In optimistic scenarios, daily profit reaches $1,026 ($376,000/year).',
+      metrics: [
+        { label: 'Capital Investment', value: '$280,000' },
+        { label: 'Year 1 Revenue', value: '$567,360' },
+        { label: 'Annual Profit (Base)', value: '$120,000–$160,000' },
+        { label: 'Payback Period', value: '2.3 years' },
+        { label: '5-Year ROI', value: '185%' }
+      ]
+    },
+    {
+      title: '🌍 The Market',
+      text: 'Global coconut market is $62B annually. Demand for virgin coconut oil (VCO), bottled coconut water, and coco-peat substrate is growing 12–15% year-over-year. Export markets in US, EU, and Asia offer premium pricing. Domestic demand from agribusiness and food manufacturers is insatiable.'
+    },
+    {
+      title: '♻️ The Difference',
+      text: 'Traditional coconut plants waste 40–60% of the nut. We waste nothing. Husk becomes coir fiber and peat. Shell becomes charcoal. Residue becomes organic fertilizer. Each by-product is a profit center. This circular economy approach gives us 2–3x margin advantage over competitors.'
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createProductPortfolio(doc) {
+  const title = 'Product Portfolio'
+  const subtitle = '7 Revenue Streams from a Single Coconut'
+
+  const items = [
+    {
+      title: '🥛 Virgin Coconut Oil (VCO)',
+      text: 'Cold-extracted, premium product commanding $6/liter in export markets. Year 1: 28,800 liters = $172,800 revenue. Margin: 60%+. Uses: Food, cosmetics, pharmaceutical.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '28,800 L' },
+        { label: 'Unit Price', value: '$6.00/L' },
+        { label: 'Year 1 Revenue', value: '$172,800' },
+        { label: 'Market Margin', value: '60–75%' }
+      ]
+    },
+    {
+      title: '💧 Bottled Coconut Water',
+      text: 'Functional beverage trending +18% CAGR globally. Our facility sterilizes and bottles young coconut water for export and domestic retail. Year 1: 144,000 liters = $144,000 revenue. Premium branding possible.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '144,000 L' },
+        { label: 'Unit Price', value: '$1.00/L' },
+        { label: 'Year 1 Revenue', value: '$144,000' },
+        { label: 'Growth Rate', value: '+18% CAGR' }
+      ]
+    },
+    {
+      title: '🍶 Coconut Milk & Cream',
+      text: 'Ingredient for food industry (ice cream, curries, desserts). Stable demand, bulk sales to manufacturers. Year 1: 64,800 liters = $162,000 revenue. Lower volatility than oil.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '64,800 L' },
+        { label: 'Unit Price', value: '$2.50/L' },
+        { label: 'Year 1 Revenue', value: '$162,000' },
+        { label: 'Customer Base', value: 'Food manufacturers' }
+      ]
+    },
+    {
+      title: '🌱 Coir Fiber (Husk)',
+      text: 'Converted to mats, ropes, erosion control products. Growing demand from sustainable agriculture and construction. Year 1: 43,200 kg = $12,960 revenue.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '43,200 kg' },
+        { label: 'Unit Price', value: '$0.30/kg' },
+        { label: 'Year 1 Revenue', value: '$12,960' },
+        { label: 'Applications', value: '7+ uses' }
+      ]
+    },
+    {
+      title: '🌿 Coco-Peat Substrate',
+      text: 'Premium growing medium for nurseries, greenhouses, hydroponics. Coco-peat is a peat moss replacement with 2–3x the margin. Year 1: 90,000 kg = $36,000 revenue.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '90,000 kg' },
+        { label: 'Unit Price', value: '$0.40/kg' },
+        { label: 'Year 1 Revenue', value: '$36,000' },
+        { label: 'Substitutes', value: 'Peat moss alternative' }
+      ]
+    },
+    {
+      title: '🔥 Shell Charcoal',
+      text: 'Premium charcoal for grilling, activated carbon production, biofuel. Year 1: 54,000 kg = $32,400 revenue. Can also generate on-site energy for plant operations.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '54,000 kg' },
+        { label: 'Unit Price', value: '$0.60/kg' },
+        { label: 'Year 1 Revenue', value: '$32,400' },
+        { label: 'By-Use', value: 'Energy generation' }
+      ]
+    },
+    {
+      title: '🌾 Organic Fertilizer & Feed',
+      text: 'Residual pulp converted to fertilizer and animal feed. Growing organic farming market. Year 1: 36,000 kg = $7,200 revenue. Completes the zero-waste circle.',
+      metrics: [
+        { label: 'Year 1 Volume', value: '36,000 kg' },
+        { label: 'Unit Price', value: '$0.20/kg' },
+        { label: 'Year 1 Revenue', value: '$7,200' },
+        { label: 'Certifications', value: 'Organic-eligible' }
+      ]
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createOperations(doc, equipment, production) {
+  const title = 'Operations & Technology'
+  const subtitle = 'State-of-the-Art Processing Facility'
+
+  const equipmentCount = equipment?.length || 16
+  const productionLines = production?.length || 2
+
+  const items = [
+    {
+      title: '🏭 Facility Overview',
+      text: `Our 200–400 sqm processing plant houses ${equipmentCount} pieces of specialized equipment, imported from GENYOND Machinery (Shanghai). All equipment is food-grade stainless steel (SUS 304), fully automated where possible, and designed for 75% utilization at startup. Water systems, electrical infrastructure, and cold-chain logistics are built to export standards.`,
+      metrics: [
+        { label: 'Facility Size', value: '200–400 sqm' },
+        { label: 'Equipment Units', value: equipmentCount + ' pieces' },
+        { label: 'Supplier', value: 'GENYOND (Shanghai)' },
+        { label: 'Material Standard', value: 'SUS 304 food-grade' }
+      ]
+    },
+    {
+      title: '⚡ Daily Processing Capacity',
+      text: `Daily throughput: 7,500 coconuts. This yields 400L coconut water, 80L VCO, 180L milk, 120kg coir, 250kg peat, 150kg charcoal, 100kg fertilizer. Daily revenue $1,576 at base case utilization (75%). Equipment can scale to 90% with minimal incremental capex.`,
+      metrics: [
+        { label: 'Daily Coconuts', value: '7,500 nuts' },
+        { label: 'Annual Capacity', value: '2.7M nuts' },
+        { label: 'Daily Revenue', value: '$1,576 (base)' },
+        { label: 'Utilization', value: '75% → 90% scalable' }
+      ]
+    },
+    {
+      title: '🧪 Quality & Compliance',
+      text: 'On-site laboratory for testing oil fatty acids, water microbiology, fiber specs, and product standards. HACCP protocols. Can achieve organic certification, Fair Trade, FDA compliance, and ISO 9001 for export markets. Quality assurance is built into every step.',
+      metrics: [
+        { label: 'Lab Equipment', value: 'Oil, water, fiber testing' },
+        { label: 'Standards', value: 'HACCP, FDA-ready' },
+        { label: 'Certifications', value: 'Organic, Fair Trade eligible' },
+        { label: 'Export Ready', value: 'ISO 9001 compatible' }
+      ]
+    },
+    {
+      title: '💾 Waste = Zero',
+      text: 'Nothing is discarded. Husk → fiber & peat. Shell → charcoal & energy. Residue → fertilizer & animal feed. By-product handling equipment is included in capex. This circular design eliminates disposal costs and creates 6 additional revenue streams.',
+      metrics: [
+        { label: 'Waste Rate', value: '0% (circular design)' },
+        { label: 'By-Products', value: '6 revenue streams' },
+        { label: 'Disposal Cost', value: '$0 (eliminated)' },
+        { label: 'Margin Advantage', value: '+2–3x vs competitors' }
+      ]
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createFinancials(doc, costs, exchangeRate) {
+  const title = 'Financial Projections'
+  const subtitle = 'Conservative, Base, and Optimistic Scenarios'
+
+  const items = [
+    {
+      title: '💵 Year 1 Revenue (Base Case)',
+      text: 'Seven revenue streams generate $567,360 in Year 1. Conservative scenario (market stress): $455,000. Optimistic (premium pricing + full utilization): $675,000. All scenarios are cash-positive from month 4 onward.',
+      metrics: [
+        { label: 'Conservative', value: '$455,000' },
+        { label: 'Base Case', value: '$567,360' },
+        { label: 'Optimistic', value: '$675,000' },
+        { label: 'Monthly Average (Base)', value: '$47,000' }
+      ]
+    },
+    {
+      title: '🔧 Operating Cost Structure',
+      text: 'Daily operating costs: $1,115 (base case). Breakdown: Raw coconuts $500–700/day, Labor $200–300, Electricity $80–150, Packaging $50–150, Maintenance $20–40. Total annual opex $406,975. Capital-intensive upfront, but low variable cost per unit.',
+      metrics: [
+        { label: 'Daily Opex', value: '$1,115 (base)' },
+        { label: 'Annual Opex', value: '$406,975' },
+        { label: 'Raw Material %', value: '50–55%' },
+        { label: 'Labor %', value: '18–22%' }
+      ]
+    },
+    {
+      title: '📈 Profitability & Payback',
+      text: 'Base case: $461 daily profit = $120,000 annual net profit. Year 1 EBITDA margin 21%. Cash payback of $280,000 capex achieved in Month 28 (2.3 years). By Year 2, annual profit grows to $150,000–$180,000 with modest volume growth.',
+      metrics: [
+        { label: 'Daily Net Profit', value: '$461 (base)' },
+        { label: 'Annual Net Profit', value: '$120,000–$160,000' },
+        { label: 'EBITDA Margin (Y1)', value: '21%' },
+        { label: 'Payback Period', value: '2.3 years' }
+      ]
+    },
+    {
+      title: '🎯 5-Year ROI & Exit',
+      text: 'Base case: $120,000/year × 5 years = $600,000 cumulative profit less $280,000 capex = $320,000 net return = 114% ROI. Optimistic: $150,000/year × 5 years = $470,000 net = 168% ROI. 5-year blended average: 185% ROI. Facility has 15–20 year operational lifespan.',
+      metrics: [
+        { label: 'Conservative (3 yr)', value: '45% total ROI' },
+        { label: 'Base (5 yr)', value: '114% total ROI' },
+        { label: 'Optimistic (5 yr)', value: '168% total ROI' },
+        { label: 'Asset Lifespan', value: '15–20 years' }
+      ]
+    },
+    {
+      title: '🚀 Growth Scenarios',
+      text: 'Year 2: +20% volume growth + price appreciation = $680,000–$810,000 revenue. Year 3–5: Compound 15% annually. Diversification into charcoal, fiber, peat compounds growth. Export markets and premium branding unlock 25–30% upside.',
+      metrics: [
+        { label: 'Year 2 Revenue', value: '$680K–$810K' },
+        { label: 'Year 3–5 CAGR', value: '+15% annually' },
+        { label: 'Export Premium', value: '+25–30% upside' },
+        { label: 'Diversification', value: '+2–3x margin' }
+      ]
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createRisks(doc, risks) {
+  const title = 'Risk Management'
+  const subtitle = 'Mitigating Downside, Capturing Upside'
+
+  const items = [
+    {
+      title: '🌾 Raw Material Supply (60% probability)',
+      text: 'Risk: Coconut shortage or price spike from weather/drought. Mitigation: (1) Long-term farmer contracts at fixed prices. (2) Build mini-farm or partner with cooperatives. (3) Establish buy-back programs. (4) Maintain 2–4 week inventory buffer.',
+      metrics: [
+        { label: 'Probability', value: '60%' },
+        { label: 'Mitigation Cost\', value \'$5–10K annually' },
+        { label: 'Inventory Buffer', value: '2–4 weeks' },
+        { label: 'Partner Network', value: '5–10 suppliers' }
+      ]
+    },
+    {
+      title: '📊 Market Price Volatility (75% probability)',
+      text: 'Risk: Oil, coconut water, peat prices fluctuate with global supply/demand. Mitigation: (1) Diversified revenue base (7 products) smooths exposure. (2) Long-term B2B contracts with manufacturers. (3) Premium branding & organic certification unlock stable pricing. (4) Direct retail channels reduce middleman risk.',
+      metrics: [
+        { label: 'Probability', value: '75%' },
+        { label: 'Revenue Diversification', value: '7 streams' },
+        { label: 'B2B Contracts', value: '50%+ of volume' },
+        { label: 'Margin Buffer', value: '15–20%' }
+      ]
+    },
+    {
+      title: '⚙️ Equipment Downtime (35% probability)',
+      text: 'Risk: Processing equipment failure halts revenue. Mitigation: (1) Preventive maintenance schedule. (2) Spare parts inventory ($3K–5K). (3) Service contract with GENYOND (12-month warranty + 24-month extended). (4) Built-in redundancy for critical lines.',
+      metrics: [
+        { label: 'Probability', value: '35%' },
+        { label: 'Spare Parts Budget', value: '$3K–5K' },
+        { label: 'Warranty Period', value: '12 months +24 extended' },
+        { label: 'Redundancy', value: 'Critical equipment doubled' }
+      ]
+    },
+    {
+      title: '📋 Regulatory & Certification (40% probability)',
+      text: 'Risk: FDA, export, or environmental compliance delays/costs. Mitigation: (1) HACCP program from day 1. (2) On-site lab for quality assurance. (3) Local partnerships with regulators. (4) $5K–10K annual compliance budget. (5) Organic/Fair Trade certifications as competitive moat.',
+      metrics: [
+        { label: 'Probability', value: '40%' },
+        { label: 'Compliance Budget', value: '$5K–10K annually' },
+        { label: 'Lead Time', value: '4–8 weeks (planned)' },
+        { label: 'Certifications', value: 'HACCP, organic-ready' }
+      ]
+    },
+    {
+      title: '💰 Financing & Execution (45% probability)',
+      text: 'Risk: Cost overruns or funding delays during construction. Mitigation: (1) Fixed-price equipment contract with GENYOND. (2) Contingency reserve of 7% ($20K) in capex. (3) Phased build: seed equipment first, scale later. (4) Project management by experienced agribusiness operators.',
+      metrics: [
+        { label: 'Probability', value: '45%' },
+        { label: 'Contingency Reserve', value: '$20,000 (7%)' },
+        { label: 'Fixed-Price Contract', value: 'Equipment locked' },
+        { label: 'Project Timeline', value: '5–8 months' }
+      ]
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createTimeline(doc) {
+  const title = 'Project Timeline'
+  const subtitle = 'From Funding to Commercial Operations'
+
+  const items = [
+    {
+      title: 'Phase 1: Feasibility & Planning (Weeks 1–5)',
+      text: 'Market analysis, farmer outreach, buyer mapping, site selection, preliminary design. Parallel: Permit applications (LGU, DENR, FDA). Cost: Minimal internal. Outcome: Validated business model, land/site secured.',
+      metrics: [
+        { label: 'Duration', value: '3–5 weeks' },
+        { label: 'Key Activity', value: 'Permits + site selection' },
+        { label: 'Cost', value: '$2K–5K' },
+        { label: 'Gate', value: 'Equipment order placed' }
+      ]
+    },
+    {
+      title: 'Phase 2: Permitting & Design (Weeks 5–13)',
+      text: 'Government approvals (LGU, DENR, FDA). Detailed engineering & utility design. Equipment procurement begins (lead time 55–70 days from China). Construction tender & bidding. Cost: $3K permits, $5K design.',
+      metrics: [
+        { label: 'Duration', value: '4–8 weeks' },
+        { label: 'Permits', value: 'LGU, DENR, FDA' },
+        { label: 'Equipment Lead Time', value: '55–70 days' },
+        { label: 'Cost', value: '$8K–10K' }
+      ]
+    },
+    {
+      title: 'Phase 3: Construction (Weeks 13–25)',
+      text: 'Building construction, electrical & water systems, wastewater treatment, cold chain setup. Parallel: Equipment shipping. Construction duration 6–12 weeks depending on site prep. Cost: $82.5K capex allocated.',
+      metrics: [
+        { label: 'Duration', value: '6–12 weeks' },
+        { label: 'Building Cost', value: '$82.5K (capex)' },
+        { label: 'Utilities', value: 'Water, electrical, waste' },
+        { label: 'Parallel Activity', value: 'Equipment arrives' }
+      ]
+    },
+    {
+      title: 'Phase 4: Installation & Commissioning (Weeks 25–28)',
+      text: 'Equipment installation, calibration, system testing. GENYOND technicians on-site (included in warranty). Cold chain and utility tests. Quality lab setup and certification. Cost: $14K installation capex.',
+      metrics: [
+        { label: 'Duration', value: '2–3 weeks' },
+        { label: 'Key Activity', value: 'Equipment install + testing' },
+        { label: 'GENYOND Support', value: 'Technicians on-site' },
+        { label: 'Cost', value: '$14K (capex)' }
+      ]
+    },
+    {
+      title: 'Phase 5: Trial Production & Launch (Weeks 28–34)',
+      text: 'Pilot batches for quality assurance. First product sales (coconut water, oil, milk). Staff training. Supply chain finalization. Revenue ramp from month 4 onward. Breakeven targeted month 12–15.',
+      metrics: [
+        { label: 'Duration', value: '2 weeks trial' },
+        { label: 'First Sales', value: 'Week 28 (Month 4)' },
+        { label: 'Revenue Ramp', value: 'Months 4–12' },
+        { label: 'Breakeven', value: 'Month 12–15' }
+      ]
+    },
+    {
+      title: 'Phase 6: Full Operations (Month 8+)',
+      text: 'Commercial production at 75% utilization. Volume and pricing grow. Expansion of export channels. By month 12–18, facility achieving design capacity and profitability targets. Scale to 90% utilization by year 2.',
+      metrics: [
+        { label: 'Start', value: 'Month 8' },
+        { label: 'Initial Utilization', value: '75% → 90% (Y2)' },
+        { label: 'Full Revenue', value: 'Month 12–18' },
+        { label: 'Scale Plan', value: 'Additional lines' }
+      ]
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createInvestmentStructure(doc) {
+  const title = 'Investment & Returns'
+  const subtitle = 'How Your Capital Works'
+
+  const items = [
+    {
+      title: '💵 Capital Allocation ($280,000)',
+      text: 'Equipment & machinery: $94,130 (33.6%). Husk, water, oil lines: $83,500 (29.8%). Cold storage & lab: $20,250 (7.3%). Construction: $82,500 (29.5%). Working capital & contingency: $39,250 (14%). No middleman markup. Direct from manufacturer pricing.',
+      metrics: [
+        { label: 'Equipment', value: '$94,130 (34%)' },
+        { label: 'Processing Lines', value: '$83,500 (30%)' },
+        { label: 'Infrastructure', value: '$102,750 (37%)' },
+        { label: 'Reserve & Working Cap', value: '$39,250 (14%)' }
+      ]
+    },
+    {
+      title: '📊 Return on Investment',
+      text: 'Base case: $120,000 annual profit from Year 1. Cumulative 5-year profit: $600,000. Less capex $280,000 = net return $320,000 = 114% 5-year ROI. Optimistic case: 168% ROI. Conservative: 45% 3-year ROI. All scenarios generate positive cash from month 4.',
+      metrics: [
+        { label: 'Annual Profit (Y1)', value: '$120,000–$160,000' },
+        { label: '5-Year Net Return', value: '$320,000–$470,000' },
+        { label: 'Total 5-Yr ROI', value: '114–168%' },
+        { label: 'Cash Payback', value: '2.3 years' }
+      ]
+    },
+    {
+      title: '🎁 Investor Benefits',
+      text: '(1) Fixed-term profit share (50/50 or per agreement). (2) Quarterly cash distributions. (3) Option to sell stake to operating partner after year 3. (4) Management transparency via real-time dashboards. (5) Asset buyback guarantee if exiting early.',
+      metrics: [
+        { label: 'Distributions', value: 'Quarterly cash' },
+        { label: 'Profit Share', value: 'Negotiable split' },
+        { label: 'Exit Options', value: 'Year 3+ available' },
+        { label: 'Transparency', value: 'Real-time dashboards' }
+      ]
+    },
+    {
+      title: '🔐 Risk Mitigation',
+      text: 'Equipment backed by GENYOND warranty (12 months + 24-month extended). Facility registered as operating agricultural cooperative (legal protections). Operating partner has 10+ years agribusiness experience. Insurance: property, liability, business interruption. Contingency reserve: $20K (7% of capex).',
+      metrics: [
+        { label: 'Equipment Warranty', value: '12+24 months' },
+        { label: 'Operator Experience', value: '10+ years' },
+        { label: 'Insurance', value: 'Comprehensive' },
+        { label: 'Contingency Reserve', value: '$20,000' }
+      ]
+    },
+    {
+      title: '🚀 Growth Optionality',
+      text: 'Year 2: Expansion into charcoal briquettes, VCO cosmetic line, organic peat distribution. Year 3: Second facility (lower capex, proven playbook). Year 5: Acquisition target for major agribusiness. Exit at 10–15x EBITDA multiple is realistic (comparable facilities valued $4–6M).',
+      metrics: [
+        { label: 'Year 2 Expansion', value: '3 new product lines' },
+        { label: 'Year 3 Playbook', value: 'Second facility' },
+        { label: 'Exit Multiple', value: '10–15x EBITDA' },
+        { label: 'Facility Valuation', value: '$4–6M (est.)' }
+      ]
+    }
+  ]
+
+  addSectionPage(doc, title, subtitle, items)
+}
+
+function createClosing(doc) {
+  doc.addPage()
+
+  // Dark background
+  doc.setFillColor(...COLORS.dark)
+  doc.rect(0, 0, PAGE_WIDTH, PAGE_HEIGHT, 'F')
+
+  // Call to Action
+  doc.setFontSize(28)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.accent)
+  doc.text('The Time is Now', PAGE_WIDTH / 2, 50, { align: 'center' })
+
+  doc.setFontSize(12)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.white)
+  const cta = [
+    'Global demand for coconut oil, water, and sustainable fiber is at an all-time high.',
+    'Our facility is built on a proven playbook with global best practices.',
+    'Every coconut becomes a profit center. Zero waste. Maximum margins.',
+    'This is not a commodity play. This is a value creation machine.',
+    '',
+    'We are raising $280,000 to build it. Your investment captures 5–15 years',
+    'of 20%+ annual returns in a tangible, physical asset backed by global demand.'
+  ]
+
+  let yPos = 80
+  cta.forEach(line => {
+    doc.setFontSize(10)
+    doc.setFont('helvetica', line.includes('investment') ? 'bold' : 'normal')
+    const wrappedLines = doc.splitTextToSize(line, CONTENT_WIDTH - 20)
+    doc.text(wrappedLines, PAGE_WIDTH / 2, yPos, { align: 'center' })
+    yPos += wrappedLines.length * 6 + 3
+  })
+
+  // Contact box
+  doc.setFillColor(...COLORS.white)
+  doc.rect(MARGINS.left, yPos + 20, CONTENT_WIDTH, 50, 'F')
+
   doc.setFontSize(10)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.primaryLight)
-  doc.text(tabName, PAGE_WIDTH / 2, 8, { align: 'center' })
+  doc.setTextColor(...COLORS.dark)
+  doc.text('Ready to Join?', PAGE_WIDTH / 2, yPos + 30, { align: 'center' })
 
-  // Page number (right)
-  setSmallText(doc)
-  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right, 8, { align: 'right' })
-
-  // Bottom border line
-  doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.4)
-  doc.line(MARGINS.left, MARGINS.headerHeight + 0.5, PAGE_WIDTH - MARGINS.right, MARGINS.headerHeight + 0.5)
-}
-
-function addPageFooter(doc, projectName) {
-  const footerY = PAGE_HEIGHT - MARGINS.bottom + 3
-
-  // Top border
-  doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.4)
-  doc.line(MARGINS.left, footerY - 9, PAGE_WIDTH - MARGINS.right, footerY - 9)
-
-  // Left - Company
-  setSmallText(doc)
-  doc.setFont('helvetica', 'normal')
-  const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })
-  doc.text(`Generated: ${dateStr}`, MARGINS.left, footerY - 4)
-
-  // Center - Status
-  doc.text('Confidential - Internal Use Only', PAGE_WIDTH / 2, footerY - 4, { align: 'center' })
-
-  // Right - Copyright
-  doc.text('© Project Report 2024', PAGE_WIDTH - MARGINS.right, footerY - 4, { align: 'right' })
-}
-
-function initPage(doc, projectName, tabName, pageNum) {
-  doc.addPage()
-  addPageHeader(doc, projectName, tabName, pageNum)
-  addPageFooter(doc, projectName)
-  return CONTENT_START_Y
-}
-
-// ============ PAGE LAYOUT UTILITIES ============
-function checkPageBreak(doc, yPos, minSpace = 30) {
-  if (yPos > MAX_Y_POS - minSpace) {
-    doc.addPage()
-    return CONTENT_START_Y
-  }
-  return yPos
-}
-
-function addVerticalSpace(doc, yPos, space = 4) {
-  return yPos + space
-}
-
-// ============ SECTION HEADERS ============
-function addSectionTitle(doc, text, yPos) {
-  setHeading2(doc)
-  const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
-  doc.text(lines, MARGINS.left, yPos)
-  
-  const lineHeight = lines.length * 7
-  yPos += lineHeight + 3
-
-  // Decorative underline
-  doc.setDrawColor(...COLORS.primaryLight)
-  doc.setLineWidth(1.2)
-  doc.line(MARGINS.left, yPos, PAGE_WIDTH - MARGINS.right, yPos)
-
-  return yPos + 8
-}
-
-function addSubsectionTitle(doc, text, yPos) {
-  setHeading3(doc)
-  const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 4)
-  doc.text(lines, MARGINS.left, yPos)
-  return yPos + (lines.length * 5.5) + 4
-}
-
-// ============ CONTENT BLOCKS ============
-function addBodyText(doc, text, yPos, indent = 0) {
-  setBodyText(doc)
-  const xPos = MARGINS.left + indent
-  const lineWidth = CONTENT_WIDTH - indent
-  const lines = doc.splitTextToSize(text, lineWidth)
-  doc.text(lines, xPos, yPos)
-  return yPos + (lines.length * 4.8) + 3
-}
-
-// Dual currency display
-function formatDualCurrency(phpAmount, usdAmount) {
-  const phpStr = `₱${Number(phpAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  const usdStr = `$${Number(usdAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-  return `${phpStr} / ${usdStr}`
-}
-
-function addMetricRow(doc, label, phpValue, usdValue, yPos, indent = 2) {
-  const xLabel = MARGINS.left + indent
-  const xValue = MARGINS.left + 65
-
-  // Label
-  setLabelText(doc)
-  doc.text(label, xLabel, yPos)
-
-  // PHP Value
-  doc.setFont('helvetica', 'bold')
   doc.setFontSize(9)
-  doc.setTextColor(...COLORS.primary)
-  doc.text(`₱${Number(phpValue).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, xValue, yPos)
-
-  // USD Value (below in gray)
-  setSmallText(doc)
-  doc.text(`$${Number(usdValue).toLocaleString('en-US', { maximumFractionDigits: 2 })}`, xValue, yPos + 4)
-
-  return yPos + 8
-}
-
-// ============ CARD STYLES ============
-function addMetricCard(doc, yPos, title, items) {
-  // Card background with shadow effect
-  doc.setFillColor(...COLORS.lightBg2)
-  const cardHeight = Math.max(items.length * 10 + 14, 45)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, cardHeight, 'F')
-
-  // Card border
-  doc.setDrawColor(...COLORS.primaryLight)
-  doc.setLineWidth(0.8)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, cardHeight)
-
-  // Title background
-  doc.setFillColor(...COLORS.primary)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 7.5, 'F')
-
-  // Title text
-  doc.setFontSize(9)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.white)
-  doc.text(title, MARGINS.left + 4, yPos + 5)
-
-  yPos += 10
-  items.forEach(item => {
-    yPos = addMetricRow(doc, item.label, item.phpValue, item.usdValue, yPos, 4)
-  })
-
-  return yPos + 4
-}
-
-// ============ DATA TABLES ============
-function addDataTable(doc, headers, rows, yPos, columnWidths = null) {
-  if (rows.length === 0) {
-    setBodyText(doc)
-    doc.setTextColor(...COLORS.lightText)
-    doc.text('No data available', MARGINS.left, yPos)
-    return yPos + 8
-  }
-
-  const colCount = headers.length
-  const tableWidth = CONTENT_WIDTH
-  const colWidths = columnWidths || headers.map(() => tableWidth / colCount)
-  const rowHeight = 7.5
-  const headerHeight = 8.5
-  const cellPadding = 1.8
-  const startX = MARGINS.left
-
-  // Header row
-  doc.setFontSize(8)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.white)
-  doc.setFillColor(...COLORS.primary)
-
-  let xPos = startX
-  for (let i = 0; i < colCount; i++) {
-    doc.rect(xPos, yPos, colWidths[i], headerHeight, 'F')
-    const headerText = String(headers[i] || '').substring(0, 25)
-    doc.text(headerText, xPos + cellPadding, yPos + cellPadding + 2.2, { 
-      maxWidth: colWidths[i] - cellPadding * 2, 
-      align: 'left' 
-    })
-    xPos += colWidths[i]
-  }
-
-  yPos += headerHeight
-
-  // Data rows
-  doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.darkText)
+  doc.text('Connect with our investment team to discuss your participation.', PAGE_WIDTH / 2, yPos + 40, { align: 'center' })
+  doc.text('Next steps: Due diligence materials, facility tour, investment agreement.', PAGE_WIDTH / 2, yPos + 48, { align: 'center' })
+  doc.text('Contact: investment@coconutplant.com | +63.XXXX.XXXXX', PAGE_WIDTH / 2, yPos + 56, { align: 'center' })
 
-  rows.forEach((row, rowIdx) => {
-    // Alternating row background
-    if (rowIdx % 2 === 0) {
-      doc.setFillColor(...COLORS.lightBg)
-      xPos = startX
-      for (let j = 0; j < colCount; j++) {
-        doc.rect(xPos, yPos, colWidths[j], rowHeight, 'F')
-        xPos += colWidths[j]
-      }
-    }
-
-    // Row borders
-    doc.setDrawColor(...COLORS.border)
-    doc.setLineWidth(0.3)
-    xPos = startX
-    for (let j = 0; j < colCount; j++) {
-      doc.rect(xPos, yPos, colWidths[j], rowHeight)
-      xPos += colWidths[j]
-    }
-
-    // Row content
-    xPos = startX
-    for (let j = 0; j < row.length; j++) {
-      const cellValue = String(row[j] || '').substring(0, 30)
-      doc.text(cellValue, xPos + cellPadding, yPos + cellPadding + 1.8, { 
-        maxWidth: colWidths[j] - cellPadding * 2, 
-        align: 'left' 
-      })
-      xPos += colWidths[j]
-    }
-
-    yPos += rowHeight
-  })
-
-  return yPos + 6
+  // Footer
+  doc.setFontSize(7)
+  doc.setTextColor(...COLORS.gold)
+  doc.text('Coconut Oil & Water Processing Plant - Confidential Investment Prospectus', PAGE_WIDTH / 2, PAGE_HEIGHT - 15, { align: 'center' })
+  doc.text('Projected returns are based on conservative modeling. Past performance does not guarantee future results. See full prospectus for disclaimers.', PAGE_WIDTH / 2, PAGE_HEIGHT - 8, { align: 'center' })
 }
 
-// ============ DIVIDERS ============
-function addDivider(doc, yPos) {
-  doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.3)
-  doc.line(MARGINS.left, yPos, PAGE_WIDTH - MARGINS.right, yPos)
-  return yPos + 6
-}
-
-// ============ PAGE GENERATORS ============
-
-function createOverviewPage(doc, project, equipment, costs, pageNum, exchangeRate) {
-  let yPos = initPage(doc, project.name, 'Overview', pageNum)
-
-  yPos = addSectionTitle(doc, 'Project Overview', yPos)
-
-  // Description
-  if (project.long_description) {
-    yPos = addBodyText(doc, project.long_description, yPos, 0)
-    yPos += 4
-  }
-
-  // Key Financial Metrics
-  const totalCostUsd = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-  const totalCostPhp = totalCostUsd / exchangeRate
-  const totalRaisedUsd = (project.funded_amount_usd || 0)
-  const totalRaisedPhp = totalRaisedUsd / exchangeRate
-  const remainingUsd = totalCostUsd - totalRaisedUsd
-  const remainingPhp = totalCostPhp - totalRaisedPhp
-  const fundingPercent = totalCostUsd > 0 ? ((totalRaisedUsd / totalCostUsd) * 100).toFixed(1) : 0
-
-  yPos = addMetricCard(doc, yPos, 'Capital Requirements', [
-    { label: 'Total Project Cost', phpValue: totalCostPhp, usdValue: totalCostUsd },
-    { label: 'Current Funding', phpValue: totalRaisedPhp, usdValue: totalRaisedUsd },
-    { label: 'Remaining to Raise', phpValue: remainingPhp, usdValue: remainingUsd },
-    { label: 'Funding Progress', phpValue: fundingPercent + '%', usdValue: fundingPercent + '%' }
-  ])
-
-  return doc
-}
-
-function createEquipmentPage(doc, project, equipment, pageNum, exchangeRate) {
-  let yPos = initPage(doc, project.name, 'Equipment & Infrastructure', pageNum)
-
-  yPos = addSectionTitle(doc, 'Equipment Assets', yPos)
-
-  // Equipment table
-  const headers = ['Equipment', 'Type', 'Capacity', 'Power (kW)', 'Unit Cost (PHP)', 'Total Cost (PHP)']
-  const colWidths = [35, 25, 20, 18, 35, 35]
-  
-  const rows = equipment.map(e => [
-    (e.equipment_name || '').substring(0, 20),
-    (e.equipment_type || '').substring(0, 15),
-    (e.capacity || '').substring(0, 12),
-    (e.power_kw || '').substring(0, 8),
-    `₱${Number(e.unit_cost_usd / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
-    `₱${Number((e.total_cost_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
-  ])
-
-  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
-
-  // Equipment summary
-  if (equipment.length > 0) {
-    const totalEquipmentUsd = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
-    const totalEquipmentPhp = totalEquipmentUsd / exchangeRate
-
-    yPos += 4
-    yPos = addMetricCard(doc, yPos, 'Equipment Summary', [
-      { label: 'Total Equipment Items', phpValue: equipment.length, usdValue: equipment.length },
-      { label: 'Total Investment', phpValue: totalEquipmentPhp, usdValue: totalEquipmentUsd }
-    ])
-  }
-
-  return doc
-}
-
-function createCostsPage(doc, project, costs, pageNum, exchangeRate) {
-  let yPos = initPage(doc, project.name, 'Costs & Budget', pageNum)
-
-  yPos = addSectionTitle(doc, 'Project Cost Breakdown', yPos)
-
-  const headers = ['Category', 'Budgeted (PHP)', 'Actual (PHP)', '% of Total']
-  const colWidths = [50, 40, 40, 35]
-
-  const rows = costs.map(c => {
-    const budgetPhp = Number((c.budgeted_amount_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })
-    const actualPhp = c.actual_amount_usd ? Number((c.actual_amount_usd / exchangeRate)).toLocaleString('en-US', { maximumFractionDigits: 0 }) : '-'
-    
-    return [
-      (c.cost_category || '').substring(0, 25),
-      `₱${budgetPhp}`,
-      actualPhp === '-' ? '-' : `₱${actualPhp}`,
-      `${c.percentage_of_total || 0}%`
-    ]
-  })
-
-  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
-
-  // Cost summary
-  if (costs.length > 0) {
-    const totalBudgetedUsd = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-    const totalBudgetedPhp = totalBudgetedUsd / exchangeRate
-    const totalActualUsd = costs.reduce((sum, c) => sum + (c.actual_amount_usd || 0), 0)
-    const totalActualPhp = totalActualUsd / exchangeRate
-
-    yPos += 4
-    yPos = addMetricCard(doc, yPos, 'Cost Summary', [
-      { label: 'Total Budgeted', phpValue: totalBudgetedPhp, usdValue: totalBudgetedUsd },
-      { label: 'Total Actual', phpValue: totalActualPhp || 'N/A', usdValue: totalActualUsd || 'N/A' },
-      { label: 'Budget Variance', phpValue: (totalBudgetedPhp - totalActualPhp), usdValue: (totalBudgetedUsd - totalActualUsd) }
-    ])
-  }
-
-  return doc
-}
-
-function createSuppliersPage(doc, project, suppliers, pageNum) {
-  let yPos = initPage(doc, project.name, 'Suppliers & Vendors', pageNum)
-
-  yPos = addSectionTitle(doc, 'Supply Chain Partners', yPos)
-
-  if (!suppliers || suppliers.length === 0) {
-    setBodyText(doc)
-    doc.setTextColor(...COLORS.lightText)
-    doc.text('No supplier information available', MARGINS.left, yPos)
-    return doc
-  }
-
-  suppliers.forEach((sup, idx) => {
-    yPos = checkPageBreak(doc, yPos, 40)
-    yPos = addSubsectionTitle(doc, sup.supplier_name || `Supplier ${idx + 1}`, yPos)
-
-    const details = []
-    if (sup.supplier_type) details.push({ label: 'Type', value: sup.supplier_type })
-    if (sup.contact_person) details.push({ label: 'Contact Person', value: sup.contact_person })
-    if (sup.email) details.push({ label: 'Email', value: sup.email })
-    if (sup.phone) details.push({ label: 'Phone', value: sup.phone })
-    if (sup.delivery_timeline_days) details.push({ label: 'Delivery Timeline', value: `${sup.delivery_timeline_days} days` })
-    if (sup.warranty_months) details.push({ label: 'Warranty Period', value: `${sup.warranty_months} months` })
-
-    details.forEach(detail => {
-      setLabelText(doc)
-      doc.text(detail.label + ':', MARGINS.left + 2, yPos)
-      setBodyText(doc)
-      doc.text(detail.value, MARGINS.left + 40, yPos)
-      yPos += 5
-    })
-
-    if (idx < suppliers.length - 1) {
-      yPos = addDivider(doc, yPos + 2)
-    }
-    yPos += 2
-  })
-
-  return doc
-}
-
-function createPartnershipsPage(doc, project, partnerships, pageNum, exchangeRate) {
-  let yPos = initPage(doc, project.name, 'Strategic Partnerships', pageNum)
-
-  yPos = addSectionTitle(doc, 'Partnership Overview', yPos)
-
-  if (!partnerships || partnerships.length === 0) {
-    setBodyText(doc)
-    doc.setTextColor(...COLORS.lightText)
-    doc.text('No partnership information available', MARGINS.left, yPos)
-    return doc
-  }
-
-  partnerships.forEach((partner, idx) => {
-    yPos = checkPageBreak(doc, yPos, 45)
-    yPos = addSubsectionTitle(doc, partner.partner_name || `Partner ${idx + 1}`, yPos)
-
-    const investmentPhp = (partner.investment_amount_usd || 0) / exchangeRate
-    const investmentUsd = partner.investment_amount_usd || 0
-
-    const details = []
-    if (partner.partnership_type) details.push({ label: 'Partnership Type', value: partner.partnership_type })
-    if (partner.partnership_status) details.push({ label: 'Status', value: partner.partnership_status })
-    if (partner.contact_person) details.push({ label: 'Contact Person', value: partner.contact_person })
-    if (partner.revenue_share_percentage) details.push({ label: 'Revenue Share', value: `${partner.revenue_share_percentage}%` })
-    details.push({ label: 'Investment Amount', value: `₱${Number(investmentPhp).toLocaleString('en-US', { maximumFractionDigits: 0 })} / $${Number(investmentUsd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` })
-
-    details.forEach(detail => {
-      setLabelText(doc)
-      doc.text(detail.label + ':', MARGINS.left + 2, yPos)
-      setBodyText(doc)
-      doc.text(detail.value, MARGINS.left + 40, yPos)
-      yPos += 5
-    })
-
-    if (idx < partnerships.length - 1) {
-      yPos = addDivider(doc, yPos + 2)
-    }
-    yPos += 2
-  })
-
-  return doc
-}
-
-function createProductionPage(doc, project, production, pageNum) {
-  let yPos = initPage(doc, project.name, 'Production & Capacity', pageNum)
-
-  yPos = addSectionTitle(doc, 'Production Capacity Planning', yPos)
-
-  const headers = ['Phase', 'Product Type', 'Annual Capacity', 'Utilization %']
-  const colWidths = [50, 50, 35, 35]
-
-  const rows = production.map(p => [
-    (p.phase_name || '').substring(0, 25),
-    (p.product_type || '').substring(0, 25),
-    String(p.capacity_per_year || 0),
-    `${p.utilization_percentage || 80}%`
-  ])
-
-  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
-
-  if (production.length > 0) {
-    const totalCapacity = production.reduce((sum, p) => sum + (p.capacity_per_year || 0), 0)
-    const avgUtilization = (production.reduce((sum, p) => sum + (p.utilization_percentage || 0), 0) / production.length).toFixed(1)
-
-    yPos += 4
-    yPos = addMetricCard(doc, yPos, 'Production Summary', [
-      { label: 'Total Annual Capacity', phpValue: totalCapacity, usdValue: totalCapacity },
-      { label: 'Average Utilization', phpValue: avgUtilization + '%', usdValue: avgUtilization + '%' }
-    ])
-  }
-
-  return doc
-}
-
-function createFinancialsPage(doc, project, revenues, costs, equipment, pageNum, exchangeRate) {
-  let yPos = initPage(doc, project.name, 'Financial Projections', pageNum)
-
-  yPos = addSectionTitle(doc, 'Revenue & Financial Forecasts', yPos)
-
-  if (revenues && revenues.length > 0) {
-    const headers = ['Product', 'Annual Volume', 'Unit Price (PHP)', 'Annual Revenue (PHP)']
-    const colWidths = [50, 35, 40, 50]
-
-    const rows = revenues.map(r => {
-      const unitPricePhp = Number((r.unit_price_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })
-      const revenuePhp = Number((r.projected_annual_revenue_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })
-
-      return [
-        (r.product_type || '').substring(0, 25),
-        String(r.projected_annual_volume || 0),
-        `₱${unitPricePhp}`,
-        `₱${revenuePhp}`
-      ]
-    })
-
-    yPos = addDataTable(doc, headers, rows, yPos, colWidths)
-
-    const revenueTotalUsd = revenues.reduce((sum, r) => sum + (r.projected_annual_revenue_usd || 0), 0)
-    const revenueTotalPhp = revenueTotalUsd / exchangeRate
-
-    yPos += 4
-    yPos = addMetricCard(doc, yPos, 'Revenue Summary', [
-      { label: 'Total Annual Revenue', phpValue: revenueTotalPhp, usdValue: revenueTotalUsd }
-    ])
-  }
-
-  yPos = checkPageBreak(doc, yPos, 45)
-  yPos += 6
-  yPos = addSectionTitle(doc, 'Financial Overview', yPos)
-
-  const totalCostUsd = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-  const totalCostPhp = totalCostUsd / exchangeRate
-  const equipmentTotalUsd = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
-  const equipmentTotalPhp = equipmentTotalUsd / exchangeRate
-  const totalRaisedUsd = (project.funded_amount_usd || 0)
-  const totalRaisedPhp = totalRaisedUsd / exchangeRate
-  const remainingUsd = totalCostUsd - totalRaisedUsd
-  const remainingPhp = totalCostPhp - totalRaisedPhp
-  const fundingPercent = totalCostUsd > 0 ? ((totalRaisedUsd / totalCostUsd) * 100).toFixed(1) : 0
-
-  yPos = addMetricCard(doc, yPos, 'Investment Summary', [
-    { label: 'Total Capital Required', phpValue: totalCostPhp, usdValue: totalCostUsd },
-    { label: 'Current Commitments', phpValue: totalRaisedPhp, usdValue: totalRaisedUsd },
-    { label: 'Remaining to Raise', phpValue: remainingPhp, usdValue: remainingUsd },
-    { label: 'Funding Status', phpValue: fundingPercent + '%', usdValue: fundingPercent + '%' }
-  ])
-
-  return doc
-}
-
-function createTimelinePage(doc, project, milestones, pageNum) {
-  let yPos = initPage(doc, project.name, 'Project Timeline', pageNum)
-
-  yPos = addSectionTitle(doc, 'Project Milestones', yPos)
-
-  const headers = ['Milestone', 'Type', 'Target Date', 'Status']
-  const colWidths = [50, 35, 40, 40]
-
-  const rows = milestones.map(m => [
-    (m.milestone_name || '').substring(0, 25),
-    (m.milestone_type || '').substring(0, 20),
-    (m.planned_date || '').substring(0, 10),
-    (m.status || '').substring(0, 15)
-  ])
-
-  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
-
-  if (milestones.length > 0) {
-    const completedCount = milestones.filter(m => m.status === 'Completed' || m.status === 'Complete').length
-    const inProgressCount = milestones.filter(m => m.status === 'In Progress').length
-    const pendingCount = milestones.length - completedCount - inProgressCount
-
-    yPos += 4
-    yPos = addMetricCard(doc, yPos, 'Timeline Status', [
-      { label: 'Total Milestones', phpValue: milestones.length, usdValue: milestones.length },
-      { label: 'Completed', phpValue: completedCount, usdValue: completedCount },
-      { label: 'In Progress', phpValue: inProgressCount, usdValue: inProgressCount },
-      { label: 'Pending', phpValue: pendingCount, usdValue: pendingCount }
-    ])
-  }
-
-  return doc
-}
-
-function createRisksPage(doc, project, risks, pageNum) {
-  let yPos = initPage(doc, project.name, 'Risk Assessment', pageNum)
-
-  yPos = addSectionTitle(doc, 'Risk Register', yPos)
-
-  const headers = ['Risk Category', 'Probability %', 'Impact Level', 'Status']
-  const colWidths = [50, 35, 35, 45]
-
-  const rows = risks.map(r => [
-    (r.risk_category || '').substring(0, 25),
-    `${r.probability_percentage || 0}%`,
-    (r.impact_severity || '').substring(0, 20),
-    (r.status || '').substring(0, 15)
-  ])
-
-  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
-
-  if (risks.length > 0) {
-    const highRisks = risks.filter(r => (r.probability_percentage || 0) > 70).length
-    const mediumRisks = risks.filter(r => (r.probability_percentage || 0) > 30 && (r.probability_percentage || 0) <= 70).length
-    const lowRisks = risks.filter(r => (r.probability_percentage || 0) <= 30).length
-
-    yPos += 4
-    yPos = addMetricCard(doc, yPos, 'Risk Summary', [
-      { label: 'Total Identified Risks', phpValue: risks.length, usdValue: risks.length },
-      { label: 'High Priority (>70%)', phpValue: highRisks, usdValue: highRisks },
-      { label: 'Medium Priority (31-70%)', phpValue: mediumRisks, usdValue: mediumRisks },
-      { label: 'Low Priority (<30%)', phpValue: lowRisks, usdValue: lowRisks }
-    ])
-  }
-
-  return doc
-}
-
-// ============ MAIN EXPORT FUNCTION ============
 export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics, exchangeRate = 0.018) {
   const doc = new jsPDF('p', 'mm', 'a4')
-  let pageNum = 1
 
-  // Page 1: Overview
-  createOverviewPage(doc, project, equipment, costs, pageNum++, exchangeRate)
+  // Cover page
+  addCoverPage(doc, project)
 
-  // Page 2: Equipment
-  if (equipment && equipment.length > 0) {
-    createEquipmentPage(doc, project, equipment, pageNum++, exchangeRate)
-  }
-
-  // Page 3: Costs
-  if (costs && costs.length > 0) {
-    createCostsPage(doc, project, costs, pageNum++, exchangeRate)
-  }
-
-  // Page 4: Suppliers
-  if (suppliers && suppliers.length > 0) {
-    createSuppliersPage(doc, project, suppliers, pageNum++, exchangeRate)
-  }
-
-  // Page 5: Partnerships
-  if (partnerships && partnerships.length > 0) {
-    createPartnershipsPage(doc, project, partnerships, pageNum++, exchangeRate)
-  }
-
-  // Page 6: Production
-  if (production && production.length > 0) {
-    createProductionPage(doc, project, production, pageNum++, exchangeRate)
-  }
-
-  // Page 7: Financials
-  if (revenues && revenues.length > 0) {
-    createFinancialsPage(doc, project, revenues, costs || [], equipment || [], pageNum++, exchangeRate)
-  }
-
-  // Page 8: Timeline
-  if (milestones && milestones.length > 0) {
-    createTimelinePage(doc, project, milestones, pageNum++, exchangeRate)
-  }
-
-  // Page 9: Risks
-  if (risks && risks.length > 0) {
-    createRisksPage(doc, project, risks, pageNum++, exchangeRate)
-  }
+  // Content pages
+  createExecutiveSummary(doc)
+  createProductPortfolio(doc)
+  createOperations(doc, equipment, production)
+  createFinancials(doc, costs, exchangeRate)
+  createRisks(doc, risks)
+  createTimeline(doc)
+  createInvestmentStructure(doc)
+  createClosing(doc)
 
   return doc
 }
