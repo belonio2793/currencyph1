@@ -738,24 +738,30 @@ export default function Investments({ userId }) {
                     <div className="overflow-x-auto">
                       <table className="w-full text-sm">
                         <thead className="border-b border-slate-200">
-                          <tr className="text-left text-slate-600 font-semibold">
+                          <tr className="text-left text-slate-600 font-semibold text-xs">
                             <th className="pb-3 px-2">Equipment</th>
                             <th className="pb-3 px-2">Type</th>
                             <th className="pb-3 px-2">Capacity</th>
                             <th className="pb-3 px-2">Power (kW)</th>
-                            <th className="pb-3 px-2">Unit Cost (USD)</th>
+                            <th className="pb-3 px-2">Unit Cost</th>
                             <th className="pb-3 px-2">Total Cost</th>
                           </tr>
                         </thead>
                         <tbody>
                           {projectEquipment.map(eq => (
                             <tr key={eq.id} className="border-b border-slate-100 hover:bg-slate-50">
-                              <td className="py-3 px-2 font-medium">{eq.equipment_name}</td>
-                              <td className="py-3 px-2">{eq.equipment_type}</td>
-                              <td className="py-3 px-2">{eq.capacity_value} {eq.capacity_unit}</td>
-                              <td className="py-3 px-2">{eq.power_consumption_kw || '—'}</td>
-                              <td className="py-3 px-2">${Number(eq.unit_cost_usd).toLocaleString()}</td>
-                              <td className="py-3 px-2 font-semibold">${Number(eq.total_cost_usd || 0).toLocaleString()}</td>
+                              <td className="py-3 px-2 font-medium text-sm">{eq.equipment_name}</td>
+                              <td className="py-3 px-2 text-sm">{eq.equipment_type}</td>
+                              <td className="py-3 px-2 text-sm">{eq.capacity_value} {eq.capacity_unit}</td>
+                              <td className="py-3 px-2 text-sm">{eq.power_consumption_kw || '—'}</td>
+                              <td className="py-3 px-2 text-sm">
+                                <div>{formatPhp(eq.unit_cost_php || phpToUsd(eq.unit_cost_usd || 0, exchangeRate))}</div>
+                                <div className="text-xs text-slate-500">{formatUsd(eq.unit_cost_usd || 0)}</div>
+                              </td>
+                              <td className="py-3 px-2 font-semibold text-sm">
+                                <div>{formatPhp((eq.unit_cost_php || phpToUsd(eq.unit_cost_usd || 0, exchangeRate)) * (eq.quantity || 1))}</div>
+                                <div className="text-xs text-slate-500">{formatUsd((eq.unit_cost_usd || 0) * (eq.quantity || 1))}</div>
+                              </td>
                             </tr>
                           ))}
                         </tbody>
