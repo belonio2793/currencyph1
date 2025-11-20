@@ -236,15 +236,9 @@ function checkAndAddPage(doc, yPos, minSpace = 35, projectName = '') {
 }
 
 export function generateProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
-  const doc = new jsPDF()
-  const pageHeight = doc.internal.pageSize.getHeight()
-  const pageWidth = doc.internal.pageSize.getWidth()
+  const doc = new jsPDF('p', 'mm', 'a4')
 
-  let yPos = MARGINS.top + 10
-
-  // Add header to first page
-  addPageHeader(doc, project.name)
-  yPos = MARGINS.top + MARGINS.headerFooter + 10
+  let yPos = MARGINS.top + MARGINS.headerFooter + 8
 
   // ===== TITLE PAGE =====
   yPos = addTitle(doc, project.name, yPos)
