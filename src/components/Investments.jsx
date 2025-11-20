@@ -595,31 +595,46 @@ export default function Investments({ userId }) {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="text-xs text-slate-600 mb-2">Total Cost</div>
-                      <div className="text-lg font-semibold text-slate-900">{formatPhp(Number(selectedProject.total_cost || 0))}</div>
-                      <div className="text-sm text-slate-500 mt-1">{formatUsd(phpToUsd(Number(selectedProject.total_cost || 0), exchangeRate))}</div>
-                    </div>
-                    <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="text-xs text-slate-600 mb-2">Funded</div>
-                      <div className="text-lg font-semibold text-slate-900">{formatPhp(Number(fundedMap[selectedProject.id] || 0))}</div>
-                      <div className="text-sm text-slate-500 mt-1">{formatUsd(phpToUsd(Number(fundedMap[selectedProject.id] || 0), exchangeRate))}</div>
-                    </div>
-                    <div className="bg-slate-50 p-4 rounded-lg">
-                      <div className="text-xs text-slate-600 mb-2">Remaining</div>
-                      <div className="text-lg font-semibold text-slate-900">{formatPhp(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0))}</div>
-                      <div className="text-sm text-slate-500 mt-1">{formatUsd(phpToUsd(Number(selectedProject.total_cost || 0) - Number(fundedMap[selectedProject.id] || 0), exchangeRate))}</div>
-                    </div>
-                  </div>
+                  {(() => {
+                    const calculatedCost = calculateTotalCost(projectEquipment, projectCosts, exchangeRate)
+                    const fundedAmount = Number(fundedMap[selectedProject.id] || 0)
+                    const fundedAmountUsd = phpToUsd(fundedAmount, exchangeRate)
+                    const totalAmount = calculatedCost.totalPhp > 0 ? calculatedCost.totalPhp : Number(selectedProject.total_cost || 0)
+                    const totalAmountUsd = calculatedCost.totalUsd > 0 ? calculatedCost.totalUsd : phpToUsd(Number(selectedProject.total_cost || 0), exchangeRate)
+                    const remainingPhpAmount = totalAmount - fundedAmount
+                    const remainingUsdAmount = totalAmountUsd - fundedAmountUsd
+                    const percentage = totalAmount > 0 ? ((fundedAmount / totalAmount) * 100).toFixed(2) : '0.00'
 
-                  <div>
-                    <div className="text-xs uppercase text-slate-500 mb-2 font-semibold">Funding Progress</div>
-                    <div className="w-full bg-slate-200 rounded-full h-4">
-                      <div className="bg-slate-400 h-4 rounded-full transition-all" style={{ width: `${selectedProject.total_cost > 0 ? ((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost) * 100) : 0}%` }} />
-                    </div>
-                    <div className="text-sm text-slate-600 mt-2">{selectedProject.total_cost > 0 ? (((fundedMap[selectedProject.id] || 0) / Number(selectedProject.total_cost)) * 100).toFixed(2) : '0.00'}%</div>
-                  </div>
+                    return (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="bg-slate-50 p-4 rounded-lg">
+                            <div className="text-xs text-slate-600 mb-2">Total Cost</div>
+                            <div className="text-lg font-semibold text-slate-900">{formatPhp(totalAmount)}</div>
+                            <div className="text-sm text-slate-500 mt-1">{formatUsd(totalAmountUsd)}</div>
+                          </div>
+                          <div className="bg-slate-50 p-4 rounded-lg">
+                            <div className="text-xs text-slate-600 mb-2">Funded</div>
+                            <div className="text-lg font-semibold text-slate-900">{formatPhp(fundedAmount)}</div>
+                            <div className="text-sm text-slate-500 mt-1">{formatUsd(fundedAmountUsd)}</div>
+                          </div>
+                          <div className="bg-slate-50 p-4 rounded-lg">
+                            <div className="text-xs text-slate-600 mb-2">Remaining</div>
+                            <div className="text-lg font-semibold text-slate-900">{formatPhp(remainingPhpAmount > 0 ? remainingPhpAmount : 0)}</div>
+                            <div className="text-sm text-slate-500 mt-1">{formatUsd(remainingUsdAmount > 0 ? remainingUsdAmount : 0)}</div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div className="text-xs uppercase text-slate-500 mb-2 font-semibold">Funding Progress</div>
+                          <div className="w-full bg-slate-200 rounded-full h-4">
+                            <div className="bg-slate-400 h-4 rounded-full transition-all" style={{ width: `${percentage}%` }} />
+                          </div>
+                          <div className="text-sm text-slate-600 mt-2">{percentage}%</div>
+                        </div>
+                      </>
+                    )
+                  })()}
 
                   <div>
                     <h4 className="text-sm font-semibold text-slate-900 mb-3">Investor Distribution</h4>
