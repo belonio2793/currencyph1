@@ -1250,7 +1250,7 @@ export default function Investments({ userId }) {
                                       value={sup.supplier_name || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].supplier_name = e.target.value
+                                        updated[actualIdx].supplier_name = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1264,7 +1264,7 @@ export default function Investments({ userId }) {
                                       value={sup.supplier_type || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].supplier_type = e.target.value
+                                        updated[actualIdx].supplier_type = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1278,7 +1278,7 @@ export default function Investments({ userId }) {
                                       value={sup.contact_person || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].contact_person = e.target.value
+                                        updated[actualIdx].contact_person = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1292,7 +1292,7 @@ export default function Investments({ userId }) {
                                       value={sup.email || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].email = e.target.value
+                                        updated[actualIdx].email = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1306,7 +1306,7 @@ export default function Investments({ userId }) {
                                       value={sup.phone || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].phone = e.target.value
+                                        updated[actualIdx].phone = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1320,7 +1320,7 @@ export default function Investments({ userId }) {
                                       value={sup.city || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].city = e.target.value
+                                        updated[actualIdx].city = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1334,7 +1334,7 @@ export default function Investments({ userId }) {
                                       value={sup.country || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].country = e.target.value
+                                        updated[actualIdx].country = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1348,7 +1348,7 @@ export default function Investments({ userId }) {
                                       value={sup.delivery_timeline_days || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].delivery_timeline_days = parseInt(e.target.value) || null
+                                        updated[actualIdx].delivery_timeline_days = parseInt(e.target.value) || null
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1362,7 +1362,7 @@ export default function Investments({ userId }) {
                                       value={sup.warranty_months || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].warranty_months = parseInt(e.target.value) || null
+                                        updated[actualIdx].warranty_months = parseInt(e.target.value) || null
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1376,7 +1376,7 @@ export default function Investments({ userId }) {
                                         checked={sup.is_primary || false}
                                         onChange={(e) => {
                                           const updated = [...editData.suppliers]
-                                          updated[idx].is_primary = e.target.checked
+                                          updated[actualIdx].is_primary = e.target.checked
                                           setEditData(prev => ({ ...prev, suppliers: updated }))
                                         }}
                                         className="rounded"
@@ -1391,7 +1391,7 @@ export default function Investments({ userId }) {
                                       value={sup.payment_terms || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].payment_terms = e.target.value
+                                        updated[actualIdx].payment_terms = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1404,7 +1404,7 @@ export default function Investments({ userId }) {
                                       value={sup.notes || ''}
                                       onChange={(e) => {
                                         const updated = [...editData.suppliers]
-                                        updated[idx].notes = e.target.value
+                                        updated[actualIdx].notes = e.target.value
                                         setEditData(prev => ({ ...prev, suppliers: updated }))
                                       }}
                                       className="w-full px-3 py-2 border rounded text-sm mt-1"
@@ -1416,7 +1416,7 @@ export default function Investments({ userId }) {
                                 <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
                                   <button
                                     onClick={() => {
-                                      const updated = editData.suppliers.filter((_, i) => i !== idx)
+                                      const updated = editData.suppliers.filter((_, i) => i !== actualIdx)
                                       setEditData(prev => ({ ...prev, suppliers: updated }))
                                     }}
                                     className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
