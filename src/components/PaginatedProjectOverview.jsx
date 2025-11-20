@@ -1,8 +1,15 @@
 import React, { useState } from 'react'
 
-export default function PaginatedProjectOverview({ project, editMode, onEdit, onSave, isSaving }) {
+export default function PaginatedProjectOverview({
+  project,
+  editMode,
+  onEdit,
+  onSave,
+  isSaving,
+  editingDescription = '',
+  onEditingDescriptionChange
+}) {
   const [currentSlide, setCurrentSlide] = useState(0)
-  const [editingDescription, setEditingDescription] = useState('')
 
   const coconutPlantOverview = [
     {
@@ -19,7 +26,7 @@ export default function PaginatedProjectOverview({ project, editMode, onEdit, on
     },
     {
       title: '1. Product Portfolio (cont.) - Residues & Optional',
-      content: 'E. Combined Residues\nProducts: Organic fertilizer, compost, animal feed, biogas\nProcessing: Anaerobic digestion / composting\nValue Note: Supports zero-waste and reduces waste management cost.\n\nF. Optional Diversified Products\nProducts: Coconut sugar, toddy, vinegar, fermented beverages\nProcessing: Sap tapping �� evaporation → fermentation/distillation\nValue Note: Allows premium niche market participation.'
+      content: 'E. Combined Residues\nProducts: Organic fertilizer, compost, animal feed, biogas\nProcessing: Anaerobic digestion / composting\nValue Note: Supports zero-waste and reduces waste management cost.\n\nF. Optional Diversified Products\nProducts: Coconut sugar, toddy, vinegar, fermented beverages\nProcessing: Sap tapping → evaporation → fermentation/distillation\nValue Note: Allows premium niche market participation.'
     },
     {
       title: '2. Equipment & Processing Lines',
