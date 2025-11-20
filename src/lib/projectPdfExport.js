@@ -284,8 +284,8 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
   if (project.long_description) {
     doc.setFontSize(10)
     doc.setTextColor(...COLORS.textDark)
-    const descLines = doc.splitTextToSize(project.long_description, 170)
-    doc.text(descLines, 25, yPos)
+    const descLines = doc.splitTextToSize(project.long_description, CONTENT_WIDTH)
+    doc.text(descLines, MARGINS.left, yPos)
     yPos += (descLines.length * 5) + 5
   }
 
