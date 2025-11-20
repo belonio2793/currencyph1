@@ -698,8 +698,8 @@ export default function Investments({ userId }) {
                           <tbody>
                             {projectEquipment.map(eq => (
                               <tr key={eq.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                <td className="py-4 px-4 font-medium text-sm">{eq.equipment_name}</td>
-                                <td className="py-4 px-4 text-sm">{eq.equipment_type || '—'}</td>
+                                <td className="py-4 px-4 font-medium text-sm">{toTitleCase(eq.equipment_name) || eq.equipment_name}</td>
+                                <td className="py-4 px-4 text-sm">{toTitleCase(eq.equipment_type) || '—'}</td>
                                 <td className="py-4 px-4 text-sm">{eq.capacity_value ? `${eq.capacity_value} ${eq.capacity_unit}` : '—'}</td>
                                 <td className="py-4 px-4 text-sm">{eq.power_consumption_kw || '—'}</td>
                                 <td className="py-4 px-4 text-sm">
