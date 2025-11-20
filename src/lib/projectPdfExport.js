@@ -218,11 +218,13 @@ function addPageFooter(doc) {
 
 function checkAndAddPage(doc, yPos, minSpace = 40, projectName = '') {
   const pageHeight = doc.internal.pageSize.getHeight()
-  const maxYPos = pageHeight - MARGINS.bottom
+  const maxYPos = pageHeight - MARGINS.bottom - 5
 
   if (yPos > maxYPos - minSpace) {
     doc.addPage()
-    addPageHeader(doc, projectName)
+    if (projectName) {
+      addPageHeader(doc, projectName)
+    }
     return MARGINS.top + MARGINS.headerFooter + 10
   }
   return yPos
