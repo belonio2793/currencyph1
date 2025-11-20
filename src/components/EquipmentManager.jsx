@@ -739,13 +739,13 @@ The AI will intelligently parse and extract all data."
                 onClick={addNewEquipment}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
               >
-                + Add Another
+                Add Another
               </button>
               <button
-                onClick={() => setShowBulkImport(true)}
+                onClick={() => setShowRawInput(true)}
                 className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"
               >
-                📋 Bulk Add
+                Paste Data
               </button>
             </div>
           </div>
