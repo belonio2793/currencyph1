@@ -420,7 +420,7 @@ function addMarketOpportunity(doc, project, revenueForecast) {
       yPos = MARGINS.top + 10
     }
 
-    doc.setFillColor(idx % 2 === 0 ? COLORS.lightbg : COLORS.white)
+    doc.setFillColor(...(idx % 2 === 0 ? COLORS.lightbg : COLORS.white))
     doc.rect(MARGINS.left, yPos - 4, CONTENT_WIDTH, 10, 'F')
 
     doc.setFontSize(8)
@@ -488,7 +488,7 @@ function addFinancialProjections(doc, project) {
   ]
 
   capexItems.forEach((item) => {
-    doc.setFillColor(COLORS.lightbg)
+    doc.setFillColor(...COLORS.lightbg)
     doc.rect(MARGINS.left, yPos - 4, CONTENT_WIDTH, 8, 'F')
 
     doc.setFontSize(8)
@@ -536,7 +536,7 @@ function addFinancialProjections(doc, project) {
       yPos = MARGINS.top + 10
     }
 
-    doc.setFillColor(idx % 2 === 0 ? COLORS.lightbg : COLORS.white)
+    doc.setFillColor(...(idx % 2 === 0 ? COLORS.lightbg : COLORS.white))
     doc.rect(MARGINS.left, yPos - 3, CONTENT_WIDTH, 7, 'F')
 
     doc.setFontSize(8)
@@ -762,7 +762,7 @@ function addInvestmentTerms(doc) {
   ]
 
   fundUsage.forEach((fund, idx) => {
-    doc.setFillColor(idx % 2 === 0 ? COLORS.lightbg : COLORS.white)
+    doc.setFillColor(...(idx % 2 === 0 ? COLORS.lightbg : COLORS.white))
     doc.rect(MARGINS.left, yPos - 3, CONTENT_WIDTH, 7, 'F')
 
     doc.setFontSize(8)
