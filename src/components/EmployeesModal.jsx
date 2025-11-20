@@ -88,6 +88,7 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
       setLoading(true)
       const data = await EmployeeManagementService.getEmployees(businessId)
       setEmployees(data)
+      checkRegistrationStatus(data)
     } catch (error) {
       console.error('Error loading employees:', error?.message || error)
       if (error?.details) console.error('Error details:', error.details)
@@ -96,6 +97,23 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const checkRegistrationStatus = async (employeeList) => {
+    const statusMap = {}
+    for (const employee of employeeList) {
+      try {
+        const { data } = await supabase
+          .from('auth.users')
+          .select('id, email')
+          .eq('email', employee.email)
+          .single()
+        statusMap[employee.id] = !!data
+      } catch (error) {
+        statusMap[employee.id] = false
+      }
+    }
+    setRegistrationStatus(statusMap)
   }
 
   // Load employee details when selected
