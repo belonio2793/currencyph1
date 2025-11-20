@@ -648,20 +648,17 @@ export default function Investments({ userId }) {
                                   className="w-full px-3 py-2 border rounded text-sm mt-1"
                                 />
                               </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Unit Cost (USD)</label>
-                                <input
-                                  type="number"
-                                  step="0.01"
-                                  value={eq.unit_cost_usd || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].unit_cost_usd = parseFloat(e.target.value) || 0
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
+                              <CurrencyInput
+                                label="Unit Cost (PHP → USD)"
+                                value={eq.unit_cost_php || eq.unit_cost_usd || 0}
+                                onChange={(phpVal) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].unit_cost_php = phpVal
+                                  updated[idx].unit_cost_usd = phpToUsd(phpVal, exchangeRate)
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                exchangeRate={exchangeRate}
+                              />
                               <div>
                                 <label className="text-xs font-medium text-slate-700">Quantity</label>
                                 <input
