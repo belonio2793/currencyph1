@@ -1484,12 +1484,18 @@ export default function Investments({ userId }) {
                                 <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
                                   <button
                                     onClick={() => {
-                                      const updated = editData.suppliers.filter((_, i) => i !== actualIdx)
-                                      setEditData(prev => ({ ...prev, suppliers: updated }))
+                                      if (confirm('Are you sure you want to delete this supplier?')) {
+                                        const updated = editData.suppliers.filter((_, i) => i !== actualIdx)
+                                        setEditData(prev => ({ ...prev, suppliers: updated }))
+                                        // Adjust page number if needed
+                                        if (supplierEditPage > Math.ceil(updated.length / 1)) {
+                                          setSupplierEditPage(Math.max(1, supplierEditPage - 1))
+                                        }
+                                      }
                                     }}
-                                    className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
+                                    className="px-3 py-1 text-sm bg-red-200 text-red-700 rounded hover:bg-red-300"
                                   >
-                                    Delete
+                                    🗑 Delete
                                   </button>
                                 </div>
                               </div>
