@@ -1090,17 +1090,28 @@ export default function Investments({ userId }) {
         <Modal onClose={() => setShowInvestModal(false)}>
           <div className="w-full max-w-lg bg-white rounded-xl p-6">
             <h3 className="text-lg font-medium text-slate-900 mb-2">Invest in {selectedProject.name}</h3>
-            <p className="text-sm text-slate-600 mb-4">Minimum: {getCurrencySymbol(selectedProject.currency_code || 'PHP')}{selectedProject.min_investment || 0}</p>
+            <p className="text-sm text-slate-600 mb-4">
+              Minimum: {formatPhp(selectedProject.min_investment || 0)} <span className="text-slate-500">({formatUsd(phpToUsd(selectedProject.min_investment || 0, exchangeRate))})</span>
+            </p>
             <form onSubmit={handleInvest} className="space-y-4">
               <div>
                 <label className="block text-sm text-slate-600 mb-1">Amount ({selectedProject.currency_code || 'PHP'})</label>
                 <input type="number" step="0.01" value={investAmount} onChange={e => setInvestAmount(e.target.value)} className="w-full px-4 py-3 border rounded-lg" />
+                {investAmount && (
+                  <div className="text-xs text-slate-500 mt-2">
+                    ≈ {formatUsd(phpToUsd(Number(investAmount) || 0, exchangeRate))} USD
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-sm text-slate-600 mb-1">From Wallet</label>
                 <select className="w-full px-4 py-3 border rounded-lg">
                   {wallets.map(w => (
-                    <option key={w.id} value={w.id}>{getCurrencySymbol(w.currency_code)}{Number(w.balance).toLocaleString()} ({w.currency_code})</option>
+                    <option key={w.id} value={w.id}>
+                      {w.currency_code === 'PHP'
+                        ? `${formatPhp(Number(w.balance))} (${formatUsd(phpToUsd(Number(w.balance), exchangeRate))} USD)`
+                        : `${formatUsd(Number(w.balance))} (${formatPhp(usdToPhp(Number(w.balance), exchangeRate))} PHP)`}
+                    </option>
                   ))}
                 </select>
               </div>
