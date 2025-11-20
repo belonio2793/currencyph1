@@ -4,7 +4,7 @@ import { EmployeeManagementService } from '../lib/employeeManagementService'
 import { employeeMessagingService } from '../lib/employeeMessagingService'
 import EmployeeChatModal from './EmployeeChatModal'
 
-export default function EmployeesModal({ businessId, userId, onClose }) {
+export default function EmployeesModal({ businessId, userId, onClose, currentUserName = 'You' }) {
   const [activeTab, setActiveTab] = useState('employees')
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
@@ -14,6 +14,9 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
   const [showEditForm, setShowEditForm] = useState(false)
   const [editingEmployeeId, setEditingEmployeeId] = useState(null)
   const [registrationStatus, setRegistrationStatus] = useState({})
+  const [userStatuses, setUserStatuses] = useState({})
+  const [showChatModal, setShowChatModal] = useState(false)
+  const [selectedEmployeeForChat, setSelectedEmployeeForChat] = useState(null)
 
   // Form states
   const [employeeForm, setEmployeeForm] = useState({
