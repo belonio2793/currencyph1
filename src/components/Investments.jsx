@@ -1094,8 +1094,8 @@ export default function Investments({ userId }) {
                       }`}>
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <div className="font-semibold text-slate-900">{risk.risk_description}</div>
-                            <div className="text-xs text-slate-600 mt-1">{risk.risk_category}</div>
+                            <div className="font-semibold text-slate-900">{toTitleCase(risk.risk_description) || risk.risk_description}</div>
+                            <div className="text-xs text-slate-600 mt-1">{toTitleCase(risk.risk_category) || risk.risk_category}</div>
                           </div>
                           <div className={`px-2 py-1 rounded text-xs font-bold ${
                             risk.impact_severity === 'critical' ? 'bg-slate-300 text-slate-700' :
@@ -1103,7 +1103,7 @@ export default function Investments({ userId }) {
                             risk.impact_severity === 'medium' ? 'bg-slate-200 text-slate-700' :
                             'bg-slate-200 text-slate-700'
                           }`}>
-                            {risk.impact_severity?.toUpperCase()}
+                            {toTitleCase(risk.impact_severity) || risk.impact_severity}
                           </div>
                         </div>
                         <div className="text-sm mb-2">
