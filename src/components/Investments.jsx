@@ -947,7 +947,7 @@ export default function Investments({ userId }) {
                                 }}
                                 className="px-3 py-1 text-sm bg-red-200 text-red-700 rounded hover:bg-red-300"
                               >
-                                🗑 Delete
+                                Delete
                               </button>
                             </div>
                           </div>
@@ -1301,7 +1301,7 @@ export default function Investments({ userId }) {
                                     }}
                                     className="px-3 py-1 text-sm bg-red-200 text-red-700 rounded hover:bg-red-300"
                                   >
-                                    🗑 Delete
+                                    Delete
                                   </button>
                                 </div>
                               </div>
@@ -1566,7 +1566,7 @@ export default function Investments({ userId }) {
                                     }}
                                     className="px-3 py-1 text-sm bg-red-200 text-red-700 rounded hover:bg-red-300"
                                   >
-                                    🗑 Delete
+                                    Delete
                                   </button>
                                 </div>
                               </div>
