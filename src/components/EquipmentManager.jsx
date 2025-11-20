@@ -757,7 +757,7 @@ The AI will intelligently parse and extract all data."
               disabled={saving}
               className="flex-1 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 font-medium"
             >
-              {saving ? 'Saving...' : '💾 Save Equipment'}
+              {saving ? 'Saving...' : 'Save Equipment'}
             </button>
             <button
               onClick={deleteCurrentEquipment}
