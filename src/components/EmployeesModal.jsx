@@ -1429,6 +1429,22 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           </button>
         </div>
       </div>
+
+      {/* Employee Chat Modal */}
+      {showChatModal && selectedEmployeeForChat && (
+        <EmployeeChatModal
+          businessId={businessId}
+          employee={selectedEmployeeForChat}
+          currentUserId={userId}
+          currentUserName={currentUserName}
+          onClose={() => {
+            setShowChatModal(false)
+            setSelectedEmployeeForChat(null)
+            // Reload statuses after chat
+            loadUserStatuses(employees)
+          }}
+        />
+      )}
     </div>
   )
 }
