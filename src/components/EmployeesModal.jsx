@@ -201,7 +201,7 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
 
     try {
       setSavingEmployee(true)
-      const employee = await EmployeeManagementService.createEmployee(businessId, employeeForm)
+      const employee = await EmployeeManagementService.createEmployee(businessId, userId, employeeForm)
       setEmployees([employee, ...employees])
       setShowAddForm(false)
       setEmployeeForm({
