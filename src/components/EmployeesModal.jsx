@@ -108,9 +108,10 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
           .from('users')
           .select('id, email')
           .eq('email', employee.email)
-          .single()
+          .maybeSingle()
         statusMap[employee.id] = !!data
       } catch (error) {
+        console.error('Error checking registration status:', error)
         statusMap[employee.id] = false
       }
     }
