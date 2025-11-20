@@ -901,19 +901,29 @@ export default function Investments({ userId }) {
                       <div className="overflow-x-auto">
                         <table className="w-full text-sm">
                           <thead className="border-b border-slate-200">
-                            <tr className="text-left text-slate-600 font-semibold">
+                            <tr className="text-left text-slate-600 font-semibold text-xs">
                               <th className="pb-3 px-2">Category</th>
-                              <th className="pb-3 px-2">Budgeted (USD)</th>
-                              <th className="pb-3 px-2">Actual (USD)</th>
+                              <th className="pb-3 px-2">Budgeted</th>
+                              <th className="pb-3 px-2">Actual</th>
                               <th className="pb-3 px-2">% of Total</th>
                             </tr>
                           </thead>
                           <tbody>
                             {projectCosts.map(cost => (
                               <tr key={cost.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                <td className="py-3 px-2 font-medium">{cost.cost_category}</td>
-                                <td className="py-3 px-2">${Number(cost.budgeted_amount_usd || 0).toLocaleString()}</td>
-                                <td className="py-3 px-2">{cost.actual_amount_usd ? `$${Number(cost.actual_amount_usd).toLocaleString()}` : '—'}</td>
+                                <td className="py-3 px-2 font-medium text-sm">{cost.cost_category}</td>
+                                <td className="py-3 px-2 text-sm">
+                                  <div>{formatPhp(cost.budgeted_amount_php || phpToUsd(cost.budgeted_amount_usd || 0, exchangeRate))}</div>
+                                  <div className="text-xs text-slate-500">{formatUsd(cost.budgeted_amount_usd || 0)}</div>
+                                </td>
+                                <td className="py-3 px-2 text-sm">
+                                  {cost.actual_amount_usd ? (
+                                    <>
+                                      <div>{formatPhp(cost.actual_amount_php || phpToUsd(cost.actual_amount_usd || 0, exchangeRate))}</div>
+                                      <div className="text-xs text-slate-500">{formatUsd(cost.actual_amount_usd)}</div>
+                                    </>
+                                  ) : '—'}
+                                </td>
                                 <td className="py-3 px-2">{cost.percentage_of_total ? `${cost.percentage_of_total.toFixed(1)}%` : '—'}</td>
                               </tr>
                             ))}
@@ -922,7 +932,10 @@ export default function Investments({ userId }) {
                       </div>
                       <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
                         <div className="text-sm font-semibold text-slate-900">Total Project Cost</div>
-                        <div className="text-xl font-bold text-blue-600">${projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0).toLocaleString()}</div>
+                        <div className="text-lg font-bold text-blue-600">
+                          <div>{formatPhp(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_php) || phpToUsd(c.budgeted_amount_usd || 0, exchangeRate)), 0))}</div>
+                          <div className="text-sm text-blue-600 mt-1">{formatUsd(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0))}</div>
+                        </div>
                       </div>
                     </div>
                   )}
