@@ -548,7 +548,13 @@ export default function Investments({ userId }) {
                       />
                     ) : (
                       <div className="text-slate-700 whitespace-pre-wrap text-sm leading-relaxed">
-                        {selectedProject.long_description || selectedProject.description || 'No description added yet'}
+                        {selectedProject.long_description || selectedProject.description || (
+                          <span className="text-slate-500 italic">
+                            {selectedProject.name === 'Coconut Oil & Water Processing Plant' || selectedProject.project_type === 'agriculture'
+                              ? 'Click Edit to add detailed project overview describing coconut components, products, equipment requirements, and integrated processing workflows.'
+                              : 'No description added yet. Click Edit to add project overview.'}
+                          </span>
+                        )}
                       </div>
                     )}
                     {editMode.overview && (
