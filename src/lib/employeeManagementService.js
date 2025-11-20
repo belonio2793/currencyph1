@@ -37,7 +37,11 @@ class EmployeeManagementService {
       }])
       .select()
 
-    if (error) throw error
+    if (error) {
+      const err = new Error(`Failed to create employee: ${error.message}`)
+      err.details = error
+      throw err
+    }
     return data[0]
   }
 
@@ -48,7 +52,11 @@ class EmployeeManagementService {
       .eq('business_id', businessId)
       .order('created_at', { ascending: false })
 
-    if (error) throw error
+    if (error) {
+      const err = new Error(`Failed to load employees: ${error.message}`)
+      err.details = error
+      throw err
+    }
     return data || []
   }
 
@@ -59,7 +67,11 @@ class EmployeeManagementService {
       .eq('id', employeeId)
       .single()
 
-    if (error) throw error
+    if (error) {
+      const err = new Error(`Failed to load employee: ${error.message}`)
+      err.details = error
+      throw err
+    }
     return data
   }
 
