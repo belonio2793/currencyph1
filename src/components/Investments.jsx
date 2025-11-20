@@ -707,7 +707,83 @@ export default function Investments({ userId }) {
               {/* Costs Tab */}
               {detailTab === 'costs' && (
                 <div className="space-y-4">
-                  {projectCosts.length === 0 ? (
+                  {editMode.costs && editData.costs.length > 0 ? (
+                    <div className="space-y-4">
+                      {editData.costs.map((cost, idx) => (
+                        <div key={cost.id || idx} className="p-4 border border-slate-200 rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Cost Category</label>
+                              <input
+                                type="text"
+                                value={cost.cost_category || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.costs]
+                                  updated[idx].cost_category = e.target.value
+                                  setEditData(prev => ({ ...prev, costs: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                placeholder="e.g., equipment, labor, permits"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Budgeted Amount (USD)</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={cost.budgeted_amount_usd || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.costs]
+                                  updated[idx].budgeted_amount_usd = parseFloat(e.target.value) || 0
+                                  setEditData(prev => ({ ...prev, costs: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Actual Amount (USD)</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={cost.actual_amount_usd || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.costs]
+                                  updated[idx].actual_amount_usd = parseFloat(e.target.value) || null
+                                  setEditData(prev => ({ ...prev, costs: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">% of Total</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={cost.percentage_of_total || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.costs]
+                                  updated[idx].percentage_of_total = parseFloat(e.target.value) || null
+                                  setEditData(prev => ({ ...prev, costs: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
+                            <button
+                              onClick={() => {
+                                const updated = editData.costs.filter((_, i) => i !== idx)
+                                setEditData(prev => ({ ...prev, costs: updated }))
+                              }}
+                              className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : projectCosts.length === 0 ? (
                     <p className="text-slate-500">No cost breakdown available</p>
                   ) : (
                     <div>
