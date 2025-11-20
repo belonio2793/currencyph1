@@ -191,22 +191,21 @@ function addTable(doc, headers, rows, yPos) {
 }
 
 function addPageHeader(doc, projectName) {
-  const pageHeight = doc.internal.pageSize.getHeight()
-
   doc.setFontSize(9)
   doc.setTextColor(...COLORS.primary)
   doc.setFont('helvetica', 'bold')
-  doc.text(projectName, MARGINS.left, MARGINS.headerFooter)
+  const headerTitle = projectName.length > 40 ? projectName.substring(0, 37) + '...' : projectName
+  doc.text(headerTitle, MARGINS.left, MARGINS.headerFooter)
 
   doc.setFontSize(8)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
   const pageNum = doc.internal.getCurrentPageInfo().pageNumber
-  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right - 20, MARGINS.headerFooter)
+  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right - 15, MARGINS.headerFooter, { align: 'right' })
 
   doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.3)
-  doc.line(MARGINS.left, MARGINS.headerFooter + 3, PAGE_WIDTH - MARGINS.right, MARGINS.headerFooter + 3)
+  doc.setLineWidth(0.2)
+  doc.line(MARGINS.left, MARGINS.headerFooter + 5, PAGE_WIDTH - MARGINS.right, MARGINS.headerFooter + 5)
 }
 
 function addPageFooter(doc) {
