@@ -873,7 +873,7 @@ export default function Investments({ userId }) {
                           <tbody>
                             {projectCosts.map(cost => (
                               <tr key={cost.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                <td className="py-3 px-2 font-medium text-sm">{cost.cost_category}</td>
+                                <td className="py-3 px-2 font-medium text-sm">{toTitleCase(cost.cost_category) || cost.cost_category}</td>
                                 <td className="py-3 px-2 text-sm">
                                   <div>{formatPhp(cost.budgeted_amount_php || usdToPhp(cost.budgeted_amount_usd || 0, exchangeRate))}</div>
                                   <div className="text-xs text-slate-500">{formatUsd(cost.budgeted_amount_usd || 0)}</div>
