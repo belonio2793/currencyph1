@@ -275,12 +275,11 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
     yPos = addDivider(doc, yPos) + 2
   }
 
-  doc.addPage()
-  pageNum = 3
-  addPageHeader(doc, projectName, pageNum, totalPages)
-  yPos = MARGINS.top + MARGINS.headerFooter + 6
-
   if (equipment.length > 0) {
+    doc.addPage()
+    addPageHeader(doc, projectName, 3, totalPages)
+    yPos = MARGINS.top + MARGINS.headerFooter + 6
+
     yPos = addSectionTitle(doc, 'Equipment & Infrastructure', yPos)
 
     const equipmentHeaders = ['Equipment', 'Qty', 'Unit Cost', 'Total Cost']
@@ -292,13 +291,11 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
     ])
 
     yPos = addTable(doc, equipmentHeaders, equipmentRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
   }
 
   if (suppliers.length > 0) {
     doc.addPage()
-    pageNum = 4
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 4, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Suppliers & Vendors', yPos)
@@ -317,15 +314,13 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
       if (i < suppliers.length - 1) {
         yPos = addDivider(doc, yPos) + 2
-        yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
       }
     }
   }
 
   if (partnerships.length > 0) {
     doc.addPage()
-    pageNum = 5
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 5, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Strategic Partnerships', yPos)
@@ -343,15 +338,13 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
       if (i < partnerships.length - 1) {
         yPos = addDivider(doc, yPos) + 2
-        yPos = checkAndAddPage(doc, yPos, 40, projectName, pageNum, totalPages)
       }
     }
   }
 
   if (costs.length > 0) {
     doc.addPage()
-    pageNum = 6
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 6, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Financial Breakdown', yPos)
@@ -368,8 +361,7 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
   if (revenues.length > 0) {
     doc.addPage()
-    pageNum = 7
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 7, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Revenue Projections', yPos)
@@ -387,8 +379,7 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
   if (production.length > 0) {
     doc.addPage()
-    pageNum = 8
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 8, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Production Capacity', yPos)
@@ -406,8 +397,7 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
   if (milestones.length > 0) {
     doc.addPage()
-    pageNum = 9
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 9, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Project Timeline', yPos)
@@ -425,8 +415,7 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
   if (risks.length > 0) {
     doc.addPage()
-    pageNum = 10
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 10, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
@@ -444,8 +433,7 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
 
   if (metrics.length > 0) {
     doc.addPage()
-    pageNum = 11
-    addPageHeader(doc, projectName, pageNum, totalPages)
+    addPageHeader(doc, projectName, 11, totalPages)
     yPos = MARGINS.top + MARGINS.headerFooter + 6
 
     yPos = addSectionTitle(doc, 'Key Performance Metrics', yPos)
@@ -461,8 +449,7 @@ export function generateComprehensiveProjectPdf(project, equipment, suppliers, p
   }
 
   doc.addPage()
-  pageNum = 12
-  addPageHeader(doc, projectName, pageNum, totalPages)
+  addPageHeader(doc, projectName, 12, totalPages)
   yPos = MARGINS.top + MARGINS.headerFooter + 6
 
   yPos = addSectionTitle(doc, 'Financial Summary', yPos)
