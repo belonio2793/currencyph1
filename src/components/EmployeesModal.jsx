@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { EmployeeManagementService } from '../lib/employeeManagementService'
+import { employeeMessagingService } from '../lib/employeeMessagingService'
+import EmployeeChatModal from './EmployeeChatModal'
 
 export default function EmployeesModal({ businessId, userId, onClose }) {
   const [activeTab, setActiveTab] = useState('employees')
