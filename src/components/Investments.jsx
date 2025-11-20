@@ -464,6 +464,33 @@ export default function Investments({ userId }) {
     }
   }
 
+  async function exportProjectPdf() {
+    if (!selectedProject) return
+    try {
+      setError('')
+      const doc = generateProjectPdf(
+        selectedProject,
+        projectEquipment,
+        projectSuppliers,
+        projectPartners,
+        projectCosts,
+        productionCapacity,
+        revenueForecast,
+        projectMilestones,
+        riskAssessment,
+        financialMetrics
+      )
+
+      const filename = `${selectedProject.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
+      doc.save(filename)
+
+      setSuccess(`PDF exported: ${filename}`)
+    } catch (err) {
+      console.error('Failed to export PDF:', err)
+      setError(`Failed to export PDF: ${err.message}`)
+    }
+  }
+
   function openProjectDetail(project) {
     // Close invest modal first to keep modals exclusive
     setShowInvestModal(false)
