@@ -10,26 +10,32 @@ const PH_DEDUCTIONS = {
 
 class EmployeeManagementService {
   // ===== EMPLOYEE MANAGEMENT =====
-  
-  static async createEmployee(businessId, employeeData) {
-    const employeeRecord = {
-      id: crypto.randomUUID(),
-      business_id: businessId,
-      first_name: employeeData.firstName,
-      last_name: employeeData.lastName,
-      email: employeeData.email,
-      phone: employeeData.phone || null,
-      position: employeeData.position,
+
+  static async createEmployee(businessId, userId, employeeData) {
+    const metadata = {
       department: employeeData.department || null,
-      employment_status: employeeData.employmentStatus || 'active',
-      base_salary: parseFloat(employeeData.baseSalary) || 0,
-      hire_date: employeeData.hireDate,
       tin: employeeData.tin || null,
       sss_number: employeeData.sssNumber || null,
       philhealth_number: employeeData.philhealthNumber || null,
       pagibig_number: employeeData.pagibigNumber || null,
       emergency_contact: employeeData.emergencyContact || null,
       emergency_contact_phone: employeeData.emergencyContactPhone || null
+    }
+
+    const employeeRecord = {
+      id: crypto.randomUUID(),
+      business_id: businessId,
+      user_id: userId,
+      first_name: employeeData.firstName,
+      last_name: employeeData.lastName,
+      email: employeeData.email || null,
+      phone: employeeData.phone || null,
+      position: employeeData.position || null,
+      salary: parseFloat(employeeData.baseSalary) || null,
+      status: employeeData.employmentStatus || 'active',
+      hire_date: employeeData.hireDate ? new Date(employeeData.hireDate).toISOString().split('T')[0] : null,
+      benefits: null,
+      metadata: metadata
     }
 
     const { data, error } = await supabase
