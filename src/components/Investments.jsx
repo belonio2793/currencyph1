@@ -1003,7 +1003,7 @@ export default function Investments({ userId }) {
                           <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                               <thead className="border-b border-slate-200">
-                                <tr className="text-left text-slate-600 font-semibold">
+                                <tr className="text-left text-slate-600 font-semibold text-xs">
                                   <th className="pb-3 px-2">Product</th>
                                   <th className="pb-3 px-2">Year</th>
                                   <th className="pb-3 px-2">Annual Volume</th>
@@ -1014,11 +1014,17 @@ export default function Investments({ userId }) {
                               <tbody>
                                 {revenueForecast.map(rev => (
                                   <tr key={rev.id} className="border-b border-slate-100 hover:bg-slate-50">
-                                    <td className="py-3 px-2 font-medium">{rev.product_type}</td>
-                                    <td className="py-3 px-2">Year {rev.year_number}</td>
-                                    <td className="py-3 px-2">{Number(rev.projected_annual_volume).toLocaleString()} {rev.volume_unit}</td>
-                                    <td className="py-3 px-2">${Number(rev.unit_price_usd).toLocaleString()}</td>
-                                    <td className="py-3 px-2 font-semibold">${Number(rev.projected_annual_revenue_usd || 0).toLocaleString()}</td>
+                                    <td className="py-3 px-2 font-medium text-sm">{rev.product_type}</td>
+                                    <td className="py-3 px-2 text-sm">Year {rev.year_number}</td>
+                                    <td className="py-3 px-2 text-sm">{Number(rev.projected_annual_volume).toLocaleString()} {rev.volume_unit}</td>
+                                    <td className="py-3 px-2 text-sm">
+                                      <div>{formatPhp(rev.unit_price_php || phpToUsd(rev.unit_price_usd || 0, exchangeRate))}</div>
+                                      <div className="text-xs text-slate-500">{formatUsd(rev.unit_price_usd || 0)}</div>
+                                    </td>
+                                    <td className="py-3 px-2 font-semibold text-sm">
+                                      <div>{formatPhp(rev.projected_annual_revenue_php || phpToUsd(rev.projected_annual_revenue_usd || 0, exchangeRate))}</div>
+                                      <div className="text-xs text-slate-500">{formatUsd(rev.projected_annual_revenue_usd || 0)}</div>
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
