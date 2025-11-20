@@ -235,8 +235,12 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
   const pageHeight = doc.internal.pageSize.getHeight()
   const pageWidth = doc.internal.pageSize.getWidth()
 
-  let yPos = MARGINS.top + MARGINS.headerFooter + 5
-  
+  let yPos = MARGINS.top + 10
+
+  // Add header to first page
+  addPageHeader(doc, project.name)
+  yPos = MARGINS.top + MARGINS.headerFooter + 10
+
   // ===== TITLE PAGE =====
   yPos = addTitle(doc, project.name, yPos)
   
