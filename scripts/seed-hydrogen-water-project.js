@@ -22,11 +22,16 @@ async function seedHydrogenWaterProject() {
     const projectId = projects?.id
     if (!projectId) {
       console.log('No hydrogen water project found. Creating one...')
-      const { data: newProj, error: createErr } = await supabase
+      const projectData = {
+        name: 'Hydrogen-Infused Mineral Water Processing Facility',
+        description: 'Ultra-Pure, Carbon-Filtered, Hydrogen-Infused Deep Well Water - A Zero-Plastic, Next-Generation Beverage & Household Water Solution'
+      }
+
+      // Try inserting with extended fields first
+      let { data: newProj, error: createErr } = await supabase
         .from('projects')
         .insert([{
-          name: 'Hydrogen-Infused Mineral Water Processing Facility',
-          description: 'Ultra-Pure, Carbon-Filtered, Hydrogen-Infused Deep Well Water - A Zero-Plastic, Next-Generation Beverage & Household Water Solution',
+          ...projectData,
           long_description: `HYDROGEN-INFUSED MINERAL WATER FACILITY
 Ultra-Pure, Carbon-Filtered, Hydrogen-Infused Deep Well Water
 A Zero-Plastic, Next-Generation Beverage & Household Water Solution
@@ -58,7 +63,21 @@ System Configuration: Closed-loop stainless steel (SUS 304/SUS 316)`,
         .select()
         .single()
 
-      if (createErr) {
+      // If extended fields don't exist, try basic fields
+      if (createErr && createErr.message.includes('column')) {
+        console.log('Extended fields not available, using basic fields...')
+        const { data: basicProj, error: basicErr } = await supabase
+          .from('projects')
+          .insert([projectData])
+          .select()
+          .single()
+
+        if (basicErr) {
+          console.error('Error creating project:', basicErr)
+          return
+        }
+        newProj = basicProj
+      } else if (createErr) {
         console.error('Error creating project:', createErr)
         return
       }
