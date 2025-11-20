@@ -521,7 +521,137 @@ export default function Investments({ userId }) {
               {/* Equipment Tab */}
               {detailTab === 'equipment' && (
                 <div className="space-y-4">
-                  {projectEquipment.length === 0 ? (
+                  {editMode.equipment && editData.equipment.length > 0 ? (
+                    <div className="space-y-4">
+                      {editData.equipment.map((eq, idx) => (
+                        <div key={eq.id || idx} className="p-4 border border-slate-200 rounded-lg">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Equipment Name</label>
+                              <input
+                                type="text"
+                                value={eq.equipment_name || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].equipment_name = e.target.value
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Type</label>
+                              <input
+                                type="text"
+                                value={eq.equipment_type || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].equipment_type = e.target.value
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Capacity</label>
+                              <input
+                                type="number"
+                                value={eq.capacity_value || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].capacity_value = parseFloat(e.target.value) || null
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Capacity Unit</label>
+                              <input
+                                type="text"
+                                placeholder="L, kg, T, etc."
+                                value={eq.capacity_unit || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].capacity_unit = e.target.value
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Power (kW)</label>
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={eq.power_consumption_kw || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].power_consumption_kw = parseFloat(e.target.value) || null
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Unit Cost (USD)</label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={eq.unit_cost_usd || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].unit_cost_usd = parseFloat(e.target.value) || 0
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Quantity</label>
+                              <input
+                                type="number"
+                                value={eq.quantity || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].quantity = parseInt(e.target.value) || 1
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                            <div>
+                              <label className="text-xs font-medium text-slate-700">Lead Time (days)</label>
+                              <input
+                                type="number"
+                                value={eq.lead_time_days || ''}
+                                onChange={(e) => {
+                                  const updated = [...editData.equipment]
+                                  updated[idx].lead_time_days = parseInt(e.target.value) || null
+                                  setEditData(prev => ({ ...prev, equipment: updated }))
+                                }}
+                                className="w-full px-3 py-2 border rounded text-sm mt-1"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex justify-between items-center pt-3 border-t border-slate-200">
+                            <div className="text-sm font-medium text-slate-900">
+                              Total: ${((eq.unit_cost_usd || 0) * (eq.quantity || 1)).toLocaleString()}
+                            </div>
+                            <button
+                              onClick={() => {
+                                const updated = editData.equipment.filter((_, i) => i !== idx)
+                                setEditData(prev => ({ ...prev, equipment: updated }))
+                              }}
+                              className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : projectEquipment.length === 0 ? (
                     <p className="text-slate-500">No equipment details available</p>
                   ) : (
                     <div className="overflow-x-auto">
@@ -552,7 +682,7 @@ export default function Investments({ userId }) {
                     </div>
                   )}
 
-                  {projectSuppliers.length > 0 && (
+                  {projectSuppliers.length > 0 && !editMode.equipment && (
                     <div className="mt-6">
                       <h4 className="text-sm font-semibold text-slate-900 mb-3">Suppliers</h4>
                       <div className="space-y-3">
