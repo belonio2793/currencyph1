@@ -387,8 +387,8 @@ export default function Investments({ userId }) {
       </div>
 
       {loading && <p className="text-sm text-slate-500">Loading...</p>}
-      {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
-      {success && <p className="text-sm text-emerald-600 mb-3">{success}</p>}
+      {error && <p className="text-sm text-slate-700 mb-3">{error}</p>}
+      {success && <p className="text-sm text-slate-700 mb-3">{success}</p>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {projects.map(p => {
@@ -405,7 +405,7 @@ export default function Investments({ userId }) {
                 <div className="flex justify-between"><span>Progress</span><span className="font-medium">{pct}%</span></div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={(e) => { e.stopPropagation(); openInvestModal(p) }} className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm">Invest</button>
+                <button onClick={(e) => { e.stopPropagation(); openInvestModal(p) }} className="flex-1 bg-slate-700 text-white py-2 rounded-lg text-sm hover:bg-slate-800">Invest</button>
                 <button onClick={() => openProjectDetail(p)} className="px-3 py-2 text-sm text-slate-600 hover:text-slate-800">View Details</button>
               </div>
             </div>
