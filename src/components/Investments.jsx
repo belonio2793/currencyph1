@@ -169,6 +169,111 @@ export default function Investments({ userId }) {
     }
   }
 
+  function toggleEditMode(tab) {
+    setEditMode(prev => ({ ...prev, [tab]: !prev[tab] }))
+    if (!editMode[tab]) {
+      // Initialize edit data when entering edit mode
+      switch (tab) {
+        case 'equipment':
+          setEditData(prev => ({ ...prev, equipment: JSON.parse(JSON.stringify(projectEquipment)) }))
+          break
+        case 'suppliers':
+          setEditData(prev => ({ ...prev, suppliers: JSON.parse(JSON.stringify(projectSuppliers)) }))
+          break
+        case 'costs':
+          setEditData(prev => ({ ...prev, costs: JSON.parse(JSON.stringify(projectCosts)) }))
+          break
+        case 'production':
+          setEditData(prev => ({ ...prev, production: JSON.parse(JSON.stringify(productionCapacity)) }))
+          break
+        case 'revenues':
+          setEditData(prev => ({ ...prev, revenues: JSON.parse(JSON.stringify(revenueForecast)) }))
+          break
+        case 'milestones':
+          setEditData(prev => ({ ...prev, milestones: JSON.parse(JSON.stringify(projectMilestones)) }))
+          break
+        case 'risks':
+          setEditData(prev => ({ ...prev, risks: JSON.parse(JSON.stringify(riskAssessment)) }))
+          break
+        case 'metrics':
+          setEditData(prev => ({ ...prev, metrics: JSON.parse(JSON.stringify(financialMetrics)) }))
+          break
+      }
+    }
+  }
+
+  async function saveChanges(tab) {
+    if (!selectedProject) return
+    setSaving(true)
+    try {
+      const table = {
+        equipment: 'project_equipment',
+        suppliers: 'project_suppliers',
+        costs: 'project_costs',
+        production: 'production_capacity',
+        revenues: 'revenue_projections',
+        milestones: 'project_milestones',
+        risks: 'risk_assessment',
+        metrics: 'financial_metrics'
+      }[tab]
+
+      const data = editData[tab]
+
+      for (const item of data) {
+        if (item.id) {
+          // Update existing
+          const { error } = await supabase
+            .from(table)
+            .update(item)
+            .eq('id', item.id)
+          if (error) throw error
+        } else if (Object.keys(item).length > 0) {
+          // Insert new
+          const { error } = await supabase
+            .from(table)
+            .insert([{ ...item, project_id: selectedProject.id }])
+          if (error) throw error
+        }
+      }
+
+      setSuccess(`${tab} updated successfully`)
+      await loadProjectDetails(selectedProject.id)
+      toggleEditMode(tab)
+    } catch (err) {
+      console.error(`Failed saving ${tab}:`, err)
+      setError(`Failed to save ${tab}: ${err.message}`)
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function deleteItem(tab, itemId) {
+    if (!confirm('Are you sure you want to delete this item?')) return
+    try {
+      const table = {
+        equipment: 'project_equipment',
+        suppliers: 'project_suppliers',
+        costs: 'project_costs',
+        production: 'production_capacity',
+        revenues: 'revenue_projections',
+        milestones: 'project_milestones',
+        risks: 'risk_assessment',
+        metrics: 'financial_metrics'
+      }[tab]
+
+      const { error } = await supabase
+        .from(table)
+        .delete()
+        .eq('id', itemId)
+
+      if (error) throw error
+      setSuccess('Item deleted successfully')
+      await loadProjectDetails(selectedProject.id)
+    } catch (err) {
+      setError(`Failed to delete: ${err.message}`)
+    }
+  }
+
   function openProjectDetail(project) {
     // Close invest modal first to keep modals exclusive
     setShowInvestModal(false)
