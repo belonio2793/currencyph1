@@ -401,7 +401,7 @@ function createRisks(doc, risks) {
       text: 'Risk: Coconut shortage or price spike from weather/drought. Mitigation: (1) Long-term farmer contracts at fixed prices. (2) Build mini-farm or partner with cooperatives. (3) Establish buy-back programs. (4) Maintain 2–4 week inventory buffer.',
       metrics: [
         { label: 'Probability', value: '60%' },
-        { label: 'Mitigation Cost\', value \'$5–10K annually' },
+        { label: 'Mitigation Cost', value: '$5–10K annually' },
         { label: 'Inventory Buffer', value: '2–4 weeks' },
         { label: 'Partner Network', value: '5–10 suppliers' }
       ]
