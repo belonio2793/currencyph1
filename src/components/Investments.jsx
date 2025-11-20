@@ -897,7 +897,296 @@ export default function Investments({ userId }) {
               {/* Suppliers & Partnerships Tab */}
               {detailTab === 'suppliers' && (
                 <div className="space-y-6">
-                  {projectSuppliers.length === 0 && projectPartners.length === 0 ? (
+                  {editMode.partnerships ? (
+                    <div className="space-y-6">
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4">Edit Partnerships</h4>
+                        <div className="space-y-4">
+                          {editData.partnerships.length > 0 ? (
+                            editData.partnerships.map((partner, idx) => (
+                              <div key={partner.id || idx} className="p-4 border border-slate-200 rounded-lg">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Partner Name *</label>
+                                    <input
+                                      type="text"
+                                      value={partner.partner_name || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].partner_name = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="e.g., Acme Distribution"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Partnership Type *</label>
+                                    <select
+                                      value={partner.partnership_type || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].partnership_type = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                    >
+                                      <option value="">Select type...</option>
+                                      <option value="distribution">Distribution</option>
+                                      <option value="manufacturing">Manufacturing</option>
+                                      <option value="joint_venture">Joint Venture</option>
+                                      <option value="supplier_partnership">Supplier Partnership</option>
+                                      <option value="technology">Technology</option>
+                                      <option value="marketing">Marketing</option>
+                                      <option value="financial">Financial</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Contact Person</label>
+                                    <input
+                                      type="text"
+                                      value={partner.contact_person || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].contact_person = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="John Doe"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Email</label>
+                                    <input
+                                      type="email"
+                                      value={partner.email || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].email = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="john@example.com"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Phone</label>
+                                    <input
+                                      type="tel"
+                                      value={partner.phone || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].phone = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="+63 912 345 6789"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">City</label>
+                                    <input
+                                      type="text"
+                                      value={partner.city || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].city = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Manila"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Country</label>
+                                    <input
+                                      type="text"
+                                      value={partner.country || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].country = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Philippines"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Partnership Status</label>
+                                    <select
+                                      value={partner.partnership_status || 'active'}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].partnership_status = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                    >
+                                      <option value="active">Active</option>
+                                      <option value="pending">Pending</option>
+                                      <option value="suspended">Suspended</option>
+                                      <option value="terminated">Terminated</option>
+                                    </select>
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Start Date</label>
+                                    <input
+                                      type="date"
+                                      value={partner.start_date || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].start_date = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">End Date</label>
+                                    <input
+                                      type="date"
+                                      value={partner.end_date || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].end_date = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Revenue Share %</label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={partner.revenue_share_percentage || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].revenue_share_percentage = parseFloat(e.target.value) || null
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="15.5"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Investment Amount (USD)</label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={partner.investment_amount_usd || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].investment_amount_usd = parseFloat(e.target.value) || null
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="50000"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="text-xs font-medium text-slate-700">Contract Duration (months)</label>
+                                    <input
+                                      type="number"
+                                      value={partner.contract_duration_months || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].contract_duration_months = parseInt(e.target.value) || null
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="24"
+                                    />
+                                  </div>
+                                  <div className="md:col-span-2">
+                                    <label className="text-xs font-medium text-slate-700">Payment Terms</label>
+                                    <input
+                                      type="text"
+                                      value={partner.payment_terms || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].payment_terms = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Net 30, FOB"
+                                    />
+                                  </div>
+                                  <div className="md:col-span-2">
+                                    <label className="text-xs font-medium text-slate-700">Key Terms</label>
+                                    <textarea
+                                      value={partner.key_terms || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].key_terms = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Key terms and conditions"
+                                      rows="2"
+                                    />
+                                  </div>
+                                  <div className="md:col-span-2">
+                                    <label className="text-xs font-medium text-slate-700">Notes</label>
+                                    <textarea
+                                      value={partner.notes || ''}
+                                      onChange={(e) => {
+                                        const updated = [...editData.partnerships]
+                                        updated[idx].notes = e.target.value
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      }}
+                                      className="w-full px-3 py-2 border rounded text-sm mt-1"
+                                      placeholder="Additional notes"
+                                      rows="2"
+                                    />
+                                  </div>
+                                </div>
+                                <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
+                                  <button
+                                    onClick={() => {
+                                      const updated = editData.partnerships.filter((_, i) => i !== idx)
+                                      setEditData(prev => ({ ...prev, partnerships: updated }))
+                                    }}
+                                    className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="p-4 border border-dashed border-slate-300 rounded-lg text-center">
+                              <p className="text-slate-600 text-sm mb-3">No partnerships added yet</p>
+                              <button
+                                onClick={() => {
+                                  setEditData(prev => ({
+                                    ...prev,
+                                    partnerships: [...prev.partnerships, {}]
+                                  }))
+                                }}
+                                className="px-4 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800"
+                              >
+                                + Add Partnership
+                              </button>
+                            </div>
+                          )}
+                          {editData.partnerships.length > 0 && (
+                            <button
+                              onClick={() => {
+                                setEditData(prev => ({
+                                  ...prev,
+                                  partnerships: [...prev.partnerships, {}]
+                                }))
+                              }}
+                              className="px-4 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800 w-full"
+                            >
+                              + Add More Partnerships
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ) : projectSuppliers.length === 0 && projectPartners.length === 0 ? (
                     <p className="text-slate-500">No suppliers or partnerships data available</p>
                   ) : (
                     <>
