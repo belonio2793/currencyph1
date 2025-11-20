@@ -444,15 +444,18 @@ export default function Investments({ userId }) {
               <div className="text-sm text-slate-700 space-y-2 mb-4">
                 <div>
                   <div className="flex justify-between mb-1"><span>Total Cost</span></div>
-                  <div className="flex justify-between text-xs"><span className="font-medium">{formatPhp(totalPhp)}</span><span className="text-slate-500">{formatUsd(totalUsd)}</span></div>
+                  <div><span className="font-medium">{formatPhp(totalPhp)}</span></div>
+                  <div className="text-xs text-slate-500">{formatUsd(totalUsd)}</div>
                 </div>
                 <div>
                   <div className="flex justify-between mb-1"><span>Funded</span></div>
-                  <div className="flex justify-between text-xs"><span className="font-medium">{formatPhp(fundedPhp)}</span><span className="text-slate-500">{formatUsd(fundedUsd)}</span></div>
+                  <div><span className="font-medium">{formatPhp(fundedPhp)}</span></div>
+                  <div className="text-xs text-slate-500">{formatUsd(fundedUsd)}</div>
                 </div>
                 <div>
                   <div className="flex justify-between mb-1"><span>Remaining</span></div>
-                  <div className="flex justify-between text-xs"><span className="font-medium">{formatPhp(remainingPhp)}</span><span className="text-slate-500">{formatUsd(remainingUsd)}</span></div>
+                  <div><span className="font-medium">{formatPhp(remainingPhp)}</span></div>
+                  <div className="text-xs text-slate-500">{formatUsd(remainingUsd)}</div>
                 </div>
                 <div className="flex justify-between"><span>Progress</span><span className="font-medium">{pct}%</span></div>
               </div>
