@@ -354,6 +354,24 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     setEditingEmployeeId(null)
   }
 
+  const handleOpenChat = (employee) => {
+    setSelectedEmployeeForChat(employee)
+    setShowChatModal(true)
+  }
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'online':
+        return { bg: 'bg-green-50', border: 'border-green-200', dot: 'bg-green-500', text: 'text-green-700' }
+      case 'idle':
+        return { bg: 'bg-yellow-50', border: 'border-yellow-200', dot: 'bg-yellow-500', text: 'text-yellow-700' }
+      case 'offline':
+        return { bg: 'bg-slate-50', border: 'border-slate-200', dot: 'bg-slate-400', text: 'text-slate-600' }
+      default:
+        return { bg: 'bg-slate-50', border: 'border-slate-200', dot: 'bg-slate-400', text: 'text-slate-600' }
+    }
+  }
+
   // Record Attendance
   const handleCheckIn = async () => {
     try {
