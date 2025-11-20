@@ -337,10 +337,10 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
       }
       
       yPos += 3
-      yPos = checkAndAddPage(doc, yPos, 40)
+      yPos = checkAndAddPage(doc, yPos, 40, project.name)
     }
   }
-  
+
   // ===== PARTNERSHIPS SECTION =====
   if (partnerships.length > 0) {
     yPos = addSectionTitle(doc, 'Partnerships', yPos)
@@ -388,10 +388,10 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
       }
       
       yPos += 3
-      yPos = checkAndAddPage(doc, yPos, 40)
+      yPos = checkAndAddPage(doc, yPos, 40, project.name)
     }
   }
-  
+
   // ===== FINANCIAL SUMMARY =====
   yPos = addSectionTitle(doc, 'Financial Summary', yPos)
   yPos += 5
@@ -408,9 +408,9 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     ])
     
     yPos = addTable(doc, costHeaders, costRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
-  
+
   // ===== REVENUE PROJECTIONS =====
   if (revenues.length > 0) {
     yPos = addSectionTitle(doc, 'Revenue Projections', yPos)
@@ -426,9 +426,9 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     ])
     
     yPos = addTable(doc, revenueHeaders, revenueRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
-  
+
   // ===== PRODUCTION CAPACITY =====
   if (production.length > 0) {
     yPos = addSectionTitle(doc, 'Production Capacity', yPos)
@@ -454,10 +454,10 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
       }
       
       yPos += 3
-      yPos = checkAndAddPage(doc, yPos, 40)
+      yPos = checkAndAddPage(doc, yPos, 40, project.name)
     }
   }
-  
+
   // ===== MILESTONES =====
   if (milestones.length > 0) {
     yPos = addSectionTitle(doc, 'Project Milestones', yPos)
@@ -473,9 +473,9 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     ])
     
     yPos = addTable(doc, milestoneHeaders, milestoneRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
-  
+
   // ===== RISK ASSESSMENT =====
   if (risks.length > 0) {
     yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
@@ -491,7 +491,7 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     ])
     
     yPos = addTable(doc, riskHeaders, riskRows, yPos)
-    yPos = checkAndAddPage(doc, yPos, 40)
+    yPos = checkAndAddPage(doc, yPos, 40, project.name)
   }
   
   // Add footer to all pages
