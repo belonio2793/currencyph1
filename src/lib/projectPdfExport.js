@@ -183,10 +183,47 @@ function addTable(doc, headers, rows, yPos) {
   return yPos + 4
 }
 
-function checkAndAddPage(doc, yPos, minSpace = 30) {
-  if (yPos > 270) {
+function addPageHeader(doc, projectName) {
+  const pageHeight = doc.internal.pageSize.getHeight()
+
+  doc.setFontSize(9)
+  doc.setTextColor(...COLORS.primary)
+  doc.setFont('helvetica', 'bold')
+  doc.text(projectName, MARGINS.left, MARGINS.headerFooter)
+
+  doc.setFontSize(8)
+  doc.setTextColor(...COLORS.textLight)
+  doc.setFont('helvetica', 'normal')
+  const pageNum = doc.internal.getCurrentPageInfo().pageNumber
+  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right - 20, MARGINS.headerFooter)
+
+  doc.setDrawColor(...COLORS.border)
+  doc.setLineWidth(0.3)
+  doc.line(MARGINS.left, MARGINS.headerFooter + 3, PAGE_WIDTH - MARGINS.right, MARGINS.headerFooter + 3)
+}
+
+function addPageFooter(doc) {
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const footerY = pageHeight - MARGINS.headerFooter + 5
+
+  doc.setDrawColor(...COLORS.border)
+  doc.setLineWidth(0.3)
+  doc.line(MARGINS.left, footerY - 3, PAGE_WIDTH - MARGINS.right, footerY - 3)
+
+  doc.setFontSize(8)
+  doc.setTextColor(...COLORS.textLight)
+  doc.setFont('helvetica', 'normal')
+  doc.text(`Generated on ${new Date().toLocaleDateString()}`, MARGINS.left, footerY)
+}
+
+function checkAndAddPage(doc, yPos, minSpace = 40, projectName = '') {
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const maxYPos = pageHeight - MARGINS.bottom
+
+  if (yPos > maxYPos - minSpace) {
     doc.addPage()
-    return 15
+    addPageHeader(doc, projectName)
+    return MARGINS.top + MARGINS.headerFooter + 10
   }
   return yPos
 }
