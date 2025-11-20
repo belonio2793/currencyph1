@@ -1,12 +1,13 @@
 import jsPDF from 'jspdf'
 
+// ============ CONFIGURATION ============
 const MARGINS = {
-  top: 20,
-  bottom: 18,
-  left: 16,
-  right: 16,
-  headerHeight: 12,
-  footerHeight: 12
+  top: 24,
+  bottom: 20,
+  left: 18,
+  right: 18,
+  headerHeight: 14,
+  footerHeight: 14
 }
 
 const PAGE_WIDTH = 210
@@ -15,68 +16,128 @@ const CONTENT_WIDTH = PAGE_WIDTH - MARGINS.left - MARGINS.right
 const CONTENT_START_Y = MARGINS.top + MARGINS.headerHeight
 const MAX_Y_POS = PAGE_HEIGHT - MARGINS.bottom - MARGINS.footerHeight
 
+// Professional color palette
 const COLORS = {
-  primary: [31, 78, 121],
-  secondary: [52, 120, 170],
-  accent: [54, 169, 225],
-  darkText: [26, 32, 44],
-  lightText: [113, 128, 150],
-  lightBg: [247, 249, 251],
-  border: [203, 213, 225],
-  highlight: [249, 250, 251],
-  white: [255, 255, 255]
+  // Primary brand colors
+  primary: [25, 55, 109],        // Deep navy blue
+  primaryLight: [41, 98, 165],    // Lighter blue
+  accent: [59, 130, 246],         // Bright blue
+  
+  // Text colors
+  darkText: [17, 24, 39],         // Almost black
+  mediumText: [55, 65, 81],       // Medium gray
+  lightText: [107, 114, 128],     // Light gray
+  
+  // Background colors
+  white: [255, 255, 255],
+  lightBg: [249, 250, 251],       // Very light gray
+  lightBg2: [243, 244, 246],      // Slightly darker light gray
+  
+  // Borders and accents
+  border: [209, 213, 219],        // Light border gray
+  success: [16, 185, 129],        // Green for positive
+  warning: [245, 158, 11],        // Orange for warnings
+  danger: [239, 68, 68],          // Red for risks
+  
+  // Card shadows (RGB for fill)
+  cardBg: [255, 255, 255],
 }
 
-function addPageHeader(doc, projectName, tabName, pageNum) {
-  // Header background
-  doc.setFillColor(...COLORS.lightBg)
-  doc.rect(0, 0, PAGE_WIDTH, MARGINS.headerHeight + 2, 'F')
-
-  // Left side - Project name
-  doc.setFontSize(9)
+// ============ TYPOGRAPHY HELPERS ============
+function setHeading1(doc) {
+  doc.setFontSize(26)
   doc.setFont('helvetica', 'bold')
   doc.setTextColor(...COLORS.primary)
-  const titleText = projectName.length > 40 ? projectName.substring(0, 37) + '...' : projectName
-  doc.text(titleText, MARGINS.left, 7)
+}
 
-  // Middle - Tab name
-  doc.setFontSize(10)
+function setHeading2(doc) {
+  doc.setFontSize(18)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.secondary)
-  doc.text(tabName, PAGE_WIDTH / 2, 7, { align: 'center' })
+  doc.setTextColor(...COLORS.primary)
+}
 
-  // Right side - Page number
+function setHeading3(doc) {
+  doc.setFontSize(13)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.primaryLight)
+}
+
+function setHeading4(doc) {
+  doc.setFontSize(11)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.mediumText)
+}
+
+function setBodyText(doc) {
+  doc.setFontSize(9)
+  doc.setFont('helvetica', 'normal')
+  doc.setTextColor(...COLORS.darkText)
+}
+
+function setSmallText(doc) {
   doc.setFontSize(8)
   doc.setFont('helvetica', 'normal')
   doc.setTextColor(...COLORS.lightText)
-  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right, 7, { align: 'right' })
+}
+
+function setLabelText(doc) {
+  doc.setFontSize(8)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.mediumText)
+}
+
+// ============ PAGE HEADER & FOOTER ============
+function addPageHeader(doc, projectName, tabName, pageNum) {
+  // Header background with subtle gradient effect (light blue)
+  doc.setFillColor(...COLORS.lightBg)
+  doc.rect(0, 0, PAGE_WIDTH, MARGINS.headerHeight, 'F')
+
+  // Left accent bar
+  doc.setFillColor(...COLORS.primaryLight)
+  doc.rect(0, 0, 3, MARGINS.headerHeight, 'F')
+
+  // Project name (left)
+  setBodyText(doc)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.primary)
+  const titleText = projectName.length > 35 ? projectName.substring(0, 32) + '...' : projectName
+  doc.text(titleText, MARGINS.left + 2, 8)
+
+  // Tab name (center)
+  doc.setFontSize(10)
+  doc.setFont('helvetica', 'bold')
+  doc.setTextColor(...COLORS.primaryLight)
+  doc.text(tabName, PAGE_WIDTH / 2, 8, { align: 'center' })
+
+  // Page number (right)
+  setSmallText(doc)
+  doc.text(`Page ${pageNum}`, PAGE_WIDTH - MARGINS.right, 8, { align: 'right' })
 
   // Bottom border line
   doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.5)
-  doc.line(MARGINS.left, MARGINS.headerHeight + 1, PAGE_WIDTH - MARGINS.right, MARGINS.headerHeight + 1)
+  doc.setLineWidth(0.4)
+  doc.line(MARGINS.left, MARGINS.headerHeight + 0.5, PAGE_WIDTH - MARGINS.right, MARGINS.headerHeight + 0.5)
 }
 
 function addPageFooter(doc, projectName) {
-  const footerY = PAGE_HEIGHT - MARGINS.bottom + 4
+  const footerY = PAGE_HEIGHT - MARGINS.bottom + 3
 
-  // Top border line
+  // Top border
   doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.5)
-  doc.line(MARGINS.left, footerY - 8, PAGE_WIDTH - MARGINS.right, footerY - 8)
+  doc.setLineWidth(0.4)
+  doc.line(MARGINS.left, footerY - 9, PAGE_WIDTH - MARGINS.right, footerY - 9)
 
-  // Left - Date
-  doc.setFontSize(7)
+  // Left - Company
+  setSmallText(doc)
   doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.lightText)
-  const dateStr = new Date().toLocaleDateString()
-  doc.text(`Generated: ${dateStr}`, MARGINS.left, footerY - 3)
+  const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: '2-digit' })
+  doc.text(`Generated: ${dateStr}`, MARGINS.left, footerY - 4)
 
-  // Center - Company info
-  doc.text('Confidential - For Internal Review Only', PAGE_WIDTH / 2, footerY - 3, { align: 'center' })
+  // Center - Status
+  doc.text('Confidential - Internal Use Only', PAGE_WIDTH / 2, footerY - 4, { align: 'center' })
 
-  // Right - Filename
-  doc.text('© Project Report', PAGE_WIDTH - MARGINS.right, footerY - 3, { align: 'right' })
+  // Right - Copyright
+  doc.text('© Project Report 2024', PAGE_WIDTH - MARGINS.right, footerY - 4, { align: 'right' })
 }
 
 function initPage(doc, projectName, tabName, pageNum) {
@@ -86,7 +147,8 @@ function initPage(doc, projectName, tabName, pageNum) {
   return CONTENT_START_Y
 }
 
-function checkPageBreak(doc, yPos, minSpace = 25) {
+// ============ PAGE LAYOUT UTILITIES ============
+function checkPageBreak(doc, yPos, minSpace = 30) {
   if (yPos > MAX_Y_POS - minSpace) {
     doc.addPage()
     return CONTENT_START_Y
@@ -94,103 +156,106 @@ function checkPageBreak(doc, yPos, minSpace = 25) {
   return yPos
 }
 
+function addVerticalSpace(doc, yPos, space = 4) {
+  return yPos + space
+}
+
+// ============ SECTION HEADERS ============
 function addSectionTitle(doc, text, yPos) {
-  doc.setFontSize(14)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.primary)
-  
+  setHeading2(doc)
   const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
   doc.text(lines, MARGINS.left, yPos)
   
-  const lineHeight = lines.length * 6.5
-  yPos += lineHeight + 4
+  const lineHeight = lines.length * 7
+  yPos += lineHeight + 3
 
-  doc.setDrawColor(...COLORS.secondary)
-  doc.setLineWidth(1)
+  // Decorative underline
+  doc.setDrawColor(...COLORS.primaryLight)
+  doc.setLineWidth(1.2)
   doc.line(MARGINS.left, yPos, PAGE_WIDTH - MARGINS.right, yPos)
 
   return yPos + 8
 }
 
 function addSubsectionTitle(doc, text, yPos) {
-  doc.setFontSize(11)
-  doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.secondary)
-  
-  const lines = doc.splitTextToSize(text, CONTENT_WIDTH)
+  setHeading3(doc)
+  const lines = doc.splitTextToSize(text, CONTENT_WIDTH - 4)
   doc.text(lines, MARGINS.left, yPos)
-  
-  return yPos + (lines.length * 5.5) + 3
+  return yPos + (lines.length * 5.5) + 4
 }
 
-function addBodyText(doc, text, yPos, indent = 0, fontSize = 9) {
-  doc.setFontSize(fontSize)
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.darkText)
-  
+// ============ CONTENT BLOCKS ============
+function addBodyText(doc, text, yPos, indent = 0) {
+  setBodyText(doc)
   const xPos = MARGINS.left + indent
   const lineWidth = CONTENT_WIDTH - indent
   const lines = doc.splitTextToSize(text, lineWidth)
   doc.text(lines, xPos, yPos)
-  
-  return yPos + (lines.length * 4.8) + 2
+  return yPos + (lines.length * 4.8) + 3
 }
 
-function addKeyValueRow(doc, label, value, yPos, indent = 2) {
-  doc.setFontSize(9)
-  
+// Dual currency display
+function formatDualCurrency(phpAmount, usdAmount) {
+  const phpStr = `₱${Number(phpAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  const usdStr = `$${Number(usdAmount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+  return `${phpStr} / ${usdStr}`
+}
+
+function addMetricRow(doc, label, phpValue, usdValue, yPos, indent = 2) {
+  const xLabel = MARGINS.left + indent
+  const xValue = MARGINS.left + 65
+
   // Label
+  setLabelText(doc)
+  doc.text(label, xLabel, yPos)
+
+  // PHP Value
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.darkText)
-  doc.text(label + ':', MARGINS.left + indent, yPos)
+  doc.setFontSize(9)
+  doc.setTextColor(...COLORS.primary)
+  doc.text(`₱${Number(phpValue).toLocaleString('en-US', { maximumFractionDigits: 0 })}`, xValue, yPos)
 
-  // Value
-  doc.setFont('helvetica', 'normal')
-  doc.setTextColor(...COLORS.darkText)
-  const valueLines = doc.splitTextToSize(String(value || 'N/A'), CONTENT_WIDTH - indent - 50)
-  doc.text(valueLines, MARGINS.left + indent + 50, yPos)
+  // USD Value (below in gray)
+  setSmallText(doc)
+  doc.text(`$${Number(usdValue).toLocaleString('en-US', { maximumFractionDigits: 2 })}`, xValue, yPos + 4)
 
-  return yPos + (valueLines.length * 4.5) + 1
+  return yPos + 8
 }
 
-function addInfoBox(doc, yPos, title, items) {
-  // Background
-  doc.setFillColor(...COLORS.highlight)
-  const boxHeight = Math.max(items.length * 6.5 + 12, 40)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, boxHeight, 'F')
+// ============ CARD STYLES ============
+function addMetricCard(doc, yPos, title, items) {
+  // Card background with shadow effect
+  doc.setFillColor(...COLORS.lightBg2)
+  const cardHeight = Math.max(items.length * 10 + 14, 45)
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, cardHeight, 'F')
 
-  // Border
-  doc.setDrawColor(...COLORS.border)
+  // Card border
+  doc.setDrawColor(...COLORS.primaryLight)
   doc.setLineWidth(0.8)
-  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, boxHeight)
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, cardHeight)
 
-  yPos += 5
-  doc.setFontSize(10)
+  // Title background
+  doc.setFillColor(...COLORS.primary)
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 7.5, 'F')
+
+  // Title text
+  doc.setFontSize(9)
   doc.setFont('helvetica', 'bold')
-  doc.setTextColor(...COLORS.primary)
-  doc.text(title, MARGINS.left + 4, yPos)
+  doc.setTextColor(...COLORS.white)
+  doc.text(title, MARGINS.left + 4, yPos + 5)
 
-  yPos += 7
+  yPos += 10
   items.forEach(item => {
-    doc.setFontSize(8)
-    doc.setFont('helvetica', 'normal')
-    doc.setTextColor(...COLORS.lightText)
-    doc.text(item.label + ':', MARGINS.left + 4, yPos)
-
-    doc.setFont('helvetica', 'bold')
-    doc.setTextColor(...COLORS.darkText)
-    const valueLines = doc.splitTextToSize(String(item.value || 'N/A'), CONTENT_WIDTH - 12)
-    doc.text(valueLines, MARGINS.left + 35, yPos)
-
-    yPos += (valueLines.length * 4.5) + 1
+    yPos = addMetricRow(doc, item.label, item.phpValue, item.usdValue, yPos, 4)
   })
 
   return yPos + 4
 }
 
-function addTable(doc, headers, rows, yPos) {
+// ============ DATA TABLES ============
+function addDataTable(doc, headers, rows, yPos, columnWidths = null) {
   if (rows.length === 0) {
-    doc.setFontSize(9)
+    setBodyText(doc)
     doc.setTextColor(...COLORS.lightText)
     doc.text('No data available', MARGINS.left, yPos)
     return yPos + 8
@@ -198,10 +263,10 @@ function addTable(doc, headers, rows, yPos) {
 
   const colCount = headers.length
   const tableWidth = CONTENT_WIDTH
-  const colWidth = tableWidth / colCount
-  const rowHeight = 7
-  const headerHeight = 8
-  const cellPadding = 2
+  const colWidths = columnWidths || headers.map(() => tableWidth / colCount)
+  const rowHeight = 7.5
+  const headerHeight = 8.5
+  const cellPadding = 1.8
   const startX = MARGINS.left
 
   // Header row
@@ -212,10 +277,13 @@ function addTable(doc, headers, rows, yPos) {
 
   let xPos = startX
   for (let i = 0; i < colCount; i++) {
-    doc.rect(xPos, yPos, colWidth, headerHeight, 'F')
-    const headerText = String(headers[i] || '').substring(0, 20)
-    doc.text(headerText, xPos + cellPadding, yPos + cellPadding + 2, { maxWidth: colWidth - cellPadding * 2, align: 'left' })
-    xPos += colWidth
+    doc.rect(xPos, yPos, colWidths[i], headerHeight, 'F')
+    const headerText = String(headers[i] || '').substring(0, 25)
+    doc.text(headerText, xPos + cellPadding, yPos + cellPadding + 2.2, { 
+      maxWidth: colWidths[i] - cellPadding * 2, 
+      align: 'left' 
+    })
+    xPos += colWidths[i]
   }
 
   yPos += headerHeight
@@ -226,31 +294,34 @@ function addTable(doc, headers, rows, yPos) {
   doc.setTextColor(...COLORS.darkText)
 
   rows.forEach((row, rowIdx) => {
-    // Alternating background
+    // Alternating row background
     if (rowIdx % 2 === 0) {
       doc.setFillColor(...COLORS.lightBg)
       xPos = startX
       for (let j = 0; j < colCount; j++) {
-        doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
-        xPos += colWidth
+        doc.rect(xPos, yPos, colWidths[j], rowHeight, 'F')
+        xPos += colWidths[j]
       }
     }
 
-    // Cell borders
+    // Row borders
     doc.setDrawColor(...COLORS.border)
     doc.setLineWidth(0.3)
     xPos = startX
     for (let j = 0; j < colCount; j++) {
-      doc.rect(xPos, yPos, colWidth, rowHeight)
-      xPos += colWidth
+      doc.rect(xPos, yPos, colWidths[j], rowHeight)
+      xPos += colWidths[j]
     }
 
-    // Cell content
+    // Row content
     xPos = startX
     for (let j = 0; j < row.length; j++) {
-      const cellValue = String(row[j] || '').substring(0, 25)
-      doc.text(cellValue, xPos + cellPadding, yPos + cellPadding + 1.5, { maxWidth: colWidth - cellPadding * 2, align: 'left' })
-      xPos += colWidth
+      const cellValue = String(row[j] || '').substring(0, 30)
+      doc.text(cellValue, xPos + cellPadding, yPos + cellPadding + 1.8, { 
+        maxWidth: colWidths[j] - cellPadding * 2, 
+        align: 'left' 
+      })
+      xPos += colWidths[j]
     }
 
     yPos += rowHeight
@@ -259,6 +330,7 @@ function addTable(doc, headers, rows, yPos) {
   return yPos + 6
 }
 
+// ============ DIVIDERS ============
 function addDivider(doc, yPos) {
   doc.setDrawColor(...COLORS.border)
   doc.setLineWidth(0.3)
@@ -266,331 +338,403 @@ function addDivider(doc, yPos) {
   return yPos + 6
 }
 
-// PAGE 1: OVERVIEW
-function createOverviewPage(doc, project, equipment, costs, pageNum) {
+// ============ PAGE GENERATORS ============
+
+function createOverviewPage(doc, project, equipment, costs, pageNum, exchangeRate) {
   let yPos = initPage(doc, project.name, 'Overview', pageNum)
 
   yPos = addSectionTitle(doc, 'Project Overview', yPos)
 
+  // Description
   if (project.long_description) {
-    yPos = addBodyText(doc, project.long_description, yPos, 0, 9)
+    yPos = addBodyText(doc, project.long_description, yPos, 0)
     yPos += 4
   }
 
-  // Key Metrics
-  const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-  const totalRaised = project.funded_amount_usd || 0
-  const remaining = totalCost - totalRaised
-  const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
+  // Key Financial Metrics
+  const totalCostUsd = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
+  const totalCostPhp = totalCostUsd / exchangeRate
+  const totalRaisedUsd = (project.funded_amount_usd || 0)
+  const totalRaisedPhp = totalRaisedUsd / exchangeRate
+  const remainingUsd = totalCostUsd - totalRaisedUsd
+  const remainingPhp = totalCostPhp - totalRaisedPhp
+  const fundingPercent = totalCostUsd > 0 ? ((totalRaisedUsd / totalCostUsd) * 100).toFixed(1) : 0
 
-  yPos = addInfoBox(doc, yPos, 'Project Financials', [
-    { label: 'Total Project Cost', value: `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { label: 'Current Funding', value: `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` },
-    { label: 'Funding Progress', value: `${fundingPercent}%` },
-    { label: 'Amount Remaining', value: `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` }
+  yPos = addMetricCard(doc, yPos, 'Capital Requirements', [
+    { label: 'Total Project Cost', phpValue: totalCostPhp, usdValue: totalCostUsd },
+    { label: 'Current Funding', phpValue: totalRaisedPhp, usdValue: totalRaisedUsd },
+    { label: 'Remaining to Raise', phpValue: remainingPhp, usdValue: remainingUsd },
+    { label: 'Funding Progress', phpValue: fundingPercent + '%', usdValue: fundingPercent + '%' }
   ])
 
   return doc
 }
 
-// PAGE 2: EQUIPMENT
-function createEquipmentPage(doc, project, equipment, pageNum) {
-  let yPos = initPage(doc, project.name, 'Equipment', pageNum)
+function createEquipmentPage(doc, project, equipment, pageNum, exchangeRate) {
+  let yPos = initPage(doc, project.name, 'Equipment & Infrastructure', pageNum)
 
-  yPos = addSectionTitle(doc, 'Manage Equipment', yPos)
+  yPos = addSectionTitle(doc, 'Equipment Assets', yPos)
 
-  const headers = ['Equipment', 'Type', 'Capacity', 'Power (kW)', 'Unit Cost', 'Total Cost']
+  // Equipment table
+  const headers = ['Equipment', 'Type', 'Capacity', 'Power (kW)', 'Unit Cost (PHP)', 'Total Cost (PHP)']
+  const colWidths = [35, 25, 20, 18, 35, 35]
+  
   const rows = equipment.map(e => [
-    e.equipment_name || '',
-    e.equipment_type || '',
-    e.capacity || '',
-    e.power_kw || '',
-    `₱${(e.unit_cost_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`,
-    `₱${(e.total_cost_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
+    (e.equipment_name || '').substring(0, 20),
+    (e.equipment_type || '').substring(0, 15),
+    (e.capacity || '').substring(0, 12),
+    (e.power_kw || '').substring(0, 8),
+    `₱${Number(e.unit_cost_usd / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+    `₱${Number((e.total_cost_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
   ])
 
-  yPos = addTable(doc, headers, rows, yPos)
+  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
 
+  // Equipment summary
   if (equipment.length > 0) {
-    const totalEquipmentCost = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
+    const totalEquipmentUsd = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
+    const totalEquipmentPhp = totalEquipmentUsd / exchangeRate
+
     yPos += 4
-    yPos = addInfoBox(doc, yPos, 'Equipment Summary', [
-      { label: 'Total Equipment Count', value: equipment.length },
-      { label: 'Total Equipment Cost', value: `₱${totalEquipmentCost.toLocaleString('en-US', { maximumFractionDigits: 2 })}` }
+    yPos = addMetricCard(doc, yPos, 'Equipment Summary', [
+      { label: 'Total Equipment Items', phpValue: equipment.length, usdValue: equipment.length },
+      { label: 'Total Investment', phpValue: totalEquipmentPhp, usdValue: totalEquipmentUsd }
     ])
   }
 
   return doc
 }
 
-// PAGE 3: COSTS
-function createCostsPage(doc, project, costs, pageNum) {
-  let yPos = initPage(doc, project.name, 'Costs', pageNum)
+function createCostsPage(doc, project, costs, pageNum, exchangeRate) {
+  let yPos = initPage(doc, project.name, 'Costs & Budget', pageNum)
 
-  yPos = addSectionTitle(doc, 'Project Costs Breakdown', yPos)
+  yPos = addSectionTitle(doc, 'Project Cost Breakdown', yPos)
 
-  const headers = ['Category', 'Budgeted', 'Actual', '% of Total']
-  const rows = costs.map(c => [
-    c.cost_category || '',
-    `₱${(c.budgeted_amount_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`,
-    c.actual_amount_usd ? `₱${(c.actual_amount_usd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` : '-',
-    `${c.percentage_of_total || 0}%`
-  ])
+  const headers = ['Category', 'Budgeted (PHP)', 'Actual (PHP)', '% of Total']
+  const colWidths = [50, 40, 40, 35]
 
-  yPos = addTable(doc, headers, rows, yPos)
-
-  if (costs.length > 0) {
-    const totalBudgeted = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-    const totalActual = costs.reduce((sum, c) => sum + (c.actual_amount_usd || 0), 0)
+  const rows = costs.map(c => {
+    const budgetPhp = Number((c.budgeted_amount_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })
+    const actualPhp = c.actual_amount_usd ? Number((c.actual_amount_usd / exchangeRate)).toLocaleString('en-US', { maximumFractionDigits: 0 }) : '-'
     
+    return [
+      (c.cost_category || '').substring(0, 25),
+      `₱${budgetPhp}`,
+      actualPhp === '-' ? '-' : `₱${actualPhp}`,
+      `${c.percentage_of_total || 0}%`
+    ]
+  })
+
+  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
+
+  // Cost summary
+  if (costs.length > 0) {
+    const totalBudgetedUsd = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
+    const totalBudgetedPhp = totalBudgetedUsd / exchangeRate
+    const totalActualUsd = costs.reduce((sum, c) => sum + (c.actual_amount_usd || 0), 0)
+    const totalActualPhp = totalActualUsd / exchangeRate
+
     yPos += 4
-    yPos = addInfoBox(doc, yPos, 'Cost Summary', [
-      { label: 'Total Budgeted', value: `₱${totalBudgeted.toLocaleString('en-US', { maximumFractionDigits: 2 })}` },
-      { label: 'Total Actual', value: totalActual > 0 ? `₱${totalActual.toLocaleString('en-US', { maximumFractionDigits: 2 })}` : 'N/A' }
+    yPos = addMetricCard(doc, yPos, 'Cost Summary', [
+      { label: 'Total Budgeted', phpValue: totalBudgetedPhp, usdValue: totalBudgetedUsd },
+      { label: 'Total Actual', phpValue: totalActualPhp || 'N/A', usdValue: totalActualUsd || 'N/A' },
+      { label: 'Budget Variance', phpValue: (totalBudgetedPhp - totalActualPhp), usdValue: (totalBudgetedUsd - totalActualUsd) }
     ])
   }
 
   return doc
 }
 
-// PAGE 4: SUPPLIERS & PARTNERSHIPS
-function createSuppliersPartnershipsPage(doc, project, suppliers, partnerships, pageNum) {
-  let yPos = initPage(doc, project.name, 'Suppliers & Partnerships', pageNum)
+function createSuppliersPage(doc, project, suppliers, pageNum) {
+  let yPos = initPage(doc, project.name, 'Suppliers & Vendors', pageNum)
 
-  // Suppliers section
-  if (suppliers && suppliers.length > 0) {
-    yPos = addSectionTitle(doc, 'Suppliers', yPos)
+  yPos = addSectionTitle(doc, 'Supply Chain Partners', yPos)
 
-    suppliers.forEach((sup, idx) => {
-      yPos = checkPageBreak(doc, yPos, 35)
-      yPos = addSubsectionTitle(doc, sup.supplier_name || `Supplier ${idx + 1}`, yPos)
-      yPos += 2
-
-      yPos = addKeyValueRow(doc, 'Type', sup.supplier_type || 'N/A', yPos)
-      yPos = addKeyValueRow(doc, 'Contact', sup.contact_person || 'N/A', yPos)
-      if (sup.email) yPos = addKeyValueRow(doc, 'Email', sup.email, yPos)
-      if (sup.phone) yPos = addKeyValueRow(doc, 'Phone', sup.phone, yPos)
-      yPos = addKeyValueRow(doc, 'Delivery Timeline', `${sup.delivery_timeline_days || 'N/A'} days`, yPos)
-      yPos = addKeyValueRow(doc, 'Warranty Period', `${sup.warranty_months || 'N/A'} months`, yPos)
-
-      if (idx < suppliers.length - 1) {
-        yPos = addDivider(doc, yPos + 2)
-      }
-    })
-
-    yPos += 4
+  if (!suppliers || suppliers.length === 0) {
+    setBodyText(doc)
+    doc.setTextColor(...COLORS.lightText)
+    doc.text('No supplier information available', MARGINS.left, yPos)
+    return doc
   }
 
-  // Partnerships section
-  if (partnerships && partnerships.length > 0) {
-    yPos = checkPageBreak(doc, yPos, 30)
-    yPos = addSectionTitle(doc, 'Strategic Partnerships', yPos)
+  suppliers.forEach((sup, idx) => {
+    yPos = checkPageBreak(doc, yPos, 40)
+    yPos = addSubsectionTitle(doc, sup.supplier_name || `Supplier ${idx + 1}`, yPos)
 
-    partnerships.forEach((partner, idx) => {
-      yPos = checkPageBreak(doc, yPos, 35)
-      yPos = addSubsectionTitle(doc, partner.partner_name || `Partner ${idx + 1}`, yPos)
-      yPos += 2
+    const details = []
+    if (sup.supplier_type) details.push({ label: 'Type', value: sup.supplier_type })
+    if (sup.contact_person) details.push({ label: 'Contact Person', value: sup.contact_person })
+    if (sup.email) details.push({ label: 'Email', value: sup.email })
+    if (sup.phone) details.push({ label: 'Phone', value: sup.phone })
+    if (sup.delivery_timeline_days) details.push({ label: 'Delivery Timeline', value: `${sup.delivery_timeline_days} days` })
+    if (sup.warranty_months) details.push({ label: 'Warranty Period', value: `${sup.warranty_months} months` })
 
-      yPos = addKeyValueRow(doc, 'Type', partner.partnership_type || 'N/A', yPos)
-      yPos = addKeyValueRow(doc, 'Status', partner.partnership_status || 'N/A', yPos)
-      yPos = addKeyValueRow(doc, 'Contact', partner.contact_person || 'N/A', yPos)
-      yPos = addKeyValueRow(doc, 'Revenue Share', `${partner.revenue_share_percentage || 0}%`, yPos)
-      yPos = addKeyValueRow(doc, 'Investment Amount', `₱${(partner.investment_amount_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`, yPos)
-
-      if (idx < partnerships.length - 1) {
-        yPos = addDivider(doc, yPos + 2)
-      }
+    details.forEach(detail => {
+      setLabelText(doc)
+      doc.text(detail.label + ':', MARGINS.left + 2, yPos)
+      setBodyText(doc)
+      doc.text(detail.value, MARGINS.left + 40, yPos)
+      yPos += 5
     })
-  }
+
+    if (idx < suppliers.length - 1) {
+      yPos = addDivider(doc, yPos + 2)
+    }
+    yPos += 2
+  })
 
   return doc
 }
 
-// PAGE 5: PRODUCTION
-function createProductionPage(doc, project, production, pageNum) {
-  let yPos = initPage(doc, project.name, 'Production', pageNum)
+function createPartnershipsPage(doc, project, partnerships, pageNum, exchangeRate) {
+  let yPos = initPage(doc, project.name, 'Strategic Partnerships', pageNum)
 
-  yPos = addSectionTitle(doc, 'Production Capacity', yPos)
+  yPos = addSectionTitle(doc, 'Partnership Overview', yPos)
+
+  if (!partnerships || partnerships.length === 0) {
+    setBodyText(doc)
+    doc.setTextColor(...COLORS.lightText)
+    doc.text('No partnership information available', MARGINS.left, yPos)
+    return doc
+  }
+
+  partnerships.forEach((partner, idx) => {
+    yPos = checkPageBreak(doc, yPos, 45)
+    yPos = addSubsectionTitle(doc, partner.partner_name || `Partner ${idx + 1}`, yPos)
+
+    const investmentPhp = (partner.investment_amount_usd || 0) / exchangeRate
+    const investmentUsd = partner.investment_amount_usd || 0
+
+    const details = []
+    if (partner.partnership_type) details.push({ label: 'Partnership Type', value: partner.partnership_type })
+    if (partner.partnership_status) details.push({ label: 'Status', value: partner.partnership_status })
+    if (partner.contact_person) details.push({ label: 'Contact Person', value: partner.contact_person })
+    if (partner.revenue_share_percentage) details.push({ label: 'Revenue Share', value: `${partner.revenue_share_percentage}%` })
+    details.push({ label: 'Investment Amount', value: `₱${Number(investmentPhp).toLocaleString('en-US', { maximumFractionDigits: 0 })} / $${Number(investmentUsd).toLocaleString('en-US', { maximumFractionDigits: 2 })}` })
+
+    details.forEach(detail => {
+      setLabelText(doc)
+      doc.text(detail.label + ':', MARGINS.left + 2, yPos)
+      setBodyText(doc)
+      doc.text(detail.value, MARGINS.left + 40, yPos)
+      yPos += 5
+    })
+
+    if (idx < partnerships.length - 1) {
+      yPos = addDivider(doc, yPos + 2)
+    }
+    yPos += 2
+  })
+
+  return doc
+}
+
+function createProductionPage(doc, project, production, pageNum) {
+  let yPos = initPage(doc, project.name, 'Production & Capacity', pageNum)
+
+  yPos = addSectionTitle(doc, 'Production Capacity Planning', yPos)
 
   const headers = ['Phase', 'Product Type', 'Annual Capacity', 'Utilization %']
+  const colWidths = [50, 50, 35, 35]
+
   const rows = production.map(p => [
-    p.phase_name || '',
-    p.product_type || '',
-    String(p.capacity_per_year || '0'),
+    (p.phase_name || '').substring(0, 25),
+    (p.product_type || '').substring(0, 25),
+    String(p.capacity_per_year || 0),
     `${p.utilization_percentage || 80}%`
   ])
 
-  yPos = addTable(doc, headers, rows, yPos)
+  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
 
   if (production.length > 0) {
     const totalCapacity = production.reduce((sum, p) => sum + (p.capacity_per_year || 0), 0)
     const avgUtilization = (production.reduce((sum, p) => sum + (p.utilization_percentage || 0), 0) / production.length).toFixed(1)
-    
+
     yPos += 4
-    yPos = addInfoBox(doc, yPos, 'Production Summary', [
-      { label: 'Total Annual Capacity', value: String(totalCapacity) },
-      { label: 'Average Utilization', value: `${avgUtilization}%` }
+    yPos = addMetricCard(doc, yPos, 'Production Summary', [
+      { label: 'Total Annual Capacity', phpValue: totalCapacity, usdValue: totalCapacity },
+      { label: 'Average Utilization', phpValue: avgUtilization + '%', usdValue: avgUtilization + '%' }
     ])
   }
 
   return doc
 }
 
-// PAGE 6: FINANCIALS
-function createFinancialsPage(doc, project, revenues, costs, equipment, pageNum) {
-  let yPos = initPage(doc, project.name, 'Financials', pageNum)
+function createFinancialsPage(doc, project, revenues, costs, equipment, pageNum, exchangeRate) {
+  let yPos = initPage(doc, project.name, 'Financial Projections', pageNum)
 
-  yPos = addSectionTitle(doc, 'Financial Projections', yPos)
+  yPos = addSectionTitle(doc, 'Revenue & Financial Forecasts', yPos)
 
   if (revenues && revenues.length > 0) {
-    yPos = addSubsectionTitle(doc, 'Revenue Projections', yPos)
-    yPos += 2
+    const headers = ['Product', 'Annual Volume', 'Unit Price (PHP)', 'Annual Revenue (PHP)']
+    const colWidths = [50, 35, 40, 50]
 
-    const headers = ['Product', 'Annual Volume', 'Unit Price', 'Annual Revenue']
-    const rows = revenues.map(r => [
-      r.product_type || '',
-      String(r.projected_annual_volume || 0),
-      `₱${(r.unit_price_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`,
-      `₱${(r.projected_annual_revenue_usd || 0).toLocaleString('en-US', { maximumFractionDigits: 2 })}`
-    ])
+    const rows = revenues.map(r => {
+      const unitPricePhp = Number((r.unit_price_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })
+      const revenuePhp = Number((r.projected_annual_revenue_usd || 0) / exchangeRate).toLocaleString('en-US', { maximumFractionDigits: 0 })
 
-    yPos = addTable(doc, headers, rows, yPos)
+      return [
+        (r.product_type || '').substring(0, 25),
+        String(r.projected_annual_volume || 0),
+        `₱${unitPricePhp}`,
+        `₱${revenuePhp}`
+      ]
+    })
 
-    const revenueTotal = revenues.reduce((sum, r) => sum + (r.projected_annual_revenue_usd || 0), 0)
-    yPos += 2
-    yPos = addInfoBox(doc, yPos, 'Revenue Summary', [
-      { label: 'Total Projected Annual Revenue', value: `₱${revenueTotal.toLocaleString('en-US', { maximumFractionDigits: 2 })}` }
+    yPos = addDataTable(doc, headers, rows, yPos, colWidths)
+
+    const revenueTotalUsd = revenues.reduce((sum, r) => sum + (r.projected_annual_revenue_usd || 0), 0)
+    const revenueTotalPhp = revenueTotalUsd / exchangeRate
+
+    yPos += 4
+    yPos = addMetricCard(doc, yPos, 'Revenue Summary', [
+      { label: 'Total Annual Revenue', phpValue: revenueTotalPhp, usdValue: revenueTotalUsd }
     ])
   }
 
-  // Financial Summary
-  yPos = checkPageBreak(doc, yPos, 30)
+  yPos = checkPageBreak(doc, yPos, 45)
   yPos += 6
-  yPos = addSectionTitle(doc, 'Financial Summary', yPos)
+  yPos = addSectionTitle(doc, 'Financial Overview', yPos)
 
-  const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
-  const equipmentTotal = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
-  const totalRaised = project.funded_amount_usd || 0
-  const remaining = totalCost - totalRaised
-  const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
+  const totalCostUsd = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
+  const totalCostPhp = totalCostUsd / exchangeRate
+  const equipmentTotalUsd = equipment.reduce((sum, e) => sum + (e.total_cost_usd || 0), 0)
+  const equipmentTotalPhp = equipmentTotalUsd / exchangeRate
+  const totalRaisedUsd = (project.funded_amount_usd || 0)
+  const totalRaisedPhp = totalRaisedUsd / exchangeRate
+  const remainingUsd = totalCostUsd - totalRaisedUsd
+  const remainingPhp = totalCostPhp - totalRaisedPhp
+  const fundingPercent = totalCostUsd > 0 ? ((totalRaisedUsd / totalCostUsd) * 100).toFixed(1) : 0
 
-  yPos = addInfoBox(doc, yPos, 'Investment Overview', [
-    { label: 'Total Capital Required', value: `₱${totalCost.toLocaleString('en-US', { maximumFractionDigits: 2 })}` },
-    { label: 'Current Commitments', value: `₱${totalRaised.toLocaleString('en-US', { maximumFractionDigits: 2 })}` },
-    { label: 'Remaining to Raise', value: `₱${Math.max(0, remaining).toLocaleString('en-US', { maximumFractionDigits: 2 })}` },
-    { label: 'Funding Status', value: `${fundingPercent}% Complete` }
+  yPos = addMetricCard(doc, yPos, 'Investment Summary', [
+    { label: 'Total Capital Required', phpValue: totalCostPhp, usdValue: totalCostUsd },
+    { label: 'Current Commitments', phpValue: totalRaisedPhp, usdValue: totalRaisedUsd },
+    { label: 'Remaining to Raise', phpValue: remainingPhp, usdValue: remainingUsd },
+    { label: 'Funding Status', phpValue: fundingPercent + '%', usdValue: fundingPercent + '%' }
   ])
 
   return doc
 }
 
-// PAGE 7: TIMELINE
 function createTimelinePage(doc, project, milestones, pageNum) {
-  let yPos = initPage(doc, project.name, 'Timeline', pageNum)
+  let yPos = initPage(doc, project.name, 'Project Timeline', pageNum)
 
-  yPos = addSectionTitle(doc, 'Project Timeline', yPos)
+  yPos = addSectionTitle(doc, 'Project Milestones', yPos)
 
   const headers = ['Milestone', 'Type', 'Target Date', 'Status']
+  const colWidths = [50, 35, 40, 40]
+
   const rows = milestones.map(m => [
-    m.milestone_name || '',
-    m.milestone_type || '',
+    (m.milestone_name || '').substring(0, 25),
+    (m.milestone_type || '').substring(0, 20),
     (m.planned_date || '').substring(0, 10),
-    m.status || ''
+    (m.status || '').substring(0, 15)
   ])
 
-  yPos = addTable(doc, headers, rows, yPos)
+  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
 
   if (milestones.length > 0) {
-    const completedCount = milestones.filter(m => m.status === 'Completed' || m.status === 'Completed').length
-    
+    const completedCount = milestones.filter(m => m.status === 'Completed' || m.status === 'Complete').length
+    const inProgressCount = milestones.filter(m => m.status === 'In Progress').length
+    const pendingCount = milestones.length - completedCount - inProgressCount
+
     yPos += 4
-    yPos = addInfoBox(doc, yPos, 'Timeline Summary', [
-      { label: 'Total Milestones', value: milestones.length },
-      { label: 'Completed', value: completedCount },
-      { label: 'Pending', value: milestones.length - completedCount }
+    yPos = addMetricCard(doc, yPos, 'Timeline Status', [
+      { label: 'Total Milestones', phpValue: milestones.length, usdValue: milestones.length },
+      { label: 'Completed', phpValue: completedCount, usdValue: completedCount },
+      { label: 'In Progress', phpValue: inProgressCount, usdValue: inProgressCount },
+      { label: 'Pending', phpValue: pendingCount, usdValue: pendingCount }
     ])
   }
 
   return doc
 }
 
-// PAGE 8: RISKS
 function createRisksPage(doc, project, risks, pageNum) {
-  let yPos = initPage(doc, project.name, 'Risks', pageNum)
+  let yPos = initPage(doc, project.name, 'Risk Assessment', pageNum)
 
-  yPos = addSectionTitle(doc, 'Risk Assessment', yPos)
+  yPos = addSectionTitle(doc, 'Risk Register', yPos)
 
-  const headers = ['Risk Category', 'Probability', 'Impact', 'Status']
+  const headers = ['Risk Category', 'Probability %', 'Impact Level', 'Status']
+  const colWidths = [50, 35, 35, 45]
+
   const rows = risks.map(r => [
-    r.risk_category || '',
+    (r.risk_category || '').substring(0, 25),
     `${r.probability_percentage || 0}%`,
-    r.impact_severity || '',
-    r.status || ''
+    (r.impact_severity || '').substring(0, 20),
+    (r.status || '').substring(0, 15)
   ])
 
-  yPos = addTable(doc, headers, rows, yPos)
+  yPos = addDataTable(doc, headers, rows, yPos, colWidths)
 
   if (risks.length > 0) {
-    const highRisks = risks.filter(r => (r.probability_percentage || 0) > 50).length
-    const lowRisks = risks.filter(r => (r.probability_percentage || 0) <= 50).length
-    
+    const highRisks = risks.filter(r => (r.probability_percentage || 0) > 70).length
+    const mediumRisks = risks.filter(r => (r.probability_percentage || 0) > 30 && (r.probability_percentage || 0) <= 70).length
+    const lowRisks = risks.filter(r => (r.probability_percentage || 0) <= 30).length
+
     yPos += 4
-    yPos = addInfoBox(doc, yPos, 'Risk Summary', [
-      { label: 'Total Identified Risks', value: risks.length },
-      { label: 'High Priority Risks', value: highRisks },
-      { label: 'Low Priority Risks', value: lowRisks }
+    yPos = addMetricCard(doc, yPos, 'Risk Summary', [
+      { label: 'Total Identified Risks', phpValue: risks.length, usdValue: risks.length },
+      { label: 'High Priority (>70%)', phpValue: highRisks, usdValue: highRisks },
+      { label: 'Medium Priority (31-70%)', phpValue: mediumRisks, usdValue: mediumRisks },
+      { label: 'Low Priority (<30%)', phpValue: lowRisks, usdValue: lowRisks }
     ])
   }
 
   return doc
 }
 
-export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
+// ============ MAIN EXPORT FUNCTION ============
+export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics, exchangeRate = 0.018) {
   const doc = new jsPDF('p', 'mm', 'a4')
-
   let pageNum = 1
 
   // Page 1: Overview
-  createOverviewPage(doc, project, equipment, costs, pageNum++)
+  createOverviewPage(doc, project, equipment, costs, pageNum++, exchangeRate)
 
   // Page 2: Equipment
   if (equipment && equipment.length > 0) {
-    createEquipmentPage(doc, project, equipment, pageNum++)
+    createEquipmentPage(doc, project, equipment, pageNum++, exchangeRate)
   }
 
   // Page 3: Costs
   if (costs && costs.length > 0) {
-    createCostsPage(doc, project, costs, pageNum++)
+    createCostsPage(doc, project, costs, pageNum++, exchangeRate)
   }
 
-  // Page 4: Suppliers & Partnerships
-  if ((suppliers && suppliers.length > 0) || (partnerships && partnerships.length > 0)) {
-    createSuppliersPartnershipsPage(doc, project, suppliers || [], partnerships || [], pageNum++)
+  // Page 4: Suppliers
+  if (suppliers && suppliers.length > 0) {
+    createSuppliersPage(doc, project, suppliers, pageNum++, exchangeRate)
   }
 
-  // Page 5: Production
+  // Page 5: Partnerships
+  if (partnerships && partnerships.length > 0) {
+    createPartnershipsPage(doc, project, partnerships, pageNum++, exchangeRate)
+  }
+
+  // Page 6: Production
   if (production && production.length > 0) {
-    createProductionPage(doc, project, production, pageNum++)
+    createProductionPage(doc, project, production, pageNum++, exchangeRate)
   }
 
-  // Page 6: Financials
+  // Page 7: Financials
   if (revenues && revenues.length > 0) {
-    createFinancialsPage(doc, project, revenues, costs || [], equipment || [], pageNum++)
+    createFinancialsPage(doc, project, revenues, costs || [], equipment || [], pageNum++, exchangeRate)
   }
 
-  // Page 7: Timeline
+  // Page 8: Timeline
   if (milestones && milestones.length > 0) {
-    createTimelinePage(doc, project, milestones, pageNum++)
+    createTimelinePage(doc, project, milestones, pageNum++, exchangeRate)
   }
 
-  // Page 8: Risks
+  // Page 9: Risks
   if (risks && risks.length > 0) {
-    createRisksPage(doc, project, risks, pageNum++)
+    createRisksPage(doc, project, risks, pageNum++, exchangeRate)
   }
 
   return doc
 }
 
-export function generateProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
-  return generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics)
+export function generateProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics, exchangeRate = 0.018) {
+  return generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics, exchangeRate)
 }
