@@ -337,7 +337,7 @@ function createFinancials(doc, costs, exchangeRate) {
 
   const items = [
     {
-      title: '💵 Year 1 Revenue (Base Case)',
+      title: 'Year 1 Revenue (Base Case)',
       text: 'Seven revenue streams generate $567,360 in Year 1. Conservative scenario (market stress): $455,000. Optimistic (premium pricing + full utilization): $675,000. All scenarios are cash-positive from month 4 onward.',
       metrics: [
         { label: 'Conservative', value: '$455,000' },
@@ -347,7 +347,7 @@ function createFinancials(doc, costs, exchangeRate) {
       ]
     },
     {
-      title: '🔧 Operating Cost Structure',
+      title: 'Operating Cost Structure',
       text: 'Daily operating costs: $1,115 (base case). Breakdown: Raw coconuts $500–700/day, Labor $200–300, Electricity $80–150, Packaging $50–150, Maintenance $20–40. Total annual opex $406,975. Capital-intensive upfront, but low variable cost per unit.',
       metrics: [
         { label: 'Daily Opex', value: '$1,115 (base)' },
@@ -357,7 +357,7 @@ function createFinancials(doc, costs, exchangeRate) {
       ]
     },
     {
-      title: '📈 Profitability & Payback',
+      title: 'Profitability & Payback',
       text: 'Base case: $461 daily profit = $120,000 annual net profit. Year 1 EBITDA margin 21%. Cash payback of $280,000 capex achieved in Month 28 (2.3 years). By Year 2, annual profit grows to $150,000–$180,000 with modest volume growth.',
       metrics: [
         { label: 'Daily Net Profit', value: '$461 (base)' },
@@ -367,7 +367,7 @@ function createFinancials(doc, costs, exchangeRate) {
       ]
     },
     {
-      title: '🎯 5-Year ROI & Exit',
+      title: '5-Year ROI & Exit',
       text: 'Base case: $120,000/year × 5 years = $600,000 cumulative profit less $280,000 capex = $320,000 net return = 114% ROI. Optimistic: $150,000/year × 5 years = $470,000 net = 168% ROI. 5-year blended average: 185% ROI. Facility has 15–20 year operational lifespan.',
       metrics: [
         { label: 'Conservative (3 yr)', value: '45% total ROI' },
@@ -377,7 +377,7 @@ function createFinancials(doc, costs, exchangeRate) {
       ]
     },
     {
-      title: '🚀 Growth Scenarios',
+      title: 'Growth Scenarios',
       text: 'Year 2: +20% volume growth + price appreciation = $680,000–$810,000 revenue. Year 3–5: Compound 15% annually. Diversification into charcoal, fiber, peat compounds growth. Export markets and premium branding unlock 25–30% upside.',
       metrics: [
         { label: 'Year 2 Revenue', value: '$680K–$810K' },
@@ -527,7 +527,7 @@ function createInvestmentStructure(doc) {
 
   const items = [
     {
-      title: '���� Capital Allocation ($280,000)',
+      title: '💵 Capital Allocation ($280,000)',
       text: 'Equipment & machinery: $94,130 (33.6%). Husk, water, oil lines: $83,500 (29.8%). Cold storage & lab: $20,250 (7.3%). Construction: $82,500 (29.5%). Working capital & contingency: $39,250 (14%). No middleman markup. Direct from manufacturer pricing.',
       metrics: [
         { label: 'Equipment', value: '$94,130 (34%)' },
