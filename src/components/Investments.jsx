@@ -317,16 +317,27 @@ export default function Investments({ userId }) {
 
       const data = editData[tab]
 
+      console.log(`[${tab}] Starting save. Original count: ${originalData.length}, Current count: ${data.length}`)
+
       // Delete items that were removed
       const deletedItems = originalData.filter(
         orig => orig.id && !data.find(item => item.id === orig.id)
       )
 
+      if (deletedItems.length > 0) {
+        console.log(`[${tab}] Found ${deletedItems.length} items to delete:`, deletedItems.map(i => ({ id: i.id })))
+      }
+
       for (const item of deletedItems) {
-        const { error } = await supabase
+        console.log(`[${tab}] Deleting item with ID: ${item.id} from table: ${table}`)
+        const { error, data: deleteData } = await supabase
           .from(table)
           .delete()
           .eq('id', item.id)
+          .select()
+
+        console.log(`[${tab}] Delete result:`, { error, deleteData })
+
         if (error) {
           console.error(`Failed deleting item ${item.id}:`, error)
           throw new Error(`Failed to delete item: ${error.message}`)
@@ -336,13 +347,18 @@ export default function Investments({ userId }) {
       // Update or insert items
       for (const item of data) {
         if (item.id) {
-          // Update existing - only send changed fields plus project_id
+          // Update existing - exclude system fields
           const itemToUpdate = { ...item }
+          delete itemToUpdate.created_at
+          delete itemToUpdate.updated_at
 
+          console.log(`[${tab}] Updating item with ID: ${item.id}`, itemToUpdate)
           const { error } = await supabase
             .from(table)
             .update(itemToUpdate)
             .eq('id', item.id)
+            .select()
+
           if (error) {
             console.error(`Failed updating item ${item.id}:`, error)
             throw new Error(`Failed to update item: ${error.message}`)
@@ -354,9 +370,16 @@ export default function Investments({ userId }) {
           )
 
           if (hasContent) {
+            const itemToInsert = { ...item, project_id: selectedProject.id }
+            delete itemToInsert.created_at
+            delete itemToInsert.updated_at
+
+            console.log(`[${tab}] Inserting new item:`, itemToInsert)
             const { error } = await supabase
               .from(table)
-              .insert([{ ...item, project_id: selectedProject.id }])
+              .insert([itemToInsert])
+              .select()
+
             if (error) {
               console.error(`Failed inserting new item:`, error)
               throw new Error(`Failed to add new item: ${error.message}`)
@@ -365,6 +388,7 @@ export default function Investments({ userId }) {
         }
       }
 
+      console.log(`[${tab}] Save completed successfully`)
       setSuccess(`${toTitleCase(tab)} updated successfully`)
       await loadProjectDetails(selectedProject.id)
       setEditMode(prev => ({ ...prev, [tab]: false }))
