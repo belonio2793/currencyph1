@@ -83,15 +83,16 @@ function addValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
 }
 
 function addMultilineValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
-  doc.setFontSize(10)
+  doc.setFontSize(9)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
   doc.text(`${label}:`, xOffset, yPos)
 
   doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'normal')
-  const lines = doc.splitTextToSize(String(value || 'N/A'), CONTENT_WIDTH - 60)
-  doc.text(lines, xOffset + 50, yPos)
+  const valueWidth = Math.max(CONTENT_WIDTH - 55, 40)
+  const lines = doc.splitTextToSize(String(value || 'N/A'), valueWidth)
+  doc.text(lines, xOffset + 45, yPos)
 
   return yPos + (lines.length * 5) + 2
 }
