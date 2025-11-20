@@ -136,7 +136,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           .maybeSingle()
         statusMap[employee.id] = !!data
       } catch (error) {
-        console.error('Error checking registration status:', error)
+        const errorMsg = error?.message || JSON.stringify(error)
+        console.error('Error checking registration status:', errorMsg)
         statusMap[employee.id] = false
       }
     }
@@ -186,7 +187,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       )
       setAttendanceRecords(data)
     } catch (error) {
-      console.error('Error loading attendance:', error)
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error loading attendance:', errorMsg)
     } finally {
       setLoadingAttendance(false)
     }
@@ -197,7 +199,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       const data = await EmployeeManagementService.getMedicalRecords(selectedEmployee.id)
       setMedicalRecords(data)
     } catch (error) {
-      console.error('Error loading medical records:', error)
+      const errorMsg = error?.message || JSON.stringify(error)
+      console.error('Error loading medical records:', errorMsg)
     }
   }
 
