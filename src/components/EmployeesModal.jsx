@@ -38,9 +38,6 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     emergencyContactPhone: ''
   })
 
-  // Attendance states
-  const [attendanceRecords, setAttendanceRecords] = useState([])
-  const [loadingAttendance, setLoadingAttendance] = useState(false)
 
   // Medical records
   const [medicalRecords, setMedicalRecords] = useState([])
