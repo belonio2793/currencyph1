@@ -603,7 +603,7 @@ function addRiskMitigation(doc) {
       yPos = MARGINS.top + 10
     }
 
-    doc.setFillColor(COLORS.lightbg)
+    doc.setFillColor(...COLORS.lightbg)
     doc.rect(MARGINS.left, yPos - 4, CONTENT_WIDTH, 5, 'F')
 
     doc.setFontSize(8)
@@ -724,7 +724,7 @@ function addInvestmentTerms(doc) {
       yPos = MARGINS.top + 10
     }
 
-    doc.setFillColor(idx % 2 === 0 ? COLORS.lightbg : COLORS.white)
+    doc.setFillColor(...(idx % 2 === 0 ? COLORS.lightbg : COLORS.white))
     doc.rect(MARGINS.left, yPos - 3, CONTENT_WIDTH, 7, 'F')
 
     doc.setFontSize(8)
