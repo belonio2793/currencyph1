@@ -397,7 +397,7 @@ function createRisks(doc, risks) {
 
   const items = [
     {
-      title: '🌾 Raw Material Supply (60% probability)',
+      title: 'Raw Material Supply (60% probability)',
       text: 'Risk: Coconut shortage or price spike from weather/drought. Mitigation: (1) Long-term farmer contracts at fixed prices. (2) Build mini-farm or partner with cooperatives. (3) Establish buy-back programs. (4) Maintain 2–4 week inventory buffer.',
       metrics: [
         { label: 'Probability', value: '60%' },
@@ -407,7 +407,7 @@ function createRisks(doc, risks) {
       ]
     },
     {
-      title: '📊 Market Price Volatility (75% probability)',
+      title: 'Market Price Volatility (75% probability)',
       text: 'Risk: Oil, coconut water, peat prices fluctuate with global supply/demand. Mitigation: (1) Diversified revenue base (7 products) smooths exposure. (2) Long-term B2B contracts with manufacturers. (3) Premium branding & organic certification unlock stable pricing. (4) Direct retail channels reduce middleman risk.',
       metrics: [
         { label: 'Probability', value: '75%' },
@@ -417,7 +417,7 @@ function createRisks(doc, risks) {
       ]
     },
     {
-      title: '⚙️ Equipment Downtime (35% probability)',
+      title: 'Equipment Downtime (35% probability)',
       text: 'Risk: Processing equipment failure halts revenue. Mitigation: (1) Preventive maintenance schedule. (2) Spare parts inventory ($3K–5K). (3) Service contract with GENYOND (12-month warranty + 24-month extended). (4) Built-in redundancy for critical lines.',
       metrics: [
         { label: 'Probability', value: '35%' },
@@ -427,7 +427,7 @@ function createRisks(doc, risks) {
       ]
     },
     {
-      title: '📋 Regulatory & Certification (40% probability)',
+      title: 'Regulatory & Certification (40% probability)',
       text: 'Risk: FDA, export, or environmental compliance delays/costs. Mitigation: (1) HACCP program from day 1. (2) On-site lab for quality assurance. (3) Local partnerships with regulators. (4) $5K–10K annual compliance budget. (5) Organic/Fair Trade certifications as competitive moat.',
       metrics: [
         { label: 'Probability', value: '40%' },
@@ -437,7 +437,7 @@ function createRisks(doc, risks) {
       ]
     },
     {
-      title: '💰 Financing & Execution (45% probability)',
+      title: 'Financing & Execution (45% probability)',
       text: 'Risk: Cost overruns or funding delays during construction. Mitigation: (1) Fixed-price equipment contract with GENYOND. (2) Contingency reserve of 7% ($20K) in capex. (3) Phased build: seed equipment first, scale later. (4) Project management by experienced agribusiness operators.',
       metrics: [
         { label: 'Probability', value: '45%' },
