@@ -267,13 +267,14 @@ export default function Investments({ userId }) {
     }
   }
 
-  async function saveProjectDescription() {
+  async function saveProjectDescription(description = null) {
     if (!selectedProject) return
     setSaving(true)
     try {
+      const descToSave = description !== null ? description : editingDescription
       const { error } = await supabase
         .from('projects')
-        .update({ long_description: editingDescription })
+        .update({ long_description: descToSave })
         .eq('id', selectedProject.id)
 
       if (error) throw error
