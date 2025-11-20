@@ -505,9 +505,7 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
 }
 
 export function generateComprehensiveProjectPdf(project, equipment, suppliers, partnerships, costs, production, revenues, milestones, risks, metrics) {
-  const doc = new jsPDF()
-  const pageHeight = doc.internal.pageSize.getHeight()
-  const pageWidth = doc.internal.pageSize.getWidth()
+  const doc = new jsPDF('p', 'mm', 'a4')
 
   let yPos = MARGINS.top + 10
 
