@@ -32,7 +32,8 @@ export const employeeMessagingService = {
       if (insertError) throw insertError
       return { data: newChannel, error: null }
     } catch (err) {
-      console.error('[employeeMessagingService] getOrCreateChatChannel failed:', err)
+      const errorMsg = err?.message || JSON.stringify(err)
+      console.error('[employeeMessagingService] getOrCreateChatChannel failed:', errorMsg)
       return { data: null, error: err }
     }
   },
