@@ -688,7 +688,7 @@ export default function Investments({ userId }) {
                             </div>
                             <div className="flex justify-between items-center pt-3 border-t border-slate-200">
                               <div className="text-sm font-medium text-slate-900">
-                                Total: ${((eq.unit_cost_usd || 0) * (eq.quantity || 1)).toLocaleString()}
+                                Total: {formatPhp((eq.unit_cost_php || phpToUsd(eq.unit_cost_usd || 0, exchangeRate)) * (eq.quantity || 1))} ({formatUsd(((eq.unit_cost_usd || 0) * (eq.quantity || 1)))})
                               </div>
                               <button
                                 onClick={() => {
