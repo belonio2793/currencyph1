@@ -29,6 +29,17 @@ export default function Investments({ userId }) {
   const [success, setSuccess] = useState('')
   const [wallets, setWallets] = useState([])
 
+  // Extended project details
+  const [projectEquipment, setProjectEquipment] = useState([])
+  const [projectSuppliers, setProjectSuppliers] = useState([])
+  const [projectCosts, setProjectCosts] = useState([])
+  const [productionCapacity, setProductionCapacity] = useState([])
+  const [revenueForecast, setRevenueForecast] = useState([])
+  const [projectMilestones, setProjectMilestones] = useState([])
+  const [riskAssessment, setRiskAssessment] = useState([])
+  const [financialMetrics, setFinancialMetrics] = useState([])
+  const [detailTab, setDetailTab] = useState('overview')
+
   useEffect(() => {
     loadProjects()
     loadWallets()
