@@ -117,7 +117,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           statusMap[employee.id] = 'offline'
         }
       } catch (error) {
-        console.error('Error loading user status:', error)
+        const errorMsg = error?.message || JSON.stringify(error)
+        console.error('Error loading user status:', errorMsg)
         statusMap[employee.id] = 'offline'
       }
     }
