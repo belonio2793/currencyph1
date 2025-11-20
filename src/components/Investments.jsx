@@ -277,6 +277,7 @@ export default function Investments({ userId }) {
   async function saveChanges(tab) {
     if (!selectedProject) return
     setSaving(true)
+    setError('')
     try {
       const table = {
         equipment: 'project_equipment',
@@ -309,38 +310,56 @@ export default function Investments({ userId }) {
       const deletedItems = originalData.filter(
         orig => orig.id && !data.find(item => item.id === orig.id)
       )
+
       for (const item of deletedItems) {
         const { error } = await supabase
           .from(table)
           .delete()
           .eq('id', item.id)
-        if (error) throw error
+        if (error) {
+          console.error(`Failed deleting item ${item.id}:`, error)
+          throw new Error(`Failed to delete item: ${error.message}`)
+        }
       }
 
       // Update or insert items
       for (const item of data) {
         if (item.id) {
-          // Update existing
+          // Update existing - only send changed fields plus project_id
+          const itemToUpdate = { ...item }
+
           const { error } = await supabase
             .from(table)
-            .update(item)
+            .update(itemToUpdate)
             .eq('id', item.id)
-          if (error) throw error
-        } else if (Object.keys(item).length > 0) {
-          // Insert new
-          const { error } = await supabase
-            .from(table)
-            .insert([{ ...item, project_id: selectedProject.id }])
-          if (error) throw error
+          if (error) {
+            console.error(`Failed updating item ${item.id}:`, error)
+            throw new Error(`Failed to update item: ${error.message}`)
+          }
+        } else {
+          // Insert new - need at least one field besides project_id
+          const hasContent = Object.entries(item).some(([key, value]) =>
+            key !== 'id' && key !== 'created_at' && key !== 'updated_at' && value !== null && value !== ''
+          )
+
+          if (hasContent) {
+            const { error } = await supabase
+              .from(table)
+              .insert([{ ...item, project_id: selectedProject.id }])
+            if (error) {
+              console.error(`Failed inserting new item:`, error)
+              throw new Error(`Failed to add new item: ${error.message}`)
+            }
+          }
         }
       }
 
-      setSuccess(`${tab} updated successfully`)
+      setSuccess(`${toTitleCase(tab)} updated successfully`)
       await loadProjectDetails(selectedProject.id)
-      toggleEditMode(tab)
+      setEditMode(prev => ({ ...prev, [tab]: false }))
     } catch (err) {
       console.error(`Failed saving ${tab}:`, err)
-      setError(`Failed to save ${tab}: ${err.message}`)
+      setError(`Failed to save ${toTitleCase(tab)}: ${err.message}`)
     } finally {
       setSaving(false)
     }
