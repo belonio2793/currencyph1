@@ -241,6 +241,9 @@ export default function Investments({ userId }) {
         case 'suppliers':
           setEditData(prev => ({ ...prev, suppliers: JSON.parse(JSON.stringify(projectSuppliers)) }))
           break
+        case 'partnerships':
+          setEditData(prev => ({ ...prev, partnerships: JSON.parse(JSON.stringify(projectPartners)) }))
+          break
         case 'costs':
           setEditData(prev => ({ ...prev, costs: JSON.parse(JSON.stringify(projectCosts)) }))
           break
