@@ -1,42 +1,123 @@
-# Currency.ph - Community Crowdfunding Platform
+# Currency.ph - Your Complete Financial Ecosystem for Asia
 
-## 🌏 Overview
+## What is Currency.ph?
 
-**Currency.ph** is a minimalist, community-oriented, tokenized cryptocurrency crowdfunding platform for Asia-only operations. It enables users to contribute fiat funds (PHP) via mobile payment methods (GCash, Maya), view real-time cryptocurrency balances, and participate in community-driven projects with transparent ownership allocation.
+**Currency.ph** is a community-driven, all-in-one financial and social platform built for the Philippines and Asia. It's not just about money—it's about giving people real tools to earn, invest, connect, and build better lives together.
 
-### Core Features
-- ✅ **Add Funds**: GCash, Maya, Bank Card payments (Philippines-focused)
-- ✅ **Real-time Balances**: PHP, BTC, ETH, CPH tokens (live conversion)
-- ✅ **Community Projects**: Browse, contribute, and vote on creative/social initiatives
-- ✅ **Tokenized Ownership**: ERC-1404 tokens on Polygon blockchain
-- ✅ **Transparent Ledger**: Public transaction history for full transparency
-- ✅ **Non-Profit Model**: Tax-deductible contributions, no guaranteed returns
-- ✅ **Community Voting**: Consensus-based project approval (token-weighted)
-- ✅ **Asia-Only**: Geofenced to Philippines, Indonesia, Malaysia, Thailand, Vietnam, Singapore, Taiwan
+We put **you** in control. No corporate middlemen deciding what you can do with your finances. No hidden fees. Just honest, transparent, peer-to-peer services that actually work for regular people.
 
 ---
 
-## 🚀 Quick Start
+## What Can You Do Here?
+
+### Money & Wallets
+- Send money to anyone, anytime
+- Manage multiple wallets in different currencies (PHP, BTC, ETH, and more)
+- See real-time balances and currency conversion
+- Track every transaction with a complete, transparent history
+- Pay bills directly from your wallet
+- Never worry about losing track of your money
+
+### Earn Money
+- **Find work**: Browse thousands of job listings from local businesses
+- **Drive or ride**: Join the ride-sharing network and earn per trip or find a ride home
+- **Lend money**: Become a lender in our P2P loan marketplace and earn interest on your money
+- **Build a business**: Create a business profile, manage employees, and track inventory and equipment
+- **Invest in projects**: Support community projects and initiatives that matter to you
+
+### Borrow When You Need It
+- Request loans from real people, not banks
+- Compare loan offers from different lenders
+- Transparent terms, clear payment schedules
+- Peer-to-peer lending without the bank's bureaucracy
+
+### Buy & Sell Services
+- Discover local businesses, restaurants, attractions, and services near you
+- Browse a complete map of everything around you with real photos and reviews
+- List your own services and attract customers
+- Support local commerce, not corporate chains
+
+### Connect & Chat
+- Message anyone on the platform
+- See who's online right now
+- Build your reputation through real feedback from real people
+- Join communities with shared interests
+
+### Have Fun (And Maybe Win)
+- Play poker with real people, real stakes
+- Play chess with players from across Asia
+- Trade cryptocurrencies with real-time dashboards
+- Gamify your finances—make earning and investing fun
+
+### Track Everything
+- Network balances show you what you own across all wallets
+- Complete audit trail of every transaction
+- Digital receipts for all payments
+- Total visibility into your financial life
+
+---
+
+## Why Currency.ph is Different
+
+**Built for Asia, not Silicon Valley**
+- Works with GCash, Maya, bank cards—payment methods that Asians actually use
+- Available in the Philippines, Indonesia, Malaysia, Thailand, Vietnam, Singapore, and Taiwan
+- Built by people who understand Asian markets
+
+**Actually Peer-to-Peer**
+- No corporation taking a cut of your transactions (well, we need small fees to keep the lights on, but nothing greedy)
+- Real people lending to real people
+- Real people hiring real people
+- Real people buying from real people
+
+**Transparent**
+- Every transaction logged and visible
+- No hidden fees or surprise charges
+- Real-time updates, no delays
+- Public ledger for all to see
+
+**Mobile-First**
+- Works seamlessly on your phone
+- Designed for people with spotty internet
+- Fast, responsive, reliable
+- Works online and offline
+
+**Secure & Trustworthy**
+- Your data is encrypted with military-grade security
+- Blockchain-based smart contracts for transactions
+- Multi-wallet support for maximum control
+- Two-factor authentication and verification systems
+- DIDIT integration for identity verification
+
+---
+
+## Getting Started
+
+### Quick Setup
+1. **Sign up** with your email or Google account
+2. **Add money** via GCash, Maya, or bank transfer
+3. **Start using**: Send money, find jobs, discover businesses, connect with people
+4. No minimum balance. No monthly fees. No nonsense.
 
 ### Prerequisites
-- Node.js 16+ or Yarn 1.22+
-- Modern web browser (Chrome, Firefox, Safari, Edge)
-- Supabase account (free): https://supabase.com
+- Node.js 16+ (for development)
+- Modern web browser
+- A Supabase account (free) if you want to host your own
 
 ### Installation
 ```bash
-# 1. Clone repository
+# Clone the repository
 git clone https://github.com/your-org/currency-ph.git
 cd currency-ph
 
-# 2. Install dependencies
+# Install dependencies
 yarn install
 
-# 3. Set up environment variables
+# Set up environment variables
 cp .env.example .env.local
-# Edit .env.local with your Supabase credentials
+# Fill in your Supabase and API keys
 
-# 4. Start development server
+# Start the development server
 yarn dev
 ```
 
@@ -44,368 +125,381 @@ Visit `http://localhost:3000` in your browser.
 
 ---
 
-## 📁 Project Structure
+## Platform Features at a Glance
+
+| Feature | What You Get | Use It For |
+|---------|-------------|-----------|
+| **Wallet** | Multi-currency storage | Store PHP, crypto, and more |
+| **Send Money** | Instant transfers | Pay friends, family, businesses |
+| **Deposits** | Add funds easily | GCash, Maya, bank cards |
+| **Bill Payments** | Pay from your wallet | Utilities, subscriptions, anything |
+| **Jobs** | Browse & post jobs | Find work or hire workers |
+| **Rides** | Share transportation | Earn by driving or save by sharing |
+| **Loans** | Peer-to-peer lending | Borrow from or lend to people |
+| **Nearby** | Discover local businesses | Find restaurants, shops, services |
+| **Business Profile** | Go digital | Manage your business online |
+| **Chat** | Connect with others | Message anyone, build relationships |
+| **Trading** | Real-time crypto | Manage portfolios and trade |
+| **Games** | Poker & Chess | Play for fun or for stakes |
+| **Network** | See all your balances | Track multiple wallets at once |
+| **Receipts** | Digital proof | Save every transaction |
+
+---
+
+## Project Structure
 
 ```
 currency-ph/
 ├── src/
-│   ├── components/           # React components (Header, AddFunds, Balance, etc.)
-│   ├── lib/
-│   │   └── supabaseClient.js # Supabase integration + API utilities
-│   ├── hooks/                # Custom React hooks (future)
-│   ├── App.jsx               # Main app component
-│   └── main.jsx              # React entry point
-├── docs/
-│   ├── ARCHITECTURE.md       # System architecture + tech stack
-│   ├── SUPABASE_SCHEMA.md    # Database schema + setup
-│   ├─�� API_INTEGRATION.md    # Payment + crypto API setup
-│   ├── POLYGON_SETUP.md      # Smart contract deployment
-│   └── STAGING_SETUP.md      # Step-by-step staging guide
-├── index.html                # HTML entry point
+│   ├── components/           # All the UI (130+ React components)
+│   ├── lib/                  # Helpers (wallets, chat, sync, auth)
+│   ├── styles/               # CSS and theming
+│   ├── App.jsx               # Main app router
+│   └── main.jsx              # Entry point
+├── supabase/
+│   └── functions/            # Serverless functions (photo scraping, syncing, wallets)
+├── scripts/                  # Data processing and population scripts
+├── docs/                     # Detailed documentation
 ├── package.json              # Dependencies
-├── vite.config.js            # Vite configuration
-├── tailwind.config.js        # Tailwind CSS config
+├── vite.config.js            # Build configuration
+├── tailwind.config.js        # Styling configuration
 └── .env.example              # Environment variables template
 ```
 
 ---
 
-## �� Configuration
+## Configuration
 
-### Environment Variables
-Create `.env.local` from `.env.example` and fill in:
+### Required Environment Variables
 
 ```bash
-# Supabase
+# Supabase (your backend)
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
-# Payment APIs (Staging)
-VITE_GCASH_SANDBOX_URL=https://sandbox.dragonpay.com
-VITE_STRIPE_PUBLIC_KEY=pk_test_...
+# Payments
+VITE_COINSPH_API_KEY=your-coinsph-key
+VITE_COINSPH_API_SECRET=your-coinsph-secret
 
-# Crypto APIs
-VITE_OANDA_API_KEY=your-oanda-token
-VITE_ABSTRACTAPI_KEY=your-abstractapi-key
+# Maps & Location
+VITE_MAPTILER_API_KEY=your-maptiler-key
+VITE_GOOGLE_API_KEY=your-google-api-key
 
-# Polygon (Mumbai testnet for staging)
-VITE_POLYGON_RPC_URL=https://rpc-mumbai.maticvigil.com
+# Crypto & Exchange Rates
+VITE_OPEN_EXCHANGE_RATES_API=your-exchange-rates-key
+VITE_X_API_KEY=your-grok-api-key
+
+# DIDIT Verification
+VITE_DIDIT_APP_ID=your-didit-app-id
+VITE_DIDIT_API_KEY=your-didit-api-key
+VITE_DIDIT_WORKFLOW_ID=your-didit-workflow-id
 ```
 
----
-
-## 📚 Documentation
-
-- **[Architecture Guide](./docs/ARCHITECTURE.md)**: System design, tech stack, data flow
-- **[Supabase Setup](./docs/SUPABASE_SCHEMA.md)**: Database schema, tables, real-time subscriptions
-- **[API Integration](./docs/API_INTEGRATION.md)**: Payment, crypto, geofencing APIs
-- **[Polygon Setup](./docs/POLYGON_SETUP.md)**: Smart contract deployment (ERC-1404)
-- **[Staging Guide](./docs/STAGING_SETUP.md)**: Step-by-step environment setup
+All keys should be kept **private** and never committed to git. Use `.env.local` for local development.
 
 ---
 
-## 🛠️ Development
+## Development
 
 ### Available Commands
 ```bash
-yarn dev        # Start development server (http://localhost:3000)
-yarn build      # Build for production
-yarn preview    # Preview production build locally
-```
+yarn dev              # Start development server (localhost:3000)
+yarn build            # Build for production
+yarn preview          # Preview production build locally
+yarn test             # Run tests
 
-### Code Style
-- **Formatting**: Prettier (automatic via pre-commit hooks, future)
-- **Linting**: ESLint for React (future)
-- **CSS**: Tailwind CSS utilities (no custom CSS unless necessary)
-
-### Component Structure
-```javascript
-// Example component (src/components/MyComponent.jsx)
-export default function MyComponent({ prop1, prop2 }) {
-  return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">{prop1}</h1>
-      <p className="text-gray-600">{prop2}</p>
-    </div>
-  );
-}
+# Data management
+yarn fetch-tripadvisor      # Fetch restaurant/venue data
+yarn fetch-all-cities       # Populate listings for all cities
+yarn populate-nearby        # Add nearby locations
+yarn import-photos          # Download and import photos
 ```
 
 ---
 
-## 🌐 Deployment
+## Technology Stack
 
-### Staging (Free Tier)
+- **Frontend**: React 18 + Vite (blazingly fast)
+- **Backend**: Supabase (PostgreSQL + real-time subscriptions)
+- **Maps**: MapTiler + Google Maps + Leaflet
+- **Crypto**: Ethers.js + Polygon blockchain
+- **Styling**: Tailwind CSS
+- **Database**: PostgreSQL (via Supabase)
+- **Real-time**: Supabase subscriptions
+- **Authentication**: Supabase Auth + JWT
+
+---
+
+## Security & Privacy
+
+**We take your security seriously.** Here's what we do:
+
+- **Encryption**: TLS 1.3 for all data in transit
+- **Database Security**: Row-Level Security (RLS) on all tables
+- **Smart Contracts**: ERC-1404 tokens with transfer restrictions
+- **Verification**: DIDIT identity verification integration
+- **Audit Logs**: Every transaction is logged and traceable
+- **No third-party tracking**: Your data is yours
+- **Open source**: Anyone can audit the code
+
+---
+
+## Supported Countries
+
+**We operate in Asia:**
+- Philippines (Home base)
+- Indonesia
+- Malaysia
+- Thailand
+- Vietnam
+- Singapore
+- Taiwan
+
+*Other regions are blocked for compliance reasons.*
+
+---
+
+## Troubleshooting
+
+### Balance Not Updating?
+1. Check the browser console for errors
+2. Make sure Supabase credentials are correct in `.env.local`
+3. Try a hard refresh: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
+4. Check your internet connection
+
+### Can't Add Funds?
+1. Verify your payment method is active
+2. Check if your region is supported
+3. Look at the browser's Network tab for error details
+4. Ensure you're using a supported payment provider
+
+### Crypto Rates Not Showing?
+1. Check your API keys in `.env.local`
+2. Make sure your API hasn't hit rate limits
+3. Look at browser console for errors
+4. Try refreshing the page
+
+### Chat Not Working?
+1. Ensure real-time subscriptions are enabled in Supabase
+2. Check your internet connection
+3. Try signing out and back in
+4. Check Supabase logs for connection issues
+
+---
+
+## How to Contribute
+
+We're building this together. All contributions are welcome.
+
+### Report a Bug
+1. Check if someone already reported it (GitHub Issues)
+2. Create a new issue with:
+   - Steps to reproduce the problem
+   - Screenshot or error message
+   - Your browser and device
+3. Tag it as `bug`
+
+### Request a Feature
+1. Check if someone already asked for it
+2. Describe your use case
+3. Explain why it would help
+4. Tag it as `enhancement`
+
+### Contribute Code
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/my-feature`
+3. Make your changes
+4. Commit: `git commit -m "feat: add my feature"`
+5. Push: `git push origin feature/my-feature`
+6. Create a pull request with a clear description
+
+**Code Style:**
+- Use Tailwind CSS for styling (no inline styles)
+- Keep components small and focused
+- Write clear variable names
+- Comment complex logic
+
+---
+
+## Documentation
+
+- **[Architecture Guide](./docs/ARCHITECTURE.md)** - How the system works
+- **[API Integration](./docs/API_INTEGRATION.md)** - Payment and crypto APIs
+- **[Supabase Setup](./docs/SUPABASE_SCHEMA.md)** - Database schema
+- **[Polygon Setup](./docs/POLYGON_SETUP.md)** - Smart contracts
+- **[Maps & APIs](./docs/PLAY_CURRENCY_GOOGLE_APIS.md)** - Real-world mapping
+
+---
+
+## Roadmap
+
+### Now (Completed)
+- Multi-currency wallets ✓
+- Job marketplace ✓
+- Peer-to-peer loans ✓
+- Ride-sharing ✓
+- Business profiles ✓
+- Local listings & maps ✓
+- Chat & messaging ✓
+- Games (Poker, Chess) ✓
+- Trading dashboard ✓
+- Receipt management ✓
+
+### Next (In Progress)
+- Enhanced verification systems
+- Advanced trading features
+- Mobile app (React Native)
+- More payment methods
+- Regional expansion
+
+### Future (Coming Soon)
+- NFT marketplace for projects
+- DAO governance
+- API access for partners
+- White-label solutions
+- Desktop app
+
+---
+
+## Deployment
+
+### Local Development
 ```bash
-# Deploy frontend to Netlify
+yarn dev
+# Opens http://localhost:3000
+```
+
+### Deploy to Netlify
+```bash
 netlify deploy --prod
-
-# Backend automatically deployed via Supabase (free tier)
 ```
 
-### Production
-1. Upgrade Supabase to paid tier (database backups, higher limits)
-2. Deploy to custom domain via Netlify
-3. Deploy smart contracts to Polygon mainnet
-4. Enable Cloudflare for DDoS protection + geofencing
+### Deploy to Your Own Server
+1. Build the project: `yarn build`
+2. Serve the `dist/` folder
+3. Set up backend on Supabase
 
 ---
 
-## 💰 Payment Methods
+## Support
 
-| Method | Min Amount | Status | Sandbox |
-|--------|-----------|--------|---------|
-| GCash | ₱500 | ✅ Ready | Dragonpay |
-| Maya | ₱500 | ✅ Ready | Stripe |
-| Bank Card | ₱1,000 | ✅ Ready | Stripe |
-| Crypto | 0.001 BTC | 🔜 Coming | Polygon |
-
----
-
-## 🔐 Security
-
-**Style guide — No emojis in code or UI**
-
-Please avoid using emoji characters in source files (components, docs, UI text). Emojis cause inconsistent rendering across platforms and complicate accessibility. Use icons, SVGs, or CSS classes for visual indicators instead.
-
-
-- **Authentication**: Supabase Auth (JWT) + MetaMask Web3 wallet
-- **Data Protection**: TLS 1.3 encryption, Row-Level Security (RLS) on database
-- **Smart Contracts**: ERC-1404 transfer restrictions, community-audited code
-- **Geofencing**: IP-based region filtering (Asia-only)
-- **Audit Logs**: All transactions logged for transparency
-
----
-
-## 🌏 Supported Regions
-
-**Asia-Only Operations**:
-- 🇵🇭 Philippines (Primary)
-- 🇮🇩 Indonesia
-- 🇲🇾 Malaysia
-- 🇹🇭 Thailand
-- 🇻🇳 Vietnam
-- 🇸🇬 Singapore
-- 🇹🇼 Taiwan
-
-*Other regions blocked via IP geofencing.*
-
----
-
-## 📊 Project Ownership Model
-
-### Example: Art Installation Project
-- **Goal**: ₱1,000,000
-- **Ownership Available**: 20% to funders
-- **Min Contribution**: ₱500 (0.2% stake)
-- **Benefits**:
-  - Art NFT (limited edition)
-  - Community credits (future purchases)
-  - Voting rights on project decisions
-- **Tax Write-off**: Contributions are tax-deductible (non-profit)
-
----
-
-## 🗳️ Community Voting
-
-### How It Works
-1. **Vote to Support**: Token-weighted consensus
-2. **Threshold**: >50% "Support" votes approves project
-3. **Transparency**: Public vote counts, anonymous users
-4. **Execution**: Community decides funding based on consensus
-
----
-
-## 🔄 Real-time Updates
-
-All balance and project data updates in real-time via Supabase subscriptions:
-
-```javascript
-// Example: Real-time balance updates
-supabase
-  .from('users:id=eq.user-123')
-  .on('UPDATE', payload => {
-    console.log('Balance updated:', payload.new);
-  })
-  .subscribe();
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Balance Not Updating
-1. Check browser console for errors
-2. Verify Supabase credentials in `.env.local`
-3. Ensure real-time subscriptions are enabled in Supabase
-4. Try hard refresh: `Ctrl+Shift+R` (Windows) or `Cmd+Shift+R` (Mac)
-
-### Payment Fails
-1. Check sandbox credentials match API provider
-2. Verify IP geofencing isn't blocking your region
-3. Check Supabase edge function logs
-4. Review browser DevTools → Network tab
-
-### Crypto Rates Not Displaying
-1. Verify OANDA/AbstractAPI keys are correct
-2. Check API rate limits (free tier has limits)
-3. Look at browser console for HTTP errors
-4. Implement caching to reduce API calls
-
-### Smart Contract Issues (Future)
-1. Verify contract deployed to correct network (Mumbai testnet)
-2. Check contract address whitelisted in Supabase
-3. Ensure Web3 wallet connected (MetaMask)
-4. Review contract audit report
-
----
-
-## 📝 Contributing
-
-### Bug Reports
-1. Check [GitHub Issues](https://github.com/your-org/currency-ph/issues)
-2. Provide steps to reproduce
-3. Include screenshot/error message
-4. Tag as `bug` or `help wanted`
-
-### Feature Requests
-1. Check existing issues first
-2. Describe use case and expected behavior
-3. Tag as `enhancement`
-4. Wait for community feedback
-
-### Code Contributions
-1. Fork repository
-2. Create feature branch: `git checkout -b feature/my-feature`
-3. Commit changes: `git commit -m "feat: add my feature"`
-4. Push to branch: `git push origin feature/my-feature`
-5. Create pull request with description
-
----
-
-## 📄 License
-
-[Add your chosen license here - MIT, Apache 2.0, GPL 3.0, etc.]
-
----
-
-## 🙏 Acknowledgments
-
-- **Supabase**: Backend database + real-time subscriptions
-- **React**: Frontend framework
-- **Tailwind CSS**: Styling
-- **Polygon**: Blockchain infrastructure
-- **GCash/Stripe**: Payment processing
-- **Community**: Feedback, testing, governance
-
----
-
-## 📞 Support
-
-- **Documentation**: See `/docs` folder
-- **GitHub Issues**: Report bugs and request features
+- **Documentation**: Check the `/docs` folder
+- **Issues**: Report bugs on GitHub
 - **Email**: support@currency.ph (future)
-- **Discord**: Join community server (future)
+- **Discord**: Join our community (future)
+- **Twitter**: @currency_ph (future)
 
 ---
 
-## 🚀 Roadmap
+## License
 
-### Phase 1: Staging (Current)
-- [x] Frontend UI with React + Tailwind
-- [x] Supabase database setup
-- [ ] Payment API integration (GCash, Stripe)
-- [ ] Real-time balance + rate conversion
-- [ ] Polygon Mumbai testnet deployment
-
-### Phase 2: Production
-- [ ] Polygon mainnet deployment
-- [ ] Compliance review + non-profit registration
-- [ ] Community campaigns (Twitter, Discord)
-- [ ] Mobile app (React Native)
-
-### Phase 3: Scale
-- [ ] Regional expansion (10K+ users)
-- [ ] Additional payment methods (crypto, bank transfer)
-- [ ] NFT marketplace for project benefits
-- [ ] DAO governance (Aragon)
+[Your chosen license - MIT, Apache 2.0, GPL 3.0, etc.]
 
 ---
 
-## 💡 Vision
+## Acknowledgments
 
-Currency.ph is building a transparent, community-driven investment platform for ambitious creative and social projects across Asia. We believe in:
+This wouldn't exist without:
 
-- **Transparency**: Public ledger-based financial reporting
-- **Community**: Decisions made via consensus, not centralized governance
-- **Impact**: Support for art, social ventures, tech education without guaranteed financial returns
-- **Accessibility**: Mobile-first for underserved communities
-- **Non-Profit**: Tax-deductible contributions supporting meaningful work
+- **Supabase** - Backend database and real-time subscriptions
+- **React** - Frontend framework
+- **Tailwind CSS** - Beautiful styling
+- **Polygon** - Blockchain infrastructure
+- **Stripe** - Payment processing
+- **GCash & Maya** - Mobile payments
+- **Our community** - Testing, feedback, and making this real
 
 ---
 
-**Made with ❤️ for the Asian creative community.**
+## The Vision
+
+**Currency.ph is for people who want control.**
+
+Control over your money. Control over your work. Control over how you invest. Control over who you connect with.
+
+We're building a financial system that works for regular people—not just the rich, not just the tech-savvy, not just those with passports to developed countries.
+
+A system where:
+- A jeepney driver can loan money to a student and earn interest
+- A small business owner can hire workers without a corporate middleman
+- A young person can invest in a friend's dream without a bank saying no
+- Anyone can send money to anyone else instantly, for almost nothing
+- Trust and reputation mean something
+
+We're not perfect. We make mistakes. But we're trying. We're learning. And we're doing it in the open.
+
+**Join us.**
+
+---
+
+**Made with love for the people of Asia.**
 
 ---
 
 ## Quick Links
 
-- 🌐 Website: https://currency.ph (future)
-- 📖 Docs: https://docs.currency.ph (future)
-- 💬 Discord: https://discord.gg/currency-ph (future)
-- 🐦 Twitter: https://twitter.com/currency_ph (future)
-- 🔗 Polygon: Mumbai testnet / Mainnet (future)
+- 🌍 **Website**: https://currency.ph (coming soon)
+- 📚 **Documentation**: See `/docs` folder
+- 💬 **Community**: Join our Discord (coming soon)
+- 🐦 **Twitter**: @currency_ph
+- 🔗 **Blockchain**: Polygon (Mumbai testnet / Mainnet)
+- 🚀 **GitHub**: This repository
 
 ---
 
 ## Environment Setup Checklist
 
+Before you start:
+
 - [ ] Node.js 16+ installed
-- [ ] Supabase account created + project initialized
-- [ ] `.env.local` configured with Supabase credentials
+- [ ] Supabase account created (free)
+- [ ] `.env.local` file created with all keys
 - [ ] Dependencies installed: `yarn install`
 - [ ] Dev server running: `yarn dev`
-- [ ] Open http://localhost:3000 in browser
-- [ ] Test components render without errors
+- [ ] Can see the app at http://localhost:3000
+- [ ] Can create an account and sign in
 
 ---
 
 ## What's Next?
 
-Start with the **[Architecture Guide](./docs/ARCHITECTURE.md)** to understand the system design, then follow the **[Supabase Setup](./docs/SUPABASE_SCHEMA.md)** to initialize your database.
-
-Happy building! 🚀
+1. **Read the [Architecture Guide](./docs/ARCHITECTURE.md)** to understand how everything works
+2. **Set up [Supabase](./docs/SUPABASE_SCHEMA.md)** for your database
+3. **Configure your [API keys](./docs/API_INTEGRATION.md)** for payments and maps
+4. **Start the development server**: `yarn dev`
+5. **Explore the app** and find the features you want to work on
 
 ---
 
-## 🗺️ Real-world mapping & Google APIs
+## Real-World Maps & Location Features
 
-This project supports building a playable real-world map of the Philippines using MapTiler (satellite tiles) and Google Maps / Street View panoramas. Add the following keys to your environment file (use `.env.template` as a starter):
+Currency.ph includes a real-world map of the Philippines using:
 
-Required env variables (add to `.env.local` or your host environment):
+- **MapTiler** for satellite imagery
+- **Google Maps** and **Street View** for panoramas
+- **Local business data** from TripAdvisor and custom sources
+- **Real-time POI updates** via Supabase
 
-- VITE_MAPTILER_KEY — MapTiler API key (satellite tiles)
-- VITE_GOOGLE_API_KEY — Google Maps / Street View API key
-- VITE_SUPABASE_URL — Supabase project URL (for POIs and metadata)
-- VITE_SUPABASE_ANON_KEY — Supabase anon key
-- VITE_SUPABASE_SERVICE_ROLE_KEY — (optional) Supabase service role key for server-side tasks
+### Set Up Maps
 
-Notes:
-- Do NOT commit real API keys to the repository. Use `.env.local` or your CI/secrets manager.
-- Street View coverage varies by location; the app falls back to satellite tiles when no panorama is available.
+Add these keys to `.env.local`:
 
-Quick setup:
+```bash
+VITE_MAPTILER_API_KEY=your-key-here
+VITE_GOOGLE_API_KEY=your-key-here
+VITE_SUPABASE_URL=your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
 
-1. Copy `.env.template` to `.env.local` and fill keys.
+Then:
 
-   cp .env.template .env.local
+1. Start dev server: `yarn dev`
+2. Click the "Nearby" button
+3. Use "Street View" (top-right) to see panoramas when available
 
-2. Start dev server:
+See **[Maps & APIs Documentation](./docs/PLAY_CURRENCY_GOOGLE_APIS.md)** for details.
 
-   yarn dev
+---
 
-3. Open the Play view and use the "Street View" button (top-right) when zoomed in to preview available panoramas.
-
-See docs/PLAY_CURRENCY_GOOGLE_APIS.md for the detailed API plan and phased rollout.
-
-Happy building! 🚀
+**Let's build something amazing together. We're just getting started.** 🚀
