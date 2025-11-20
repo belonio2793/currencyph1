@@ -488,11 +488,12 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
     yPos = checkAndAddPage(doc, yPos, 40)
   }
   
-  // ===== FOOTER =====
-  doc.setFontSize(8)
-  doc.setTextColor(...COLORS.textLight)
-  doc.text(`Generated on ${new Date().toLocaleDateString()}`, 20, pageHeight - 10)
-  doc.text(`Project: ${project.name}`, pageWidth - 60, pageHeight - 10)
-  
+  // Add footer to all pages
+  const totalPages = doc.internal.getNumberOfPages()
+  for (let i = 1; i <= totalPages; i++) {
+    doc.setPage(i)
+    addPageFooter(doc)
+  }
+
   return doc
 }
