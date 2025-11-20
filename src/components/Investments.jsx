@@ -1050,8 +1050,8 @@ export default function Investments({ userId }) {
                       <div key={mile.id} className="p-4 border border-slate-200 rounded-lg">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <div className="font-semibold text-slate-900">{mile.milestone_name}</div>
-                            <div className="text-xs text-slate-600 mt-1">{mile.milestone_type}</div>
+                            <div className="font-semibold text-slate-900">{toTitleCase(mile.milestone_name) || mile.milestone_name}</div>
+                            <div className="text-xs text-slate-600 mt-1">{toTitleCase(mile.milestone_type) || mile.milestone_type}</div>
                           </div>
                           <div className={`px-2 py-1 rounded text-xs font-medium ${
                             mile.status === 'completed' ? 'bg-slate-200 text-slate-700' :
