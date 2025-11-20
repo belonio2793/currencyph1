@@ -18,35 +18,51 @@ const getEnv = (name) => {
   return undefined
 }
 
-// Enhanced fetch wrapper with better error logging
+// Enhanced fetch wrapper with retry logic for network errors
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
 let _fetchWrapper = originalFetch
 
 if (typeof window !== 'undefined') {
   window.fetch = function(...args) {
     const [url, options] = args
+    const MAX_RETRIES = 2
+    let retryCount = 0
 
-    return originalFetch.apply(this, args).catch(err => {
-      // Log network errors with diagnostics
-      const isSupabaseUrl = typeof url === 'string' && url.includes('supabase')
-      const isHealthCheck = typeof url === 'string' && url.includes('/auth/v1/health')
+    const attemptFetch = () => {
+      return originalFetch.apply(this, args).catch(async (err) => {
+        // Log network errors with diagnostics
+        const isSupabaseUrl = typeof url === 'string' && url.includes('supabase')
+        const isHealthCheck = typeof url === 'string' && url.includes('/auth/v1/health')
 
-      if (isSupabaseUrl && !isHealthCheck) {
-        console.warn('[supabase-fetch-error]', {
-          url: typeof url === 'string' ? url.split('?')[0] : url,
-          error: err?.message,
-          type: err?.name,
-          timestamp: new Date().toISOString()
-        })
-      }
+        if (isSupabaseUrl && !isHealthCheck) {
+          console.warn('[supabase-fetch-error]', {
+            url: typeof url === 'string' ? url.split('?')[0] : url,
+            error: err?.message,
+            type: err?.name,
+            attempt: retryCount + 1,
+            timestamp: new Date().toISOString()
+          })
+        }
 
-      if (isHealthCheck) {
-        console.debug('[supabase-health-check-error]', err?.message)
+        // Retry on network errors (Failed to fetch, etc.)
+        if (isSupabaseUrl && !isHealthCheck && retryCount < MAX_RETRIES && err?.message?.includes('Failed to fetch')) {
+          retryCount++
+          console.debug(`[supabase-fetch-retry] Retrying ${retryCount}/${MAX_RETRIES}...`)
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 300 * retryCount))
+          return attemptFetch()
+        }
+
+        if (isHealthCheck) {
+          console.debug('[supabase-health-check-error]', err?.message)
+          throw err
+        }
+
         throw err
-      }
+      })
+    }
 
-      throw err
-    })
+    return attemptFetch()
   }
 }
 
