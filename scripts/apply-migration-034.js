@@ -14,7 +14,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey)
 async function applyMigration() {
   try {
     console.log('Reading migration 034...')
-    const migrationSql = fs.readFileSync('./supabase/migrations/034_add_equipment_images.sql', 'utf-8')
+    const migrationSql = fs.readFileSync('../supabase/migrations/034_add_equipment_images.sql', 'utf-8')
     
     // Split SQL into individual statements
     const statements = migrationSql
