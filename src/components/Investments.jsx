@@ -695,24 +695,17 @@ export default function Investments({ userId }) {
               {/* Overview Tab */}
               {detailTab === 'overview' && (
                 <div className="space-y-6">
-                  {/* Paginated Project Overview */}
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-                    <h3 className="text-lg font-semibold text-slate-900 mb-4">Project Overview</h3>
-                    <PaginatedProjectOverview
-                      project={selectedProject}
-                      editMode={editMode.overview}
-                      editingDescription={editingDescription}
-                      onEditingDescriptionChange={setEditingDescription}
-                      onEdit={() => {
-                        setEditingDescription(selectedProject.long_description || selectedProject.description || '')
-                        setEditMode(prev => ({ ...prev, overview: true }))
-                      }}
-                      onSave={async (description) => {
-                        await saveProjectDescription(description)
-                      }}
-                      isSaving={saving}
-                    />
-                  </div>
+                  {/* Sales-Oriented Project Overview */}
+                  <SalesProjectOverview
+                    project={selectedProject}
+                    equipment={projectEquipment}
+                    costs={projectCosts}
+                    financialMetrics={financialMetrics}
+                    productionCapacity={productionCapacity}
+                    revenueForecast={revenueForecast}
+                    suppliers={projectSuppliers}
+                    partnerships={projectPartners}
+                  />
 
                   {(() => {
                     const calculatedCost = calculateTotalCost(projectEquipment, projectCosts, exchangeRate)
