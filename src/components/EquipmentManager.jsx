@@ -11,11 +11,11 @@ export default function EquipmentManager({ projectId, onClose, exchangeRate = 0.
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
-  const [bulkText, setBulkText] = useState('')
-  const [showBulkImport, setShowBulkImport] = useState(false)
+  const [pasteText, setPasteText] = useState('')
   const [parseLoading, setParseLoading] = useState(false)
-  const [parseError, setParseError] = useState('')
   const [rate, setRate] = useState(exchangeRate)
+  const [parsePreview, setParsePreview] = useState(null)
+  const [showRawInput, setShowRawInput] = useState(false)
 
   useEffect(() => {
     if (projectId) {
