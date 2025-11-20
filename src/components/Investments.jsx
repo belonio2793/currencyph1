@@ -55,11 +55,26 @@ export default function Investments({ userId }) {
     metrics: []
   })
   const [saving, setSaving] = useState(false)
+  const [exchangeRate, setExchangeRate] = useState(0.018)
+  const [loadingRate, setLoadingRate] = useState(true)
 
   useEffect(() => {
+    loadExchangeRate()
     loadProjects()
     loadWallets()
   }, [])
+
+  async function loadExchangeRate() {
+    try {
+      const rate = await getPhpToUsdRate()
+      setExchangeRate(rate)
+    } catch (err) {
+      console.warn('Failed to load exchange rate:', err)
+      setExchangeRate(0.018)
+    } finally {
+      setLoadingRate(false)
+    }
+  }
 
   // Prevent background scrolling when modals are open
   useEffect(() => {
