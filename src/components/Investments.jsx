@@ -672,14 +672,8 @@ export default function Investments({ userId }) {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => exportProjectPdf()}
-                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                >
-                  Export PDF
-                </button>
-                <button
                   onClick={() => exportComprehensivePdf()}
-                  className="px-4 py-2 bg-purple-600 text-white text-sm rounded hover:bg-purple-700"
+                  className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                 >
                   Export Professional Report
                 </button>
