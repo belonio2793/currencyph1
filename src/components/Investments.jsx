@@ -778,7 +778,7 @@ export default function Investments({ userId }) {
                                 />
                               </div>
                               <CurrencyInput
-                                label="Budgeted Amount (PHP → USD)"
+                                label="Budgeted Amount (PHP ⇄ USD)"
                                 value={cost.budgeted_amount_php || cost.budgeted_amount_usd || 0}
                                 onChange={(phpVal) => {
                                   const updated = [...editData.costs]
@@ -787,9 +787,10 @@ export default function Investments({ userId }) {
                                   setEditData(prev => ({ ...prev, costs: updated }))
                                 }}
                                 exchangeRate={exchangeRate}
+                                invertible={true}
                               />
                               <CurrencyInput
-                                label="Actual Amount (PHP → USD)"
+                                label="Actual Amount (PHP ⇄ USD)"
                                 value={cost.actual_amount_php || cost.actual_amount_usd || 0}
                                 onChange={(phpVal) => {
                                   const updated = [...editData.costs]
@@ -798,6 +799,7 @@ export default function Investments({ userId }) {
                                   setEditData(prev => ({ ...prev, costs: updated }))
                                 }}
                                 exchangeRate={exchangeRate}
+                                invertible={true}
                               />
                               <div>
                                 <label className="text-xs font-medium text-slate-700">% of Total</label>
