@@ -470,27 +470,29 @@ export default function Investments({ userId }) {
     if (!selectedProject) return
     try {
       setError('')
-      const doc = generateComprehensiveProjectPdf(
+      const doc = generateDynamicProjectPdf(
         selectedProject,
         projectEquipment,
-        projectSuppliers,
-        projectPartners,
         projectCosts,
         productionCapacity,
         revenueForecast,
         projectMilestones,
         riskAssessment,
-        financialMetrics,
-        exchangeRate
+        financialMetrics
       )
 
-      const filename = `${selectedProject.name.replace(/\s+/g, '_')}_comprehensive_${new Date().toISOString().split('T')[0]}.pdf`
+      if (!doc) {
+        setError('Failed to generate PDF. Please try again.')
+        return
+      }
+
+      const filename = `${selectedProject.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
       const pdfUrl = doc.output('bloburi')
       window.open(pdfUrl, '_blank')
 
-      setSuccess(`Comprehensive PDF opened in new window`)
+      setSuccess(`PDF generated and opened successfully`)
     } catch (err) {
-      console.error('Failed to export comprehensive PDF:', err)
+      console.error('Failed to export PDF:', err)
       setError(`Failed to export PDF: ${err.message}`)
     }
   }
