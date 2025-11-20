@@ -266,6 +266,40 @@ export default function Investments({ userId }) {
     }
   }
 
+  async function saveProjectDescription() {
+    if (!selectedProject) return
+    setSaving(true)
+    try {
+      const { error } = await supabase
+        .from('projects')
+        .update({ long_description: editingDescription })
+        .eq('id', selectedProject.id)
+
+      if (error) throw error
+
+      setSuccess('Project overview updated successfully')
+      setEditMode(prev => ({ ...prev, overview: false }))
+
+      // Reload projects to reflect changes
+      const { data } = await supabase
+        .from('projects')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (data) {
+        setProjects(data)
+        // Update selected project
+        const updated = data.find(p => p.id === selectedProject.id)
+        if (updated) setSelectedProject(updated)
+      }
+    } catch (err) {
+      console.error('Failed saving description:', err)
+      setError(`Failed to save: ${err.message}`)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   async function deleteItem(tab, itemId) {
     if (!confirm('Are you sure you want to delete this item?')) return
     try {
