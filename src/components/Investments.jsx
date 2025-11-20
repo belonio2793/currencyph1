@@ -542,12 +542,13 @@ export default function Investments({ userId }) {
                     <PaginatedProjectOverview
                       project={selectedProject}
                       editMode={editMode.overview}
+                      editingDescription={editingDescription}
+                      onEditingDescriptionChange={setEditingDescription}
                       onEdit={() => {
                         setEditingDescription(selectedProject.long_description || selectedProject.description || '')
                         setEditMode(prev => ({ ...prev, overview: true }))
                       }}
                       onSave={async (description) => {
-                        setEditingDescription(description)
                         await saveProjectDescription(description)
                       }}
                       isSaving={saving}
