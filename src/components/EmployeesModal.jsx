@@ -894,69 +894,12 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           {activeTab === 'attendance' && (
             <div>
               {selectedEmployee ? (
-                <>
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-semibold text-slate-900">
-                      Attendance for {selectedEmployee.first_name} {selectedEmployee.last_name}
-                    </h3>
-                    <div className="flex gap-3">
-                      <button
-                        onClick={handleCheckIn}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
-                      >
-                        Check In
-                      </button>
-                      <button
-                        onClick={handleCheckOut}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
-                      >
-                        Check Out
-                      </button>
-                    </div>
-                  </div>
-
-                  {loadingAttendance ? (
-                    <div className="text-center py-12">
-                      <p className="text-slate-500">Loading attendance records...</p>
-                    </div>
-                  ) : attendanceRecords.length === 0 ? (
-                    <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
-                      <p className="text-slate-500">No attendance records yet</p>
-                    </div>
-                  ) : (
-                    <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead className="bg-slate-50 border-b border-slate-200">
-                          <tr>
-                            <th className="text-left px-6 py-3 text-slate-700 font-semibold">Date</th>
-                            <th className="text-left px-6 py-3 text-slate-700 font-semibold">Check In</th>
-                            <th className="text-left px-6 py-3 text-slate-700 font-semibold">Check Out</th>
-                            <th className="text-left px-6 py-3 text-slate-700 font-semibold">Hours</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {attendanceRecords.map(record => {
-                            const hours = record.check_in && record.check_out
-                              ? EmployeeManagementService.calculateHoursWorked(record.check_in, record.check_out)
-                              : 0
-                            return (
-                              <tr key={record.id} className="border-b border-slate-200 hover:bg-slate-50">
-                                <td className="px-6 py-3 text-slate-600">{new Date(record.attendance_date).toLocaleDateString()}</td>
-                                <td className="px-6 py-3 text-slate-700">
-                                  {record.check_in ? new Date(record.check_in).toLocaleTimeString() : '-'}
-                                </td>
-                                <td className="px-6 py-3 text-slate-700">
-                                  {record.check_out ? new Date(record.check_out).toLocaleTimeString() : '-'}
-                                </td>
-                                <td className="px-6 py-3 font-semibold text-slate-900">{hours.toFixed(2)}</td>
-                              </tr>
-                            )
-                          })}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </>
+                <EmployeeAttendancePanel
+                  businessId={businessId}
+                  employee={selectedEmployee}
+                  userId={userId}
+                  isManager={true}
+                />
               ) : (
                 <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
                   <p className="text-slate-500">Select an employee to view attendance</p>
