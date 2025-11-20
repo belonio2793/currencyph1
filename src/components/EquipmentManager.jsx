@@ -708,56 +708,6 @@ The AI will intelligently parse and extract all data."
       </div>
 
       {/* Bulk Import Modal */}
-      {showBulkImport && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="sticky top-0 bg-gradient-to-r from-purple-600 to-purple-700 text-white p-6 flex items-center justify-between">
-              <h3 className="text-xl font-bold">AI Bulk Import</h3>
-              <button
-                onClick={() => setShowBulkImport(false)}
-                className="text-white hover:bg-white/20 rounded p-1"
-              >
-                ✕
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <p className="text-sm text-slate-600">
-                Paste equipment data below. The AI will parse it and extract individual equipment items. You can use any format - text, CSV, bullet points, etc.
-              </p>
-
-              <textarea
-                value={bulkText}
-                onChange={(e) => setBulkText(e.target.value)}
-                placeholder="Example:
-washing machine, stainless steel, 10 L capacity, 1.5 kW power, $500 per unit, 30mm L x 25mm W x 30mm H
-grinder machine, aluminum, 5 kg/h capacity, $1000 per unit, lead time 15 days
-..."
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 font-mono text-sm"
-                rows="8"
-              />
-
-              {parseError && <div className="bg-red-50 text-red-700 p-3 rounded text-sm">{parseError}</div>}
-
-              <div className="flex gap-3">
-                <button
-                  onClick={parseGrokBulkData}
-                  disabled={parseLoading || !bulkText.trim()}
-                  className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 font-medium"
-                >
-                  {parseLoading ? 'Parsing with Grok AI...' : 'Parse with AI'}
-                </button>
-                <button
-                  onClick={() => setShowBulkImport(false)}
-                  className="px-6 py-3 border border-slate-300 rounded-lg hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Footer Actions */}
       {equipment.length > 0 && (
