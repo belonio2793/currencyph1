@@ -915,8 +915,8 @@ export default function Investments({ userId }) {
                         <div key={cap.id} className="p-4 border border-slate-200 rounded-lg">
                           <div className="flex justify-between items-start mb-3">
                             <div>
-                              <div className="font-semibold text-slate-900">{cap.phase_name}</div>
-                              <div className="text-sm text-slate-600">{cap.product_type}</div>
+                              <div className="font-semibold text-slate-900">{toTitleCase(cap.phase_name) || cap.phase_name}</div>
+                              <div className="text-sm text-slate-600">{toTitleCase(cap.product_type) || cap.product_type}</div>
                             </div>
                             <div className="text-right">
                               <div className="text-sm font-semibold text-slate-900">{cap.utilization_percentage}% Utilization</div>
