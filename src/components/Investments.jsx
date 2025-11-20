@@ -476,8 +476,8 @@ export default function Investments({ userId }) {
           const remainingUsd = totalUsd - fundedUsd
           return (
             <div key={p.id} onClick={() => openProjectDetail(p)} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <h3 className="text-lg font-medium text-slate-900 mb-2">{p.name}</h3>
-              <p className="text-sm text-slate-600 mb-3">{p.description}</p>
+              <h3 className="text-lg font-medium text-slate-900 mb-2">{toTitleCase(p.name) || p.name}</h3>
+              <p className="text-sm text-slate-600 mb-3">{toTitleCase(p.description) || p.description}</p>
               <div className="text-sm text-slate-700 space-y-2 mb-4">
                 <div>
                   <div className="flex justify-between mb-1"><span>Total Cost</span></div>
