@@ -534,8 +534,8 @@ export default function Investments({ userId }) {
       </div>
 
       {loading && <p className="text-sm text-slate-500">Loading...</p>}
-      {error && <p className="text-sm text-slate-700 mb-3">{error}</p>}
-      {success && <p className="text-sm text-slate-700 mb-3">{success}</p>}
+      {error && <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-3">{error}</div>}
+      {success && <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm mb-3">{success}</div>}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {projects.map(p => {
