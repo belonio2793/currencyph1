@@ -18,6 +18,43 @@ function Modal({ children, onClose, className = '' }) {
   )
 }
 
+/**
+ * Currency Input Component - PHP primary with USD display
+ */
+function CurrencyInput({ label, value, onChange, exchangeRate, placeholder = '0.00', step = '0.01' }) {
+  const phpAmount = value || 0
+  const usdAmount = phpToUsd(phpAmount, exchangeRate)
+
+  return (
+    <div>
+      <label className="text-xs font-medium text-slate-700">{label}</label>
+      <div className="flex gap-2 mt-1">
+        <div className="flex-1">
+          <input
+            type="number"
+            step={step}
+            value={phpAmount}
+            onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+            placeholder={placeholder}
+            className="w-full px-3 py-2 border rounded text-sm"
+          />
+          <div className="text-xs text-slate-500 mt-1">{formatPhp(phpAmount)}</div>
+        </div>
+        <div className="flex-1">
+          <input
+            type="number"
+            step="0.01"
+            value={usdAmount}
+            readOnly
+            className="w-full px-3 py-2 border rounded text-sm bg-slate-50 cursor-not-allowed"
+          />
+          <div className="text-xs text-slate-500 mt-1">{formatUsd(usdAmount)}</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function Investments({ userId }) {
   const [projects, setProjects] = useState([])
   const [fundedMap, setFundedMap] = useState({})
