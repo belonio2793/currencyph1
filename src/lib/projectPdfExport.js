@@ -287,7 +287,7 @@ function createOperations(doc, equipment, production) {
 
   const items = [
     {
-      title: '🏭 Facility Overview',
+      title: 'Facility Overview',
       text: `Our 200–400 sqm processing plant houses ${equipmentCount} pieces of specialized equipment, imported from GENYOND Machinery (Shanghai). All equipment is food-grade stainless steel (SUS 304), fully automated where possible, and designed for 75% utilization at startup. Water systems, electrical infrastructure, and cold-chain logistics are built to export standards.`,
       metrics: [
         { label: 'Facility Size', value: '200–400 sqm' },
@@ -297,7 +297,7 @@ function createOperations(doc, equipment, production) {
       ]
     },
     {
-      title: '⚡ Daily Processing Capacity',
+      title: 'Daily Processing Capacity',
       text: `Daily throughput: 7,500 coconuts. This yields 400L coconut water, 80L VCO, 180L milk, 120kg coir, 250kg peat, 150kg charcoal, 100kg fertilizer. Daily revenue $1,576 at base case utilization (75%). Equipment can scale to 90% with minimal incremental capex.`,
       metrics: [
         { label: 'Daily Coconuts', value: '7,500 nuts' },
@@ -307,7 +307,7 @@ function createOperations(doc, equipment, production) {
       ]
     },
     {
-      title: '🧪 Quality & Compliance',
+      title: 'Quality & Compliance',
       text: 'On-site laboratory for testing oil fatty acids, water microbiology, fiber specs, and product standards. HACCP protocols. Can achieve organic certification, Fair Trade, FDA compliance, and ISO 9001 for export markets. Quality assurance is built into every step.',
       metrics: [
         { label: 'Lab Equipment', value: 'Oil, water, fiber testing' },
@@ -317,7 +317,7 @@ function createOperations(doc, equipment, production) {
       ]
     },
     {
-      title: '💾 Waste = Zero',
+      title: 'Waste = Zero',
       text: 'Nothing is discarded. Husk → fiber & peat. Shell → charcoal & energy. Residue → fertilizer & animal feed. By-product handling equipment is included in capex. This circular design eliminates disposal costs and creates 6 additional revenue streams.',
       metrics: [
         { label: 'Waste Rate', value: '0% (circular design)' },
@@ -527,7 +527,7 @@ function createInvestmentStructure(doc) {
 
   const items = [
     {
-      title: '💵 Capital Allocation ($280,000)',
+      title: '���� Capital Allocation ($280,000)',
       text: 'Equipment & machinery: $94,130 (33.6%). Husk, water, oil lines: $83,500 (29.8%). Cold storage & lab: $20,250 (7.3%). Construction: $82,500 (29.5%). Working capital & contingency: $39,250 (14%). No middleman markup. Direct from manufacturer pricing.',
       metrics: [
         { label: 'Equipment', value: '$94,130 (34%)' },
