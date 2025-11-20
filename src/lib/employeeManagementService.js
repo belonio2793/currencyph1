@@ -12,34 +12,35 @@ class EmployeeManagementService {
   // ===== EMPLOYEE MANAGEMENT =====
   
   static async createEmployee(businessId, employeeData) {
+    const employeeRecord = {
+      id: crypto.randomUUID(),
+      business_id: businessId,
+      first_name: employeeData.firstName,
+      last_name: employeeData.lastName,
+      email: employeeData.email,
+      phone: employeeData.phone || null,
+      position: employeeData.position,
+      department: employeeData.department || null,
+      employment_status: employeeData.employmentStatus || 'active',
+      base_salary: parseFloat(employeeData.baseSalary) || 0,
+      hire_date: employeeData.hireDate,
+      tin: employeeData.tin || null,
+      sss_number: employeeData.sssNumber || null,
+      philhealth_number: employeeData.philhealthNumber || null,
+      pagibig_number: employeeData.pagibigNumber || null,
+      emergency_contact: employeeData.emergencyContact || null,
+      emergency_contact_phone: employeeData.emergencyContactPhone || null
+    }
+
     const { data, error } = await supabase
       .from('employees')
-      .insert([{
-        id: crypto.randomUUID(),
-        business_id: businessId,
-        first_name: employeeData.firstName,
-        last_name: employeeData.lastName,
-        email: employeeData.email,
-        phone: employeeData.phone,
-        position: employeeData.position,
-        department: employeeData.department,
-        employment_status: employeeData.employmentStatus || 'active',
-        base_salary: employeeData.baseSalary || 0,
-        hire_date: employeeData.hireDate,
-        tin: employeeData.tin || null,
-        sss_number: employeeData.sssNumber || null,
-        philhealth_number: employeeData.philhealthNumber || null,
-        pagibig_number: employeeData.pagibigNumber || null,
-        emergency_contact: employeeData.emergencyContact || null,
-        emergency_contact_phone: employeeData.emergencyContactPhone || null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      }])
+      .insert([employeeRecord])
       .select()
 
     if (error) {
       const err = new Error(`Failed to create employee: ${error.message}`)
       err.details = error
+      console.error('Supabase error:', error)
       throw err
     }
     return data[0]
