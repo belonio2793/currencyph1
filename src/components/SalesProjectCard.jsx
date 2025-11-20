@@ -41,7 +41,7 @@ export default function SalesProjectCard({
     }
     return {
       headline: '📈 High-Growth Investment',
-      tagline: project.description || '',
+      tagline: cleanDescription(project.description) || '',
       benefits: ['Diversified revenue', 'Strong returns', 'Sustainable model'],
       opportunity: 'Proven market demand'
     }
