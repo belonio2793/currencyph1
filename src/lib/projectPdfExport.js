@@ -125,8 +125,9 @@ function addTable(doc, headers, rows, yPos) {
   const tableWidth = CONTENT_WIDTH
   const colWidth = tableWidth / headers.length
   const cellPadding = 2
-  const rowHeight = 7
+  const rowHeight = 8
   const startXPos = MARGINS.left
+  const maxRowHeight = 12
 
   doc.setFontSize(8)
 
@@ -139,7 +140,7 @@ function addTable(doc, headers, rows, yPos) {
   for (let i = 0; i < headers.length; i++) {
     doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
     const headerText = doc.splitTextToSize(headers[i], colWidth - 2 * cellPadding)
-    doc.text(headerText[0] || '', xPos + cellPadding, yPos + cellPadding + 1.5)
+    doc.text((headerText[0] || '').substring(0, 15), xPos + cellPadding, yPos + cellPadding + 1.5)
     xPos += colWidth
   }
 
@@ -153,12 +154,13 @@ function addTable(doc, headers, rows, yPos) {
   let alternateColor = false
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
+    let actualRowHeight = rowHeight
 
     if (alternateColor) {
       doc.setFillColor(...COLORS.lightGray)
       xPos = startXPos
       for (let j = 0; j < headers.length; j++) {
-        doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
+        doc.rect(xPos, yPos, colWidth, actualRowHeight, 'F')
         xPos += colWidth
       }
     }
@@ -166,13 +168,14 @@ function addTable(doc, headers, rows, yPos) {
     xPos = startXPos
     for (let j = 0; j < row.length; j++) {
       const cellValue = String(row[j] || '')
-      const cellText = doc.splitTextToSize(cellValue, colWidth - 2 * cellPadding)
-      doc.text(cellText[0] || '', xPos + cellPadding, yPos + cellPadding + 1.5)
+      const cellText = doc.splitTextToSize(cellValue, colWidth - 3 * cellPadding)
+      const displayText = cellText[0] ? cellText[0].substring(0, 20) : ''
+      doc.text(displayText, xPos + cellPadding, yPos + cellPadding + 1.5)
       xPos += colWidth
     }
 
     alternateColor = !alternateColor
-    yPos += rowHeight
+    yPos += actualRowHeight
   }
 
   // Border
