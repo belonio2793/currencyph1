@@ -203,9 +203,10 @@ export default function Investments({ userId }) {
 
   async function loadProjectDetails(projectId) {
     try {
-      const [eqp, sup, cost, cap, rev, mil, risk, fin] = await Promise.all([
+      const [eqp, sup, part, cost, cap, rev, mil, risk, fin] = await Promise.all([
         supabase.from('project_equipment').select('*').eq('project_id', projectId),
         supabase.from('project_suppliers').select('*').eq('project_id', projectId),
+        supabase.from('project_partnerships').select('*').eq('project_id', projectId),
         supabase.from('project_costs').select('*').eq('project_id', projectId),
         supabase.from('production_capacity').select('*').eq('project_id', projectId),
         supabase.from('revenue_projections').select('*').eq('project_id', projectId).order('year_number'),
@@ -216,6 +217,7 @@ export default function Investments({ userId }) {
 
       setProjectEquipment(eqp.data || [])
       setProjectSuppliers(sup.data || [])
+      setProjectPartners(part.data || [])
       setProjectCosts(cost.data || [])
       setProductionCapacity(cap.data || [])
       setRevenueForecast(rev.data || [])
