@@ -6,6 +6,7 @@ import { createPortal } from 'react-dom'
 import EquipmentManager from './EquipmentManager'
 import PaginatedProjectOverview from './PaginatedProjectOverview'
 import PaginatedSuppliersPartners from './PaginatedSuppliersPartners'
+import { generateProjectPdf } from '../lib/projectPdfExport'
 
 // Utility function to convert snake_case to Title Case
 function toTitleCase(str) {
