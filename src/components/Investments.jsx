@@ -129,6 +129,32 @@ export default function Investments({ userId }) {
     }
   }
 
+  async function loadProjectDetails(projectId) {
+    try {
+      const [eqp, sup, cost, cap, rev, mil, risk, fin] = await Promise.all([
+        supabase.from('project_equipment').select('*').eq('project_id', projectId),
+        supabase.from('project_suppliers').select('*').eq('project_id', projectId),
+        supabase.from('project_costs').select('*').eq('project_id', projectId),
+        supabase.from('production_capacity').select('*').eq('project_id', projectId),
+        supabase.from('revenue_projections').select('*').eq('project_id', projectId).order('year_number'),
+        supabase.from('project_milestones').select('*').eq('project_id', projectId).order('planned_date'),
+        supabase.from('risk_assessment').select('*').eq('project_id', projectId),
+        supabase.from('financial_metrics').select('*').eq('project_id', projectId)
+      ])
+
+      setProjectEquipment(eqp.data || [])
+      setProjectSuppliers(sup.data || [])
+      setProjectCosts(cost.data || [])
+      setProductionCapacity(cap.data || [])
+      setRevenueForecast(rev.data || [])
+      setProjectMilestones(mil.data || [])
+      setRiskAssessment(risk.data || [])
+      setFinancialMetrics(fin.data || [])
+    } catch (err) {
+      console.error('Failed loading project details', err)
+    }
+  }
+
   function openProjectDetail(project) {
     // Close invest modal first to keep modals exclusive
     setShowInvestModal(false)
