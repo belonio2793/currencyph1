@@ -478,7 +478,8 @@ export default function Investments({ userId }) {
         revenueForecast,
         projectMilestones,
         riskAssessment,
-        financialMetrics
+        financialMetrics,
+        exchangeRate
       )
 
       const filename = `${selectedProject.name.replace(/\s+/g, '_')}_comprehensive_${new Date().toISOString().split('T')[0]}.pdf`
