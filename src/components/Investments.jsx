@@ -44,6 +44,7 @@ export default function Investments({ userId }) {
 
   // Edit mode states
   const [editMode, setEditMode] = useState({})
+  const [editingDescription, setEditingDescription] = useState('')
   const [editData, setEditData] = useState({
     equipment: [],
     suppliers: [],
@@ -484,6 +485,48 @@ export default function Investments({ userId }) {
               {/* Overview Tab */}
               {detailTab === 'overview' && (
                 <div className="space-y-6">
+                  {/* Project Description */}
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-semibold text-slate-900">Project Overview</h3>
+                      <button
+                        onClick={() => {
+                          if (editMode.overview) {
+                            saveProjectDescription()
+                          } else {
+                            setEditingDescription(selectedProject.long_description || selectedProject.description || '')
+                            setEditMode(prev => ({ ...prev, overview: true }))
+                          }
+                        }}
+                        disabled={saving}
+                        className="px-3 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800 disabled:opacity-50"
+                      >
+                        {editMode.overview ? (saving ? 'Saving...' : 'Save Description') : '✎ Edit'}
+                      </button>
+                    </div>
+                    {editMode.overview ? (
+                      <textarea
+                        value={editingDescription}
+                        onChange={(e) => setEditingDescription(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono text-sm"
+                        rows="15"
+                        placeholder="Enter project overview and description..."
+                      />
+                    ) : (
+                      <div className="text-slate-700 whitespace-pre-wrap text-sm leading-relaxed">
+                        {selectedProject.long_description || selectedProject.description || 'No description added yet'}
+                      </div>
+                    )}
+                    {editMode.overview && (
+                      <button
+                        onClick={() => setEditMode(prev => ({ ...prev, overview: false }))}
+                        className="mt-3 px-3 py-2 border border-slate-300 text-slate-700 text-sm rounded hover:bg-slate-100"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-slate-50 p-4 rounded-lg">
                       <div className="text-xs text-slate-600 mb-1">Total Cost</div>
