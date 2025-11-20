@@ -429,14 +429,29 @@ export default function Investments({ userId }) {
         {projects.map(p => {
           const funded = fundedMap[p.id] || 0
           const pct = p.total_cost > 0 ? ((funded / Number(p.total_cost)) * 100).toFixed(2) : '0.00'
+          const totalPhp = Number(p.total_cost || 0)
+          const totalUsd = phpToUsd(totalPhp, exchangeRate)
+          const fundedPhp = Number(funded)
+          const fundedUsd = phpToUsd(fundedPhp, exchangeRate)
+          const remainingPhp = totalPhp - fundedPhp
+          const remainingUsd = totalUsd - fundedUsd
           return (
             <div key={p.id} onClick={() => openProjectDetail(p)} className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg transition-shadow cursor-pointer">
               <h3 className="text-lg font-medium text-slate-900 mb-2">{p.name}</h3>
               <p className="text-sm text-slate-600 mb-3">{p.description}</p>
-              <div className="text-sm text-slate-700 space-y-1 mb-4">
-                <div className="flex justify-between"><span>Total Cost</span><span className="font-medium">{getCurrencySymbol(p.currency_code || 'PHP')}{Number(p.total_cost || 0).toLocaleString()}</span></div>
-                <div className="flex justify-between"><span>Funded</span><span className="font-medium">{getCurrencySymbol(p.currency_code || 'PHP')}{Number(funded).toLocaleString()}</span></div>
-                <div className="flex justify-between"><span>Remaining</span><span className="font-medium">{getCurrencySymbol(p.currency_code || 'PHP')}{(Number(p.total_cost || 0) - Number(funded)).toLocaleString()}</span></div>
+              <div className="text-sm text-slate-700 space-y-2 mb-4">
+                <div>
+                  <div className="flex justify-between mb-1"><span>Total Cost</span></div>
+                  <div className="flex justify-between text-xs"><span className="font-medium">{formatPhp(totalPhp)}</span><span className="text-slate-500">{formatUsd(totalUsd)}</span></div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1"><span>Funded</span></div>
+                  <div className="flex justify-between text-xs"><span className="font-medium">{formatPhp(fundedPhp)}</span><span className="text-slate-500">{formatUsd(fundedUsd)}</span></div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-1"><span>Remaining</span></div>
+                  <div className="flex justify-between text-xs"><span className="font-medium">{formatPhp(remainingPhp)}</span><span className="text-slate-500">{formatUsd(remainingUsd)}</span></div>
+                </div>
                 <div className="flex justify-between"><span>Progress</span><span className="font-medium">{pct}%</span></div>
               </div>
               <div className="flex items-center gap-2">
