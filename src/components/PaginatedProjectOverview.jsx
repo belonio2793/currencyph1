@@ -85,7 +85,7 @@ export default function PaginatedProjectOverview({
           <label className="block text-xs font-semibold text-slate-600">EDIT PROJECT OVERVIEW</label>
           <textarea
             value={editingDescription}
-            onChange={(e) => setEditingDescription(e.target.value)}
+            onChange={(e) => handleEditingChange(e.target.value)}
             className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 font-mono text-sm"
             rows="20"
             placeholder="Enter detailed project overview..."
