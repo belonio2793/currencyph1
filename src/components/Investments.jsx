@@ -482,9 +482,10 @@ export default function Investments({ userId }) {
       )
 
       const filename = `${selectedProject.name.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`
-      doc.save(filename)
+      const pdfUrl = doc.output('bloburi')
+      window.open(pdfUrl, '_blank')
 
-      setSuccess(`PDF exported: ${filename}`)
+      setSuccess(`PDF opened in new window`)
     } catch (err) {
       console.error('Failed to export PDF:', err)
       setError(`Failed to export PDF: ${err.message}`)
