@@ -180,7 +180,7 @@ export default function RideUserProfile({ userId, userRole = 'driver', onClose }
                 <h3 className="font-semibold text-slate-900 mb-3">Verification Status</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2">
-                    <span className={profile.is_phone_verified ? '✓' : '✗'} className={`w-5 h-5 rounded-full flex items-center justify-center text-white ${profile.is_phone_verified ? 'bg-green-600' : 'bg-slate-400'}`}>
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center text-white ${profile.is_phone_verified ? 'bg-green-600' : 'bg-slate-400'}`}>
                       {profile.is_phone_verified ? '✓' : '✗'}
                     </span>
                     <span className="text-slate-700">Phone Verified</span>
