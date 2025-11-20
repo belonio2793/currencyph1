@@ -251,6 +251,84 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
     }
   }
 
+  // Edit Employee
+  const handleEditEmployee = (employee) => {
+    setEditingEmployeeId(employee.id)
+    setEmployeeForm({
+      firstName: employee.first_name || '',
+      lastName: employee.last_name || '',
+      email: employee.email || '',
+      phone: employee.phone || '',
+      position: employee.position || '',
+      department: employee.metadata?.department || '',
+      employmentStatus: employee.status || 'active',
+      baseSalary: employee.salary || '',
+      hireDate: employee.hire_date || '',
+      tin: employee.metadata?.tin || '',
+      sssNumber: employee.metadata?.sss_number || '',
+      philhealthNumber: employee.metadata?.philhealth_number || '',
+      pagibigNumber: employee.metadata?.pagibig_number || '',
+      emergencyContact: employee.metadata?.emergency_contact || '',
+      emergencyContactPhone: employee.metadata?.emergency_contact_phone || ''
+    })
+    setShowEditForm(true)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!employeeForm.firstName || !employeeForm.lastName || !employeeForm.email || !employeeForm.position) {
+      alert('Please fill all required fields')
+      return
+    }
+
+    try {
+      setSavingEmployee(true)
+      const metadata = {
+        department: employeeForm.department || null,
+        tin: employeeForm.tin || null,
+        sss_number: employeeForm.sssNumber || null,
+        philhealth_number: employeeForm.philhealthNumber || null,
+        pagibig_number: employeeForm.pagibigNumber || null,
+        emergency_contact: employeeForm.emergencyContact || null,
+        emergency_contact_phone: employeeForm.emergencyContactPhone || null
+      }
+
+      const { data, error } = await supabase
+        .from('employees')
+        .update({
+          first_name: employeeForm.firstName,
+          last_name: employeeForm.lastName,
+          email: employeeForm.email,
+          phone: employeeForm.phone || null,
+          position: employeeForm.position || null,
+          salary: parseFloat(employeeForm.baseSalary) || null,
+          status: employeeForm.employmentStatus || 'active',
+          hire_date: employeeForm.hireDate ? new Date(employeeForm.hireDate).toISOString().split('T')[0] : null,
+          metadata: metadata,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', editingEmployeeId)
+        .select()
+
+      if (error) throw error
+
+      const updatedEmployee = data[0]
+      setEmployees(employees.map(e => e.id === editingEmployeeId ? updatedEmployee : e))
+      setSelectedEmployee(updatedEmployee)
+      setShowEditForm(false)
+      setEditingEmployeeId(null)
+    } catch (error) {
+      console.error('Error updating employee:', error)
+      alert('Failed to update employee')
+    } finally {
+      setSavingEmployee(false)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setShowEditForm(false)
+    setEditingEmployeeId(null)
+  }
+
   // Record Attendance
   const handleCheckIn = async () => {
     try {
