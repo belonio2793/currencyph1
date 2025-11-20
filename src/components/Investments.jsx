@@ -615,8 +615,8 @@ export default function Investments({ userId }) {
             <div className="sticky top-0 bg-white border-b border-slate-200 p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-2xl font-semibold text-slate-900">{toTitleCase(selectedProject.name) || selectedProject.name}</h3>
-                  <p className="text-sm text-slate-600 mt-1">{toTitleCase(selectedProject.description) || selectedProject.description}</p>
+                  <h3 className="text-2xl font-semibold text-slate-900">{cleanProjectName(selectedProject.name) || toTitleCase(selectedProject.name)}</h3>
+                  <p className="text-sm text-slate-600 mt-1">{cleanDescription(selectedProject.description) || toTitleCase(selectedProject.description)}</p>
                 </div>
                 <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800 ml-4">Close</button>
               </div>
