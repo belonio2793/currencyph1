@@ -67,7 +67,15 @@ export default function PaginatedProjectOverview({
   }
 
   const handleSave = async () => {
-    await onSave(editingDescription)
+    if (onSave) {
+      await onSave(editingDescription)
+    }
+  }
+
+  const handleEditingChange = (value) => {
+    if (onEditingDescriptionChange) {
+      onEditingDescriptionChange(value)
+    }
   }
 
   return (
