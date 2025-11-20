@@ -492,6 +492,34 @@ export default function Investments({ userId }) {
     }
   }
 
+  async function exportComprehensivePdf() {
+    if (!selectedProject) return
+    try {
+      setError('')
+      const doc = generateComprehensiveProjectPdf(
+        selectedProject,
+        projectEquipment,
+        projectSuppliers,
+        projectPartners,
+        projectCosts,
+        productionCapacity,
+        revenueForecast,
+        projectMilestones,
+        riskAssessment,
+        financialMetrics
+      )
+
+      const filename = `${selectedProject.name.replace(/\s+/g, '_')}_comprehensive_${new Date().toISOString().split('T')[0]}.pdf`
+      const pdfUrl = doc.output('bloburi')
+      window.open(pdfUrl, '_blank')
+
+      setSuccess(`Comprehensive PDF opened in new window`)
+    } catch (err) {
+      console.error('Failed to export comprehensive PDF:', err)
+      setError(`Failed to export PDF: ${err.message}`)
+    }
+  }
+
   function openProjectDetail(project) {
     // Close invest modal first to keep modals exclusive
     setShowInvestModal(false)
