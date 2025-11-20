@@ -751,47 +751,48 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                   {employees.map(employee => (
                     <div
                       key={employee.id}
-                      className={`text-left p-4 rounded-lg border-2 transition-all ${
+                      className={`text-left p-4 rounded-lg border-2 transition-all relative ${
                         selectedEmployee?.id === employee.id
                           ? 'border-purple-600 bg-purple-50'
                           : 'border-slate-200 bg-white hover:border-purple-300'
                       }`}
                     >
-                      <div className="flex items-center gap-3 mb-2">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 text-white flex items-center justify-center font-bold">
+                      {/* Status Badge - Top Right */}
+                      <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                        <span className={`w-2 h-2 rounded-full ${employee.status === 'active' ? 'bg-green-500' : 'bg-slate-400'}`}></span>
+                        <span className={employee.status === 'active' ? 'text-green-700' : 'text-slate-600'}>
+                          {employee.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-3 mb-3 pr-16">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-400 to-purple-600 text-white flex items-center justify-center font-bold flex-shrink-0">
                           {employee.first_name[0]}{employee.last_name[0]}
                         </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-slate-900">{employee.first_name} {employee.last_name}</p>
-                          <p className="text-sm text-slate-600">{employee.position}</p>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-slate-900 truncate">{employee.first_name} {employee.last_name}</p>
+                          <p className="text-sm text-slate-600 truncate">{employee.position}</p>
                         </div>
                       </div>
+
                       <div className="text-sm text-slate-600 mb-3">
-                        <p>{employee.email}</p>
-                        {employee.department && <p>{employee.department}</p>}
-                        <p className={`mt-2 font-medium ${employee.status === 'active' ? 'text-green-600' : 'text-slate-600'}`}>
-                          {employee.status}
-                        </p>
+                        <p className="truncate">{employee.email}</p>
+                        {employee.department && <p className="text-xs text-slate-500">{employee.department}</p>}
                       </div>
 
-                      <div className="mb-3 px-2 py-1 rounded bg-slate-100 text-xs font-medium">
-                        {registrationStatus[employee.id] ? (
-                          <span className="text-green-700">✓ Registered</span>
-                        ) : (
-                          <span className="text-amber-700">⚠ Not Registered</span>
-                        )}
-                      </div>
-
-                      <div className="flex gap-2 pt-2 border-t border-slate-200">
+                      <div className="flex gap-2 pt-3 border-t border-slate-200">
                         <button
-                          onClick={() => setSelectedEmployee(employee)}
-                          className="flex-1 px-3 py-1 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
+                          onClick={() => {
+                            setSelectedEmployee(employee)
+                            setActiveTab('attendance')
+                          }}
+                          className="flex-1 px-3 py-1.5 text-sm bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium transition-colors"
                         >
                           View
                         </button>
                         <button
                           onClick={() => handleEditEmployee(employee)}
-                          className="flex-1 px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium"
+                          className="flex-1 px-3 py-1.5 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 font-medium transition-colors"
                         >
                           Edit
                         </button>
