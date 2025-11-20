@@ -18,3 +18,11 @@ export function formatCurrency(amount, code) {
   const symbol = getCurrencySymbol(code)
   return `${symbol}${formatNumber(amount)}`
 }
+
+export function formatPhp(amount) {
+  return formatCurrency(amount, 'PHP')
+}
+
+export function formatUsd(amount) {
+  return formatCurrency(amount, 'USD')
+}
