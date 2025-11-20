@@ -539,214 +539,76 @@ export default function Investments({ userId }) {
               {/* Equipment Tab */}
               {detailTab === 'equipment' && (
                 <div className="space-y-4">
-                  {editMode.equipment ? (
-                    <div className="space-y-4">
-                      {editData.equipment.length > 0 ? (
-                        editData.equipment.map((eq, idx) => (
-                          <div key={eq.id || idx} className="p-4 border border-slate-200 rounded-lg">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Equipment Name</label>
-                                <input
-                                  type="text"
-                                  value={eq.equipment_name || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].equipment_name = e.target.value
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Type</label>
-                                <input
-                                  type="text"
-                                  value={eq.equipment_type || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].equipment_type = e.target.value
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Capacity</label>
-                                <input
-                                  type="number"
-                                  value={eq.capacity_value || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].capacity_value = parseFloat(e.target.value) || null
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Capacity Unit</label>
-                                <input
-                                  type="text"
-                                  placeholder="L, kg, T, etc."
-                                  value={eq.capacity_unit || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].capacity_unit = e.target.value
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Power (kW)</label>
-                                <input
-                                  type="number"
-                                  step="0.1"
-                                  value={eq.power_consumption_kw || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].power_consumption_kw = parseFloat(e.target.value) || null
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <CurrencyInput
-                                label="Unit Cost (PHP ⇄ USD)"
-                                value={eq.unit_cost_php || eq.unit_cost_usd || 0}
-                                onChange={(phpVal) => {
-                                  const updated = [...editData.equipment]
-                                  updated[idx].unit_cost_php = phpVal
-                                  updated[idx].unit_cost_usd = phpToUsd(phpVal, exchangeRate)
-                                  setEditData(prev => ({ ...prev, equipment: updated }))
-                                }}
-                                exchangeRate={exchangeRate}
-                                invertible={true}
-                              />
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Quantity</label>
-                                <input
-                                  type="number"
-                                  value={eq.quantity || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].quantity = parseInt(e.target.value) || 1
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                              <div>
-                                <label className="text-xs font-medium text-slate-700">Lead Time (days)</label>
-                                <input
-                                  type="number"
-                                  value={eq.lead_time_days || ''}
-                                  onChange={(e) => {
-                                    const updated = [...editData.equipment]
-                                    updated[idx].lead_time_days = parseInt(e.target.value) || null
-                                    setEditData(prev => ({ ...prev, equipment: updated }))
-                                  }}
-                                  className="w-full px-3 py-2 border rounded text-sm mt-1"
-                                />
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center pt-3 border-t border-slate-200">
-                              <div className="text-sm font-medium text-slate-900">
-                                Total: {formatPhp((eq.unit_cost_php || phpToUsd(eq.unit_cost_usd || 0, exchangeRate)) * (eq.quantity || 1))} ({formatUsd(((eq.unit_cost_usd || 0) * (eq.quantity || 1)))})
-                              </div>
-                              <button
-                                onClick={() => {
-                                  const updated = editData.equipment.filter((_, i) => i !== idx)
-                                  setEditData(prev => ({ ...prev, equipment: updated }))
-                                }}
-                                className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="p-4 border border-dashed border-slate-300 rounded-lg text-center">
-                          <p className="text-slate-600 text-sm mb-3">No equipment added yet</p>
-                          <button
-                            onClick={() => {
-                              setEditData(prev => ({
-                                ...prev,
-                                equipment: [...prev.equipment, {}]
-                              }))
-                            }}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                          >
-                            + Add Equipment
-                          </button>
-                        </div>
-                      )}
-                      {editData.equipment.length > 0 && (
-                        <button
-                          onClick={() => {
-                            setEditData(prev => ({
-                              ...prev,
-                              equipment: [...prev.equipment, {}]
-                            }))
-                          }}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 w-full"
-                        >
-                          + Add More Equipment
-                        </button>
-                      )}
+                  <button
+                    onClick={() => setShowEquipmentManager(true)}
+                    className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-lg"
+                  >
+                    ⚙️ Manage Equipment
+                  </button>
+
+                  {projectEquipment.length === 0 ? (
+                    <div className="p-8 text-center border border-dashed border-slate-300 rounded-lg">
+                      <p className="text-slate-600 mb-4">No equipment added yet</p>
+                      <p className="text-sm text-slate-500">Click the button above to add equipment with detailed specifications and photos</p>
                     </div>
-                  ) : projectEquipment.length === 0 ? (
-                    <p className="text-slate-500">No equipment details available</p>
                   ) : (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead className="border-b border-slate-200">
-                          <tr className="text-left text-slate-600 font-semibold text-xs">
-                            <th className="pb-3 px-2">Equipment</th>
-                            <th className="pb-3 px-2">Type</th>
-                            <th className="pb-3 px-2">Capacity</th>
-                            <th className="pb-3 px-2">Power (kW)</th>
-                            <th className="pb-3 px-2">Unit Cost</th>
-                            <th className="pb-3 px-2">Total Cost</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {projectEquipment.map(eq => (
-                            <tr key={eq.id} className="border-b border-slate-100 hover:bg-slate-50">
-                              <td className="py-3 px-2 font-medium text-sm">{eq.equipment_name}</td>
-                              <td className="py-3 px-2 text-sm">{eq.equipment_type}</td>
-                              <td className="py-3 px-2 text-sm">{eq.capacity_value} {eq.capacity_unit}</td>
-                              <td className="py-3 px-2 text-sm">{eq.power_consumption_kw || '—'}</td>
-                              <td className="py-3 px-2 text-sm">
-                                <div>{formatPhp(eq.unit_cost_php || phpToUsd(eq.unit_cost_usd || 0, exchangeRate))}</div>
-                                <div className="text-xs text-slate-500">{formatUsd(eq.unit_cost_usd || 0)}</div>
-                              </td>
-                              <td className="py-3 px-2 font-semibold text-sm">
-                                <div>{formatPhp((eq.unit_cost_php || phpToUsd(eq.unit_cost_usd || 0, exchangeRate)) * (eq.quantity || 1))}</div>
-                                <div className="text-xs text-slate-500">{formatUsd((eq.unit_cost_usd || 0) * (eq.quantity || 1))}</div>
-                              </td>
+                    <div className="space-y-4">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead className="border-b border-slate-200 bg-slate-50">
+                            <tr className="text-left text-slate-600 font-semibold text-xs">
+                              <th className="pb-3 px-4 py-3">Equipment</th>
+                              <th className="pb-3 px-4 py-3">Type</th>
+                              <th className="pb-3 px-4 py-3">Capacity</th>
+                              <th className="pb-3 px-4 py-3">Power (kW)</th>
+                              <th className="pb-3 px-4 py-3">Unit Cost</th>
+                              <th className="pb-3 px-4 py-3">Total Cost</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {projectEquipment.map(eq => (
+                              <tr key={eq.id} className="border-b border-slate-100 hover:bg-slate-50">
+                                <td className="py-4 px-4 font-medium text-sm">{eq.equipment_name}</td>
+                                <td className="py-4 px-4 text-sm">{eq.equipment_type || '—'}</td>
+                                <td className="py-4 px-4 text-sm">{eq.capacity_value ? `${eq.capacity_value} ${eq.capacity_unit}` : '—'}</td>
+                                <td className="py-4 px-4 text-sm">{eq.power_consumption_kw || '—'}</td>
+                                <td className="py-4 px-4 text-sm">
+                                  <div className="font-medium">{formatUsd(eq.unit_cost_usd || 0)}</div>
+                                </td>
+                                <td className="py-4 px-4 font-semibold text-sm text-blue-600">
+                                  {formatUsd((eq.unit_cost_usd || 0) * (eq.quantity || 1))}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="text-sm text-blue-900">
+                          <span className="font-semibold">Total Equipment Cost: </span>
+                          <span className="text-lg font-bold text-blue-600">
+                            {formatUsd(projectEquipment.reduce((sum, eq) => sum + ((eq.unit_cost_usd || 0) * (eq.quantity || 1)), 0))}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   )}
 
-                  {projectSuppliers.length > 0 && !editMode.equipment && (
-                    <div className="mt-6">
+                  {projectSuppliers.length > 0 && (
+                    <div className="mt-6 border-t pt-6">
                       <h4 className="text-sm font-semibold text-slate-900 mb-3">Suppliers</h4>
                       <div className="space-y-3">
                         {projectSuppliers.map(sup => (
-                          <div key={sup.id} className="p-3 bg-slate-50 rounded-lg">
+                          <div key={sup.id} className="p-4 bg-slate-50 rounded-lg border border-slate-200">
                             <div className="font-medium text-slate-900">{sup.supplier_name}</div>
-                            <div className="text-xs text-slate-600 mt-1">
-                              {sup.contact_person && <div>Contact: {sup.contact_person}</div>}
-                              {sup.email && <div>Email: {sup.email}</div>}
-                              {sup.phone && <div>Phone: {sup.phone}</div>}
-                              {sup.country && <div>Location: {sup.city}, {sup.country}</div>}
-                              {sup.delivery_timeline_days && <div>Delivery: {sup.delivery_timeline_days} days</div>}
+                            {sup.supplier_type && <div className="text-xs font-medium text-blue-600 mt-1">Type: {sup.supplier_type}</div>}
+                            <div className="text-xs text-slate-600 mt-2 space-y-1">
+                              {sup.contact_person && <div>👤 {sup.contact_person}</div>}
+                              {sup.email && <div>📧 {sup.email}</div>}
+                              {sup.phone && <div>📞 {sup.phone}</div>}
+                              {sup.city && sup.country && <div>📍 {sup.city}, {sup.country}</div>}
+                              {sup.delivery_timeline_days && <div>🚚 Delivery: {sup.delivery_timeline_days} days</div>}
                             </div>
                           </div>
                         ))}
