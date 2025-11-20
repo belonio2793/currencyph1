@@ -616,6 +616,127 @@ export default function EmployeesModal({ businessId, userId, onClose }) {
                 </div>
               )}
 
+              {/* Edit Employee Form */}
+              {showEditForm && editingEmployeeId && (
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
+                  <h4 className="text-lg font-semibold text-slate-900 mb-4">Edit Employee</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="First Name"
+                      value={employeeForm.firstName}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, firstName: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Last Name"
+                      value={employeeForm.lastName}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, lastName: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="email"
+                      placeholder="Email"
+                      value={employeeForm.email}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, email: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Phone"
+                      value={employeeForm.phone}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, phone: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Position"
+                      value={employeeForm.position}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, position: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Department"
+                      value={employeeForm.department}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, department: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="date"
+                      value={employeeForm.hireDate}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, hireDate: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Base Salary"
+                      value={employeeForm.baseSalary}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, baseSalary: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="TIN"
+                      value={employeeForm.tin}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, tin: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="SSS Number"
+                      value={employeeForm.sssNumber}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, sssNumber: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="PhilHealth Number"
+                      value={employeeForm.philhealthNumber}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, philhealthNumber: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="PagIBIG Number"
+                      value={employeeForm.pagibigNumber}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, pagibigNumber: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Emergency Contact Name"
+                      value={employeeForm.emergencyContact}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, emergencyContact: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                    <input
+                      type="tel"
+                      placeholder="Emergency Contact Phone"
+                      value={employeeForm.emergencyContactPhone}
+                      onChange={(e) => setEmployeeForm({ ...employeeForm, emergencyContactPhone: e.target.value })}
+                      className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:border-blue-600"
+                    />
+                  </div>
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      onClick={handleSaveEdit}
+                      disabled={savingEmployee}
+                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 font-medium"
+                    >
+                      {savingEmployee ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button
+                      onClick={handleCancelEdit}
+                      className="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
               {/* Employees List */}
               {loading ? (
                 <div className="text-center py-12">
