@@ -67,7 +67,7 @@ function addLabel(doc, text, yPos, fontSize = 10, bold = false) {
 }
 
 function addValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
-  doc.setFontSize(10)
+  doc.setFontSize(9)
   doc.setTextColor(...COLORS.textLight)
   doc.setFont('helvetica', 'normal')
   doc.text(`${label}:`, xOffset, yPos)
@@ -75,10 +75,11 @@ function addValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
   doc.setTextColor(...COLORS.textDark)
   doc.setFont('helvetica', 'bold')
   const valueStr = String(value || 'N/A')
-  const valueLines = doc.splitTextToSize(valueStr, CONTENT_WIDTH - 60)
-  doc.text(valueLines, xOffset + 50, yPos)
+  const valueWidth = Math.max(CONTENT_WIDTH - 55, 40)
+  const valueLines = doc.splitTextToSize(valueStr, valueWidth)
+  doc.text(valueLines, xOffset + 45, yPos)
 
-  return yPos + (valueLines.length * 5)
+  return yPos + (valueLines.length * 5) + 2
 }
 
 function addMultilineValue(doc, label, value, yPos, xOffset = MARGINS.left + 5) {
