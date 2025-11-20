@@ -1219,12 +1219,18 @@ export default function Investments({ userId }) {
                                 <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-slate-200">
                                   <button
                                     onClick={() => {
-                                      const updated = editData.partnerships.filter((_, i) => i !== actualIdx)
-                                      setEditData(prev => ({ ...prev, partnerships: updated }))
+                                      if (confirm('Are you sure you want to delete this partnership?')) {
+                                        const updated = editData.partnerships.filter((_, i) => i !== actualIdx)
+                                        setEditData(prev => ({ ...prev, partnerships: updated }))
+                                        // Adjust page number if needed
+                                        if (partnerEditPage > Math.ceil(updated.length / 1)) {
+                                          setPartnerEditPage(Math.max(1, partnerEditPage - 1))
+                                        }
+                                      }
                                     }}
-                                    className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
+                                    className="px-3 py-1 text-sm bg-red-200 text-red-700 rounded hover:bg-red-300"
                                   >
-                                    Delete
+                                    🗑 Delete
                                   </button>
                                 </div>
                               </div>
