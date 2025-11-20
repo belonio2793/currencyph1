@@ -256,22 +256,22 @@ export function generateProjectPdf(project, equipment, suppliers, partnerships, 
   
   // Key Metrics Box
   doc.setFillColor(...COLORS.lightGray)
-  doc.rect(20, yPos, 170, 50, 'F')
-  
+  doc.rect(MARGINS.left, yPos, CONTENT_WIDTH, 50, 'F')
+
   yPos += 5
   const totalCost = costs.reduce((sum, c) => sum + (c.budgeted_amount_usd || 0), 0)
   const totalRaised = project.funded_amount_usd || 0
   const remaining = totalCost - totalRaised
-  
+
   yPos = addValue(doc, 'Total Project Cost', `$${totalCost.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
   yPos = addValue(doc, 'Amount Funded', `$${totalRaised.toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
   yPos = addValue(doc, 'Remaining to Fund', `$${Math.max(0, remaining).toLocaleString('en-US', { minimumFractionDigits: 2 })}`, yPos)
-  
+
   const fundingPercent = totalCost > 0 ? ((totalRaised / totalCost) * 100).toFixed(1) : 0
   doc.setFontSize(10)
   doc.setTextColor(...COLORS.green)
   doc.setFont('helvetica', 'bold')
-  doc.text(`Funding Progress: ${fundingPercent}%`, 25, yPos + 8)
+  doc.text(`Funding Progress: ${fundingPercent}%`, MARGINS.left + 5, yPos + 8)
   
   yPos += 35
   yPos = checkAndAddPage(doc, yPos, 50, project.name)
