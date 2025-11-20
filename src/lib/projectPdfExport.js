@@ -126,12 +126,13 @@ function addTwoColumnValues(doc, label1, value1, label2, value2, yPos) {
 }
 
 function addTable(doc, headers, rows, yPos) {
+  if (rows.length === 0) return yPos
+
   const tableWidth = CONTENT_WIDTH
   const colWidth = tableWidth / headers.length
-  const cellPadding = 2
-  const rowHeight = 8
+  const cellPadding = 1.5
+  const rowHeight = 7
   const startXPos = MARGINS.left
-  const maxRowHeight = 12
 
   doc.setFontSize(8)
 
@@ -143,8 +144,9 @@ function addTable(doc, headers, rows, yPos) {
   let xPos = startXPos
   for (let i = 0; i < headers.length; i++) {
     doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
-    const headerText = doc.splitTextToSize(headers[i], colWidth - 2 * cellPadding)
-    doc.text((headerText[0] || '').substring(0, 15), xPos + cellPadding, yPos + cellPadding + 1.5)
+    const headerText = doc.splitTextToSize(String(headers[i] || ''), colWidth - 2 * cellPadding)
+    const displayHeader = (headerText[0] || '').substring(0, 14)
+    doc.text(displayHeader, xPos + cellPadding, yPos + cellPadding + 1)
     xPos += colWidth
   }
 
@@ -158,36 +160,36 @@ function addTable(doc, headers, rows, yPos) {
   let alternateColor = false
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i]
-    let actualRowHeight = rowHeight
 
     if (alternateColor) {
       doc.setFillColor(...COLORS.lightGray)
       xPos = startXPos
       for (let j = 0; j < headers.length; j++) {
-        doc.rect(xPos, yPos, colWidth, actualRowHeight, 'F')
+        doc.rect(xPos, yPos, colWidth, rowHeight, 'F')
         xPos += colWidth
       }
+      doc.setTextColor(...COLORS.textDark)
     }
 
     xPos = startXPos
     for (let j = 0; j < row.length; j++) {
       const cellValue = String(row[j] || '')
-      const cellText = doc.splitTextToSize(cellValue, colWidth - 3 * cellPadding)
-      const displayText = cellText[0] ? cellText[0].substring(0, 20) : ''
-      doc.text(displayText, xPos + cellPadding, yPos + cellPadding + 1.5)
+      const cellText = doc.splitTextToSize(cellValue, colWidth - 2 * cellPadding)
+      const displayText = (cellText[0] || '').substring(0, 16)
+      doc.text(displayText, xPos + cellPadding, yPos + cellPadding + 1)
       xPos += colWidth
     }
 
     alternateColor = !alternateColor
-    yPos += actualRowHeight
+    yPos += rowHeight
   }
 
   // Border
   doc.setDrawColor(...COLORS.border)
-  doc.setLineWidth(0.2)
+  doc.setLineWidth(0.15)
   doc.rect(startXPos, headerYPos - rowHeight, tableWidth, rowHeight + (rowHeight * rows.length))
 
-  return yPos + 4
+  return yPos + 3
 }
 
 function addPageHeader(doc, projectName) {
