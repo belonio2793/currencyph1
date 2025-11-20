@@ -931,6 +931,13 @@ export default function Investments({ userId }) {
                                     </td>
                                   </tr>
                                 ))}
+                                <tr className="border-t-2 border-slate-300 bg-slate-50 font-semibold">
+                                  <td colSpan="4" className="py-3 px-2 text-sm text-slate-900">Total Annual Revenue</td>
+                                  <td className="py-3 px-2 text-sm">
+                                    <div className="text-slate-900">{formatPhp(revenueForecast.reduce((sum, rev) => sum + (rev.projected_annual_revenue_php || phpToUsd(rev.projected_annual_revenue_usd || 0, exchangeRate)), 0))}</div>
+                                    <div className="text-xs text-slate-600">{formatUsd(revenueForecast.reduce((sum, rev) => sum + (rev.projected_annual_revenue_usd || 0), 0))}</div>
+                                  </td>
+                                </tr>
                               </tbody>
                             </table>
                           </div>
