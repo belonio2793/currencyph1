@@ -686,7 +686,7 @@ export default function Investments({ userId }) {
                                   const updated = editData.costs.filter((_, i) => i !== idx)
                                   setEditData(prev => ({ ...prev, costs: updated }))
                                 }}
-                                className="px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
+                                className="px-3 py-1 text-sm bg-slate-200 text-slate-700 rounded hover:bg-slate-300"
                               >
                                 Delete
                               </button>
@@ -703,7 +703,7 @@ export default function Investments({ userId }) {
                                 costs: [...prev.costs, {}]
                               }))
                             }}
-                            className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                            className="px-4 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800"
                           >
                             + Add Cost
                           </button>
@@ -717,7 +717,7 @@ export default function Investments({ userId }) {
                               costs: [...prev.costs, {}]
                             }))
                           }}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 w-full"
+                          className="px-4 py-2 bg-slate-700 text-white text-sm rounded hover:bg-slate-800 w-full"
                         >
                           + Add More Costs
                         </button>
@@ -759,11 +759,11 @@ export default function Investments({ userId }) {
                           </tbody>
                         </table>
                       </div>
-                      <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <div className="mt-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
                         <div className="text-sm font-semibold text-slate-900">Total Project Cost</div>
-                        <div className="text-lg font-bold text-blue-600">
+                        <div className="text-lg font-bold text-slate-900">
                           <div>{formatPhp(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_php) || phpToUsd(c.budgeted_amount_usd || 0, exchangeRate)), 0))}</div>
-                          <div className="text-sm text-blue-600 mt-1">{formatUsd(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0))}</div>
+                          <div className="text-sm text-slate-700 mt-1">{formatUsd(projectCosts.reduce((sum, c) => sum + (Number(c.budgeted_amount_usd) || 0), 0))}</div>
                         </div>
                       </div>
                     </div>
@@ -906,9 +906,9 @@ export default function Investments({ userId }) {
                             <div className="text-xs text-slate-600 mt-1">{mile.milestone_type}</div>
                           </div>
                           <div className={`px-2 py-1 rounded text-xs font-medium ${
-                            mile.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
-                            mile.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
-                            mile.status === 'delayed' ? 'bg-red-100 text-red-700' :
+                            mile.status === 'completed' ? 'bg-slate-200 text-slate-700' :
+                            mile.status === 'in_progress' ? 'bg-slate-200 text-slate-700' :
+                            mile.status === 'delayed' ? 'bg-slate-200 text-slate-700' :
                             'bg-slate-100 text-slate-700'
                           }`}>
                             {mile.status}
@@ -921,7 +921,7 @@ export default function Investments({ userId }) {
                         {mile.progress_percentage > 0 && (
                           <div className="mt-2">
                             <div className="w-full bg-slate-200 rounded h-2">
-                              <div className="bg-blue-600 h-2 rounded" style={{ width: `${mile.progress_percentage}%` }} />
+                              <div className="bg-slate-400 h-2 rounded" style={{ width: `${mile.progress_percentage}%` }} />
                             </div>
                             <div className="text-xs text-slate-600 mt-1">{mile.progress_percentage}%</div>
                           </div>
@@ -940,8 +940,8 @@ export default function Investments({ userId }) {
                   ) : (
                     riskAssessment.map(risk => (
                       <div key={risk.id} className={`p-4 border rounded-lg ${
-                        risk.impact_severity === 'critical' ? 'border-red-300 bg-red-50' :
-                        risk.impact_severity === 'high' ? 'border-orange-300 bg-orange-50' :
+                        risk.impact_severity === 'critical' ? 'border-slate-300 bg-slate-50' :
+                        risk.impact_severity === 'high' ? 'border-slate-300 bg-slate-50' :
                         'border-slate-200 bg-slate-50'
                       }`}>
                         <div className="flex justify-between items-start mb-2">
@@ -950,10 +950,10 @@ export default function Investments({ userId }) {
                             <div className="text-xs text-slate-600 mt-1">{risk.risk_category}</div>
                           </div>
                           <div className={`px-2 py-1 rounded text-xs font-bold ${
-                            risk.impact_severity === 'critical' ? 'bg-red-200 text-red-700' :
-                            risk.impact_severity === 'high' ? 'bg-orange-200 text-orange-700' :
-                            risk.impact_severity === 'medium' ? 'bg-yellow-200 text-yellow-700' :
-                            'bg-green-200 text-green-700'
+                            risk.impact_severity === 'critical' ? 'bg-slate-300 text-slate-700' :
+                            risk.impact_severity === 'high' ? 'bg-slate-300 text-slate-700' :
+                            risk.impact_severity === 'medium' ? 'bg-slate-200 text-slate-700' :
+                            'bg-slate-200 text-slate-700'
                           }`}>
                             {risk.impact_severity?.toUpperCase()}
                           </div>
@@ -995,11 +995,11 @@ export default function Investments({ userId }) {
                 </select>
               </div>
 
-              {error && <p className="text-sm text-red-600">{error}</p>}
-              {success && <p className="text-sm text-emerald-600">{success}</p>}
+              {error && <p className="text-sm text-slate-700">{error}</p>}
+              {success && <p className="text-sm text-slate-700">{success}</p>}
 
               <div className="flex gap-3">
-                <button type="submit" className="flex-1 bg-emerald-600 text-white py-2 rounded-lg">Confirm Invest</button>
+                <button type="submit" className="flex-1 bg-slate-700 text-white py-2 rounded-lg hover:bg-slate-800">Confirm Invest</button>
                 <button type="button" onClick={() => setShowInvestModal(false)} className="px-4 py-2 border rounded-lg">Cancel</button>
               </div>
             </form>
