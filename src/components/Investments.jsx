@@ -8,7 +8,7 @@ import PaginatedProjectOverview from './PaginatedProjectOverview'
 import PaginatedSuppliersPartners from './PaginatedSuppliersPartners'
 import SalesProjectCard from './SalesProjectCard'
 import SalesProjectOverview from './SalesProjectOverview'
-import { generateComprehensiveProjectPdf } from '../lib/projectPdfExport'
+import { generateDynamicProjectPdf } from '../lib/dynamicProjectPdfExport'
 
 // Utility function to convert snake_case to Title Case
 function toTitleCase(str) {
