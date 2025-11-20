@@ -510,8 +510,8 @@ export default function Investments({ userId }) {
           <div className="w-full max-w-6xl bg-white rounded-xl shadow-lg max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
               <div>
-                <h3 className="text-2xl font-semibold text-slate-900">{selectedProject.name}</h3>
-                <p className="text-sm text-slate-600 mt-1">{selectedProject.description}</p>
+                <h3 className="text-2xl font-semibold text-slate-900">{toTitleCase(selectedProject.name) || selectedProject.name}</h3>
+                <p className="text-sm text-slate-600 mt-1">{toTitleCase(selectedProject.description) || selectedProject.description}</p>
               </div>
               <button onClick={() => setShowDetail(false)} className="text-sm text-slate-500 hover:text-slate-800">✕ Close</button>
             </div>
