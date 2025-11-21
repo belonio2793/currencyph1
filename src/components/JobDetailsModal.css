@@ -58,16 +58,22 @@
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: capitalize;
+  color: white;
 }
 
 .status-badge.active {
   background: rgba(200, 230, 201, 0.3);
-  color: #fff;
+  color: white;
 }
 
 .status-badge.filled {
   background: rgba(255, 204, 188, 0.3);
-  color: #fff;
+  color: white;
+}
+
+.status-badge.closed {
+  background: rgba(150, 150, 150, 0.3);
+  color: white;
 }
 
 .btn-edit-job {
