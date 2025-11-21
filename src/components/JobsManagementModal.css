@@ -408,20 +408,21 @@
 /* Empty State */
 .empty-state {
   text-align: center;
-  padding: 40px 20px;
+  padding: 20px 10px;
   color: #6b7280;
 }
 
 .empty-state p {
-  margin: 0 0 16px 0;
-  font-size: 1rem;
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
 }
 
 /* Loading */
 .loading {
   text-align: center;
-  padding: 40px 20px;
+  padding: 20px 10px;
   color: #6b7280;
+  font-size: 0.9rem;
 }
 
 /* Modal Footer */
