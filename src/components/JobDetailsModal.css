@@ -312,12 +312,12 @@
 .description-section,
 .skills-section,
 .timeline-section {
-  margin: 20px 0 0 0;
-  padding: 20px 0 0 0;
-  border-top: 1px solid #f0f0f0;
-  width: 100%;
-  box-sizing: border-box;
-  max-width: 100%;
+  margin: 20px 0 0 0 !important;
+  padding: 20px 0 0 0 !important;
+  border-top: 1px solid #f0f0f0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
 .description-section h4,
