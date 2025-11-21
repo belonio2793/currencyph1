@@ -49,12 +49,13 @@
   width: auto;
 }
 
-.modal-header > div:last-of-type {
+.header-buttons {
   display: flex;
   gap: 8px;
   align-items: center;
   margin-left: auto;
   flex-shrink: 0;
+  justify-content: flex-end;
 }
 
 .header-content h2 {
