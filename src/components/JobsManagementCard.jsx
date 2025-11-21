@@ -50,16 +50,16 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
         jobCount = 0
       }
 
-      // Get pending job offers
+      // Get pending job applications
       try {
         const { count } = await supabase
-          .from('job_offers')
+          .from('job_applications')
           .select('*', { count: 'exact' })
           .eq('business_id', business.id)
-          .eq('status', 'pending')
+          .eq('status', 'submitted')
         offersCount = count || 0
       } catch (offersErr) {
-        console.debug('Job offers table query failed:', offersErr?.message)
+        console.debug('Job applications table query failed:', offersErr?.message)
         offersCount = 0
       }
 
