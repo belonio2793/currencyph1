@@ -143,10 +143,9 @@ export default function MyBusinessEmployeeCard({ assignment, userId, onUpdate })
 
     try {
       const { error: err } = await supabase
-        .from('employee_assignments')
+        .from('job_applications')
         .update({
-          status: 'terminated',
-          end_date: new Date().toISOString().split('T')[0]
+          status: 'rejected'
         })
         .eq('id', assignment.id)
 
