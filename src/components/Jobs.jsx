@@ -146,7 +146,7 @@ export default function Jobs({ userId }) {
   }, [jobs, offers, userJobs])
 
   const loadJobs = async () => {
-    if (activeSection === 'employments') {
+    if (mainSection === 'my-employments') {
       // Skip loading - EmployeeDashboard handles its own data loading
       return
     }
@@ -155,13 +155,13 @@ export default function Jobs({ userId }) {
     setError('')
 
     try {
-      if (activeTab === 'job-listings') {
+      if (marketplaceTab === 'job-listings') {
         const data = await jobsService.getActiveJobs(filters)
         setJobs(data)
-      } else if (activeTab === 'offers-received') {
+      } else if (marketplaceTab === 'offers-received') {
         const data = await jobsService.getProviderOffers(userId)
         setOffers(data)
-      } else if (activeTab === 'my-jobs') {
+      } else if (marketplaceTab === 'my-jobs') {
         // Get jobs posted by the user
         const data = await jobsService.getUserJobHistory(userId)
         setUserJobs(data)
