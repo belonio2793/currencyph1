@@ -32,7 +32,7 @@ export const employeeMessagingService = {
       if (insertError) throw insertError
       return { data: newChannel, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeMessagingService] getOrCreateChatChannel failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -56,7 +56,7 @@ export const employeeMessagingService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeMessagingService] sendMessage failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -79,7 +79,7 @@ export const employeeMessagingService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeMessagingService] getMessages failed:', errorMsg)
       if (err?.code === '42P01') {
         console.warn('Note: employee_messages table does not exist. Please create it in Supabase.')
@@ -103,7 +103,7 @@ export const employeeMessagingService = {
       if (error && error.code !== 'PGRST116') throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeMessagingService] getLastMessageTime failed:', errorMsg)
       if (err?.code === '42P01') {
         console.warn('Note: employee_messages table does not exist. Please create it in Supabase.')
@@ -133,7 +133,7 @@ export const employeeMessagingService = {
         }
       }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeMessagingService] subscribeToEmployeeMessages failed:', errorMsg)
       return { unsubscribe: () => {} }
     }
