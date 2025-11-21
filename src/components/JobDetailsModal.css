@@ -143,8 +143,9 @@
   display: flex;
   gap: 0;
   border-bottom: 2px solid #e0e0e0;
-  padding: 0 24px;
+  padding: 0;
   background: #f9f9f9;
+  width: 100%;
 }
 
 .modal-tabs .tab {
