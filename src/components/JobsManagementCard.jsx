@@ -178,10 +178,6 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
           </button>
         </div>
 
-        {/* Access Indicator */}
-        <div className="access-feature">
-          <span className="feature-label">Access Feature</span>
-        </div>
       </div>
 
       {/* Jobs Management Modal */}
