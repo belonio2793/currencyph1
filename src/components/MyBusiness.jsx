@@ -1325,6 +1325,20 @@ export default function MyBusiness({ userId }) {
                 <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Access feature →</div>
               </button>
 
+              {/* Jobs & Hiring */}
+              <button onClick={() => setSelectedFeatureModal('jobs')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-blue-300 transition-all group">
+                <div className="flex justify-center mb-4">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 13.255A23.931 23.931 0 0112 15c-3.728 0-7.04-1.379-9.532-3.697M5 13h14M5 13a23.952 23.952 0 003.48-3.97m12.04 0a23.952 23.952 0 003.48 3.97M5 13c1.053-3.478 4.31-6 8-6s6.947 2.522 8 6" />
+                    </svg>
+                  </div>
+                </div>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Jobs & Hiring</h3>
+                <p className="text-sm text-slate-600 mb-4">Post jobs and manage job positions</p>
+                <div className="text-sm font-medium text-blue-600 group-hover:text-blue-700">Access feature →</div>
+              </button>
+
               {/* Employees & Payroll */}
               <button onClick={() => setShowEmployeesModal(true)} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
                 <div className="flex justify-center mb-4">
