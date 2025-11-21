@@ -508,8 +508,8 @@ export default function BusinessDirectory({ userId }) {
         </div>
       )}
 
-      {/* Request Modal */}
-      {showRequestModal && selectedBusiness && (
+      {/* Request Modal - Portaled to document body to prevent overflow clipping */}
+      {showRequestModal && selectedBusiness && createPortal(
         <BusinessRequestModal
           business={selectedBusiness}
           userId={userId}
@@ -518,11 +518,12 @@ export default function BusinessDirectory({ userId }) {
             setSelectedBusiness(null)
           }}
           onSubmitted={handleRequestSubmitted}
-        />
+        />,
+        document.body
       )}
 
-      {/* Edit Business Modal */}
-      {showEditModal && selectedBusiness && (
+      {/* Edit Business Modal - Portaled to document body to prevent overflow clipping */}
+      {showEditModal && selectedBusiness && createPortal(
         <BusinessEditModal
           business={selectedBusiness}
           userId={userId}
@@ -531,7 +532,8 @@ export default function BusinessDirectory({ userId }) {
             setSelectedBusiness(null)
           }}
           onUpdated={handleBusinessUpdated}
-        />
+        />,
+        document.body
       )}
     </div>
   )
