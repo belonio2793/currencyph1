@@ -187,12 +187,20 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
         .select(`
           id,
           business_id,
-          job_title,
-          job_category,
-          pay_rate,
-          job_type,
+          job_id,
+          position_applied_for,
+          salary_expectation,
+          salary_currency,
+          employment_type,
           submitted_at,
           status,
+          jobs(
+            id,
+            job_title,
+            job_category,
+            pay_rate,
+            job_type
+          ),
           businesses:business_id (
             id,
             business_name,
@@ -200,8 +208,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
             city_of_registration
           )
         `)
-        .eq('employee_id', selectedEmployee.id)
-        .eq('status', 'active')
+        .eq('applicant_user_id', selectedEmployee.id)
+        .eq('status', 'accepted')
 
       if (error) {
         console.error('Error loading employee businesses:', error)
