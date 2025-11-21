@@ -364,7 +364,15 @@ export const jobsService = {
     const { data, error } = await supabase
       .from('job_applications')
       .select(`
-        *,
+        id,
+        business_id,
+        job_id,
+        applicant_user_id,
+        position_applied_for,
+        employment_type,
+        status,
+        submitted_at,
+        created_at,
         jobs:job_id (
           id,
           job_title,
