@@ -565,6 +565,7 @@ export default function App() {
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
             {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
+            {activeTab === 'attendance' && <EmployeeAttendanceDashboard userId={userId} employeeId={userId} />}
           </>
         )}
       </main>
