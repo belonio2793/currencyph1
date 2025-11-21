@@ -256,8 +256,9 @@
 }
 
 .detail-section {
-  width: 100%;
-  box-sizing: border-box;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
 .detail-section h4 {
