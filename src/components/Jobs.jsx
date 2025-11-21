@@ -14,6 +14,7 @@ import OfferActions from './OfferActions'
 import SelectBusinessModal from './SelectBusinessModal'
 import UserProfilePreview from './UserProfilePreview'
 import UserProfileModal from './UserProfileModal'
+import EmployeeDashboard from './EmployeeDashboard'
 import './Jobs.css'
 
 export default function Jobs({ userId }) {
