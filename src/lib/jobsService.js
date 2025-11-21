@@ -129,16 +129,11 @@ export const jobsService = {
         is_public,
         created_at,
         updated_at,
-        job_offers (
+        job_applications (
           id,
           status,
-          service_provider_id,
-          provider_name,
-          provider_email,
-          provider_phone,
-          offered_rate,
-          offer_message,
-          created_at
+          applicant_user_id,
+          submitted_at
         ),
         job_ratings (
           id,
