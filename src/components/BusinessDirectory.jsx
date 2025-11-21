@@ -21,6 +21,8 @@ export default function BusinessDirectory({ userId }) {
   const [showEditModal, setShowEditModal] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [expandedCard, setExpandedCard] = useState(null)
+  const [showHideConfirmation, setShowHideConfirmation] = useState(false)
+  const [businessToHide, setBusinessToHide] = useState(null)
   const ITEMS_PER_PAGE = 12
 
   // Load user's businesses
