@@ -758,3 +758,17 @@
     width: 100%;
   }
 }
+
+/* My Employments Content */
+.my-employments-content {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0;
+}
+
+.my-employments-content .employee-dashboard {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin-top: 0;
+}
