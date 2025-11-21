@@ -29,28 +29,43 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
   const loadJobsData = async () => {
     try {
       setLoading(true)
-      
+
+      let jobCount = 0
+      let offersCount = 0
+
       // Get active jobs count
-      const { count: jobCount } = await supabase
-        .from('jobs')
-        .select('*', { count: 'exact' })
-        .eq('business_id', business.id)
-        .eq('status', 'active')
-        .is('deleted_at', null)
+      try {
+        const { count } = await supabase
+          .from('jobs')
+          .select('*', { count: 'exact' })
+          .eq('business_id', business.id)
+          .eq('status', 'active')
+          .is('deleted_at', null)
+        jobCount = count || 0
+      } catch (jobErr) {
+        console.debug('Jobs table query failed:', jobErr?.message)
+        jobCount = 0
+      }
 
       // Get pending job offers
-      const { count: offersCount } = await supabase
-        .from('job_offers')
-        .select('*', { count: 'exact' })
-        .eq('business_id', business.id)
-        .eq('status', 'pending')
+      try {
+        const { count } = await supabase
+          .from('job_offers')
+          .select('*', { count: 'exact' })
+          .eq('business_id', business.id)
+          .eq('status', 'pending')
+        offersCount = count || 0
+      } catch (offersErr) {
+        console.debug('Job offers table query failed:', offersErr?.message)
+        offersCount = 0
+      }
 
-      setJobsCount(jobCount || 0)
-      setPendingOffers(offersCount || 0)
+      setJobsCount(jobCount)
+      setPendingOffers(offersCount)
       setHiringStatus(business?.metadata?.hiring_status || 'not_hiring')
     } catch (err) {
       console.error('Error loading jobs data:', err)
-      setError('Failed to load jobs data')
+      // Don't set error for non-critical data loading issues
     } finally {
       setLoading(false)
     }
