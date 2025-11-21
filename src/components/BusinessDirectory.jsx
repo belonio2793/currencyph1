@@ -412,6 +412,20 @@ export default function BusinessDirectory({ userId }) {
                       </div>
                     </div>
 
+                    {/* Jobs Section - Different for owners vs job seekers */}
+                    {owner ? (
+                      <JobsManagementCard
+                        business={business}
+                        userId={userId}
+                        onUpdate={loadBusinesses}
+                      />
+                    ) : (
+                      <JobsJobSeekerDisplay
+                        business={business}
+                        userId={userId}
+                      />
+                    )}
+
                     {/* Owner Tools */}
                     {owner && (
                       <div className="detail-section owner-section">
