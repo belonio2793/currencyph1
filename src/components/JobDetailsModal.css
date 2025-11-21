@@ -234,6 +234,8 @@
   max-width: 100%;
   position: relative;
   min-width: 0;
+  left: 0;
+  right: 0;
 }
 
 .details-tab {
