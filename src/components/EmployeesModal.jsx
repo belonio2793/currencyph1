@@ -917,8 +917,7 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
                             if (business) {
                               setSelectedBusinessForAttendance({
                                 business_id: e.target.value,
-                                business: business,
-                                id: crypto.randomUUID()
+                                business: business
                               })
                             }
                           }}
