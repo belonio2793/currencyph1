@@ -40,6 +40,10 @@ export default function EmployeeDashboard({ userId }) {
         console.error('Error loading businesses:', businessesRes.error)
       } else {
         setMyBusinesses(businessesRes.data || [])
+        // Auto-select first business for attendance if available
+        if (businessesRes.data?.length > 0 && !selectedBusinessForAttendance) {
+          setSelectedBusinessForAttendance(businessesRes.data[0])
+        }
       }
 
       if (invitationsRes.error) {
@@ -58,6 +62,36 @@ export default function EmployeeDashboard({ userId }) {
     } finally {
       setLoading(false)
     }
+  }
+
+  const loadAttendanceRecords = async (businessId) => {
+    if (!businessId) return
+
+    try {
+      const startDate = new Date()
+      startDate.setMonth(startDate.getMonth() - 1)
+
+      const { data, error: err } = await supabase
+        .from('employee_attendance')
+        .select('*')
+        .eq('business_id', businessId)
+        .eq('user_id', userId)
+        .gte('attendance_date', startDate.toISOString().split('T')[0])
+        .order('attendance_date', { ascending: false })
+
+      if (err) {
+        console.error('Error loading attendance:', err)
+      } else {
+        setAttendanceRecords(data || [])
+      }
+    } catch (err) {
+      console.error('Error loading attendance records:', err)
+    }
+  }
+
+  const handleBusinessSelectionForAttendance = (business) => {
+    setSelectedBusinessForAttendance(business)
+    loadAttendanceRecords(business.business_id)
   }
 
   const handleInvitationAccepted = async (invitationId) => {
