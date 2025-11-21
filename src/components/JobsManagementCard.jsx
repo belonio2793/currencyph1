@@ -101,11 +101,11 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
   const getHiringStatusText = () => {
     switch (hiringStatus) {
       case 'actively_hiring':
-        return '🟢 Actively Hiring'
+        return 'Actively Hiring'
       case 'limited_hiring':
-        return '🟡 Limited Hiring'
+        return 'Limited Hiring'
       case 'not_hiring':
-        return '🔴 Not Hiring'
+        return 'Not Hiring'
       default:
         return 'Not Set'
     }
@@ -142,7 +142,7 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
               className="btn-manage-jobs"
               title="Manage jobs and hiring"
             >
-              ⚙️ Manage
+              Manage
             </button>
           </div>
         </div>

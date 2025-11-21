@@ -342,7 +342,7 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
                   className="btn-save"
                   disabled={loading}
                 >
-                  {loading ? 'Saving...' : 'Save Hiring Parameters'}
+                  {loading ? 'Saving...' : 'Save'}
                 </button>
               </div>
             </div>
