@@ -1,0 +1,379 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content.business-response-modal {
+  background: white;
+  border-radius: 8px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid #e5e7eb;
+  gap: 15px;
+}
+
+.modal-header div {
+  flex: 1;
+}
+
+.modal-header h2 {
+  margin: 0 0 5px 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.modal-header .text-slate-500 {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+  border-radius: 4px;
+}
+
+.modal-close:hover {
+  color: #1f2937;
+  background: #f3f4f6;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+/* Form Styles */
+.response-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Info Box */
+.info-box {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  font-size: 0.95rem;
+}
+
+.info-item:not(:last-child) {
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-item .label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.info-item .value {
+  color: #6b7280;
+  text-align: right;
+  flex: 1;
+  margin-left: 10px;
+  word-break: break-word;
+}
+
+/* Response Type Options */
+.response-type-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.radio-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.radio-option:hover {
+  border-color: #d1d5db;
+  background: #f9fafb;
+}
+
+.radio-option input[type="radio"] {
+  margin-top: 4px;
+  cursor: pointer;
+}
+
+.radio-option input[type="radio"]:checked {
+  accent-color: #667eea;
+}
+
+.radio-option input[type="radio"]:checked + .option-label {
+  color: #667eea;
+}
+
+.radio-option:has(input[type="radio"]:checked) {
+  border-color: #667eea;
+  background: #f0f4ff;
+}
+
+.option-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  color: #4b5563;
+}
+
+.option-title {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.option-desc {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+/* Conditional Section */
+.conditional-section {
+  background: #f0f4ff;
+  border: 1px solid #dbeafe;
+  border-radius: 6px;
+  padding: 12px;
+  margin-top: 8px;
+}
+
+.conditional-section .form-group {
+  margin-bottom: 12px;
+}
+
+.conditional-section .form-group:last-child {
+  margin-bottom: 0;
+}
+
+/* Form Groups */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.form-input,
+.form-textarea {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  color: #1f2937;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-input:disabled,
+.form-textarea:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-input[type="number"] {
+  font-family: inherit;
+}
+
+/* Character Counter */
+.form-group + .text-slate-500 {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin-top: -8px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: #e5e7eb;
+  border-color: #9ca3af;
+}
+
+.btn-submit {
+  background: #667eea;
+  color: white;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Error Message */
+.error-message {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.95rem;
+}
+
+.close-error {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: inherit;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s;
+}
+
+.close-error:hover {
+  opacity: 0.7;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: 10px;
+  }
+
+  .modal-content.business-response-modal {
+    max-width: 100%;
+  }
+
+  .modal-header {
+    flex-direction: column;
+  }
+
+  .modal-close {
+    align-self: flex-end;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+  }
+
+  .response-type-options {
+    gap: 10px;
+  }
+
+  .radio-option {
+    padding: 10px;
+  }
+
+  .option-title {
+    font-size: 0.95rem;
+  }
+
+  .option-desc {
+    font-size: 0.8rem;
+  }
+}
