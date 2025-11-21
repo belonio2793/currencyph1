@@ -174,18 +174,7 @@ export const employeeInvitationService = {
     try {
       const { data, error } = await supabase
         .from('employee_assignments')
-        .select(`
-          id,
-          business_id,
-          employee_id,
-          assigned_job_title,
-          assigned_job_category,
-          pay_rate,
-          employment_type,
-          start_date,
-          end_date,
-          status
-        `)
+        .select('id,business_id,employee_id,assigned_job_title,assigned_job_category,pay_rate,employment_type,start_date,end_date,status')
         .eq('user_id', userId)
         .eq('status', 'active')
         .order('start_date', { ascending: false })
@@ -198,10 +187,14 @@ export const employeeInvitationService = {
       // Fetch business details separately
       if (data && data.length > 0) {
         const businessIds = [...new Set(data.map(a => a.business_id))]
-        const { data: businesses } = await supabase
+        const { data: businesses, error: businessError } = await supabase
           .from('businesses')
-          .select('id, business_name, owner_id, city, province')
+          .select('id,business_name,owner_id,city,province')
           .in('id', businessIds)
+
+        if (businessError) {
+          console.error('[employeeInvitationService] Error fetching businesses:', businessError)
+        }
 
         const businessMap = {}
         businesses?.forEach(b => {
