@@ -253,8 +253,8 @@
 }
 
 .details-grid {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 24px;
   width: 100%;
   box-sizing: border-box;
