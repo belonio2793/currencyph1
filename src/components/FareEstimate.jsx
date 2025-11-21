@@ -119,7 +119,7 @@ export default function FareEstimate({ startCoord, endCoord, vehicleType = 'car'
         {isPeakHour && (
           <div className="flex justify-between items-center bg-orange-100 p-2 rounded">
             <div className="flex items-center gap-2">
-              <span className="text-orange-600">⏰</span>
+              <span className="text-orange-600 font-bold">*</span>
               <span className="text-sm text-orange-900 font-medium">Peak hour surcharge ({(fareBreakdown.timeOfDayMultiplier - 1) * 100}%)</span>
             </div>
             <span className="text-sm font-semibold text-orange-900">+{formatFare(fareBreakdown.timeAdjustment)}</span>
@@ -130,7 +130,7 @@ export default function FareEstimate({ startCoord, endCoord, vehicleType = 'car'
         {hasSurge && (
           <div className="flex justify-between items-center bg-red-100 p-2 rounded">
             <div className="flex items-center gap-2">
-              <span className="text-red-600">📈</span>
+              <span className="text-red-600 font-bold">!</span>
               <span className="text-sm text-red-900 font-medium">
                 High demand ({(fareBreakdown.surgeMultiplier).toFixed(1)}x)
               </span>
@@ -147,10 +147,10 @@ export default function FareEstimate({ startCoord, endCoord, vehicleType = 'car'
 
       {/* Notes */}
       <div className="text-xs text-slate-600 space-y-1 pt-2 border-t border-blue-200">
-        <p>💡 Final fare may vary based on actual route and traffic</p>
-        {hasSurge && <p>⚠️ High demand - rates are increased by {(fareBreakdown.surgeMultiplier - 1) * 100}%</p>}
-        {isPeakHour && <p>🕐 Peak hours in effect - additional surcharge applied</p>}
-        <p>✓ Inclusive of all taxes and fees</p>
+        <p>Final fare may vary based on actual route and traffic</p>
+        {hasSurge && <p>High demand - rates are increased by {(fareBreakdown.surgeMultiplier - 1) * 100}%</p>}
+        {isPeakHour && <p>Peak hours in effect - additional surcharge applied</p>}
+        <p>Inclusive of all taxes and fees</p>
       </div>
     </div>
   )

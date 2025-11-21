@@ -4,13 +4,13 @@ const VEHICLE_TYPES = [
   {
     id: 'car',
     label: 'Car',
-    icon: '🚗',
+    icon: 'C',
     color: 'from-blue-500 to-blue-600',
     description: 'Ride sharing with a comfortable car',
     criteria: [
-      { label: 'Passengers', icon: '👥', hint: '1-4 people' },
-      { label: 'Luggage', icon: '🧳', hint: 'Small bags' },
-      { label: 'Duration', icon: '⏱️', hint: 'Any duration' }
+      { label: 'Passengers', icon: 'P', hint: '1-4 people' },
+      { label: 'Luggage', icon: 'L', hint: 'Small bags' },
+      { label: 'Duration', icon: 'D', hint: 'Any duration' }
     ],
     details: {
       maxPassengers: 4,
@@ -21,13 +21,13 @@ const VEHICLE_TYPES = [
   {
     id: 'tricycle',
     label: 'Tricycle',
-    icon: '🛺',
+    icon: 'T',
     color: 'from-yellow-500 to-yellow-600',
     description: 'Budget-friendly three-wheeled transportation',
     criteria: [
-      { label: 'Passengers', icon: '👥', hint: '1-3 people' },
-      { label: 'Distance', icon: '📍', hint: 'Short to medium' },
-      { label: 'Cost', icon: '💰', hint: 'Most affordable' }
+      { label: 'Passengers', icon: 'P', hint: '1-3 people' },
+      { label: 'Distance', icon: 'D', hint: 'Short to medium' },
+      { label: 'Cost', icon: 'C', hint: 'Most affordable' }
     ],
     details: {
       maxPassengers: 3,
