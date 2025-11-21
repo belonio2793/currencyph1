@@ -146,14 +146,16 @@ export default function Jobs({ userId }) {
   }, [jobs, offers, userJobs])
 
   const loadJobs = async () => {
+    if (activeSection === 'employments') {
+      // Skip loading - EmployeeDashboard handles its own data loading
+      return
+    }
+
     setLoading(true)
     setError('')
 
     try {
-      if (activeTab === 'my-employments') {
-        // Skip loading - EmployeeDashboard handles its own data loading
-        setLoading(false)
-      } else if (activeTab === 'job-listings') {
+      if (activeTab === 'job-listings') {
         const data = await jobsService.getActiveJobs(filters)
         setJobs(data)
       } else if (activeTab === 'offers-received') {
@@ -168,9 +170,7 @@ export default function Jobs({ userId }) {
       console.error('Error loading jobs:', err)
       setError('Failed to load jobs. Please try again.')
     } finally {
-      if (activeTab !== 'my-employments') {
-        setLoading(false)
-      }
+      setLoading(false)
     }
   }
 
