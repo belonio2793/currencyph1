@@ -29,7 +29,7 @@ export default function JobInvitationCard({ invitation, userId, onAccepted, onRe
 
       try {
         // Create employee record first
-        const employeeRes = await employeeManagementService.createEmployee(
+        const employeeRes = await EmployeeManagementService.createEmployee(
           invitation.business_id,
           userId,
           {
