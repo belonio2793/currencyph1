@@ -159,6 +159,101 @@ class EmployeeManagementService {
     return data || []
   }
 
+  static async getEmployeeBusinessesWithAttendance(employeeId, startDate, endDate) {
+    const { data, error } = await supabase
+      .from('employee_assignments')
+      .select(`
+        id,
+        business_id,
+        employee_id,
+        assigned_job_title,
+        assigned_job_category,
+        pay_rate,
+        employment_type,
+        start_date,
+        end_date,
+        status,
+        businesses:business_id (
+          id,
+          business_name,
+          currency_registration_number,
+          city_of_registration,
+          registration_type,
+          tin
+        )
+      `)
+      .eq('employee_id', employeeId)
+      .eq('status', 'active')
+      .order('start_date', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching employee businesses:', error)
+      throw error
+    }
+
+    // Fetch attendance records for all businesses
+    const assignments = data || []
+    const attendanceMap = {}
+
+    for (const assignment of assignments) {
+      const { data: records, error: attendanceError } = await supabase
+        .from('employee_attendance')
+        .select('*')
+        .eq('business_id', assignment.business_id)
+        .eq('employee_id', employeeId)
+        .gte('attendance_date', startDate)
+        .lte('attendance_date', endDate)
+        .order('attendance_date', { ascending: false })
+
+      if (!attendanceError) {
+        attendanceMap[assignment.business_id] = records || []
+      }
+    }
+
+    return {
+      assignments,
+      attendanceMap
+    }
+  }
+
+  static async getAttendanceRecordsByBusinessId(businessId, employeeId, startDate, endDate) {
+    const { data, error } = await supabase
+      .from('employee_attendance')
+      .select('*')
+      .eq('business_id', businessId)
+      .eq('employee_id', employeeId)
+      .gte('attendance_date', startDate)
+      .lte('attendance_date', endDate)
+      .order('attendance_date', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching attendance records:', error)
+      throw error
+    }
+    return data || []
+  }
+
+  static async syncAttendanceByRegistrationNumber(employeeId, currencyRegistrationNumber, startDate, endDate) {
+    // Fetch business by currency registration number
+    const { data: businessData, error: businessError } = await supabase
+      .from('businesses')
+      .select('id, business_name, currency_registration_number')
+      .eq('currency_registration_number', currencyRegistrationNumber)
+      .single()
+
+    if (businessError) {
+      console.error('Error finding business by registration number:', businessError)
+      throw businessError
+    }
+
+    if (!businessData) {
+      throw new Error(`Business with registration number ${currencyRegistrationNumber} not found`)
+    }
+
+    // Fetch attendance records for this business
+    return this.getAttendanceRecordsByBusinessId(businessData.id, employeeId, startDate, endDate)
+  }
+
   static calculateHoursWorked(checkIn, checkOut) {
     if (!checkIn || !checkOut) return 0
     const inTime = new Date(checkIn)
