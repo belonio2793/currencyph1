@@ -488,36 +488,48 @@ export default function Jobs({ userId }) {
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="jobs-tabs">
+      {/* Main Tabs - Separate My Employments from Job Marketplace */}
+      <div className="jobs-main-tabs">
         <button
-          className={`tab ${activeTab === 'my-employments' ? 'active' : ''}`}
-          onClick={() => setActiveTab('my-employments')}
+          className={`main-tab ${mainSection === 'my-employments' ? 'active' : ''}`}
+          onClick={() => setMainSection('my-employments')}
         >
           My Employments
         </button>
         <button
-          className={`tab ${activeTab === 'job-listings' ? 'active' : ''}`}
-          onClick={() => setActiveTab('job-listings')}
+          className={`main-tab ${mainSection === 'job-marketplace' ? 'active' : ''}`}
+          onClick={() => setMainSection('job-marketplace')}
         >
-          Job Listings
-          <span className="tab-badge">{tabCounts.jobListings}</span>
-        </button>
-        <button
-          className={`tab ${activeTab === 'offers-received' ? 'active' : ''}`}
-          onClick={() => setActiveTab('offers-received')}
-        >
-          Offers Received
-          <span className="tab-badge">{tabCounts.offersReceived}</span>
-        </button>
-        <button
-          className={`tab ${activeTab === 'my-jobs' ? 'active' : ''}`}
-          onClick={() => setActiveTab('my-jobs')}
-        >
-          My Jobs
-          <span className="tab-badge">{tabCounts.myJobs}</span>
+          Job Marketplace
         </button>
       </div>
+
+      {/* Job Marketplace Sub-Tabs - Only shown when in Job Marketplace section */}
+      {mainSection === 'job-marketplace' && (
+        <div className="jobs-tabs">
+          <button
+            className={`tab ${marketplaceTab === 'job-listings' ? 'active' : ''}`}
+            onClick={() => setMarketplaceTab('job-listings')}
+          >
+            Job Listings
+            <span className="tab-badge">{tabCounts.jobListings}</span>
+          </button>
+          <button
+            className={`tab ${marketplaceTab === 'offers-received' ? 'active' : ''}`}
+            onClick={() => setMarketplaceTab('offers-received')}
+          >
+            Offers Received
+            <span className="tab-badge">{tabCounts.offersReceived}</span>
+          </button>
+          <button
+            className={`tab ${marketplaceTab === 'my-jobs' ? 'active' : ''}`}
+            onClick={() => setMarketplaceTab('my-jobs')}
+          >
+            My Jobs
+            <span className="tab-badge">{tabCounts.myJobs}</span>
+          </button>
+        </div>
+      )}
 
       {/* Error Message */}
       {error && (
