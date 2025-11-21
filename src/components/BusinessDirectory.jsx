@@ -176,6 +176,19 @@ export default function BusinessDirectory({ userId }) {
     setShowRequestModal(true)
   }
 
+  const handleEditBusiness = (business) => {
+    setSelectedBusiness(business)
+    setShowEditModal(true)
+  }
+
+  const handleBusinessUpdated = (updatedBusiness) => {
+    setShowEditModal(false)
+    setSelectedBusiness(null)
+    setError('success|Business updated successfully!')
+    setTimeout(() => setError(''), 3000)
+    loadBusinesses()
+  }
+
   const handleRequestSubmitted = () => {
     setShowRequestModal(false)
     setSelectedBusiness(null)
