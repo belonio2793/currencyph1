@@ -217,6 +217,11 @@
   width: 100%;
 }
 
+.detail-section {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .detail-section h4 {
   margin: 0 0 15px 0;
   color: #667eea;
