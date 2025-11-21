@@ -170,23 +170,22 @@
 .btn-open-modal {
   width: 100%;
   padding: 12px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   border: none;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: background-color 0.2s;
 }
 
 .btn-open-modal:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background-color: #5568d3;
 }
 
 .btn-open-modal:active {
-  transform: translateY(0);
+  background-color: #4556bb;
 }
 
 /* Access Feature Badge */
