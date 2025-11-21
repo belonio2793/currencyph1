@@ -26,22 +26,31 @@
 }
 
 .post-job-modal .close-btn {
-  background: none;
+  background: rgba(0, 0, 0, 0.08);
   border: none;
-  color: #1a1a1a;
+  color: #374151;
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.3s ease;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .post-job-modal .close-btn:hover {
-  opacity: 0.8;
+  background: rgba(0, 0, 0, 0.15);
+  color: #1f2937;
+  transform: scale(1.1) rotate(90deg);
+}
+
+.post-job-modal .close-btn:active {
+  transform: scale(0.95) rotate(90deg);
 }
 
 .post-job-modal .error-message {
