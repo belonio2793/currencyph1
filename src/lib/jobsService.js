@@ -319,13 +319,13 @@ export const jobsService = {
     return data || []
   },
 
-  // Get offers submitted by a service provider
+  // Get applications submitted by a user (service provider)
   async getProviderOffers(providerId) {
     const { data, error } = await supabase
-      .from('job_offers')
+      .from('job_applications')
       .select(`
         *,
-        jobs (
+        jobs:job_id (
           id,
           job_title,
           job_category,
@@ -335,8 +335,8 @@ export const jobsService = {
           created_at
         )
       `)
-      .eq('service_provider_id', providerId)
-      .order('created_at', { ascending: false })
+      .eq('applicant_user_id', providerId)
+      .order('submitted_at', { ascending: false })
 
     if (error) throw error
     return data || []
