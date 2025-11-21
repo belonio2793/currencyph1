@@ -39,7 +39,6 @@ import ChessPage from './components/ChessPage'
 import Rides from './components/Rides'
 import TradingDashboard from './components/Trading/TradingDashboard'
 import Sunshine from './components/Sunshine'
-import EmployeeAttendanceDashboard from './components/EmployeeAttendanceDashboard'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
@@ -565,7 +564,6 @@ export default function App() {
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
             {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
-            {activeTab === 'attendance' && <EmployeeAttendanceDashboard userId={userId} employeeId={userId} />}
           </>
         )}
       </main>
