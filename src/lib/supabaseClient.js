@@ -123,6 +123,13 @@ async function checkSupabaseHealth(retryCount = 0) {
       _supabaseHealthy = response.ok
       _connectionRetries = 0
 
+      // Properly consume the response body to avoid stream conflicts
+      try {
+        await response.text()
+      } catch (e) {
+        // Ignore body reading errors - status is what matters
+      }
+
       if (!_supabaseHealthy) {
         console.warn('[supabase-client] Health check failed with status:', response.status)
       } else {
