@@ -167,6 +167,7 @@
   width: 100%;
   flex-shrink: 0;
   overflow-x: auto;
+  box-sizing: border-box;
 }
 
 .modal-tabs .tab {
