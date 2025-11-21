@@ -20,7 +20,7 @@
 .card-header-jobs {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 16px;
 }
 
@@ -28,20 +28,6 @@
   display: flex;
   gap: 12px;
   flex: 1;
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.header-icon {
-  font-size: 2rem;
-  min-width: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .header-text {
