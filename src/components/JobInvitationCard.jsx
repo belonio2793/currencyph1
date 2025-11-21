@@ -1,206 +1,242 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { employeeInvitationService } from '../lib/employeeInvitationService'
-import { supabase } from '../lib/supabaseClient'
+import { employeeManagementService } from '../lib/employeeManagementService'
+import { formatFieldValue } from '../lib/formatters'
+import './JobInvitationCard.css'
 
-export default function JobInvitationCard({ invitation, userId, onInvitationAccepted, onInvitationRejected }) {
-  const [processing, setProcessing] = useState(false)
-  const [error, setError] = useState(null)
-  const [employeeId, setEmployeeId] = useState(null)
+export default function JobInvitationCard({ invitation, userId, onAccepted, onRejected, onHidden }) {
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [showConfirmation, setShowConfirmation] = useState(false)
+  const [confirmAction, setConfirmAction] = useState(null)
 
-  React.useEffect(() => {
-    loadEmployeeId()
-  }, [userId])
-
-  const loadEmployeeId = async () => {
-    try {
-      const { data } = await supabase
-        .from('employees')
-        .select('id')
-        .eq('user_id', userId)
-        .single()
-
-      if (data) {
-        setEmployeeId(data.id)
-      }
-    } catch (err) {
-      console.error('Error loading employee ID:', err)
-    }
+  const calculateDaysUntilExpiry = (expiresAt) => {
+    if (!expiresAt) return null
+    const now = new Date()
+    const expiry = new Date(expiresAt)
+    const diffTime = expiry - now
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    return diffDays
   }
 
+  const daysUntilExpiry = calculateDaysUntilExpiry(invitation.expires_at)
+  const isExpired = daysUntilExpiry && daysUntilExpiry <= 0
+
   const handleAccept = async () => {
-    if (!employeeId) {
-      setError('Employee record not found. Please try again.')
-      return
-    }
+    if (confirmAction === 'accept') {
+      setIsLoading(true)
+      setError('')
 
-    try {
-      setProcessing(true)
-      setError(null)
+      try {
+        // Create employee record first
+        const employeeRes = await employeeManagementService.createEmployee(
+          invitation.business_id,
+          userId,
+          {
+            firstName: 'New',
+            lastName: 'Employee',
+            position: invitation.job_title,
+            baseSalary: invitation.pay_rate,
+            hireDate: new Date().toISOString().split('T')[0]
+          }
+        )
 
-      const { error: acceptError } = await employeeInvitationService.acceptInvitation(
-        invitation.id,
-        employeeId
-      )
+        if (!employeeRes || !employeeRes.id) {
+          throw new Error('Failed to create employee record')
+        }
 
-      if (acceptError) throw acceptError
+        // Accept invitation
+        const res = await employeeInvitationService.acceptInvitation(
+          invitation.id,
+          employeeRes.id
+        )
 
-      onInvitationAccepted()
-    } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
-      console.error('Error accepting invitation:', errorMsg)
-      setError(`Failed to accept invitation: ${errorMsg}`)
-    } finally {
-      setProcessing(false)
+        if (res.error) {
+          throw res.error
+        }
+
+        setShowConfirmation(false)
+        setConfirmAction(null)
+        onAccepted()
+      } catch (err) {
+        console.error('Error accepting invitation:', err)
+        setError('Failed to accept invitation. Please try again.')
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      setConfirmAction('accept')
+      setShowConfirmation(true)
     }
   }
 
   const handleReject = async () => {
-    try {
-      setProcessing(true)
-      setError(null)
+    if (confirmAction === 'reject') {
+      setIsLoading(true)
+      setError('')
 
-      const { error: rejectError } = await employeeInvitationService.rejectInvitation(invitation.id)
+      try {
+        const res = await employeeInvitationService.rejectInvitation(invitation.id)
 
-      if (rejectError) throw rejectError
+        if (res.error) {
+          throw res.error
+        }
 
-      onInvitationRejected()
-    } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
-      console.error('Error rejecting invitation:', errorMsg)
-      setError(`Failed to reject invitation: ${errorMsg}`)
-    } finally {
-      setProcessing(false)
+        setShowConfirmation(false)
+        setConfirmAction(null)
+        onRejected()
+      } catch (err) {
+        console.error('Error rejecting invitation:', err)
+        setError('Failed to reject invitation. Please try again.')
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      setConfirmAction('reject')
+      setShowConfirmation(true)
     }
   }
 
   const handleHide = async () => {
+    setIsLoading(true)
+    setError('')
+
     try {
-      setProcessing(true)
-      setError(null)
+      const res = await employeeInvitationService.hideInvitation(invitation.id)
 
-      const { error: hideError } = await employeeInvitationService.hideInvitation(invitation.id)
+      if (res.error) {
+        throw res.error
+      }
 
-      if (hideError) throw hideError
-
-      onInvitationRejected()
+      onHidden()
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
-      console.error('Error hiding invitation:', errorMsg)
-      setError(`Failed to hide invitation: ${errorMsg}`)
+      console.error('Error hiding invitation:', err)
+      setError('Failed to hide invitation. Please try again.')
     } finally {
-      setProcessing(false)
+      setIsLoading(false)
     }
   }
 
-  const isExpired = invitation.expires_at && new Date(invitation.expires_at) < new Date()
-  const daysUntilExpiry = invitation.expires_at
-    ? Math.ceil((new Date(invitation.expires_at) - new Date()) / (1000 * 60 * 60 * 24))
-    : null
+  const handleConfirmCancel = () => {
+    setShowConfirmation(false)
+    setConfirmAction(null)
+  }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-      {/* Header */}
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-bold text-slate-900">{invitation.job_title}</h3>
-          <p className="text-sm text-slate-600 mt-1">
-            from <span className="font-semibold">{invitation.business?.business_name}</span>
-          </p>
-        </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-          isExpired
-            ? 'bg-red-100 text-red-700'
-            : 'bg-blue-100 text-blue-700'
-        }`}>
-          {isExpired ? 'Expired' : 'Pending'}
-        </span>
-      </div>
-
-      {/* Job Details */}
-      <div className="grid grid-cols-3 gap-4 mb-4 py-4 border-y border-slate-200">
-        <div>
-          <p className="text-xs text-slate-600 font-semibold uppercase">Job Type</p>
-          <p className="text-sm font-medium text-slate-900 mt-1">
-            {invitation.job_type ? invitation.job_type.replace('_', ' ') : 'N/A'}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-600 font-semibold uppercase">Pay Rate</p>
-          <p className="text-sm font-medium text-slate-900 mt-1">
-            ₱{invitation.pay_rate?.toFixed(2) || 'Negotiable'}
-          </p>
-        </div>
-        <div>
-          <p className="text-xs text-slate-600 font-semibold uppercase">Category</p>
-          <p className="text-sm font-medium text-slate-900 mt-1">
-            {invitation.job_category ? invitation.job_category.replace('_', ' ') : 'General'}
-          </p>
-        </div>
-      </div>
-
-      {/* Description */}
-      {invitation.job_description && (
-        <div className="mb-4">
-          <p className="text-sm text-slate-700 line-clamp-2">
-            {invitation.job_description}
-          </p>
-        </div>
-      )}
-
-      {/* Message */}
-      {invitation.message && (
-        <div className="mb-4 bg-slate-50 p-3 rounded border border-slate-200">
-          <p className="text-xs text-slate-600 font-semibold uppercase mb-1">Message from Employer</p>
-          <p className="text-sm text-slate-700">"{invitation.message}"</p>
-        </div>
-      )}
-
-      {/* Expiry Info */}
-      {!isExpired && daysUntilExpiry !== null && (
-        <div className="mb-4 text-xs text-orange-600 font-medium">
-          ⏰ Expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}
-        </div>
-      )}
-
-      {/* Error Message */}
+    <div className="job-invitation-card">
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded p-3">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="card-error">
+          {error}
         </div>
       )}
 
-      {/* Actions */}
-      <div className="flex gap-3">
-        <button
-          onClick={handleAccept}
-          disabled={processing || isExpired}
-          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 font-medium text-sm transition-colors"
-        >
-          {processing ? 'Processing...' : 'Accept'}
-        </button>
-        <button
-          onClick={handleReject}
-          disabled={processing || isExpired}
-          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:bg-slate-300 font-medium text-sm transition-colors"
-        >
-          {processing ? 'Processing...' : 'Reject'}
-        </button>
-        <button
-          onClick={handleHide}
-          disabled={processing}
-          className="flex-1 px-4 py-2 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 disabled:bg-slate-300 font-medium text-sm transition-colors"
-        >
-          {processing ? 'Processing...' : 'Hide'}
-        </button>
+      <div className="invitation-header">
+        <div className="invitation-title-section">
+          <h3 className="job-title">{invitation.job_title}</h3>
+          <p className="business-name">{invitation.business?.business_name || 'Unknown Business'}</p>
+        </div>
+        <div className="invitation-status-section">
+          {isExpired ? (
+            <span className="expiry-badge expired">Expired</span>
+          ) : daysUntilExpiry && daysUntilExpiry <= 3 ? (
+            <span className="expiry-badge expiring">Expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}</span>
+          ) : daysUntilExpiry ? (
+            <span className="expiry-badge active">Valid for {daysUntilExpiry} more days</span>
+          ) : null}
+        </div>
       </div>
 
-      {/* Business Owner Info */}
-      <div className="mt-4 pt-4 border-t border-slate-200">
-        <p className="text-xs text-slate-600">
-          Invited by <span className="font-semibold text-slate-900">
-            {invitation.invited_by?.full_name || 'Business Manager'}
-          </span>
-        </p>
+      <div className="invitation-details">
+        <div className="detail-item">
+          <span className="label">Position:</span>
+          <span className="value">{invitation.job_title}</span>
+        </div>
+        {invitation.job_category && (
+          <div className="detail-item">
+            <span className="label">Category:</span>
+            <span className="value">{invitation.job_category}</span>
+          </div>
+        )}
+        <div className="detail-item">
+          <span className="label">Pay Rate:</span>
+          <span className="value">₱{invitation.pay_rate?.toFixed(2)}</span>
+        </div>
+        <div className="detail-item">
+          <span className="label">Type:</span>
+          <span className="value">{formatFieldValue(invitation.job_type)}</span>
+        </div>
+      </div>
+
+      {invitation.job_description && (
+        <div className="invitation-description">
+          <p>{invitation.job_description}</p>
+        </div>
+      )}
+
+      {invitation.message && (
+        <div className="invitation-message">
+          <strong>Message from employer:</strong>
+          <p>{invitation.message}</p>
+        </div>
+      )}
+
+      <div className="sent-date">
+        <small>Sent {new Date(invitation.sent_at).toLocaleDateString()}</small>
+      </div>
+
+      {showConfirmation && (
+        <div className="confirmation-dialog">
+          <div className="confirmation-content">
+            <p>
+              {confirmAction === 'accept'
+                ? 'Are you sure you want to accept this job invitation?'
+                : 'Are you sure you want to reject this job invitation?'}
+            </p>
+            <div className="confirmation-actions">
+              <button
+                className="btn-confirm-yes"
+                onClick={confirmAction === 'accept' ? handleAccept : handleReject}
+                disabled={isLoading}
+              >
+                {isLoading ? 'Processing...' : confirmAction === 'accept' ? 'Accept' : 'Reject'}
+              </button>
+              <button
+                className="btn-confirm-no"
+                onClick={handleConfirmCancel}
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="invitation-actions">
+        <button
+          className="btn-accept"
+          onClick={handleAccept}
+          disabled={isLoading || isExpired || showConfirmation && confirmAction !== 'accept'}
+          title={isExpired ? 'This invitation has expired' : ''}
+        >
+          {showConfirmation && confirmAction === 'accept' ? 'Confirming...' : 'Accept'}
+        </button>
+        <button
+          className="btn-reject"
+          onClick={handleReject}
+          disabled={isLoading || isExpired || showConfirmation && confirmAction !== 'reject'}
+          title={isExpired ? 'This invitation has expired' : ''}
+        >
+          {showConfirmation && confirmAction === 'reject' ? 'Confirming...' : 'Reject'}
+        </button>
+        <button
+          className="btn-hide"
+          onClick={handleHide}
+          disabled={isLoading}
+          title="Hide this invitation"
+        >
+          Hide
+        </button>
       </div>
     </div>
   )
