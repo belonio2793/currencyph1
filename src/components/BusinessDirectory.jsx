@@ -202,23 +202,36 @@ export default function BusinessDirectory({ userId }) {
     loadBusinesses()
   }
 
-  const handleToggleVisibility = async (business) => {
+  const handleToggleVisibility = (business) => {
+    const currentVisibility = business.metadata?.visible !== false
+    // If hiding (currentVisibility is true), show confirmation
+    if (currentVisibility) {
+      setBusinessToHide(business)
+      setShowHideConfirmation(true)
+    } else {
+      // If showing (currentVisibility is false), directly show it
+      confirmVisibilityChange(business, true)
+    }
+  }
+
+  const confirmVisibilityChange = async (business, newVisibility) => {
     try {
-      const currentVisibility = business.metadata?.visible !== false
       const { error: err } = await supabase
         .from('businesses')
         .update({
           metadata: {
             ...business.metadata,
-            visible: !currentVisibility
+            visible: newVisibility
           }
         })
         .eq('id', business.id)
 
       if (err) throw err
       loadBusinesses()
-      setError(`success|Business visibility ${!currentVisibility ? 'enabled' : 'disabled'}`)
+      setError(`success|Business visibility ${newVisibility ? 'enabled' : 'disabled'}`)
       setTimeout(() => setError(''), 3000)
+      setShowHideConfirmation(false)
+      setBusinessToHide(null)
     } catch (err) {
       console.error('Error updating visibility:', err?.message)
       setError('Failed to update visibility')
