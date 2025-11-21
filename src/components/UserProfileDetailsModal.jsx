@@ -63,9 +63,9 @@ export default function UserProfileDetailsModal({ userId, onClose }) {
           .select('id', { count: 'exact' })
           .eq('posted_by_user_id', userId),
         supabase
-          .from('job_offers')
+          .from('job_applications')
           .select('id', { count: 'exact' })
-          .eq('service_provider_id', userId)
+          .eq('applicant_user_id', userId)
           .eq('status', 'accepted'),
         supabase
           .from('job_history')
