@@ -97,7 +97,7 @@ export default function ApplyConfirmationModal({
         {/* Header */}
         <div className="confirmation-header">
           <h2>Apply for Job</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose}>X</button>
         </div>
 
         {/* Content */}
@@ -186,7 +186,7 @@ export default function ApplyConfirmationModal({
         {error && (
           <div className="error-message" style={{ marginBottom: '12px' }}>
             {error}
-            <button onClick={() => setError('')} className="close-error">×</button>
+            <button onClick={() => setError('')} className="close-error">X</button>
           </div>
         )}
 

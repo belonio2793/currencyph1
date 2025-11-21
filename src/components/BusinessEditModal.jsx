@@ -75,13 +75,13 @@ export default function BusinessEditModal({ business, userId, onClose, onUpdated
       <div className="modal-content business-edit-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2>Edit Business Details</h2>
-          <button className="btn-close" onClick={onClose}>×</button>
+          <button className="btn-close" onClick={onClose}>X</button>
         </div>
 
         {error && (
           <div className="error-message">
             {error}
-            <button onClick={() => setError('')} className="close-error">×</button>
+            <button onClick={() => setError('')} className="close-error">X</button>
           </div>
         )}
 
