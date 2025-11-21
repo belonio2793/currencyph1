@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { supabase } from '../lib/supabaseClient'
 import { jobsService } from '../lib/jobsService'
 import JobsManagementModal from './JobsManagementModal'
