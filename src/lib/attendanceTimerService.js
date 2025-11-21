@@ -13,7 +13,7 @@ export const attendanceTimerService = {
       if (error && error.code !== 'PGRST116') throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] getBusinessHours failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -44,7 +44,7 @@ export const attendanceTimerService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] saveBusinessHours failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -74,7 +74,7 @@ export const attendanceTimerService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] checkIn failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -100,7 +100,7 @@ export const attendanceTimerService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] checkOut failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -135,7 +135,7 @@ export const attendanceTimerService = {
 
       return { data: null, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] autoCheckOutIfNeeded failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -158,7 +158,7 @@ export const attendanceTimerService = {
       if (error && error.code !== 'PGRST116') throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] getCurrentCheckInStatus failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -188,7 +188,7 @@ export const attendanceTimerService = {
         error: null
       }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] getAttendanceRecords failed:', errorMsg)
       return { data: [], error: err }
     }
@@ -248,7 +248,7 @@ export const attendanceTimerService = {
         }
       }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[attendanceTimerService] subscribeToAttendance failed:', errorMsg)
       return { unsubscribe: () => {} }
     }
