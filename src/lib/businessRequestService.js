@@ -24,7 +24,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data: data || [], count: count || 0, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] getAllBusinesses failed:', errorMsg)
       return { data: [], count: 0, error: err }
     }
@@ -52,7 +52,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] getBusinessDetails failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -86,7 +86,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] submitBusinessRequest failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -124,7 +124,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] getUserRequests failed:', errorMsg)
       return { data: [], error: err }
     }
@@ -160,7 +160,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] getBusinessRequests failed:', errorMsg)
       return { data: [], error: err }
     }
@@ -183,7 +183,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] updateRequestStatus failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -205,7 +205,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] withdrawRequest failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -239,7 +239,7 @@ export const businessRequestService = {
 
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] submitResponse failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -257,7 +257,7 @@ export const businessRequestService = {
       if (error) throw error
       return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[businessRequestService] getResponsesForRequest failed:', errorMsg)
       return { data: [], error: err }
     }
