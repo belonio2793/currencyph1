@@ -123,11 +123,9 @@ export default function JobsJobSeekerDisplay({ business, userId }) {
           applicant_user_id: userId,
           status: 'submitted',
           cover_letter: applicationData.message,
-          job_title: selectedJob.job_title,
-          job_category: selectedJob.job_category,
-          pay_rate: selectedJob.pay_rate,
-          pay_currency: selectedJob.pay_currency || 'PHP',
-          submitted_at: new Date().toISOString()
+          position_applied_for: selectedJob.job_title,
+          salary_expectation: selectedJob.pay_rate,
+          salary_currency: selectedJob.pay_currency || 'PHP'
         }])
         .select()
 
