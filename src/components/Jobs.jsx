@@ -15,6 +15,7 @@ import SelectBusinessModal from './SelectBusinessModal'
 import UserProfilePreview from './UserProfilePreview'
 import UserProfileModal from './UserProfileModal'
 import EmployeeDashboard from './EmployeeDashboard'
+import BusinessCatalog from './BusinessCatalog'
 import './Jobs.css'
 
 export default function Jobs({ userId }) {
