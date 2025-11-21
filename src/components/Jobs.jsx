@@ -552,6 +552,17 @@ export default function Jobs({ userId }) {
         <div className="my-employments-content">
           {userId && <EmployeeDashboard userId={userId} />}
         </div>
+      ) : mainSection === 'businesses' ? (
+        <div className="businesses-content">
+          {userType === 'employer' && userBusinesses.length > 0 ? (
+            <BusinessRequestsManager
+              userId={userId}
+              selectedBusiness={selectedBusiness || userBusinesses[0]}
+            />
+          ) : (
+            <BusinessCatalog userId={userId} />
+          )}
+        </div>
       ) : marketplaceTab === 'job-listings' ? (
         <div className="jobs-content">
           <JobSearch
