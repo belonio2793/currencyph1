@@ -911,16 +911,14 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
                           Select Business for Attendance View
                         </label>
                         <select
-                          value={selectedBusinessForAttendance?.id || ''}
+                          value={selectedBusinessForAttendance?.business_id || ''}
                           onChange={(e) => {
-                            const assignment = Object.values(employeeBusinesses).find(
-                              b => b.id === e.target.value
-                            )
-                            if (assignment) {
+                            const business = employeeBusinesses[e.target.value]
+                            if (business) {
                               setSelectedBusinessForAttendance({
-                                business_id: assignment.id,
-                                business: assignment,
-                                id: e.target.value
+                                business_id: e.target.value,
+                                business: business,
+                                id: crypto.randomUUID()
                               })
                             }
                           }}
@@ -928,7 +926,7 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
                         >
                           <option value="">Choose a business...</option>
                           {Object.entries(employeeBusinesses).map(([businessId, business]) => (
-                            <option key={businessId} value={business.id}>
+                            <option key={businessId} value={businessId}>
                               {business.business_name}
                               {business.currency_registration_number && ` (${business.currency_registration_number})`}
                             </option>
