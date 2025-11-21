@@ -7,6 +7,7 @@ import SelectBusinessModal from './SelectBusinessModal'
 import EmployeesModal from './EmployeesModal'
 import EmployerJobsOverview from './EmployerJobsOverview'
 import JobsManagementCard from './JobsManagementCard'
+import JobsManagementModal from './JobsManagementModal'
 import { miscellaneousCostsService } from '../lib/miscellaneousCostsService'
 import { taxReportingService } from '../lib/taxReportingService'
 
