@@ -165,12 +165,20 @@ class EmployeeManagementService {
       .select(`
         id,
         business_id,
-        job_title,
-        job_category,
-        pay_rate,
-        job_type,
+        job_id,
+        position_applied_for,
+        salary_expectation,
+        salary_currency,
+        employment_type,
         submitted_at,
         status,
+        jobs(
+          id,
+          job_title,
+          job_category,
+          pay_rate,
+          job_type
+        ),
         businesses:business_id (
           id,
           business_name,
@@ -182,7 +190,7 @@ class EmployeeManagementService {
       `)
       .eq('applicant_user_id', employeeId)
       .eq('status', 'accepted')
-      .order('start_date', { ascending: false })
+      .order('submitted_at', { ascending: false })
 
     if (error) {
       console.error('Error fetching employee businesses:', error)
