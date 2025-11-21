@@ -247,6 +247,7 @@
   padding: 0;
   max-width: 100%;
   min-width: 0;
+  padding-right: 0;
 }
 
 .details-grid {
@@ -259,12 +260,14 @@
   padding: 0;
   max-width: 100%;
   min-width: 0;
+  align-items: start;
 }
 
 .detail-section {
   width: 100%;
   box-sizing: border-box;
   max-width: 100%;
+  overflow-x: auto;
 }
 
 .detail-section h4 {
