@@ -231,6 +231,9 @@
   grid-template-columns: 1fr 1fr;
   gap: 30px;
   width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .detail-section {
