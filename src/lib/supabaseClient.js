@@ -28,8 +28,11 @@ if (typeof window !== 'undefined') {
     const MAX_RETRIES = 2
     let retryCount = 0
 
-    const attemptFetch = () => {
-      return originalFetch.apply(this, args).catch(async (err) => {
+    const attemptFetch = async () => {
+      try {
+        const response = await originalFetch.apply(this, args)
+        return response
+      } catch (err) {
         // Log network errors with diagnostics
         const isSupabaseUrl = typeof url === 'string' && url.includes('supabase')
         const isHealthCheck = typeof url === 'string' && url.includes('/auth/v1/health')
@@ -59,7 +62,7 @@ if (typeof window !== 'undefined') {
         }
 
         throw err
-      })
+      }
     }
 
     return attemptFetch()
