@@ -226,25 +226,16 @@
     width: 100%;
   }
 
-  .header-actions {
-    width: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  .status-badge-header {
+    align-self: flex-start;
   }
 
-  .status-badge-header {
+  .manage-button-row {
     width: 100%;
-    text-align: center;
   }
 
   .btn-manage-jobs {
-    width: 100%;
-  }
-
-  .header-icon {
-    font-size: 1.5rem;
-    min-width: 40px;
+    flex: 1;
   }
 
   .header-text h3 {
