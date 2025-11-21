@@ -338,7 +338,7 @@
 .btn-view-details,
 .btn-apply {
   flex: 1;
-  padding: 12px 16px;
+  padding: 0;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -351,6 +351,7 @@
   align-items: center;
   justify-content: center;
   height: 44px;
+  line-height: 1;
 }
 
 .btn-view-details {
