@@ -252,8 +252,8 @@
 
 .details-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1fr;
+  gap: 24px;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
