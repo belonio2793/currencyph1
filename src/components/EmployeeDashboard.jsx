@@ -201,6 +201,12 @@ export default function EmployeeDashboard({ userId }) {
           <span className="tab-badge">{invitationCounts.myBusinesses}</span>
         </button>
         <button
+          className={`tab ${activeTab === 'attendance' ? 'active' : ''}`}
+          onClick={() => setActiveTab('attendance')}
+        >
+          My Attendance
+        </button>
+        <button
           className={`tab ${activeTab === 'invitations' ? 'active' : ''}`}
           onClick={() => setActiveTab('invitations')}
         >
