@@ -539,7 +539,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                     <div className="text-lg font-semibold text-white">{selectedTable.name}</div>
                     <div className="text-sm text-slate-300 mt-1">Stakes: {selectedTable.stake_min}/{selectedTable.stake_max} {selectedTable.currency_code}</div>
                     {userId && seats.some(s => s.user_id === userId) && (
-                      <div className="text-xs text-emerald-400 mt-1 font-semibold">✓ You are seated at this table</div>
+                      <div className="text-xs text-emerald-400 mt-1 font-semibold">You are seated at this table</div>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
