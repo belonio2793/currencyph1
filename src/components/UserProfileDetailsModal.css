@@ -34,24 +34,31 @@
 }
 
 .profile-header .close-btn {
-  background: none;
+  background: rgba(0, 0, 0, 0.08);
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: #64748b;
+  color: #374151;
   padding: 0;
-  width: 24px;
-  height: 24px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 4px;
-  transition: background-color 0.2s;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .profile-header .close-btn:hover {
-  background-color: #e2e8f0;
-  color: #1e293b;
+  background: rgba(0, 0, 0, 0.15);
+  color: #1f2937;
+  transform: scale(1.1) rotate(90deg);
+}
+
+.profile-header .close-btn:active {
+  transform: scale(0.95) rotate(90deg);
 }
 
 .profile-main {

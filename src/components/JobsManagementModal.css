@@ -53,22 +53,30 @@
 }
 
 .btn-close {
-  background: none;
+  background: rgba(255, 255, 255, 0.2);
   border: none;
   color: white;
-  font-size: 2rem;
+  font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 300;
+  letter-spacing: 0.5px;
 }
 
 .btn-close:hover {
-  opacity: 0.8;
+  background: rgba(255, 255, 255, 0.35);
+  transform: scale(1.1) rotate(90deg);
+}
+
+.btn-close:active {
+  transform: scale(0.95) rotate(90deg);
 }
 
 /* Messages */
