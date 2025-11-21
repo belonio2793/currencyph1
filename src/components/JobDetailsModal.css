@@ -37,6 +37,7 @@
   width: 100%;
   box-sizing: border-box;
   flex-wrap: nowrap;
+  min-height: 60px;
 }
 
 .header-content {
