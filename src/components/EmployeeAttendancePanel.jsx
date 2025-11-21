@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { attendanceTimerService } from '../lib/attendanceTimerService'
 
-export default function EmployeeAttendancePanel({ 
-  businessId, 
-  employee, 
+export default function EmployeeAttendancePanel({
+  businessId,
+  employee,
   userId,
-  isManager = true 
+  isManager = true,
+  businessDetails = null
 }) {
   const [currentCheckIn, setCurrentCheckIn] = useState(null)
   const [attendanceRecords, setAttendanceRecords] = useState([])
