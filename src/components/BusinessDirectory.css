@@ -8,10 +8,13 @@
 /* Header Section */
 .directory-header {
   margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
 }
 
 .header-content {
   margin-bottom: 25px;
+  flex-shrink: 0;
 }
 
 .header-content h2 {
@@ -19,12 +22,14 @@
   font-weight: 700;
   color: #1f2937;
   margin: 0 0 8px 0;
+  line-height: 1.2;
 }
 
 .header-content p {
   font-size: 1rem;
   color: #6b7280;
   margin: 0;
+  line-height: 1.4;
 }
 
 /* Filter Controls */
