@@ -588,13 +588,16 @@
 
   .card-actions {
     flex-direction: column;
+    padding: 10px 12px;
   }
 
   .btn-request,
   .btn-visibility,
-  .btn-manage {
+  .btn-manage,
+  .btn-edit-business {
     width: 100%;
     min-width: auto;
+    padding: 10px 12px;
   }
 
   .pagination {
