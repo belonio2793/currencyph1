@@ -70,9 +70,9 @@ export default function RideListings({ riders, drivers, startCoord, endCoord, on
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
             >
-              <option value="distance">🗺️ Distance</option>
-              <option value="price">💰 Price</option>
-              <option value="rating">⭐ Rating</option>
+              <option value="distance">Distance</option>
+              <option value="price">Price</option>
+              <option value="rating">Rating</option>
             </select>
           </div>
 
@@ -85,8 +85,8 @@ export default function RideListings({ riders, drivers, startCoord, endCoord, on
               className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
             >
               <option value="all">All Vehicles</option>
-              <option value="car">🚗 Car</option>
-              <option value="tricycle">🛺 Tricycle</option>
+              <option value="car">Car</option>
+              <option value="tricycle">Tricycle</option>
             </select>
           </div>
 

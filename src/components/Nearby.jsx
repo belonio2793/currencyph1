@@ -1297,7 +1297,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                             : 'bg-green-100 text-green-700 hover:bg-green-200'
                         }`}
                       >
-                        👍 Approve
+                        Approve
                       </button>
                       <button
                         onClick={() => handleApprovalVote(listing.id, 'reject')}
@@ -1307,7 +1307,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                             : 'bg-red-100 text-red-700 hover:bg-red-200'
                         }`}
                       >
-                        👎 Reject
+                        Reject
                       </button>
                     </div>
 
