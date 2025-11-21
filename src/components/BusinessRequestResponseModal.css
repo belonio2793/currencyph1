@@ -62,6 +62,10 @@
   justify-content: center;
   transition: color 0.2s;
   border-radius: 4px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .modal-close:hover {
