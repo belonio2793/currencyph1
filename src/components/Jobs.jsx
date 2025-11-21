@@ -467,8 +467,8 @@ export default function Jobs({ userId }) {
         </div>
       )}
 
-      {/* Business Selector for Employers */}
-      {userType === 'employer' && userBusinesses.length > 1 && (
+      {/* Business Selector for Employers - Only in Job Marketplace */}
+      {mainSection === 'job-marketplace' && userType === 'employer' && userBusinesses.length > 1 && (
         <div className="business-selector">
           <label>Select Business:</label>
           <select 
