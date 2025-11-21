@@ -392,9 +392,11 @@ export default function Jobs({ userId }) {
 
       <div className="jobs-header">
         <div className="jobs-title-section">
-          <h2>Jobs Marketplace</h2>
+          <h2>Jobs & Employment</h2>
           <p>
-            {userType === 'employer'
+            {mainSection === 'my-employments'
+              ? 'Manage your employment and track attendance'
+              : userType === 'employer'
               ? 'Post jobs and find service providers'
               : 'Browse jobs and submit your offers'}
           </p>
