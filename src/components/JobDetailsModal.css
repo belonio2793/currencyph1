@@ -206,7 +206,6 @@
   font-weight: 600;
   color: #666;
   cursor: pointer;
-  border-bottom: 3px solid transparent;
   transition: all 0.3s ease;
   white-space: nowrap;
   flex-shrink: 0;
@@ -219,7 +218,6 @@
 
 .modal-tabs .tab.active {
   color: #667eea;
-  border-bottom-color: #667eea;
 }
 
 /* Content */
