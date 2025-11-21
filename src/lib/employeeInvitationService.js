@@ -188,7 +188,7 @@ export const employeeInvitationService = {
       if (error) {
         const errorMsg = error?.message || error?.code || 'Unknown error'
         console.error('[employeeInvitationService] getEmployeeBusinesses error:', errorMsg)
-        throw error
+        return { data: [], error: error }
       }
 
       // Fetch business details separately
