@@ -28,19 +28,21 @@
 }
 
 .modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #667eea;
-  color: white;
-  border-radius: 12px 12px 0 0;
-  gap: 16px;
-  width: 100%;
-  box-sizing: border-box;
-  flex-wrap: nowrap;
-  min-height: 60px;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 24px !important;
+  border-bottom: 1px solid #e0e0e0 !important;
+  background: #667eea !important;
+  color: white !important;
+  border-radius: 12px 12px 0 0 !important;
+  gap: 16px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  flex-wrap: nowrap !important;
+  min-height: 60px !important;
+  margin: 0 !important;
+  position: relative !important;
 }
 
 .header-content {
