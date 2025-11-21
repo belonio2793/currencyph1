@@ -555,10 +555,6 @@
     margin: 0;
   }
 
-  .details-grid {
-    grid-template-columns: 1fr;
-  }
-
   .header-content h2 {
     font-size: 1.2rem;
   }
