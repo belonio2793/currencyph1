@@ -386,33 +386,34 @@ export const jobsService = {
     return data || []
   },
 
-  // Update job offer status
-  async updateJobOffer(offerId, updates) {
+  // Update job application status
+  async updateJobOffer(applicationId, updates) {
     const { data, error } = await supabase
-      .from('job_offers')
+      .from('job_applications')
       .update({
         ...updates,
         updated_at: new Date().toISOString()
       })
-      .eq('id', offerId)
+      .eq('id', applicationId)
       .select()
 
     if (error) throw error
     return data?.[0]
   },
 
-  // Accept a job offer
-  async acceptJobOffer(offerId) {
-    return this.updateJobOffer(offerId, {
+  // Accept a job application
+  async acceptJobOffer(applicationId) {
+    return this.updateJobOffer(applicationId, {
       status: 'accepted',
-      accepted_date: new Date().toISOString()
+      reviewed_at: new Date().toISOString()
     })
   },
 
-  // Reject a job offer
-  async rejectJobOffer(offerId) {
-    return this.updateJobOffer(offerId, {
-      status: 'rejected'
+  // Reject a job application
+  async rejectJobOffer(applicationId) {
+    return this.updateJobOffer(applicationId, {
+      status: 'rejected',
+      reviewed_at: new Date().toISOString()
     })
   },
 
