@@ -340,11 +340,12 @@
 }
 
 .skills-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
-  box-sizing: border-box;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
 .skill-tag {
