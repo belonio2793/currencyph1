@@ -93,13 +93,13 @@
   gap: 25px;
 }
 
-.form-section {
+.post-job-modal .form-section {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-.form-section h3 {
+.post-job-modal .form-section h3 {
   margin: 0;
   color: #1a1a1a;
   font-size: 1.1rem;
@@ -110,21 +110,21 @@
   color: #667eea;
 }
 
-.form-group {
+.post-job-modal .form-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.form-group label {
+.post-job-modal .form-group label {
   color: #1a1a1a;
   font-weight: 600;
   font-size: 0.9rem;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea {
+.post-job-modal .form-group input,
+.post-job-modal .form-group select,
+.post-job-modal .form-group textarea {
   padding: 10px 12px;
   border: 1px solid #e0e0e0;
   border-radius: 6px;
@@ -133,31 +133,31 @@
   transition: all 0.3s ease;
 }
 
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
+.post-job-modal .form-group input:focus,
+.post-job-modal .form-group select:focus,
+.post-job-modal .form-group textarea:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-group textarea {
+.post-job-modal .form-group textarea {
   resize: vertical;
 }
 
-.form-row {
+.post-job-modal .form-row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 15px;
 }
 
 /* Skills Section */
-.skill-input-group {
+.post-job-modal .skill-input-group {
   display: flex;
   gap: 8px;
 }
 
-.skill-input {
+.post-job-modal .skill-input {
   flex: 1;
   padding: 10px 12px;
   border: 1px solid #e0e0e0;
@@ -166,13 +166,13 @@
   transition: all 0.3s ease;
 }
 
-.skill-input:focus {
+.post-job-modal .skill-input:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.btn-add-skill {
+.post-job-modal .btn-add-skill {
   background: #667eea;
   color: white;
   border: none;
@@ -184,18 +184,18 @@
   white-space: nowrap;
 }
 
-.btn-add-skill:hover {
+.post-job-modal .btn-add-skill:hover {
   background: #5568d3;
 }
 
-.skills-list {
+.post-job-modal .skills-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 10px;
 }
 
-.skill-tag {
+.post-job-modal .skill-tag {
   background: #e8eaf6;
   color: #667eea;
   padding: 6px 12px;
@@ -207,7 +207,7 @@
   gap: 8px;
 }
 
-.remove-skill {
+.post-job-modal .remove-skill {
   background: none;
   border: none;
   color: #667eea;
@@ -220,7 +220,7 @@
   transition: all 0.2s ease;
 }
 
-.remove-skill:hover {
+.post-job-modal .remove-skill:hover {
   opacity: 0.7;
 }
 
@@ -256,7 +256,7 @@
 }
 
 /* Form Actions */
-.form-actions {
+.post-job-modal .form-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -265,8 +265,8 @@
   border-top: 1px solid #e0e0e0;
 }
 
-.btn-cancel,
-.btn-submit {
+.post-job-modal .btn-cancel,
+.post-job-modal .btn-submit {
   padding: 12px 20px;
   border: none;
   border-radius: 6px;
@@ -276,25 +276,25 @@
   transition: all 0.3s ease;
 }
 
-.btn-cancel {
+.post-job-modal .btn-cancel {
   background: #e0e0e0;
   color: #1a1a1a;
 }
 
-.btn-cancel:hover {
+.post-job-modal .btn-cancel:hover {
   background: #d0d0d0;
 }
 
-.btn-submit {
+.post-job-modal .btn-submit {
   background: #667eea;
   color: white;
 }
 
-.btn-submit:hover:not(:disabled) {
+.post-job-modal .btn-submit:hover:not(:disabled) {
   background: #5568d3;
 }
 
-.btn-submit:disabled {
+.post-job-modal .btn-submit:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
