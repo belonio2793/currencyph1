@@ -29,7 +29,7 @@ export const employeeInvitationService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] sendJobInvitation failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -127,7 +127,7 @@ export const employeeInvitationService = {
 
       return { data: assignment, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] acceptInvitation failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -148,7 +148,7 @@ export const employeeInvitationService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] rejectInvitation failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -166,7 +166,7 @@ export const employeeInvitationService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] hideInvitation failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -235,7 +235,7 @@ export const employeeInvitationService = {
       if (error && error.code !== 'PGRST116') throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] getEmployeeAssignment failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -256,7 +256,7 @@ export const employeeInvitationService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] terminateAssignment failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -339,7 +339,7 @@ export const employeeInvitationService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] acceptJobOffer failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -359,7 +359,7 @@ export const employeeInvitationService = {
       if (error) throw error
       return { data, error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] rejectJobOffer failed:', errorMsg)
       return { data: null, error: err }
     }
@@ -400,7 +400,7 @@ export const employeeInvitationService = {
         }
       }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] subscribeToInvitations failed:', errorMsg)
       return { unsubscribe: () => {} }
     }
@@ -426,7 +426,7 @@ export const employeeInvitationService = {
         }
       }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] subscribeToAssignments failed:', errorMsg)
       return { unsubscribe: () => {} }
     }
