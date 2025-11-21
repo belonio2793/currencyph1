@@ -126,27 +126,28 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
         {/* Card Header */}
         <div className="card-header-jobs">
           <div className="header-content">
-            <div className="header-icon">💼</div>
             <div className="header-text">
               <h3>Jobs & Hiring</h3>
               <p>Manage employment positions and hiring</p>
             </div>
           </div>
-          <div className="header-actions">
-            <span
-              className="status-badge-header"
-              style={{ backgroundColor: getHiringStatusColor() }}
-            >
-              {getHiringStatusText()}
-            </span>
-            <button
-              onClick={() => setShowModal(true)}
-              className="btn-manage-jobs"
-              title="Manage jobs and hiring"
-            >
-              Manage
-            </button>
-          </div>
+          <span
+            className="status-badge-header"
+            style={{ backgroundColor: getHiringStatusColor() }}
+          >
+            {getHiringStatusText()}
+          </span>
+        </div>
+
+        {/* Manage Button */}
+        <div className="manage-button-row">
+          <button
+            onClick={() => setShowModal(true)}
+            className="btn-manage-jobs"
+            title="Manage jobs and hiring"
+          >
+            Manage
+          </button>
         </div>
 
         {/* Stats Section */}
