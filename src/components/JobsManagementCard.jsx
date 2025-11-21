@@ -195,23 +195,25 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
 
       </div>
 
-      {/* Jobs Management Modal */}
-      {showModal && (
+      {/* Jobs Management Modal - Portaled to document body to prevent overflow clipping */}
+      {showModal && createPortal(
         <JobsManagementModal
           business={business}
           userId={userId}
           onClose={handleModalClose}
           onUpdated={handleModalUpdated}
-        />
+        />,
+        document.body
       )}
 
-      {/* Job Seeker Request Modal */}
-      {showJobSeekerModal && (
+      {/* Job Seeker Request Modal - Portaled to document body to prevent overflow clipping */}
+      {showJobSeekerModal && createPortal(
         <JobSeekerRequestModal
           business={business}
           userId={userId}
           onClose={() => setShowJobSeekerModal(false)}
-        />
+        />,
+        document.body
       )}
     </>
   )
