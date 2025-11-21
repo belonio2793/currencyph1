@@ -2096,6 +2096,19 @@ export default function MyBusiness({ userId }) {
                 <MerchantReceipts business={selectedBusiness} userId={userId} />
               )}
 
+              {/* Jobs & Hiring Modal */}
+              {selectedFeatureModal === 'jobs' && selectedBusiness && (
+                <JobsManagementModal
+                  business={selectedBusiness}
+                  userId={userId}
+                  onClose={() => setSelectedFeatureModal(null)}
+                  onUpdated={(updatedBusiness) => {
+                    setSelectedBusiness(updatedBusiness)
+                    setSelectedFeatureModal(null)
+                  }}
+                />
+              )}
+
               {/* Payments Modal */}
               {selectedFeatureModal === 'payments' && (
                 <div>
