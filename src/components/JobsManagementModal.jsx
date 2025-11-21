@@ -51,9 +51,17 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
       setLoading(true)
       const jobsList = await jobsService.getBusinessJobs(business.id)
       setJobs(jobsList || [])
+      setError('')
     } catch (err) {
       console.error('Error loading jobs:', err)
-      setError('Failed to load jobs')
+      // If table doesn't exist, show a friendly message but don't block the form
+      if (err?.message?.includes('not found') || err?.code === 'PGRST116') {
+        console.debug('Jobs table not yet available, showing empty state')
+        setJobs([])
+        setError('')
+      } else {
+        setError('Unable to load existing jobs, but you can still create new ones')
+      }
     } finally {
       setLoading(false)
     }
