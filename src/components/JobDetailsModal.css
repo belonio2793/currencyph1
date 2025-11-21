@@ -242,6 +242,7 @@
   margin: 0;
   padding: 0;
   max-width: 100%;
+  min-width: 0;
 }
 
 .details-grid {
@@ -405,6 +406,7 @@
 .offers-tab {
   width: 100%;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .offers-list {
