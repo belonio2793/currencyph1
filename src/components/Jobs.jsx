@@ -489,7 +489,7 @@ export default function Jobs({ userId }) {
         </div>
       )}
 
-      {/* Main Tabs - Separate My Employments from Job Marketplace */}
+      {/* Main Tabs - Separate My Employments from Job Marketplace and Businesses */}
       <div className="jobs-main-tabs">
         <button
           className={`main-tab ${mainSection === 'my-employments' ? 'active' : ''}`}
@@ -502,6 +502,12 @@ export default function Jobs({ userId }) {
           onClick={() => setMainSection('job-marketplace')}
         >
           Job Marketplace
+        </button>
+        <button
+          className={`main-tab ${mainSection === 'businesses' ? 'active' : ''}`}
+          onClick={() => setMainSection('businesses')}
+        >
+          Businesses
         </button>
       </div>
 
