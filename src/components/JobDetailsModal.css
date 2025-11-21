@@ -180,19 +180,19 @@
 
 /* Tabs */
 .modal-tabs {
-  display: flex !important;
-  gap: 0 !important;
-  border-bottom: 2px solid #e0e0e0 !important;
-  padding: 0 !important;
-  background: #f9f9f9 !important;
-  width: 100% !important;
-  flex-shrink: 0 !important;
-  overflow-x: auto !important;
-  box-sizing: border-box !important;
-  justify-content: center !important;
-  margin: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e0e0e0;
+  padding: 0;
+  background: #f9f9f9;
+  width: 100%;
+  flex-shrink: 0;
+  overflow-x: auto;
+  box-sizing: border-box;
+  justify-content: center;
+  margin: 0;
+  left: 0;
+  right: 0;
 }
 
 .modal-tabs .tab {
@@ -221,38 +221,38 @@
 
 /* Content */
 .modal-content {
-  padding: 24px !important;
-  overflow-y: auto !important;
-  flex: 1 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  display: flex !important;
-  flex-direction: column !important;
-  margin: 0 !important;
-  max-width: 100% !important;
-  position: relative !important;
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  max-width: 100%;
+  position: relative;
 }
 
 .details-tab {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 20px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 100% !important;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
 }
 
 .details-grid {
-  display: grid !important;
-  grid-template-columns: 1fr 1fr !important;
-  gap: 30px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 100% !important;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
 }
 
 .detail-section {
