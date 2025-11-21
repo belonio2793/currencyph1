@@ -55,8 +55,8 @@
 .btn-close {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  color: white;
-  font-size: 1.5rem;
+  color: white !important;
+  font-size: 1.5rem !important;
   cursor: pointer;
   padding: 0;
   width: 36px;

@@ -40,9 +40,9 @@
 .confirmation-header .close-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
-  font-size: 1.5rem;
+  font-size: 1.5rem !important;
   cursor: pointer;
-  color: white;
+  color: white !important;
   padding: 0;
   width: 36px;
   height: 36px;
