@@ -109,6 +109,38 @@
   letter-spacing: 0.5px;
 }
 
+/* Main Tabs - Section Selector */
+.jobs-main-tabs {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  border-bottom: 3px solid #e0e0e0;
+  padding-bottom: 0;
+}
+
+.main-tab {
+  background: none;
+  border: none;
+  padding: 16px 24px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 4px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  bottom: -3px;
+}
+
+.main-tab:hover {
+  color: #667eea;
+}
+
+.main-tab.active {
+  color: #667eea;
+  border-bottom-color: #667eea;
+}
+
 /* Tabs */
 .jobs-tabs {
   display: flex;
