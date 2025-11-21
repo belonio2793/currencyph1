@@ -513,6 +513,7 @@
 /* Comprehensive fix for all modal elements */
 .job-details-modal * {
   box-sizing: border-box !important;
+  max-width: none !important;
 }
 
 /* Remove any min-width that might be inherited from Tailwind */
@@ -524,6 +525,13 @@
 .details-grid,
 .detail-section {
   min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+/* Force flex items in modal to not shrink */
+.modal-header,
+.modal-tabs {
+  flex-shrink: 0 !important;
 }
 
 /* Responsive */
