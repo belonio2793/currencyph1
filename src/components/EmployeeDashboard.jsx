@@ -236,6 +236,95 @@ export default function EmployeeDashboard({ userId }) {
             </div>
           )}
         </div>
+      ) : activeTab === 'attendance' ? (
+        <div className="attendance-content">
+          {myBusinesses.length === 0 ? (
+            <div className="empty-state">
+              <h3>No Active Employment</h3>
+              <p>You need to be employed at a business to track attendance.</p>
+            </div>
+          ) : (
+            <>
+              <div className="business-selector-attendance">
+                <label>Select Business:</label>
+                <select
+                  value={selectedBusinessForAttendance?.business_id || ''}
+                  onChange={(e) => {
+                    const business = myBusinesses.find(b => b.business_id === e.target.value)
+                    if (business) handleBusinessSelectionForAttendance(business)
+                  }}
+                >
+                  <option value="">Choose a business...</option>
+                  {myBusinesses.map(business => (
+                    <option key={business.business_id} value={business.business_id}>
+                      {business.business?.business_name || business.assigned_job_title}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {selectedBusinessForAttendance && (
+                <div className="attendance-section">
+                  <h3>{selectedBusinessForAttendance.business?.business_name}</h3>
+                  <p className="business-detail">Position: {selectedBusinessForAttendance.assigned_job_title}</p>
+
+                  <div className="attendance-history">
+                    <h4>Attendance History (Last 30 Days)</h4>
+                    {attendanceRecords.length === 0 ? (
+                      <div className="empty-state">
+                        <p>No attendance records yet</p>
+                      </div>
+                    ) : (
+                      <div className="attendance-records">
+                        {attendanceRecords.map((record) => (
+                          <div key={record.id} className="attendance-record">
+                            <div className="record-date">
+                              <span className="date-label">
+                                {new Date(record.attendance_date).toLocaleDateString('en-US', {
+                                  weekday: 'short',
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </span>
+                              <span className={`status-badge ${record.status}`}>
+                                {record.status.replace('_', ' ')}
+                              </span>
+                            </div>
+                            <div className="record-times">
+                              {record.check_in_time && (
+                                <div className="time-item">
+                                  <span className="time-label">Check In:</span>
+                                  <span className="time-value">
+                                    {new Date(record.check_in_time).toLocaleTimeString('en-US', {
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                              {record.check_out_time && (
+                                <div className="time-item">
+                                  <span className="time-label">Check Out:</span>
+                                  <span className="time-value">
+                                    {new Date(record.check_out_time).toLocaleTimeString('en-US', {
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       ) : (
         <div className="invitations-content">
           {jobInvitations.length === 0 ? (
