@@ -403,7 +403,7 @@ export default function Jobs({ userId }) {
         </div>
 
         <div className="header-buttons" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          {userId && (
+          {userId && mainSection === 'job-marketplace' && (
             <>
               <button
                 className="btn-post-job"
