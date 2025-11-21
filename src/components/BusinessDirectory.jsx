@@ -296,12 +296,18 @@ export default function BusinessDirectory({ userId }) {
           {filteredBusinesses.map((business) => {
             const owner = isOwner(business.id)
             const verified = isVerified(business)
-            const stats = businessStats[business.id] || { pendingRequests: 0, activeJobs: 0, activeEmployees: 0 }
+            const stats = businessStats[business.id] || {
+              pendingRequests: 0,
+              activeJobs: 0,
+              activeEmployees: 0,
+              totalApplicants: 0,
+              acceptedApplicants: 0
+            }
             const isExpanded = expandedCard === business.id
 
             return (
-              <div 
-                key={business.id} 
+              <div
+                key={business.id}
                 className={`business-card ${owner ? 'owner-card' : ''}`}
               >
                 {/* Card Header */}
