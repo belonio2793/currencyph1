@@ -299,13 +299,11 @@ export const jobsService = {
           business_id: offerData.business_id,
           job_id: offerData.job_id,
           applicant_user_id: offerData.service_provider_id || user.id,
+          position_applied_for: offerData.job_title,
           cover_letter: offerData.offer_message || '',
-          job_title: offerData.job_title,
-          job_category: offerData.job_category,
-          pay_rate: offerData.pay_rate,
-          pay_currency: offerData.pay_currency,
-          status: 'submitted',
-          submitted_at: new Date().toISOString()
+          salary_expectation: offerData.pay_rate,
+          salary_currency: offerData.pay_currency || 'PHP',
+          status: 'submitted'
         }])
         .select()
         .single()
