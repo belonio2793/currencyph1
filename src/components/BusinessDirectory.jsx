@@ -393,6 +393,23 @@ export default function BusinessDirectory({ userId }) {
                       </div>
                     </div>
 
+                    {/* Community Engagement Stats */}
+                    <div className="detail-section">
+                      <h4>Community Activity</h4>
+                      <div className="detail-row">
+                        <span className="label">Total Applicants:</span>
+                        <span className="value">{stats.totalApplicants}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Accepted:</span>
+                        <span className="value">{stats.acceptedApplicants}</span>
+                      </div>
+                      <div className="detail-row">
+                        <span className="label">Active Positions:</span>
+                        <span className="value">{stats.activeJobs}</span>
+                      </div>
+                    </div>
+
                     {/* Owner Tools */}
                     {owner && (
                       <div className="detail-section owner-section">
@@ -421,6 +438,12 @@ export default function BusinessDirectory({ userId }) {
                       )}
                       {owner && (
                         <>
+                          <button
+                            onClick={() => handleEditBusiness(business)}
+                            className="btn-edit-business"
+                          >
+                            ✏️ Edit Business
+                          </button>
                           <button
                             onClick={() => handleToggleVisibility(business)}
                             className={`btn-visibility ${business.metadata?.visible !== false ? 'hide' : 'show'}`}
