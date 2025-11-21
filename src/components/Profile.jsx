@@ -591,7 +591,7 @@ export default function Profile({ userId, onSignOut }) {
                   <label className="block text-sm font-medium text-slate-700 mb-2">Username</label>
                   <div className="flex items-center gap-2">
                     <input type="text" value={formData.username || ''} onChange={e => handleUsernameChange(e.target.value)} className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent" placeholder="Enter a display name here" />
-                    {formData.username && (<span className={`text-sm font-medium ${usernameAvailable ? 'text-emerald-600' : 'text-red-600'}`}>{usernameAvailable ? '✓ Available' : '✗ Taken'}</span>)}
+                    {formData.username && (<span className={`text-sm font-medium ${usernameAvailable ? 'text-emerald-600' : 'text-red-600'}`}>{usernameAvailable ? 'Available' : 'Taken'}</span>)}
                   </div>
                   <p className="text-xs text-slate-500 mt-1">3-20 characters, letters and numbers only</p>
                 </div>
