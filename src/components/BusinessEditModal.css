@@ -229,15 +229,18 @@ form {
   cursor: not-allowed;
 }
 
-/* Tablet and larger */
-@media (max-width: 1024px) {
+/* Responsive Design */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
   .modal-content {
-    width: 85%;
-    max-width: 800px;
+    width: 95%;
+    max-width: 100%;
   }
 }
 
-/* Responsive Design */
 @media (max-width: 640px) {
   .modal-overlay {
     padding: 10px;
@@ -249,18 +252,8 @@ form {
     max-width: 100%;
   }
 
-  .modal-header {
-    padding: 16px;
-  }
-
   .modal-header h2 {
-    font-size: 1.2rem;
-  }
-
-  .btn-close {
-    width: 32px;
-    height: 32px;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
   }
 
   form {
