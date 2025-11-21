@@ -503,15 +503,6 @@
   min-width: 0;
 }
 
-/* Force all direct children of modal-content to full width */
-.modal-content > * {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  max-width: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-}
-
 
 /* Responsive */
 @media (max-width: 600px) {
