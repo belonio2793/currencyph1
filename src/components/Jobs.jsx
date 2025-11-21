@@ -149,7 +149,10 @@ export default function Jobs({ userId }) {
     setError('')
 
     try {
-      if (activeTab === 'job-listings') {
+      if (activeTab === 'my-employments') {
+        // Skip loading - EmployeeDashboard handles its own data loading
+        setLoading(false)
+      } else if (activeTab === 'job-listings') {
         const data = await jobsService.getActiveJobs(filters)
         setJobs(data)
       } else if (activeTab === 'offers-received') {
@@ -164,7 +167,9 @@ export default function Jobs({ userId }) {
       console.error('Error loading jobs:', err)
       setError('Failed to load jobs. Please try again.')
     } finally {
-      setLoading(false)
+      if (activeTab !== 'my-employments') {
+        setLoading(false)
+      }
     }
   }
 
