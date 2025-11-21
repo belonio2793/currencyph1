@@ -36,12 +36,12 @@ export default function SalesProjectOverview({
           }
         },
         keyBenefits: [
-          { icon: '💰', title: 'Multiple Revenue Streams', desc: 'Premium drinking water, mineral water, whole-house systems, shower units, bulk B2B delivery' },
-          { icon: '♻️', title: 'Zero Environmental Impact', desc: 'No plastic waste, no RO reject water, fully closed-loop stainless steel system' },
-          { icon: '🏥', title: 'Health-Conscious Market', desc: 'Therapeutic hydrogen water targets premium health/wellness segment with 40%+ margins' },
-          { icon: '📈', title: 'Scalable Model', desc: 'Expandable from 70k L/day to 150k L/day with minimal capex additions' },
-          { icon: '🌍', title: 'Export Potential', desc: 'Premium product suitable for ASEAN distribution and high-end international markets' },
-          { icon: '⚡', title: 'Low Operating Cost', desc: 'Minimal electricity, deep well reduces supply cost, high margins on all products' }
+          { icon: 'R', title: 'Multiple Revenue Streams', desc: 'Premium drinking water, mineral water, whole-house systems, shower units, bulk B2B delivery' },
+          { icon: 'E', title: 'Zero Environmental Impact', desc: 'No plastic waste, no RO reject water, fully closed-loop stainless steel system' },
+          { icon: 'H', title: 'Health-Conscious Market', desc: 'Therapeutic hydrogen water targets premium health/wellness segment with 40%+ margins' },
+          { icon: 'S', title: 'Scalable Model', desc: 'Expandable from 70k L/day to 150k L/day with minimal capex additions' },
+          { icon: 'E', title: 'Export Potential', desc: 'Premium product suitable for ASEAN distribution and high-end international markets' },
+          { icon: 'L', title: 'Low Operating Cost', desc: 'Minimal electricity, deep well reduces supply cost, high margins on all products' }
         ],
         riskMitigation: [
           { risk: 'Water Supply Risk', mitigation: 'Deep well tested for sustainability; 500mm+ annual rainfall in region; backup extraction systems' },
