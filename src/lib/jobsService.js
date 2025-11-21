@@ -618,8 +618,8 @@ export const jobsService = {
       totalJobs: totalJobs.count || 0,
       activeJobs: activeJobs.count || 0,
       filledJobs: filledJobs.count || 0,
-      totalOffers: totalOffers.count || 0,
-      acceptedOffers: acceptedOffers.count || 0
+      totalOffers: totalApplications.count || 0,
+      acceptedOffers: acceptedApplications.count || 0
     }
   },
 
