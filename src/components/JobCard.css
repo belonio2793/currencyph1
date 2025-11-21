@@ -337,39 +337,38 @@
 .btn-view-details,
 .btn-apply {
   padding: 12px 16px;
-  border: none;
+  border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: background-color 0.2s ease;
   text-align: center;
   white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 44px;
 }
 
 .btn-view-details {
-  background: #f0f0f0;
-  color: #1a1a1a;
-  border: 1px solid #e0e0e0;
+  background: #f5f5f5;
+  color: #333;
+  border-color: #ddd;
 }
 
 .btn-view-details:hover {
-  background: #e0e0e0;
-  border-color: #d0d0d0;
+  background: #efefef;
 }
 
 .btn-apply {
   background: #667eea;
   color: white;
-  border: 1px solid #667eea;
+  border-color: #667eea;
 }
 
 .btn-apply:hover {
-  background: #5568d3;
-  border-color: #4d5bc5;
+  background: #5a6fd8;
 }
 
 /* =====================================================
