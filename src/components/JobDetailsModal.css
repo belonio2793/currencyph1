@@ -51,6 +51,7 @@
   min-width: 0;
   justify-content: flex-start;
   width: auto;
+  height: 100%;
 }
 
 .modal-header-buttons {
