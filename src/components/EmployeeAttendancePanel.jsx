@@ -181,6 +181,24 @@ export default function EmployeeAttendancePanel({
 
   return (
     <div className="space-y-6">
+      {/* Business Information Header */}
+      {businessDetails && (
+        <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+          <h4 className="font-semibold text-slate-900 mb-2">{businessDetails.business_name}</h4>
+          <div className="text-sm text-slate-600 space-y-1">
+            {businessDetails.currency_registration_number && (
+              <p><strong>Registration #:</strong> {businessDetails.currency_registration_number}</p>
+            )}
+            {businessDetails.tin && (
+              <p><strong>TIN:</strong> {businessDetails.tin}</p>
+            )}
+            {businessDetails.city_of_registration && (
+              <p><strong>Location:</strong> {businessDetails.city_of_registration}</p>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Business Hours (Manager Only) */}
       {isManager && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
