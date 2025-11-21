@@ -14,7 +14,7 @@
 /* Rating Summary */
 .rating-summary {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: 1fr;
   gap: 30px;
   padding: 20px;
   background: #f9f9f9;
