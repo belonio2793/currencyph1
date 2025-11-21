@@ -186,7 +186,8 @@ export const employeeInvitationService = {
         .order('start_date', { ascending: false })
 
       if (error) {
-        console.error('[employeeInvitationService] getEmployeeBusinesses error:', error)
+        const errorMsg = error?.message || error?.code || 'Unknown error'
+        console.error('[employeeInvitationService] getEmployeeBusinesses error:', errorMsg)
         throw error
       }
 
@@ -199,7 +200,8 @@ export const employeeInvitationService = {
           .in('id', businessIds)
 
         if (businessError) {
-          console.error('[employeeInvitationService] Error fetching businesses:', businessError)
+          const errorMsg = businessError?.message || businessError?.code || 'Unknown error'
+          console.error('[employeeInvitationService] Error fetching businesses:', errorMsg)
         }
 
         const businessMap = {}
@@ -214,7 +216,7 @@ export const employeeInvitationService = {
 
       return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || 'Unknown error'
+      const errorMsg = err?.message || err?.code || 'Unknown error'
       console.error('[employeeInvitationService] getEmployeeBusinesses failed:', errorMsg)
       return { data: [], error: err }
     }
