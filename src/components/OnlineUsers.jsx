@@ -32,7 +32,7 @@ const createUserIcon = (isFriend) => {
         font-weight: bold;
         color: white;
       ">
-        ${isFriend ? '👤' : '🔵'}
+        ${isFriend ? 'F' : 'O'}
       </div>
     `,
     iconSize: [32, 32],
