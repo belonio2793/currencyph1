@@ -491,6 +491,15 @@
   max-width: 100% !important;
 }
 
+/* Override any Tailwind width utilities */
+.modal-overlay .job-details-modal,
+.modal-overlay .modal-header,
+.modal-overlay .modal-tabs,
+.modal-overlay .modal-content {
+  width: 100% !important;
+  max-width: none !important;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .modal-overlay {
