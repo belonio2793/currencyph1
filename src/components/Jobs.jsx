@@ -520,7 +520,11 @@ export default function Jobs({ userId }) {
       )}
 
       {/* Tab Content */}
-      {activeTab === 'job-listings' ? (
+      {activeTab === 'my-employments' ? (
+        <div className="my-employments-content">
+          {userId && <EmployeeDashboard userId={userId} />}
+        </div>
+      ) : activeTab === 'job-listings' ? (
         <div className="jobs-content">
           <JobSearch
             onFilterChange={handleFilterChange}
