@@ -483,6 +483,12 @@ export default function Jobs({ userId }) {
       {/* Tabs */}
       <div className="jobs-tabs">
         <button
+          className={`tab ${activeTab === 'my-employments' ? 'active' : ''}`}
+          onClick={() => setActiveTab('my-employments')}
+        >
+          My Employments
+        </button>
+        <button
           className={`tab ${activeTab === 'job-listings' ? 'active' : ''}`}
           onClick={() => setActiveTab('job-listings')}
         >
