@@ -903,12 +903,56 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           {activeTab === 'attendance' && (
             <div>
               {selectedEmployee ? (
-                <EmployeeAttendancePanel
-                  businessId={businessId}
-                  employee={selectedEmployee}
-                  userId={userId}
-                  isManager={true}
-                />
+                <>
+                  {Object.keys(employeeBusinesses).length > 0 ? (
+                    <div className="space-y-6">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <label className="block text-sm font-medium text-slate-900 mb-2">
+                          Select Business for Attendance View
+                        </label>
+                        <select
+                          value={selectedBusinessForAttendance?.id || ''}
+                          onChange={(e) => {
+                            const assignment = Object.values(employeeBusinesses).find(
+                              b => b.id === e.target.value
+                            )
+                            if (assignment) {
+                              setSelectedBusinessForAttendance({
+                                business_id: assignment.id,
+                                business: assignment,
+                                id: e.target.value
+                              })
+                            }
+                          }}
+                          className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:border-blue-600"
+                        >
+                          <option value="">Choose a business...</option>
+                          {Object.entries(employeeBusinesses).map(([businessId, business]) => (
+                            <option key={businessId} value={business.id}>
+                              {business.business_name}
+                              {business.currency_registration_number && ` (${business.currency_registration_number})`}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {selectedBusinessForAttendance && (
+                        <EmployeeAttendancePanel
+                          businessId={selectedBusinessForAttendance.business_id}
+                          employee={selectedEmployee}
+                          userId={userId}
+                          isManager={true}
+                          businessDetails={selectedBusinessForAttendance.business}
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12 bg-blue-50 rounded-lg border-2 border-dashed border-blue-200">
+                      <p className="text-blue-600">This employee is not assigned to any businesses yet</p>
+                      <p className="text-sm text-blue-500 mt-2">Send a job invitation to assign them to a business</p>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-12 bg-slate-50 rounded-lg border-2 border-dashed border-slate-200">
                   <p className="text-slate-500">Select an employee to view attendance</p>
