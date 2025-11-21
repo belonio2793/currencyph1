@@ -18,6 +18,8 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
   const [userStatuses, setUserStatuses] = useState({})
   const [showChatModal, setShowChatModal] = useState(false)
   const [selectedEmployeeForChat, setSelectedEmployeeForChat] = useState(null)
+  const [employeeBusinesses, setEmployeeBusinesses] = useState({})
+  const [selectedBusinessForAttendance, setSelectedBusinessForAttendance] = useState(null)
 
   // Form states
   const [employeeForm, setEmployeeForm] = useState({
