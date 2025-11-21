@@ -6,6 +6,7 @@ import MerchantReceipts from './MerchantReceipts'
 import SelectBusinessModal from './SelectBusinessModal'
 import EmployeesModal from './EmployeesModal'
 import EmployerJobsOverview from './EmployerJobsOverview'
+import JobsManagementCard from './JobsManagementCard'
 import { miscellaneousCostsService } from '../lib/miscellaneousCostsService'
 import { taxReportingService } from '../lib/taxReportingService'
 
