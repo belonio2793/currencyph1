@@ -256,9 +256,9 @@
 }
 
 .detail-section {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  max-width: 100% !important;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .detail-section h4 {
@@ -271,15 +271,15 @@
 }
 
 .info-item {
-  display: grid !important;
-  grid-template-columns: minmax(120px, auto) 1fr !important;
-  align-items: center !important;
-  padding: 12px 0 !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  gap: 15px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  max-width: 100% !important;
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .info-item:last-child {
@@ -314,12 +314,12 @@
 .description-section,
 .skills-section,
 .timeline-section {
-  margin: 20px 0 0 0 !important;
-  padding: 20px 0 0 0 !important;
-  border-top: 1px solid #f0f0f0 !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  max-width: 100% !important;
+  margin: 20px 0 0 0;
+  padding: 20px 0 0 0;
+  border-top: 1px solid #f0f0f0;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .description-section h4,
@@ -340,12 +340,12 @@
 }
 
 .skills-list {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  max-width: 100% !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .skill-tag {
@@ -358,15 +358,15 @@
 }
 
 .timeline-item {
-  display: grid !important;
-  grid-template-columns: minmax(140px, auto) 1fr !important;
-  align-items: center !important;
-  padding: 12px 0 !important;
-  border-bottom: 1px solid #f0f0f0 !important;
-  gap: 15px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  max-width: 100% !important;
+  display: grid;
+  grid-template-columns: minmax(140px, auto) 1fr;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .timeline-item:last-child {
