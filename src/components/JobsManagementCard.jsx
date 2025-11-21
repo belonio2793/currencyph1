@@ -185,10 +185,10 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
         {/* Action Button */}
         <div className="card-action">
           <button
-            onClick={() => setShowModal(true)}
+            onClick={() => setShowJobSeekerModal(true)}
             className="btn-open-modal"
           >
-            View & Manage Jobs →
+            Send Request
           </button>
         </div>
 
