@@ -259,11 +259,4 @@
   .jobs-stats-section {
     grid-template-columns: 1fr;
   }
-
-  .access-feature {
-    top: auto;
-    right: auto;
-    position: static;
-    margin-top: 8px;
-  }
 }
