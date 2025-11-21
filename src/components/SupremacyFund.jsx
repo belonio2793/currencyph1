@@ -122,37 +122,37 @@ export default function SupremacyFund({ userId }) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <FeatureCard
-          title="📊 Market Analysis"
+          title="Market Analysis"
           description="AI-powered analysis of Bitcoin, Ethereum, Gold & Stock markets in real-time"
           tab="market-analysis"
           onSelect={() => setActiveTab('market-analysis')}
         />
         <FeatureCard
-          title="🎯 Trading Signals"
+          title="Trading Signals"
           description="Automatic buy/sell signals based on technical indicators (RSI, MACD, Moving Averages)"
           tab="signals"
           onSelect={() => setActiveTab('signals')}
         />
         <FeatureCard
-          title="🤖 Auto Trading"
+          title="Auto Trading"
           description="Execute trades automatically: DCA, support bounces, grid trading, and more"
           tab="auto-trading"
           onSelect={() => setActiveTab('auto-trading')}
         />
         <FeatureCard
-          title="🛡️ Risk Management"
+          title="Risk Management"
           description="Protect your capital: trailing stops, position sizing, volatility control"
           tab="risk-management"
           onSelect={() => setActiveTab('risk-management')}
         />
         <FeatureCard
-          title="💼 Portfolio"
+          title="Portfolio"
           description="Track your holdings, performance, and allocation across assets"
           tab="portfolio"
           onSelect={() => setActiveTab('portfolio')}
         />
         <FeatureCard
-          title="💰 Advanced Profit Tools"
+          title="Advanced Profit Tools"
           description="Maximize gains: partial profits, arbitrage, whale tracking, rebalancing"
           tab="profit-tools"
           onSelect={() => setActiveTab('profit-tools')}
