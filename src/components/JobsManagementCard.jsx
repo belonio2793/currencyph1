@@ -203,6 +203,15 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
           onUpdated={handleModalUpdated}
         />
       )}
+
+      {/* Job Seeker Request Modal */}
+      {showJobSeekerModal && (
+        <JobSeekerRequestModal
+          business={business}
+          userId={userId}
+          onClose={() => setShowJobSeekerModal(false)}
+        />
+      )}
     </>
   )
 }
