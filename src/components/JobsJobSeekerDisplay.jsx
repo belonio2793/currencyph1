@@ -114,20 +114,20 @@ export default function JobsJobSeekerDisplay({ business, userId }) {
       setSubmitting(true)
       setError('')
 
-      // Create job offer/application
+      // Create job application
       const { data, error: createError } = await supabase
-        .from('job_offers')
+        .from('job_applications')
         .insert([{
           job_id: selectedJob.id,
           business_id: business.id,
-          service_provider_id: userId,
-          status: 'pending',
-          offer_message: applicationData.message,
-          metadata: {
-            availability: applicationData.availability,
-            applied_at: new Date().toISOString()
-          },
-          created_at: new Date().toISOString()
+          applicant_user_id: userId,
+          status: 'submitted',
+          cover_letter: applicationData.message,
+          job_title: selectedJob.job_title,
+          job_category: selectedJob.job_category,
+          pay_rate: selectedJob.pay_rate,
+          pay_currency: selectedJob.pay_currency || 'PHP',
+          submitted_at: new Date().toISOString()
         }])
         .select()
 
