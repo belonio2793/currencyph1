@@ -311,11 +311,11 @@
     padding: 16px;
   }
 
-  .form-row {
+  .post-job-modal .form-row {
     grid-template-columns: 1fr;
   }
 
-  .form-actions {
+  .post-job-modal .form-actions {
     grid-template-columns: 1fr;
   }
 
