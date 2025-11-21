@@ -163,18 +163,18 @@
 .form-section {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .form-section h3 {
-  margin: 0 0 12px 0;
-  font-size: 1rem;
+  margin: 0;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #1f2937;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   border-bottom: 2px solid #e5e7eb;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 
 .form-group {
