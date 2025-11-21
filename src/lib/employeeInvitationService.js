@@ -269,19 +269,55 @@ export const employeeInvitationService = {
     try {
       const { data, error } = await supabase
         .from('employee_job_offers')
-        .select(`
-          *,
-          business:businesses(id, business_name),
-          job:jobs(id, job_title, job_description)
-        `)
+        .select('*')
         .eq('user_id', userId)
         .eq('status', status)
         .order('created_at', { ascending: false })
 
-      if (error) throw error
-      return { data, error: null }
+      if (error) {
+        console.error('[employeeInvitationService] getEmployeeJobOffers error:', error)
+        throw error
+      }
+
+      // Fetch related data separately
+      if (data && data.length > 0) {
+        const businessIds = [...new Set(data.map(o => o.business_id).filter(Boolean))]
+        const jobIds = [...new Set(data.map(o => o.job_id).filter(Boolean))]
+
+        let businessMap = {}
+        let jobMap = {}
+
+        if (businessIds.length > 0) {
+          const { data: businesses } = await supabase
+            .from('businesses')
+            .select('id, business_name')
+            .in('id', businessIds)
+
+          businesses?.forEach(b => {
+            businessMap[b.id] = b
+          })
+        }
+
+        if (jobIds.length > 0) {
+          const { data: jobs } = await supabase
+            .from('jobs')
+            .select('id, job_title, job_description')
+            .in('id', jobIds)
+
+          jobs?.forEach(j => {
+            jobMap[j.id] = j
+          })
+        }
+
+        data.forEach(offer => {
+          offer.business = businessMap[offer.business_id] || null
+          offer.job = jobMap[offer.job_id] || null
+        })
+      }
+
+      return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || 'Unknown error'
       console.error('[employeeInvitationService] getEmployeeJobOffers failed:', errorMsg)
       return { data: [], error: err }
     }
