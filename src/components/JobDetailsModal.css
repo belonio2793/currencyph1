@@ -178,17 +178,19 @@
 
 /* Tabs */
 .modal-tabs {
-  display: flex;
-  gap: 0;
-  border-bottom: 2px solid #e0e0e0;
-  padding: 0;
-  background: #f9f9f9;
-  width: 100%;
-  flex-shrink: 0;
-  overflow-x: auto;
-  box-sizing: border-box;
-  justify-content: center;
-  margin: 0;
+  display: flex !important;
+  gap: 0 !important;
+  border-bottom: 2px solid #e0e0e0 !important;
+  padding: 0 !important;
+  background: #f9f9f9 !important;
+  width: 100% !important;
+  flex-shrink: 0 !important;
+  overflow-x: auto !important;
+  box-sizing: border-box !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
 }
 
 .modal-tabs .tab {
