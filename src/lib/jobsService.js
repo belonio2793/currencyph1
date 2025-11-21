@@ -586,8 +586,8 @@ export const jobsService = {
       totalJobs,
       activeJobs,
       filledJobs,
-      totalOffers,
-      acceptedOffers
+      totalApplications,
+      acceptedApplications
     ] = await Promise.all([
       supabase
         .from('jobs')
@@ -604,11 +604,11 @@ export const jobsService = {
         .eq('business_id', businessId)
         .eq('status', 'filled'),
       supabase
-        .from('job_offers')
+        .from('job_applications')
         .select('id', { count: 'exact' })
         .eq('business_id', businessId),
       supabase
-        .from('job_offers')
+        .from('job_applications')
         .select('id', { count: 'exact' })
         .eq('business_id', businessId)
         .eq('status', 'accepted')
