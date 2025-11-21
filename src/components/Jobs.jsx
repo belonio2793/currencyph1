@@ -591,7 +591,7 @@ export default function Jobs({ userId }) {
             </div>
           )}
         </div>
-      ) : activeTab === 'offers-received' ? (
+      ) : marketplaceTab === 'offers-received' ? (
         <div className="offers-content">
           {loading ? (
             <div className="loading">Loading offers...</div>
@@ -610,7 +610,7 @@ export default function Jobs({ userId }) {
               {userType === 'job-seeker' && (
                 <button
                   className="btn-primary"
-                  onClick={() => setActiveTab('job-listings')}
+                  onClick={() => setMarketplaceTab('job-listings')}
                 >
                   Browse Jobs
                 </button>
