@@ -290,7 +290,7 @@ export default function SalesProjectOverview({
           {messaging.riskMitigation.map((item, idx) => (
             <div key={idx} className="bg-white border border-slate-200 rounded-lg p-5 hover:shadow-md transition-shadow">
               <div className="flex gap-4">
-                <div className="text-2xl">⚙️</div>
+                <div className="text-2xl font-bold">*</div>
                 <div className="flex-1">
                   <h4 className="font-bold text-slate-900 mb-1">{item.risk}</h4>
                   <p className="text-sm text-slate-700">✓ {item.mitigation}</p>
@@ -307,7 +307,7 @@ export default function SalesProjectOverview({
           <div className="grid md:grid-cols-2 gap-4">
             {messaging.trustFactors.map((factor, idx) => (
               <div key={idx} className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-                <div className="text-2xl">✓</div>
+                <div className="text-2xl font-bold">+</div>
                 <div className="text-sm font-medium text-slate-900">{factor}</div>
               </div>
             ))}
