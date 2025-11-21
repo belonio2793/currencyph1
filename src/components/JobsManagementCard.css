@@ -188,24 +188,6 @@
   background-color: #4556bb;
 }
 
-/* Access Feature Badge */
-.access-feature {
-  position: absolute;
-  top: -8px;
-  right: 16px;
-  background: #667eea;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.feature-label {
-  white-space: nowrap;
-}
 
 /* Error Message */
 .error-message {
