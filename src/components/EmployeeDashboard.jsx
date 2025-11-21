@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabaseClient'
 import { employeeInvitationService } from '../lib/employeeInvitationService'
+import { attendanceTimerService } from '../lib/attendanceTimerService'
 import JobInvitationCard from './JobInvitationCard'
 import MyBusinessEmployeeCard from './MyBusinessEmployeeCard'
 import './EmployeeDashboard.css'
@@ -8,6 +10,8 @@ export default function EmployeeDashboard({ userId }) {
   const [activeTab, setActiveTab] = useState('my-businesses')
   const [myBusinesses, setMyBusinesses] = useState([])
   const [jobInvitations, setJobInvitations] = useState([])
+  const [attendanceRecords, setAttendanceRecords] = useState([])
+  const [selectedBusinessForAttendance, setSelectedBusinessForAttendance] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [invitationCounts, setInvitationCounts] = useState({
