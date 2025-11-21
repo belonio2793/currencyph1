@@ -51,7 +51,7 @@ export default function JobCard({ job, onSelect, onApply }) {
     ? (job.job_ratings.reduce((sum, r) => sum + r.rating_score, 0) / job.job_ratings.length).toFixed(1)
     : 0
 
-  const offersCount = job.job_offers?.length || 0
+  const offersCount = job.job_applications?.length || 0
 
   return (
     <>
