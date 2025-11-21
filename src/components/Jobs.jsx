@@ -19,7 +19,7 @@ import BusinessCatalog from './BusinessCatalog'
 import './Jobs.css'
 
 export default function Jobs({ userId }) {
-  const [mainSection, setMainSection] = useState('my-employments') // 'my-employments' or 'job-marketplace'
+  const [mainSection, setMainSection] = useState('my-employments') // 'my-employments', 'job-marketplace', or 'businesses'
   const [userType, setUserType] = useState('job-seeker') // 'employer' or 'job-seeker'
   const [marketplaceTab, setMarketplaceTab] = useState('job-listings') // 'job-listings', 'offers-received', 'my-jobs'
   const [jobs, setJobs] = useState([])
