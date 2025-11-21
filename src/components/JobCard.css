@@ -1,12 +1,38 @@
-/* Poster Section */
+/* =====================================================
+   JOB CARD - Responsive Layout with Symmetrical Spacing
+   ===================================================== */
+
+.job-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 500px;
+}
+
+.job-card:hover {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(-4px);
+}
+
+/* =====================================================
+   POSTER SECTION - Top Profile Area
+   ===================================================== */
+
 .job-poster-section {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
   border-bottom: 1px solid #e0e0e0;
-  gap: 12px;
+  gap: 16px;
 }
 
 .poster-avatar-wrapper {
@@ -17,6 +43,8 @@
   transition: all 0.2s ease;
   padding: 8px;
   border-radius: 6px;
+  flex: 1;
+  min-width: 0;
 }
 
 .poster-avatar-wrapper:hover {
@@ -57,7 +85,9 @@
 .poster-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
 }
 
 .poster-name {
@@ -65,6 +95,9 @@
   color: #1a1a1a;
   font-size: 0.95rem;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .poster-display-type {
@@ -72,6 +105,9 @@
   color: #999;
   font-size: 0.8rem;
   text-transform: capitalize;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .poster-actions {
@@ -79,19 +115,22 @@
   flex-direction: column;
   gap: 8px;
   flex-shrink: 0;
-  align-items: flex-end;
+  align-items: stretch;
+  justify-content: center;
 }
 
 .employer-badge-top {
   display: inline-block;
-  padding: 4px 12px;
+  padding: 6px 12px;
+  background: #c8e6c9;
   color: #2e7d32;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   line-height: 1;
+  text-align: center;
 }
 
 .btn-view-profile-top {
@@ -105,6 +144,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  text-align: center;
 }
 
 .btn-view-profile-top:hover {
@@ -112,46 +152,29 @@
   color: white;
 }
 
-.job-card {
-  background: white;
-  border-radius: 8px;
-  padding: 20px;
-  border: 1px solid #e0e0e0;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
-.job-card:hover {
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-  transform: translateY(-4px);
-}
+/* =====================================================
+   HEADER SECTION - Title and Status
+   ===================================================== */
 
 .job-card-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 15px;
-  gap: 10px;
+  margin-bottom: 16px;
+  gap: 12px;
 }
 
 .job-title-section {
   flex: 1;
-}
-
-.header-badges {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  align-items: center;
 }
 
 .job-title {
   margin: 0;
   color: #1a1a1a;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.4;
 }
@@ -160,20 +183,22 @@
   display: inline-block;
   background: #e8eaf6;
   color: #667eea;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  margin-top: 5px;
+  width: fit-content;
+  text-transform: capitalize;
 }
 
 .job-status {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .job-status.active {
@@ -191,10 +216,16 @@
   color: #616161;
 }
 
+.header-badges {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .employer-badge {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: capitalize;
   white-space: nowrap;
@@ -203,20 +234,28 @@
   border: 1px solid #667eea;
 }
 
+/* =====================================================
+   DESCRIPTION SECTION
+   ===================================================== */
+
 .job-description {
   color: #555;
   font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 0 0 15px 0;
+  line-height: 1.6;
+  margin: 0 0 16px 0;
   flex: 1;
 }
 
+/* =====================================================
+   META INFORMATION SECTION
+   ===================================================== */
+
 .job-meta {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-bottom: 15px;
-  padding: 12px 0;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 16px 0;
   border-top: 1px solid #f0f0f0;
   border-bottom: 1px solid #f0f0f0;
 }
@@ -224,28 +263,34 @@
 .meta-item {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .meta-item .label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #999;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
 }
 
 .meta-item .value {
   color: #1a1a1a;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   font-weight: 600;
+  word-break: break-word;
 }
+
+/* =====================================================
+   STATS SECTION
+   ===================================================== */
 
 .job-stats {
   display: flex;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 16px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
 .stat {
@@ -254,26 +299,39 @@
   gap: 6px;
   font-size: 0.85rem;
   color: #666;
+  white-space: nowrap;
 }
 
 .stat .icon {
   font-size: 1rem;
 }
 
-.stat .text {
-  white-space: nowrap;
+.stat .label {
+  font-weight: 600;
+  color: #999;
 }
+
+.stat .text {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+/* =====================================================
+   FOOTER BUTTONS SECTION
+   ===================================================== */
 
 .job-card-footer {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
   margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f0f0f0;
 }
 
 .btn-view-details,
 .btn-apply {
-  padding: 10px 16px;
+  padding: 12px 16px;
   border: none;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -282,81 +340,206 @@
   transition: all 0.3s ease;
   text-align: center;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-view-details {
   background: #f0f0f0;
   color: #1a1a1a;
+  border: 1px solid #e0e0e0;
 }
 
 .btn-view-details:hover {
   background: #e0e0e0;
+  border-color: #d0d0d0;
 }
 
 .btn-apply {
   background: #667eea;
   color: white;
+  border: 1px solid #667eea;
 }
 
 .btn-apply:hover {
   background: #5568d3;
+  border-color: #4d5bc5;
 }
 
+/* =====================================================
+   SKILLS SECTION
+   ===================================================== */
+
 .skills-section {
-  margin-top: 15px;
-  padding-top: 15px;
+  margin-top: 16px;
+  padding-top: 16px;
   border-top: 1px solid #f0f0f0;
 }
 
 .skills-section label {
   display: block;
-  font-size: 0.85rem;
-  color: #666;
+  font-size: 0.7rem;
+  color: #999;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 8px;
-  letter-spacing: 0.4px;
+  margin-bottom: 10px;
+  letter-spacing: 0.5px;
 }
 
 .skills-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 8px;
 }
 
 .skill-tag {
   background: #e8eaf6;
   color: #667eea;
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 16px;
   font-size: 0.8rem;
   font-weight: 500;
+  border: 1px solid #d8dff5;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .job-meta {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
+/* =====================================================
+   RESPONSIVE DESIGN - Tablet (640px and below)
+   ===================================================== */
 
-  .job-card-footer {
-    grid-template-columns: 1fr;
-  }
-
-  .header-badges {
-    flex-wrap: wrap;
-    justify-content: flex-start;
+@media (max-width: 768px) {
+  .job-card {
+    min-height: auto;
   }
 
   .job-poster-section {
     flex-wrap: wrap;
+    gap: 12px;
   }
 
   .poster-actions {
     width: 100%;
   }
 
+  .btn-view-profile-top {
+    width: 100%;
+  }
+
+  .job-meta {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .job-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+}
+
+/* =====================================================
+   RESPONSIVE DESIGN - Mobile (640px and below)
+   ===================================================== */
+
+@media (max-width: 640px) {
+  .job-card {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .job-poster-section {
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    gap: 12px;
+  }
+
+  .poster-avatar-wrapper {
+    width: 100%;
+  }
+
+  .poster-actions {
+    width: 100%;
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .employer-badge-top {
+    flex: 1;
+  }
+
+  .btn-view-profile-top {
+    flex: 1;
+  }
+
+  .job-card-header {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .job-title {
+    font-size: 1rem;
+  }
+
+  .job-meta {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px 0;
+  }
+
+  .job-stats {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .job-card-footer {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding-top: 12px;
+  }
+
+  .btn-view-details,
+  .btn-apply {
+    padding: 10px 14px;
+    font-size: 0.8rem;
+  }
+
+  .skills-section {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .skills-list {
+    gap: 6px;
+  }
+
+  .skill-tag {
+    font-size: 0.75rem;
+    padding: 5px 10px;
+  }
+}
+
+/* =====================================================
+   EXTRA SMALL DEVICES (320px and below)
+   ===================================================== */
+
+@media (max-width: 320px) {
+  .job-card {
+    padding: 12px;
+  }
+
+  .job-title {
+    font-size: 0.95rem;
+  }
+
+  .poster-actions {
+    flex-direction: column;
+  }
+
+  .employer-badge-top,
   .btn-view-profile-top {
     width: 100%;
   }
