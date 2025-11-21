@@ -18,56 +18,8 @@ const getEnv = (name) => {
   return undefined
 }
 
-// Enhanced fetch wrapper with retry logic for network errors
+// Keep reference to original fetch (no wrapper to avoid response body conflicts with Supabase)
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
-let _fetchWrapper = originalFetch
-
-if (typeof window !== 'undefined') {
-  window.fetch = function(...args) {
-    const [url, options] = args
-    const MAX_RETRIES = 2
-    let retryCount = 0
-
-    const attemptFetch = async () => {
-      try {
-        const response = await originalFetch.apply(this, args)
-        return response
-      } catch (err) {
-        // Log network errors with diagnostics
-        const isSupabaseUrl = typeof url === 'string' && url.includes('supabase')
-        const isHealthCheck = typeof url === 'string' && url.includes('/auth/v1/health')
-
-        if (isSupabaseUrl && !isHealthCheck) {
-          console.warn('[supabase-fetch-error]', {
-            url: typeof url === 'string' ? url.split('?')[0] : url,
-            error: err?.message,
-            type: err?.name,
-            attempt: retryCount + 1,
-            timestamp: new Date().toISOString()
-          })
-        }
-
-        // Retry on network errors (Failed to fetch, etc.)
-        if (isSupabaseUrl && !isHealthCheck && retryCount < MAX_RETRIES && err?.message?.includes('Failed to fetch')) {
-          retryCount++
-          console.debug(`[supabase-fetch-retry] Retrying ${retryCount}/${MAX_RETRIES}...`)
-          // Wait before retry (exponential backoff)
-          await new Promise(resolve => setTimeout(resolve, 300 * retryCount))
-          return attemptFetch()
-        }
-
-        if (isHealthCheck) {
-          console.debug('[supabase-health-check-error]', err?.message)
-          throw err
-        }
-
-        throw err
-      }
-    }
-
-    return attemptFetch()
-  }
-}
 
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_PUBLISHABLE_KEY') || ''
