@@ -293,27 +293,47 @@ export const jobsService = {
   },
 
   // ============================================================================
-  // JOB OFFERS OPERATIONS
+  // JOB APPLICATIONS OPERATIONS
   // ============================================================================
 
-  // Create a job offer (service provider applying for a job)
+  // Create a job application (user applying for a job)
   async createJobOffer(offerData) {
-    const { data, error } = await supabase
-      .from('job_offers')
-      .insert([offerData])
-      .select()
+    try {
+      const { data: { user }, error: authError } = await supabase.auth.getUser()
+      if (authError || !user) throw new Error('User not authenticated')
 
-    if (error) throw error
-    return data?.[0]
+      const { data, error } = await supabase
+        .from('job_applications')
+        .insert([{
+          business_id: offerData.business_id,
+          job_id: offerData.job_id,
+          applicant_user_id: offerData.service_provider_id || user.id,
+          cover_letter: offerData.offer_message || '',
+          job_title: offerData.job_title,
+          job_category: offerData.job_category,
+          pay_rate: offerData.pay_rate,
+          pay_currency: offerData.pay_currency,
+          status: 'submitted',
+          submitted_at: new Date().toISOString()
+        }])
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (err) {
+      console.error('Error creating job application:', err)
+      throw err
+    }
   },
 
-  // Get offers for a specific job
+  // Get applications for a specific job
   async getJobOffers(jobId) {
     const { data, error } = await supabase
-      .from('job_offers')
+      .from('job_applications')
       .select('*')
       .eq('job_id', jobId)
-      .order('created_at', { ascending: false })
+      .order('submitted_at', { ascending: false })
 
     if (error) throw error
     return data || []
