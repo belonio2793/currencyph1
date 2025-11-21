@@ -486,11 +486,12 @@
 .offers-tab,
 .ratings-tab,
 .remarks-tab {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  max-width: 100% !important;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Force all direct children of modal-content to full width */
