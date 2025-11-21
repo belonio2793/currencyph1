@@ -244,8 +244,7 @@ export default function BusinessDirectory({ userId }) {
       {/* Header Section */}
       <div className="directory-header">
         <div className="header-content">
-          <h2>Business Directory</h2>
-          <p>Discover businesses, explore opportunities, and grow your network</p>
+          <h2>Business Directory <span className="header-subtitle">Discover businesses, explore opportunities, and grow your network</span></h2>
         </div>
         
         {/* Filter and Search */}
