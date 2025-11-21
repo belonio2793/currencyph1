@@ -294,6 +294,22 @@
   gap: 16px;
 }
 
+/* Jobs Components within expanded content */
+.card-expanded .jobs-management-card {
+  background: white;
+  border: 1px solid #d1d5db;
+  margin: 8px 0;
+  padding: 16px;
+}
+
+.card-expanded .jobs-seeker-display {
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px;
+  margin: 8px 0;
+}
+
 .detail-section {
   display: flex;
   flex-direction: column;
