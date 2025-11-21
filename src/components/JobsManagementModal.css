@@ -9,16 +9,16 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 20px;
 }
 
 .modal-content.jobs-modal {
   background: white;
   border-radius: 12px;
   max-width: 700px;
-  width: 100%;
-  max-height: 90vh;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  width: calc(100% - 0px);
+  height: calc(100vh - 0px);
+  max-height: 100vh;
+  box-shadow: none;
   display: flex;
   flex-direction: column;
   animation: slideIn 0.3s ease-out;
