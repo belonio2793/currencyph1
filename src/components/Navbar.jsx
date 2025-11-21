@@ -26,6 +26,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
     { id: 'transactions', label: 'History', auth: true },
     { id: 'profile', label: 'Profile', auth: true },
     { id: 'inbox', label: 'Inbox', auth: true },
+    { id: 'attendance', label: 'My Attendance', auth: true },
     { id: 'my-business', label: 'My Business', auth: true }
   ]
 
