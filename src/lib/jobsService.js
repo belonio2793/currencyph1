@@ -201,12 +201,11 @@ export const jobsService = {
       .from('jobs')
       .select(`
         *,
-        job_offers (
+        job_applications (
           id,
           status,
-          service_provider_id,
-          provider_name,
-          offered_rate
+          applicant_user_id,
+          submitted_at
         ),
         job_ratings (
           id,
