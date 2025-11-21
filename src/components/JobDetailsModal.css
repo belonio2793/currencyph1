@@ -427,6 +427,13 @@
   color: #999;
 }
 
+.offers-tab,
+.ratings-tab,
+.remarks-tab {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .modal-overlay {
