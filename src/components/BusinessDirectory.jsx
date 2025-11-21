@@ -550,6 +550,52 @@ export default function BusinessDirectory({ userId }) {
         />,
         document.body
       )}
+
+      {/* Hide Business Confirmation Modal */}
+      {showHideConfirmation && businessToHide && createPortal(
+        <div className="modal-overlay" onClick={() => setShowHideConfirmation(false)}>
+          <div className="confirmation-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="confirmation-header">
+              <h2>Hide Business from Directory?</h2>
+              <button
+                className="btn-close"
+                onClick={() => setShowHideConfirmation(false)}
+                aria-label="Close"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="confirmation-content">
+              <div className="confirmation-icon">🚫</div>
+              <p className="confirmation-title">Hide "{businessToHide.business_name}"</p>
+              <p className="confirmation-description">
+                This business will be hidden from the Business Directory and will no longer appear in search results.
+                Users seeking work will not be able to find or send requests to this business.
+              </p>
+              <p className="confirmation-note">
+                You can show this business again at any time by clicking the "Show" button.
+              </p>
+            </div>
+
+            <div className="confirmation-actions">
+              <button
+                className="btn-cancel"
+                onClick={() => setShowHideConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-confirm-hide"
+                onClick={() => confirmVisibilityChange(businessToHide, false)}
+              >
+                Hide Business
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   )
 }
