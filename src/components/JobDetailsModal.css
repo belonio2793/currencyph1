@@ -520,13 +520,15 @@
     border-radius: 0;
     padding: 16px;
     position: relative;
+    flex-wrap: wrap;
+  }
+
+  .header-content {
+    flex: 0 0 calc(100% - 100px);
   }
 
   .modal-header-buttons {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
+    flex: 0 0 auto;
   }
 
   .modal-tabs {
