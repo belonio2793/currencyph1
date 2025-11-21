@@ -772,7 +772,7 @@ export default function Profile({ userId, onSignOut }) {
                         <p className="text-xs text-slate-600">Verified on: {new Date(verificationStatus.didit_verified_at).toLocaleDateString()}</p>
                       )}
                       {verificationStatus.is_public && verificationStatus.status === 'approved' && (
-                        <p className="text-xs text-green-600 mt-2">🌐 Your verification is publicly visible</p>
+                        <p className="text-xs text-green-600 mt-2">Your verification is publicly visible</p>
                       )}
                       {!verificationStatus.is_public && verificationStatus.status === 'approved' && (
                         <p className="text-xs text-slate-600 mt-2">�� Your verification is private</p>
