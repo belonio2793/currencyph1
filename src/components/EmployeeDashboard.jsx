@@ -26,6 +26,13 @@ export default function EmployeeDashboard({ userId }) {
     }
   }, [userId])
 
+  // Load attendance when business is selected
+  useEffect(() => {
+    if (selectedBusinessForAttendance?.business_id && activeTab === 'attendance') {
+      loadAttendanceRecords(selectedBusinessForAttendance.business_id)
+    }
+  }, [selectedBusinessForAttendance, activeTab])
+
   const loadEmployeeData = async () => {
     setLoading(true)
     setError('')
