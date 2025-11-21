@@ -111,33 +111,17 @@ async function checkSupabaseHealth(retryCount = 0) {
   }
 }
 
-// Run health check if in browser environment with periodic reconnection
+// Initialize Supabase on module load (simplified - no health checks to avoid network interference)
 if (typeof window !== 'undefined' && typeof setTimeout !== 'undefined') {
-  // Run health check after a short delay to not block app startup
+  // Initialize client on first page load without health checks
   setTimeout(() => {
     try {
-      checkSupabaseHealth().catch(err => {
-        console.debug('[supabase-client] Health check exception (non-blocking):', err?.message)
-      })
+      initClient()
+      console.debug('[supabase-client] Supabase client initialized')
     } catch (err) {
-      console.debug('[supabase-client] Health check startup error:', err?.message)
+      console.debug('[supabase-client] Initialization error:', err?.message)
     }
-  }, 100)
-
-  // Periodically check health and attempt reconnection if offline
-  const HEALTH_CHECK_INTERVAL = 30000 // 30 seconds
-  setInterval(() => {
-    if (!_supabaseHealthy) {
-      try {
-        console.debug('[supabase-client] Attempting reconnection...')
-        checkSupabaseHealth().catch(err => {
-          console.debug('[supabase-client] Reconnection attempt failed:', err?.message)
-        })
-      } catch (err) {
-        console.debug('[supabase-client] Reconnection error:', err?.message)
-      }
-    }
-  }, HEALTH_CHECK_INTERVAL)
+  }, 50)
 }
 
 // Export a Proxy that lazily initializes the real client on first access while keeping the same import shape
