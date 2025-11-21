@@ -1431,7 +1431,7 @@ export default function MyBusiness({ userId }) {
               <div className="mt-8">
                 <JobsManagementCard
                   business={selectedBusiness}
-                  userId={session?.user?.id}
+                  userId={userId}
                   onUpdate={(updatedBusiness) => setSelectedBusiness(updatedBusiness)}
                 />
               </div>
