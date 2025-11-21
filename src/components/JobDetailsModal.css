@@ -489,6 +489,7 @@
   color: #999;
 }
 
+.details-tab,
 .offers-tab,
 .ratings-tab,
 .remarks-tab {
@@ -505,6 +506,8 @@
   width: 100% !important;
   box-sizing: border-box !important;
   max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 
