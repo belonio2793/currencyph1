@@ -434,27 +434,15 @@
 /* Responsive Design */
 @media (max-width: 1024px) {
   .modal-content.jobs-modal {
-    border-radius: 12px;
     width: 95%;
-    height: auto;
     max-height: 90vh;
-  }
-
-  .modal-overlay {
-    padding: 20px;
   }
 }
 
 @media (max-width: 768px) {
   .modal-content.jobs-modal {
-    border-radius: 12px;
-    width: 100%;
-    height: auto;
+    width: 95%;
     max-height: 85vh;
-  }
-
-  .modal-overlay {
-    padding: 10px;
   }
 
   .modal-header {
