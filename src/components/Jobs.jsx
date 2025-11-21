@@ -18,9 +18,9 @@ import EmployeeDashboard from './EmployeeDashboard'
 import './Jobs.css'
 
 export default function Jobs({ userId }) {
-  const [activeSection, setActiveSection] = useState('marketplace') // 'employments' or 'marketplace'
+  const [mainSection, setMainSection] = useState('my-employments') // 'my-employments' or 'job-marketplace'
   const [userType, setUserType] = useState('job-seeker') // 'employer' or 'job-seeker'
-  const [activeTab, setActiveTab] = useState('job-listings') // 'job-listings', 'offers-received', 'my-jobs'
+  const [marketplaceTab, setMarketplaceTab] = useState('job-listings') // 'job-listings', 'offers-received', 'my-jobs'
   const [jobs, setJobs] = useState([])
   const [offers, setOffers] = useState([])
   const [userJobs, setUserJobs] = useState([])
