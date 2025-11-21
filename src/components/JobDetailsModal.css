@@ -64,6 +64,8 @@
   flex-shrink: 0;
   justify-content: flex-end;
   height: 100%;
+  position: absolute;
+  right: 24px;
 }
 
 .header-content h2 {
