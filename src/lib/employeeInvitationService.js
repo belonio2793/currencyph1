@@ -53,10 +53,14 @@ export const employeeInvitationService = {
       // Fetch business details separately for each invitation
       if (data && data.length > 0) {
         const businessIds = [...new Set(data.map(inv => inv.business_id))]
-        const { data: businesses } = await supabase
+        const { data: businesses, error: businessError } = await supabase
           .from('businesses')
-          .select('id, business_name, owner_id')
+          .select('id,business_name,owner_id')
           .in('id', businessIds)
+
+        if (businessError) {
+          console.error('[employeeInvitationService] Error fetching invitation businesses:', businessError)
+        }
 
         const businessMap = {}
         businesses?.forEach(b => {
