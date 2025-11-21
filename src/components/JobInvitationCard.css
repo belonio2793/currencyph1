@@ -1,0 +1,315 @@
+.job-invitation-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.job-invitation-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.card-error {
+  padding: 10px 12px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c33;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+/* Header Section */
+.invitation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.invitation-title-section {
+  flex: 1;
+}
+
+.invitation-header .job-title {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.invitation-header .business-name {
+  font-size: 0.9rem;
+  color: #667eea;
+  margin: 0;
+  font-weight: 600;
+}
+
+.invitation-status-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Expiry Badges */
+.expiry-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.expiry-badge.active {
+  background: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+
+.expiry-badge.expiring {
+  background: #ffe;
+  color: #cc3;
+  border: 1px solid #ffc;
+}
+
+.expiry-badge.expired {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+
+/* Details Section */
+.invitation-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item .label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.detail-item .value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Description */
+.invitation-description {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #f0f4ff;
+  border-left: 4px solid #667eea;
+  border-radius: 4px;
+}
+
+.invitation-description p {
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Message from Employer */
+.invitation-message {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+}
+
+.invitation-message strong {
+  display: block;
+  color: #ff9800;
+  margin-bottom: 4px;
+  font-size: 0.85rem;
+}
+
+.invitation-message p {
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Sent Date */
+.sent-date {
+  color: #999;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+
+/* Confirmation Dialog */
+.confirmation-dialog {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.confirmation-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.confirmation-content p {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-confirm-yes,
+.btn-confirm-no {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.btn-confirm-yes {
+  background: #667eea;
+  color: white;
+}
+
+.btn-confirm-yes:hover:not(:disabled) {
+  background: #5568d3;
+}
+
+.btn-confirm-no {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-confirm-no:hover:not(:disabled) {
+  background: #d0d0d0;
+}
+
+.btn-confirm-yes:disabled,
+.btn-confirm-no:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Actions */
+.invitation-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-accept,
+.btn-reject,
+.btn-hide {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.btn-accept {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.btn-accept:hover:not(:disabled) {
+  background: #c8e6c9;
+  border-color: #a5d6a7;
+}
+
+.btn-reject {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.btn-reject:hover:not(:disabled) {
+  background: #ffcdd2;
+  border-color: #ef9a9a;
+}
+
+.btn-hide {
+  background: #f5f5f5;
+  color: #666;
+  border: 1px solid #e0e0e0;
+}
+
+.btn-hide:hover:not(:disabled) {
+  background: #e0e0e0;
+  border-color: #bdbdbd;
+}
+
+.btn-accept:disabled,
+.btn-reject:disabled,
+.btn-hide:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .job-invitation-card {
+    padding: 15px;
+  }
+
+  .invitation-header {
+    flex-direction: column;
+  }
+
+  .invitation-status-section {
+    align-items: flex-start;
+  }
+
+  .invitation-details {
+    grid-template-columns: 1fr;
+  }
+
+  .invitation-actions {
+    flex-direction: column;
+  }
+}
