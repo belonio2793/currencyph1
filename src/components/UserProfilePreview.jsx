@@ -85,7 +85,7 @@ export default function UserProfilePreview({ userId }) {
       ])
 
       const postedCount = postedJobsResult.count || 0
-      const acceptedCount = acceptedOffersResult.count || 0
+      const acceptedCount = acceptedApplicationsResult.count || 0
       const completedCount = completedJobsResult.count || 0
       const ratings = ratingsResult.data || []
 
