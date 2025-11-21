@@ -190,8 +190,10 @@ export const employeeInvitationService = {
           businessMap[b.id] = b
         })
 
-        data.forEach(assignment => {
-          assignment.business = businessMap[assignment.business_id] || null
+        data.forEach(application => {
+          application.business = businessMap[application.business_id] || null
+          // Map field names for backward compatibility with EmployeeDashboard
+          application.assigned_job_title = application.job_title
         })
       }
 
