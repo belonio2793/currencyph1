@@ -29,7 +29,7 @@
 
 .modal-header {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   padding: 20px 24px;
   border-bottom: 1px solid #e0e0e0;
@@ -50,10 +50,9 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 1;
+  flex: 0 1 auto;
   min-width: 0;
   justify-content: center;
-  width: auto;
   height: 100%;
 }
 
@@ -61,10 +60,13 @@
   display: flex;
   gap: 8px;
   align-items: center;
-  margin-left: auto;
+  position: absolute;
+  right: 24px;
   flex-shrink: 0;
   justify-content: flex-end;
   height: 100%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .header-content h2 {
@@ -73,7 +75,7 @@
   color: white !important;
   font-weight: 700;
   word-break: break-word;
-  line-height: 1;
+  line-height: 1.2;
   flex: 0 1 auto;
 }
 
@@ -233,6 +235,8 @@
   max-width: 100%;
   position: relative;
   min-width: 0;
+  left: 0;
+  right: 0;
 }
 
 .details-tab {
@@ -245,7 +249,6 @@
   padding: 0;
   max-width: 100%;
   min-width: 0;
-  padding-right: 0;
 }
 
 .details-grid {
@@ -260,6 +263,8 @@
   min-width: 0;
   align-items: start;
   border: none;
+  left: 0;
+  right: 0;
 }
 
 .detail-section {
@@ -494,6 +499,8 @@
   padding: 0;
   max-width: 100%;
   min-width: 0;
+  left: 0;
+  right: 0;
 }
 
 
