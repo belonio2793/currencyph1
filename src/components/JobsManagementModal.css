@@ -443,15 +443,15 @@
   }
 
   .modal-header {
-    padding: 16px;
+    padding: 12px;
   }
 
   .modal-header h2 {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
   }
 
   .modal-body {
-    padding: 16px;
+    padding: 12px;
   }
 
   .form-row {
