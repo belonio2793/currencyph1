@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { businessRequestService } from '../lib/businessRequestService'
 import BusinessRequestModal from './BusinessRequestModal'
+import BusinessEditModal from './BusinessEditModal'
 import './BusinessDirectory.css'
 
 export default function BusinessDirectory({ userId }) {
@@ -14,6 +15,7 @@ export default function BusinessDirectory({ userId }) {
   const [filterType, setFilterType] = useState('all')
   const [selectedBusiness, setSelectedBusiness] = useState(null)
   const [showRequestModal, setShowRequestModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
   const [currentPage, setCurrentPage] = useState(0)
   const [expandedCard, setExpandedCard] = useState(null)
   const ITEMS_PER_PAGE = 12
