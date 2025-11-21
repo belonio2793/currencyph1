@@ -251,19 +251,22 @@
    ===================================================== */
 
 .job-meta {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
   margin-bottom: 16px;
   padding: 16px 0;
   border-top: 1px solid #f0f0f0;
   border-bottom: 1px solid #f0f0f0;
+  align-items: flex-start;
 }
 
 .meta-item {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  flex: 0 1 auto;
+  min-width: 100px;
 }
 
 .meta-item .label {
@@ -272,6 +275,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  line-height: 1.2;
 }
 
 .meta-item .value {
@@ -279,6 +283,7 @@
   font-size: 0.95rem;
   font-weight: 600;
   word-break: break-word;
+  line-height: 1.4;
 }
 
 /* =====================================================
