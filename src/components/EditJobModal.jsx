@@ -261,7 +261,7 @@ export default function EditJobModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="post-job-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Edit Job Listing</h2>
+          <h2>{job.job_title || 'Edit Job Listing'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
         </div>
 
