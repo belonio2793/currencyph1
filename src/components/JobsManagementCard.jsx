@@ -5,6 +5,14 @@ import JobsManagementModal from './JobsManagementModal'
 import './JobsManagementCard.css'
 
 export default function JobsManagementCard({ business, userId, onUpdate }) {
+  // Check if current user is the business owner
+  const isBusinessOwner = business?.user_id === userId
+
+  // Don't render card if user is not the business owner
+  if (!isBusinessOwner) {
+    return null
+  }
+
   const [jobsCount, setJobsCount] = useState(0)
   const [pendingOffers, setPendingOffers] = useState(0)
   const [hiringStatus, setHiringStatus] = useState(business?.metadata?.hiring_status || 'not_hiring')
