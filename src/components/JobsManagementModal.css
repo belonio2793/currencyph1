@@ -6,32 +6,27 @@
   bottom: 0;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
 }
 
 .modal-content.jobs-modal {
   background: white;
   border-radius: 0;
-  max-width: 100%;
   width: 100%;
-  height: 100vh;
-  max-height: 100vh;
+  height: 100%;
   box-shadow: none;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s ease-out;
+  animation: none;
 }
 
-@keyframes slideIn {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(-20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
