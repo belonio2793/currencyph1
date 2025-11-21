@@ -28,9 +28,9 @@
 
 .modal-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 24px;
+  padding: 20px 24px;
   border-bottom: 1px solid #e0e0e0;
   background: #667eea;
   color: white;
@@ -49,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  flex: 0 1 auto;
+  flex: 1;
   min-width: 0;
   justify-content: center;
   width: auto;
@@ -133,18 +133,16 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   font-weight: 300;
   letter-spacing: 0.5px;
 }
 
 .close-btn:hover {
   background: rgba(255, 255, 255, 0.35);
-  transform: scale(1.1) rotate(90deg);
 }
 
 .close-btn:active {
-  transform: scale(0.95) rotate(90deg);
+  background: rgba(255, 255, 255, 0.3);
 }
 
 /* Error Message */
