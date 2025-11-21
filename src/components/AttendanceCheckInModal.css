@@ -61,6 +61,10 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .modal-close:hover {
