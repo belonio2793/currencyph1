@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import { jobsService } from '../lib/jobsService'
 import { PHILIPPINES_CITIES, searchCities } from '../data/philippinesCities'
-import './PostJobModal.css'
+import './EditJobModal.css'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
@@ -259,7 +259,7 @@ export default function EditJobModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="post-job-modal" onClick={e => e.stopPropagation()}>
+      <div className="edit-job-modal" onClick={e => e.stopPropagation()}>
         <div className="modal-header">
           <h2>{job.job_title || 'Edit Job Listing'}</h2>
           <button className="close-btn" onClick={onClose}>×</button>
