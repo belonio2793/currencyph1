@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { employeeInvitationService } from '../lib/employeeInvitationService'
-import { employeeManagementService } from '../lib/employeeManagementService'
+import { EmployeeManagementService } from '../lib/employeeManagementService'
 import { formatFieldValue } from '../lib/formatters'
 import './JobInvitationCard.css'
 
