@@ -286,8 +286,9 @@
 }
 
 /* Responsive */
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .post-job-modal {
+    max-width: 95vw;
     border-radius: 0;
     max-height: 100vh;
   }
@@ -306,5 +307,10 @@
 
   .post-job-modal .modal-header {
     border-radius: 0;
+    padding: 16px;
+  }
+
+  .post-job-modal .modal-header h2 {
+    font-size: 1.2rem;
   }
 }
