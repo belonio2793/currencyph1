@@ -754,25 +754,27 @@ export default function Jobs({ userId }) {
         </div>
       )}
 
-      {/* Modals */}
-      {showSelectBusiness && (
+      {/* Modals - Portaled to document body to prevent overflow clipping */}
+      {showSelectBusiness && createPortal(
         <SelectBusinessModal
           businesses={userBusinesses}
           onSelect={handleSelectBusiness}
           onClose={() => setShowSelectBusiness(false)}
-        />
+        />,
+        document.body
       )}
 
-      {showPostModal && selectedBusiness && (
+      {showPostModal && selectedBusiness && createPortal(
         <PostJobModal
           onClose={() => setShowPostModal(false)}
           onSubmit={handlePostJob}
           categories={categories}
           cities={cities}
-        />
+        />,
+        document.body
       )}
 
-      {showSubmitModal && (
+      {showSubmitModal && createPortal(
         <SubmitJobModal
           onClose={() => setShowSubmitModal(false)}
           onSubmit={handleSubmitJob}
@@ -780,10 +782,11 @@ export default function Jobs({ userId }) {
           cities={cities}
           userBusinesses={userBusinesses}
           userId={userId}
-        />
+        />,
+        document.body
       )}
 
-      {showLookingToHireModal && (
+      {showLookingToHireModal && createPortal(
         <LookingToHireModal
           onClose={() => setShowLookingToHireModal(false)}
           onSubmit={handleSubmitJob}
@@ -791,10 +794,11 @@ export default function Jobs({ userId }) {
           cities={cities}
           userBusinesses={userBusinesses}
           userId={userId}
-        />
+        />,
+        document.body
       )}
 
-      {showApplyConfirmation && jobToApplyFor && (
+      {showApplyConfirmation && jobToApplyFor && createPortal(
         <ApplyConfirmationModal
           job={jobToApplyFor}
           userId={userId}
@@ -809,10 +813,11 @@ export default function Jobs({ userId }) {
             setError('Application submitted successfully!')
             setTimeout(() => setError(''), 3000)
           }}
-        />
+        />,
+        document.body
       )}
 
-      {showJobDetails && selectedJob && (
+      {showJobDetails && selectedJob && createPortal(
         <JobDetailsModal
           job={selectedJob}
           onClose={() => setShowJobDetails(false)}
@@ -824,10 +829,11 @@ export default function Jobs({ userId }) {
           }}
           currentUserId={userId}
           businessId={selectedBusiness?.id}
-        />
+        />,
+        document.body
       )}
 
-      {showEditJobModal && editingJob && (
+      {showEditJobModal && editingJob && createPortal(
         <EditJobModal
           job={editingJob}
           onClose={() => {
@@ -837,17 +843,19 @@ export default function Jobs({ userId }) {
           onSubmit={handleEditJob}
           categories={categories}
           cities={cities}
-        />
+        />,
+        document.body
       )}
 
-      {showProfileModal && profileUserId && (
+      {showProfileModal && profileUserId && createPortal(
         <UserProfileModal
           userId={profileUserId}
           onClose={() => {
             setShowProfileModal(false)
             setProfileUserId(null)
           }}
-        />
+        />,
+        document.body
       )}
     </div>
   )
