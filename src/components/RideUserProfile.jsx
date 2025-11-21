@@ -144,9 +144,9 @@ export default function RideUserProfile({ userId, userRole = 'driver', onClose }
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              {tab === 'overview' && '📋 Overview'}
-              {tab === 'ratings' && '⭐ Ratings'}
-              {tab === 'history' && '📜 History'}
+              {tab === 'overview' && 'Overview'}
+              {tab === 'ratings' && 'Ratings'}
+              {tab === 'history' && 'History'}
             </button>
           ))}
         </div>
