@@ -60,7 +60,7 @@ export default function UserProfilePreview({ userId }) {
     try {
       const [
         postedJobsResult,
-        acceptedOffersResult,
+        acceptedApplicationsResult,
         completedJobsResult,
         ratingsResult
       ] = await Promise.all([
@@ -69,9 +69,9 @@ export default function UserProfilePreview({ userId }) {
           .select('id', { count: 'exact' })
           .eq('posted_by_user_id', uid),
         supabase
-          .from('job_offers')
+          .from('job_applications')
           .select('id', { count: 'exact' })
-          .eq('service_provider_id', uid)
+          .eq('applicant_user_id', uid)
           .eq('status', 'accepted'),
         supabase
           .from('job_history')
