@@ -15,16 +15,10 @@ export const employeeInvitationService = {
         .insert([{
           business_id: businessId,
           applicant_user_id: invitedUserId,
-          job_title: jobDetails.job_title,
-          job_description: jobDetails.job_description,
-          job_category: jobDetails.job_category,
-          pay_rate: jobDetails.pay_rate,
-          pay_currency: jobDetails.pay_currency || 'PHP',
-          pay_type: jobDetails.pay_type,
-          job_type: jobDetails.job_type,
+          position_applied_for: jobDetails.job_title,
           cover_letter: jobDetails.message,
-          status: 'submitted',
-          submitted_at: new Date().toISOString()
+          employment_type: jobDetails.job_type,
+          status: 'submitted'
         }])
         .select()
         .single()
@@ -42,7 +36,10 @@ export const employeeInvitationService = {
     try {
       const { data, error } = await supabase
         .from('job_applications')
-        .select('*')
+        .select(`
+          *,
+          jobs:job_id (id, job_title, job_category, pay_rate, pay_currency, job_type)
+        `)
         .eq('applicant_user_id', userId)
         .eq('status', 'submitted')
         .order('submitted_at', { ascending: false })
@@ -158,10 +155,18 @@ export const employeeInvitationService = {
 
   async getEmployeeBusinesses(userId) {
     try {
-      // Get accepted applications for the user
+      // Get accepted applications for the user with job details
       const { data, error } = await supabase
         .from('job_applications')
-        .select('id,business_id,job_title,job_category,pay_rate,pay_currency,job_type,submitted_at')
+        .select(`
+          id,
+          business_id,
+          position_applied_for,
+          employment_type,
+          submitted_at,
+          status,
+          jobs:job_id (id, job_title, job_category, pay_rate, pay_currency)
+        `)
         .eq('applicant_user_id', userId)
         .eq('status', 'accepted')
         .order('submitted_at', { ascending: false })
@@ -193,7 +198,14 @@ export const employeeInvitationService = {
         data.forEach(application => {
           application.business = businessMap[application.business_id] || null
           // Map field names for backward compatibility with EmployeeDashboard
-          application.assigned_job_title = application.job_title
+          const jobInfo = application.jobs
+          if (jobInfo) {
+            application.job_title = jobInfo.job_title
+            application.job_category = jobInfo.job_category
+            application.pay_rate = jobInfo.pay_rate
+            application.pay_currency = jobInfo.pay_currency
+          }
+          application.assigned_job_title = application.position_applied_for
         })
       }
 
