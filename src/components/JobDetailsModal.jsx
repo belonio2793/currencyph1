@@ -93,7 +93,7 @@ export default function JobDetailsModal({
             <h2>{job.job_title}</h2>
             <span className={`status-badge ${job.status}`}>{job.status}</span>
           </div>
-          <div className="header-buttons">
+          <div className="modal-header-buttons">
             {currentUserId === job.posted_by_user_id && (
               <button
                 className="btn-edit-job"
