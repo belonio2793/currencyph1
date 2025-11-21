@@ -445,8 +445,8 @@ export default function Jobs({ userId }) {
         </div>
       </div>
 
-      {/* Stats Dashboard - Only for employers */}
-      {userType === 'employer' && selectedBusiness && (
+      {/* Stats Dashboard - Only for employers in Job Marketplace section */}
+      {mainSection === 'job-marketplace' && userType === 'employer' && selectedBusiness && (
         <div className="jobs-stats">
           <div className="stat-card">
             <div className="stat-value">{stats.jobsPosted}</div>
