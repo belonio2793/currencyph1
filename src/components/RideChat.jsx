@@ -182,7 +182,7 @@ export default function RideChat({ rideId, userId, otherUserName, onClose }) {
               >
                 {msg.message_type === 'location' ? (
                   <div className="text-sm">
-                    📍 Location shared
+                    Location shared
                     <p className="text-xs mt-1 opacity-75">
                       {msg.location_latitude?.toFixed(4)}, {msg.location_longitude?.toFixed(4)}
                     </p>
