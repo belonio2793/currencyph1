@@ -169,6 +169,64 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     }
   }, [selectedEmployee, activeTab])
 
+  useEffect(() => {
+    if (selectedEmployee && activeTab === 'attendance') {
+      loadEmployeeBusinesses()
+    }
+  }, [selectedEmployee, activeTab])
+
+  const loadEmployeeBusinesses = async () => {
+    try {
+      if (!selectedEmployee.user_id) {
+        console.warn('No user_id for selected employee')
+        return
+      }
+
+      const { data: assignments, error } = await supabase
+        .from('employee_assignments')
+        .select(`
+          id,
+          business_id,
+          employee_id,
+          assigned_job_title,
+          assigned_job_category,
+          pay_rate,
+          employment_type,
+          start_date,
+          end_date,
+          status,
+          businesses:business_id (
+            id,
+            business_name,
+            currency_registration_number,
+            city_of_registration
+          )
+        `)
+        .eq('employee_id', selectedEmployee.id)
+        .eq('status', 'active')
+
+      if (error) {
+        console.error('Error loading employee businesses:', error)
+        return
+      }
+
+      const businessMap = {}
+      assignments?.forEach(assignment => {
+        businessMap[assignment.business_id] = assignment.businesses
+      })
+      setEmployeeBusinesses(businessMap)
+
+      if (assignments && assignments.length > 0) {
+        setSelectedBusinessForAttendance({
+          ...assignments[0],
+          business: assignments[0].businesses
+        })
+      }
+    } catch (err) {
+      console.error('Error in loadEmployeeBusinesses:', err)
+    }
+  }
+
   const loadMedicalRecords = async () => {
     try {
       const data = await EmployeeManagementService.getMedicalRecords(selectedEmployee.id)
