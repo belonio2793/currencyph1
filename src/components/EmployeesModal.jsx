@@ -353,29 +353,6 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
     }
   }
 
-  // Record Attendance
-  const handleCheckIn = async () => {
-    try {
-      await EmployeeManagementService.recordAttendance(selectedEmployee.id, 'check-in')
-      loadAttendance()
-    } catch (error) {
-      const errorMsg = error?.message || JSON.stringify(error)
-      console.error('Error recording check-in:', errorMsg)
-      alert(`Failed to record check-in: ${errorMsg}`)
-    }
-  }
-
-  const handleCheckOut = async () => {
-    try {
-      await EmployeeManagementService.recordAttendance(selectedEmployee.id, 'check-out')
-      loadAttendance()
-    } catch (error) {
-      const errorMsg = error?.message || JSON.stringify(error)
-      console.error('Error recording check-out:', errorMsg)
-      alert(`Failed to record check-out: ${errorMsg}`)
-    }
-  }
-
   // Save Medical Record
   const handleSaveMedical = async () => {
     try {
