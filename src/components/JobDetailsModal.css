@@ -272,6 +272,8 @@
   box-sizing: border-box;
   max-width: 100%;
   overflow: visible;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .detail-section h4 {
