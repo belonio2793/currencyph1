@@ -544,7 +544,7 @@ export default function Jobs({ userId }) {
       {error && (
         <div className={`error-message ${error.toLowerCase().includes('success') ? 'success' : ''}`}>
           {error}
-          <button onClick={() => setError('')} className="close-error">×</button>
+          <button onClick={() => setError('')} className="close-error">X</button>
         </div>
       )}
 

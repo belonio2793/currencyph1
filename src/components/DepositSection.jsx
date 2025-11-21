@@ -76,7 +76,7 @@ export default function DepositSection({ userId, onDepositSuccess }) {
       )}
 
       {success && (
-        <p className="text-green-600 text-xs mt-2">✓ Deposit successful</p>
+        <p className="text-green-600 text-xs mt-2">Deposit successful</p>
       )}
     </div>
   )

@@ -97,14 +97,14 @@ export default function BusinessRequestModal({ business, userId, onClose, onSubm
             <h2>Apply to {business.business_name}</h2>
             <p className="text-slate-500">Submit your application and resume</p>
           </div>
-          <button onClick={onClose} className="modal-close">×</button>
+          <button onClick={onClose} className="modal-close">X</button>
         </div>
 
         <div className="modal-body">
           {error && (
             <div className="error-message">
               {error}
-              <button onClick={() => setError('')} className="close-error">×</button>
+              <button onClick={() => setError('')} className="close-error">X</button>
             </div>
           )}
 
