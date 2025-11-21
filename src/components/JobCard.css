@@ -326,16 +326,18 @@
    ===================================================== */
 
 .job-card-footer {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 12px;
   margin-top: auto;
   padding-top: 16px;
   border-top: 1px solid #f0f0f0;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-view-details,
 .btn-apply {
+  flex: 1;
   padding: 12px 16px;
   border: 1px solid #ddd;
   border-radius: 6px;
