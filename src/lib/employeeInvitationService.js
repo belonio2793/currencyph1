@@ -46,7 +46,7 @@ export const employeeInvitationService = {
         .order('sent_at', { ascending: false })
 
       if (error) {
-        const errorMsg = error?.message || error?.code || 'Unknown error'
+        const errorMsg = error?.message || error?.code || String(error)
         console.error('[employeeInvitationService] getPendingInvitations error:', errorMsg)
         return { data: [], error: error }
       }
@@ -60,7 +60,7 @@ export const employeeInvitationService = {
           .in('id', businessIds)
 
         if (businessError) {
-          const errorMsg = businessError?.message || businessError?.code || 'Unknown error'
+          const errorMsg = businessError?.message || businessError?.code || String(businessError)
           console.error('[employeeInvitationService] Error fetching invitation businesses:', errorMsg)
         }
 
@@ -76,7 +76,7 @@ export const employeeInvitationService = {
 
       return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || err?.code || 'Unknown error'
+      const errorMsg = err?.message || err?.code || String(err)
       console.error('[employeeInvitationService] getPendingInvitations failed:', errorMsg)
       return { data: [], error: err }
     }
