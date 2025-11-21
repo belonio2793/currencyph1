@@ -183,17 +183,15 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
       }
 
       const { data: assignments, error } = await supabase
-        .from('employee_assignments')
+        .from('job_applications')
         .select(`
           id,
           business_id,
-          employee_id,
-          assigned_job_title,
-          assigned_job_category,
+          job_title,
+          job_category,
           pay_rate,
-          employment_type,
-          start_date,
-          end_date,
+          job_type,
+          submitted_at,
           status,
           businesses:business_id (
             id,
