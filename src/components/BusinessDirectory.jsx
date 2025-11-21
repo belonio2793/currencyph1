@@ -120,18 +120,17 @@ export default function BusinessDirectory({ userId }) {
             .eq('business_id', business.id)
             .eq('status', 'active')
 
-          // Get active employees count - try employee_assignments if it exists
+          // Get active employees count from accepted job applications
           let employeeCount = 0
           try {
             const { count } = await supabase
-              .from('employee_assignments')
+              .from('job_applications')
               .select('*', { count: 'exact' })
               .eq('business_id', business.id)
-              .eq('status', 'active')
+              .eq('status', 'accepted')
             employeeCount = count || 0
           } catch (err) {
-            // employee_assignments table may not exist yet, continue without it
-            console.warn(`Could not load employee_assignments for business ${business.id}:`, err?.message)
+            console.warn(`Could not load job_applications for business ${business.id}:`, err?.message)
           }
 
           // Get total applicants count (all non-withdrawn requests)
