@@ -272,7 +272,7 @@ export default function EditJobModal({
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="post-job-form">
+        <form onSubmit={handleSubmit} className="edit-job-form">
           <div className="form-section">
             <h3>Job Details</h3>
 
