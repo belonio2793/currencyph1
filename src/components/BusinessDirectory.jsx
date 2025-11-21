@@ -504,6 +504,19 @@ export default function BusinessDirectory({ userId }) {
           onSubmitted={handleRequestSubmitted}
         />
       )}
+
+      {/* Edit Business Modal */}
+      {showEditModal && selectedBusiness && (
+        <BusinessEditModal
+          business={selectedBusiness}
+          userId={userId}
+          onClose={() => {
+            setShowEditModal(false)
+            setSelectedBusiness(null)
+          }}
+          onUpdated={handleBusinessUpdated}
+        />
+      )}
     </div>
   )
 }
