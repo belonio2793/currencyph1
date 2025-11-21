@@ -499,7 +499,7 @@ export default function ListingDetail({ slug, onBack }) {
             )}
             {listing.traveler_type && (
               <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200">
-                <h3 className="font-semibold text-slate-900 mb-1">👥 Best For</h3>
+                <h3 className="font-semibold text-slate-900 mb-1">Best For</h3>
                 <p className="text-slate-700">{listing.traveler_type}</p>
               </div>
             )}
@@ -544,7 +544,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Hours of Operation */}
         {listing.hours_of_operation && Object.keys(listing.hours_of_operation).length > 0 && (
           <div className="mb-8 bg-slate-50 p-6 rounded-lg border border-slate-200">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">🕒 Hours of Operation</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Hours of Operation</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {Object.entries(listing.hours_of_operation).map(([day, hours], idx) => (
                 <div key={`hours-${day}-${idx}`} className="flex justify-between text-slate-700">
@@ -565,7 +565,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Amenities */}
         {listing.amenities && listing.amenities.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">🛎️ Amenities</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Amenities</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {listing.amenities.map((amenity, idx) => {
                 const amenityText = typeof amenity === 'string' ? amenity : (amenity.name || JSON.stringify(amenity))
@@ -583,7 +583,7 @@ export default function ListingDetail({ slug, onBack }) {
         {/* Cuisine / Features */}
         {(listing.cuisine || listing.features) && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">🍽️ Cuisine & Features</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">Cuisine & Features</h2>
             <div className="flex flex-wrap gap-2">
               {(Array.isArray(listing.cuisine) ? listing.cuisine : []).map((c, i) => (
                 <span key={`c-${i}`} className="px-3 py-1 bg-rose-100 text-rose-700 rounded-full text-sm font-medium">
