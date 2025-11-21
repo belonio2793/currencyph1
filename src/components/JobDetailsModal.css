@@ -182,6 +182,7 @@
   overflow-x: auto;
   box-sizing: border-box;
   justify-content: center;
+  margin: 0;
 }
 
 .modal-tabs .tab {
