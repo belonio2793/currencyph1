@@ -198,10 +198,10 @@
 .form-group input,
 .form-group select,
 .form-group textarea {
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid #d1d5db;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   color: #1f2937;
   transition: border-color 0.2s, box-shadow 0.2s;
   font-family: inherit;
