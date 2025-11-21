@@ -48,7 +48,7 @@ export const employeeInvitationService = {
       if (error) {
         const errorMsg = error?.message || error?.code || 'Unknown error'
         console.error('[employeeInvitationService] getPendingInvitations error:', errorMsg)
-        throw error
+        return { data: [], error: error }
       }
 
       // Fetch business details separately for each invitation
