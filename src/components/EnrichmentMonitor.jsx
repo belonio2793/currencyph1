@@ -113,7 +113,7 @@ export default function EnrichmentMonitor() {
   return (
     <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 mb-6 border border-blue-200 shadow-lg">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-gray-800">🔄 Enrichment Monitor</h2>
+        <h2 className="text-2xl font-bold text-gray-800">Enrichment Monitor</h2>
         <div className="text-sm text-gray-600">
           {loading ? 'Loading...' : 'Live Updates'}
         </div>

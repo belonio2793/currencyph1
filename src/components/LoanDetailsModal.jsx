@@ -246,7 +246,7 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                     <p className="text-xs text-slate-600 uppercase font-semibold mb-1">
                       Location
                     </p>
-                    <p className="text-sm font-medium text-slate-900">📍 {loan.city}</p>
+                    <p className="text-sm font-medium text-slate-900">{loan.city}</p>
                   </div>
                   {loan.loan_purpose && (
                     <div className="col-span-2">
