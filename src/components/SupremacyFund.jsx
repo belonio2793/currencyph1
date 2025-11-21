@@ -15,12 +15,12 @@ export default function SupremacyFund({ userId }) {
   const [showApiSetup, setShowApiSetup] = useState(false)
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'market-analysis', label: 'Market Analysis', icon: '📈' },
-    { id: 'signals', label: 'Trading Signals', icon: '🎯' },
-    { id: 'auto-trading', label: 'Auto Trading', icon: '🤖' },
-    { id: 'portfolio', label: 'Portfolio', icon: '💼' },
-    { id: 'risk-management', label: 'Risk Management', icon: '🛡️' }
+    { id: 'overview', label: 'Overview', icon: 'O' },
+    { id: 'market-analysis', label: 'Market Analysis', icon: 'M' },
+    { id: 'signals', label: 'Trading Signals', icon: 'S' },
+    { id: 'auto-trading', label: 'Auto Trading', icon: 'A' },
+    { id: 'portfolio', label: 'Portfolio', icon: 'P' },
+    { id: 'risk-management', label: 'Risk Management', icon: 'R' }
   ]
 
   useEffect(() => {
