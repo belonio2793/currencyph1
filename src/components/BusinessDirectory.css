@@ -388,7 +388,8 @@
 
 .btn-request,
 .btn-visibility,
-.btn-manage {
+.btn-manage,
+.btn-edit-business {
   flex: 1;
   min-width: 120px;
   padding: 10px 12px;
@@ -407,6 +408,15 @@
 
 .btn-request:hover {
   background: #5568d3;
+}
+
+.btn-edit-business {
+  background: #f59e0b;
+  color: white;
+}
+
+.btn-edit-business:hover {
+  background: #d97706;
 }
 
 .btn-visibility {
