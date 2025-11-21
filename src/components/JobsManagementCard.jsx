@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { jobsService } from '../lib/jobsService'
 import JobsManagementModal from './JobsManagementModal'
+import JobSeekerRequestModal from './JobSeekerRequestModal'
 import './JobsManagementCard.css'
 
 export default function JobsManagementCard({ business, userId, onUpdate }) {
@@ -17,6 +18,7 @@ export default function JobsManagementCard({ business, userId, onUpdate }) {
   const [pendingOffers, setPendingOffers] = useState(0)
   const [hiringStatus, setHiringStatus] = useState(business?.metadata?.hiring_status || 'not_hiring')
   const [showModal, setShowModal] = useState(false)
+  const [showJobSeekerModal, setShowJobSeekerModal] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
