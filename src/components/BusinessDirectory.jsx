@@ -473,13 +473,13 @@ export default function BusinessDirectory({ userId }) {
                             onClick={() => handleEditBusiness(business)}
                             className="btn-edit-business"
                           >
-                            ✏️ Edit Business
+                            Edit Business
                           </button>
                           <button
                             onClick={() => handleToggleVisibility(business)}
                             className={`btn-visibility ${business.metadata?.visible !== false ? 'hide' : 'show'}`}
                           >
-                            {business.metadata?.visible !== false ? '🚫 Hide' : '👁️ Show'}
+                            {business.metadata?.visible !== false ? 'Hide' : 'Show'}
                           </button>
                           <button
                             className="btn-manage"
