@@ -1427,6 +1427,15 @@ export default function MyBusiness({ userId }) {
                 </div>
               </div>
 
+              {/* Jobs & Hiring Management Card */}
+              <div className="mt-8">
+                <JobsManagementCard
+                  business={selectedBusiness}
+                  userId={session?.user?.id}
+                  onUpdate={(updatedBusiness) => setSelectedBusiness(updatedBusiness)}
+                />
+              </div>
+
               {/* Supporting Documents Section */}
               <div className="mt-8 pt-8 border-t border-slate-200">
                 <h3 className="text-xl font-semibold text-slate-900 mb-4">Supporting Documents</h3>
