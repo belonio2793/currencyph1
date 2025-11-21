@@ -177,8 +177,9 @@ export const employeeInvitationService = {
         .select(`
           id,
           business_id,
-          business:businesses(id, business_name, owner_id, city, province),
+          employee_id,
           assigned_job_title,
+          assigned_job_category,
           pay_rate,
           employment_type,
           start_date,
@@ -189,10 +190,32 @@ export const employeeInvitationService = {
         .eq('status', 'active')
         .order('start_date', { ascending: false })
 
-      if (error) throw error
-      return { data, error: null }
+      if (error) {
+        console.error('[employeeInvitationService] getEmployeeBusinesses error:', error)
+        throw error
+      }
+
+      // Fetch business details separately
+      if (data && data.length > 0) {
+        const businessIds = [...new Set(data.map(a => a.business_id))]
+        const { data: businesses } = await supabase
+          .from('businesses')
+          .select('id, business_name, owner_id, city, province')
+          .in('id', businessIds)
+
+        const businessMap = {}
+        businesses?.forEach(b => {
+          businessMap[b.id] = b
+        })
+
+        data.forEach(assignment => {
+          assignment.business = businessMap[assignment.business_id] || null
+        })
+      }
+
+      return { data: data || [], error: null }
     } catch (err) {
-      const errorMsg = err?.message || JSON.stringify(err)
+      const errorMsg = err?.message || 'Unknown error'
       console.error('[employeeInvitationService] getEmployeeBusinesses failed:', errorMsg)
       return { data: [], error: err }
     }
