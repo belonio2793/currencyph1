@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { jobsService } from '../lib/jobsService'
+import { jobApplicationService } from '../lib/jobApplicationService'
 import { formatFieldValue } from '../lib/formatters'
 import './ApplyConfirmationModal.css'
 
@@ -14,7 +14,7 @@ export default function ApplyConfirmationModal({
   const [error, setError] = useState('')
   const [userProfile, setUserProfile] = useState(null)
   const [userLoading, setUserLoading] = useState(true)
-  const [offerMessage, setOfferMessage] = useState(`I am interested in this ${job.job_title} position and am ready to start immediately.`)
+  const [coverLetter, setCoverLetter] = useState(`I am interested in this ${job?.job_title || 'position'} and am ready to start immediately.`)
 
   useEffect(() => {
     if (userId) {
@@ -43,14 +43,14 @@ export default function ApplyConfirmationModal({
     }
   }
 
-  const handleDirectSubmit = async () => {
+  const handleSubmitApplication = async () => {
     if (!job || !userId || !userProfile) {
       setError('Missing required information to submit application')
       return
     }
 
-    if (!offerMessage.trim()) {
-      setError('Please enter a message for your application')
+    if (!coverLetter.trim()) {
+      setError('Please enter a cover letter for your application')
       return
     }
 
@@ -58,18 +58,17 @@ export default function ApplyConfirmationModal({
     setError('')
 
     try {
-      await jobsService.createJobOffer({
-        job_id: job.id,
-        service_provider_id: userId,
+      const { data, error: appError } = await jobApplicationService.createApplication({
         business_id: job.business_id,
-        provider_name: userProfile.full_name || 'Service Provider',
-        provider_email: userProfile.email || '',
-        provider_phone: userProfile.phone_number || '',
-        provider_description: '',
-        offered_rate: job.pay_rate,
-        offer_message: offerMessage,
-        status: 'pending'
+        job_id: job.id,
+        cover_letter: coverLetter,
+        job_title: job.job_title,
+        job_category: job.job_category,
+        pay_rate: job.pay_rate,
+        pay_currency: job.pay_currency || 'PHP'
       })
+
+      if (appError) throw appError
 
       onClose()
       if (onAccept) {
@@ -89,7 +88,7 @@ export default function ApplyConfirmationModal({
 
   if (!job) return null
 
-  const skillsList = job.skills_required ? JSON.parse(job.skills_required) : []
+  const skillsList = job.skills_required ? (typeof job.skills_required === 'string' ? JSON.parse(job.skills_required) : job.skills_required) : []
 
   return (
     <div className="confirmation-modal-overlay" onClick={onClose}>
@@ -169,10 +168,10 @@ export default function ApplyConfirmationModal({
             )}
 
             <div className="summary-section">
-              <h4>Your Message</h4>
+              <h4>Your Cover Letter</h4>
               <textarea
-                value={offerMessage}
-                onChange={(e) => setOfferMessage(e.target.value)}
+                value={coverLetter}
+                onChange={(e) => setCoverLetter(e.target.value)}
                 className="message-textarea"
                 placeholder="Tell the employer about your interest in this position..."
                 rows="4"
@@ -201,10 +200,10 @@ export default function ApplyConfirmationModal({
           </button>
           <button
             className="btn-accept"
-            onClick={handleDirectSubmit}
+            onClick={handleSubmitApplication}
             disabled={loading || userLoading}
           >
-            {loading ? 'Starting Job...' : userLoading ? 'Loading...' : 'Accept & Continue'}
+            {loading ? 'Submitting...' : userLoading ? 'Loading...' : 'Submit Application'}
           </button>
         </div>
       </div>
