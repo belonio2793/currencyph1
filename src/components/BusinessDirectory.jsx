@@ -99,31 +99,65 @@ export default function BusinessDirectory({ userId }) {
       const stats = {}
 
       for (const business of businessList) {
-        // Get pending requests count
-        const { count: requestCount } = await supabase
-          .from('business_requests')
-          .select('*', { count: 'exact' })
-          .eq('business_id', business.id)
-          .eq('status', 'pending')
+        try {
+          // Get pending requests count
+          const { count: requestCount } = await supabase
+            .from('business_requests')
+            .select('*', { count: 'exact' })
+            .eq('business_id', business.id)
+            .eq('status', 'pending')
 
-        // Get active jobs count
-        const { count: jobCount } = await supabase
-          .from('jobs')
-          .select('*', { count: 'exact' })
-          .eq('business_id', business.id)
-          .eq('status', 'active')
+          // Get active jobs count
+          const { count: jobCount } = await supabase
+            .from('jobs')
+            .select('*', { count: 'exact' })
+            .eq('business_id', business.id)
+            .eq('status', 'active')
 
-        // Get active employees count
-        const { count: employeeCount } = await supabase
-          .from('employee_assignments')
-          .select('*', { count: 'exact' })
-          .eq('business_id', business.id)
-          .eq('status', 'active')
+          // Get active employees count - try employee_assignments if it exists
+          let employeeCount = 0
+          try {
+            const { count } = await supabase
+              .from('employee_assignments')
+              .select('*', { count: 'exact' })
+              .eq('business_id', business.id)
+              .eq('status', 'active')
+            employeeCount = count || 0
+          } catch (err) {
+            // employee_assignments table may not exist yet, continue without it
+            console.warn(`Could not load employee_assignments for business ${business.id}:`, err?.message)
+          }
 
-        stats[business.id] = {
-          pendingRequests: requestCount || 0,
-          activeJobs: jobCount || 0,
-          activeEmployees: employeeCount || 0
+          // Get total applicants count (all non-withdrawn requests)
+          const { count: totalApplicants } = await supabase
+            .from('business_requests')
+            .select('*', { count: 'exact' })
+            .eq('business_id', business.id)
+            .neq('status', 'withdrawn')
+
+          // Get accepted applicants
+          const { count: acceptedCount } = await supabase
+            .from('business_requests')
+            .select('*', { count: 'exact' })
+            .eq('business_id', business.id)
+            .eq('status', 'accepted')
+
+          stats[business.id] = {
+            pendingRequests: requestCount || 0,
+            activeJobs: jobCount || 0,
+            activeEmployees: employeeCount || 0,
+            totalApplicants: totalApplicants || 0,
+            acceptedApplicants: acceptedCount || 0
+          }
+        } catch (err) {
+          console.error(`Error loading stats for business ${business.id}:`, err?.message)
+          stats[business.id] = {
+            pendingRequests: 0,
+            activeJobs: 0,
+            activeEmployees: 0,
+            totalApplicants: 0,
+            acceptedApplicants: 0
+          }
         }
       }
 
