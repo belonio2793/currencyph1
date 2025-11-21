@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { EmployeeManagementService } from '../lib/employeeManagementService'
 import { formatFieldValue } from '../lib/formatters'
 import AttendanceCheckInModal from './AttendanceCheckInModal'
 import './MyBusinessEmployeeCard.css'
