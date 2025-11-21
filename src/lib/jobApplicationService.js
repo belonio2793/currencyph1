@@ -13,10 +13,18 @@ export const jobApplicationService = {
       const { data, error } = await supabase
         .from('job_applications')
         .insert([{
-          ...applicationData,
+          business_id: applicationData.business_id,
+          job_id: applicationData.job_id,
           applicant_user_id: user.id,
-          status: 'submitted',
-          submitted_at: new Date().toISOString()
+          applicant_name: applicationData.applicant_name || '',
+          applicant_email: applicationData.applicant_email || user.email,
+          applicant_phone: applicationData.applicant_phone || '',
+          position_applied_for: applicationData.position_applied_for || '',
+          salary_expectation: applicationData.salary_expectation,
+          salary_currency: applicationData.salary_currency || 'PHP',
+          cover_letter: applicationData.cover_letter || '',
+          additional_message: applicationData.additional_message || '',
+          status: 'submitted'
         }])
         .select()
         .single()

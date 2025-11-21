@@ -342,7 +342,7 @@ export const jobsService = {
         status,
         submitted_at,
         created_at,
-        jobs:job_id (
+        jobs(
           id,
           job_title,
           job_category,
@@ -373,7 +373,7 @@ export const jobsService = {
         status,
         submitted_at,
         created_at,
-        jobs:job_id (
+        jobs(
           id,
           job_title,
           job_category,

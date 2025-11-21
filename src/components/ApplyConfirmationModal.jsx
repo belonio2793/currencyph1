@@ -62,10 +62,12 @@ export default function ApplyConfirmationModal({
         business_id: job.business_id,
         job_id: job.id,
         cover_letter: coverLetter,
-        job_title: job.job_title,
-        job_category: job.job_category,
-        pay_rate: job.pay_rate,
-        pay_currency: job.pay_currency || 'PHP'
+        position_applied_for: job.job_title,
+        salary_expectation: job.pay_rate,
+        salary_currency: job.pay_currency || 'PHP',
+        applicant_name: userProfile.full_name,
+        applicant_email: userProfile.email,
+        applicant_phone: userProfile.phone_number || ''
       })
 
       if (appError) throw appError
