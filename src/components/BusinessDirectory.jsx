@@ -3,6 +3,8 @@ import { supabase } from '../lib/supabaseClient'
 import { businessRequestService } from '../lib/businessRequestService'
 import BusinessRequestModal from './BusinessRequestModal'
 import BusinessEditModal from './BusinessEditModal'
+import JobsManagementCard from './JobsManagementCard'
+import JobsJobSeekerDisplay from './JobsJobSeekerDisplay'
 import './BusinessDirectory.css'
 
 export default function BusinessDirectory({ userId }) {
