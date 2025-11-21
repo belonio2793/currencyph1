@@ -1,0 +1,306 @@
+.my-business-employee-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.my-business-employee-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.card-error {
+  padding: 10px 12px;
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: 4px;
+  color: #c33;
+  font-size: 0.85rem;
+  margin-bottom: 12px;
+}
+
+.card-error.success {
+  background: #efe;
+  border-color: #cfc;
+  color: #3c3;
+}
+
+/* Business Header */
+.business-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.business-info {
+  flex: 1;
+}
+
+.business-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 4px 0;
+}
+
+.job-title {
+  font-size: 0.9rem;
+  color: #667eea;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Status Badge */
+.employment-status {
+  display: flex;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-badge.active {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.status-badge.terminated {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.status-badge.on_leave {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffe0b2;
+}
+
+.status-badge.suspended {
+  background: #f3e5f5;
+  color: #6a1b9a;
+  border: 1px solid #e1bee7;
+}
+
+/* Employment Details */
+.employment-details {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.detail-item .label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.detail-item .value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Attendance Section */
+.attendance-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f0f4ff;
+  border-left: 4px solid #667eea;
+  border-radius: 6px;
+}
+
+.attendance-section h4 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0 0 12px 0;
+}
+
+.attendance-status {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.attendance-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.attendance-item .label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #667eea;
+  text-transform: uppercase;
+}
+
+.attendance-item .value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Courier New', monospace;
+}
+
+.no-attendance {
+  text-align: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+/* Attendance Actions */
+.attendance-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.btn-check-in,
+.btn-check-out {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.btn-check-in {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+}
+
+.btn-check-in:hover:not(:disabled) {
+  background: #c8e6c9;
+  border-color: #a5d6a7;
+}
+
+.btn-check-out {
+  background: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffe0b2;
+}
+
+.btn-check-out:hover:not(:disabled) {
+  background: #ffe0b2;
+  border-color: #ffd699;
+}
+
+.btn-check-in:disabled,
+.btn-check-out:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checked-out-badge {
+  text-align: center;
+  padding: 10px 12px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #c8e6c9;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+/* Business Actions */
+.business-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-secondary,
+.btn-danger {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #bbdefb;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #bbdefb;
+  border-color: #90caf9;
+}
+
+.btn-danger {
+  background: #ffebee;
+  color: #c62828;
+  border: 1px solid #ffcdd2;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #ffcdd2;
+  border-color: #ef9a9a;
+}
+
+.btn-secondary:disabled,
+.btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .my-business-employee-card {
+    padding: 15px;
+  }
+
+  .business-header {
+    flex-direction: column;
+  }
+
+  .employment-details {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-status {
+    grid-template-columns: 1fr;
+  }
+
+  .attendance-actions,
+  .business-actions {
+    flex-direction: column;
+  }
+}
