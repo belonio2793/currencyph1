@@ -121,10 +121,10 @@ export default function Jobs({ userId }) {
     }
   }
 
-  // Load jobs based on active tab
+  // Load jobs based on active tab and section
   useEffect(() => {
     loadJobs()
-  }, [activeTab, filters, selectedBusiness])
+  }, [activeTab, filters, selectedBusiness, activeSection])
 
   // Load user stats
   useEffect(() => {
