@@ -507,6 +507,22 @@
   max-width: none !important;
 }
 
+/* Comprehensive fix for all modal elements */
+.job-details-modal * {
+  box-sizing: border-box !important;
+}
+
+/* Remove any min-width that might be inherited from Tailwind */
+.job-details-modal,
+.modal-header,
+.modal-tabs,
+.modal-content,
+.details-tab,
+.details-grid,
+.detail-section {
+  min-width: 0 !important;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .modal-overlay {
