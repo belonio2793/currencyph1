@@ -39,10 +39,7 @@ export const employeeInvitationService = {
     try {
       const { data, error } = await supabase
         .from('job_invitations')
-        .select(`
-          *,
-          business:business_id(id, business_name, owner_id)
-        `)
+        .select('*')
         .eq('invited_user_id', userId)
         .eq('status', 'pending')
         .eq('is_hidden', false)
@@ -52,6 +49,25 @@ export const employeeInvitationService = {
         console.error('[employeeInvitationService] getPendingInvitations error:', error)
         throw error
       }
+
+      // Fetch business details separately for each invitation
+      if (data && data.length > 0) {
+        const businessIds = [...new Set(data.map(inv => inv.business_id))]
+        const { data: businesses } = await supabase
+          .from('businesses')
+          .select('id, business_name, owner_id')
+          .in('id', businessIds)
+
+        const businessMap = {}
+        businesses?.forEach(b => {
+          businessMap[b.id] = b
+        })
+
+        data.forEach(inv => {
+          inv.business = businessMap[inv.business_id] || null
+        })
+      }
+
       return { data: data || [], error: null }
     } catch (err) {
       const errorMsg = err?.message || 'Unknown error'
