@@ -357,14 +357,15 @@
 }
 
 .timeline-item {
-  display: grid;
-  grid-template-columns: minmax(140px, auto) 1fr;
-  align-items: center;
-  padding: 12px 0;
-  border-bottom: 1px solid #f0f0f0;
-  gap: 15px;
-  width: 100%;
-  box-sizing: border-box;
+  display: grid !important;
+  grid-template-columns: minmax(140px, auto) 1fr !important;
+  align-items: center !important;
+  padding: 12px 0 !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+  gap: 15px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
 .timeline-item:last-child {
