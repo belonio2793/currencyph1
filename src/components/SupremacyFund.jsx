@@ -365,39 +365,39 @@ export default function SupremacyFund({ userId }) {
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <RiskCard
-          title="🛑 Position Sizing"
+          title="Position Sizing"
           description="Risk only 1-2% of your account per trade"
           action="Calculate Position Size"
         />
         <RiskCard
-          title="📊 Portfolio Allocation"
+          title="Portfolio Allocation"
           description="Diversify: 40% Bitcoin, 30% Altcoins, 20% Stables, 10% Cash"
           action="View Allocation"
         />
         <RiskCard
-          title="🎯 Stop-Loss Rules"
+          title="Stop-Loss Rules"
           description="Always use stops. Standard: 2-5% below entry for swing trades"
           action="Set Default Stop"
         />
         <RiskCard
-          title="💰 Take-Profit Levels"
+          title="Take-Profit Levels"
           description="Lock in gains at 25%, 50%, 75% targets, let 25% run"
           action="Configure Targets"
         />
         <RiskCard
-          title="📈 Volatility Control"
+          title="Volatility Control"
           description="Pause trading when volatility spikes. Resume when calm"
           action="Check Volatility"
         />
         <RiskCard
-          title="📰 News Control"
+          title="News Control"
           description="Auto-pause 1 hour before major economic news"
           action="Sync Calendar"
         />
       </div>
 
       <div className="bg-red-50 border-2 border-red-300 rounded-lg p-6">
-        <h3 className="font-semibold text-red-900 mb-4">🚨 Risk Management Rules</h3>
+        <h3 className="font-semibold text-red-900 mb-4">Risk Management Rules</h3>
         <ul className="space-y-3 text-sm text-red-900">
           <li>✓ <strong>Never risk more than 2% per trade</strong> - This preserves your capital</li>
           <li>✓ <strong>Always use stop-losses</strong> - Even if you think price will recover</li>
