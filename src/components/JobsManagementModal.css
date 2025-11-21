@@ -232,10 +232,10 @@
 .btn-cancel,
 .btn-delete-job,
 .btn-close-modal {
-  padding: 10px 16px;
+  padding: 8px 14px;
   border: none;
   border-radius: 6px;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
