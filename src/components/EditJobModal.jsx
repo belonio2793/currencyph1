@@ -32,7 +32,9 @@ export default function EditJobModal({
   onClose,
   onSubmit,
   categories = [],
-  cities = []
+  cities = [],
+  userBusinesses = [],
+  userId
 }) {
   const mapRef = useRef(null)
   const [formData, setFormData] = useState({
@@ -53,8 +55,10 @@ export default function EditJobModal({
     end_date: '',
     deadline_for_applications: '',
     positions_available: 1,
-    status: 'active'
+    status: 'active',
+    business_id: ''
   })
+  const [updatedBusinesses, setUpdatedBusinesses] = useState([])
 
   const [skillInput, setSkillInput] = useState('')
   const [error, setError] = useState('')
