@@ -285,9 +285,9 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
                       <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1a1a1a' }}>
                         {business?.business_name || 'Business Name'}
                       </p>
-                      {business?.currency_registration_number && (
+                      {business?.currency_registration_id && (
                         <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>
-                          CRN: {business.currency_registration_number}
+                          CRN: {business.currency_registration_id}
                         </p>
                       )}
                     </div>
