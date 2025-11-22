@@ -86,11 +86,20 @@ export default function EditJobModal({
             .select('*')
             .eq('user_id', userId)
 
-          if (!error && data && data.length > 0) {
+          if (error) {
+            console.error('Error loading businesses from database:', error)
+            setUpdatedBusinesses([])
+            return
+          }
+
+          if (data && data.length > 0) {
             setUpdatedBusinesses(data)
+          } else {
+            setUpdatedBusinesses([])
           }
         } catch (err) {
           console.error('Error loading businesses:', err)
+          setUpdatedBusinesses([])
         }
       }
     }
