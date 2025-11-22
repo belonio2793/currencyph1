@@ -843,6 +843,8 @@ export default function Jobs({ userId }) {
           onSubmit={handleEditJob}
           categories={categories}
           cities={cities}
+          userBusinesses={userBusinesses}
+          userId={userId}
         />,
         document.body
       )}
