@@ -253,32 +253,40 @@ export default function ChatBar({ userId, userEmail }) {
   const subscribeToMessages = () => {
     if (!selectedConversation?.id) return
 
-    const channel = supabase
-      .channel(`conv:${selectedConversation.id}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${selectedConversation.id}`
-      }, async (payload) => {
-        const msg = payload.new
-        if (msg.ciphertext && msg.iv) {
+    try {
+      const channel = supabase
+        .channel(`conv:${selectedConversation.id}`)
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `conversation_id=eq.${selectedConversation.id}`
+        }, async (payload) => {
           try {
-            const keyB64 = localStorage.getItem(`conv_key_${selectedConversation.id}`)
-            if (keyB64) {
-              const key = await importKeyFromBase64(keyB64)
-              const plain = await decryptString(key, msg.ciphertext, msg.iv)
-              setMessages(prev => [...prev, { ...msg, plain, decrypted: true }])
+            const msg = payload.new
+            if (msg.ciphertext && msg.iv) {
+              try {
+                const keyB64 = localStorage.getItem(`conv_key_${selectedConversation.id}`)
+                if (keyB64) {
+                  const key = await importKeyFromBase64(keyB64)
+                  const plain = await decryptString(key, msg.ciphertext, msg.iv)
+                  setMessages(prev => [...prev, { ...msg, plain, decrypted: true }])
+                }
+              } catch (e) {
+                console.warn('Decrypt error:', e)
+                setMessages(prev => [...prev, { ...msg, plain: '[Encrypted]', decrypted: false }])
+              }
             }
           } catch (e) {
-            console.warn('Decrypt error:', e)
-            setMessages(prev => [...prev, { ...msg, plain: '[Encrypted]', decrypted: false }])
+            console.warn('Subscribe message handler error:', e)
           }
-        }
-      })
-      .subscribe()
+        })
+        .subscribe()
 
-    subRef.current = channel
+      subRef.current = channel
+    } catch (err) {
+      console.warn('Subscribe to messages error:', err)
+    }
   }
 
   const sendMessage = async () => {
