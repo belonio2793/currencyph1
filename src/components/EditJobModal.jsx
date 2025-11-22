@@ -99,6 +99,30 @@ export default function EditJobModal({
   }, [userBusinesses, userId])
 
   useEffect(() => {
+    const loadAssociatedBusiness = async () => {
+      if (job && job.business_id) {
+        try {
+          const { data, error } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('id', job.business_id)
+            .single()
+
+          if (!error && data) {
+            setAssociatedBusiness(data)
+          }
+        } catch (err) {
+          console.error('Error loading associated business:', err)
+        }
+      } else {
+        setAssociatedBusiness(null)
+      }
+    }
+
+    loadAssociatedBusiness()
+  }, [job?.business_id])
+
+  useEffect(() => {
     if (job) {
       const city = job.city || ''
       const latitude = job.latitude || 12.5
