@@ -119,6 +119,27 @@
   flex-shrink: 0;
 }
 
+.btn-edit-job {
+  background: #f0f4ff;
+  border: 1px solid #667eea;
+  color: #667eea;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-edit-job:hover {
+  background: #667eea;
+  color: white;
+}
+
 .btn-submit-offer-header {
   background: #667eea;
   color: white;

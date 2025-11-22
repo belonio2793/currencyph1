@@ -108,6 +108,15 @@ export default function JobDetailsModal({
             </div>
           </div>
           <div className="job-header-right">
+            {currentUserId === job.posted_by_user_id && (
+              <button
+                className="btn-edit-job"
+                onClick={() => onEdit && onEdit(job)}
+                title="Edit this job posting"
+              >
+                ✎ Edit
+              </button>
+            )}
             {currentUserId !== job.posted_by_user_id && (
               <button
                 className="btn-submit-offer-header"
