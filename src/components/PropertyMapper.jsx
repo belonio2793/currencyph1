@@ -26,8 +26,17 @@ export default function PropertyMapper({ userId, onPropertyAdded }) {
 
   // Load properties from database
   useEffect(() => {
-    loadProperties()
+    if (userId) {
+      loadProperties()
+    }
   }, [userId])
+
+  // Reload properties when a new one is added
+  useEffect(() => {
+    if (onPropertyAdded) {
+      loadProperties()
+    }
+  }, [onPropertyAdded])
 
   // Filter properties based on search query
   useEffect(() => {
