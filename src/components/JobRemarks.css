@@ -2,6 +2,10 @@
   display: flex;
   flex-direction: column;
   gap: 25px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 /* Add Remark Form */
@@ -10,6 +14,8 @@
   padding: 20px;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .add-remark-form h4 {
@@ -68,6 +74,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .visibility-toggle {
@@ -123,7 +131,9 @@
 
 /* Remarks Sections */
 .remarks-section {
-  margin-top: 20px;
+  margin-top: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .remarks-section h4 {
