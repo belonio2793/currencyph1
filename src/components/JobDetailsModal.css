@@ -28,6 +28,8 @@
   margin: auto;
   padding: 0;
   box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
 .modal-header {
@@ -189,10 +191,13 @@
   background: #f9f9f9;
   width: 100%;
   flex-shrink: 0;
-  overflow-x: auto;
+  overflow: hidden;
   box-sizing: border-box;
   justify-content: flex-start;
   margin: 0;
+  flex-wrap: wrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .modal-tabs .tab {
@@ -205,8 +210,11 @@
   cursor: pointer;
   transition: all 0.3s ease;
   white-space: nowrap;
-  flex-shrink: 0;
+  flex-shrink: 1;
   display: inline-block;
+  min-width: auto;
+  flex: 1;
+  text-align: center;
 }
 
 .modal-tabs .tab:hover {
@@ -490,21 +498,25 @@
 }
 
 /* Scrollbar styling */
-.modal-content::-webkit-scrollbar {
-  width: 8px;
+.job-details-modal::-webkit-scrollbar {
+  width: 6px;
 }
 
-.modal-content::-webkit-scrollbar-track {
+.job-details-modal::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.modal-content::-webkit-scrollbar-thumb {
+.job-details-modal::-webkit-scrollbar-thumb {
   background: #ccc;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover {
+.job-details-modal::-webkit-scrollbar-thumb:hover {
   background: #999;
+}
+
+.modal-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 /* Responsive */
