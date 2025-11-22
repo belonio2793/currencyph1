@@ -1,7 +1,7 @@
-.confirmation-modal-overlay {
+.apply-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,257 +9,240 @@
   padding: 20px;
 }
 
-.confirmation-modal {
+.apply-modal-container {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-  max-width: 800px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
   width: 100%;
-  max-height: 90vh;
-  overflow-y: auto;
+  max-width: 320px;
   display: flex;
   flex-direction: column;
+  max-height: 90vh;
 }
 
-.confirmation-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  border-bottom: 1px solid #e0e0e0;
-  background: #667eea;
-  color: white;
+.apply-modal-header {
+  padding: 20px;
+  border-bottom: 1px solid #e5e5e5;
+  background: white;
   border-radius: 12px 12px 0 0;
 }
 
-.confirmation-header h2 {
-  font-size: 1.5rem;
-  font-weight: 700;
+.apply-modal-header h2 {
+  font-size: 1.125rem;
+  font-weight: 600;
   margin: 0;
-  color: white;
+  color: #1a1a1a;
 }
 
-.confirmation-header .close-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: white;
-  padding: 0;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  font-weight: 400;
-  letter-spacing: 0;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-.confirmation-header .close-btn:hover {
-  background: rgba(255, 255, 255, 0.35);
-}
-
-.confirmation-header .close-btn:active {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.confirmation-content {
+.apply-modal-content {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.job-summary {
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.job-summary h3 {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  color: #0f172a;
+.apply-job-title {
+  text-align: center;
   padding-bottom: 12px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #f0f0f0;
 }
 
-.summary-section {
+.apply-job-title h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+  color: #1a1a1a;
+}
+
+.apply-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
-  background: #f8fafc;
-  border-radius: 8px;
 }
 
-.summary-section h4 {
-  font-size: 0.875rem;
-  font-weight: 600;
+.apply-section-title {
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #475569;
+  color: #666666;
   margin: 0 0 8px 0;
 }
 
-.detail-row {
+.apply-detail-item {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   gap: 12px;
+  padding: 6px 0;
+  font-size: 0.875rem;
 }
 
-.detail-row .label {
-  font-weight: 500;
-  color: #64748b;
-  min-width: 120px;
-}
-
-.detail-row .value {
-  color: #1e293b;
+.apply-detail-label {
+  color: #666666;
   font-weight: 500;
 }
 
-.detail-row .value.highlight {
-  color: #667eea;
-  font-weight: 700;
+.apply-detail-value {
+  color: #1a1a1a;
+  font-weight: 500;
+  text-align: right;
 }
 
-.description-text {
+.apply-description-text {
+  font-size: 0.875rem;
+  color: #666666;
   margin: 0;
-  color: #475569;
-  line-height: 1.6;
-  font-size: 0.9375rem;
+  line-height: 1.5;
 }
 
-.skills-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.skills-preview .skill-tag {
-  display: inline-block;
-  padding: 4px 12px;
-  background: #e0e7ff;
-  color: #4f46e5;
-  border-radius: 20px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-}
-
-.message-textarea {
+.apply-textarea {
   width: 100%;
-  padding: 12px;
-  border: 1px solid #cbd5e1;
+  min-height: 100px;
+  padding: 10px;
+  border: 1px solid #ddd;
   border-radius: 6px;
   font-family: inherit;
-  font-size: 0.9375rem;
-  line-height: 1.5;
-  color: #1e293b;
+  font-size: 0.875rem;
+  color: #1a1a1a;
   resize: vertical;
   transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
 }
 
-.message-textarea:focus {
+.apply-textarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #90caf9;
+  box-shadow: 0 0 0 2px rgba(144, 202, 249, 0.2);
 }
 
-.message-textarea:disabled {
-  background-color: #f1f5f9;
-  color: #94a3b8;
+.apply-textarea:disabled {
+  background-color: #f5f5f5;
+  color: #999;
   cursor: not-allowed;
 }
 
-.confirmation-actions {
+.apply-error-message {
+  padding: 12px;
+  background: #fee;
+  color: #c33;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.apply-error-close {
+  background: none;
+  border: none;
+  color: #c33;
+  cursor: pointer;
+  font-size: 1.25rem;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.apply-modal-footer {
+  padding: 16px 20px;
+  border-top: 1px solid #e5e5e5;
+  background: white;
   display: flex;
   gap: 12px;
-  padding: 24px;
-  border-top: 1px solid #e0e0e0;
-  background: white;
-  justify-content: flex-end;
-  margin-top: auto;
+  border-radius: 0 0 12px 12px;
 }
 
-.btn-cancel {
-  padding: 10px 20px;
-  background: #e2e8f0;
-  color: #1e293b;
+.apply-btn-cancel {
+  flex: 1;
+  padding: 10px 12px;
+  background: #f0f0f0;
+  color: #1a1a1a;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.apply-btn-cancel:hover:not(:disabled) {
+  background: #e0e0e0;
+}
+
+.apply-btn-cancel:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.apply-btn-submit {
+  flex: 1;
+  padding: 10px 12px;
+  background: #a8e6a8;
+  color: #2d5a2d;
   border: none;
   border-radius: 6px;
   font-weight: 600;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: background-color 0.2s;
-  font-size: 0.9375rem;
 }
 
-.btn-cancel:hover {
-  background: #cbd5e1;
+.apply-btn-submit:hover:not(:disabled) {
+  background: #95d895;
 }
 
-.btn-accept {
-  padding: 10px 24px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-size: 0.9375rem;
+.apply-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
-.btn-accept:hover {
-  background: #5568d3;
+/* Scrollbar styling */
+.apply-modal-content::-webkit-scrollbar {
+  width: 6px;
 }
 
-.btn-accept:active {
-  transform: scale(0.98);
+.apply-modal-content::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .confirmation-modal {
-    max-height: 100vh;
-    border-radius: 0;
+.apply-modal-content::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 3px;
+}
+
+.apply-modal-content::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .apply-modal-overlay {
+    padding: 10px;
   }
 
-  .confirmation-header {
+  .apply-modal-container {
+    max-width: 100%;
+  }
+
+  .apply-modal-header {
     padding: 16px;
   }
 
-  .confirmation-header h2 {
-    font-size: 1.25rem;
-  }
-
-  .confirmation-content {
+  .apply-modal-content {
     padding: 16px;
+    gap: 12px;
   }
 
-  .confirmation-actions {
+  .apply-modal-footer {
     padding: 12px 16px;
-    flex-direction: column-reverse;
   }
 
-  .btn-cancel,
-  .btn-accept {
-    width: 100%;
-  }
-
-  .detail-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .detail-row .label {
-    min-width: auto;
+  .apply-btn-cancel,
+  .apply-btn-submit {
+    padding: 8px 10px;
+    font-size: 0.8125rem;
   }
 }
