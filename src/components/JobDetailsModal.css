@@ -17,10 +17,11 @@
 .job-details-modal {
   background: white;
   border-radius: 12px;
-  max-width: 900px;
-  width: 95%;
+  max-width: 800px;
   max-height: 90vh;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
