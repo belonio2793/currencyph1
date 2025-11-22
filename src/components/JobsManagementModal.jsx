@@ -240,6 +240,156 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
           {/* Overview Tab */}
           {activeTab === 'overview' && (
             <div className="tab-content">
+              {/* Business Preview Card */}
+              <div style={{
+                padding: '20px',
+                backgroundColor: '#f8fafc',
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                marginBottom: '30px'
+              }}>
+                <h3 style={{ margin: '0 0 15px 0', fontSize: '1rem', color: '#334155' }}>
+                  📋 How Your Business Appears in Job Listings
+                </h3>
+                <div style={{
+                  backgroundColor: 'white',
+                  border: '1px solid #cbd5e1',
+                  borderRadius: '8px',
+                  padding: '16px',
+                  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.1)'
+                }}>
+                  {/* Business Header */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    marginBottom: '12px',
+                    paddingBottom: '12px',
+                    borderBottom: '1px solid #e2e8f0'
+                  }}>
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '50%',
+                      backgroundColor: '#667eea',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: 'white',
+                      fontSize: '18px',
+                      fontWeight: '700',
+                      marginRight: '12px'
+                    }}>
+                      {business?.business_name?.charAt(0).toUpperCase() || 'B'}
+                    </div>
+                    <div>
+                      <p style={{ margin: 0, fontSize: '0.95rem', fontWeight: '600', color: '#1a1a1a' }}>
+                        {business?.business_name || 'Business Name'}
+                      </p>
+                      {business?.currency_registration_number && (
+                        <p style={{ margin: '4px 0 0 0', fontSize: '0.85rem', color: '#64748b' }}>
+                          CRN: {business.currency_registration_number}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Hiring Status Badge */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    marginBottom: '12px'
+                  }}>
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      borderRadius: '20px',
+                      backgroundColor: hiringParams.hiring_status === 'actively_hiring'
+                        ? '#dcfce7'
+                        : hiringParams.hiring_status === 'limited_hiring'
+                          ? '#fef3c7'
+                          : '#fee2e2',
+                      color: hiringParams.hiring_status === 'actively_hiring'
+                        ? '#166534'
+                        : hiringParams.hiring_status === 'limited_hiring'
+                          ? '#92400e'
+                          : '#991b1b',
+                      fontSize: '0.85rem',
+                      fontWeight: '600'
+                    }}>
+                      {hiringParams.hiring_status === 'actively_hiring' && '🟢 Actively Hiring'}
+                      {hiringParams.hiring_status === 'limited_hiring' && '🟡 Limited Hiring'}
+                      {hiringParams.hiring_status === 'not_hiring' && '🔴 Not Hiring'}
+                    </span>
+                    {hiringParams.positions_available > 0 && (
+                      <span style={{
+                        fontSize: '0.85rem',
+                        color: '#64748b'
+                      }}>
+                        {hiringParams.positions_available} position{hiringParams.positions_available !== 1 ? 's' : ''} available
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Hiring Details Grid */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '12px',
+                    fontSize: '0.9rem',
+                    color: '#475569'
+                  }}>
+                    {hiringParams.salary_range_min || hiringParams.salary_range_max ? (
+                      <>
+                        <div>
+                          <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Salary Range</span>
+                          <p style={{ margin: '4px 0 0 0', fontWeight: '600', color: '#1a1a1a' }}>
+                            ₱{hiringParams.salary_range_min || '0'} - ₱{hiringParams.salary_range_max || '0'}
+                          </p>
+                        </div>
+                      </>
+                    ) : null}
+                    {hiringParams.experience_level !== 'any' && (
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Experience</span>
+                        <p style={{ margin: '4px 0 0 0', fontWeight: '600', color: '#1a1a1a', textTransform: 'capitalize' }}>
+                          {hiringParams.experience_level}
+                        </p>
+                      </div>
+                    )}
+                    {hiringParams.hiring_timeline && (
+                      <div>
+                        <span style={{ color: '#64748b', fontSize: '0.85rem' }}>Timeline</span>
+                        <p style={{ margin: '4px 0 0 0', fontWeight: '600', color: '#1a1a1a' }}>
+                          {hiringParams.hiring_timeline}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Benefits Section */}
+                  {hiringParams.benefits && (
+                    <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #e2e8f0' }}>
+                      <p style={{ margin: '0 0 6px 0', fontSize: '0.85rem', color: '#64748b' }}>Benefits & Perks</p>
+                      <p style={{ margin: '0', fontSize: '0.9rem', color: '#334155', lineHeight: '1.5' }}>
+                        {hiringParams.benefits}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <p style={{
+                  margin: '12px 0 0 0',
+                  fontSize: '0.8rem',
+                  color: '#64748b',
+                  fontStyle: 'italic'
+                }}>
+                  💡 This is how job seekers will see your business when browsing jobs. Save your hiring details to update this preview.
+                </p>
+              </div>
+
               <div className="form-section">
                 <h3>Hiring Status & Parameters</h3>
 
