@@ -226,19 +226,16 @@
 /* Content */
 .modal-content {
   padding: 24px;
-  overflow-y: auto;
-  overflow-x: visible;
-  flex: 1;
+  overflow: visible;
   width: 100%;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   margin: 0;
   position: relative;
-  scrollbar-gutter: stable;
   gap: 24px;
   align-items: stretch;
-  min-width: 0;
+  flex-shrink: 0;
 }
 
 .details-tab {
