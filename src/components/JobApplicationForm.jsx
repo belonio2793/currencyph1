@@ -12,7 +12,8 @@ export default function JobApplicationForm({ business, job, userId, onClose, onS
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [applicationId, setApplicationId] = useState(null)
-  const [formStep, setFormStep] = useState('basic') // basic, employment, education, certifications, skills, interview, references, review
+  const [formStep, setFormStep] = useState('basic')
+  const [activeTab, setActiveTab] = useState('application')
 
   const [basicInfo, setBasicInfo] = useState({
     position_applied_for: job?.job_title || '',
@@ -122,25 +123,9 @@ export default function JobApplicationForm({ business, job, userId, onClose, onS
       case 'basic':
         return (
           <form onSubmit={handleSubmitBasicInfo} className="form-section-main">
-            <div className="section-header">
-              <h2>Basic Application Information</h2>
-              <p>Tell us about yourself and the position you're applying for</p>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Position Applied For *</label>
-              <input
-                type="text"
-                name="position_applied_for"
-                value={basicInfo.position_applied_for}
-                onChange={handleBasicInfoChange}
-                placeholder="e.g., Senior Software Engineer, Marketing Manager"
-                className="form-input"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="form-row">
+            <div>
+              <h3 className="section-title">Your Information</h3>
+              
               <div className="form-group">
                 <label className="form-label">Years of Experience *</label>
                 <input
@@ -155,171 +140,154 @@ export default function JobApplicationForm({ business, job, userId, onClose, onS
                   disabled={loading}
                 />
               </div>
-              <div className="form-group">
-                <label className="form-label">Notice Period (days)</label>
-                <input
-                  type="number"
-                  name="notice_period_days"
-                  value={basicInfo.notice_period_days}
-                  onChange={handleBasicInfoChange}
-                  placeholder="0"
-                  className="form-input"
-                  min="0"
-                  disabled={loading}
-                />
-              </div>
-            </div>
 
-            <div className="form-row">
               <div className="form-group">
                 <label className="form-label">Salary Expectation</label>
-                <input
-                  type="number"
-                  name="salary_expectation"
-                  value={basicInfo.salary_expectation}
-                  onChange={handleBasicInfoChange}
-                  placeholder="Enter amount"
-                  className="form-input"
-                  min="0"
-                  step="0.01"
-                  disabled={loading}
-                />
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <input
+                    type="number"
+                    name="salary_expectation"
+                    value={basicInfo.salary_expectation}
+                    onChange={handleBasicInfoChange}
+                    placeholder="Enter amount"
+                    className="form-input"
+                    min="0"
+                    step="0.01"
+                    disabled={loading}
+                  />
+                  <select
+                    name="salary_currency"
+                    value={basicInfo.salary_currency}
+                    onChange={handleBasicInfoChange}
+                    className="form-input"
+                    disabled={loading}
+                  >
+                    <option value="PHP">PHP</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                </div>
               </div>
+
               <div className="form-group">
-                <label className="form-label">Currency</label>
+                <label className="form-label">Employment Type</label>
                 <select
-                  name="salary_currency"
-                  value={basicInfo.salary_currency}
+                  name="employment_type"
+                  value={basicInfo.employment_type}
                   onChange={handleBasicInfoChange}
                   className="form-input"
                   disabled={loading}
                 >
-                  <option value="PHP">PHP</option>
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
+                  <option value="full_time">Full-Time</option>
+                  <option value="part_time">Part-Time</option>
+                  <option value="contract">Contract</option>
+                  <option value="temporary">Temporary</option>
+                  <option value="flexible">Flexible</option>
                 </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Work Arrangement</label>
+                <select
+                  name="work_arrangement"
+                  value={basicInfo.work_arrangement}
+                  onChange={handleBasicInfoChange}
+                  className="form-input"
+                  disabled={loading}
+                >
+                  <option value="on_site">On-Site</option>
+                  <option value="remote">Remote</option>
+                  <option value="hybrid">Hybrid</option>
+                </select>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Available Start Date</label>
+                <input
+                  type="date"
+                  name="available_start_date"
+                  value={basicInfo.available_start_date}
+                  onChange={handleBasicInfoChange}
+                  className="form-input"
+                  disabled={loading}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Cover Letter</label>
+                <textarea
+                  name="cover_letter"
+                  value={basicInfo.cover_letter}
+                  onChange={handleBasicInfoChange}
+                  placeholder="Tell us why you're interested in this position..."
+                  className="form-textarea"
+                  disabled={loading}
+                />
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Available Start Date</label>
-              <input
-                type="date"
-                name="available_start_date"
-                value={basicInfo.available_start_date}
-                onChange={handleBasicInfoChange}
-                className="form-input"
-                disabled={loading}
-              />
-            </div>
+            <div>
+              <h3 className="section-title">Preferences</h3>
+              
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="work_authorized"
+                    checked={basicInfo.work_authorized}
+                    onChange={handleBasicInfoChange}
+                    disabled={loading}
+                  />
+                  <span>I am authorized to work in this country</span>
+                </label>
 
-            <div className="form-group">
-              <label className="form-label">Employment Type</label>
-              <select
-                name="employment_type"
-                value={basicInfo.employment_type}
-                onChange={handleBasicInfoChange}
-                className="form-input"
-                disabled={loading}
-              >
-                <option value="full_time">Full-Time</option>
-                <option value="part_time">Part-Time</option>
-                <option value="contract">Contract</option>
-                <option value="temporary">Temporary</option>
-                <option value="flexible">Flexible</option>
-              </select>
-            </div>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="visa_sponsorship_needed"
+                    checked={basicInfo.visa_sponsorship_needed}
+                    onChange={handleBasicInfoChange}
+                    disabled={loading}
+                  />
+                  <span>I require visa sponsorship</span>
+                </label>
 
-            <div className="form-group">
-              <label className="form-label">Work Arrangement</label>
-              <select
-                name="work_arrangement"
-                value={basicInfo.work_arrangement}
-                onChange={handleBasicInfoChange}
-                className="form-input"
-                disabled={loading}
-              >
-                <option value="on_site">On-Site</option>
-                <option value="remote">Remote</option>
-                <option value="hybrid">Hybrid</option>
-              </select>
-            </div>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="willing_to_relocate"
+                    checked={basicInfo.willing_to_relocate}
+                    onChange={handleBasicInfoChange}
+                    disabled={loading}
+                  />
+                  <span>Willing to relocate</span>
+                </label>
 
-            <div className="checkbox-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="work_authorized"
-                  checked={basicInfo.work_authorized}
-                  onChange={handleBasicInfoChange}
-                  disabled={loading}
-                />
-                <span>I am authorized to work in this country</span>
-              </label>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="willing_to_travel"
+                    checked={basicInfo.willing_to_travel}
+                    onChange={handleBasicInfoChange}
+                    disabled={loading}
+                  />
+                  <span>Willing to travel</span>
+                </label>
 
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="visa_sponsorship_needed"
-                  checked={basicInfo.visa_sponsorship_needed}
-                  onChange={handleBasicInfoChange}
-                  disabled={loading}
-                />
-                <span>I require visa sponsorship</span>
-              </label>
-
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="willing_to_relocate"
-                  checked={basicInfo.willing_to_relocate}
-                  onChange={handleBasicInfoChange}
-                  disabled={loading}
-                />
-                <span>Willing to relocate</span>
-              </label>
-
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="willing_to_travel"
-                  checked={basicInfo.willing_to_travel}
-                  onChange={handleBasicInfoChange}
-                  disabled={loading}
-                />
-                <span>Willing to travel</span>
-              </label>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Cover Letter</label>
-              <textarea
-                name="cover_letter"
-                value={basicInfo.cover_letter}
-                onChange={handleBasicInfoChange}
-                placeholder="Write a brief cover letter explaining why you're interested in this position..."
-                className="form-textarea"
-                rows="6"
-                disabled={loading}
-              />
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={onClose}
-                className="btn-cancel"
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="btn-next"
-                disabled={loading}
-              >
-                {loading ? 'Creating Application...' : 'Next: Employment History'}
-              </button>
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="notice_period_days"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setBasicInfo(prev => ({ ...prev, notice_period_days: 30 }))
+                      }
+                    }}
+                    disabled={loading}
+                  />
+                  <span>Notice period: {basicInfo.notice_period_days} days</span>
+                </label>
+              </div>
             </div>
           </form>
         )
@@ -393,32 +361,11 @@ export default function JobApplicationForm({ business, job, userId, onClose, onS
       case 'review':
         return (
           <div className="form-section-main">
-            <div className="section-header">
-              <h2>Review Your Application</h2>
-              <p>Please review all information before submitting</p>
-            </div>
-
-            <div className="review-message">
-              <p>Your application is ready to submit. Make sure all information is accurate and complete.</p>
-            </div>
-
-            <div className="form-actions">
-              <button
-                type="button"
-                onClick={() => setFormStep('references')}
-                className="btn-back"
-                disabled={loading}
-              >
-                Back
-              </button>
-              <button
-                type="button"
-                onClick={handleFinalSubmit}
-                className="btn-submit"
-                disabled={loading}
-              >
-                {loading ? 'Submitting Application...' : 'Submit Application'}
-              </button>
+            <div>
+              <h3 className="section-title">Review Application</h3>
+              <p style={{ color: '#6b7280', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                Your application is ready to submit. Please review all information to ensure it's accurate and complete before submitting.
+              </p>
             </div>
           </div>
         )
@@ -428,29 +375,87 @@ export default function JobApplicationForm({ business, job, userId, onClose, onS
     }
   }
 
+  const getProgressPercentage = () => {
+    const steps = ['basic', 'employment', 'education', 'certifications', 'skills', 'interview', 'references', 'review']
+    const currentIndex = steps.indexOf(formStep)
+    return ((currentIndex + 1) / steps.length) * 100
+  }
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content job-application-form" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <div>
-            <h2>Apply to {business.business_name}</h2>
-            <p className="text-slate-500">Step {getStepNumber(formStep)} of 7: {getStepTitle(formStep)}</p>
+          <div className="modal-header-content">
+            <h2>{job?.job_title || 'Apply for Position'}</h2>
+            <p>{business?.business_name}</p>
+            <div className="modal-header-meta">
+              Step {getStepNumber(formStep)} of 8
+            </div>
           </div>
           <button onClick={onClose} className="modal-close">×</button>
         </div>
 
-        <div className="progress-bar">
-          <div className="progress" style={{ width: `${(getStepNumber(formStep) / 7) * 100}%` }}></div>
-        </div>
-
-        <div className="modal-body">
-          {error && (
+        {error && (
+          <div style={{ padding: '0 24px 12px 24px' }}>
             <div className="error-message">
               {error}
               <button onClick={() => setError('')} className="close-error">×</button>
             </div>
-          )}
+          </div>
+        )}
+
+        <div className="modal-body">
           {renderStep()}
+        </div>
+
+        <div className="form-actions">
+          {formStep !== 'basic' && (
+            <button
+              type="button"
+              onClick={() => {
+                if (formStep === 'employment') setFormStep('basic')
+                else if (formStep === 'education') setFormStep('employment')
+                else if (formStep === 'certifications') setFormStep('education')
+                else if (formStep === 'skills') setFormStep('certifications')
+                else if (formStep === 'interview') setFormStep('skills')
+                else if (formStep === 'references') setFormStep('interview')
+                else if (formStep === 'review') setFormStep('references')
+              }}
+              className="btn-cancel"
+              disabled={loading}
+            >
+              Back
+            </button>
+          )}
+          {formStep !== 'basic' && formStep !== 'review' && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-cancel"
+              disabled={loading}
+            >
+              Cancel
+            </button>
+          )}
+          {formStep !== 'review' ? (
+            <button
+              type="button"
+              onClick={formStep === 'basic' ? handleSubmitBasicInfo : () => {}}
+              className="btn-next"
+              disabled={loading}
+            >
+              {loading ? 'Processing...' : 'Next'}
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleFinalSubmit}
+              className="btn-submit"
+              disabled={loading}
+            >
+              {loading ? 'Submitting...' : 'Submit Application'}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -460,18 +465,4 @@ export default function JobApplicationForm({ business, job, userId, onClose, onS
 function getStepNumber(step) {
   const steps = ['basic', 'employment', 'education', 'certifications', 'skills', 'interview', 'references', 'review']
   return steps.indexOf(step) + 1
-}
-
-function getStepTitle(step) {
-  const titles = {
-    basic: 'Basic Information',
-    employment: 'Employment History',
-    education: 'Education',
-    certifications: 'Certifications',
-    skills: 'Skills',
-    interview: 'Interview Preferences',
-    references: 'References',
-    review: 'Review'
-  }
-  return titles[step] || 'Application'
 }
