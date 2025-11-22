@@ -221,15 +221,11 @@
 .modal-content {
   padding: 24px;
   overflow: visible;
-  width: 100%;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: block !important;
   margin: 0;
   position: relative;
-  gap: 24px;
-  align-items: stretch;
-  flex-shrink: 0;
 }
 
 .details-tab {
