@@ -72,6 +72,32 @@ export default function EditJobModal({
   const cityDropdownRef = useRef(null)
 
   useEffect(() => {
+    const initializeBusinesses = async () => {
+      if (userBusinesses && userBusinesses.length > 0) {
+        setUpdatedBusinesses(userBusinesses)
+        return
+      }
+
+      if (userId) {
+        try {
+          const { data, error } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('user_id', userId)
+
+          if (!error && data && data.length > 0) {
+            setUpdatedBusinesses(data)
+          }
+        } catch (err) {
+          console.error('Error loading businesses:', err)
+        }
+      }
+    }
+
+    initializeBusinesses()
+  }, [userBusinesses, userId])
+
+  useEffect(() => {
     if (job) {
       const city = job.city || ''
       const latitude = job.latitude || 12.5
@@ -97,7 +123,8 @@ export default function EditJobModal({
         end_date: job.end_date || '',
         deadline_for_applications: job.deadline_for_applications || '',
         positions_available: job.positions_available || 1,
-        status: job.status || 'active'
+        status: job.status || 'active',
+        business_id: job.business_id || ''
       })
       setCitySearchQuery(city)
       if (city) {
