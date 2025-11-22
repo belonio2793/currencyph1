@@ -221,37 +221,34 @@
 .modal-content {
   padding: 24px;
   overflow: visible;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  display: block !important;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
   margin: 0;
   position: relative;
 }
 
 .details-tab {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  min-width: 0;
+  display: block;
 }
 
 .details-grid {
-  display: block !important;
   width: 100%;
   box-sizing: border-box;
-  margin: 0;
+  margin: 0 0 24px 0;
   padding: 0;
+  display: block;
 }
 
 .detail-section {
-  width: 100% !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  box-sizing: border-box;
   overflow: visible;
-  display: block !important;
+  display: block;
   margin-bottom: 24px;
 }
 
@@ -265,11 +262,11 @@
 }
 
 .info-item {
-  display: block !important;
+  display: block;
   padding: 10px 0;
   border-bottom: 1px solid #f0f0f0;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .info-item:last-child {
@@ -306,9 +303,9 @@
   margin: 0 0 24px 0;
   padding: 0;
   border-top: none;
-  width: 100% !important;
-  box-sizing: border-box !important;
-  display: block !important;
+  width: 100%;
+  box-sizing: border-box;
+  display: block;
 }
 
 .description-section h4,
@@ -345,11 +342,11 @@
 }
 
 .timeline-item {
-  display: block !important;
+  display: block;
   padding: 10px 0;
   border-bottom: 1px solid #f0f0f0;
-  width: 100% !important;
-  box-sizing: border-box !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .timeline-item:last-child {
@@ -357,11 +354,14 @@
 }
 
 .timeline-item .label {
+  display: block;
   color: #666;
   font-weight: 600;
+  margin-bottom: 4px;
 }
 
 .timeline-item .value {
+  display: block;
   color: #1a1a1a;
 }
 
@@ -390,7 +390,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  min-width: 0;
+  display: block;
 }
 
 .offers-list {
@@ -471,6 +471,24 @@
   color: #999;
 }
 
+/* Ratings Tab */
+.ratings-tab {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+/* Remarks Tab */
+.remarks-tab {
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
 /* Scrollbar styling */
 .modal-content::-webkit-scrollbar {
   width: 8px;
@@ -488,18 +506,6 @@
 .modal-content::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
-
-.details-tab,
-.offers-tab,
-.ratings-tab,
-.remarks-tab {
-  width: 100% !important;
-  box-sizing: border-box !important;
-  margin: 0;
-  padding: 0;
-  display: block !important;
-}
-
 
 /* Responsive */
 @media (max-width: 768px) {
