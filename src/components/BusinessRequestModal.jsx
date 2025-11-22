@@ -117,10 +117,10 @@ export default function BusinessRequestModal({ business, userId, onClose, onSubm
                   <span className="label">Business Name:</span>
                   <span className="value">{business.business_name}</span>
                 </div>
-                {business.currency_registration_number && (
+                {business.currency_registration_id && (
                   <div className="info-item">
-                    <span className="label">Registration #:</span>
-                    <span className="value">{business.currency_registration_number}</span>
+                    <span className="label">Registration ID:</span>
+                    <span className="value">{business.currency_registration_id}</span>
                   </div>
                 )}
                 {business.city_of_registration && (
