@@ -8,7 +8,7 @@ export default function BusinessEditModal({ business, userId, onClose, onUpdated
     registration_type: business?.registration_type || 'sole',
     city_of_registration: business?.city_of_registration || '',
     tin: business?.tin || '',
-    currency_registration_number: business?.currency_registration_number || '',
+    currency_registration_id: business?.currency_registration_id || '',
     address: business?.metadata?.address || '',
     phone: business?.metadata?.phone || '',
     email: business?.metadata?.email || '',
@@ -45,7 +45,7 @@ export default function BusinessEditModal({ business, userId, onClose, onUpdated
           registration_type: formData.registration_type,
           city_of_registration: formData.city_of_registration,
           tin: formData.tin,
-          currency_registration_number: formData.currency_registration_number,
+          currency_registration_id: formData.currency_registration_id,
           metadata: {
             ...business.metadata,
             address: formData.address,
@@ -151,14 +151,15 @@ export default function BusinessEditModal({ business, userId, onClose, onUpdated
               </div>
 
               <div className="form-group">
-                <label htmlFor="currency_registration_number">CRN</label>
+                <label htmlFor="currency_registration_id">Currency Registration ID</label>
                 <input
                   type="text"
-                  id="currency_registration_number"
-                  name="currency_registration_number"
-                  value={formData.currency_registration_number}
-                  onChange={handleChange}
-                  placeholder="Currency Registration Number"
+                  id="currency_registration_id"
+                  name="currency_registration_id"
+                  value={formData.currency_registration_id}
+                  readOnly
+                  placeholder="CRN-XXXXXXXXXXXXXXXX"
+                  style={{ backgroundColor: '#f3f4f6', color: '#6b7280', cursor: 'not-allowed' }}
                 />
               </div>
             </div>
