@@ -90,118 +90,102 @@ export default function ApplyConfirmationModal({
 
   if (!job) return null
 
-  const skillsList = job.skills_required ? (typeof job.skills_required === 'string' ? JSON.parse(job.skills_required) : job.skills_required) : []
-
   return (
-    <div className="confirmation-modal-overlay" onClick={onClose}>
-      <div className="confirmation-modal" onClick={e => e.stopPropagation()}>
-        {/* Header */}
-        <div className="confirmation-header">
+    <div className="apply-modal-overlay" onClick={onClose}>
+      <div className="apply-modal-container" onClick={e => e.stopPropagation()}>
+        {/* Header with Title */}
+        <div className="apply-modal-header">
           <h2>Apply for Job</h2>
-          <button className="close-btn" onClick={onClose}>X</button>
         </div>
 
-        {/* Content */}
-        <div className="confirmation-content">
-          <div className="job-summary">
+        {/* Scrollable Content */}
+        <div className="apply-modal-content">
+          {/* Job Title */}
+          <div className="apply-job-title">
             <h3>{job.job_title}</h3>
-            
-            <div className="summary-section">
-              <h4>Job Details</h4>
-              <div className="detail-row">
-                <span className="label">Category:</span>
-                <span className="value">{formatFieldValue(job.job_category)}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Type:</span>
-                <span className="value">{formatFieldValue(job.job_type)}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Location:</span>
-                <span className="value">{job.city}{job.province ? `, ${job.province}` : ''}</span>
-              </div>
+          </div>
+
+          {/* Job Details Section */}
+          <div className="apply-section">
+            <h4 className="apply-section-title">JOB DETAILS</h4>
+            <div className="apply-detail-item">
+              <span className="apply-detail-label">Category:</span>
+              <span className="apply-detail-value">{formatFieldValue(job.job_category)}</span>
             </div>
-
-            <div className="summary-section">
-              <h4>Compensation</h4>
-              <div className="detail-row">
-                <span className="label">Rate:</span>
-                <span className="value highlight">₱{job.pay_rate?.toFixed(2) || 'Negotiable'}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Pay Type:</span>
-                <span className="value">{formatFieldValue(job.pay_type)}</span>
-              </div>
+            <div className="apply-detail-item">
+              <span className="apply-detail-label">Type:</span>
+              <span className="apply-detail-value">{formatFieldValue(job.job_type)}</span>
             </div>
-
-            {job.job_description && (
-              <div className="summary-section">
-                <h4>Description</h4>
-                <p className="description-text">
-                  {job.job_description.length > 300
-                    ? job.job_description.substring(0, 300) + '...'
-                    : job.job_description}
-                </p>
-              </div>
-            )}
-
-            {skillsList.length > 0 && (
-              <div className="summary-section">
-                <h4>Required Skills</h4>
-                <div className="skills-preview">
-                  {skillsList.slice(0, 5).map((skill, idx) => (
-                    <span key={idx} className="skill-tag">{skill}</span>
-                  ))}
-                  {skillsList.length > 5 && (
-                    <span className="skill-tag">+{skillsList.length - 5}</span>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {job.start_date && (
-              <div className="summary-section">
-                <h4>Timeline</h4>
-                <div className="detail-row">
-                  <span className="label">Start Date:</span>
-                  <span className="value">{new Date(job.start_date).toLocaleDateString()}</span>
-                </div>
-              </div>
-            )}
-
-            <div className="summary-section">
-              <h4>Your Cover Letter</h4>
-              <textarea
-                value={coverLetter}
-                onChange={(e) => setCoverLetter(e.target.value)}
-                className="message-textarea"
-                placeholder="Tell the employer about your interest in this position..."
-                rows="4"
-                disabled={loading || userLoading}
-              />
+            <div className="apply-detail-item">
+              <span className="apply-detail-label">Location:</span>
+              <span className="apply-detail-value">{job.city}{job.province ? `, ${job.province}` : ''}</span>
             </div>
           </div>
+
+          {/* Compensation Section */}
+          <div className="apply-section">
+            <h4 className="apply-section-title">COMPENSATION</h4>
+            <div className="apply-detail-item">
+              <span className="apply-detail-label">Rate:</span>
+              <span className="apply-detail-value">₱{job.pay_rate?.toFixed(2) || 'Negotiable'}</span>
+            </div>
+            <div className="apply-detail-item">
+              <span className="apply-detail-label">Pay Type:</span>
+              <span className="apply-detail-value">{formatFieldValue(job.pay_type)}</span>
+            </div>
+          </div>
+
+          {/* Description Section */}
+          {job.job_description && (
+            <div className="apply-section">
+              <h4 className="apply-section-title">DESCRIPTION</h4>
+              <p className="apply-description-text">{job.job_description}</p>
+            </div>
+          )}
+
+          {/* Timeline Section */}
+          {job.start_date && (
+            <div className="apply-section">
+              <h4 className="apply-section-title">TIMELINE</h4>
+              <div className="apply-detail-item">
+                <span className="apply-detail-label">Start Date:</span>
+                <span className="apply-detail-value">{new Date(job.start_date).toLocaleDateString()}</span>
+              </div>
+            </div>
+          )}
+
+          {/* Cover Letter Section */}
+          <div className="apply-section">
+            <h4 className="apply-section-title">YOUR COVER LETTER</h4>
+            <textarea
+              value={coverLetter}
+              onChange={(e) => setCoverLetter(e.target.value)}
+              className="apply-textarea"
+              placeholder="Tell the employer about your interest in this position..."
+              disabled={loading || userLoading}
+            />
+          </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="apply-error-message">
+              {error}
+              <button onClick={() => setError('')} className="apply-error-close">×</button>
+            </div>
+          )}
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="error-message" style={{ marginBottom: '12px' }}>
-            {error}
-            <button onClick={() => setError('')} className="close-error">X</button>
-          </div>
-        )}
-
-        {/* Actions */}
-        <div className="confirmation-actions">
+        {/* Footer Actions */}
+        <div className="apply-modal-footer">
           <button
-            className="btn-cancel"
+            className="apply-btn-cancel"
             onClick={onClose}
             disabled={loading || userLoading}
           >
             Cancel
           </button>
           <button
-            className="btn-accept"
+            className="apply-btn-submit"
             onClick={handleSubmitApplication}
             disabled={loading || userLoading}
           >
