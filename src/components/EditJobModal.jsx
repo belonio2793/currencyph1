@@ -636,6 +636,54 @@ export default function EditJobModal({
           </div>
 
           <div className="form-section">
+            <h3>Business Details</h3>
+
+            <div className="form-group">
+              <label htmlFor="business_select">Link to Business (Optional)</label>
+              <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px' }}>
+                Select a registered business to associate with this job
+              </p>
+              <select
+                id="business_select"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    setFormData({
+                      ...formData,
+                      business_id: e.target.value
+                    })
+                  } else {
+                    setFormData({
+                      ...formData,
+                      business_id: ''
+                    })
+                  }
+                }}
+                value={formData.business_id}
+                className="form-control"
+                style={{
+                  width: '100%',
+                  padding: '10px 12px',
+                  border: '1px solid #e0e0e0',
+                  borderRadius: '6px',
+                  fontSize: '0.9rem'
+                }}
+              >
+                <option value="">No business selected</option>
+                {updatedBusinesses && updatedBusinesses.length > 0 ? (
+                  updatedBusinesses.map(business => (
+                    <option key={business.id} value={business.id}>
+                      {business.business_name}
+                      {business.currency_registration_number ? ` (${business.currency_registration_number})` : ''}
+                    </option>
+                  ))
+                ) : (
+                  <option disabled>No businesses available</option>
+                )}
+              </select>
+            </div>
+          </div>
+
+          <div className="form-section">
             <h3>Requirements & Timeline</h3>
 
             <div className="form-group">
