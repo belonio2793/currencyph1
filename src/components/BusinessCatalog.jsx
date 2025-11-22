@@ -113,9 +113,9 @@ export default function BusinessCatalog({ userId }) {
                 <div className="business-info">
                   <h3 className="business-name">{business.business_name}</h3>
                   <div className="business-meta">
-                    {business.currency_registration_number && (
+                    {business.currency_registration_id && (
                       <span className="meta-badge registration">
-                        CRN: {business.currency_registration_number}
+                        CRN: {business.currency_registration_id}
                       </span>
                     )}
                     {business.registration_type && (
