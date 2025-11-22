@@ -17,8 +17,8 @@
 .job-details-modal {
   background: white;
   border-radius: 12px;
-  max-width: 900px;
-  width: 95%;
+  max-width: calc(100vw - 40px);
+  width: 100%;
   max-height: 90vh;
   overflow: visible;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -26,6 +26,7 @@
   flex-direction: column;
   margin: auto;
   padding: 0;
+  box-sizing: border-box;
 }
 
 .modal-header {
@@ -225,7 +226,7 @@
 .modal-content {
   padding: 20px 24px;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: auto;
   flex: 1;
   width: 100%;
   box-sizing: border-box;
@@ -255,17 +256,14 @@
 .details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 30px;
+  gap: 40px;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  max-width: 100%;
-  min-width: 0;
   align-items: start;
   border: none;
-  left: 0;
-  right: 0;
+  flex: 0 0 auto;
 }
 
 .detail-section {
