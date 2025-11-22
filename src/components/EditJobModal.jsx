@@ -701,9 +701,9 @@ export default function EditJobModal({
                   <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
                     <strong>Business:</strong> {associatedBusiness.business_name}
                   </p>
-                  {associatedBusiness.currency_registration_number && (
+                  {associatedBusiness.currency_registration_id && (
                     <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
-                      <strong>CRN:</strong> {associatedBusiness.currency_registration_number}
+                      <strong>CRN:</strong> {associatedBusiness.currency_registration_id}
                     </p>
                   )}
                   {associatedBusiness.registration_type && (
