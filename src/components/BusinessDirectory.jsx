@@ -354,7 +354,7 @@ export default function BusinessDirectory({ userId }) {
                   </div>
                   <div className="info-item">
                     <span className="label">CRN:</span>
-                    <span className="value">{business.currency_registration_number || 'N/A'}</span>
+                    <span className="value">{business.currency_registration_id || 'N/A'}</span>
                   </div>
                 </div>
 
