@@ -340,12 +340,12 @@
   flex: 1;
   height: 44px;
   padding: 0 16px;
-  border: 1px solid #ddd;
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: opacity 0.2s ease;
   text-align: center;
   white-space: nowrap;
   display: flex;
@@ -355,13 +355,13 @@
 }
 
 .btn-view-details {
-  background: #f5f5f5;
+  background: white;
   color: #333;
   border-color: #e0e0e0;
 }
 
 .btn-view-details:hover {
-  background: #efefef;
+  opacity: 0.8;
 }
 
 .btn-apply {
@@ -371,7 +371,7 @@
 }
 
 .btn-apply:hover {
-  background: #5a6fd8;
+  opacity: 0.9;
 }
 
 /* =====================================================
