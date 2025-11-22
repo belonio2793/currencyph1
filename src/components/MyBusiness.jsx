@@ -167,7 +167,7 @@ export default function MyBusiness({ userId }) {
     registrationType: 'sole',
     tin: '',
     certificateOfIncorporation: '',
-    currencyRegistrationNumber: '',
+    currencyRegistrationId: '',
     cityOfRegistration: '',
     registrationDate: ''
   })
@@ -175,7 +175,7 @@ export default function MyBusiness({ userId }) {
   const [editFormData, setEditFormData] = useState({
     tin: '',
     certificateOfIncorporation: '',
-    currencyRegistrationNumber: ''
+    currencyRegistrationId: ''
   })
   const [savingEdit, setSavingEdit] = useState(false)
   const [miscCosts, setMiscCosts] = useState([])
@@ -447,8 +447,8 @@ export default function MyBusiness({ userId }) {
     return `BIR-${year}-${month}-${random}`
   }
 
-  // Generate Currency Registration Number (random string of alphanumeric characters)
-  const generateCurrencyRegistrationNumber = () => {
+  // Generate Currency Registration ID (random string of alphanumeric characters)
+  const generateCurrencyRegistrationId = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
     let result = 'CRN-'
     for (let i = 0; i < 16; i++) {
@@ -709,7 +709,7 @@ export default function MyBusiness({ userId }) {
       registrationType: 'sole',
       tin: '',
       certificateOfIncorporation: '',
-      currencyRegistrationNumber: generateCurrencyRegistrationNumber(),
+      currencyRegistrationId: generateCurrencyRegistrationId(),
       cityOfRegistration: '',
       registrationDate: mode === 'create' ? getCurrentManillaDate() : ''
     })
@@ -722,7 +722,7 @@ export default function MyBusiness({ userId }) {
       setEditFormData({
         tin: selectedBusiness.tin || '',
         certificateOfIncorporation: selectedBusiness.certificate_of_incorporation || '',
-        currencyRegistrationNumber: selectedBusiness.currency_registration_number || ''
+        currencyRegistrationId: selectedBusiness.currency_registration_id || ''
       })
       setEditMode(true)
     }
@@ -736,7 +736,7 @@ export default function MyBusiness({ userId }) {
         .update({
           tin: editFormData.tin || null,
           certificate_of_incorporation: editFormData.certificateOfIncorporation || null,
-          currency_registration_number: editFormData.currencyRegistrationNumber || null
+          currency_registration_id: editFormData.currencyRegistrationId || null
         })
         .eq('id', selectedBusiness.id)
 
@@ -746,7 +746,7 @@ export default function MyBusiness({ userId }) {
         ...selectedBusiness,
         tin: editFormData.tin || null,
         certificate_of_incorporation: editFormData.certificateOfIncorporation || null,
-        currency_registration_number: editFormData.currencyRegistrationNumber
+        currency_registration_id: editFormData.currencyRegistrationId
       })
 
       setBusinesses(
@@ -775,7 +775,7 @@ export default function MyBusiness({ userId }) {
   const handleGenerateCurrencyRegistration = () => {
     setEditFormData({
       ...editFormData,
-      currencyRegistrationNumber: generateCurrencyRegistrationNumber()
+      currencyRegistrationId: generateCurrencyRegistrationId()
     })
   }
 
@@ -1057,7 +1057,7 @@ export default function MyBusiness({ userId }) {
                 {/* Currency Registration Number Field - Auto-generated, Read-only */}
                 <div className="mb-6 p-4 rounded-lg bg-blue-50 border border-blue-200">
                   <label className="block text-xs font-semibold text-blue-900 uppercase mb-2 tracking-wide">
-                    Currency Registration Number (Auto-Generated)
+                    Currency Registration ID (Auto-Generated)
                   </label>
                   <input
                     type="text"
@@ -1427,7 +1427,7 @@ export default function MyBusiness({ userId }) {
                   <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.certificate_of_incorporation}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                  <p className="text-sm text-slate-500 mb-2">Currency Registration Number</p>
+                  <p className="text-sm text-slate-500 mb-2">Currency Registration ID</p>
                   <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.currency_registration_number || 'Not assigned'}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
@@ -1984,8 +1984,8 @@ export default function MyBusiness({ userId }) {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <label className="block text-sm font-semibold text-slate-900">Currency Registration Number</label>
-                      {!editFormData.currencyRegistrationNumber && (
+                      <label className="block text-sm font-semibold text-slate-900">Currency Registration ID</label>
+                      {!editFormData.currencyRegistrationId && (
                         <button
                           onClick={handleGenerateCurrencyRegistration}
                           className="text-sm text-blue-600 hover:text-blue-700 font-medium"
@@ -1997,11 +1997,11 @@ export default function MyBusiness({ userId }) {
                     <input
                       type="text"
                       placeholder="CRN-XXXXXXXXXXXXXXXX"
-                      value={editFormData.currencyRegistrationNumber}
-                      onChange={(e) => setEditFormData({ ...editFormData, currencyRegistrationNumber: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 font-mono"
+                      value={editFormData.currencyRegistrationId}
+                      readOnly
+                      className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg bg-slate-100 text-slate-600 font-mono cursor-not-allowed"
                     />
-                    <p className="text-xs text-slate-500 mt-1">Your unique Currency Registration Number for currency.ph</p>
+                    <p className="text-xs text-slate-500 mt-1">Your unique Currency Registration ID for currency.ph (auto-generated, immutable)</p>
                   </div>
                 </div>
 
