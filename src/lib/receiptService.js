@@ -58,7 +58,7 @@ export const receiptService = {
             city_of_registration,
             registration_type,
             registration_date,
-            currency_registration_number,
+            currency_registration_id,
             metadata
           )
         `)
@@ -91,7 +91,7 @@ export const receiptService = {
               city_of_registration,
               registration_type,
               registration_date,
-              currency_registration_number,
+              currency_registration_id,
               metadata
             )
           `)
@@ -115,7 +115,7 @@ export const receiptService = {
               city_of_registration,
               registration_type,
               registration_date,
-              currency_registration_number,
+              currency_registration_id,
               metadata
             )
           `)
@@ -150,7 +150,7 @@ export const receiptService = {
             city_of_registration,
             registration_type,
             registration_date,
-            currency_registration_number,
+            currency_registration_id,
             metadata
           )
         `)
