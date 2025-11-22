@@ -339,31 +339,53 @@ export default function PropertyMapper({ userId, onPropertyAdded }) {
             </div>
           ) : (
             <div className="sidebar-empty">
-              <p>Click on a marker on the map to view property details</p>
-              {properties.length === 0 && (
-                <p className="empty-message">No properties with location data yet</p>
-              )}
-              {properties.length > 0 && (
-                <div className="properties-list">
-                  <h4>Properties:</h4>
-                  <ul>
-                    {filteredProperties.slice(0, 10).map(prop => (
-                      <li
-                        key={prop.id}
-                        onClick={() => handlePropertyClick(prop)}
-                        className="property-list-item"
-                      >
-                        {prop.addresses_street_name}, {prop.addresses_city}
-                      </li>
-                    ))}
-                    {filteredProperties.length > 10 && (
-                      <li className="property-list-more">
-                        +{filteredProperties.length - 10} more
-                      </li>
-                    )}
-                  </ul>
-                </div>
-              )}
+              <div className="empty-state-content">
+                <p className="empty-title">No Property Selected</p>
+                <p className="empty-subtitle">Click on a marker on the map to view property details</p>
+
+                {properties.length === 0 ? (
+                  <div className="empty-state-info">
+                    <p className="empty-message">No properties with location data yet</p>
+                    <p className="empty-hint">Use the + button to add your first property</p>
+                  </div>
+                ) : (
+                  <div className="properties-list">
+                    <div className="properties-list-header">
+                      <h4>Properties ({filteredProperties.length})</h4>
+                      {searchQuery && (
+                        <span className="search-badge">Search Results</span>
+                      )}
+                    </div>
+                    <ul>
+                      {filteredProperties.slice(0, 15).map(prop => (
+                        <li
+                          key={prop.id}
+                          onClick={() => handlePropertyClick(prop)}
+                          className="property-list-item"
+                        >
+                          <div className="property-list-item-main">
+                            <span className="property-street">{prop.addresses_street_name}</span>
+                            <span className="property-city">{prop.addresses_city}</span>
+                          </div>
+                          {prop.zoning_classification && (
+                            <span
+                              className="property-zoning-mini"
+                              style={{ backgroundColor: getZoningColor(prop.zoning_classification) }}
+                            >
+                              {prop.zoning_classification.substring(0, 3)}
+                            </span>
+                          )}
+                        </li>
+                      ))}
+                      {filteredProperties.length > 15 && (
+                        <li className="property-list-more">
+                          +{filteredProperties.length - 15} more
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
