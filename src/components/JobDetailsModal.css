@@ -252,15 +252,11 @@
 }
 
 .detail-section {
-  width: 100%;
-  box-sizing: border-box;
+  width: 100% !important;
+  box-sizing: border-box !important;
   overflow: visible;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  flex-shrink: 0;
-  flex-grow: 0;
-  flex-basis: auto;
+  display: block !important;
+  margin-bottom: 24px;
 }
 
 .detail-section h4 {
