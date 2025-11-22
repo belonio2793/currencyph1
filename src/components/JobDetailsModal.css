@@ -281,14 +281,17 @@
 }
 
 .info-item .label {
+  display: block;
   color: #666;
   font-weight: 600;
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+  margin-bottom: 4px;
 }
 
 .info-item .value {
+  display: block;
   color: #1a1a1a;
   font-weight: 500;
   font-size: 0.95rem;
