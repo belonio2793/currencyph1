@@ -117,11 +117,20 @@ export default function EditJobModal({
             .eq('id', job.business_id)
             .single()
 
-          if (!error && data) {
+          if (error) {
+            console.error('Error loading associated business from database:', error)
+            setAssociatedBusiness(null)
+            return
+          }
+
+          if (data) {
             setAssociatedBusiness(data)
+          } else {
+            setAssociatedBusiness(null)
           }
         } catch (err) {
           console.error('Error loading associated business:', err)
+          setAssociatedBusiness(null)
         }
       } else {
         setAssociatedBusiness(null)
