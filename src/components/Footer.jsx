@@ -10,11 +10,8 @@ export default function Footer() {
       { name: 'Loans', path: '/loans' },
       { name: 'Rides', path: '/rides' }
     ],
-    Finance: [
-      { name: 'Supremacy Fund', path: '/supremacy-fund' },
-      { name: 'Trading Signals', path: '/supremacy-fund?tab=signals' },
-      { name: 'Auto Trading', path: '/supremacy-fund?tab=auto-trading' },
-      { name: 'Risk Management', path: '/supremacy-fund?tab=risk-management' }
+    Maps: [
+      { name: 'Addresses', path: '/addresses' }
     ],
     Company: [
       { name: 'About', path: '#' },
