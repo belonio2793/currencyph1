@@ -501,14 +501,7 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
           {/* Positions Tab */}
           {activeTab === 'positions' && (
             <div className="tab-content">
-              {!showNewJobForm ? (
-                <button
-                  onClick={() => setShowNewJobForm(true)}
-                  className="btn-add-job"
-                >
-                  + Create New Position
-                </button>
-              ) : (
+              {showNewJobForm ? (
                 <form onSubmit={handleCreateJob} className="new-job-form">
                   <div className="form-section">
                     <h3>Create New Job Position</h3>
@@ -632,23 +625,17 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
                     </div>
                   </div>
                 </form>
-              )}
-
-              {/* Jobs List */}
-              {loading && !showNewJobForm ? (
-                <div className="loading">Loading positions...</div>
-              ) : jobs.length === 0 && !showNewJobForm ? (
-                <div className="empty-state">
-                  <p>No job positions created yet</p>
-                  <button
-                    onClick={() => setShowNewJobForm(true)}
-                    className="btn-add-job"
-                  >
-                    Create Your First Position
-                  </button>
-                </div>
               ) : (
-                <div className="jobs-list">
+                <>
+                  {/* Jobs List */}
+                  {loading ? (
+                    <div className="loading">Loading positions...</div>
+                  ) : jobs.length === 0 ? (
+                    <div className="empty-state">
+                      <p>No job positions created yet</p>
+                    </div>
+                  ) : (
+                    <div className="jobs-list">
                   {jobs.map(job => (
                     <div key={job.id} className="job-item">
                       <div className="job-header">
@@ -675,7 +662,9 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
                       </div>
                     </div>
                   ))}
-                </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -683,7 +672,16 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
 
         {/* Modal Actions */}
         <div className="modal-footer">
-          <button onClick={onClose} className="btn-close-modal">
+          {activeTab === 'positions' && !showNewJobForm && (
+            <button
+              onClick={() => setShowNewJobForm(true)}
+              className="btn-add-job"
+              style={{ flex: 1, marginRight: '10px' }}
+            >
+              + Create New Position
+            </button>
+          )}
+          <button onClick={onClose} className="btn-close-modal" style={{ flex: 1 }}>
             Close
           </button>
         </div>
