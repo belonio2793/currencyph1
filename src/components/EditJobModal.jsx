@@ -69,6 +69,7 @@ export default function EditJobModal({
   const [mapLocation, setMapLocation] = useState([12.5, 121.5])
   const [fetchingLocation, setFetchingLocation] = useState(false)
   const [locationMode, setLocationMode] = useState('location')
+  const [associatedBusiness, setAssociatedBusiness] = useState(null)
   const cityDropdownRef = useRef(null)
 
   useEffect(() => {
