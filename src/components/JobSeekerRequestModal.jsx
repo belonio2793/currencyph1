@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import UserProfilePreview from './UserProfilePreview'
 import './JobSeekerRequestModal.css'
 
 export default function JobSeekerRequestModal({ business, userId, onClose }) {
@@ -89,6 +90,13 @@ export default function JobSeekerRequestModal({ business, userId, onClose }) {
 
         {/* Modal Body */}
         <div className="modal-body">
+          {/* User Profile Preview */}
+          {userId && (
+            <div style={{ marginBottom: '24px' }}>
+              <UserProfilePreview userId={userId} />
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="request-form">
             <div className="form-group">
               <label htmlFor="business-name">Applying to</label>
