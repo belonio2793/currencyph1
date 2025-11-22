@@ -216,7 +216,13 @@ export default function ChatBar({ userId, userEmail }) {
         .order('created_at', { ascending: true })
         .limit(200)
 
-      if (!error && data) {
+      if (error) {
+        console.warn('Load messages error:', error)
+        setMessages([])
+        return
+      }
+
+      if (data) {
         const decrypted = await Promise.all(
           data.map(async (msg) => {
             if (msg.ciphertext && msg.iv) {
@@ -238,6 +244,7 @@ export default function ChatBar({ userId, userEmail }) {
       }
     } catch (err) {
       console.warn('Load messages error:', err)
+      setMessages([])
     } finally {
       setLoading(false)
     }
