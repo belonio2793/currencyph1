@@ -182,7 +182,7 @@ class EmployeeManagementService {
         businesses:business_id (
           id,
           business_name,
-          currency_registration_number,
+          currency_registration_id,
           city_of_registration,
           registration_type,
           tin
@@ -243,8 +243,8 @@ class EmployeeManagementService {
     // Fetch business by currency registration number
     const { data: businessData, error: businessError } = await supabase
       .from('businesses')
-      .select('id, business_name, currency_registration_number')
-      .eq('currency_registration_number', currencyRegistrationNumber)
+      .select('id, business_name, currency_registration_id')
+      .eq('currency_registration_id', currencyRegistrationNumber)
       .single()
 
     if (businessError) {
