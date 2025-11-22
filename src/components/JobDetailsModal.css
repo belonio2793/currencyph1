@@ -255,7 +255,11 @@
   box-sizing: border-box;
   overflow: visible;
   display: block;
-  margin-bottom: 0;
+  margin-bottom: 24px;
+}
+
+.detail-section:last-of-type {
+  margin-bottom: 24px;
 }
 
 .detail-section h4 {
