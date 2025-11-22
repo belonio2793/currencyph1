@@ -204,7 +204,7 @@ export default function EmployeesModal({ businessId, userId, onClose, currentUse
           businesses:business_id (
             id,
             business_name,
-            currency_registration_number,
+            currency_registration_id,
             city_of_registration
           )
         `)
