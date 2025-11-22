@@ -186,8 +186,8 @@ export default function EmployeeAttendancePanel({
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
           <h4 className="font-semibold text-slate-900 mb-2">{businessDetails.business_name}</h4>
           <div className="text-sm text-slate-600 space-y-1">
-            {businessDetails.currency_registration_number && (
-              <p><strong>Registration #:</strong> {businessDetails.currency_registration_number}</p>
+            {businessDetails.currency_registration_id && (
+              <p><strong>Registration ID:</strong> {businessDetails.currency_registration_id}</p>
             )}
             {businessDetails.tin && (
               <p><strong>TIN:</strong> {businessDetails.tin}</p>
