@@ -549,7 +549,7 @@
     padding: 16px;
   }
 
-  .details-grid {
-    gap: 20px;
+  .detail-section {
+    margin-bottom: 16px;
   }
 }
