@@ -48,15 +48,16 @@ export default function PropertyMapper({ userId, onPropertyAdded }) {
   const loadProperties = async () => {
     try {
       setLoading(true)
-      const { data, error: fetchError } = await supabase
+      const { data, error: fetchError, count } = await supabase
         .from('addresses')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('user_id', userId)
         .not('addresses_latitude', 'is', null)
         .not('addresses_longitude', 'is', null)
 
       if (fetchError) throw fetchError
       setProperties(data || [])
+      setPropertyCount(count || data?.length || 0)
     } catch (err) {
       console.error('Error loading properties:', err)
       setError('Failed to load properties')
