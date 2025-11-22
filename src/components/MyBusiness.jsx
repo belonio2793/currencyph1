@@ -669,7 +669,7 @@ export default function MyBusiness({ userId }) {
           registration_type: formData.registrationType,
           tin: formData.tin || null,
           certificate_of_incorporation: formData.certificateOfIncorporation || null,
-          currency_registration_number: formData.currencyRegistrationNumber,
+          currency_registration_id: formData.currencyRegistrationId,
           city_of_registration: formData.cityOfRegistration,
           registration_date: formData.registrationDate,
           status: 'active'
@@ -690,7 +690,7 @@ export default function MyBusiness({ userId }) {
         registrationType: 'sole',
         tin: '',
         certificateOfIncorporation: '',
-        currencyRegistrationNumber: '',
+        currencyRegistrationId: '',
         cityOfRegistration: '',
         registrationDate: ''
       })
