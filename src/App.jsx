@@ -588,9 +588,9 @@ export default function App() {
               </ul>
             </div>
             <div>
-              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Finance</h4>
+              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Maps</h4>
               <ul className="space-y-3 text-sm">
-                <li><button onClick={() => setActiveTab('sunshine')} className="text-slate-600 hover:text-slate-900 transition-colors">Sunshine</button></li>
+                <li><button onClick={() => setActiveTab('addresses')} className="text-slate-600 hover:text-slate-900 transition-colors">Addresses</button></li>
               </ul>
             </div>
             <div>
