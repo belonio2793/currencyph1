@@ -274,7 +274,8 @@ export default function EditJobModal({
         ...formData,
         skills_required: JSON.stringify(formData.skills_required),
         latitude: locationMode === 'location' ? formData.latitude : null,
-        longitude: locationMode === 'location' ? formData.longitude : null
+        longitude: locationMode === 'location' ? formData.longitude : null,
+        business_id: formData.business_id || null
       }
       await onSubmit(jobDataToSubmit, job.id)
     } catch (err) {
