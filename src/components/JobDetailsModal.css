@@ -232,19 +232,15 @@
   padding: 24px;
   overflow: visible;
   width: 100%;
-  max-width: 100%;
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display: block;
   margin: 0;
   position: relative;
 }
 
 .details-tab {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   display: block;
   box-sizing: border-box;
@@ -252,14 +248,12 @@
 
 .details-grid {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto 24px auto;
+  margin: 0 0 24px 0;
   padding: 0;
-  display: block;
-  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box;
 }
 
 .detail-section {
@@ -318,11 +312,10 @@
 .description-section,
 .skills-section,
 .timeline-section {
-  margin: 0 auto 24px auto;
+  margin: 0 0 24px 0;
   padding: 0;
   border-top: none;
   width: 100%;
-  max-width: 600px;
   box-sizing: border-box;
   display: block;
 }
@@ -395,8 +388,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   width: 100%;
-  max-width: 600px;
-  margin: 20px auto 0 auto;
+  margin: 20px 0 0 0;
 }
 
 .btn-apply-large:hover {
@@ -407,8 +399,7 @@
 /* Offers Tab */
 .offers-tab {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   display: block;
   box-sizing: border-box;
@@ -420,9 +411,8 @@
   gap: 15px;
   width: 100%;
   box-sizing: border-box;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
-  max-width: 600px;
 }
 
 .offer-card {
@@ -496,8 +486,7 @@
 /* Ratings Tab */
 .ratings-tab {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   display: block;
   box-sizing: border-box;
@@ -506,8 +495,7 @@
 /* Remarks Tab */
 .remarks-tab {
   width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
   display: block;
   box-sizing: border-box;
