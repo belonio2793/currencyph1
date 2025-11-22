@@ -664,24 +664,61 @@ export default function EditJobModal({
           <div className="form-section">
             <h3>Business Details</h3>
 
+            {associatedBusiness && (
+              <div style={{
+                padding: '15px',
+                backgroundColor: '#f0f9ff',
+                borderLeft: '4px solid #0ea5e9',
+                borderRadius: '6px',
+                marginBottom: '15px'
+              }}>
+                <p style={{ margin: '0 0 8px 0', color: '#0ea5e9', fontWeight: '600', fontSize: '0.95rem' }}>
+                  📋 Currently Linked Business
+                </p>
+                <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                  <strong>Business:</strong> {associatedBusiness.business_name}
+                </p>
+                {associatedBusiness.currency_registration_number && (
+                  <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                    <strong>CRN:</strong> {associatedBusiness.currency_registration_number}
+                  </p>
+                )}
+                {associatedBusiness.registration_type && (
+                  <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                    <strong>Type:</strong> {associatedBusiness.registration_type}
+                  </p>
+                )}
+                {associatedBusiness.city_of_registration && (
+                  <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                    <strong>Location:</strong> {associatedBusiness.city_of_registration}
+                  </p>
+                )}
+              </div>
+            )}
+
             <div className="form-group">
-              <label htmlFor="business_select">Link to Business (Optional)</label>
+              <label htmlFor="business_select">
+                {associatedBusiness ? 'Change Business' : 'Link to Business (Optional)'}
+              </label>
               <p style={{ fontSize: '0.8rem', color: '#666', marginBottom: '10px' }}>
-                Select a registered business to associate with this job
+                {associatedBusiness
+                  ? 'Select a different business or leave empty to unlink'
+                  : 'Select a registered business to associate with this job'}
               </p>
               <select
                 id="business_select"
                 onChange={(e) => {
-                  if (e.target.value) {
-                    setFormData({
-                      ...formData,
-                      business_id: e.target.value
-                    })
+                  const selectedId = e.target.value
+                  setFormData({
+                    ...formData,
+                    business_id: selectedId
+                  })
+
+                  if (selectedId) {
+                    const selected = updatedBusinesses.find(b => b.id === selectedId)
+                    setAssociatedBusiness(selected || null)
                   } else {
-                    setFormData({
-                      ...formData,
-                      business_id: ''
-                    })
+                    setAssociatedBusiness(null)
                   }
                 }}
                 value={formData.business_id}
