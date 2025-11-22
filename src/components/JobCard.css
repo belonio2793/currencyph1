@@ -328,7 +328,7 @@
 .job-card-footer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   margin-top: auto;
   padding-top: 16px;
   border-top: 1px solid #f0f0f0;
