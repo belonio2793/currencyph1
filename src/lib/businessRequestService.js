@@ -10,7 +10,7 @@ export const businessRequestService = {
           id,
           business_name,
           registration_type,
-          currency_registration_number,
+          currency_registration_id,
           city_of_registration,
           status,
           metadata,
@@ -38,7 +38,7 @@ export const businessRequestService = {
           id,
           business_name,
           registration_type,
-          currency_registration_number,
+          currency_registration_id,
           city_of_registration,
           status,
           tin,
@@ -109,7 +109,7 @@ export const businessRequestService = {
           businesses:business_id (
             id,
             business_name,
-            currency_registration_number,
+            currency_registration_id,
             city_of_registration
           )
         `)
