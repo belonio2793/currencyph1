@@ -77,22 +77,24 @@ export default function SubmitJobModal({
     businessName: '',
     registrationType: 'sole',
     tin: '',
-    currencyRegistrationNumber: '',
+    currencyRegistrationId: '',
     cityOfRegistration: '',
     registrationDate: ''
   })
   const [creatingBusiness, setCreatingBusiness] = useState(false)
 
-  // Generate a unique currency registration number when the modal opens
+  // Generate a unique currency registration ID when the modal opens
   useEffect(() => {
-    if (showAddBusinessModal && !businessFormData.currencyRegistrationNumber) {
-      // Generate format: P-XXXXXXXX-XXX (Philippine registration format)
-      const randomNum1 = Math.floor(Math.random() * 100000000).toString().padStart(8, '0')
-      const randomNum2 = Math.floor(Math.random() * 1000).toString().padStart(3, '0')
-      const generatedNumber = `P-${randomNum1}-${randomNum2}`
+    if (showAddBusinessModal && !businessFormData.currencyRegistrationId) {
+      // Generate format: CRN-XXXXXXXXXXXXXXXX (Currency Registration ID format)
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+      let generatedNumber = 'CRN-'
+      for (let i = 0; i < 16; i++) {
+        generatedNumber += chars.charAt(Math.floor(Math.random() * chars.length))
+      }
       setBusinessFormData(prev => ({
         ...prev,
-        currencyRegistrationNumber: generatedNumber
+        currencyRegistrationId: generatedNumber
       }))
     }
   }, [showAddBusinessModal])
@@ -113,7 +115,7 @@ export default function SubmitJobModal({
           business_name: businessFormData.businessName,
           registration_type: businessFormData.registrationType,
           tin: businessFormData.tin || null,
-          currency_registration_number: businessFormData.currencyRegistrationNumber,
+          currency_registration_id: businessFormData.currencyRegistrationId,
           city_of_registration: businessFormData.cityOfRegistration,
           registration_date: businessFormData.registrationDate || null,
           status: 'active'
@@ -134,7 +136,7 @@ export default function SubmitJobModal({
         businessName: '',
         registrationType: 'sole',
         tin: '',
-        currencyRegistrationNumber: '',
+        currencyRegistrationId: '',
         cityOfRegistration: '',
         registrationDate: ''
       })
@@ -1158,11 +1160,11 @@ export default function SubmitJobModal({
 
               <div style={{ marginBottom: '15px' }}>
                 <label style={{ display: 'block', color: '#1a1a1a', fontWeight: '600', marginBottom: '6px', fontSize: '0.9rem' }}>
-                  Currency Registration Number
+                  Currency Registration ID
                 </label>
                 <input
                   type="text"
-                  value={businessFormData.currencyRegistrationNumber}
+                  value={businessFormData.currencyRegistrationId}
                   disabled
                   placeholder="Auto-generated"
                   style={{
