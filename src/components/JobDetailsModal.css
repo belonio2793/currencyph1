@@ -265,7 +265,8 @@
   flex-direction: column;
   gap: 0;
   flex-shrink: 0;
-  min-width: 0;
+  flex-grow: 0;
+  flex-basis: auto;
 }
 
 .detail-section h4 {
