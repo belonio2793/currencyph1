@@ -10,7 +10,7 @@
   justify-content: center;
   z-index: 1000;
   padding: 20px;
-  overflow: auto;
+  overflow: visible;
   box-sizing: border-box;
 }
 
