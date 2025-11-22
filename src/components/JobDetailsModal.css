@@ -244,17 +244,11 @@
 }
 
 .details-grid {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 24px;
+  display: block !important;
   width: 100%;
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  align-items: stretch;
-  border: none;
-  flex-wrap: nowrap !important;
-  flex-basis: auto;
 }
 
 .detail-section {
