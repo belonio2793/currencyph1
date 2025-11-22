@@ -503,8 +503,8 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .details-grid {
-    gap: 20px;
+  .detail-section {
+    margin-bottom: 20px;
   }
 }
 
