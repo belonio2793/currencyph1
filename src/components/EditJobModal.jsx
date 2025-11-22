@@ -670,29 +670,67 @@ export default function EditJobModal({
                 backgroundColor: '#f0f9ff',
                 borderLeft: '4px solid #0ea5e9',
                 borderRadius: '6px',
-                marginBottom: '15px'
+                marginBottom: '15px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: '15px'
               }}>
-                <p style={{ margin: '0 0 8px 0', color: '#0ea5e9', fontWeight: '600', fontSize: '0.95rem' }}>
-                  📋 Currently Linked Business
-                </p>
-                <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
-                  <strong>Business:</strong> {associatedBusiness.business_name}
-                </p>
-                {associatedBusiness.currency_registration_number && (
-                  <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
-                    <strong>CRN:</strong> {associatedBusiness.currency_registration_number}
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: '0 0 8px 0', color: '#0ea5e9', fontWeight: '600', fontSize: '0.95rem' }}>
+                    📋 Currently Linked Business
                   </p>
-                )}
-                {associatedBusiness.registration_type && (
                   <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
-                    <strong>Type:</strong> {associatedBusiness.registration_type}
+                    <strong>Business:</strong> {associatedBusiness.business_name}
                   </p>
-                )}
-                {associatedBusiness.city_of_registration && (
-                  <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
-                    <strong>Location:</strong> {associatedBusiness.city_of_registration}
-                  </p>
-                )}
+                  {associatedBusiness.currency_registration_number && (
+                    <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                      <strong>CRN:</strong> {associatedBusiness.currency_registration_number}
+                    </p>
+                  )}
+                  {associatedBusiness.registration_type && (
+                    <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                      <strong>Type:</strong> {associatedBusiness.registration_type}
+                    </p>
+                  )}
+                  {associatedBusiness.city_of_registration && (
+                    <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
+                      <strong>Location:</strong> {associatedBusiness.city_of_registration}
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData({
+                      ...formData,
+                      business_id: ''
+                    })
+                    setAssociatedBusiness(null)
+                  }}
+                  style={{
+                    padding: '8px 12px',
+                    backgroundColor: '#fee2e2',
+                    color: '#dc2626',
+                    border: '1px solid #fca5a5',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '0.85rem',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#fecaca'
+                    e.target.style.borderColor = '#f87171'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#fee2e2'
+                    e.target.style.borderColor = '#fca5a5'
+                  }}
+                >
+                  ✕ Remove
+                </button>
               </div>
             )}
 
