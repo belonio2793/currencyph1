@@ -215,6 +215,7 @@
   min-width: auto;
   flex: 1;
   text-align: center;
+  border-bottom: 3px solid transparent;
 }
 
 .modal-tabs .tab:hover {
@@ -223,6 +224,7 @@
 
 .modal-tabs .tab.active {
   color: #667eea;
+  border-bottom-color: #667eea;
 }
 
 /* Content */
