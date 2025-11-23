@@ -642,6 +642,7 @@
 .sidebar-layer-controls {
   cursor: pointer;
   user-select: none;
+  flex: 0 1 auto;
 }
 
 .controls-summary {
@@ -656,6 +657,7 @@
   color: #334155;
   list-style: none;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .controls-summary:hover {
@@ -669,7 +671,7 @@
 }
 
 .controls-summary::before {
-  content: '▶';
+  content: '▼';
   display: inline-block;
   margin-right: 6px;
   font-size: 10px;
@@ -677,7 +679,7 @@
 }
 
 details[open] .controls-summary::before {
-  transform: rotate(90deg);
+  transform: rotate(180deg);
 }
 
 .controls-content {
