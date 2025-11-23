@@ -90,7 +90,15 @@ export default function MapControls({
 
   // Full featured version for sidebar
   return (
-    <div className="map-controls-full">
+    <div
+      className="map-controls-full"
+      onClick={(e) => {
+        e.stopPropagation()
+      }}
+      onMouseDown={(e) => {
+        e.stopPropagation()
+      }}
+    >
       <button
         onClick={(e) => {
           e.stopPropagation()
