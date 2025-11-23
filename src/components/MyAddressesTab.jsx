@@ -174,6 +174,19 @@ export default function MyAddressesTab({ userId }) {
   ]
 
   useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (citiesDropdownRef.current && !citiesDropdownRef.current.contains(e.target)) {
+        setCitiesSearchOpen(false)
+      }
+    }
+
+    if (citiesSearchOpen) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [citiesSearchOpen])
+
+  useEffect(() => {
     loadAddresses()
   }, [userId])
 
