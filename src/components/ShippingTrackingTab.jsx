@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabaseClient'
 export default function ShippingTrackingTab({ userId }) {
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(null)
+  const [trackingHistory, setTrackingHistory] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
