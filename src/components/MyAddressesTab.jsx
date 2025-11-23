@@ -213,13 +213,82 @@ export default function MyAddressesTab({ userId }) {
   }
 
   const handleMapClick = (coords) => {
+    let latitude = coords.latitude
+    let longitude = coords.longitude
+
+    if (magneticSnap) {
+      const snapDistance = 0.001
+      for (const address of addresses) {
+        if (address.addresses_latitude && address.addresses_longitude) {
+          const addrLat = parseFloat(address.addresses_latitude)
+          const addrLng = parseFloat(address.addresses_longitude)
+          if (
+            Math.abs(latitude - addrLat) < snapDistance &&
+            Math.abs(longitude - addrLng) < snapDistance
+          ) {
+            latitude = addrLat
+            longitude = addrLng
+            break
+          }
+        }
+      }
+    }
+
     setFormData(prev => ({
       ...prev,
-      addresses_latitude: coords.latitude.toFixed(8),
-      addresses_longitude: coords.longitude.toFixed(8)
+      addresses_latitude: latitude.toFixed(8),
+      addresses_longitude: longitude.toFixed(8)
     }))
     setShowForm(true)
     setIsCreatingFromMap(false)
+  }
+
+  const handleGeolocation = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          setCurrentLocation({ latitude, longitude })
+          setMapCenter([latitude, longitude])
+          setZoomLevel(13)
+        },
+        (error) => {
+          console.error('Geolocation error:', error)
+          setError('Unable to get your location. Please check permissions.')
+        }
+      )
+    } else {
+      setError('Geolocation is not supported by your browser')
+    }
+  }
+
+  const handleMapSearch = async (query) => {
+    if (!query.trim()) {
+      setMapSearchResults([])
+      setShowSearchResults(false)
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=ph&limit=5`
+      )
+      const results = await response.json()
+      setMapSearchResults(results || [])
+      setShowSearchResults(results && results.length > 0)
+    } catch (err) {
+      console.error('Search error:', err)
+      setMapSearchResults([])
+    }
+  }
+
+  const handleSearchResultClick = (result) => {
+    const lat = parseFloat(result.lat)
+    const lng = parseFloat(result.lon)
+    setMapCenter([lat, lng])
+    setZoomLevel(14)
+    setMapSearchQuery('')
+    setShowSearchResults(false)
   }
 
   const handleSubmit = async (e) => {
