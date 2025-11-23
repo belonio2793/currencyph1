@@ -157,6 +157,11 @@ export default function RouteCalculatorTab({ userId }) {
 
   return (
     <div className="route-calculator-tab">
+      {/* Page Title */}
+      <div className="page-title">
+        <h2>Route Calculator</h2>
+      </div>
+
       <div className="route-calculator-container">
         {/* Header */}
         <div className="route-calculator-header">
