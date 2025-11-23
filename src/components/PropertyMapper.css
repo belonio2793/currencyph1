@@ -1,8 +1,10 @@
 .property-mapper-container {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
+  width: 100%;
   background: #f8fafc;
+  gap: 0;
 }
 
 .map-section {
@@ -12,6 +14,7 @@
   overflow: hidden;
   background: white;
   position: relative;
+  min-height: 0;
 }
 
 .map-header {
