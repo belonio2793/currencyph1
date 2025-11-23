@@ -702,6 +702,7 @@ details[open] .controls-summary::before {
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+  white-space: nowrap;
 }
 
 .layer-btn-small:hover {
@@ -716,8 +717,7 @@ details[open] .controls-summary::before {
 }
 
 .controls-geolocation-btn {
-  width: 100%;
-  padding: 8px;
+  padding: 6px 8px;
   background: #667eea;
   color: white;
   border: none;
@@ -726,6 +726,7 @@ details[open] .controls-summary::before {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .controls-geolocation-btn:hover {
