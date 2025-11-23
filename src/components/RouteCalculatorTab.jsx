@@ -32,6 +32,7 @@ export default function RouteCalculatorTab({ userId }) {
   const [zoomLevel, setZoomLevel] = useState(6)
   const [mapLayer, setMapLayer] = useState('street')
   const [mapInstance, setMapInstance] = useState(null)
+  const [showLegend, setShowLegend] = useState(false)
 
   const packageTypes = [
     { value: 'general', label: 'General Cargo' },
