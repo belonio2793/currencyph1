@@ -370,7 +370,7 @@ function ManagerVotingCard({ manager, onVote, userId }) {
               : 'bg-green-50 text-green-700 hover:bg-green-100'
           }`}
         >
-          👍 Approve
+          Approve
         </button>
         <button
           onClick={() => {

@@ -57,11 +57,11 @@ export const networkDiagnostics = {
   },
 
   logEnvironment() {
-    console.log('📋 Environment Configuration:')
+    console.log('Environment Configuration:')
     console.log({
-      PROJECT_URL: import.meta.env.VITE_PROJECT_URL ? '✅ Set' : '❌ Not set',
-      SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? '✅ Set' : '❌ Not set',
-      SUPABASE_SERVICE_ROLE_KEY: import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY ? '✅ Set' : '❌ Not set'
+      PROJECT_URL: import.meta.env.VITE_PROJECT_URL ? 'Set' : 'Not set',
+      SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY ? 'Set' : 'Not set',
+      SUPABASE_SERVICE_ROLE_KEY: import.meta.env.VITE_SUPABASE_SERVICE_ROLE_KEY ? 'Set' : 'Not set'
     })
   }
 }

@@ -347,12 +347,12 @@ export function getDistance(lat1, lon1, lat2, lon2) {
 export function getRouteSourceInfo(source) {
   const sourceMap = {
     [ROUTE_SOURCES.GOOGLE]: { name: 'Google Maps', color: '#4285F4', icon: '🗺️' },
-    [ROUTE_SOURCES.MAPTILER]: { name: 'MapTiler', color: '#00BCD4', icon: '🧭' },
-    [ROUTE_SOURCES.LEAFLET]: { name: 'Leaflet', color: '#199900', icon: '🌐' },
-    [ROUTE_SOURCES.DIRECT]: { name: 'Direct Calculation', color: '#757575', icon: '📍' }
+    [ROUTE_SOURCES.MAPTILER]: { name: 'MapTiler', color: '#00BCD4', icon: '' },
+    [ROUTE_SOURCES.LEAFLET]: { name: 'Leaflet', color: '#199900', icon: '' },
+    [ROUTE_SOURCES.DIRECT]: { name: 'Direct Calculation', color: '#757575', icon: '' }
   }
 
-  return sourceMap[source] || { name: 'Unknown', color: '#9E9E9E', icon: '❓' }
+  return sourceMap[source] || { name: 'Unknown', color: '#9E9E9E', icon: '' }
 }
 
 /**
