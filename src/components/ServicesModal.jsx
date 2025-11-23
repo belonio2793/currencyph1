@@ -5,14 +5,14 @@ const SERVICES = [
   {
     id: 'ride-share',
     label: 'Ride Share',
-    icon: '🚙',
+    icon: '',
     color: 'from-cyan-500 to-cyan-600',
     description: 'Share a ride with other passengers',
     category: 'transportation',
     criteria: [
-      { label: 'Passengers', icon: '👥', hint: '1-4 people' },
-      { label: 'Route', icon: '🗺️', hint: 'Shared route' },
-      { label: 'Cost', icon: '💰', hint: 'Split fare' }
+      { label: 'Passengers', hint: '1-4 people' },
+      { label: 'Route', hint: 'Shared route' },
+      { label: 'Cost', hint: 'Split fare' }
     ],
     details: {
       maxPassengers: 4,
