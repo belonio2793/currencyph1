@@ -173,7 +173,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   return (
     <div className="property-mapper-container">
       {/* Map Section */}
-      <div className="map-section" style={{ flex: `0 0 ${mapWidth}%` }}>
+      <div className="map-section" style={{ flex: `1 1 ${mapWidth}%` }}>
         <div className="map-header">
           <h3>Property Map</h3>
         </div>
