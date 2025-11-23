@@ -204,6 +204,101 @@ export default function RouteCalculatorTab({ userId }) {
           </div>
         </div>
 
+        {/* Map Legend */}
+        {showLegend && (
+          <div className="map-legend">
+            <div className="legend-header">
+              <h4>Map Controls</h4>
+              <button
+                onClick={() => setShowLegend(false)}
+                className="legend-close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="legend-content">
+              {/* Default Location */}
+              <div className="legend-section">
+                <button
+                  onClick={() => {
+                    const center = [12.8797, 121.7740]
+                    const zoom = 6
+                    setMapCenter(center)
+                    setZoomLevel(zoom)
+                    if (mapRef.current) {
+                      try {
+                        mapRef.current.flyTo(center, zoom, { duration: 1 })
+                      } catch (error) {
+                        console.error('Error flying to Philippines:', error)
+                      }
+                    }
+                  }}
+                  className="btn-default-location"
+                  title="Focus on Philippines"
+                >
+                  Philippines
+                </button>
+              </div>
+
+              {/* Layer Selection */}
+              <div className="legend-section">
+                <label className="legend-label">Map Layer</label>
+                <div className="layer-buttons">
+                  <button
+                    onClick={() => setMapLayer('street')}
+                    className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
+                    title="Street view"
+                  >
+                    Street
+                  </button>
+                  <button
+                    onClick={() => setMapLayer('satellite')}
+                    className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
+                    title="Satellite view"
+                  >
+                    Satellite
+                  </button>
+                  <button
+                    onClick={() => setMapLayer('terrain')}
+                    className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
+                    title="Terrain view"
+                  >
+                    Terrain
+                  </button>
+                </div>
+              </div>
+
+              {/* Geolocation */}
+              <div className="legend-section">
+                <button
+                  onClick={() => {
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                          const { latitude, longitude } = position.coords
+                          setMapCenter([latitude, longitude])
+                          setZoomLevel(13)
+                          if (mapRef.current) {
+                            mapRef.current.flyTo([latitude, longitude], 13, { duration: 1 })
+                          }
+                        },
+                        (error) => {
+                          console.error('Geolocation error:', error)
+                        }
+                      )
+                    }
+                  }}
+                  className="btn-geolocation"
+                  title="Get your current location"
+                >
+                  My Location
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Calculator Form */}
         <div className="calculator-form-section">
 
