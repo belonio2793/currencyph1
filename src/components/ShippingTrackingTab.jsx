@@ -281,8 +281,11 @@ export default function ShippingTrackingTab({ userId }) {
           <div className="shipment-detail-panel">
             <div className="detail-panel-header">
               <h3>Shipment Details</h3>
-              <button 
-                onClick={() => setSelectedShipment(null)}
+              <button
+                onClick={() => {
+                  setSelectedShipment(null)
+                  setTrackingHistory([])
+                }}
                 className="detail-panel-close"
               >
                 ×
