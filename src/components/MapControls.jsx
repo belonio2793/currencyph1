@@ -66,7 +66,17 @@ export default function MapControls({
   // Compact inline version for search bar - only Philippines button
   if (compact) {
     return (
-      <div className="map-controls-compact">
+      <div
+        className="map-controls-compact"
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
         <button
           onClick={(e) => handleCenterPhilippines(e)}
           className="btn-map-control-primary"
