@@ -214,6 +214,13 @@ export default function MapControls({
         >
           Philippines
         </button>
+        <button
+          onClick={(e) => handleResetMap(e)}
+          className="btn-reset-map-compact"
+          title="Reset map to default view"
+        >
+          ↺ Reset
+        </button>
       </div>
     )
   }
