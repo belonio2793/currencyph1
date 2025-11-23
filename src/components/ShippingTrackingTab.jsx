@@ -282,6 +282,31 @@ export default function ShippingTrackingTab({ userId }) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               />
             </MapContainer>
+
+            {/* Map Controls */}
+            {!loading && (
+              <div className="mapper-map-controls">
+                <MapControls
+                  mapInstance={mapInstance}
+                  onMapLayerChange={setMapLayer}
+                  onCenterLocation={(preset) => {
+                    if (preset && preset.center && preset.zoom) {
+                      setMapCenter(preset.center)
+                      setZoomLevel(preset.zoom)
+                      if (mapRef.current) {
+                        try {
+                          mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
+                        } catch (error) {
+                          console.error('Error flying to location:', error)
+                        }
+                      }
+                    }
+                  }}
+                  currentMapLayer={mapLayer}
+                  compact={false}
+                />
+              </div>
+            )}
           </div>
         </div>
 
