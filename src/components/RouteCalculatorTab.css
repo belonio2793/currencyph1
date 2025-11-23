@@ -82,12 +82,46 @@
   flex: 1;
   overflow: hidden;
   position: relative;
+  touch-action: none;
+  cursor: grab;
+}
+
+.map-container.dragging {
+  cursor: grabbing;
 }
 
 .map-container :global(.leaflet-container-route) {
   height: 100%;
   width: 100%;
   z-index: 1;
+  touch-action: none;
+}
+
+.map-container :global(.leaflet-container-route .leaflet-control-container) {
+  pointer-events: auto;
+}
+
+.map-container :global(.leaflet-container-route .leaflet-top),
+.map-container :global(.leaflet-container-route .leaflet-bottom) {
+  pointer-events: none;
+}
+
+.map-container :global(.leaflet-container-route .leaflet-control) {
+  pointer-events: auto;
+}
+
+/* Edge dragging support - make edges easily draggable */
+.map-container :global(.leaflet-container-route) {
+  background-clip: padding-box;
+}
+
+.map-container :global(.leaflet-pane) {
+  will-change: transform;
+}
+
+.route-map {
+  border: 2px solid #cbd5e1;
+  border-radius: 6px;
 }
 
 /* Calculator Form Section */
