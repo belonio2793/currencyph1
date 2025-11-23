@@ -163,6 +163,28 @@ export default function RouteCalculatorTab({ userId }) {
           <h3>Package Details & Route Calculation</h3>
         </div>
 
+        {/* Map Controls */}
+        <div className="map-controls-container">
+          <MapControls
+            mapInstance={mapInstance}
+            onMapLayerChange={setMapLayer}
+            onCenterLocation={(preset) => {
+              if (preset && preset.center && preset.zoom) {
+                setMapCenter(preset.center)
+                setZoomLevel(preset.zoom)
+                if (mapRef.current) {
+                  try {
+                    mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
+                  } catch (error) {
+                    console.error('Error flying to location:', error)
+                  }
+                }
+              }
+            }}
+            currentMapLayer={mapLayer}
+          />
+        </div>
+
         {/* Route Map */}
         <div className="route-map-section">
           <div className="map-header">
