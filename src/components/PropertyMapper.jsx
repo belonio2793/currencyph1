@@ -204,6 +204,15 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               })}
             </MapContainer>
           )}
+          {!loading && (
+            <button
+              onClick={handleCenterPhilippines}
+              className="btn-default-location mapper-center-philippines"
+              title="Center map on Philippines"
+            >
+              Philippines
+            </button>
+          )}
         </div>
 
         {/* Sidebar */}
