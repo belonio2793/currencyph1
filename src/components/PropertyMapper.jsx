@@ -147,31 +147,35 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
   return (
     <div className="property-mapper-container">
-      {/* Search Bar with Controls */}
-      <div className="mapper-search-bar">
-        <input
-          type="text"
-          placeholder="Search by address, city, street, or region..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="mapper-search-input"
-        />
+      {/* Map Section */}
+      <div className="map-section">
+        <div className="map-header">
+          <h3>Property Map</h3>
+          <div className="map-header-actions">
+            <button
+              onClick={() => setShowLegend(!showLegend)}
+              className="btn-legend-toggle"
+              title={showLegend ? 'Hide map controls' : 'Show map controls'}
+            >
+              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+            </button>
+          </div>
+        </div>
 
-        {/* Map Controls in Search Bar */}
-        {!loading && (
-          <MapControls
-            mapInstance={mapInstance}
-            onMapLayerChange={setMapLayer}
-            onCenterLocation={handleCenterLocation}
-            currentMapLayer={mapLayer}
-            compact={true}
-          />
-        )}
-      </div>
+        {/* Map Search Bar */}
+        <div className="map-search-section">
+          <div className="map-search-input-group">
+            <input
+              type="text"
+              placeholder="🔍 Search location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="map-search-input"
+            />
+          </div>
+        </div>
 
-      <div className="mapper-main">
-        {/* Map Area */}
-        <div className="mapper-map-area">
+        <div className="map-container">
           {loading ? (
             <div className="mapper-loading">Loading properties...</div>
           ) : (
@@ -179,8 +183,8 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               ref={mapRef}
               center={mapCenter}
               zoom={zoomLevel}
-              className="mapper-leaflet-container"
-              whenCreated={setMapInstance}
+              style={{ height: '100%', width: '100%' }}
+              attributionControl={false}
             >
               <TileLayer
                 url={
@@ -232,21 +236,70 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               })}
             </MapContainer>
           )}
-
-          {/* Map Controls */}
-          {!loading && (
-            <MapControls
-              mapInstance={mapInstance}
-              onMapLayerChange={setMapLayer}
-              onCenterLocation={handleCenterLocation}
-              currentMapLayer={mapLayer}
-              compact={false}
-            />
-          )}
         </div>
 
-        {/* Sidebar */}
-        <div className="mapper-sidebar">
+        {/* Map Legend */}
+        {showLegend && (
+          <div className="map-legend">
+            <div className="legend-header">
+              <h4>Map Controls</h4>
+              <button
+                onClick={() => setShowLegend(false)}
+                className="legend-close"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="legend-content">
+              {/* Default Location */}
+              <div className="legend-section">
+                <button
+                  onClick={() => {
+                    setMapCenter([12.8797, 121.7740])
+                    setZoomLevel(6)
+                  }}
+                  className="btn-default-location"
+                  title="Focus on Philippines"
+                >
+                  Philippines
+                </button>
+              </div>
+
+              {/* Layer Selection */}
+              <div className="legend-section">
+                <label className="legend-label">Map Layer</label>
+                <div className="layer-buttons">
+                  <button
+                    onClick={() => setMapLayer('street')}
+                    className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
+                    title="Street view"
+                  >
+                    Street
+                  </button>
+                  <button
+                    onClick={() => setMapLayer('satellite')}
+                    className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
+                    title="Satellite view"
+                  >
+                    Satellite
+                  </button>
+                  <button
+                    onClick={() => setMapLayer('terrain')}
+                    className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
+                    title="Terrain view"
+                  >
+                    Terrain
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Sidebar */}
+      <div className="mapper-sidebar">
           {error && (
             <div className="sidebar-error">
               {error}
@@ -452,7 +505,6 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               </div>
             </div>
           )}
-        </div>
       </div>
     </div>
   )
