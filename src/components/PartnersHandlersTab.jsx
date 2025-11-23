@@ -25,6 +25,7 @@ export default function PartnersHandlersTab({ userId }) {
   const [zoomLevel, setZoomLevel] = useState(6)
   const [mapLayer, setMapLayer] = useState('street')
   const [mapInstance, setMapInstance] = useState(null)
+  const [showLegend, setShowLegend] = useState(false)
 
   // Mock partners data
   const mockPartners = [
