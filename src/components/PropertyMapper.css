@@ -887,16 +887,9 @@ details[open] .controls-summary::before {
 }
 
 /* Responsive Design */
-@media (max-width: 1440px) {
-  .mapper-sidebar {
-    max-width: 450px;
-  }
-}
-
 @media (max-width: 1024px) {
   .mapper-sidebar {
-    max-width: 400px;
-    min-width: 280px;
+    min-width: 250px;
   }
 
   .mapper-search-bar {
