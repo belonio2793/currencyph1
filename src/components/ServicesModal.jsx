@@ -108,9 +108,9 @@ const SERVICES = [
     description: 'Deliver packages and parcels',
     category: 'logistics',
     criteria: [
-      { label: 'Weight', icon: '⚖️', hint: 'Up to 25kg' },
+      { label: 'Weight', hint: 'Up to 25kg' },
       { label: 'Size', icon: '���', hint: 'Standard boxes' },
-      { label: 'Fragility', icon: '🛡️', hint: 'Handle with care' }
+      { label: 'Fragility', hint: 'Handle with care' }
     ],
     details: {
       maxWeight: 25,
