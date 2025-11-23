@@ -162,28 +162,15 @@ export default function RouteCalculatorTab({ userId }) {
         {/* Header */}
         <div className="route-calculator-header">
           <h3>Package Details & Route Calculation</h3>
-        </div>
-
-        {/* Map Controls */}
-        <div className="map-controls-container">
-          <MapControls
-            mapInstance={mapInstance}
-            onMapLayerChange={setMapLayer}
-            onCenterLocation={(preset) => {
-              if (preset && preset.center && preset.zoom) {
-                setMapCenter(preset.center)
-                setZoomLevel(preset.zoom)
-                if (mapRef.current) {
-                  try {
-                    mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
-                  } catch (error) {
-                    console.error('Error flying to location:', error)
-                  }
-                }
-              }
-            }}
-            currentMapLayer={mapLayer}
-          />
+          <div className="header-actions">
+            <button
+              onClick={() => setShowLegend(!showLegend)}
+              className="btn-legend-toggle"
+              title={showLegend ? 'Hide map controls' : 'Show map controls'}
+            >
+              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+            </button>
+          </div>
         </div>
 
         {/* Route Map */}
