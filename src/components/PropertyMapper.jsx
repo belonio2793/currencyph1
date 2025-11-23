@@ -349,7 +349,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
       </div>
 
       {/* Sidebar */}
-      <div className="mapper-sidebar" style={{ flex: `0 0 ${100 - mapWidth}%` }}>
+      <div className="mapper-sidebar" style={{ flex: `1 1 ${100 - mapWidth}%` }}>
           {error && (
             <div className="sidebar-error">
               {error}
