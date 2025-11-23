@@ -1,13 +1,29 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { MapContainer, TileLayer } from 'react-leaflet'
+import L from 'leaflet'
+import MapControls from './MapControls'
+import './PartnersHandlersTab.css'
+
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+})
 
 export default function PartnersHandlersTab({ userId }) {
+  const mapRef = useRef(null)
   const [partners, setPartners] = useState([])
   const [selectedPartner, setSelectedPartner] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
+  const [zoomLevel, setZoomLevel] = useState(6)
+  const [mapLayer, setMapLayer] = useState('street')
+  const [mapInstance, setMapInstance] = useState(null)
 
   // Mock partners data
   const mockPartners = [
