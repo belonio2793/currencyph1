@@ -467,6 +467,61 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
             </div>
           ) : (
             <div className="sidebar-empty">
+              {/* Map Controls Section - Top Right */}
+              <div className="sidebar-map-controls-section">
+                <button
+                  onClick={handleCenterPhilippines}
+                  className="btn-default-location sidebar-philippines-btn"
+                  title="Center map on Philippines"
+                >
+                  Philippines
+                </button>
+
+                <details className="sidebar-layer-controls">
+                  <summary className="controls-summary">Map Layers</summary>
+                  <div className="controls-content">
+                    <button
+                      onClick={() => setMapLayer('street')}
+                      className={`layer-btn-small ${mapLayer === 'street' ? 'active' : ''}`}
+                    >
+                      Street
+                    </button>
+                    <button
+                      onClick={() => setMapLayer('satellite')}
+                      className={`layer-btn-small ${mapLayer === 'satellite' ? 'active' : ''}`}
+                    >
+                      Satellite
+                    </button>
+                    <button
+                      onClick={() => setMapLayer('terrain')}
+                      className={`layer-btn-small ${mapLayer === 'terrain' ? 'active' : ''}`}
+                    >
+                      Terrain
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (navigator.geolocation) {
+                          navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                              const { latitude, longitude } = position.coords
+                              if (mapInstance) {
+                                mapInstance.flyTo([latitude, longitude], 13, { duration: 1 })
+                              }
+                            },
+                            (error) => {
+                              console.error('Geolocation error:', error)
+                            }
+                          )
+                        }
+                      }}
+                      className="controls-geolocation-btn"
+                    >
+                      My Location
+                    </button>
+                  </div>
+                </details>
+              </div>
+
               <div className="empty-state-content">
                 <p className="empty-title">No Property Selected</p>
                 <p className="empty-subtitle">Click on a marker on the map to view property details</p>
