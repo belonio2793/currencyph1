@@ -4,11 +4,23 @@ import PropertyMapper from './PropertyMapper'
 
 export default function MyAddressesTab({ userId }) {
   const [showForm, setShowForm] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
   const [addresses, setAddresses] = useState([])
+  const [addressHistory, setAddressHistory] = useState([])
   const [selectedAddressId, setSelectedAddressId] = useState(null)
+  const [selectedAddressForHistory, setSelectedAddressForHistory] = useState(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [filterCity, setFilterCity] = useState('all')
+  const [filterRegion, setFilterRegion] = useState('all')
+  const [cities, setCities] = useState([])
+  const [regions, setRegions] = useState([])
+  const [editingNickname, setEditingNickname] = useState(null)
+  const [nicknameInput, setNicknameInput] = useState('')
+  const [showNicknameForm, setShowNicknameForm] = useState(false)
+
   const [formData, setFormData] = useState({
     addresses_address: '',
     addresses_street_number: '',
@@ -20,6 +32,7 @@ export default function MyAddressesTab({ userId }) {
     barangay: '',
     addresses_latitude: '',
     addresses_longitude: '',
+    address_nickname: '',
     lot_number: '',
     lot_area: '',
     lot_area_unit: 'sqm',
@@ -51,7 +64,7 @@ export default function MyAddressesTab({ userId }) {
     'govt'
   ]
 
-  const regions = [
+  const regionsList = [
     'National Capital Region',
     'Cordillera Administrative Region',
     'Ilocos Region',
@@ -71,9 +84,31 @@ export default function MyAddressesTab({ userId }) {
     'Bangsamoro Autonomous Region in Muslim Mindanao'
   ]
 
+  const popularCities = [
+    { name: 'Manila', region: 'National Capital Region', highlight: 'primary' },
+    { name: 'Quezon City', region: 'National Capital Region', highlight: 'primary' },
+    { name: 'Makati', region: 'National Capital Region', highlight: 'primary' },
+    { name: 'Taguig', region: 'National Capital Region', highlight: 'primary' },
+    { name: 'Cebu City', region: 'Central Visayas', highlight: 'secondary' },
+    { name: 'Davao City', region: 'Davao Region', highlight: 'secondary' },
+    { name: 'Cagayan de Oro', region: 'Northern Mindanao', highlight: 'secondary' },
+    { name: 'Iloilo City', region: 'Western Visayas', highlight: 'secondary' },
+    { name: 'Bacolod City', region: 'Western Visayas', highlight: 'secondary' },
+    { name: 'Baguio City', region: 'Cordillera Administrative Region', highlight: 'secondary' }
+  ]
+
   useEffect(() => {
     loadAddresses()
   }, [userId])
+
+  useEffect(() => {
+    if (addresses.length > 0) {
+      const uniqueCities = [...new Set(addresses.map(a => a.addresses_city))].filter(Boolean).sort()
+      const uniqueRegions = [...new Set(addresses.map(a => a.addresses_region))].filter(Boolean).sort()
+      setCities(uniqueCities)
+      setRegions(uniqueRegions)
+    }
+  }, [addresses])
 
   const loadAddresses = async () => {
     if (!userId) return
@@ -96,6 +131,21 @@ export default function MyAddressesTab({ userId }) {
       setError('Failed to load addresses')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const loadAddressHistory = async (addressId) => {
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('address_history')
+        .select('*')
+        .eq('address_id', addressId)
+        .order('changed_at', { ascending: false })
+
+      if (fetchError) throw fetchError
+      setAddressHistory(data || [])
+    } catch (err) {
+      console.error('Error loading address history:', err)
     }
   }
 
@@ -144,6 +194,7 @@ export default function MyAddressesTab({ userId }) {
         barangay: '',
         addresses_latitude: '',
         addresses_longitude: '',
+        address_nickname: '',
         lot_number: '',
         lot_area: '',
         lot_area_unit: 'sqm',
@@ -187,6 +238,64 @@ export default function MyAddressesTab({ userId }) {
     }
   }
 
+  const handleUpdateNickname = async (addressId) => {
+    try {
+      const { error: updateError } = await supabase
+        .from('addresses')
+        .update({ address_nickname: nicknameInput })
+        .eq('id', addressId)
+        .eq('user_id', userId)
+
+      if (updateError) throw updateError
+
+      const { error: historyError } = await supabase
+        .from('address_history')
+        .insert([{
+          address_id: addressId,
+          user_id: userId,
+          field_name: 'address_nickname',
+          old_value: addresses.find(a => a.id === addressId)?.address_nickname || '',
+          new_value: nicknameInput
+        }])
+
+      if (historyError && historyError.code !== 'UNIQUE_VIOLATION') {
+        console.warn('Could not record history:', historyError)
+      }
+
+      setEditingNickname(null)
+      setNicknameInput('')
+      await loadAddresses()
+    } catch (err) {
+      console.error('Error updating nickname:', err)
+      setError('Failed to update nickname')
+    }
+  }
+
+  const filteredAddresses = addresses.filter(address => {
+    const matchesQuery = 
+      address.addresses_street_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      address.addresses_city?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      address.address_nickname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      address.barangay?.toLowerCase().includes(searchQuery.toLowerCase())
+    
+    const matchesCity = filterCity === 'all' || address.addresses_city === filterCity
+    const matchesRegion = filterRegion === 'all' || address.addresses_region === filterRegion
+
+    return matchesQuery && matchesCity && matchesRegion
+  })
+
+  const getAddressDisplayName = (address) => {
+    if (address.address_nickname) {
+      return `${address.address_nickname} - ${address.addresses_street_name}`
+    }
+    return address.addresses_street_name || address.addresses_city
+  }
+
+  const handleCitySelect = (cityName) => {
+    setFilterCity(cityName)
+    setSearchQuery('')
+  }
+
   return (
     <div className="my-addresses-tab">
       <div className="my-addresses-layout">
@@ -195,16 +304,129 @@ export default function MyAddressesTab({ userId }) {
           userId={userId} 
           onPropertyAdded={loadAddresses}
           allowDelete={true}
+          highlightCity={filterCity !== 'all' ? filterCity : null}
         />
 
-        <button
-          onClick={() => setShowForm(true)}
-          className="btn-add-property-fixed"
-          title="Add new address"
-        >
-          +
-        </button>
+        {/* Address List Sidebar */}
+        <div className="addresses-sidebar">
+          <div className="sidebar-header">
+            <h3>My Addresses</h3>
+            <button
+              onClick={() => setShowForm(true)}
+              className="btn-add-address"
+              title="Add new address"
+            >
+              +
+            </button>
+          </div>
 
+          <div className="addresses-search-section">
+            <input
+              type="text"
+              placeholder="Search addresses, nicknames..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="addresses-search-input"
+            />
+          </div>
+
+          <div className="addresses-filters-section">
+            <div className="filter-group">
+              <label className="filter-label">Filter by Region</label>
+              <select
+                value={filterRegion}
+                onChange={(e) => {
+                  setFilterRegion(e.target.value)
+                  setFilterCity('all')
+                }}
+                className="filter-select"
+              >
+                <option value="all">All Regions</option>
+                {regions.map(region => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-group">
+              <label className="filter-label">Filter by City</label>
+              <select
+                value={filterCity}
+                onChange={(e) => setFilterCity(e.target.value)}
+                className="filter-select"
+              >
+                <option value="all">All Cities</option>
+                {cities.filter(city => !filterRegion || addresses.find(a => a.addresses_city === city && a.addresses_region === filterRegion)).map(city => (
+                  <option key={city} value={city}>{city}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div className="popular-cities-section">
+            <label className="filter-label">Popular Cities</label>
+            <div className="popular-cities-grid">
+              {popularCities.map(city => (
+                <button
+                  key={city.name}
+                  onClick={() => handleCitySelect(city.name)}
+                  className={`popular-city-btn ${filterCity === city.name ? 'active' : ''} ${city.highlight}`}
+                  title={city.region}
+                >
+                  {city.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="addresses-list-section">
+            {loading && !addresses.length ? (
+              <div className="list-loading">Loading addresses...</div>
+            ) : filteredAddresses.length === 0 ? (
+              <div className="list-empty">
+                <p className="empty-title">No addresses found</p>
+                <p className="empty-subtitle">Create your first address to get started</p>
+              </div>
+            ) : (
+              <div className="addresses-list">
+                {filteredAddresses.map(address => (
+                  <div
+                    key={address.id}
+                    className={`address-item ${selectedAddressId === address.id ? 'active' : ''}`}
+                    onClick={() => setSelectedAddressId(address.id)}
+                  >
+                    <div className="address-item-header">
+                      <div className="address-item-title">
+                        <h4 className="address-name">{getAddressDisplayName(address)}</h4>
+                        {address.is_default && <span className="default-badge">Default</span>}
+                      </div>
+                      <div className="address-item-actions">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setSelectedAddressForHistory(address.id)
+                            loadAddressHistory(address.id)
+                            setShowHistory(true)
+                          }}
+                          className="btn-history"
+                          title="View history"
+                        >
+                          📋
+                        </button>
+                      </div>
+                    </div>
+                    <p className="address-city">{address.addresses_city}, {address.addresses_region}</p>
+                    {address.address_nickname && (
+                      <p className="address-nickname-display">Nickname: {address.address_nickname}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Add Address Form Modal */}
         {showForm && (
           <div className="property-form-overlay" onClick={() => setShowForm(false)}>
             <div className="property-form-modal" onClick={e => e.stopPropagation()}>
@@ -226,6 +448,23 @@ export default function MyAddressesTab({ userId }) {
               )}
 
               <form onSubmit={handleSubmit} className="property-form">
+                <div className="form-section">
+                  <h3 className="form-section-title">Address Nickname</h3>
+
+                  <div className="form-row">
+                    <div className="form-group full-width">
+                      <label>Address Nickname (e.g., "Home", "Office", "Weekend House")</label>
+                      <input
+                        type="text"
+                        name="address_nickname"
+                        value={formData.address_nickname}
+                        onChange={handleInputChange}
+                        placeholder="Give this address a memorable name"
+                      />
+                    </div>
+                  </div>
+                </div>
+
                 <div className="form-section">
                   <h3 className="form-section-title">Address Information</h3>
 
@@ -263,7 +502,13 @@ export default function MyAddressesTab({ userId }) {
                         onChange={handleInputChange}
                         placeholder="e.g., Manila"
                         required
+                        list="city-suggestions"
                       />
+                      <datalist id="city-suggestions">
+                        {popularCities.map(city => (
+                          <option key={city.name} value={city.name} />
+                        ))}
+                      </datalist>
                     </div>
                     <div className="form-group">
                       <label>Province</label>
@@ -286,7 +531,7 @@ export default function MyAddressesTab({ userId }) {
                         onChange={handleInputChange}
                       >
                         <option value="">Select Region</option>
-                        {regions.map(region => (
+                        {regionsList.map(region => (
                           <option key={region} value={region}>{region}</option>
                         ))}
                       </select>
@@ -504,6 +749,61 @@ export default function MyAddressesTab({ userId }) {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Address History Modal */}
+        {showHistory && selectedAddressForHistory && (
+          <div className="history-overlay" onClick={() => setShowHistory(false)}>
+            <div className="history-modal" onClick={e => e.stopPropagation()}>
+              <div className="history-modal-header">
+                <h2>Address Change History</h2>
+                <button
+                  onClick={() => setShowHistory(false)}
+                  className="history-modal-close"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="history-modal-content">
+                {addressHistory.length === 0 ? (
+                  <div className="history-empty">
+                    <p className="empty-title">No changes recorded</p>
+                    <p className="empty-subtitle">Changes to this address will appear here</p>
+                  </div>
+                ) : (
+                  <div className="history-list">
+                    {addressHistory.map((entry, idx) => (
+                      <div key={entry.id} className="history-item">
+                        <div className="history-item-header">
+                          <span className="history-field">{entry.field_name}</span>
+                          <span className="history-date">
+                            {new Date(entry.changed_at).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <div className="history-item-content">
+                          <div className="history-change">
+                            <span className="label">Previous:</span>
+                            <span className="old-value">{entry.old_value || '(empty)'}</span>
+                          </div>
+                          <div className="history-change">
+                            <span className="label">Current:</span>
+                            <span className="new-value">{entry.new_value || '(empty)'}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
