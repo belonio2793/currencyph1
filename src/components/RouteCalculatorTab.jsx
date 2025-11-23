@@ -217,6 +217,7 @@ export default function RouteCalculatorTab({ userId }) {
               zoom={zoomLevel}
               className="leaflet-container-route"
               style={{ height: '100%', width: '100%' }}
+              attributionControl={false}
               whenCreated={setMapInstance}
             >
               <TileLayer
@@ -227,7 +228,7 @@ export default function RouteCalculatorTab({ userId }) {
                     ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
                     : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                 }
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution=""
               />
             </MapContainer>
           </div>
