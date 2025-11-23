@@ -237,6 +237,27 @@ export default function MapControls({
           </div>
 
           <div className="controls-panel-content">
+            {/* Zoom Controls */}
+            <div className="control-section">
+              <label className="control-label">Zoom</label>
+              <div className="zoom-buttons-group">
+                <button
+                  onClick={(e) => handleZoomOut(e)}
+                  className="btn-zoom-control-full"
+                  title="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  onClick={(e) => handleZoomIn(e)}
+                  className="btn-zoom-control-full"
+                  title="Zoom in"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
             {/* Philippines Button */}
             <div className="control-section">
               <button
