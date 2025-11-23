@@ -11,18 +11,20 @@
   border-bottom: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   z-index: 10;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .mapper-search-input {
-  width: 100%;
   padding: 12px 16px;
   border: 1px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.2s, box-shadow 0.2s;
-  max-width: 600px;
-  margin: 0 auto;
-  display: block;
+  flex: 1;
+  min-width: 300px;
 }
 
 .mapper-search-input:focus {
