@@ -16,6 +16,7 @@
   position: relative;
   min-height: 0;
   min-width: 0;
+  transition: flex 0.3s ease;
 }
 
 .map-header {
