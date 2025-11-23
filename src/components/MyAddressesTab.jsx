@@ -73,6 +73,7 @@ export default function MyAddressesTab({ userId }) {
   const [selectedMapillaryLocation, setSelectedMapillaryLocation] = useState(null)
   const [citiesSearchOpen, setCitiesSearchOpen] = useState(false)
   const [citiesSearchQuery, setCitiesSearchQuery] = useState('')
+  const citiesDropdownRef = useRef(null)
 
   const allCities = [
     "Abuyog", "Alaminos", "Alcala", "Angeles", "Antipolo", "Aroroy", "Bacolod", "Bacoor", "Bago",
