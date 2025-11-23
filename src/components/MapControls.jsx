@@ -68,7 +68,7 @@ export default function MapControls({
     return (
       <div className="map-controls-compact">
         <button
-          onClick={handleCenterPhilippines}
+          onClick={(e) => handleCenterPhilippines(e)}
           className="btn-map-control-primary"
           title="Center map on Philippines"
         >
@@ -79,28 +79,28 @@ export default function MapControls({
           <summary className="controls-dropdown-summary">Map Layers</summary>
           <div className="controls-dropdown-content">
             <button
-              onClick={() => handleLayerChange('street')}
+              onClick={(e) => handleLayerChange('street', e)}
               className={`layer-control-btn ${currentMapLayer === 'street' ? 'active' : ''}`}
               title="Street view"
             >
               Street
             </button>
             <button
-              onClick={() => handleLayerChange('satellite')}
+              onClick={(e) => handleLayerChange('satellite', e)}
               className={`layer-control-btn ${currentMapLayer === 'satellite' ? 'active' : ''}`}
               title="Satellite view"
             >
               Satellite
             </button>
             <button
-              onClick={() => handleLayerChange('terrain')}
+              onClick={(e) => handleLayerChange('terrain', e)}
               className={`layer-control-btn ${currentMapLayer === 'terrain' ? 'active' : ''}`}
               title="Terrain view"
             >
               Terrain
             </button>
             <button
-              onClick={handleGetLocation}
+              onClick={(e) => handleGetLocation(e)}
               className="location-control-btn"
               title="Get your current location"
             >
