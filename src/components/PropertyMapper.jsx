@@ -27,6 +27,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   const [mapInstance, setMapInstance] = useState(null)
   const [mapLayer, setMapLayer] = useState('street')
   const [showLegend, setShowLegend] = useState(false)
+  const [mapWidth, setMapWidth] = useState(50)
 
   // Load properties from database
   useEffect(() => {
@@ -172,7 +173,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   return (
     <div className="property-mapper-container">
       {/* Map Section */}
-      <div className="map-section">
+      <div className="map-section" style={{ flex: `0 0 ${mapWidth}%` }}>
         <div className="map-header">
           <h3>Property Map</h3>
         </div>
@@ -194,18 +195,18 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
           <div className="map-overlay-controls">
             <div className="map-resize-controls">
               <button
-                onClick={() => setZoomLevel(prev => Math.max(prev - 1, 2))}
+                onClick={() => setMapWidth(prev => Math.max(prev - 10, 30))}
                 className="btn-map-resize-overlay"
-                title="Zoom out"
+                title="Collapse map"
               >
-                −
+                ‹
               </button>
               <button
-                onClick={() => setZoomLevel(prev => Math.min(prev + 1, 18))}
+                onClick={() => setMapWidth(prev => Math.min(prev + 10, 80))}
                 className="btn-map-resize-overlay"
-                title="Zoom in"
+                title="Expand map"
               >
-                +
+                ›
               </button>
             </div>
             <button
@@ -348,7 +349,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
       </div>
 
       {/* Sidebar */}
-      <div className="mapper-sidebar">
+      <div className="mapper-sidebar" style={{ flex: `0 0 ${100 - mapWidth}%` }}>
           {error && (
             <div className="sidebar-error">
               {error}
