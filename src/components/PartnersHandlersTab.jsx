@@ -217,13 +217,31 @@ export default function PartnersHandlersTab({ userId }) {
             </div>
           </div>
           <div className="map-container partners-map">
-            <button
-              onClick={() => setShowLegend(!showLegend)}
-              className="btn-legend-toggle-overlay"
-              title={showLegend ? 'Hide map controls' : 'Show map controls'}
-            >
-              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-            </button>
+            <div className="map-overlay-controls">
+              <div className="map-resize-controls">
+                <button
+                  onClick={() => setZoomLevel(prev => Math.max(prev - 1, 2))}
+                  className="btn-map-resize-overlay"
+                  title="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  onClick={() => setZoomLevel(prev => Math.min(prev + 1, 18))}
+                  className="btn-map-resize-overlay"
+                  title="Zoom in"
+                >
+                  +
+                </button>
+              </div>
+              <button
+                onClick={() => setShowLegend(!showLegend)}
+                className="btn-legend-toggle-overlay"
+                title={showLegend ? 'Hide map controls' : 'Show map controls'}
+              >
+                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+              </button>
+            </div>
             <MapContainer
               ref={mapRef}
               center={mapCenter}
