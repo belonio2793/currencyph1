@@ -583,44 +583,158 @@ export default function MyAddressesTab({ userId }) {
             </MapContainer>
           </div>
 
-          {/* Lat/Lon Input Fields */}
-          <div className="coordinates-section">
-            <div className="coordinate-inputs">
-              <div className="form-group">
-                <label>Latitude</label>
-                <input
-                  type="number"
-                  name="addresses_latitude"
-                  value={formData.addresses_latitude}
-                  onChange={handleInputChange}
-                  placeholder="14.5549"
-                  step="0.000001"
-                  readOnly={isCreatingFromMap}
-                  className="coordinate-input"
-                />
+          {/* Map Legend */}
+          {showLegend && (
+            <div className="map-legend">
+              <div className="legend-header">
+                <h4>Map Controls</h4>
+                <button
+                  onClick={() => setShowLegend(false)}
+                  className="legend-close"
+                >
+                  ✕
+                </button>
               </div>
-              <div className="form-group">
-                <label>Longitude</label>
-                <input
-                  type="number"
-                  name="addresses_longitude"
-                  value={formData.addresses_longitude}
-                  onChange={handleInputChange}
-                  placeholder="121.0175"
-                  step="0.000001"
-                  readOnly={isCreatingFromMap}
-                  className="coordinate-input"
-                />
+
+              <div className="legend-content">
+                {/* Layer Selection */}
+                <div className="legend-section">
+                  <label className="legend-label">Map Layer</label>
+                  <div className="layer-buttons">
+                    <button
+                      onClick={() => setMapLayer('street')}
+                      className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
+                      title="Street view"
+                    >
+                      🗺️ Street
+                    </button>
+                    <button
+                      onClick={() => setMapLayer('satellite')}
+                      className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
+                      title="Satellite view"
+                    >
+                      🛰️ Satellite
+                    </button>
+                    <button
+                      onClick={() => setMapLayer('terrain')}
+                      className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
+                      title="Terrain view"
+                    >
+                      ⛰️ Terrain
+                    </button>
+                  </div>
+                </div>
+
+                {/* Geolocation */}
+                <div className="legend-section">
+                  <button
+                    onClick={handleGeolocation}
+                    className="btn-geolocation"
+                    title="Get your current location"
+                  >
+                    📍 My Location
+                  </button>
+                </div>
+
+                {/* Magnetic Snapping */}
+                <div className="legend-section">
+                  <label className="legend-label">Smart Features</label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={magneticSnap}
+                      onChange={(e) => setMagneticSnap(e.target.checked)}
+                    />
+                    <span>Magnetic Snap</span>
+                    <span className="checkbox-hint">Snap markers to nearby addresses</span>
+                  </label>
+                </div>
+
+                {/* Legend Items */}
+                <div className="legend-section">
+                  <label className="legend-label">Legend</label>
+                  <div className="legend-items">
+                    <div className="legend-item">
+                      <span className="legend-marker-default">📍</span>
+                      <span>Saved Address</span>
+                    </div>
+                    <div className="legend-item">
+                      <span className="legend-marker-new">📍</span>
+                      <span>New Address</span>
+                    </div>
+                    <div className="legend-item">
+                      <span className="legend-marker-current">📍</span>
+                      <span>Your Location</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Current Coordinates */}
+                {formData.addresses_latitude && formData.addresses_longitude && (
+                  <div className="legend-section">
+                    <label className="legend-label">Selected Location</label>
+                    <div className="coordinate-display">
+                      <div className="coord-item">
+                        <span className="coord-label">Lat:</span>
+                        <span className="coord-value">{formData.addresses_latitude}</span>
+                      </div>
+                      <div className="coord-item">
+                        <span className="coord-label">Lon:</span>
+                        <span className="coord-value">{formData.addresses_longitude}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setShowForm(true)}
+                      className="btn-edit-coords"
+                    >
+                      Edit Location
+                    </button>
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => setShowForm(true)}
-                disabled={!formData.addresses_latitude || !formData.addresses_longitude}
-                className="btn-open-form"
-              >
-                Edit Details
-              </button>
             </div>
-          </div>
+          )}
+
+          {/* Lat/Lon Input Fields (Compact) */}
+          {!showLegend && (
+            <div className="coordinates-section-compact">
+              <div className="coordinate-inputs">
+                <div className="form-group">
+                  <label>Latitude</label>
+                  <input
+                    type="number"
+                    name="addresses_latitude"
+                    value={formData.addresses_latitude}
+                    onChange={handleInputChange}
+                    placeholder="14.5549"
+                    step="0.000001"
+                    readOnly={isCreatingFromMap}
+                    className="coordinate-input"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Longitude</label>
+                  <input
+                    type="number"
+                    name="addresses_longitude"
+                    value={formData.addresses_longitude}
+                    onChange={handleInputChange}
+                    placeholder="121.0175"
+                    step="0.000001"
+                    readOnly={isCreatingFromMap}
+                    className="coordinate-input"
+                  />
+                </div>
+                <button
+                  onClick={() => setShowForm(true)}
+                  disabled={!formData.addresses_latitude || !formData.addresses_longitude}
+                  className="btn-open-form"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Address List Section */}
