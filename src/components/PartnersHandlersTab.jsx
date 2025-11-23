@@ -199,6 +199,41 @@ export default function PartnersHandlersTab({ userId }) {
         <div className="partners-header">
           <h3>Shipping Partners & Handlers</h3>
           <p className="header-subtitle">Browse and manage available couriers and logistics providers</p>
+          {/* Map Controls */}
+          <MapControls
+            mapInstance={mapInstance}
+            onMapLayerChange={setMapLayer}
+            currentMapLayer={mapLayer}
+            compact={true}
+          />
+        </div>
+
+        {/* Partners Map */}
+        <div className="partners-map-section">
+          <div className="map-header">
+            <h4>Coverage Map</h4>
+            <p className="map-subtitle">View partner coverage areas across the Philippines</p>
+          </div>
+          <div className="map-container partners-map">
+            <MapContainer
+              ref={mapRef}
+              center={mapCenter}
+              zoom={zoomLevel}
+              className="leaflet-container-partners"
+              whenCreated={setMapInstance}
+            >
+              <TileLayer
+                url={
+                  mapLayer === 'satellite'
+                    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                    : mapLayer === 'terrain'
+                    ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                }
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              />
+            </MapContainer>
+          </div>
         </div>
 
         {/* Search and Filter */}
