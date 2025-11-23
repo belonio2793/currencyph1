@@ -170,25 +170,6 @@ export default function RouteCalculatorTab({ userId }) {
               <h4>Route Map</h4>
               <p className="map-subtitle">Visualize shipping routes across the Philippines</p>
             </div>
-            <MapControls
-              mapInstance={mapInstance}
-              onMapLayerChange={setMapLayer}
-              onCenterLocation={(preset) => {
-                if (preset && preset.center && preset.zoom) {
-                  setMapCenter(preset.center)
-                  setZoomLevel(preset.zoom)
-                  if (mapRef.current) {
-                    try {
-                      mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
-                    } catch (error) {
-                      console.error('Error flying to location:', error)
-                    }
-                  }
-                }
-              }}
-              currentMapLayer={mapLayer}
-              headerLayout={true}
-            />
           </div>
           <div className="map-container route-map">
             <MapContainer
