@@ -228,26 +228,6 @@ export default function ShippingTrackingTab({ userId }) {
             <option value="failed">Failed</option>
           </select>
 
-          {/* Map Controls */}
-          <MapControls
-            mapInstance={mapInstance}
-            onMapLayerChange={setMapLayer}
-            onCenterLocation={(preset) => {
-              if (preset && preset.center && preset.zoom) {
-                setMapCenter(preset.center)
-                setZoomLevel(preset.zoom)
-                if (mapRef.current) {
-                  try {
-                    mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
-                  } catch (error) {
-                    console.error('Error flying to location:', error)
-                  }
-                }
-              }
-            }}
-            currentMapLayer={mapLayer}
-            compact={true}
-          />
         </div>
 
         {error && (
@@ -260,39 +240,24 @@ export default function ShippingTrackingTab({ userId }) {
         {/* Map View */}
         <div className="shipping-map-section">
           <div className="map-header">
-            <div className="map-header-content">
-              <h4>Shipment Routes Map</h4>
-              <p className="map-subtitle">View shipment routes across the Philippines</p>
+            <h3>Shipment Routes Map</h3>
+            <div className="map-header-actions">
+              <button
+                onClick={() => setShowLegend(!showLegend)}
+                className="btn-legend-toggle"
+                title={showLegend ? 'Hide map controls' : 'Show map controls'}
+              >
+                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+              </button>
             </div>
-            {!loading && (
-              <MapControls
-                mapInstance={mapInstance}
-                onMapLayerChange={setMapLayer}
-                onCenterLocation={(preset) => {
-                  if (preset && preset.center && preset.zoom) {
-                    setMapCenter(preset.center)
-                    setZoomLevel(preset.zoom)
-                    if (mapRef.current) {
-                      try {
-                        mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
-                      } catch (error) {
-                        console.error('Error flying to location:', error)
-                      }
-                    }
-                  }
-                }}
-                currentMapLayer={mapLayer}
-                headerLayout={true}
-              />
-            )}
           </div>
           <div className="map-container shipping-map">
             <MapContainer
               ref={mapRef}
               center={mapCenter}
               zoom={zoomLevel}
-              className="leaflet-container-shipping"
-              whenCreated={setMapInstance}
+              style={{ height: '100%', width: '100%' }}
+              attributionControl={false}
             >
               <TileLayer
                 url={
@@ -305,6 +270,65 @@ export default function ShippingTrackingTab({ userId }) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               />
             </MapContainer>
+
+            {/* Map Legend */}
+            {showLegend && (
+              <div className="map-legend">
+                <div className="legend-header">
+                  <h4>Map Controls</h4>
+                  <button
+                    onClick={() => setShowLegend(false)}
+                    className="legend-close"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="legend-content">
+                  {/* Default Location */}
+                  <div className="legend-section">
+                    <button
+                      onClick={() => {
+                        setMapCenter([12.8797, 121.7740])
+                        setZoomLevel(6)
+                      }}
+                      className="btn-default-location"
+                      title="Focus on Philippines"
+                    >
+                      Philippines
+                    </button>
+                  </div>
+
+                  {/* Layer Selection */}
+                  <div className="legend-section">
+                    <label className="legend-label">Map Layer</label>
+                    <div className="layer-buttons">
+                      <button
+                        onClick={() => setMapLayer('street')}
+                        className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
+                        title="Street view"
+                      >
+                        Street
+                      </button>
+                      <button
+                        onClick={() => setMapLayer('satellite')}
+                        className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
+                        title="Satellite view"
+                      >
+                        Satellite
+                      </button>
+                      <button
+                        onClick={() => setMapLayer('terrain')}
+                        className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
+                        title="Terrain view"
+                      >
+                        Terrain
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
