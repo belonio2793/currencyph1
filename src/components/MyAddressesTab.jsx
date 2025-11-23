@@ -61,6 +61,7 @@ export default function MyAddressesTab({ userId }) {
   const [isCreatingFromMap, setIsCreatingFromMap] = useState(false)
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [zoomLevel, setZoomLevel] = useState(6)
+  const [mapHeight, setMapHeight] = useState(400)
 
   const [formData, setFormData] = useState({
     addresses_address: '',
