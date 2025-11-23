@@ -158,6 +158,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               center={mapCenter}
               zoom={zoomLevel}
               className="mapper-leaflet-container"
+              whenCreated={setMapInstance}
             >
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
