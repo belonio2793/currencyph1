@@ -244,7 +244,7 @@ export default function ShippingTrackingTab({ userId }) {
         )}
 
         {/* Map View */}
-        <div className="shipping-map-section">
+        <div className="shipping-map-section" style={{ height: `${mapHeight}px` }}>
           <div className="map-header">
             <h3>Shipment Routes Map</h3>
           </div>
