@@ -26,28 +26,50 @@
   flex-shrink: 0;
 }
 
+.header-content {
+  flex: 1;
+  min-width: 250px;
+}
+
 .partners-header h3 {
   font-size: 1.25rem;
   font-weight: 700;
   color: #0f172a;
   margin: 0;
-  min-width: 250px;
 }
 
 .header-subtitle {
   font-size: 13px;
   color: #64748b;
-  margin: 0;
-  flex: 1;
-  min-width: 200px;
+  margin: 8px 0 0 0;
 }
 
-/* Map Controls Container */
-.map-controls-container {
-  padding: 12px 24px;
-  background: white;
-  border-bottom: 1px solid #e2e8f0;
+.header-actions {
+  display: flex;
+  gap: 8px;
   flex-shrink: 0;
+}
+
+.btn-legend-toggle {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-legend-toggle:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.btn-legend-toggle:active {
+  background: #f1f5f9;
 }
 
 /* Partners Map Section */
