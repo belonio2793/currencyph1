@@ -101,6 +101,12 @@ export default function ShippingTrackingTab({ userId }) {
     }))
   }
 
+  const handleSelectShipment = async (shipment) => {
+    setSelectedShipment(shipment)
+    const history = await loadShipmentTrackingHistory(shipment.id)
+    setTrackingHistory(history)
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
