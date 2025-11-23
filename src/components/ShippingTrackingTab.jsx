@@ -207,7 +207,7 @@ export default function ShippingTrackingTab({ userId }) {
           </button>
         </div>
 
-        {/* Search and Filter Bar */}
+        {/* Search and Filter Bar with Map Controls */}
         <div className="shipping-controls">
           <input
             type="text"
@@ -227,6 +227,14 @@ export default function ShippingTrackingTab({ userId }) {
             <option value="delivered">Delivered</option>
             <option value="failed">Failed</option>
           </select>
+
+          {/* Map Controls */}
+          <MapControls
+            mapInstance={mapInstance}
+            onMapLayerChange={setMapLayer}
+            currentMapLayer={mapLayer}
+            compact={true}
+          />
         </div>
 
         {error && (
