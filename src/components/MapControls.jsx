@@ -16,7 +16,11 @@ export default function MapControls({
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
-  const handleCenterPhilippines = () => {
+  const handleCenterPhilippines = (e) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
     if (mapInstance && mapInstance.flyTo) {
       try {
         mapInstance.flyTo(PHILIPPINES_PRESET.center, PHILIPPINES_PRESET.zoom, { duration: 1 })
