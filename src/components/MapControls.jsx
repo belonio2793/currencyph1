@@ -170,6 +170,22 @@ export default function MapControls({
           e.preventDefault()
         }}
       >
+        <div className="map-zoom-controls-compact">
+          <button
+            onClick={(e) => handleZoomOut(e)}
+            className="btn-zoom-control-compact"
+            title="Zoom out"
+          >
+            −
+          </button>
+          <button
+            onClick={(e) => handleZoomIn(e)}
+            className="btn-zoom-control-compact"
+            title="Zoom in"
+          >
+            +
+          </button>
+        </div>
         <button
           onClick={(e) => handleCenterPhilippines(e)}
           className="btn-map-control-primary"
