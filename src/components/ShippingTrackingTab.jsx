@@ -75,6 +75,23 @@ export default function ShippingTrackingTab({ userId }) {
     }))
   }
 
+  const loadShipmentTrackingHistory = async (shipmentId) => {
+    try {
+      const { data, error: historyError } = await supabase
+        .from('shipment_tracking_history')
+        .select('*')
+        .eq('shipment_id', shipmentId)
+        .order('timestamp', { ascending: false })
+
+      if (historyError) throw historyError
+
+      return data || []
+    } catch (err) {
+      console.error('Error loading tracking history:', err)
+      return []
+    }
+  }
+
   const handleGenerateTracking = () => {
     const trackingNumber = generateTrackingNumber()
     setFormData(prev => ({
