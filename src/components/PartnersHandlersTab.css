@@ -61,6 +61,14 @@
   border-bottom: 1px solid #e2e8f0;
   background: #f8fafc;
   flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.map-header-content {
+  flex: 1;
 }
 
 .map-header h4 {
