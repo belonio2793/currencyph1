@@ -394,6 +394,32 @@
   .form-row {
     gap: 12px;
   }
+
+  /* Map responsive on mobile */
+  .my-addresses-layout {
+    flex-direction: column;
+  }
+
+  .map-section {
+    flex: 0 0 300px;
+  }
+
+  .addresses-list-full-width {
+    flex: 1;
+  }
+
+  .coordinate-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-open-form {
+    align-self: auto;
+    width: 100%;
+  }
+
+  .popular-cities-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 480px) {
