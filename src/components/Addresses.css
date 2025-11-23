@@ -610,7 +610,6 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  align-self: flex-end;
   height: 32px;
   white-space: nowrap;
 }
