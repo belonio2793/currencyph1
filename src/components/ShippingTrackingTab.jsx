@@ -371,6 +371,31 @@ export default function ShippingTrackingTab({ userId }) {
                 </div>
               </div>
 
+              <div className="detail-section">
+                <h4 className="section-title">Tracking History</h4>
+                {trackingHistory.length === 0 ? (
+                  <p className="notes-text">No tracking updates yet. Shipment will be updated when in transit.</p>
+                ) : (
+                  <div className="tracking-history-list">
+                    {trackingHistory.map((entry) => (
+                      <div key={entry.id} className="tracking-history-item">
+                        <div className="history-timestamp">
+                          {new Date(entry.timestamp).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                        <div className="history-status">{entry.status}</div>
+                        {entry.location && <div className="history-location">📍 {entry.location}</div>}
+                        {entry.notes && <div className="history-notes">{entry.notes}</div>}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {selectedShipment.notes && (
                 <div className="detail-section">
                   <h4 className="section-title">Notes</h4>
