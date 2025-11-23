@@ -1353,6 +1353,56 @@
   color: #475569;
 }
 
+/* Route Calculator Tab Styles */
+.route-calculator-tab {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.route-calculator-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+.route-calculator-header {
+  padding: 20px 24px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.route-calculator-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.calculator-form-section {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.calculator-results-header {
+  padding: 20px 24px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  margin-bottom: 20px;
+  border-radius: 8px 8px 0 0;
+}
+
+.calculator-results-header h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
 .shipping-form,
 .calculator-form {
   flex: 1;
