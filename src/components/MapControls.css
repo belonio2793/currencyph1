@@ -5,6 +5,9 @@
   align-items: center;
   flex-shrink: 0;
   flex-wrap: wrap;
+  z-index: 100;
+  position: relative;
+  pointer-events: auto;
 }
 
 .btn-map-control-primary {
