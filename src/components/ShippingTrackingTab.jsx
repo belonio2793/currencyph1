@@ -23,6 +23,7 @@ export default function ShippingTrackingTab({ userId }) {
   const [filterStatus, setFilterStatus] = useState('all')
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [zoomLevel, setZoomLevel] = useState(6)
+  const [mapHeight, setMapHeight] = useState(350)
   const [mapLayer, setMapLayer] = useState('street')
   const [mapInstance, setMapInstance] = useState(null)
   const [showLegend, setShowLegend] = useState(false)
