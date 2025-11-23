@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DefaultAddressesTab from './DefaultAddressesTab'
 import MyAddressesTab from './MyAddressesTab'
 import ShippingTrackingTab from './ShippingTrackingTab'
 import RouteCalculatorTab from './RouteCalculatorTab'
@@ -6,31 +7,32 @@ import PartnersHandlersTab from './PartnersHandlersTab'
 import './Addresses.css'
 
 export default function Addresses({ userId, onClose }) {
-  const [activeTab, setActiveTab] = useState('my-addresses')
+  const [activeTab, setActiveTab] = useState('default')
 
   const tabs = [
     {
+      id: 'default',
+      label: 'Default',
+      component: DefaultAddressesTab
+    },
+    {
       id: 'my-addresses',
       label: 'My Addresses',
-      icon: '📍',
       component: MyAddressesTab
     },
     {
       id: 'shipping-tracking',
       label: 'Shipping & Tracking',
-      icon: '📦',
       component: ShippingTrackingTab
     },
     {
       id: 'route-calculator',
       label: 'Route Calculator',
-      icon: '🛣️',
       component: RouteCalculatorTab
     },
     {
       id: 'partners-handlers',
       label: 'Partners & Handlers',
-      icon: '🏢',
       component: PartnersHandlersTab
     }
   ]
@@ -46,7 +48,6 @@ export default function Addresses({ userId, onClose }) {
             onClick={() => setActiveTab(tab.id)}
             title={tab.label}
           >
-            <span>{tab.icon}</span>
             <span>{tab.label}</span>
           </button>
         ))}
