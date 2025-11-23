@@ -64,6 +64,54 @@ export default function MapControls({
     }
   }
 
+  // Header layout version - wider controls aligned in header
+  if (headerLayout) {
+    return (
+      <div
+        className="map-controls-header"
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+        onMouseDown={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+        }}
+      >
+        <button
+          onClick={(e) => handleCenterPhilippines(e)}
+          className="btn-map-control-header"
+          title="Center map on Philippines"
+        >
+          Show Map Controls
+        </button>
+        <div className="map-layer-controls">
+          <button
+            onClick={(e) => handleLayerChange('street', e)}
+            className={`layer-control-btn ${currentMapLayer === 'street' ? 'active' : ''}`}
+            title="Street view"
+          >
+            Street
+          </button>
+          <button
+            onClick={(e) => handleLayerChange('satellite', e)}
+            className={`layer-control-btn ${currentMapLayer === 'satellite' ? 'active' : ''}`}
+            title="Satellite view"
+          >
+            Satellite
+          </button>
+          <button
+            onClick={(e) => handleLayerChange('terrain', e)}
+            className={`layer-control-btn ${currentMapLayer === 'terrain' ? 'active' : ''}`}
+            title="Terrain view"
+          >
+            Terrain
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   // Compact inline version for search bar - only Philippines button
   if (compact) {
     return (
