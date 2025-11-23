@@ -315,7 +315,7 @@ export default function RouteCalculatorTab({ userId }) {
                         <p className="route-method">{route.method}</p>
                       </div>
                       <div className="route-rating">
-                        <span className="stars">⭐ {route.reliability}</span>
+                        <span className="stars">{route.reliability}</span>
                       </div>
                     </div>
 

@@ -402,7 +402,7 @@ export default function MyAddressesTab({ userId }) {
                           className="btn-history"
                           title="View history"
                         >
-                          📋
+                          ℹ
                         </button>
                       </div>
                     </div>

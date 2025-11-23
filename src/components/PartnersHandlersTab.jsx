@@ -295,7 +295,7 @@ export default function PartnersHandlersTab({ userId }) {
                   <p className="detail-description">{selectedPartner.description}</p>
                   <div className="rating-section">
                     <span className="rating-label">Overall Rating:</span>
-                    <span className="rating-display">⭐ {selectedPartner.rating}</span>
+                    <span className="rating-display">{selectedPartner.rating}</span>
                   </div>
                 </div>
 
