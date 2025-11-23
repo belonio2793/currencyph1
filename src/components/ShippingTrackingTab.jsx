@@ -246,17 +246,15 @@ export default function ShippingTrackingTab({ userId }) {
         <div className="shipping-map-section">
           <div className="map-header">
             <h3>Shipment Routes Map</h3>
-            <div className="map-header-actions">
-              <button
-                onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle"
-                title={showLegend ? 'Hide map controls' : 'Show map controls'}
-              >
-                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-              </button>
-            </div>
           </div>
           <div className="map-container shipping-map">
+            <button
+              onClick={() => setShowLegend(!showLegend)}
+              className="btn-legend-toggle-overlay"
+              title={showLegend ? 'Hide map controls' : 'Show map controls'}
+            >
+              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+            </button>
             <MapContainer
               ref={mapRef}
               center={mapCenter}
