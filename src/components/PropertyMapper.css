@@ -602,6 +602,130 @@
   transform: translateY(-1px);
 }
 
+/* Sidebar Map Controls */
+.sidebar-map-controls-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(248, 250, 252, 0.5);
+  border-radius: 6px;
+  border: 1px dashed #cbd5e1;
+}
+
+.sidebar-philippines-btn {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #334155;
+  border: 2px dashed #94a3b8;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+}
+
+.sidebar-philippines-btn:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #64748b;
+  color: #1e293b;
+}
+
+.sidebar-layer-controls {
+  cursor: pointer;
+  user-select: none;
+}
+
+.controls-summary {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  list-style: none;
+  transition: all 0.2s;
+}
+
+.controls-summary:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #94a3b8;
+}
+
+.controls-summary::marker,
+.controls-summary::-webkit-details-marker {
+  display: none;
+}
+
+.controls-summary::before {
+  content: '▶';
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+details[open] .controls-summary::before {
+  transform: rotate(90deg);
+}
+
+.controls-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.layer-btn-small {
+  padding: 6px 8px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.layer-btn-small:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.layer-btn-small.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.controls-geolocation-btn {
+  width: 100%;
+  padding: 8px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.controls-geolocation-btn:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .mapper-sidebar {
