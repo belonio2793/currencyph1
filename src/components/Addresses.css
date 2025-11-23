@@ -1202,6 +1202,47 @@
   line-height: 1.6;
 }
 
+.tracking-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tracking-history-item {
+  background: #f8fafc;
+  border-left: 3px solid #667eea;
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.history-timestamp {
+  font-size: 12px;
+  font-weight: 700;
+  color: #667eea;
+  margin-bottom: 4px;
+}
+
+.history-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 4px;
+  text-transform: capitalize;
+}
+
+.history-location {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.history-notes {
+  font-size: 12px;
+  color: #475569;
+  font-style: italic;
+  margin-top: 4px;
+}
+
 .form-overlay {
   position: fixed;
   inset: 0;
