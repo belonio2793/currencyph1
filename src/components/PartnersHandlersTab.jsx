@@ -210,7 +210,7 @@ export default function PartnersHandlersTab({ userId }) {
         </div>
 
         {/* Partners Map */}
-        <div className="partners-map-section">
+        <div className="partners-map-section" style={{ height: `${mapHeight}px` }}>
           <div className="map-header">
             <div className="map-header-content">
               <h4>Coverage Map</h4>
