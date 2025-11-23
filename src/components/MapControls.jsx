@@ -7,12 +7,13 @@ const PHILIPPINES_PRESET = {
   zoom: 6
 }
 
-export default function MapControls({ 
-  mapInstance, 
-  onMapLayerChange, 
+export default function MapControls({
+  mapInstance,
+  onMapLayerChange,
   onCenterLocation,
   currentMapLayer = 'street',
-  compact = false
+  compact = false,
+  headerLayout = false
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
 
