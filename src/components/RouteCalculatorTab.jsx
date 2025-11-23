@@ -170,7 +170,7 @@ export default function RouteCalculatorTab({ userId }) {
         </div>
 
         {/* Route Map */}
-        <div className="route-map-section">
+        <div className="route-map-section" style={{ height: `${mapHeight}px` }}>
           <div className="map-header">
             <div className="map-header-content">
               <h4>Route Map</h4>
