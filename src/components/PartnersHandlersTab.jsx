@@ -224,8 +224,29 @@ export default function PartnersHandlersTab({ userId }) {
         {/* Partners Map */}
         <div className="partners-map-section">
           <div className="map-header">
-            <h4>Coverage Map</h4>
-            <p className="map-subtitle">View partner coverage areas across the Philippines</p>
+            <div className="map-header-content">
+              <h4>Coverage Map</h4>
+              <p className="map-subtitle">View partner coverage areas across the Philippines</p>
+            </div>
+            <MapControls
+              mapInstance={mapInstance}
+              onMapLayerChange={setMapLayer}
+              onCenterLocation={(preset) => {
+                if (preset && preset.center && preset.zoom) {
+                  setMapCenter(preset.center)
+                  setZoomLevel(preset.zoom)
+                  if (mapRef.current) {
+                    try {
+                      mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
+                    } catch (error) {
+                      console.error('Error flying to location:', error)
+                    }
+                  }
+                }
+              }}
+              currentMapLayer={mapLayer}
+              headerLayout={true}
+            />
           </div>
           <div className="map-container partners-map">
             <MapContainer
@@ -246,27 +267,6 @@ export default function PartnersHandlersTab({ userId }) {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               />
             </MapContainer>
-
-            {/* Map Controls */}
-            <MapControls
-              mapInstance={mapInstance}
-              onMapLayerChange={setMapLayer}
-              onCenterLocation={(preset) => {
-                if (preset && preset.center && preset.zoom) {
-                  setMapCenter(preset.center)
-                  setZoomLevel(preset.zoom)
-                  if (mapRef.current) {
-                    try {
-                      mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
-                    } catch (error) {
-                      console.error('Error flying to location:', error)
-                    }
-                  }
-                }
-              }}
-              currentMapLayer={mapLayer}
-              compact={false}
-            />
           </div>
         </div>
 
