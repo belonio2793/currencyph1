@@ -258,6 +258,87 @@ details[open] .controls-dropdown-summary::before {
   transform: translateY(-1px);
 }
 
+.btn-reset-map {
+  padding: 10px 16px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  pointer-events: auto;
+  z-index: 101;
+  position: relative;
+}
+
+.btn-reset-map:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.btn-reset-map:active {
+  transform: translateY(0);
+}
+
+.btn-reset-map-compact {
+  padding: 10px 14px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  pointer-events: auto;
+  z-index: 101;
+  position: relative;
+}
+
+.btn-reset-map-compact:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.btn-reset-map-compact:active {
+  transform: translateY(0);
+}
+
+.reset-map-btn {
+  padding: 10px 12px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  white-space: nowrap;
+  user-select: none;
+  width: 100%;
+}
+
+.reset-map-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+  color: #1e293b;
+  transform: translateY(-1px);
+}
+
+.reset-map-btn:active {
+  transform: translateY(0);
+}
+
 /* Full Featured Version */
 .map-controls-full {
   position: absolute;
