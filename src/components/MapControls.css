@@ -1,3 +1,44 @@
+/* Header Layout Version */
+.map-controls-header {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  z-index: 100;
+  position: relative;
+  pointer-events: auto;
+}
+
+.btn-map-control-header {
+  padding: 10px 24px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  pointer-events: auto;
+  z-index: 101;
+  position: relative;
+}
+
+.btn-map-control-header:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #64748b;
+  color: #1e293b;
+}
+
+.map-layer-controls {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
 /* Compact Inline Version */
 .map-controls-compact {
   display: flex;
