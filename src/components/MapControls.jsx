@@ -106,9 +106,9 @@ export default function MapControls({
           setIsExpanded(!isExpanded)
         }}
         className="btn-controls-toggle"
-        title={isExpanded ? 'Hide controls' : 'Show controls'}
+        title={isExpanded ? 'Hide map controls' : 'Show map controls'}
       >
-        ⊞ {isExpanded ? 'Hide' : 'Show'}
+        ⊞ {isExpanded ? 'Hide Map Controls' : 'Show Map Controls'}
       </button>
 
       {isExpanded && (
