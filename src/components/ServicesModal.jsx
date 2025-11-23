@@ -103,7 +103,7 @@ const SERVICES = [
   {
     id: 'package',
     label: 'Package Delivery',
-    icon: '📦',
+    icon: '',
     color: 'from-purple-500 to-purple-600',
     description: 'Deliver packages and parcels',
     category: 'logistics',
