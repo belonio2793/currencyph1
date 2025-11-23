@@ -166,15 +166,6 @@ export default function RouteCalculatorTab({ userId }) {
         {/* Header */}
         <div className="route-calculator-header">
           <h3>Package Details & Route Calculation</h3>
-          <div className="header-actions">
-            <button
-              onClick={() => setShowLegend(!showLegend)}
-              className="btn-legend-toggle"
-              title={showLegend ? 'Hide map controls' : 'Show map controls'}
-            >
-              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-            </button>
-          </div>
         </div>
 
         {/* Route Map */}
