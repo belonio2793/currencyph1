@@ -109,7 +109,7 @@ const SERVICES = [
     category: 'logistics',
     criteria: [
       { label: 'Weight', hint: 'Up to 25kg' },
-      { label: 'Size', icon: '���', hint: 'Standard boxes' },
+      { label: 'Size', hint: 'Standard boxes' },
       { label: 'Fragility', hint: 'Handle with care' }
     ],
     details: {
