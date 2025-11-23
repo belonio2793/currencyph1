@@ -380,6 +380,7 @@ export default function MyAddressesTab({ userId }) {
               zoom={zoomLevel}
               style={{ height: '100%', width: '100%' }}
               ref={mapRef}
+              attributionControl={false}
             >
               <TileLayer
                 attribution='&copy; OpenStreetMap contributors'
