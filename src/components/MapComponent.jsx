@@ -98,14 +98,14 @@ export const createEnhancedMarker = (color, label, status = 'active', size = 40,
  * Create pickup location marker (Green with animated ping)
  */
 export const createPickupMarker = (status = 'active') => {
-  return createEnhancedMarker('#10B981', '📍', status, 40, '#10B981')
+  return createEnhancedMarker('#10B981', '', status, 40, '#10B981')
 }
 
 /**
  * Create destination marker (Red with animated ping)
  */
 export const createDestinationMarker = (status = 'active') => {
-  return createEnhancedMarker('#EF4444', '📌', status, 40, '#EF4444')
+  return createEnhancedMarker('#EF4444', '', status, 40, '#EF4444')
 }
 
 /**
@@ -399,7 +399,7 @@ export default function MapComponent({
                 </svg>
               </div>
               <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1F2937', marginBottom: '8px' }}>
-                📍 Finding Your Location
+                Finding Your Location
               </h3>
               <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', maxWidth: '320px' }}>
                 Please allow location access when prompted to continue
@@ -563,7 +563,7 @@ export default function MapComponent({
             type="pickup"
             onDrag={onPickupDrag}
             icon={createPickupMarker()}
-            label="📍 Pickup Location"
+            label="Pickup Location"
             description="Where you'll be picked up from"
             hovered={hoveredMarker === 'pickup'}
             onHoverChange={(isHovered) => setHoveredMarker(isHovered ? 'pickup' : null)}
