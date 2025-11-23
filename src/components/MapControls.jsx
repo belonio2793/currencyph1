@@ -166,6 +166,13 @@ export default function MapControls({
             Terrain
           </button>
         </div>
+        <button
+          onClick={(e) => handleResetMap(e)}
+          className="btn-reset-map"
+          title="Reset map to default view"
+        >
+          ↺ Reset
+        </button>
       </div>
     )
   }
