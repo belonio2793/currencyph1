@@ -94,6 +94,19 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     setSelectedProperty(property)
   }
 
+  const handleCenterLocation = (preset) => {
+    if (preset && preset.center && preset.zoom) {
+      setMapCenter(preset.center)
+      setZoomLevel(preset.zoom)
+      if (mapRef.current) {
+        try {
+          mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
+        } catch (error) {
+          console.error('Error flying to location:', error)
+        }
+      }
+    }
+  }
 
   const handleDeleteProperty = async () => {
     if (!selectedProperty || !window.confirm('Delete this property?')) return
