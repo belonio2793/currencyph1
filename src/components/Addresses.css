@@ -446,6 +446,7 @@
   flex-direction: column;
   background: #f8fafc;
   overflow: hidden;
+  max-width: 100%;
 }
 
 /* Address Sidebar */
