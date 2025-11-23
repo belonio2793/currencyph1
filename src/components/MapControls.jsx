@@ -17,8 +17,12 @@ export default function MapControls({
   const [isExpanded, setIsExpanded] = useState(false)
 
   const handleCenterPhilippines = () => {
-    if (mapInstance) {
-      mapInstance.flyTo(PHILIPPINES_PRESET.center, PHILIPPINES_PRESET.zoom, { duration: 1 })
+    if (mapInstance && mapInstance.flyTo) {
+      try {
+        mapInstance.flyTo(PHILIPPINES_PRESET.center, PHILIPPINES_PRESET.zoom, { duration: 1 })
+      } catch (error) {
+        console.error('Error flying to Philippines:', error)
+      }
     }
     if (onCenterLocation) {
       onCenterLocation(PHILIPPINES_PRESET)
