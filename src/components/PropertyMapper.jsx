@@ -27,7 +27,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   const [mapInstance, setMapInstance] = useState(null)
   const [mapLayer, setMapLayer] = useState('street')
   const [showLegend, setShowLegend] = useState(false)
-  const [mapWidth, setMapWidth] = useState(50)
+  const [mapWidth, setMapWidth] = useState(70)
 
   // Load properties from database
   useEffect(() => {
