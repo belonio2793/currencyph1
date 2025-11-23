@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import PropertyMapper from './PropertyMapper'
 
 export default function MyAddressesTab({ userId }) {
   const [showForm, setShowForm] = useState(false)
@@ -298,17 +297,9 @@ export default function MyAddressesTab({ userId }) {
 
   return (
     <div className="my-addresses-tab">
-      <div className="my-addresses-layout">
-        <PropertyMapper 
-          key={refreshKey} 
-          userId={userId} 
-          onPropertyAdded={loadAddresses}
-          allowDelete={true}
-          highlightCity={filterCity !== 'all' ? filterCity : null}
-        />
-
-        {/* Address List Sidebar */}
-        <div className="addresses-sidebar">
+      <div className="my-addresses-layout-no-map">
+        {/* Address List */}
+        <div className="addresses-list-full-width">
           <div className="sidebar-header">
             <h3>My Addresses</h3>
             <button
