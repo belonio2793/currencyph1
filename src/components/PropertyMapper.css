@@ -222,6 +222,7 @@
   width: 400px;
   background: white;
   border-left: 1px solid #e2e8f0;
+  border-top: 1px solid #e2e8f0;
   overflow-y: auto;
   flex-shrink: 0;
   display: flex;
