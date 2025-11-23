@@ -175,15 +175,6 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
       <div className="map-section">
         <div className="map-header">
           <h3>Property Map</h3>
-          <div className="map-header-actions">
-            <button
-              onClick={() => setShowLegend(!showLegend)}
-              className="btn-legend-toggle"
-              title={showLegend ? 'Hide map controls' : 'Show map controls'}
-            >
-              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-            </button>
-          </div>
         </div>
 
         {/* Map Search Bar */}
