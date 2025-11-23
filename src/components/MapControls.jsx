@@ -82,6 +82,20 @@ export default function MapControls({
     }
   }
 
+  const handleResetMap = (e) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+    if (mapInstance) {
+      try {
+        mapInstance.flyTo(PHILIPPINES_PRESET.center, PHILIPPINES_PRESET.zoom, { duration: 1 })
+      } catch (error) {
+        console.error('Error resetting map:', error)
+      }
+    }
+  }
+
   const handleLayerChange = (layer, e) => {
     if (e) {
       e.stopPropagation()
