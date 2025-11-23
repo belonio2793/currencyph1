@@ -213,10 +213,6 @@ export default function MyAddressesTab({ userId }) {
     setIsCreatingFromMap(false)
   }
 
-  const handleStartMapCreation = () => {
-    setIsCreatingFromMap(true)
-  }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
