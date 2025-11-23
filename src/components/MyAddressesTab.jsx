@@ -456,7 +456,44 @@ export default function MyAddressesTab({ userId }) {
               >
                 +
               </button>
+              <button
+                onClick={() => setShowLegend(!showLegend)}
+                className="btn-legend-toggle"
+                title={showLegend ? 'Hide legend' : 'Show legend'}
+              >
+                ⊟ {showLegend ? 'Hide' : 'Show'}
+              </button>
             </div>
+          </div>
+
+          {/* Map Search Bar */}
+          <div className="map-search-section">
+            <div className="map-search-input-group">
+              <input
+                type="text"
+                placeholder="🔍 Search location..."
+                value={mapSearchQuery}
+                onChange={(e) => {
+                  setMapSearchQuery(e.target.value)
+                  handleMapSearch(e.target.value)
+                }}
+                className="map-search-input"
+              />
+            </div>
+            {showSearchResults && mapSearchResults.length > 0 && (
+              <div className="map-search-results">
+                {mapSearchResults.map((result, idx) => (
+                  <div
+                    key={idx}
+                    className="search-result-item"
+                    onClick={() => handleSearchResultClick(result)}
+                  >
+                    <span className="result-name">{result.name}</span>
+                    <span className="result-type">{result.type}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           <div className="map-container">
             <MapContainer
