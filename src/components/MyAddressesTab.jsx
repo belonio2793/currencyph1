@@ -466,10 +466,21 @@ export default function MyAddressesTab({ userId }) {
               ref={mapRef}
               attributionControl={false}
             >
-              <TileLayer
-                attribution='&copy; OpenStreetMap contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              {mapLayer === 'street' && (
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+              )}
+              {mapLayer === 'satellite' && (
+                <TileLayer
+                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                />
+              )}
+              {mapLayer === 'terrain' && (
+                <TileLayer
+                  url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
+                />
+              )}
               <MapClickHandler onMapClick={handleMapClick} isCreating={isCreatingFromMap} />
               {addresses.map((address) => (
                 address.addresses_latitude && address.addresses_longitude && (
