@@ -741,6 +741,15 @@ details[open] .controls-summary::before {
   .mapper-sidebar {
     width: 350px;
   }
+
+  .mapper-search-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .mapper-search-input {
+    width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -760,8 +769,17 @@ details[open] .controls-summary::before {
     max-height: 50vh;
   }
 
+  .mapper-search-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
   .mapper-search-input {
-    max-width: 100%;
+    width: 100%;
+  }
+
+  .sidebar-map-controls-section {
+    width: 100%;
   }
 }
 
