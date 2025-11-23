@@ -793,13 +793,6 @@ export default function MyAddressesTab({ userId }) {
                     className="coordinate-input"
                   />
                 </div>
-                <button
-                  onClick={() => setShowForm(true)}
-                  disabled={!formData.addresses_latitude || !formData.addresses_longitude}
-                  className="btn-open-form"
-                >
-                  Edit
-                </button>
               </div>
             </div>
           )}
