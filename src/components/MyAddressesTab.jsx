@@ -482,6 +482,30 @@ export default function MyAddressesTab({ userId }) {
                 />
               )}
               <MapClickHandler onMapClick={handleMapClick} isCreating={isCreatingFromMap} />
+              {currentLocation && (
+                <Marker
+                  position={[currentLocation.latitude, currentLocation.longitude]}
+                  icon={
+                    new L.Icon({
+                      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+                      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                      iconSize: [25, 41],
+                      iconAnchor: [12, 41],
+                      popupAnchor: [1, -34],
+                      shadowSize: [41, 41],
+                      className: 'current-location-marker'
+                    })
+                  }
+                >
+                  <Popup>
+                    <div className="marker-popup">
+                      <p><strong>📍 Your Location</strong></p>
+                      <p>Lat: {currentLocation.latitude.toFixed(4)}</p>
+                      <p>Lon: {currentLocation.longitude.toFixed(4)}</p>
+                    </div>
+                  </Popup>
+                </Marker>
+              )}
               {addresses.map((address) => (
                 address.addresses_latitude && address.addresses_longitude && (
                   <Marker
