@@ -22,6 +22,9 @@
   transition: all 0.3s ease;
   backdrop-filter: blur(4px);
   white-space: nowrap;
+  pointer-events: auto;
+  z-index: 101;
+  position: relative;
 }
 
 .btn-map-control-primary:hover {
