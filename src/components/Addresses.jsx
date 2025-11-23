@@ -22,7 +22,7 @@ export default function Addresses({ userId, onClose }) {
     },
     {
       id: 'shipping-tracking',
-      label: 'Shipping & Tracking',
+      label: 'Shipping',
       component: ShippingTrackingTab
     },
     {
@@ -32,7 +32,7 @@ export default function Addresses({ userId, onClose }) {
     },
     {
       id: 'partners-handlers',
-      label: 'Partners & Handlers',
+      label: 'Shipping Handlers',
       component: PartnersHandlersTab
     }
   ]
