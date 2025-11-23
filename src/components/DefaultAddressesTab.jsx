@@ -10,9 +10,14 @@ export default function DefaultAddressesTab({ userId, onClose }) {
 
   return (
     <div className="default-addresses-tab">
-      <PropertyMapper 
-        key={refreshKey} 
-        userId={userId} 
+      {/* Page Title */}
+      <div className="page-title">
+        <h2>Default</h2>
+      </div>
+
+      <PropertyMapper
+        key={refreshKey}
+        userId={userId}
         onPropertyAdded={handlePropertyAdded}
         allowDelete={true}
       />
