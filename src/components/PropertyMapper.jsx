@@ -239,6 +239,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               <MapControls
                 mapInstance={mapInstance}
                 onMapLayerChange={setMapLayer}
+                onCenterLocation={handleCenterLocation}
                 currentMapLayer={mapLayer}
                 compact={false}
               />
