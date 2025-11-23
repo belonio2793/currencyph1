@@ -164,6 +164,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
             onMapLayerChange={setMapLayer}
             onCenterLocation={handleCenterLocation}
             currentMapLayer={mapLayer}
+            compact={true}
           />
         )}
       </div>
