@@ -18,12 +18,14 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   const [selectedProperty, setSelectedProperty] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [mapCenter] = useState([12.8797, 121.7740])
+  const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [zoomLevel, setZoomLevel] = useState(6)
   const [filteredProperties, setFilteredProperties] = useState([])
   const [propertyCount, setPropertyCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
   const [mapInstance, setMapInstance] = useState(null)
+  const [mapLayer, setMapLayer] = useState('street')
+  const [showLegend, setShowLegend] = useState(false)
 
   // Load properties from database
   useEffect(() => {
