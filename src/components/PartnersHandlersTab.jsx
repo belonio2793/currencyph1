@@ -221,16 +221,16 @@ export default function PartnersHandlersTab({ userId }) {
             <div className="map-overlay-controls">
               <div className="map-resize-controls">
                 <button
-                  onClick={() => setZoomLevel(prev => Math.max(prev - 1, 2))}
+                  onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
                   className="btn-map-resize-overlay"
-                  title="Zoom out"
+                  title="Decrease map size"
                 >
                   −
                 </button>
                 <button
-                  onClick={() => setZoomLevel(prev => Math.min(prev + 1, 18))}
+                  onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
                   className="btn-map-resize-overlay"
-                  title="Zoom in"
+                  title="Increase map size"
                 >
                   +
                 </button>
