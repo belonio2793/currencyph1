@@ -436,6 +436,11 @@ export default function MyAddressesTab({ userId }) {
 
   return (
     <div className="my-addresses-tab">
+      {/* Page Title */}
+      <div className="page-title">
+        <h2>My Addresses</h2>
+      </div>
+
       <div className="my-addresses-layout">
         {/* Map Section */}
         <div className="map-section" style={{ flex: `0 0 ${mapHeight}px` }}>
