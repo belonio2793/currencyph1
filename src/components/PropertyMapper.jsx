@@ -171,6 +171,11 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
   return (
     <div className="property-mapper-container">
+      {/* Page Title */}
+      <div className="page-title">
+        <h2>Default</h2>
+      </div>
+
       {/* Map Section */}
       <div className="map-section">
         <div className="map-header">
