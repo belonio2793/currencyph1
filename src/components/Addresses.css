@@ -565,6 +565,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr auto;
   gap: 8px;
+  align-items: flex-end;
 }
 
 .coordinate-inputs .form-group {
