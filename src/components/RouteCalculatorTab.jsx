@@ -1,6 +1,18 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import { MapContainer, TileLayer } from 'react-leaflet'
+import L from 'leaflet'
+import MapControls from './MapControls'
+import './RouteCalculatorTab.css'
+
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+})
 
 export default function RouteCalculatorTab({ userId }) {
+  const mapRef = useRef(null)
   const [formData, setFormData] = useState({
     packageWeight: '',
     packageLength: '',
@@ -15,6 +27,10 @@ export default function RouteCalculatorTab({ userId }) {
   const [routes, setRoutes] = useState([])
   const [showResults, setShowResults] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
+  const [zoomLevel, setZoomLevel] = useState(6)
+  const [mapLayer, setMapLayer] = useState('street')
+  const [mapInstance, setMapInstance] = useState(null)
 
   const packageTypes = [
     { value: 'general', label: 'General Cargo' },
