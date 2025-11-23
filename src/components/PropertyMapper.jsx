@@ -158,32 +158,42 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               />
               
               {/* Render property markers */}
-              {filteredProperties.map(property => (
-                <Marker
-                  key={property.id}
-                  position={[
-                    parseFloat(property.addresses_latitude),
-                    parseFloat(property.addresses_longitude)
-                  ]}
-                  icon={L.icon({
-                    iconUrl: `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${getZoningColor(property.zoning_classification)}"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>`)}`,
-                    iconSize: [25, 25],
-                    iconAnchor: [12, 25],
-                    popupAnchor: [0, -25]
-                  })}
-                  eventHandlers={{
-                    click: () => handleMarkerClick(property)
-                  }}
-                >
-                  <Popup>
-                    <div className="marker-popup">
-                      <h4>{property.addresses_street_name}</h4>
-                      <p>{property.addresses_city}</p>
-                      <button onClick={() => handlePropertyClick(property)}>View Details</button>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
+              {filteredProperties.map(property => {
+                const isHighlighted = highlightCity && property.addresses_city === highlightCity
+                const markerColor = getMarkerColor(property)
+                const markerSize = isHighlighted ? 35 : 25
+
+                return (
+                  <Marker
+                    key={property.id}
+                    position={[
+                      parseFloat(property.addresses_latitude),
+                      parseFloat(property.addresses_longitude)
+                    ]}
+                    icon={L.icon({
+                      iconUrl: `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${markerColor}" opacity="${isHighlighted ? 1 : 0.7}"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>`)}`,
+                      iconSize: [markerSize, markerSize],
+                      iconAnchor: [markerSize / 2, markerSize],
+                      popupAnchor: [0, -markerSize],
+                      className: isHighlighted ? 'highlighted-marker' : ''
+                    })}
+                    eventHandlers={{
+                      click: () => handleMarkerClick(property)
+                    }}
+                  >
+                    <Popup>
+                      <div className="marker-popup">
+                        <h4>{property.addresses_street_name}</h4>
+                        <p>{property.addresses_city}</p>
+                        {property.address_nickname && (
+                          <p className="marker-nickname"><strong>Nickname:</strong> {property.address_nickname}</p>
+                        )}
+                        <button onClick={() => handlePropertyClick(property)}>View Details</button>
+                      </div>
+                    </Popup>
+                  </Marker>
+                )
+              })}
             </MapContainer>
           )}
         </div>
