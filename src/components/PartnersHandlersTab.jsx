@@ -195,12 +195,16 @@ export default function PartnersHandlersTab({ userId }) {
 
   return (
     <div className="partners-handlers-tab">
+      {/* Page Title */}
+      <div className="page-title">
+        <h2>Shipping Handlers</h2>
+      </div>
+
       <div className="partners-container">
         {/* Header */}
         <div className="partners-header">
           <div className="header-content">
-            <h3>Shipping Partners & Handlers</h3>
-            <p className="header-subtitle">Browse and manage available couriers and logistics providers</p>
+            <h3>Partner Details</h3>
           </div>
           <div className="header-actions">
             <button
