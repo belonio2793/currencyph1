@@ -244,6 +244,34 @@ export default function ShippingTrackingTab({ userId }) {
           </div>
         )}
 
+        {/* Map View */}
+        <div className="shipping-map-section">
+          <div className="map-header">
+            <h4>Shipment Routes Map</h4>
+            <p className="map-subtitle">View shipment routes across the Philippines</p>
+          </div>
+          <div className="map-container shipping-map">
+            <MapContainer
+              ref={mapRef}
+              center={mapCenter}
+              zoom={zoomLevel}
+              className="leaflet-container-shipping"
+              whenCreated={setMapInstance}
+            >
+              <TileLayer
+                url={
+                  mapLayer === 'satellite'
+                    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                    : mapLayer === 'terrain'
+                    ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                }
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              />
+            </MapContainer>
+          </div>
+        </div>
+
         {/* Shipments List */}
         <div className="shipments-list">
           {loading ? (
