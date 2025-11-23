@@ -1,7 +1,19 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import L from 'leaflet'
+import MapControls from './MapControls'
+import './ShippingTrackingTab.css'
+
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+})
 
 export default function ShippingTrackingTab({ userId }) {
+  const mapRef = useRef(null)
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(null)
   const [trackingHistory, setTrackingHistory] = useState([])
@@ -10,6 +22,10 @@ export default function ShippingTrackingTab({ userId }) {
   const [error, setError] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [filterStatus, setFilterStatus] = useState('all')
+  const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
+  const [zoomLevel, setZoomLevel] = useState(6)
+  const [mapLayer, setMapLayer] = useState('street')
+  const [mapInstance, setMapInstance] = useState(null)
 
   const [formData, setFormData] = useState({
     tracking_number: '',
