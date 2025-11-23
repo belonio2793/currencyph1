@@ -94,11 +94,6 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     setSelectedProperty(property)
   }
 
-  const handleCenterPhilippines = () => {
-    if (mapInstance) {
-      mapInstance.flyTo([12.8797, 121.7740], 6, { duration: 1 })
-    }
-  }
 
   const handleDeleteProperty = async () => {
     if (!selectedProperty || !window.confirm('Delete this property?')) return
