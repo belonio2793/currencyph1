@@ -696,7 +696,7 @@ export default function EditJobModal({
               }}>
                 <div style={{ flex: 1 }}>
                   <p style={{ margin: '0 0 8px 0', color: '#0ea5e9', fontWeight: '600', fontSize: '0.95rem' }}>
-                    📋 Currently Linked Business
+                    Currently Linked Business
                   </p>
                   <p style={{ margin: '4px 0', color: '#333', fontSize: '0.9rem' }}>
                     <strong>Business:</strong> {associatedBusiness.business_name}

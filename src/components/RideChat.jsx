@@ -223,7 +223,7 @@ export default function RideChat({ rideId, userId, otherUserName, onClose }) {
             onClick={sendLocationShare}
             className="flex-1 px-3 py-2 bg-slate-100 text-slate-900 rounded-lg hover:bg-slate-200 text-sm font-medium"
           >
-            📍 Share Location
+            Share Location
           </button>
         </div>
         <div className="flex gap-2">

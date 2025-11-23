@@ -125,7 +125,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
                 </svg>
               </div>
               <div>
-                <p className="text-sm font-bold text-slate-900">📍 Auto-Detected Location</p>
+                <p className="text-sm font-bold text-slate-900">Auto-Detected Location</p>
                 <p className="text-lg font-bold text-blue-700">{detectedCity.name}</p>
                 <p className="text-xs text-slate-600">{detectedCity.region}</p>
               </div>
@@ -288,7 +288,7 @@ export default function RideScanNearby({ userId, onSelectDriver, onSelectRider, 
       {/* Empty State */}
       {selectedCity && drivers.length === 0 && riders.length === 0 && !loading && (
         <div className="bg-slate-50 rounded-lg p-12 text-center border-2 border-dashed border-slate-300">
-          <p className="text-slate-600 text-lg mb-2">📍 No users nearby</p>
+          <p className="text-slate-600 text-lg mb-2">No users nearby</p>
           <p className="text-slate-500 text-sm mb-4">Try increasing the scan radius or selecting another city</p>
           <button
             onClick={() => setScanRadius(Math.min(scanRadius + 10, 100))}
