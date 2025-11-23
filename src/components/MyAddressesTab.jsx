@@ -861,16 +861,47 @@ export default function MyAddressesTab({ userId }) {
 
             <div className="filter-group">
               <label className="filter-label">Filter by City</label>
-              <select
-                value={filterCity}
-                onChange={(e) => setFilterCity(e.target.value)}
-                className="filter-select"
-              >
-                <option value="all">All Cities</option>
-                {cities.filter(city => !filterRegion || addresses.find(a => a.addresses_city === city && a.addresses_region === filterRegion)).map(city => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
+              <div className="city-search-dropdown">
+                <input
+                  type="text"
+                  placeholder="Search cities..."
+                  value={citiesSearchQuery}
+                  onChange={(e) => setCitiesSearchQuery(e.target.value)}
+                  onFocus={() => setCitiesSearchOpen(true)}
+                  className="city-search-input"
+                />
+                {citiesSearchOpen && (
+                  <div className="city-dropdown-list">
+                    <div
+                      className="city-option"
+                      onClick={() => {
+                        setFilterCity('all')
+                        setCitiesSearchQuery('')
+                        setCitiesSearchOpen(false)
+                      }}
+                    >
+                      All Cities
+                    </div>
+                    {allCities
+                      .filter(city =>
+                        city.toLowerCase().includes(citiesSearchQuery.toLowerCase())
+                      )
+                      .map(city => (
+                        <div
+                          key={city}
+                          className={`city-option ${filterCity === city ? 'active' : ''}`}
+                          onClick={() => {
+                            setFilterCity(city)
+                            setCitiesSearchQuery(city)
+                            setCitiesSearchOpen(false)
+                          }}
+                        >
+                          {city}
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
