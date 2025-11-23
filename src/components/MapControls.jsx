@@ -63,7 +63,7 @@ export default function MapControls({
     }
   }
 
-  // Compact inline version for search bar
+  // Compact inline version for search bar - only Philippines button
   if (compact) {
     return (
       <div className="map-controls-compact">
@@ -74,40 +74,6 @@ export default function MapControls({
         >
           Philippines
         </button>
-
-        <details className="map-controls-dropdown">
-          <summary className="controls-dropdown-summary">Map Layers</summary>
-          <div className="controls-dropdown-content">
-            <button
-              onClick={(e) => handleLayerChange('street', e)}
-              className={`layer-control-btn ${currentMapLayer === 'street' ? 'active' : ''}`}
-              title="Street view"
-            >
-              Street
-            </button>
-            <button
-              onClick={(e) => handleLayerChange('satellite', e)}
-              className={`layer-control-btn ${currentMapLayer === 'satellite' ? 'active' : ''}`}
-              title="Satellite view"
-            >
-              Satellite
-            </button>
-            <button
-              onClick={(e) => handleLayerChange('terrain', e)}
-              className={`layer-control-btn ${currentMapLayer === 'terrain' ? 'active' : ''}`}
-              title="Terrain view"
-            >
-              Terrain
-            </button>
-            <button
-              onClick={(e) => handleGetLocation(e)}
-              className="location-control-btn"
-              title="Get your current location"
-            >
-              My Location
-            </button>
-          </div>
-        </details>
       </div>
     )
   }
