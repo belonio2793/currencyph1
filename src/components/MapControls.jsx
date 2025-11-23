@@ -113,6 +113,22 @@ export default function MapControls({
         >
           Show Map Controls
         </button>
+        <div className="map-zoom-controls">
+          <button
+            onClick={(e) => handleZoomOut(e)}
+            className="btn-zoom-control"
+            title="Zoom out"
+          >
+            −
+          </button>
+          <button
+            onClick={(e) => handleZoomIn(e)}
+            className="btn-zoom-control"
+            title="Zoom in"
+          >
+            +
+          </button>
+        </div>
         <div className="map-layer-controls">
           <button
             onClick={(e) => handleLayerChange('street', e)}
