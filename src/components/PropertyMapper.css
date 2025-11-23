@@ -889,9 +889,16 @@ details[open] .controls-summary::before {
 }
 
 /* Responsive Design */
+@media (max-width: 1440px) {
+  .mapper-sidebar {
+    max-width: 450px;
+  }
+}
+
 @media (max-width: 1024px) {
   .mapper-sidebar {
-    width: 350px;
+    max-width: 400px;
+    min-width: 280px;
   }
 
   .mapper-search-bar {
@@ -905,17 +912,20 @@ details[open] .controls-summary::before {
 }
 
 @media (max-width: 768px) {
-  .mapper-main {
+  .property-mapper-container {
     flex-direction: column;
   }
 
-  .mapper-map-area {
+  .map-section {
     flex: 1;
     min-height: 50vh;
+    min-width: 0;
   }
 
   .mapper-sidebar {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
     border-left: none;
     border-top: 1px solid #e2e8f0;
     max-height: 50vh;
@@ -942,6 +952,7 @@ details[open] .controls-summary::before {
 
   .mapper-sidebar {
     max-height: 45vh;
+    min-width: 0;
   }
 
   .panel-header h3 {
