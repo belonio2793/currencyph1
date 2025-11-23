@@ -335,6 +335,17 @@ export default function MapControls({
                 My Location
               </button>
             </div>
+
+            {/* Reset Map */}
+            <div className="control-section">
+              <button
+                onClick={(e) => handleResetMap(e)}
+                className="reset-map-btn"
+                title="Reset map to default view"
+              >
+                ↺ Reset Map
+              </button>
+            </div>
           </div>
         </div>
       )}
