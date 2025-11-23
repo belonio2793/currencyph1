@@ -7,7 +7,7 @@
   flex-direction: column;
 }
 
-/* Page Title */
+/* Page Title - Consistent across all tabs */
 .page-title {
   padding: 16px 24px;
   background: white;
@@ -20,6 +20,7 @@
   font-weight: 700;
   color: #0f172a;
   margin: 0;
+  line-height: 1.2;
 }
 
 /* Tab Navigation */
