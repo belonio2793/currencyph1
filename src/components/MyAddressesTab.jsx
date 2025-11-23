@@ -62,6 +62,15 @@ export default function MyAddressesTab({ userId }) {
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [zoomLevel, setZoomLevel] = useState(6)
   const [mapHeight, setMapHeight] = useState(400)
+  const [mapLayer, setMapLayer] = useState('street')
+  const [showLegend, setShowLegend] = useState(true)
+  const [currentLocation, setCurrentLocation] = useState(null)
+  const [mapSearchQuery, setMapSearchQuery] = useState('')
+  const [mapSearchResults, setMapSearchResults] = useState([])
+  const [showSearchResults, setShowSearchResults] = useState(false)
+  const [magneticSnap, setMagneticSnap] = useState(true)
+  const [showStreetView, setShowStreetView] = useState(false)
+  const [selectedMapillaryLocation, setSelectedMapillaryLocation] = useState(null)
 
   const [formData, setFormData] = useState({
     addresses_address: '',
