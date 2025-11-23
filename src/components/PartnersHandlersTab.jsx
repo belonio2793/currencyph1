@@ -241,7 +241,7 @@ export default function PartnersHandlersTab({ userId }) {
                     </span>
                   </div>
                   <div className="partner-rating">
-                    <span className="rating-value">⭐ {partner.rating}</span>
+                    <span className="rating-value">{partner.rating}</span>
                   </div>
                 </div>
 
@@ -259,8 +259,8 @@ export default function PartnersHandlersTab({ userId }) {
                 </div>
 
                 <div className="partner-features">
-                  {partner.tracking && <span className="feature-badge">📍 Tracking</span>}
-                  {partner.insurance && <span className="feature-badge">🛡️ Insurance</span>}
+                  {partner.tracking && <span className="feature-badge">Tracking</span>}
+                  {partner.insurance && <span className="feature-badge">Insurance</span>}
                 </div>
               </div>
             ))
