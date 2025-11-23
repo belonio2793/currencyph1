@@ -217,32 +217,32 @@ export default function PartnersHandlersTab({ userId }) {
               <p className="map-subtitle">View partner coverage areas across the Philippines</p>
             </div>
           </div>
-          <div className="map-container partners-map">
-            <div className="map-overlay-controls">
-              <div className="map-resize-controls">
-                <button
-                  onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
-                  className="btn-map-resize-overlay"
-                  title="Decrease map size"
-                >
-                  −
-                </button>
-                <button
-                  onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
-                  className="btn-map-resize-overlay"
-                  title="Increase map size"
-                >
-                  +
-                </button>
-              </div>
+          <div className="map-controls-toolbar">
+            <div className="map-resize-controls">
               <button
-                onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle-overlay"
-                title={showLegend ? 'Hide map controls' : 'Show map controls'}
+                onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
+                className="btn-map-resize-overlay"
+                title="Decrease map size"
               >
-                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+                −
+              </button>
+              <button
+                onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
+                className="btn-map-resize-overlay"
+                title="Increase map size"
+              >
+                +
               </button>
             </div>
+            <button
+              onClick={() => setShowLegend(!showLegend)}
+              className="btn-legend-toggle-overlay"
+              title={showLegend ? 'Hide map controls' : 'Show map controls'}
+            >
+              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+            </button>
+          </div>
+          <div className="map-container partners-map">
             <MapContainer
               ref={mapRef}
               center={mapCenter}
