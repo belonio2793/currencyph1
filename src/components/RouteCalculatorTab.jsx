@@ -160,6 +160,41 @@ export default function RouteCalculatorTab({ userId }) {
         {/* Header */}
         <div className="route-calculator-header">
           <h3>Package Details & Route Calculation</h3>
+          {/* Map Controls */}
+          <MapControls
+            mapInstance={mapInstance}
+            onMapLayerChange={setMapLayer}
+            currentMapLayer={mapLayer}
+            compact={true}
+          />
+        </div>
+
+        {/* Route Map */}
+        <div className="route-map-section">
+          <div className="map-header">
+            <h4>Route Map</h4>
+            <p className="map-subtitle">Visualize shipping routes across the Philippines</p>
+          </div>
+          <div className="map-container route-map">
+            <MapContainer
+              ref={mapRef}
+              center={mapCenter}
+              zoom={zoomLevel}
+              className="leaflet-container-route"
+              whenCreated={setMapInstance}
+            >
+              <TileLayer
+                url={
+                  mapLayer === 'satellite'
+                    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                    : mapLayer === 'terrain'
+                    ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                }
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              />
+            </MapContainer>
+          </div>
         </div>
 
         {/* Calculator Form */}
