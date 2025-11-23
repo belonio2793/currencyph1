@@ -255,6 +255,7 @@ export default function PartnersHandlersTab({ userId }) {
               center={mapCenter}
               zoom={zoomLevel}
               className="leaflet-container-partners"
+              style={{ height: '100%', width: '100%' }}
               whenCreated={setMapInstance}
             >
               <TileLayer
