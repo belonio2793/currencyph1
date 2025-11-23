@@ -1,3 +1,47 @@
+/* Zoom Controls - Header Layout */
+.map-zoom-controls {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  z-index: 100;
+  position: relative;
+  pointer-events: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px;
+}
+
+.btn-zoom-control {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: transparent;
+  color: #334155;
+  border: none;
+  border-radius: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  pointer-events: auto;
+  z-index: 101;
+  position: relative;
+}
+
+.btn-zoom-control:hover {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+}
+
+.btn-zoom-control:active {
+  transform: scale(0.95);
+}
+
 /* Header Layout Version */
 .map-controls-header {
   display: flex;
