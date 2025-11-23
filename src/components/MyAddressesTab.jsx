@@ -461,7 +461,7 @@ export default function MyAddressesTab({ userId }) {
                 className="btn-legend-toggle"
                 title={showLegend ? 'Hide legend' : 'Show legend'}
               >
-                ⊟ {showLegend ? 'Hide' : 'Show'}
+                {showLegend ? 'Hide' : 'Show'}
               </button>
             </div>
           </div>
@@ -597,6 +597,20 @@ export default function MyAddressesTab({ userId }) {
               </div>
 
               <div className="legend-content">
+                {/* Default Location */}
+                <div className="legend-section">
+                  <button
+                    onClick={() => {
+                      setMapCenter([12.8797, 121.7740])
+                      setZoomLevel(6)
+                    }}
+                    className="btn-default-location"
+                    title="Focus on Philippines"
+                  >
+                    Philippines
+                  </button>
+                </div>
+
                 {/* Layer Selection */}
                 <div className="legend-section">
                   <label className="legend-label">Map Layer</label>
@@ -606,21 +620,21 @@ export default function MyAddressesTab({ userId }) {
                       className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
                       title="Street view"
                     >
-                      🗺️ Street
+                      Street
                     </button>
                     <button
                       onClick={() => setMapLayer('satellite')}
                       className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
                       title="Satellite view"
                     >
-                      🛰️ Satellite
+                      Satellite
                     </button>
                     <button
                       onClick={() => setMapLayer('terrain')}
                       className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
                       title="Terrain view"
                     >
-                      ⛰️ Terrain
+                      Terrain
                     </button>
                   </div>
                 </div>
@@ -632,7 +646,7 @@ export default function MyAddressesTab({ userId }) {
                     className="btn-geolocation"
                     title="Get your current location"
                   >
-                    📍 My Location
+                    My Location
                   </button>
                 </div>
 
@@ -729,6 +743,7 @@ export default function MyAddressesTab({ userId }) {
                   onClick={() => setShowForm(true)}
                   disabled={!formData.addresses_latitude || !formData.addresses_longitude}
                   className="btn-open-form"
+                  style={{ alignSelf: 'flex-end' }}
                 >
                   Edit
                 </button>
