@@ -82,7 +82,7 @@ export default function MyAddressesTab({ userId }) {
     "Borongan", "Butuan", "Cabadbaran", "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calamba",
     "Calapan", "Calbayog", "Caloocan", "Camiling", "Canlaon", "Caoayan", "Capiz", "Caraga", "Carmona",
     "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City", "Dagupan", "Danao", "Dapitan",
-    "Daraga", "Dasmariñas", "Davao City", "Davao del Norte", "Davao del Sur", "Davao Oriental", "Dipolog",
+    "Daraga", "Dasmari��as", "Davao City", "Davao del Norte", "Davao del Sur", "Davao Oriental", "Dipolog",
     "Dumaguete", "General Santos", "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan",
     "Iloilo City", "Imus", "Isabela", "Isulan", "Kabankalan", "Kidapawan", "Koronadal", "La Carlota", "Laoag",
     "Lapu-Lapu", "Las Piñas", "Laoang", "Legazpi", "Ligao", "Limay", "Lucena", "Maasin", "Mabalacat",
@@ -875,7 +875,7 @@ export default function MyAddressesTab({ userId }) {
 
             <div className="filter-group">
               <label className="filter-label">Filter by City</label>
-              <div className="city-search-dropdown">
+              <div className="city-search-dropdown" ref={citiesDropdownRef}>
                 <input
                   type="text"
                   placeholder="Search cities..."
