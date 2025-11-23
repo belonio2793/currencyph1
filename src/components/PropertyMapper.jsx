@@ -235,15 +235,13 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
           {/* Map Controls */}
           {!loading && (
-            <div className="mapper-map-controls">
-              <MapControls
-                mapInstance={mapInstance}
-                onMapLayerChange={setMapLayer}
-                onCenterLocation={handleCenterLocation}
-                currentMapLayer={mapLayer}
-                compact={false}
-              />
-            </div>
+            <MapControls
+              mapInstance={mapInstance}
+              onMapLayerChange={setMapLayer}
+              onCenterLocation={handleCenterLocation}
+              currentMapLayer={mapLayer}
+              compact={false}
+            />
           )}
         </div>
 
