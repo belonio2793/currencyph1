@@ -116,7 +116,11 @@ export default function MapControls({
   return (
     <div className="map-controls-full">
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          setIsExpanded(!isExpanded)
+        }}
         className="btn-controls-toggle"
         title={isExpanded ? 'Hide controls' : 'Show controls'}
       >
@@ -128,7 +132,11 @@ export default function MapControls({
           <div className="controls-panel-header">
             <h4>Map Controls</h4>
             <button
-              onClick={() => setIsExpanded(false)}
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                setIsExpanded(false)
+              }}
               className="controls-panel-close"
             >
               ✕
@@ -139,7 +147,7 @@ export default function MapControls({
             {/* Philippines Button */}
             <div className="control-section">
               <button
-                onClick={handleCenterPhilippines}
+                onClick={(e) => handleCenterPhilippines(e)}
                 className="btn-map-control-primary"
                 title="Center map on Philippines"
               >
@@ -152,21 +160,21 @@ export default function MapControls({
               <label className="control-label">Map Layer</label>
               <div className="layer-buttons-group">
                 <button
-                  onClick={() => handleLayerChange('street')}
+                  onClick={(e) => handleLayerChange('street', e)}
                   className={`layer-control-btn ${currentMapLayer === 'street' ? 'active' : ''}`}
                   title="Street view"
                 >
                   Street
                 </button>
                 <button
-                  onClick={() => handleLayerChange('satellite')}
+                  onClick={(e) => handleLayerChange('satellite', e)}
                   className={`layer-control-btn ${currentMapLayer === 'satellite' ? 'active' : ''}`}
                   title="Satellite view"
                 >
                   Satellite
                 </button>
                 <button
-                  onClick={() => handleLayerChange('terrain')}
+                  onClick={(e) => handleLayerChange('terrain', e)}
                   className={`layer-control-btn ${currentMapLayer === 'terrain' ? 'active' : ''}`}
                   title="Terrain view"
                 >
@@ -178,7 +186,7 @@ export default function MapControls({
             {/* Geolocation */}
             <div className="control-section">
               <button
-                onClick={handleGetLocation}
+                onClick={(e) => handleGetLocation(e)}
                 className="location-control-btn"
                 title="Get your current location"
               >
