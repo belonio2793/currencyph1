@@ -195,6 +195,11 @@ export default function ShippingTrackingTab({ userId }) {
 
   return (
     <div className="shipping-tracking-tab">
+      {/* Page Title */}
+      <div className="page-title">
+        <h2>Shipping</h2>
+      </div>
+
       <div className="shipping-container">
         {/* Header with Search and Filter */}
         <div className="shipping-header">
