@@ -237,7 +237,7 @@ const SERVICES = [
   {
     id: 'food',
     label: 'Food Pickup',
-    icon: '🍔',
+    icon: '',
     color: 'from-orange-500 to-orange-600',
     description: 'Delivery of food orders',
     category: 'food',
