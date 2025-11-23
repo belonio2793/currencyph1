@@ -1505,6 +1505,9 @@
   margin: 20px;
   overflow: hidden;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
 }
 
 .routes-grid {
