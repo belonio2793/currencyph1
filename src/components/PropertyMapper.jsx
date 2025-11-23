@@ -23,6 +23,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   const [filteredProperties, setFilteredProperties] = useState([])
   const [propertyCount, setPropertyCount] = useState(0)
   const [searchQuery, setSearchQuery] = useState('')
+  const [mapInstance, setMapInstance] = useState(null)
 
   // Load properties from database
   useEffect(() => {
