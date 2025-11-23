@@ -2770,3 +2770,82 @@
     width: 100%;
   }
 }
+
+/* City Search Dropdown */
+.city-search-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.city-search-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  background: white;
+  cursor: text;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.city-search-input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+}
+
+.city-dropdown-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.city-option {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer;
+  font-size: 12px;
+  color: #334155;
+  transition: background-color 0.2s;
+}
+
+.city-option:last-child {
+  border-bottom: none;
+}
+
+.city-option:hover {
+  background: #f0f4ff;
+  color: #667eea;
+}
+
+.city-option.active {
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+}
+
+/* Scrollbar styling for city dropdown */
+.city-dropdown-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.city-dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.city-dropdown-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.city-dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
