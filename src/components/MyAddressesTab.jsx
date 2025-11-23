@@ -367,13 +367,22 @@ export default function MyAddressesTab({ userId }) {
         <div className="map-section">
           <div className="map-header">
             <h3>Address Map</h3>
-            <button
-              onClick={handleStartMapCreation}
-              className={`btn-map-action ${isCreatingFromMap ? 'active' : ''}`}
-              title={isCreatingFromMap ? 'Click on map to place marker' : 'Click to add address by map'}
-            >
-              {isCreatingFromMap ? '📍 Click on map' : '+ Map'}
-            </button>
+            <div className="map-header-actions">
+              <button
+                onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
+                className="btn-map-resize"
+                title="Decrease map size"
+              >
+                −
+              </button>
+              <button
+                onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
+                className="btn-map-resize"
+                title="Increase map size"
+              >
+                +
+              </button>
+            </div>
           </div>
           <div className="map-container">
             <MapContainer
