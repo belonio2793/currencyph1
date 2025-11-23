@@ -1503,11 +1503,10 @@
   background: white;
   border-radius: 8px;
   margin: 20px;
-  overflow: hidden;
+  overflow: auto;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  max-height: 600px;
 }
 
 .routes-grid {
@@ -1515,6 +1514,7 @@
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
   padding: 24px;
+  overflow-y: auto;
 }
 
 .no-results {
