@@ -58,7 +58,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     }
   }, [searchQuery, properties])
 
-  const loadProperties = async () => {
+  const loadProperties = async (retryCount = 0) => {
     try {
       setLoading(true)
       const { data, error: fetchError, count } = await supabase
@@ -68,14 +68,38 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
         .not('addresses_latitude', 'is', null)
         .not('addresses_longitude', 'is', null)
 
-      if (fetchError) throw fetchError
+      if (fetchError) {
+        const errorMsg = fetchError?.message || JSON.stringify(fetchError)
+        console.error('Supabase error:', errorMsg)
+        throw fetchError
+      }
       setProperties(data || [])
       setPropertyCount(count || data?.length || 0)
+      setError('')
     } catch (err) {
-      console.error('Error loading properties:', err)
-      setError('Failed to load properties')
+      console.error('Error loading properties (attempt ' + (retryCount + 1) + '):', err)
+
+      // Check if it's a network error (Failed to fetch)
+      const isNetworkError = err?.message?.includes('fetch') || err instanceof TypeError
+
+      if (isNetworkError && retryCount < 2) {
+        // Retry after delay for network errors
+        setTimeout(() => {
+          console.log('Retrying property load...')
+          loadProperties(retryCount + 1)
+        }, 2000 * (retryCount + 1))
+      } else {
+        // Set user-friendly error message
+        if (isNetworkError) {
+          setError('Unable to connect to the server. Please check your connection and refresh the page.')
+        } else {
+          setError('Failed to load properties')
+        }
+      }
     } finally {
-      setLoading(false)
+      if (retryCount === 0) {
+        setLoading(false)
+      }
     }
   }
 
