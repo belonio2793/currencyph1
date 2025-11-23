@@ -216,6 +216,7 @@ export default function RouteCalculatorTab({ userId }) {
               center={mapCenter}
               zoom={zoomLevel}
               className="leaflet-container-route"
+              style={{ height: '100%', width: '100%' }}
               whenCreated={setMapInstance}
             >
               <TileLayer
