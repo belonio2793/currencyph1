@@ -141,9 +141,13 @@ export default function RouteCalculatorTab({ userId }) {
   return (
     <div className="route-calculator-tab">
       <div className="route-calculator-container">
+        {/* Header */}
+        <div className="route-calculator-header">
+          <h3>Package Details & Route Calculation</h3>
+        </div>
+
         {/* Calculator Form */}
         <div className="calculator-form-section">
-          <h3 className="section-title">Package Details & Route Calculation</h3>
 
           <form onSubmit={calculateRoutes} className="calculator-form">
             {/* Package Type */}
@@ -289,7 +293,9 @@ export default function RouteCalculatorTab({ userId }) {
         {/* Results Section */}
         {showResults && (
           <div className="calculator-results-section">
-            <h3 className="section-title">Available Routes & Partners</h3>
+            <div className="calculator-results-header">
+              <h3>Available Routes & Partners</h3>
+            </div>
 
             {routes.length === 0 ? (
               <div className="no-results">
