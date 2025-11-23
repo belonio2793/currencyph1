@@ -770,23 +770,22 @@
 }
 
 .sidebar-philippines-btn {
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.85);
-  color: #334155;
-  border: 2px dashed #94a3b8;
+  padding: 10px 16px;
+  background: #667eea;
+  color: white;
+  border: none;
   border-radius: 6px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
   white-space: nowrap;
 }
 
 .sidebar-philippines-btn:hover {
-  background: rgba(255, 255, 255, 0.95);
-  border-color: #64748b;
-  color: #1e293b;
+  background: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
 }
 
 .sidebar-layer-controls {
