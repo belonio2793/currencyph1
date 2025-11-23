@@ -1,0 +1,253 @@
+/* Compact Inline Version */
+.map-controls-compact {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+.btn-map-control-primary {
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #334155;
+  border: 2px dashed #94a3b8;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.btn-map-control-primary:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #64748b;
+  color: #1e293b;
+}
+
+/* Dropdown Controls */
+.map-controls-dropdown {
+  cursor: pointer;
+  user-select: none;
+  flex: 0 1 auto;
+}
+
+.controls-dropdown-summary {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #334155;
+  list-style: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.controls-dropdown-summary:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #94a3b8;
+}
+
+.controls-dropdown-summary::marker,
+.controls-dropdown-summary::-webkit-details-marker {
+  display: none;
+}
+
+.controls-dropdown-summary::before {
+  content: '▼';
+  display: inline-block;
+  margin-right: 6px;
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+details[open] .controls-dropdown-summary::before {
+  transform: rotate(180deg);
+}
+
+.controls-dropdown-content {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  margin-left: 8px;
+  flex-wrap: wrap;
+}
+
+.layer-control-btn {
+  padding: 6px 8px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.layer-control-btn:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.layer-control-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.location-control-btn {
+  padding: 6px 8px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.location-control-btn:hover {
+  background: #5568d3;
+  transform: translateY(-1px);
+}
+
+/* Full Featured Version */
+.map-controls-full {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 500;
+}
+
+.btn-controls-toggle {
+  display: block;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+
+.btn-controls-toggle:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #94a3b8;
+}
+
+.map-controls-panel {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 12px;
+  max-width: 250px;
+  backdrop-filter: blur(4px);
+}
+
+.controls-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.controls-panel-header h4 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.controls-panel-close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.controls-panel-close:hover {
+  color: #1e293b;
+}
+
+.controls-panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.control-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.layer-buttons-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .map-controls-compact {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-map-control-primary {
+    width: 100%;
+  }
+
+  .map-controls-dropdown {
+    width: 100%;
+  }
+
+  .controls-dropdown-content {
+    margin-left: 0;
+    flex-direction: column;
+  }
+
+  .layer-control-btn,
+  .location-control-btn {
+    width: 100%;
+  }
+
+  .map-controls-panel {
+    max-width: 100%;
+  }
+}
