@@ -120,6 +120,13 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     return colorMap[zoning?.toLowerCase()] || '#94a3b8'
   }
 
+  const getMarkerColor = (property) => {
+    if (highlightCity && property.addresses_city === highlightCity) {
+      return '#667eea'
+    }
+    return getZoningColor(property.zoning_classification)
+  }
+
   return (
     <div className="property-mapper-container">
       {/* Search Bar */}
