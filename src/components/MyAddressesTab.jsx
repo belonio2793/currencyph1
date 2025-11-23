@@ -1,7 +1,46 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
+import L from 'leaflet'
+import './MyAddressesTab.css'
+
+// Fix default marker icons
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+})
+
+// Custom red marker for new address being created
+const newAddressIcon = new L.Icon({
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+  className: 'new-address-marker'
+})
+
+// Map click handler component
+function MapClickHandler({ onMapClick, isCreating }) {
+  useMapEvents({
+    click: (e) => {
+      if (isCreating) {
+        onMapClick({
+          latitude: e.latlng.lat,
+          longitude: e.latlng.lng
+        })
+      }
+    }
+  })
+  return null
+}
 
 export default function MyAddressesTab({ userId }) {
+  const mapRef = useRef(null)
   const [showForm, setShowForm] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [addresses, setAddresses] = useState([])
@@ -19,6 +58,9 @@ export default function MyAddressesTab({ userId }) {
   const [editingNickname, setEditingNickname] = useState(null)
   const [nicknameInput, setNicknameInput] = useState('')
   const [showNicknameForm, setShowNicknameForm] = useState(false)
+  const [isCreatingFromMap, setIsCreatingFromMap] = useState(false)
+  const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
+  const [zoomLevel, setZoomLevel] = useState(6)
 
   const [formData, setFormData] = useState({
     addresses_address: '',
@@ -124,10 +166,14 @@ export default function MyAddressesTab({ userId }) {
       setAddresses(data || [])
       if (data && data.length > 0 && !selectedAddressId) {
         setSelectedAddressId(data[0].id)
+        if (data[0].addresses_latitude && data[0].addresses_longitude) {
+          setMapCenter([parseFloat(data[0].addresses_latitude), parseFloat(data[0].addresses_longitude)])
+          setZoomLevel(10)
+        }
       }
     } catch (err) {
-      console.error('Error loading addresses:', err)
-      setError('Failed to load addresses')
+      console.error('Error loading addresses:', err?.message || err)
+      setError(err?.message || 'Failed to load addresses')
     } finally {
       setLoading(false)
     }
@@ -144,7 +190,7 @@ export default function MyAddressesTab({ userId }) {
       if (fetchError) throw fetchError
       setAddressHistory(data || [])
     } catch (err) {
-      console.error('Error loading address history:', err)
+      console.error('Error loading address history:', err?.message || err)
     }
   }
 
@@ -154,6 +200,20 @@ export default function MyAddressesTab({ userId }) {
       ...prev,
       [name]: value
     }))
+  }
+
+  const handleMapClick = (coords) => {
+    setFormData(prev => ({
+      ...prev,
+      addresses_latitude: coords.latitude.toFixed(8),
+      addresses_longitude: coords.longitude.toFixed(8)
+    }))
+    setShowForm(true)
+    setIsCreatingFromMap(false)
+  }
+
+  const handleStartMapCreation = () => {
+    setIsCreatingFromMap(true)
   }
 
   const handleSubmit = async (e) => {
@@ -207,10 +267,11 @@ export default function MyAddressesTab({ userId }) {
         notes: ''
       })
       setShowForm(false)
+      setIsCreatingFromMap(false)
       await loadAddresses()
     } catch (err) {
-      console.error('Error saving address:', err)
-      setError(err.message || 'Failed to save address')
+      console.error('Error saving address:', err?.message || err)
+      setError(err?.message || 'Failed to save address')
     } finally {
       setLoading(false)
     }
@@ -232,13 +293,16 @@ export default function MyAddressesTab({ userId }) {
 
       await loadAddresses()
     } catch (err) {
-      console.error('Error setting default address:', err)
+      console.error('Error setting default address:', err?.message || err)
       setError('Failed to set default address')
     }
   }
 
   const handleUpdateNickname = async (addressId) => {
     try {
+      const oldAddress = addresses.find(a => a.id === addressId)
+      const oldValue = oldAddress?.address_nickname || ''
+
       const { error: updateError } = await supabase
         .from('addresses')
         .update({ address_nickname: nicknameInput })
@@ -253,7 +317,7 @@ export default function MyAddressesTab({ userId }) {
           address_id: addressId,
           user_id: userId,
           field_name: 'address_nickname',
-          old_value: addresses.find(a => a.id === addressId)?.address_nickname || '',
+          old_value: oldValue,
           new_value: nicknameInput
         }])
 
@@ -265,7 +329,7 @@ export default function MyAddressesTab({ userId }) {
       setNicknameInput('')
       await loadAddresses()
     } catch (err) {
-      console.error('Error updating nickname:', err)
+      console.error('Error updating nickname:', err?.message || err)
       setError('Failed to update nickname')
     }
   }
@@ -297,13 +361,144 @@ export default function MyAddressesTab({ userId }) {
 
   return (
     <div className="my-addresses-tab">
-      <div className="my-addresses-layout-no-map">
-        {/* Address List */}
+      <div className="my-addresses-layout">
+        {/* Map Section */}
+        <div className="map-section">
+          <div className="map-header">
+            <h3>Address Map</h3>
+            <button
+              onClick={handleStartMapCreation}
+              className={`btn-map-action ${isCreatingFromMap ? 'active' : ''}`}
+              title={isCreatingFromMap ? 'Click on map to place marker' : 'Click to add address by map'}
+            >
+              {isCreatingFromMap ? '📍 Click on map' : '+ Map'}
+            </button>
+          </div>
+          <div className="map-container">
+            <MapContainer
+              center={mapCenter}
+              zoom={zoomLevel}
+              style={{ height: '100%', width: '100%' }}
+              ref={mapRef}
+            >
+              <TileLayer
+                attribution='&copy; OpenStreetMap contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <MapClickHandler onMapClick={handleMapClick} isCreating={isCreatingFromMap} />
+              {addresses.map((address) => (
+                address.addresses_latitude && address.addresses_longitude && (
+                  <Marker
+                    key={address.id}
+                    position={[
+                      parseFloat(address.addresses_latitude),
+                      parseFloat(address.addresses_longitude)
+                    ]}
+                    onClick={() => setSelectedAddressId(address.id)}
+                  >
+                    <Popup>
+                      <div className="marker-popup">
+                        <h4>{getAddressDisplayName(address)}</h4>
+                        <p>{address.addresses_street_name}</p>
+                        <p>{address.addresses_city}, {address.addresses_region}</p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                )
+              ))}
+              {formData.addresses_latitude && formData.addresses_longitude && isCreatingFromMap && (
+                <Marker
+                  position={[
+                    parseFloat(formData.addresses_latitude),
+                    parseFloat(formData.addresses_longitude)
+                  ]}
+                  icon={newAddressIcon}
+                >
+                  <Popup>
+                    <div className="marker-popup">
+                      <p>New Address</p>
+                      <p>Lat: {formData.addresses_latitude}</p>
+                      <p>Lon: {formData.addresses_longitude}</p>
+                    </div>
+                  </Popup>
+                </Marker>
+              )}
+            </MapContainer>
+          </div>
+
+          {/* Lat/Lon Input Fields */}
+          <div className="coordinates-section">
+            <div className="coordinate-inputs">
+              <div className="form-group">
+                <label>Latitude</label>
+                <input
+                  type="number"
+                  name="addresses_latitude"
+                  value={formData.addresses_latitude}
+                  onChange={handleInputChange}
+                  placeholder="14.5549"
+                  step="0.000001"
+                  readOnly={isCreatingFromMap}
+                  className="coordinate-input"
+                />
+              </div>
+              <div className="form-group">
+                <label>Longitude</label>
+                <input
+                  type="number"
+                  name="addresses_longitude"
+                  value={formData.addresses_longitude}
+                  onChange={handleInputChange}
+                  placeholder="121.0175"
+                  step="0.000001"
+                  readOnly={isCreatingFromMap}
+                  className="coordinate-input"
+                />
+              </div>
+              <button
+                onClick={() => setShowForm(true)}
+                disabled={!formData.addresses_latitude || !formData.addresses_longitude}
+                className="btn-open-form"
+              >
+                Edit Details
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Address List Section */}
         <div className="addresses-list-full-width">
           <div className="sidebar-header">
             <h3>My Addresses</h3>
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                setIsCreatingFromMap(false)
+                setFormData({
+                  addresses_address: '',
+                  addresses_street_number: '',
+                  addresses_street_name: '',
+                  addresses_city: '',
+                  addresses_province: '',
+                  addresses_region: '',
+                  addresses_postal_code: '',
+                  barangay: '',
+                  addresses_latitude: '',
+                  addresses_longitude: '',
+                  address_nickname: '',
+                  lot_number: '',
+                  lot_area: '',
+                  lot_area_unit: 'sqm',
+                  property_type: 'Residential',
+                  zoning_classification: 'residential',
+                  land_use: '',
+                  owner_name: '',
+                  land_title_number: '',
+                  elevation: '',
+                  property_status: 'active',
+                  notes: ''
+                })
+                setShowForm(true)
+              }}
               className="btn-add-address"
               title="Add new address"
             >
@@ -424,7 +619,10 @@ export default function MyAddressesTab({ userId }) {
               <div className="form-modal-header">
                 <h2>Add New Address</h2>
                 <button
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    setShowForm(false)
+                    setIsCreatingFromMap(false)
+                  }}
                   className="form-modal-close"
                 >
                   ×
@@ -441,7 +639,6 @@ export default function MyAddressesTab({ userId }) {
               <form onSubmit={handleSubmit} className="property-form">
                 <div className="form-section">
                   <h3 className="form-section-title">Address Nickname</h3>
-
                   <div className="form-row">
                     <div className="form-group full-width">
                       <label>Address Nickname (e.g., "Home", "Office", "Weekend House")</label>
@@ -725,7 +922,10 @@ export default function MyAddressesTab({ userId }) {
                 <div className="form-actions">
                   <button
                     type="button"
-                    onClick={() => setShowForm(false)}
+                    onClick={() => {
+                      setShowForm(false)
+                      setIsCreatingFromMap(false)
+                    }}
                     className="btn-form-cancel"
                     disabled={loading}
                   >
@@ -766,7 +966,7 @@ export default function MyAddressesTab({ userId }) {
                   </div>
                 ) : (
                   <div className="history-list">
-                    {addressHistory.map((entry, idx) => (
+                    {addressHistory.map((entry) => (
                       <div key={entry.id} className="history-item">
                         <div className="history-item-header">
                           <span className="history-field">{entry.field_name}</span>
