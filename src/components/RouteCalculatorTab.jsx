@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { MapContainer, TileLayer } from 'react-leaflet'
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import MapControls from './MapControls'
 import './RouteCalculatorTab.css'
 
