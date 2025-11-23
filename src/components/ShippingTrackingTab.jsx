@@ -238,7 +238,7 @@ export default function ShippingTrackingTab({ userId }) {
               <div
                 key={shipment.id}
                 className="shipment-card"
-                onClick={() => setSelectedShipment(shipment)}
+                onClick={() => handleSelectShipment(shipment)}
               >
                 <div className="shipment-card-header">
                   <div className="shipment-info">
