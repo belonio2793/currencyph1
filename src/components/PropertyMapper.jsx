@@ -12,7 +12,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
 
-export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = false }) {
+export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = false, highlightCity = null }) {
   const mapRef = useRef(null)
   const [properties, setProperties] = useState([])
   const [selectedProperty, setSelectedProperty] = useState(null)
@@ -22,6 +22,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   const [zoomLevel, setZoomLevel] = useState(6)
   const [filteredProperties, setFilteredProperties] = useState([])
   const [propertyCount, setPropertyCount] = useState(0)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Load properties from database
   useEffect(() => {
