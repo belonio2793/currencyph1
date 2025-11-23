@@ -743,7 +743,6 @@ export default function MyAddressesTab({ userId }) {
                   onClick={() => setShowForm(true)}
                   disabled={!formData.addresses_latitude || !formData.addresses_longitude}
                   className="btn-open-form"
-                  style={{ alignSelf: 'flex-end' }}
                 >
                   Edit
                 </button>
