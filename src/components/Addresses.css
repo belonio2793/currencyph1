@@ -400,10 +400,6 @@
     flex-direction: column;
   }
 
-  .map-section {
-    flex: 0 0 300px;
-  }
-
   .addresses-list-full-width {
     flex: 1;
   }
