@@ -71,6 +71,36 @@
   position: relative;
   background: white;
   overflow: hidden;
+  display: flex;
+  align-items: stretch;
+}
+
+.btn-legend-toggle-overlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 500;
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-legend-toggle-overlay:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-legend-toggle-overlay:active {
+  background: #f1f5f9;
 }
 
 .mapper-loading {
