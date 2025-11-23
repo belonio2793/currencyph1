@@ -151,63 +151,12 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
         {/* Map Controls in Search Bar */}
         {!loading && (
-          <div className="mapper-search-bar-controls">
-            <button
-              onClick={handleCenterPhilippines}
-              className="btn-default-location sidebar-philippines-btn"
-              title="Center map on Philippines"
-            >
-              Philippines
-            </button>
-
-            <details className="sidebar-layer-controls">
-              <summary className="controls-summary">Map Layers</summary>
-              <div className="controls-content">
-                <button
-                  onClick={() => setMapLayer('street')}
-                  className={`layer-btn-small ${mapLayer === 'street' ? 'active' : ''}`}
-                  title="Street view"
-                >
-                  Street
-                </button>
-                <button
-                  onClick={() => setMapLayer('satellite')}
-                  className={`layer-btn-small ${mapLayer === 'satellite' ? 'active' : ''}`}
-                  title="Satellite view"
-                >
-                  Satellite
-                </button>
-                <button
-                  onClick={() => setMapLayer('terrain')}
-                  className={`layer-btn-small ${mapLayer === 'terrain' ? 'active' : ''}`}
-                  title="Terrain view"
-                >
-                  Terrain
-                </button>
-                <button
-                  onClick={() => {
-                    if (navigator.geolocation) {
-                      navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                          const { latitude, longitude } = position.coords
-                          if (mapInstance) {
-                            mapInstance.flyTo([latitude, longitude], 13, { duration: 1 })
-                          }
-                        },
-                        (error) => {
-                          console.error('Geolocation error:', error)
-                        }
-                      )
-                    }
-                  }}
-                  className="controls-geolocation-btn"
-                  title="Get your current location"
-                >
-                  My Location
-                </button>
-              </div>
-            </details>
-          </div>
+          <MapControls
+            mapInstance={mapInstance}
+            onMapLayerChange={setMapLayer}
+            currentMapLayer={mapLayer}
+            compact={true}
+          />
         )}
       </div>
 
