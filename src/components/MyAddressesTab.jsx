@@ -63,7 +63,7 @@ export default function MyAddressesTab({ userId }) {
   const [zoomLevel, setZoomLevel] = useState(6)
   const [mapHeight, setMapHeight] = useState(400)
   const [mapLayer, setMapLayer] = useState('street')
-  const [showLegend, setShowLegend] = useState(true)
+  const [showLegend, setShowLegend] = useState(false)
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mapSearchQuery, setMapSearchQuery] = useState('')
   const [mapSearchResults, setMapSearchResults] = useState([])
