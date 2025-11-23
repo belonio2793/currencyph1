@@ -289,8 +289,17 @@ export default function ShippingTrackingTab({ userId }) {
                   <div className="legend-section">
                     <button
                       onClick={() => {
-                        setMapCenter([12.8797, 121.7740])
-                        setZoomLevel(6)
+                        const center = [12.8797, 121.7740]
+                        const zoom = 6
+                        setMapCenter(center)
+                        setZoomLevel(zoom)
+                        if (mapRef.current) {
+                          try {
+                            mapRef.current.flyTo(center, zoom, { duration: 1 })
+                          } catch (error) {
+                            console.error('Error flying to Philippines:', error)
+                          }
+                        }
                       }}
                       className="btn-default-location"
                       title="Focus on Philippines"
