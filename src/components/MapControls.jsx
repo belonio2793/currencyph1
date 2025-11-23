@@ -34,6 +34,34 @@ export default function MapControls({
     }
   }
 
+  const handleZoomIn = (e) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+    if (mapInstance && mapInstance.zoomIn) {
+      try {
+        mapInstance.zoomIn()
+      } catch (error) {
+        console.error('Error zooming in:', error)
+      }
+    }
+  }
+
+  const handleZoomOut = (e) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
+    if (mapInstance && mapInstance.zoomOut) {
+      try {
+        mapInstance.zoomOut()
+      } catch (error) {
+        console.error('Error zooming out:', error)
+      }
+    }
+  }
+
   const handleGetLocation = (e) => {
     if (e) {
       e.stopPropagation()
