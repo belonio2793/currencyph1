@@ -242,9 +242,9 @@ const SERVICES = [
     description: 'Delivery of food orders',
     category: 'food',
     criteria: [
-      { label: 'Temperature', icon: '🌡️', hint: 'Insulated bag' },
-      { label: 'Items', icon: '🥗', hint: 'Multiple items' },
-      { label: 'Speed', icon: '⚡', hint: 'Quick delivery' }
+      { label: 'Temperature', hint: 'Insulated bag' },
+      { label: 'Items', hint: 'Multiple items' },
+      { label: 'Speed', hint: 'Quick delivery' }
     ],
     details: {
       maxItems: 10,
@@ -351,14 +351,14 @@ const SERVICES = [
   {
     id: 'laundry',
     label: 'Laundry Service',
-    icon: '👕',
+    icon: '',
     color: 'from-pink-500 to-pink-600',
     description: 'Laundry pickup and delivery',
     category: 'personal-care',
     criteria: [
-      { label: 'Weight', icon: '⚖️', hint: 'Up to 10kg' },
-      { label: 'Type', icon: '👔', hint: 'Clothes & fabric' },
-      { label: 'Cleaning', icon: '✨', hint: 'Same-day service' }
+      { label: 'Weight', hint: 'Up to 10kg' },
+      { label: 'Type', hint: 'Clothes & fabric' },
+      { label: 'Cleaning', hint: 'Same-day service' }
     ],
     details: {
       maxWeight: 10,
@@ -482,14 +482,14 @@ const SERVICES = [
   {
     id: 'medical',
     label: 'Medical Supplies',
-    icon: '⚕️',
+    icon: '',
     color: 'from-red-500 to-red-600',
     description: 'Delivery of medications and medical items',
     category: 'medical',
     criteria: [
-      { label: 'Temperature', icon: '🌡️', hint: 'Climate controlled' },
-      { label: 'Sensitivity', icon: '⚠️', hint: 'Handle with care' },
-      { label: 'Urgency', icon: '🚨', hint: 'Priority delivery' }
+      { label: 'Temperature', hint: 'Climate controlled' },
+      { label: 'Sensitivity', hint: 'Handle with care' },
+      { label: 'Urgency', hint: 'Priority delivery' }
     ],
     details: {
       maxItems: 20,
