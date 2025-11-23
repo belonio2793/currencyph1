@@ -33,7 +33,11 @@ export default function MapControls({
     }
   }
 
-  const handleGetLocation = () => {
+  const handleGetLocation = (e) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -49,7 +53,11 @@ export default function MapControls({
     }
   }
 
-  const handleLayerChange = (layer) => {
+  const handleLayerChange = (layer, e) => {
+    if (e) {
+      e.stopPropagation()
+      e.preventDefault()
+    }
     if (onMapLayerChange) {
       onMapLayerChange(layer)
     }
