@@ -297,4 +297,23 @@ details[open] .controls-dropdown-summary::before {
   .map-controls-panel {
     max-width: 100%;
   }
+
+  .map-controls-header {
+    flex-direction: column;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .btn-map-control-header {
+    width: 100%;
+  }
+
+  .map-layer-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .layer-control-btn {
+    flex: 1;
+  }
 }
