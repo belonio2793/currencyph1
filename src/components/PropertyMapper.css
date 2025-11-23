@@ -33,6 +33,12 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.mapper-search-bar-controls {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .mapper-main {
   display: flex;
   flex: 1;
