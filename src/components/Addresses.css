@@ -1393,8 +1393,7 @@
   padding: 20px 24px;
   background: white;
   border-bottom: 1px solid #e2e8f0;
-  margin-bottom: 20px;
-  border-radius: 8px 8px 0 0;
+  flex-shrink: 0;
 }
 
 .calculator-results-header h3 {
