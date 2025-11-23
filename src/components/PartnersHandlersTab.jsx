@@ -203,6 +203,19 @@ export default function PartnersHandlersTab({ userId }) {
           <MapControls
             mapInstance={mapInstance}
             onMapLayerChange={setMapLayer}
+            onCenterLocation={(preset) => {
+              if (preset && preset.center && preset.zoom) {
+                setMapCenter(preset.center)
+                setZoomLevel(preset.zoom)
+                if (mapRef.current) {
+                  try {
+                    mapRef.current.flyTo(preset.center, preset.zoom, { duration: 1 })
+                  } catch (error) {
+                    console.error('Error flying to location:', error)
+                  }
+                }
+              }
+            }}
             currentMapLayer={mapLayer}
             compact={true}
           />
