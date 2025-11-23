@@ -237,10 +237,10 @@ export default function JobsJobSeekerDisplay({ business, userId }) {
 
                 {/* Quick Info Bar */}
                 <div className="quick-info">
-                  <span className="info">💰 ₱{job.pay_rate?.toLocaleString() || 'Negotiable'}</span>
-                  <span className="info">📍 {job.positions_available} position(s)</span>
+                  <span className="info">₱{job.pay_rate?.toLocaleString() || 'Negotiable'}</span>
+                  <span className="info">{job.positions_available} position(s)</span>
                   {job.deadline_for_applications && (
-                    <span className="info">📅 Deadline: {new Date(job.deadline_for_applications).toLocaleDateString()}</span>
+                    <span className="info">Deadline: {new Date(job.deadline_for_applications).toLocaleDateString()}</span>
                   )}
                 </div>
 

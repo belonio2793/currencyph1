@@ -330,7 +330,7 @@ export default function ListingCard({
               }`}
               title={isAuthenticated ? 'Like this listing' : 'Log in to vote'}
             >
-              👍 {voteCounts.thumbsUp || 0}
+              {voteCounts.thumbsUp || 0}
             </button>
             <button
               onClick={(e) => {

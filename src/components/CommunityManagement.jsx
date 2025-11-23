@@ -176,7 +176,7 @@ export default function CommunityManagement({ userId }) {
                         : 'bg-green-100 text-green-700 hover:bg-green-200'
                     }`}
                   >
-                    👍 Approve
+                    Approve
                   </button>
                   <button
                     onClick={() => handleApprovalVote(listing.id, 'reject')}

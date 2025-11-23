@@ -249,7 +249,7 @@ export default function JobsManagementModal({ business, userId, onClose, onUpdat
                 marginBottom: '30px'
               }}>
                 <h3 style={{ margin: '0 0 15px 0', fontSize: '1rem', color: '#334155' }}>
-                  📋 How Your Business Appears in Job Listings
+                  How Your Business Appears in Job Listings
                 </h3>
                 <div style={{
                   backgroundColor: 'white',
