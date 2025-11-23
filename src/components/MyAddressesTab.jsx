@@ -461,13 +461,6 @@ export default function MyAddressesTab({ userId }) {
               >
                 +
               </button>
-              <button
-                onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle"
-                title={showLegend ? 'Hide map controls' : 'Show map controls'}
-              >
-                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-              </button>
             </div>
           </div>
 
