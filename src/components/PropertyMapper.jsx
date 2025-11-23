@@ -191,6 +191,13 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
         </div>
 
         <div className="map-container">
+          <button
+            onClick={() => setShowLegend(!showLegend)}
+            className="btn-legend-toggle-overlay"
+            title={showLegend ? 'Hide map controls' : 'Show map controls'}
+          >
+            {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+          </button>
           {loading ? (
             <div className="mapper-loading">Loading properties...</div>
           ) : (
