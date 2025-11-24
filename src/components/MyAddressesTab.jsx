@@ -259,12 +259,12 @@ export default function MyAddressesTab({ userId }) {
   ]
 
   const zoningOptions = [
-    'residential',
-    'commercial',
-    'industrial',
-    'agricultural',
-    'mixed-use',
-    'govt'
+    'Residential',
+    'Commercial',
+    'Industrial',
+    'Agricultural',
+    'Mixed-use',
+    'Government'
   ]
 
   const regionsList = [
