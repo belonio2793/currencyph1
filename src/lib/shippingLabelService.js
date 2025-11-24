@@ -136,8 +136,7 @@ export async function getShippingLabelsWithCheckpoints(userId, status = null) {
     .select(`
       *,
       origin_address:origin_address_id(*),
-      destination_address:destination_address_id(*),
-      checkpoints:addresses_shipment_checkpoints(*)
+      destination_address:destination_address_id(*)
     `)
     .eq('user_id', userId)
 
@@ -148,7 +147,24 @@ export async function getShippingLabelsWithCheckpoints(userId, status = null) {
   const { data, error } = await query.order('created_at', { ascending: false })
 
   if (error) throw error
-  return data
+
+  // Fetch checkpoints from tracking table separately
+  const labelsWithCheckpoints = await Promise.all(
+    (data || []).map(async (label) => {
+      const { data: checkpoints } = await supabase
+        .from('addresses_shipment_tracking')
+        .select('*')
+        .eq('shipment_id', label.id)
+        .order('scanned_at', { ascending: false })
+
+      return {
+        ...label,
+        checkpoints: checkpoints || []
+      }
+    })
+  )
+
+  return labelsWithCheckpoints
 }
 
 // Add checkpoint for package
