@@ -53,6 +53,16 @@
   box-sizing: border-box;
 }
 
+.form-label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
 .form-group {
   margin-bottom: 15px;
   width: 100%;
