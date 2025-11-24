@@ -1264,10 +1264,10 @@ export default function MyAddressesTab({ userId }) {
                       <button
                         type="button"
                         onClick={handleFetchUserLocation}
-                        className="btn-fetch-location"
+                        className="btn-fetch-location btn-fetch-primary"
                         disabled={fetchingLocation}
                       >
-                        {fetchingLocation ? 'Getting Location...' : '📍 Fetch My Location'}
+                        {fetchingLocation ? 'Getting Location...' : 'Fetch My Location'}
                       </button>
                       <button
                         type="button"
