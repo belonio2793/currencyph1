@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
-import { addCheckpoint, searchShippingLabelBySerialId } from '../lib/shippingLabelService'
+import { addCheckpoint, searchLabelByTrackingCode } from '../lib/shippingLabelService'
 import './BarcodeScanner.css'
 
 export default function BarcodeScanner({ userId, onCheckpointAdded }) {
-  const [mode, setMode] = useState('input') // 'input', 'camera', 'result'
-  const [serialId, setSerialId] = useState('')
+  const [mode, setMode] = useState('input')
+  const [trackingCode, setTrackingCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [scannedLabel, setScannedLabel] = useState(null)
@@ -12,7 +12,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
   const [location, setLocation] = useState(null)
   const [checkpointName, setCheckpointName] = useState('')
   const [checkpointNotes, setCheckpointNotes] = useState('')
-  const [checkpointType, setCheckpointType] = useState('scanned')
+  const [checkpointStatus, setCheckpointStatus] = useState('scanned')
   const videoRef = useRef(null)
   const streamRef = useRef(null)
   const canvasRef = useRef(null)
@@ -25,7 +25,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
           setLocation({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
-            address: `Lat: ${position.coords.latitude.toFixed(6)}, Lng: ${position.coords.longitude.toFixed(6)}`
+            address: `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`
           })
         },
         (err) => {
@@ -52,46 +52,11 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
         videoRef.current.srcObject = stream
         streamRef.current = stream
         setMode('camera')
-        
-        // Start scanning after a short delay
-        setTimeout(() => {
-          scanFrame()
-        }, 500)
       }
     } catch (err) {
       setError('Camera access denied. Please enable camera permission and try again.')
       console.error('Camera error:', err)
     }
-  }
-
-  // Scan video frame for barcode patterns
-  const scanFrame = () => {
-    if (!videoRef.current || !streamRef.current) return
-    
-    const canvas = canvasRef.current
-    if (!canvas) return
-    
-    const ctx = canvas.getContext('2d')
-    const video = videoRef.current
-    
-    if (video.readyState === video.HAVE_ENOUGH_DATA) {
-      canvas.width = video.videoWidth
-      canvas.height = video.videoHeight
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
-      
-      // Simple barcode detection - look for PKG- patterns in image analysis
-      // For now, this is a placeholder. In production, use a library like jsQR or html5-qrcode
-      detectBarcode(canvas)
-    }
-    
-    // Continue scanning
-    requestAnimationFrame(scanFrame)
-  }
-
-  // Simple barcode detection (placeholder)
-  const detectBarcode = (canvas) => {
-    // This is a simplified detection. In production, use a proper barcode/QR library
-    // For now, we'll just let users input manually or use the form
   }
 
   // Stop camera
@@ -102,11 +67,11 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
     }
   }
 
-  // Search for label by serial ID
+  // Search for label by tracking code
   const handleSearch = async (e) => {
     e.preventDefault()
-    if (!serialId.trim()) {
-      setError('Please enter a serial ID')
+    if (!trackingCode.trim()) {
+      setError('Please enter a tracking code')
       return
     }
     
@@ -114,7 +79,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
     setError('')
     
     try {
-      const label = await searchShippingLabelBySerialId(userId, serialId.toUpperCase())
+      const label = await searchLabelByTrackingCode(trackingCode.toUpperCase())
       
       if (!label) {
         setError('Shipping label not found')
@@ -154,13 +119,12 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
 
     try {
       const checkpointData = {
+        status: checkpointStatus,
         checkpointName: checkpointName.trim(),
-        checkpointType,
         latitude: location?.latitude || 0,
         longitude: location?.longitude || 0,
-        locationAddress: location?.address || checkpointName,
-        scannedAt: new Date().toISOString(),
-        scannedByUserId: userId,
+        addressText: location?.address || checkpointName,
+        scannedBy: userId,
         notes: checkpointNotes.trim(),
         metadata: {
           timestamp: new Date().toISOString(),
@@ -170,35 +134,34 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
         }
       }
 
-      const checkpoint = await addCheckpoint(scannedLabel.id, checkpointData)
+      const checkpoint = await addCheckpoint(scannedLabel.tracking_code, checkpointData)
 
-      // Update scanned label's checkpoints array
-      const updatedCheckpoints = (scannedLabel.checkpoints || []).map(cp => ({
-        ...cp,
-        id: cp.id,
-        checkpoint_name: cp.checkpoint_name,
-        checkpoint_type: cp.checkpoint_type,
-        scanned_at: cp.scanned_at,
-        location_address: cp.location_address,
-        notes: cp.notes
-      }))
-      updatedCheckpoints.push({
+      // Update scanned label's tracking history
+      const updatedHistory = (scannedLabel.tracking_history || [])
+      updatedHistory.unshift({
         id: checkpoint.id,
+        tracking_code: checkpoint.tracking_code,
+        status: checkpoint.status,
         checkpoint_name: checkpoint.checkpoint_name,
-        checkpoint_type: checkpoint.checkpoint_type,
-        scanned_at: checkpoint.scanned_at,
-        location_address: checkpoint.location_address,
-        notes: checkpoint.notes
+        latitude: checkpoint.latitude,
+        longitude: checkpoint.longitude,
+        address_text: checkpoint.address_text,
+        created_at: checkpoint.created_at
       })
 
       setScannedLabel({
         ...scannedLabel,
-        checkpoints: updatedCheckpoints
+        tracking_history: updatedHistory,
+        status: checkpointStatus,
+        last_scanned_at: new Date().toISOString(),
+        last_scanned_lat: location?.latitude,
+        last_scanned_lng: location?.longitude,
+        current_checkpoint: checkpointName
       })
 
       setCheckpointName('')
       setCheckpointNotes('')
-      setCheckpointType('scanned')
+      setCheckpointStatus('scanned')
 
       if (onCheckpointAdded) {
         onCheckpointAdded(checkpoint)
@@ -215,10 +178,11 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
   const handleReset = () => {
     stopCamera()
     setMode('input')
-    setSerialId('')
+    setTrackingCode('')
     setScannedLabel(null)
     setCheckpointName('')
     setCheckpointNotes('')
+    setCheckpointStatus('scanned')
     setError('')
   }
 
@@ -232,12 +196,12 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
           
           <form onSubmit={handleSearch} className="search-form">
             <div className="form-group">
-              <label>Serial ID / Barcode Number</label>
+              <label>Tracking Code</label>
               <input
                 type="text"
-                value={serialId}
-                onChange={(e) => setSerialId(e.target.value)}
-                placeholder="PKG-XXXXXXXXXX"
+                value={trackingCode}
+                onChange={(e) => setTrackingCode(e.target.value)}
+                placeholder="e.g., PH-2025-A1B2C3D4"
                 autoComplete="off"
                 autoFocus
               />
@@ -316,8 +280,8 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
           
           <div className="label-info">
             <div className="info-row">
-              <span className="info-label">Serial ID:</span>
-              <span className="info-value">{scannedLabel.serial_id}</span>
+              <span className="info-label">Tracking Code:</span>
+              <span className="info-value">{scannedLabel.tracking_code}</span>
             </div>
             
             {scannedLabel.package_name && (
@@ -327,10 +291,10 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
               </div>
             )}
             
-            {scannedLabel.package_weight && (
+            {scannedLabel.weight_kg && (
               <div className="info-row">
                 <span className="info-label">Weight:</span>
-                <span className="info-value">{scannedLabel.package_weight} kg</span>
+                <span className="info-value">{scannedLabel.weight_kg} kg</span>
               </div>
             )}
             
@@ -354,20 +318,18 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
                   type="text"
                   value={checkpointName}
                   onChange={(e) => setCheckpointName(e.target.value)}
-                  placeholder="e.g., Warehouse A, In Transit, Delivery..."
+                  placeholder="e.g., Warehouse, In Transit, Delivery..."
                   required
                 />
               </div>
 
               <div className="form-group">
-                <label>Checkpoint Type</label>
+                <label>Checkpoint Status</label>
                 <select
-                  value={checkpointType}
-                  onChange={(e) => setCheckpointType(e.target.value)}
+                  value={checkpointStatus}
+                  onChange={(e) => setCheckpointStatus(e.target.value)}
                 >
                   <option value="scanned">Scanned</option>
-                  <option value="arrived">Arrived</option>
-                  <option value="departed">Departed</option>
                   <option value="in_transit">In Transit</option>
                   <option value="out_for_delivery">Out for Delivery</option>
                   <option value="delivered">Delivered</option>
@@ -400,28 +362,30 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
             </form>
           </div>
 
-          {scannedLabel.checkpoints && scannedLabel.checkpoints.length > 0 && (
+          {scannedLabel.tracking_history && scannedLabel.tracking_history.length > 0 && (
             <div className="checkpoint-history">
-              <h4>Checkpoint History ({scannedLabel.checkpoints.length})</h4>
+              <h4>Checkpoint History ({scannedLabel.tracking_history.length})</h4>
               <div className="timeline">
-                {scannedLabel.checkpoints.map((checkpoint, index) => (
+                {scannedLabel.tracking_history.map((checkpoint, index) => (
                   <div key={checkpoint.id || index} className="timeline-item">
                     <div className="timeline-marker" />
                     <div className="timeline-content">
                       <h5>{checkpoint.checkpoint_name || 'Checkpoint'}</h5>
-                      <p className="timestamp">
-                        {checkpoint.scanned_at ? new Date(checkpoint.scanned_at).toLocaleString() : 'No date'}
-                      </p>
-                      {checkpoint.location_address && (
-                        <p className="location">📍 {checkpoint.location_address}</p>
+                      {checkpoint.status && (
+                        <p className="status-type">{checkpoint.status.toUpperCase()}</p>
+                      )}
+                      {checkpoint.created_at && (
+                        <p className="timestamp">
+                          {new Date(checkpoint.created_at).toLocaleString()}
+                        </p>
+                      )}
+                      {checkpoint.address_text && (
+                        <p className="location">📍 {checkpoint.address_text}</p>
                       )}
                       {checkpoint.latitude && checkpoint.longitude && (
                         <p className="coordinates">
-                          Coords: {checkpoint.latitude.toFixed(4)}, {checkpoint.longitude.toFixed(4)}
+                          {checkpoint.latitude.toFixed(4)}, {checkpoint.longitude.toFixed(4)}
                         </p>
-                      )}
-                      {checkpoint.notes && (
-                        <p className="notes">{checkpoint.notes}</p>
                       )}
                     </div>
                   </div>
