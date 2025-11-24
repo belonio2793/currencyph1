@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import {
   createShippingLabel,
   bulkCreateShippingLabels,
-  generateMultipleSerialIds
+  exportBatchToPDF
 } from '../lib/shippingLabelService'
 import jsPDF from 'jspdf'
 import './ShippingLabelGenerator.css'
@@ -22,7 +22,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
     packageDimensions: '',
     originAddressId: '',
     destinationAddressId: '',
-    notes: ''
+    labelFormat: 'a4-10'
   })
   
   // Bulk label form
@@ -34,47 +34,12 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
     packageDimensions: '',
     originAddressId: '',
     destinationAddressId: '',
-    notes: ''
+    labelFormat: 'a4-10'
   })
   
   // Generated labels for preview
   const [generatedLabels, setGeneratedLabels] = useState([])
   const canvasRef = useRef(null)
-
-  // Generate QR code using canvas
-  const generateQRCode = (text, canvasElement) => {
-    if (!canvasElement) return
-    
-    // Simple QR code generation using a canvas
-    const canvas = canvasElement
-    const ctx = canvas.getContext('2d')
-    const size = canvas.width
-    
-    // Create a simple barcode-like pattern for demo
-    ctx.fillStyle = '#ffffff'
-    ctx.fillRect(0, 0, size, size)
-    
-    ctx.fillStyle = '#000000'
-    ctx.font = 'bold 16px monospace'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    
-    // Draw barcode-like lines
-    const barWidth = 2
-    let x = 10
-    for (let i = 0; i < text.length; i++) {
-      const charCode = text.charCodeAt(i)
-      const bars = (charCode % 7) + 2
-      for (let j = 0; j < bars; j++) {
-        ctx.fillRect(x, 10, barWidth, 30)
-        x += barWidth + 1
-      }
-    }
-    
-    // Draw text below barcode
-    ctx.font = 'bold 12px monospace'
-    ctx.fillText(text, size / 2, 60)
-  }
 
   // Handle single label generation
   const handleGenerateSingleLabel = async (e) => {
@@ -91,11 +56,11 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
     try {
       const label = await createShippingLabel(userId, {
         ...singleLabel,
-        prefix: 'PKG'
+        packageWeight: parseFloat(singleLabel.packageWeight) || 0
       })
       
       setGeneratedLabels([label])
-      setSuccess(`Label created successfully: ${label.serial_id}`)
+      setSuccess(`Label created successfully: ${label.tracking_code}`)
       setSingleLabel({
         packageName: '',
         packageDescription: '',
@@ -103,7 +68,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
         packageDimensions: '',
         originAddressId: '',
         destinationAddressId: '',
-        notes: ''
+        labelFormat: 'a4-10'
       })
     } catch (err) {
       setError(err.message || 'Failed to generate label')
@@ -130,7 +95,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
     try {
       const labels = await bulkCreateShippingLabels(userId, quantity, {
         ...bulkLabel,
-        prefix: 'PKG'
+        packageWeight: parseFloat(bulkLabel.packageWeight) || 0
       })
       
       setGeneratedLabels(labels)
@@ -143,7 +108,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
         packageDimensions: '',
         originAddressId: '',
         destinationAddressId: '',
-        notes: ''
+        labelFormat: 'a4-10'
       })
     } catch (err) {
       setError(err.message || 'Failed to generate labels')
@@ -173,9 +138,10 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
       let yPosition = 20
       const pageHeight = pdf.internal.pageSize.getHeight()
       const pageWidth = pdf.internal.pageSize.getWidth()
+      let isFirstPage = true
 
       generatedLabels.forEach((label, index) => {
-        if (yPosition > pageHeight - 80) {
+        if (!isFirstPage && yPosition > pageHeight - 80) {
           pdf.addPage()
           yPosition = 20
         }
@@ -193,52 +159,38 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
         // Label details
         pdf.setFontSize(10)
         pdf.setFont(undefined, 'normal')
-        pdf.text(`Serial ID: ${label.serial_id}`, 15, yPosition)
+        pdf.text(`Tracking Code: ${label.tracking_code}`, 15, yPosition)
         yPosition += 8
 
         if (label.package_name) {
           pdf.text(`Package: ${label.package_name}`, 15, yPosition)
-          yPosition += 8
+          yPosition += 6
         }
 
-        if (label.package_weight) {
-          pdf.text(`Weight: ${label.package_weight}`, 15, yPosition)
-          yPosition += 8
+        if (label.weight_kg) {
+          pdf.text(`Weight: ${label.weight_kg} kg`, 15, yPosition)
+          yPosition += 6
         }
 
-        if (label.package_dimensions) {
-          pdf.text(`Dimensions: ${label.package_dimensions}`, 15, yPosition)
-          yPosition += 8
+        if (label.dimensions) {
+          pdf.text(`Dimensions: ${label.dimensions}`, 15, yPosition)
+          yPosition += 6
         }
 
         // Barcode representation
-        pdf.setFontSize(14)
+        pdf.setFontSize(12)
         pdf.setFont(undefined, 'bold')
-        pdf.text('|||||||||||||||||', 15, yPosition)
-        yPosition += 8
-        pdf.setFontSize(10)
-        pdf.text(label.serial_id, 15, yPosition)
+        pdf.text('|||||||||||||||', 15, yPosition)
+        yPosition += 7
+        pdf.setFontSize(9)
+        pdf.text(label.tracking_code, 15, yPosition)
 
         yPosition += 20
+        isFirstPage = false
       })
 
       const pdfBlob = pdf.output('blob')
       const pdfUrl = URL.createObjectURL(pdfBlob)
-
-      // Update labels with PDF info
-      const batchId = generatedLabels[0].batch_id || `BATCH-${Date.now()}`
-      for (const label of generatedLabels) {
-        await supabase
-          .from('addresses_shipment_labels')
-          .update({
-            batch_id: batchId,
-            batch_size: generatedLabels.length,
-            generated_count: generatedLabels.length,
-            pdf_url: pdfUrl,
-            export_format: 'pdf'
-          })
-          .eq('id', label.id)
-      }
 
       // Trigger download
       const link = document.createElement('a')
@@ -365,13 +317,15 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
             </div>
 
             <div className="form-group">
-              <label>Notes</label>
-              <textarea
-                value={singleLabel.notes}
-                onChange={(e) => setSingleLabel({ ...singleLabel, notes: e.target.value })}
-                placeholder="Additional notes"
-                rows="2"
-              />
+              <label>Label Format</label>
+              <select
+                value={singleLabel.labelFormat}
+                onChange={(e) => setSingleLabel({ ...singleLabel, labelFormat: e.target.value })}
+              >
+                <option value="a4-10">A4 (10 labels)</option>
+                <option value="a4-4">A4 (4 labels)</option>
+                <option value="4x6">4x6 Thermal</option>
+              </select>
             </div>
 
             <button type="submit" disabled={loading} className="btn btn-primary">
@@ -415,7 +369,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
                 type="text"
                 value={bulkLabel.packageName}
                 onChange={(e) => setBulkLabel({ ...bulkLabel, packageName: e.target.value })}
-                placeholder="e.g., Package {serial_id}"
+                placeholder="e.g., Bulk Package"
               />
             </div>
 
@@ -485,13 +439,15 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
             </div>
 
             <div className="form-group">
-              <label>Notes</label>
-              <textarea
-                value={bulkLabel.notes}
-                onChange={(e) => setBulkLabel({ ...bulkLabel, notes: e.target.value })}
-                placeholder="Additional notes"
-                rows="2"
-              />
+              <label>Label Format</label>
+              <select
+                value={bulkLabel.labelFormat}
+                onChange={(e) => setBulkLabel({ ...bulkLabel, labelFormat: e.target.value })}
+              >
+                <option value="a4-10">A4 (10 labels)</option>
+                <option value="a4-4">A4 (4 labels)</option>
+                <option value="4x6">4x6 Thermal</option>
+              </select>
             </div>
 
             <button type="submit" disabled={loading} className="btn btn-primary">
@@ -514,20 +470,19 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
                       </div>
                       <div className="label-content">
                         <div className="label-field">
-                          <span className="label-key">Serial ID:</span>
-                          <span className="label-value">{label.serial_id}</span>
+                          <span className="label-key">Tracking Code:</span>
+                          <span className="label-value">{label.tracking_code}</span>
                         </div>
                         
-                        <canvas
-                          ref={el => {
-                            if (el && index < 1) {
-                              generateQRCode(label.serial_id, el)
-                            }
-                          }}
-                          width="150"
-                          height="80"
-                          className="barcode-canvas"
-                        />
+                        {label.barcode_svg && (
+                          <div className="barcode-container">
+                            <img 
+                              src={label.barcode_svg} 
+                              alt="barcode" 
+                              className="barcode-image"
+                            />
+                          </div>
+                        )}
                         
                         {label.package_name && (
                           <div className="label-field">
@@ -536,23 +491,29 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
                           </div>
                         )}
                         
-                        {label.package_weight && (
+                        {label.weight_kg && (
                           <div className="label-field">
                             <span className="label-key">Weight:</span>
-                            <span className="label-value">{label.package_weight} kg</span>
+                            <span className="label-value">{label.weight_kg} kg</span>
                           </div>
                         )}
                         
-                        {label.package_dimensions && (
+                        {label.dimensions && (
                           <div className="label-field">
                             <span className="label-key">Dimensions:</span>
-                            <span className="label-value">{label.package_dimensions}</span>
+                            <span className="label-value">{label.dimensions}</span>
                           </div>
                         )}
                         
                         <div className="label-field timestamp">
                           <span className="label-value">
                             {new Date(label.created_at).toLocaleDateString()}
+                          </span>
+                        </div>
+
+                        <div className="status-badge" style={{ marginTop: '8px' }}>
+                          <span className={`badge badge-${label.status}`}>
+                            {label.status.toUpperCase()}
                           </span>
                         </div>
                       </div>
@@ -565,8 +526,8 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
                 )}
                 
                 <div className="export-actions">
-                  <button onClick={handleExportPDF} className="btn btn-success">
-                    Export as PDF ({generatedLabels.length} labels)
+                  <button onClick={handleExportPDF} className="btn btn-success" disabled={loading}>
+                    {loading ? 'Exporting...' : `Export as PDF (${generatedLabels.length} labels)`}
                   </button>
                 </div>
               </>
