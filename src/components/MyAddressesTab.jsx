@@ -520,14 +520,14 @@ export default function MyAddressesTab({ userId }) {
               <div className="map-resize-controls">
                 <button
                   onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
-                  className="btn-map-resize-overlay"
+                  className="btn-map-resize"
                   title="Decrease map size"
                 >
                   −
                 </button>
                 <button
                   onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
-                  className="btn-map-resize-overlay"
+                  className="btn-map-resize"
                   title="Increase map size"
                 >
                   +
@@ -535,7 +535,7 @@ export default function MyAddressesTab({ userId }) {
               </div>
               <button
                 onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle-overlay"
+                className="btn-legend-toggle"
                 title={showLegend ? 'Hide map controls' : 'Show map controls'}
               >
                 {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
@@ -727,7 +727,7 @@ export default function MyAddressesTab({ userId }) {
                       <span>Saved Address</span>
                     </div>
                     <div className="legend-item">
-                      <span className="legend-marker-new">📍</span>
+                      <span className="legend-marker-new">��</span>
                       <span>New Address</span>
                     </div>
                     <div className="legend-item">
