@@ -2,11 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabaseClient'
-import { 
+import {
   getUserShippingLabels,
   searchLabelByTrackingCode,
   getTrackingHistory
 } from '../lib/shippingLabelService'
+import QuickCheckpointButton from './QuickCheckpointButton'
 import './PackageTracker.css'
 
 // Fix default marker icons
