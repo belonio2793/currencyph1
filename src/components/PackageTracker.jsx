@@ -184,13 +184,6 @@ export default function PackageTracker({ userId, onViewMap }) {
 
   return (
     <div className="package-tracker">
-      <div className="map-header">
-        <div className="map-header-content">
-          <h4>Package Tracking</h4>
-          <p className="map-subtitle">Track your packages across the Philippines</p>
-        </div>
-      </div>
-
       <div className="tracker-header">
         <h2>Package Tracking</h2>
         <div className="view-toggle">
