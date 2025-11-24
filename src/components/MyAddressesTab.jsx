@@ -668,6 +668,66 @@ export default function MyAddressesTab({ userId }) {
     }
   }
 
+  const handleEditAddress = (address) => {
+    setFormData({
+      addresses_address: address.addresses_address || '',
+      addresses_street_number: address.addresses_street_number || '',
+      addresses_street_name: address.addresses_street_name || '',
+      addresses_city: address.addresses_city || '',
+      addresses_province: address.addresses_province || '',
+      addresses_region: address.addresses_region || '',
+      addresses_postal_code: address.addresses_postal_code || '',
+      barangay: address.barangay || '',
+      addresses_latitude: address.addresses_latitude || '',
+      addresses_longitude: address.addresses_longitude || '',
+      address_nickname: address.address_nickname || '',
+      lot_number: address.lot_number || '',
+      lot_area: address.lot_area || '',
+      lot_area_unit: address.lot_area_unit || 'sqm',
+      property_type: address.property_type || 'Residential',
+      zoning_classification: address.zoning_classification || 'residential',
+      land_use: address.land_use || '',
+      owner_name: address.owner_name || '',
+      land_title_number: address.land_title_number || '',
+      elevation: address.elevation || '',
+      property_status: address.property_status || 'active',
+      notes: address.notes || ''
+    })
+    setEditingAddressId(address.id)
+    setIsCreating(false)
+    if (address.addresses_latitude && address.addresses_longitude) {
+      setMapCenter([parseFloat(address.addresses_latitude), parseFloat(address.addresses_longitude)])
+      setZoomLevel(14)
+    }
+    setShowForm(true)
+  }
+
+  const handleDeleteAddress = async (addressId) => {
+    if (!window.confirm('Are you sure you want to delete this address? This action cannot be undone.')) {
+      return
+    }
+
+    try {
+      setLoading(true)
+      const { error: deleteError } = await supabase
+        .from('addresses')
+        .delete()
+        .eq('id', addressId)
+        .eq('user_id', userId)
+
+      if (deleteError) throw deleteError
+
+      setEditingAddressId(null)
+      setSelectedAddressId(null)
+      await loadAddresses()
+    } catch (err) {
+      console.error('Error deleting address:', err?.message || err)
+      setError('Failed to delete address. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const filteredAddresses = addresses.filter(address => {
     const matchesQuery = 
       address.addresses_street_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
