@@ -1329,50 +1329,45 @@
   gap: 4px;
 }
 
-.btn-edit-address {
+.btn-edit-address,
+.btn-delete-address,
+.btn-history {
   background: none;
   border: none;
-  font-size: 16px;
   cursor: pointer;
-  padding: 2px;
-  opacity: 0.6;
-  transition: opacity 0.2s, color 0.2s;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.btn-edit-address {
   color: #667eea;
 }
 
 .btn-edit-address:hover {
-  opacity: 1;
+  background: rgba(102, 126, 234, 0.1);
   color: #5568d3;
 }
 
 .btn-delete-address {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 2px;
-  opacity: 0.6;
-  transition: opacity 0.2s, color 0.2s;
   color: #dc2626;
 }
 
 .btn-delete-address:hover {
-  opacity: 1;
+  background: rgba(220, 38, 38, 0.1);
   color: #b91c1c;
 }
 
 .btn-history {
-  background: none;
-  border: none;
-  font-size: 16px;
-  cursor: pointer;
-  padding: 2px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
+  color: #64748b;
 }
 
 .btn-history:hover {
-  opacity: 1;
+  background: rgba(100, 116, 139, 0.1);
+  color: #334155;
 }
 
 .address-city {
