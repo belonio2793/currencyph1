@@ -356,6 +356,14 @@ export default function PackageTracker({ userId, onViewMap }) {
               )}
             </div>
 
+            <div className="quick-actions">
+              <QuickCheckpointButton
+                trackingCode={selectedLabel.tracking_code}
+                onCheckpointAdded={() => loadLabels()}
+                buttonText="⚡ Add Checkpoint"
+              />
+            </div>
+
             {selectedLabel.tracking_history && selectedLabel.tracking_history.length > 0 && (
               <div className="checkpoints-sidebar">
                 <h4>Checkpoint History ({selectedLabel.tracking_history.length})</h4>
