@@ -295,6 +295,12 @@ export default function PackageTracker({ userId, onViewMap }) {
 
       {viewMode === 'map' && selectedLabel && (
         <div className="map-view">
+          <div className="map-header">
+            <div className="map-header-content">
+              <h4>Package Route Map</h4>
+              <p className="map-subtitle">Track package location and delivery route</p>
+            </div>
+          </div>
           <div className="map-sidebar">
             <div className="sidebar-header">
               <h3>{selectedLabel.tracking_code}</h3>
