@@ -400,18 +400,23 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
 
           {scannedLabel.checkpoints && scannedLabel.checkpoints.length > 0 && (
             <div className="checkpoint-history">
-              <h4>Checkpoint History</h4>
+              <h4>Checkpoint History ({scannedLabel.checkpoints.length})</h4>
               <div className="timeline">
                 {scannedLabel.checkpoints.map((checkpoint, index) => (
-                  <div key={checkpoint.id} className="timeline-item">
+                  <div key={checkpoint.id || index} className="timeline-item">
                     <div className="timeline-marker" />
                     <div className="timeline-content">
-                      <h5>{checkpoint.checkpoint_name}</h5>
+                      <h5>{checkpoint.checkpoint_name || 'Checkpoint'}</h5>
                       <p className="timestamp">
-                        {new Date(checkpoint.scanned_at).toLocaleString()}
+                        {checkpoint.scanned_at ? new Date(checkpoint.scanned_at).toLocaleString() : 'No date'}
                       </p>
                       {checkpoint.location_address && (
                         <p className="location">📍 {checkpoint.location_address}</p>
+                      )}
+                      {checkpoint.latitude && checkpoint.longitude && (
+                        <p className="coordinates">
+                          Coords: {checkpoint.latitude.toFixed(4)}, {checkpoint.longitude.toFixed(4)}
+                        </p>
                       )}
                       {checkpoint.notes && (
                         <p className="notes">{checkpoint.notes}</p>
