@@ -1216,7 +1216,32 @@ export default function MyAddressesTab({ userId }) {
                   <h3 className="form-section-title">Geolocation *</h3>
 
                   <div className="modal-map-section">
-                    <div className="modal-map-container" style={{ height: '300px', marginBottom: '16px' }}>
+                    <div className="modal-map-container" style={{ height: `${modalMapHeight}px`, marginBottom: '16px', position: 'relative' }}>
+                      <div className="map-overlay-controls" style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 400 }}>
+                        <div className="map-resize-controls">
+                          <button
+                            onClick={() => setModalMapHeight(prev => Math.max(prev - 50, 200))}
+                            className="btn-map-resize"
+                            title="Decrease map size"
+                          >
+                            −
+                          </button>
+                          <button
+                            onClick={() => setModalMapHeight(prev => Math.min(prev + 50, 600))}
+                            className="btn-map-resize"
+                            title="Increase map size"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => setShowModalMapControls(!showModalMapControls)}
+                          className="btn-legend-toggle"
+                          title={showModalMapControls ? 'Hide map controls' : 'Show map controls'}
+                        >
+                          {showModalMapControls ? 'Hide Map Controls' : 'Show Map Controls'}
+                        </button>
+                      </div>
                       <MapContainer
                         center={[
                           parseFloat(formData.addresses_latitude) || 12.8797,
@@ -1260,6 +1285,68 @@ export default function MyAddressesTab({ userId }) {
                           </Marker>
                         )}
                       </MapContainer>
+
+                      {showModalMapControls && (
+                        <div className="map-legend" style={{ position: 'absolute', bottom: '10px', right: '10px', maxHeight: 'calc(100% - 20px)', overflowY: 'auto', zIndex: 400 }}>
+                          <div className="legend-header">
+                            <h4>Map Controls</h4>
+                            <button
+                              onClick={() => setShowModalMapControls(false)}
+                              className="legend-close"
+                            >
+                              ✕
+                            </button>
+                          </div>
+
+                          <div className="legend-content">
+                            <div className="legend-section">
+                              <button
+                                onClick={() => {
+                                  const center = [12.8797, 121.7740]
+                                  const zoom = 6
+                                  if (modalMapRef) {
+                                    try {
+                                      modalMapRef.flyTo(center, zoom, { duration: 1 })
+                                    } catch (error) {
+                                      console.error('Error flying to Philippines:', error)
+                                    }
+                                  }
+                                }}
+                                className="btn-default-location"
+                                title="Focus on Philippines"
+                              >
+                                Philippines
+                              </button>
+                            </div>
+
+                            <div className="legend-section">
+                              <label className="legend-label">Legend</label>
+                              <div className="legend-items">
+                                <div className="legend-item">
+                                  <span className="legend-marker-default">📍</span>
+                                  <span>Selected Location</span>
+                                </div>
+                              </div>
+                            </div>
+
+                            {formData.addresses_latitude && formData.addresses_longitude && (
+                              <div className="legend-section">
+                                <label className="legend-label">Selected Location</label>
+                                <div className="coordinate-display">
+                                  <div className="coord-item">
+                                    <span className="coord-label">Lat:</span>
+                                    <span className="coord-value">{formData.addresses_latitude}</span>
+                                  </div>
+                                  <div className="coord-item">
+                                    <span className="coord-label">Lon:</span>
+                                    <span className="coord-value">{formData.addresses_longitude}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="modal-map-buttons">
