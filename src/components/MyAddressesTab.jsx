@@ -99,6 +99,8 @@ export default function MyAddressesTab({ userId }) {
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [editingAddressId, setEditingAddressId] = useState(null)
+  const [isCreating, setIsCreating] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCity, setFilterCity] = useState('all')
   const [filterRegion, setFilterRegion] = useState('all')
