@@ -1198,6 +1198,26 @@ export default function MyAddressesTab({ userId }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation()
+                            handleEditAddress(address)
+                          }}
+                          className="btn-edit-address"
+                          title="Edit address"
+                        >
+                          ✎
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleDeleteAddress(address.id)
+                          }}
+                          className="btn-delete-address"
+                          title="Delete address"
+                        >
+                          🗑
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
                             setSelectedAddressForHistory(address.id)
                             loadAddressHistory(address.id)
                             setShowHistory(true)
