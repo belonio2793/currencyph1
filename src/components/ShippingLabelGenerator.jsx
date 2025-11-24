@@ -295,7 +295,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
               </div>
 
               <div className="form-group">
-                <label>Dimensions (Length, Width, Height Centimeters [CM])</label>
+                <label>Dimensions (Length, Width, Height Centimeters)</label>
                 <input
                   type="text"
                   value={singleLabel.packageDimensions}
@@ -417,7 +417,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
               </div>
 
               <div className="form-group">
-                <label>Dimensions (Length, Width, Height Centimeters [CM])</label>
+                <label>Dimensions (Length, Width, Height Centimeters)</label>
                 <input
                   type="text"
                   value={bulkLabel.packageDimensions}
