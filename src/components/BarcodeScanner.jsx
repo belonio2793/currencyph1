@@ -177,10 +177,25 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
       {mode === 'input' && (
         <div className="scanner-input-mode">
           <h3>Scan Package Checkpoint</h3>
-          
+
           <form onSubmit={handleSearch} className="search-form">
+            <label className="form-label">Tracking Code</label>
+
+            <div className="form-actions">
+              <button type="submit" disabled={loading} className="btn btn-primary">
+                {loading ? 'Searching...' : 'Search Label'}
+              </button>
+
+              <button
+                type="button"
+                onClick={startCamera}
+                className="btn btn-secondary"
+              >
+                Open Camera
+              </button>
+            </div>
+
             <div className="form-group">
-              <label>Tracking Code</label>
               <input
                 type="text"
                 value={trackingCode}
@@ -189,20 +204,6 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
                 autoComplete="off"
                 autoFocus
               />
-            </div>
-
-            <div className="form-actions">
-              <button type="submit" disabled={loading} className="btn btn-primary">
-                {loading ? 'Searching...' : 'Search Label'}
-              </button>
-              
-              <button
-                type="button"
-                onClick={startCamera}
-                className="btn btn-secondary"
-              >
-                Open Camera
-              </button>
             </div>
           </form>
 
