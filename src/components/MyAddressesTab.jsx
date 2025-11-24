@@ -1228,6 +1228,7 @@ export default function MyAddressesTab({ userId }) {
                           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                         />
+                        <ModalMapRefHandler onMapReady={setModalMapRef} />
                         <ModalMapClickHandler
                           onMapClick={handleModalMapClick}
                           latitude={formData.addresses_latitude}
