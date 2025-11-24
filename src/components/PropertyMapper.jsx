@@ -174,10 +174,6 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     <div className="property-mapper-container">
       {/* Map Section */}
       <div className="map-section" style={{ flex: `1 1 ${mapWidth}%` }}>
-        <div className="map-header">
-          <h3>Property Map</h3>
-        </div>
-
         {/* Map Search Bar */}
         <div className="map-search-section">
           <div className="map-search-input-group">

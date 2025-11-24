@@ -202,12 +202,6 @@ export default function PartnersHandlersTab({ userId }) {
       </div>
 
       <div className="partners-container">
-        {/* Header */}
-        <div className="partners-header">
-          <div className="header-content">
-            <h3>Partner Details</h3>
-          </div>
-        </div>
 
         {/* Partners Map */}
         <div className="partners-map-section" style={{ height: `${mapHeight}px` }}>

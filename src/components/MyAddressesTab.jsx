@@ -482,10 +482,6 @@ export default function MyAddressesTab({ userId }) {
       <div className="my-addresses-layout">
         {/* Map Section */}
         <div className="map-section" style={{ flex: `0 0 ${mapHeight}px` }}>
-          <div className="map-header">
-            <h3>Address Map</h3>
-          </div>
-
           {/* Map Search Bar */}
           <div className="map-search-section">
             <div className="map-search-input-group">

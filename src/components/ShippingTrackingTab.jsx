@@ -202,10 +202,9 @@ export default function ShippingTrackingTab({ userId }) {
       </div>
 
       <div className="shipping-container">
-        {/* Header with Search and Filter */}
+        {/* Create Shipment Button */}
         <div className="shipping-header">
-          <h3>Shipments & Tracking</h3>
-          <button 
+          <button
             onClick={() => setShowForm(true)}
             className="btn-create-shipment"
           >

@@ -164,11 +164,6 @@ export default function RouteCalculatorTab({ userId }) {
       </div>
 
       <div className="route-calculator-container">
-        {/* Header */}
-        <div className="route-calculator-header">
-          <h3>Package Details & Route Calculation</h3>
-        </div>
-
         {/* Route Map */}
         <div className="route-map-section" style={{ height: `${mapHeight}px` }}>
           <div className="map-header">
