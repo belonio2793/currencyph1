@@ -1050,6 +1050,8 @@ export default function MyAddressesTab({ userId }) {
             <button
               onClick={() => {
                 setIsCreatingFromMap(false)
+                setEditingAddressId(null)
+                setIsCreating(true)
                 setFormData({
                   addresses_address: '',
                   addresses_street_number: '',
