@@ -26,7 +26,7 @@ const createMarkerIcon = (type = 'checkpoint', index = null) => {
   
   return L.divIcon({
     html: `<div style="background-color: ${color}; width: 40px; height: 40px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2); font-size: 14px; font-weight: bold; color: white;">
-      ${index !== null ? index : '📍'}
+      ${index !== null ? index : ''}
     </div>`,
     iconSize: [40, 40],
     className: 'custom-marker'
@@ -141,7 +141,7 @@ export default function PackageCheckpointMap({ trackingCode, onClose }) {
           <h2>{label.tracking_code}</h2>
           <p className="package-name">{label.package_name}</p>
           {onClose && (
-            <button onClick={onClose} className="close-btn" title="Close">✕</button>
+            <button onClick={onClose} className="close-btn" title="Close">×</button>
           )}
         </div>
         
@@ -280,15 +280,15 @@ export default function PackageCheckpointMap({ trackingCode, onClose }) {
                       </p>
                     )}
                     {checkpoint.address_text && (
-                      <p className="address">📍 {checkpoint.address_text}</p>
+                      <p className="address">{checkpoint.address_text}</p>
                     )}
                     {checkpoint.latitude && checkpoint.longitude && (
                       <p className="coordinates">
-                        🌐 {checkpoint.latitude.toFixed(6)}, {checkpoint.longitude.toFixed(6)}
+                        {checkpoint.latitude.toFixed(6)}, {checkpoint.longitude.toFixed(6)}
                       </p>
                     )}
                     {checkpoint.notes && (
-                      <p className="notes">💬 {checkpoint.notes}</p>
+                      <p className="notes">{checkpoint.notes}</p>
                     )}
                   </div>
                 </div>
