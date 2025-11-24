@@ -105,16 +105,22 @@
 
 .form-actions {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
   width: 100%;
   box-sizing: border-box;
-  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.form-actions .btn {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13px;
 }
 
 @media (max-width: 640px) {
   .form-actions {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
