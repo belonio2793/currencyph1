@@ -84,6 +84,7 @@
   transition: border-color 0.3s ease;
   box-sizing: border-box;
   min-width: 0;
+  box-shadow: none;
 }
 
 .tracking-input:focus {
