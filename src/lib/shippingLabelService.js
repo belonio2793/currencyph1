@@ -118,14 +118,25 @@ export async function searchShippingLabelBySerialId(userId, serialId) {
     .select(`
       *,
       origin_address:origin_address_id(*),
-      destination_address:destination_address_id(*),
-      checkpoints:addresses_shipment_checkpoints(*)
+      destination_address:destination_address_id(*)
     `)
     .eq('user_id', userId)
     .eq('serial_id', serialId)
     .single()
 
   if (error && error.code !== 'PGRST116') throw error
+
+  // Fetch checkpoints from tracking table
+  if (data) {
+    const { data: checkpoints } = await supabase
+      .from('addresses_shipment_tracking')
+      .select('*')
+      .eq('shipment_id', data.id)
+      .order('scanned_at', { ascending: false })
+
+    data.checkpoints = checkpoints || []
+  }
+
   return data
 }
 
