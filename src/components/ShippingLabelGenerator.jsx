@@ -71,7 +71,14 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
         labelFormat: 'a4-10'
       })
     } catch (err) {
-      setError(err.message || 'Failed to generate label')
+      let errorMsg = err.message || 'Failed to generate label'
+      // Handle specific known errors with user-friendly messages
+      if (errorMsg && errorMsg.includes('body stream already read')) {
+        errorMsg = 'Connection error occurred. Please try again in a moment.'
+      } else if (errorMsg && errorMsg.includes('Failed to fetch')) {
+        errorMsg = 'Network connection error. Please check your internet and try again.'
+      }
+      setError(errorMsg)
       console.error('Error:', err)
     } finally {
       setLoading(false)
@@ -82,22 +89,22 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
   const handleGenerateBulkLabels = async (e) => {
     e.preventDefault()
     const quantity = parseInt(bulkLabel.quantity) || 1
-    
+
     if (quantity < 1 || quantity > 1000) {
       setError('Quantity must be between 1 and 1000')
       return
     }
-    
+
     setLoading(true)
     setError('')
     setSuccess('')
-    
+
     try {
       const labels = await bulkCreateShippingLabels(userId, quantity, {
         ...bulkLabel,
         packageWeight: parseFloat(bulkLabel.packageWeight) || 0
       })
-      
+
       setGeneratedLabels(labels)
       setSuccess(`${labels.length} labels generated successfully`)
       setBulkLabel({
@@ -111,7 +118,14 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
         labelFormat: 'a4-10'
       })
     } catch (err) {
-      setError(err.message || 'Failed to generate labels')
+      let errorMsg = err.message || 'Failed to generate labels'
+      // Handle specific known errors with user-friendly messages
+      if (errorMsg && errorMsg.includes('body stream already read')) {
+        errorMsg = 'Connection error occurred. Please try again in a moment.'
+      } else if (errorMsg && errorMsg.includes('Failed to fetch')) {
+        errorMsg = 'Network connection error. Please check your internet and try again.'
+      }
+      setError(errorMsg)
       console.error('Error:', err)
     } finally {
       setLoading(false)
