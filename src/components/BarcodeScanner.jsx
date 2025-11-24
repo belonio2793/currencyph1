@@ -156,15 +156,17 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
       const checkpointData = {
         checkpointName: checkpointName.trim(),
         checkpointType,
-        latitude: location?.latitude,
-        longitude: location?.longitude,
+        latitude: location?.latitude || 0,
+        longitude: location?.longitude || 0,
         locationAddress: location?.address || checkpointName,
+        scannedAt: new Date().toISOString(),
         scannedByUserId: userId,
         notes: checkpointNotes.trim(),
         metadata: {
           timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
-          accuracy: location?.accuracy
+          accuracy: location?.accuracy,
+          source: 'barcode_scan'
         }
       }
 
