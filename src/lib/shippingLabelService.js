@@ -626,3 +626,169 @@ export async function getBatchStats(userId) {
 
   return stats
 }
+
+// ============================================
+// CHECKPOINT JSONB ARRAY OPERATIONS
+// ============================================
+
+/**
+ * Add checkpoint to JSONB array on label
+ * Stores complete checkpoint data directly on the label
+ */
+export async function addCheckpointToJsonbArray(trackingCode, checkpointData) {
+  const newCheckpoint = {
+    id: `cp-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+    latitude: checkpointData.latitude,
+    longitude: checkpointData.longitude,
+    checkpoint_name: checkpointData.checkpointName,
+    address_text: checkpointData.addressText,
+    checkpoint_type: checkpointData.checkpointType || 'scanned',
+    notes: checkpointData.notes,
+    timestamp: new Date().toISOString(),
+    user_id: checkpointData.userId,
+    metadata: checkpointData.metadata || {}
+  }
+
+  // Get current label to fetch existing checkpoints
+  const { data: label, error: fetchError } = await supabase
+    .from('addresses_shipping_labels')
+    .select('checkpoints_jsonb')
+    .eq('tracking_code', trackingCode)
+    .single()
+
+  if (fetchError) throw fetchError
+
+  // Append new checkpoint to array
+  const existingCheckpoints = label?.checkpoints_jsonb || []
+  const updatedCheckpoints = [...existingCheckpoints, newCheckpoint]
+
+  // Update label with new checkpoint array
+  const { data, error: updateError } = await supabase
+    .from('addresses_shipping_labels')
+    .update({
+      checkpoints_jsonb: updatedCheckpoints,
+      status: checkpointData.status || 'in_transit',
+      last_scanned_at: new Date().toISOString(),
+      last_scanned_lat: checkpointData.latitude,
+      last_scanned_lng: checkpointData.longitude,
+      current_checkpoint: checkpointData.checkpointName,
+      updated_at: new Date().toISOString()
+    })
+    .eq('tracking_code', trackingCode)
+    .select('*')
+
+  if (updateError) throw updateError
+
+  return {
+    checkpoint: newCheckpoint,
+    label: data[0]
+  }
+}
+
+/**
+ * Get all checkpoints from JSONB array for a label
+ */
+export async function getCheckpointsFromJsonbArray(trackingCode) {
+  const { data, error } = await supabase
+    .from('addresses_shipping_labels')
+    .select('checkpoints_jsonb')
+    .eq('tracking_code', trackingCode)
+    .single()
+
+  if (error) throw error
+  return data?.checkpoints_jsonb || []
+}
+
+/**
+ * Get label with all JSONB checkpoints
+ */
+export async function getLabelWithCheckpoints(trackingCode) {
+  const { data, error } = await supabase
+    .from('addresses_shipping_labels')
+    .select(`
+      *,
+      origin_address:origin_address_id(*),
+      destination_address:destination_address_id(*)
+    `)
+    .eq('tracking_code', trackingCode)
+    .single()
+
+  if (error && error.code !== 'PGRST116') throw error
+
+  if (data) {
+    data.checkpoints = data.checkpoints_jsonb || []
+  }
+
+  return data
+}
+
+/**
+ * Remove checkpoint from JSONB array
+ */
+export async function removeCheckpointFromJsonbArray(trackingCode, checkpointId) {
+  const { data: label, error: fetchError } = await supabase
+    .from('addresses_shipping_labels')
+    .select('checkpoints_jsonb')
+    .eq('tracking_code', trackingCode)
+    .single()
+
+  if (fetchError) throw fetchError
+
+  const filteredCheckpoints = (label?.checkpoints_jsonb || []).filter(
+    cp => cp.id !== checkpointId
+  )
+
+  const { error: updateError } = await supabase
+    .from('addresses_shipping_labels')
+    .update({
+      checkpoints_jsonb: filteredCheckpoints,
+      updated_at: new Date().toISOString()
+    })
+    .eq('tracking_code', trackingCode)
+
+  if (updateError) throw updateError
+  return filteredCheckpoints
+}
+
+/**
+ * Update checkpoint in JSONB array
+ */
+export async function updateCheckpointInJsonbArray(trackingCode, checkpointId, updates) {
+  const { data: label, error: fetchError } = await supabase
+    .from('addresses_shipping_labels')
+    .select('checkpoints_jsonb')
+    .eq('tracking_code', trackingCode)
+    .single()
+
+  if (fetchError) throw fetchError
+
+  const updatedCheckpoints = (label?.checkpoints_jsonb || []).map(cp =>
+    cp.id === checkpointId ? { ...cp, ...updates, updated_at: new Date().toISOString() } : cp
+  )
+
+  const { error: updateError } = await supabase
+    .from('addresses_shipping_labels')
+    .update({
+      checkpoints_jsonb: updatedCheckpoints,
+      updated_at: new Date().toISOString()
+    })
+    .eq('tracking_code', trackingCode)
+
+  if (updateError) throw updateError
+  return updatedCheckpoints
+}
+
+/**
+ * Clear all checkpoints from JSONB array
+ */
+export async function clearCheckpointsFromJsonbArray(trackingCode) {
+  const { error } = await supabase
+    .from('addresses_shipping_labels')
+    .update({
+      checkpoints_jsonb: [],
+      updated_at: new Date().toISOString()
+    })
+    .eq('tracking_code', trackingCode)
+
+  if (error) throw error
+}
