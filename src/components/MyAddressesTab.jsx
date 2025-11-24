@@ -39,6 +39,19 @@ function MapClickHandler({ onMapClick, isCreating }) {
   return null
 }
 
+// Modal map click handler - allows clicking anywhere on the modal map
+function ModalMapClickHandler({ onMapClick }) {
+  useMapEvents({
+    click: (e) => {
+      onMapClick({
+        latitude: e.latlng.lat,
+        longitude: e.latlng.lng
+      })
+    }
+  })
+  return null
+}
+
 export default function MyAddressesTab({ userId }) {
   const mapRef = useRef(null)
   const [showForm, setShowForm] = useState(false)
