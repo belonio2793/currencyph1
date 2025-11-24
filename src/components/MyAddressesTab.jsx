@@ -131,28 +131,6 @@ export default function MyAddressesTab({ userId }) {
   const [citySearchOpen, setCitySearchOpen] = useState(false)
   const [filteredCities, setFilteredCities] = useState(allCities)
 
-  const allCities = [
-    "Abuyog", "Alaminos", "Alcala", "Angeles", "Antipolo", "Aroroy", "Bacolod", "Bacoor", "Bago",
-    "Bais", "Balanga", "Baliuag", "Bangued", "Bansalan", "Bantayan", "Bataan", "Batac", "Batangas City",
-    "Bayambang", "Bayawan", "Baybay", "Bayugan", "Biñan", "Bislig", "Bocaue", "Bogo", "Boracay",
-    "Borongan", "Butuan", "Cabadbaran", "Cabanatuan", "Cabuyao", "Cadiz", "Cagayan de Oro", "Calamba",
-    "Calapan", "Calbayog", "Caloocan", "Camiling", "Canlaon", "Caoayan", "Capiz", "Caraga", "Carmona",
-    "Catbalogan", "Cauayan", "Cavite City", "Cebu City", "Cotabato City", "Dagupan", "Danao", "Dapitan",
-    "Daraga", "Dasmari��as", "Davao City", "Davao del Norte", "Davao del Sur", "Davao Oriental", "Dipolog",
-    "Dumaguete", "General Santos", "General Trias", "Gingoog", "Guihulngan", "Himamaylan", "Ilagan", "Iligan",
-    "Iloilo City", "Imus", "Isabela", "Isulan", "Kabankalan", "Kidapawan", "Koronadal", "La Carlota", "Laoag",
-    "Lapu-Lapu", "Las Piñas", "Laoang", "Legazpi", "Ligao", "Limay", "Lucena", "Maasin", "Mabalacat",
-    "Malabon", "Malaybalay", "Malolos", "Mandaluyong", "Mandaue", "Manila", "Marawi", "Marilao", "Masbate City",
-    "Mati", "Meycauayan", "Muntinlupa", "Naga (Camarines Sur)", "Navotas", "Olongapo", "Ormoc", "Oroquieta",
-    "Ozamiz", "Pagadian", "Palo", "Parañaque", "Pasay", "Pasig", "Passi", "Puerto Princesa", "Quezon City",
-    "Roxas", "Sagay", "Samal", "San Carlos (Negros Occidental)", "San Carlos (Pangasinan)", "San Fernando (La Union)",
-    "San Fernando (Pampanga)", "San Jose (Antique)", "San Jose del Monte", "San Juan", "San Pablo", "San Pedro",
-    "Santiago", "Silay", "Sipalay", "Sorsogon City", "Surigao City", "Tabaco", "Tabuk", "Tacurong", "Tagaytay",
-    "Tagbilaran", "Taguig", "Tacloban", "Talisay (Cebu)", "Talisay (Negros Occidental)", "Tanjay", "Tarlac City",
-    "Tayabas", "Toledo", "Trece Martires", "Tuguegarao", "Urdaneta", "Valencia", "Valenzuela", "Victorias", "Vigan",
-    "Virac", "Zamboanga City", "Baguio", "Bohol", "Coron", "El Nido", "Makati", "Palawan", "Siargao"
-  ].sort()
-
   const [formData, setFormData] = useState({
     addresses_address: '',
     addresses_street_number: '',
