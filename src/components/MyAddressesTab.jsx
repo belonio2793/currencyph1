@@ -1225,11 +1225,13 @@ export default function MyAddressesTab({ userId }) {
           <div className="property-form-overlay" onClick={() => setShowForm(false)}>
             <div className="property-form-modal" onClick={e => e.stopPropagation()}>
               <div className="form-modal-header">
-                <h2>Add New Address</h2>
+                <h2>{editingAddressId ? 'Edit Address' : 'Add New Address'}</h2>
                 <button
                   onClick={() => {
                     setShowForm(false)
                     setIsCreatingFromMap(false)
+                    setEditingAddressId(null)
+                    setIsCreating(true)
                   }}
                   className="form-modal-close"
                 >
