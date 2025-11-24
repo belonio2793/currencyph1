@@ -255,8 +255,12 @@ export default function PackageTracker({ userId, onViewMap }) {
                   key={label.id}
                   className={`label-card ${selectedLabel?.id === label.id ? 'active' : ''}`}
                   onClick={() => {
-                    setSelectedLabel(label)
-                    setViewMode('map')
+                    if (onViewMap) {
+                      onViewMap(label.tracking_code)
+                    } else {
+                      setSelectedLabel(label)
+                      setViewMode('map')
+                    }
                   }}
                 >
                   <div className="card-header">
