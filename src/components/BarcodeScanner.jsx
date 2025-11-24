@@ -176,7 +176,12 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
 
       {mode === 'input' && (
         <div className="scanner-input-mode">
-          <h3>Scan Package Checkpoint</h3>
+          <div className="map-header">
+            <div className="map-header-content">
+              <h4>Scan Package Checkpoint</h4>
+              <p className="map-subtitle">Use barcode scanning to track package checkpoints</p>
+            </div>
+          </div>
 
           <form onSubmit={handleSearch} className="search-form">
             <div className="input-row">
