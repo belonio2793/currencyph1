@@ -87,6 +87,16 @@ export default function DefaultAddressesTab({ userId, onClose }) {
 
       {/* Sub-tab Content */}
       <div className="subtab-content">
+        {/* Map modal overlay */}
+        {viewingMapForTrackingCode && (
+          <div className="modal-overlay">
+            <PackageCheckpointMap
+              trackingCode={viewingMapForTrackingCode}
+              onClose={() => setViewingMapForTrackingCode(null)}
+            />
+          </div>
+        )}
+
         {activeSubTab === 'properties' && (
           <PropertyMapper
             key={refreshKey}
@@ -113,7 +123,10 @@ export default function DefaultAddressesTab({ userId, onClose }) {
         )}
 
         {activeSubTab === 'track' && (
-          <PackageTracker userId={userId} />
+          <PackageTracker
+            userId={userId}
+            onViewMap={(trackingCode) => setViewingMapForTrackingCode(trackingCode)}
+          />
         )}
       </div>
     </div>
