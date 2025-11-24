@@ -218,6 +218,8 @@ export default function MyAddressesTab({ userId }) {
   const [modalMapLayer, setModalMapLayer] = useState('street')
   const [citySearchOpen, setCitySearchOpen] = useState(false)
   const [filteredCities, setFilteredCities] = useState(allCities)
+  const [provinceSearchOpen, setProvinceSearchOpen] = useState(false)
+  const [filteredProvinces, setFilteredProvinces] = useState(allProvinces)
 
   const [formData, setFormData] = useState({
     addresses_address: '',
