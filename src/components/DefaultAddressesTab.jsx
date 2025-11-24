@@ -58,28 +58,28 @@ export default function DefaultAddressesTab({ userId, onClose }) {
           onClick={() => setActiveSubTab('properties')}
           title="Manage Properties"
         >
-          📍 Properties
+          Properties
         </button>
         <button
           className={`subtab-btn ${activeSubTab === 'generate' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('generate')}
           title="Generate Shipping Labels"
         >
-          📦 Generate Labels
+          Generate Labels
         </button>
         <button
           className={`subtab-btn ${activeSubTab === 'scan' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('scan')}
           title="Scan Package Checkpoints"
         >
-          📱 Scan Barcode
+          Scan Barcode
         </button>
         <button
           className={`subtab-btn ${activeSubTab === 'track' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('track')}
           title="Track Packages"
         >
-          🗺️ Track Package
+          Track Package
         </button>
       </div>
 
