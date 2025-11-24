@@ -1809,6 +1809,8 @@ export default function MyAddressesTab({ userId }) {
                     onClick={() => {
                       setShowForm(false)
                       setIsCreatingFromMap(false)
+                      setEditingAddressId(null)
+                      setIsCreating(true)
                     }}
                     className="btn-form-cancel"
                     disabled={loading}
@@ -1820,7 +1822,7 @@ export default function MyAddressesTab({ userId }) {
                     className="btn-form-save"
                     disabled={loading}
                   >
-                    {loading ? 'Saving...' : 'Save Address'}
+                    {loading ? 'Saving...' : (editingAddressId ? 'Update Address' : 'Add Address')}
                   </button>
                 </div>
               </form>
