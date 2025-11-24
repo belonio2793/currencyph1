@@ -1480,13 +1480,79 @@ export default function MyAddressesTab({ userId }) {
                     </div>
                     <div className="form-group">
                       <label>Province</label>
-                      <input
-                        type="text"
-                        name="addresses_province"
-                        value={formData.addresses_province}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Metro Manila"
-                      />
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="text"
+                          name="addresses_province"
+                          value={formData.addresses_province}
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            const query = e.target.value.toLowerCase()
+                            if (query) {
+                              setFilteredProvinces(allProvinces.filter(province =>
+                                province.toLowerCase().includes(query)
+                              ))
+                              setProvinceSearchOpen(true)
+                            } else {
+                              setFilteredProvinces(allProvinces)
+                              setProvinceSearchOpen(false)
+                            }
+                          }}
+                          onFocus={() => {
+                            setProvinceSearchOpen(true)
+                            setFilteredProvinces(allProvinces)
+                          }}
+                          onBlur={() => setTimeout(() => setProvinceSearchOpen(false), 200)}
+                          placeholder="e.g., Metro Manila"
+                          autoComplete="off"
+                        />
+                        {provinceSearchOpen && filteredProvinces.length > 0 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            backgroundColor: 'white',
+                            border: '1px solid #ccc',
+                            borderTop: 'none',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            zIndex: 1000,
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          }}>
+                            {filteredProvinces.slice(0, 10).map(province => (
+                              <div
+                                key={province}
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, addresses_province: province }))
+                                  setProvinceSearchOpen(false)
+                                }}
+                                style={{
+                                  padding: '10px',
+                                  cursor: 'pointer',
+                                  borderBottom: '1px solid #f0f0f0',
+                                  backgroundColor: province === formData.addresses_province ? '#f5f5f5' : 'white',
+                                  transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = province === formData.addresses_province ? '#f5f5f5' : 'white'}
+                              >
+                                {province}
+                              </div>
+                            ))}
+                            {filteredProvinces.length > 10 && (
+                              <div style={{
+                                padding: '10px',
+                                textAlign: 'center',
+                                color: '#999',
+                                fontSize: '12px'
+                              }}>
+                                Showing 10 of {filteredProvinces.length} provinces
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
