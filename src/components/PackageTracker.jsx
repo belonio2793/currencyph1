@@ -154,23 +154,40 @@ export default function PackageTracker({ userId }) {
 
   // Get route information
   const getRouteInfo = () => {
-    if (!selectedLabel || !selectedLabel.origin_address || !selectedLabel.destination_address) {
+    if (!selectedLabel) {
       return null
     }
 
-    const origin = selectedLabel.origin_address
-    const destination = selectedLabel.destination_address
-    
-    if (!origin.addresses_latitude || !destination.addresses_latitude) {
+    let fromLat, fromLon, toLat, toLon
+
+    // Start from origin
+    if (selectedLabel.origin_address && selectedLabel.origin_address.addresses_latitude) {
+      fromLat = selectedLabel.origin_address.addresses_latitude
+      fromLon = selectedLabel.origin_address.addresses_longitude
+    } else {
       return null
     }
 
-    const distance = calculateDistance(
-      origin.addresses_latitude,
-      origin.addresses_longitude,
-      destination.addresses_latitude,
-      destination.addresses_longitude
-    )
+    // End at last checkpoint or destination
+    if (selectedLabel.checkpoints && selectedLabel.checkpoints.length > 0) {
+      const lastCheckpoint = selectedLabel.checkpoints[selectedLabel.checkpoints.length - 1]
+      if (lastCheckpoint.latitude && lastCheckpoint.longitude) {
+        toLat = lastCheckpoint.latitude
+        toLon = lastCheckpoint.longitude
+      } else if (selectedLabel.destination_address && selectedLabel.destination_address.addresses_latitude) {
+        toLat = selectedLabel.destination_address.addresses_latitude
+        toLon = selectedLabel.destination_address.addresses_longitude
+      } else {
+        return null
+      }
+    } else if (selectedLabel.destination_address && selectedLabel.destination_address.addresses_latitude) {
+      toLat = selectedLabel.destination_address.addresses_latitude
+      toLon = selectedLabel.destination_address.addresses_longitude
+    } else {
+      return null
+    }
+
+    const distance = calculateDistance(fromLat, fromLon, toLat, toLon)
 
     // Estimate delivery time (assuming average speed of 40 km/h for courier)
     const estimatedHours = distance / 40
