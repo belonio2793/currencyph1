@@ -1,61 +1,159 @@
 import { supabase } from './supabaseClient'
+import JsBarcode from 'jsbarcode'
 
-// Generate unique serial ID with prefix
-export async function generateUniqueSerialId(prefix = 'PKG') {
-  const timestamp = Date.now().toString(36).toUpperCase()
-  const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase()
-  const serialId = `${prefix}-${timestamp}-${randomPart}`
+// ============================================
+// TRACKING CODE GENERATION
+// ============================================
 
-  // Check if it already exists
+/**
+ * Generate unique tracking code in format: PH-YYYY-XXXXXXXX
+ * Example: PH-2025-A1B2C3D4
+ */
+export async function generateUniqueTrackingCode() {
+  const year = new Date().getFullYear()
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let code = ''
+  
+  // Generate random 8-char code
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  
+  const trackingCode = `PH-${year}-${code}`
+
+  // Check uniqueness
   const { data } = await supabase
-    .from('addresses_shipment_labels')
+    .from('addresses_shipping_labels')
     .select('id')
-    .eq('serial_id', serialId)
+    .eq('tracking_code', trackingCode)
     .single()
 
-  // If exists, try again recursively
+  // Retry if exists
   if (data) {
-    return generateUniqueSerialId(prefix)
+    return generateUniqueTrackingCode()
   }
 
-  return serialId
+  return trackingCode
 }
 
-// Generate multiple unique serial IDs
-export async function generateMultipleSerialIds(count = 1, prefix = 'PKG') {
-  const serialIds = []
+/**
+ * Generate multiple unique tracking codes for batch operations
+ */
+export async function generateMultipleTrackingCodes(count = 1) {
+  const codes = []
   for (let i = 0; i < count; i++) {
-    const serialId = await generateUniqueSerialId(prefix)
-    serialIds.push(serialId)
+    const code = await generateUniqueTrackingCode()
+    codes.push(code)
   }
-  return serialIds
+  return codes
 }
 
-// Create shipping label with QR/barcode data
+// ============================================
+// BARCODE & QR CODE SVG GENERATION
+// ============================================
+
+/**
+ * Generate SVG barcode using CODE128 format
+ */
+export function generateBarcodeSVG(trackingCode) {
+  try {
+    const canvas = document.createElement('canvas')
+    JsBarcode(canvas, trackingCode, {
+      format: 'CODE128',
+      width: 2,
+      height: 100,
+      displayValue: true,
+      fontSize: 14,
+      margin: 10
+    })
+    return canvas.toDataURL('image/svg+xml')
+  } catch (err) {
+    console.error('Barcode generation error:', err)
+    return null
+  }
+}
+
+/**
+ * Generate QR code SVG (client-side using simple grid pattern for demo)
+ * For production, use: npm install qrcode
+ */
+export function generateQRCodeSVG(trackingCode) {
+  try {
+    // Simple QR-like pattern generator for demo
+    // In production, replace with proper QR library:
+    // import QRCode from 'qrcode'
+    
+    const size = 200
+    const moduleCount = 29
+    const moduleSize = Math.floor(size / moduleCount)
+    
+    // Create SVG
+    let svg = `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">`
+    svg += `<rect width="${size}" height="${size}" fill="white"/>`
+    
+    // Add border pattern (quiet zone)
+    svg += `<rect x="0" y="0" width="${size}" height="${size}" fill="none" stroke="black" stroke-width="2"/>`
+    
+    // Generate pseudo-QR pattern from tracking code
+    let hash = 0
+    for (let i = 0; i < trackingCode.length; i++) {
+      const char = trackingCode.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // Keep it 32-bit
+    }
+    
+    // Create pattern based on hash
+    for (let y = 1; y < moduleCount - 1; y++) {
+      for (let x = 1; x < moduleCount - 1; x++) {
+        const seed = (x * 73856093) ^ (y * 19349663) ^ hash
+        if ((seed & 1) === 0) {
+          const px = x * moduleSize
+          const py = y * moduleSize
+          svg += `<rect x="${px}" y="${py}" width="${moduleSize}" height="${moduleSize}" fill="black"/>`
+        }
+      }
+    }
+    
+    // Add text
+    svg += `<text x="${size / 2}" y="${size - 10}" text-anchor="middle" font-size="10" fill="black">${trackingCode}</text>`
+    svg += `</svg>`
+    
+    return `data:image/svg+xml;base64,${btoa(svg)}`
+  } catch (err) {
+    console.error('QR code generation error:', err)
+    return null
+  }
+}
+
+// ============================================
+// LABEL CREATION
+// ============================================
+
+/**
+ * Create single shipping label with tracking code and SVG barcodes
+ */
 export async function createShippingLabel(userId, labelData) {
-  const serialId = await generateUniqueSerialId(labelData.prefix || 'PKG')
+  const trackingCode = await generateUniqueTrackingCode()
+  
+  // Generate barcode and QR code SVGs
+  const barcodeSVG = generateBarcodeSVG(trackingCode)
+  const qrCodeSVG = generateQRCodeSVG(trackingCode)
 
   const { data, error } = await supabase
-    .from('addresses_shipment_labels')
+    .from('addresses_shipping_labels')
     .insert([{
       user_id: userId,
-      serial_id: serialId,
-      barcode_data: serialId,
-      qr_code_data: JSON.stringify({
-        serialId,
-        packageName: labelData.packageName,
-        origin: labelData.originAddressId,
-        destination: labelData.destinationAddressId,
-        createdAt: new Date().toISOString()
-      }),
-      shipment_id: labelData.shipmentId,
+      tracking_code: trackingCode,
+      barcode_svg: barcodeSVG,
+      qr_code_svg: qrCodeSVG,
       package_name: labelData.packageName,
       package_description: labelData.packageDescription,
-      package_weight: labelData.packageWeight,
-      package_dimensions: labelData.packageDimensions,
+      weight_kg: labelData.packageWeight,
+      dimensions: labelData.packageDimensions,
       origin_address_id: labelData.originAddressId,
       destination_address_id: labelData.destinationAddressId,
-      notes: labelData.notes
+      status: 'created',
+      label_format: labelData.labelFormat || 'a4-10'
     }])
     .select()
 
@@ -63,87 +161,95 @@ export async function createShippingLabel(userId, labelData) {
   return data[0]
 }
 
-// Bulk create shipping labels
+/**
+ * Bulk create shipping labels for batch operations (1, 10, 100, 1000)
+ */
 export async function bulkCreateShippingLabels(userId, count = 1, labelData = {}) {
-  const serialIds = await generateMultipleSerialIds(count, labelData.prefix || 'PKG')
-  const batchId = `BATCH-${Date.now()}`
+  const trackingCodes = await generateMultipleTrackingCodes(count)
+  const batchId = `BATCH-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
 
-  const labels = serialIds.map(serialId => ({
+  // Create all labels
+  const labels = trackingCodes.map(trackingCode => ({
     user_id: userId,
-    serial_id: serialId,
-    barcode_data: serialId,
-    qr_code_data: JSON.stringify({
-      serialId,
-      packageName: labelData.packageName || `Package ${serialId}`,
-      origin: labelData.originAddressId,
-      destination: labelData.destinationAddressId,
-      createdAt: new Date().toISOString(),
-      batchId
-    }),
-    shipment_id: labelData.shipmentId,
-    package_name: labelData.packageName || `Package ${serialId}`,
+    tracking_code: trackingCode,
+    barcode_svg: generateBarcodeSVG(trackingCode),
+    qr_code_svg: generateQRCodeSVG(trackingCode),
+    package_name: labelData.packageName || `Package ${trackingCode}`,
     package_description: labelData.packageDescription,
-    package_weight: labelData.packageWeight,
-    package_dimensions: labelData.packageDimensions,
+    weight_kg: labelData.packageWeight,
+    dimensions: labelData.packageDimensions,
     origin_address_id: labelData.originAddressId,
     destination_address_id: labelData.destinationAddressId,
-    notes: labelData.notes
+    status: 'created',
+    batch_id: batchId,
+    batch_position: trackingCodes.indexOf(trackingCode) + 1,
+    label_format: labelData.labelFormat || 'a4-10'
   }))
 
-  const { data, error } = await supabase
-    .from('addresses_shipment_labels')
+  // Insert all labels
+  const { data: insertedLabels, error: insertError } = await supabase
+    .from('addresses_shipping_labels')
     .insert(labels)
     .select()
 
-  if (error) throw error
+  if (insertError) throw insertError
 
   // Record batch generation
-  await supabase
-    .from('addresses_shipment_label_generated_codes')
+  const { error: batchError } = await supabase
+    .from('addresses_shipping_batches')
     .insert([{
       user_id: userId,
       batch_id: batchId,
-      batch_size: count,
-      generated_count: data.length,
+      requested_count: count,
+      generated_count: insertedLabels.length,
       status: 'completed'
     }])
 
-  return data
+  if (batchError) throw batchError
+
+  return insertedLabels
 }
 
-// Search for shipping label by serial ID
-export async function searchShippingLabelBySerialId(userId, serialId) {
+// ============================================
+// LABEL QUERIES
+// ============================================
+
+/**
+ * Search for label by tracking code
+ */
+export async function searchLabelByTrackingCode(trackingCode) {
   const { data, error } = await supabase
-    .from('addresses_shipment_labels')
+    .from('addresses_shipping_labels')
     .select(`
       *,
       origin_address:origin_address_id(*),
       destination_address:destination_address_id(*)
     `)
-    .eq('user_id', userId)
-    .eq('serial_id', serialId)
+    .eq('tracking_code', trackingCode)
     .single()
 
   if (error && error.code !== 'PGRST116') throw error
 
-  // Fetch checkpoints from tracking table
   if (data) {
-    const { data: checkpoints } = await supabase
-      .from('addresses_shipment_tracking')
+    // Fetch tracking history
+    const { data: history } = await supabase
+      .from('addresses_shipping_tracking')
       .select('*')
-      .eq('shipment_id', data.id)
-      .order('scanned_at', { ascending: false })
+      .eq('tracking_code', trackingCode)
+      .order('created_at', { ascending: false })
 
-    data.checkpoints = checkpoints || []
+    data.tracking_history = history || []
   }
 
   return data
 }
 
-// Get all shipping labels with checkpoints
-export async function getShippingLabelsWithCheckpoints(userId, status = null) {
+/**
+ * Get all labels for a user
+ */
+export async function getUserShippingLabels(userId, status = null) {
   let query = supabase
-    .from('addresses_shipment_labels')
+    .from('addresses_shipping_labels')
     .select(`
       *,
       origin_address:origin_address_id(*),
@@ -159,41 +265,82 @@ export async function getShippingLabelsWithCheckpoints(userId, status = null) {
 
   if (error) throw error
 
-  // Fetch checkpoints from tracking table separately
-  const labelsWithCheckpoints = await Promise.all(
+  // Fetch tracking history for each label
+  const labelsWithHistory = await Promise.all(
     (data || []).map(async (label) => {
-      const { data: checkpoints } = await supabase
-        .from('addresses_shipment_tracking')
+      const { data: history } = await supabase
+        .from('addresses_shipping_tracking')
         .select('*')
-        .eq('shipment_id', label.id)
-        .order('scanned_at', { ascending: false })
+        .eq('tracking_code', label.tracking_code)
+        .order('created_at', { ascending: false })
 
       return {
         ...label,
-        checkpoints: checkpoints || []
+        tracking_history: history || []
       }
     })
   )
 
-  return labelsWithCheckpoints
+  return labelsWithHistory
 }
 
-// Add checkpoint for package
-// Note: shipment_id field is used to track which label this checkpoint belongs to
-export async function addCheckpoint(shippingLabelId, checkpointData) {
-  const { data, error } = await supabase
-    .from('addresses_shipment_tracking')
+/**
+ * Get batch details
+ */
+export async function getBatchDetails(batchId) {
+  const { data: batch, error: batchError } = await supabase
+    .from('addresses_shipping_batches')
+    .select('*')
+    .eq('batch_id', batchId)
+    .single()
+
+  if (batchError) throw batchError
+
+  // Get all labels in batch
+  const { data: labels, error: labelsError } = await supabase
+    .from('addresses_shipping_labels')
+    .select('*')
+    .eq('batch_id', batchId)
+    .order('batch_position', { ascending: true })
+
+  if (labelsError) throw labelsError
+
+  return {
+    ...batch,
+    labels: labels || []
+  }
+}
+
+// ============================================
+// CHECKPOINT TRACKING
+// ============================================
+
+/**
+ * Add checkpoint/scan for a label
+ */
+export async function addCheckpoint(trackingCode, checkpointData) {
+  // Get the label first
+  const { data: label } = await supabase
+    .from('addresses_shipping_labels')
+    .select('id')
+    .eq('tracking_code', trackingCode)
+    .single()
+
+  if (!label) {
+    throw new Error(`Label not found: ${trackingCode}`)
+  }
+
+  // Insert checkpoint
+  const { data: checkpoint, error } = await supabase
+    .from('addresses_shipping_tracking')
     .insert([{
-      shipment_id: shippingLabelId,
+      tracking_code: trackingCode,
       status: checkpointData.status || 'scanned',
-      location: checkpointData.locationAddress,
       checkpoint_name: checkpointData.checkpointName,
-      checkpoint_type: checkpointData.checkpointType || 'scanned',
       latitude: checkpointData.latitude,
       longitude: checkpointData.longitude,
-      location_address: checkpointData.locationAddress,
-      scanned_at: checkpointData.scannedAt || new Date().toISOString(),
-      scanned_by_user_id: checkpointData.scannedByUserId,
+      address_text: checkpointData.addressText,
+      scanned_by: checkpointData.scannedBy,
       notes: checkpointData.notes,
       metadata: checkpointData.metadata || {}
     }])
@@ -201,45 +348,264 @@ export async function addCheckpoint(shippingLabelId, checkpointData) {
 
   if (error) throw error
 
-  // Update shipping label status if it's the first checkpoint
-  if (data && data.length > 0) {
-    await supabase
-      .from('addresses_shipment_labels')
-      .update({
-        current_checkpoint_id: data[0].id,
-        status: 'in_transit',
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', shippingLabelId)
-  }
+  // Update label with latest checkpoint info
+  const checkpointToUse = checkpoint[0]
+  const { error: updateError } = await supabase
+    .from('addresses_shipping_labels')
+    .update({
+      status: checkpointData.status || 'in_transit',
+      last_scanned_at: new Date().toISOString(),
+      last_scanned_lat: checkpointData.latitude,
+      last_scanned_lng: checkpointData.longitude,
+      current_checkpoint: checkpointData.checkpointName
+    })
+    .eq('tracking_code', trackingCode)
 
-  return data[0]
+  if (updateError) throw updateError
+
+  return checkpointToUse
 }
 
-// Get checkpoint history for a shipping label
-// Checkpoints are stored in addresses_shipment_tracking with shipment_id = label id
-export async function getCheckpointHistory(shippingLabelId) {
+/**
+ * Get tracking history for a label
+ */
+export async function getTrackingHistory(trackingCode) {
   const { data, error } = await supabase
-    .from('addresses_shipment_tracking')
+    .from('addresses_shipping_tracking')
     .select('*')
-    .eq('shipment_id', shippingLabelId)
-    .order('scanned_at', { ascending: true })
+    .eq('tracking_code', trackingCode)
+    .order('created_at', { ascending: true })
 
   if (error) throw error
   return data || []
 }
 
-// Update shipping label status
-export async function updateShippingLabelStatus(shippingLabelId, status) {
+// ============================================
+// STATUS UPDATES
+// ============================================
+
+/**
+ * Update label status (created, printed, in_transit, delivered, returned, lost)
+ */
+export async function updateLabelStatus(trackingCode, status) {
+  const validStatuses = ['created', 'printed', 'in_transit', 'delivered', 'returned', 'lost']
+  
+  if (!validStatuses.includes(status)) {
+    throw new Error(`Invalid status: ${status}`)
+  }
+
   const { data, error } = await supabase
-    .from('addresses_shipment_labels')
+    .from('addresses_shipping_labels')
     .update({
       status,
       updated_at: new Date().toISOString()
     })
-    .eq('id', shippingLabelId)
+    .eq('tracking_code', trackingCode)
     .select()
 
   if (error) throw error
   return data[0]
+}
+
+/**
+ * Mark label as printed
+ */
+export async function markLabelAsPrinted(trackingCode, pdfUrl = null) {
+  return updateLabelStatus(trackingCode, 'printed')
+}
+
+/**
+ * Mark label as delivered
+ */
+export async function markLabelAsDelivered(trackingCode) {
+  return updateLabelStatus(trackingCode, 'delivered')
+}
+
+// ============================================
+// PDF GENERATION & EXPORT
+// ============================================
+
+/**
+ * Generate PDF with label details and barcode/QR
+ * Uses jsPDF for PDF generation
+ */
+export async function generateLabelPDF(label, jsPDF) {
+  if (!jsPDF) {
+    throw new Error('jsPDF library required')
+  }
+
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  })
+
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  let yPos = 15
+
+  // Title
+  pdf.setFontSize(14)
+  pdf.setFont(undefined, 'bold')
+  pdf.text('SHIPPING LABEL', pageWidth / 2, yPos, { align: 'center' })
+  yPos += 12
+
+  // Border
+  pdf.setDrawColor(0, 0, 0)
+  pdf.rect(10, yPos - 8, pageWidth - 20, 70)
+
+  // Tracking Code
+  pdf.setFontSize(11)
+  pdf.setFont(undefined, 'bold')
+  pdf.text(`Tracking: ${label.tracking_code}`, 15, yPos)
+  yPos += 10
+
+  // Package info
+  pdf.setFontSize(9)
+  pdf.setFont(undefined, 'normal')
+  
+  if (label.package_name) {
+    pdf.text(`Package: ${label.package_name}`, 15, yPos)
+    yPos += 6
+  }
+
+  if (label.weight_kg) {
+    pdf.text(`Weight: ${label.weight_kg} kg`, 15, yPos)
+    yPos += 6
+  }
+
+  if (label.dimensions) {
+    pdf.text(`Dimensions: ${label.dimensions}`, 15, yPos)
+    yPos += 6
+  }
+
+  // Barcode representation (text version since we can't embed SVG directly)
+  pdf.setFontSize(12)
+  pdf.setFont(undefined, 'bold')
+  pdf.text('|||||||||||||||', 15, yPos)
+  yPos += 7
+
+  pdf.setFontSize(10)
+  pdf.text(label.tracking_code, 15, yPos)
+
+  return pdf.output('blob')
+}
+
+/**
+ * Bulk export multiple labels to PDF
+ */
+export async function exportBatchToPDF(batchId, jsPDF) {
+  const batch = await getBatchDetails(batchId)
+  
+  if (!jsPDF) {
+    throw new Error('jsPDF library required')
+  }
+
+  const pdf = new jsPDF({
+    orientation: 'portrait',
+    unit: 'mm',
+    format: 'a4'
+  })
+
+  const pageWidth = pdf.internal.pageSize.getWidth()
+  const pageHeight = pdf.internal.pageSize.getHeight()
+  let yPos = 15
+  let isFirstPage = true
+
+  for (const label of batch.labels) {
+    // Add new page if needed
+    if (!isFirstPage && yPos > pageHeight - 90) {
+      pdf.addPage()
+      yPos = 15
+    }
+
+    // Title
+    pdf.setFontSize(12)
+    pdf.setFont(undefined, 'bold')
+    pdf.text('SHIPPING LABEL', pageWidth / 2, yPos, { align: 'center' })
+    yPos += 10
+
+    // Border
+    pdf.setDrawColor(0, 0, 0)
+    pdf.rect(10, yPos - 8, pageWidth - 20, 60)
+
+    // Tracking Code
+    pdf.setFontSize(10)
+    pdf.setFont(undefined, 'bold')
+    pdf.text(`Code: ${label.tracking_code}`, 15, yPos)
+    yPos += 8
+
+    // Package info
+    pdf.setFontSize(8)
+    pdf.setFont(undefined, 'normal')
+    
+    if (label.package_name) {
+      pdf.text(`Pkg: ${label.package_name}`, 15, yPos)
+      yPos += 5
+    }
+
+    if (label.weight_kg) {
+      pdf.text(`Wt: ${label.weight_kg}kg`, 15, yPos)
+      yPos += 5
+    }
+
+    // Barcode text
+    pdf.setFontSize(9)
+    pdf.setFont(undefined, 'bold')
+    pdf.text('|||||||||||', 15, yPos)
+    yPos += 8
+    pdf.text(label.tracking_code, 15, yPos)
+    yPos += 15
+
+    isFirstPage = false
+  }
+
+  return pdf.output('blob')
+}
+
+// ============================================
+// BATCH OPERATIONS
+// ============================================
+
+/**
+ * Get user's batch history
+ */
+export async function getUserBatches(userId) {
+  const { data, error } = await supabase
+    .from('addresses_shipping_batches')
+    .select('*')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+
+  if (error) throw error
+  return data || []
+}
+
+/**
+ * Get batch generation statistics
+ */
+export async function getBatchStats(userId) {
+  const { data: batches, error } = await supabase
+    .from('addresses_shipping_batches')
+    .select('*')
+    .eq('user_id', userId)
+
+  if (error) throw error
+
+  const stats = {
+    totalBatches: batches?.length || 0,
+    totalLabelsGenerated: 0,
+    completedBatches: 0,
+    failedBatches: 0,
+    processingBatches: 0
+  }
+
+  batches?.forEach(batch => {
+    stats.totalLabelsGenerated += batch.generated_count || 0
+    if (batch.status === 'completed') stats.completedBatches++
+    if (batch.status === 'failed') stats.failedBatches++
+    if (batch.status === 'processing') stats.processingBatches++
+  })
+
+  return stats
 }
