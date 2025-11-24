@@ -1259,14 +1259,24 @@ export default function MyAddressesTab({ userId }) {
                       </MapContainer>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={handleFetchLocation}
-                      className="btn-fetch-location"
-                      disabled={!formData.addresses_latitude || !formData.addresses_longitude}
-                    >
-                      Search Address from Map
-                    </button>
+                    <div className="modal-map-buttons">
+                      <button
+                        type="button"
+                        onClick={handleFetchUserLocation}
+                        className="btn-fetch-location"
+                        disabled={fetchingLocation}
+                      >
+                        {fetchingLocation ? 'Getting Location...' : '📍 Fetch My Location'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleFetchLocation}
+                        className="btn-fetch-location"
+                        disabled={!formData.addresses_latitude || !formData.addresses_longitude}
+                      >
+                        Search Address from Map
+                      </button>
+                    </div>
                   </div>
 
                   <div className="form-row">
