@@ -179,7 +179,18 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
           <h3>Scan Package Checkpoint</h3>
 
           <form onSubmit={handleSearch} className="search-form">
-            <label className="form-label">Tracking Code</label>
+            <div className="input-row">
+              <label className="form-label">Tracking Code</label>
+              <input
+                type="text"
+                value={trackingCode}
+                onChange={(e) => setTrackingCode(e.target.value)}
+                placeholder="e.g., PH-2025-A1B2C3D4"
+                autoComplete="off"
+                autoFocus
+                className="tracking-input"
+              />
+            </div>
 
             <div className="form-actions">
               <button type="submit" disabled={loading} className="btn btn-primary">
@@ -193,17 +204,6 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
               >
                 Open Camera
               </button>
-            </div>
-
-            <div className="form-group">
-              <input
-                type="text"
-                value={trackingCode}
-                onChange={(e) => setTrackingCode(e.target.value)}
-                placeholder="e.g., PH-2025-A1B2C3D4"
-                autoComplete="off"
-                autoFocus
-              />
             </div>
           </form>
 
