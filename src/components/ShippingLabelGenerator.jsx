@@ -154,60 +154,63 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
   }
 
   // Export to PDF
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (generatedLabels.length === 0) {
       setError('No labels to export')
       return
     }
-    
+
+    setLoading(true)
+    setError('')
+
     try {
       const pdf = new jsPDF({
         orientation: 'portrait',
         unit: 'mm',
         format: 'a4'
       })
-      
+
       let yPosition = 20
       const pageHeight = pdf.internal.pageSize.getHeight()
       const pageWidth = pdf.internal.pageSize.getWidth()
-      
+
       generatedLabels.forEach((label, index) => {
         if (yPosition > pageHeight - 80) {
           pdf.addPage()
           yPosition = 20
         }
-        
+
         // Header
         pdf.setFontSize(12)
         pdf.setFont(undefined, 'bold')
         pdf.text('SHIPPING LABEL', pageWidth / 2, yPosition, { align: 'center' })
         yPosition += 10
-        
+
         // Border box
         pdf.setDrawColor(0, 0, 0)
         pdf.rect(10, yPosition - 8, pageWidth - 20, 60)
-        
+
         // Label details
         pdf.setFontSize(10)
         pdf.setFont(undefined, 'normal')
         pdf.text(`Serial ID: ${label.serial_id}`, 15, yPosition)
         yPosition += 8
-        
+
         if (label.package_name) {
           pdf.text(`Package: ${label.package_name}`, 15, yPosition)
           yPosition += 8
         }
-        
+
         if (label.package_weight) {
           pdf.text(`Weight: ${label.package_weight}`, 15, yPosition)
           yPosition += 8
         }
-        
+
         if (label.package_dimensions) {
           pdf.text(`Dimensions: ${label.package_dimensions}`, 15, yPosition)
           yPosition += 8
         }
-        
+
         // Barcode representation
         pdf.setFontSize(14)
         pdf.setFont(undefined, 'bold')
@@ -215,15 +218,42 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
         yPosition += 8
         pdf.setFontSize(10)
         pdf.text(label.serial_id, 15, yPosition)
-        
+
         yPosition += 20
       })
-      
-      pdf.save(`shipping_labels_${Date.now()}.pdf`)
-      setSuccess('PDF exported successfully')
+
+      const pdfBlob = pdf.output('blob')
+      const pdfUrl = URL.createObjectURL(pdfBlob)
+
+      // Update labels with PDF info
+      const batchId = generatedLabels[0].batch_id || `BATCH-${Date.now()}`
+      for (const label of generatedLabels) {
+        await supabase
+          .from('addresses_shipment_labels')
+          .update({
+            batch_id: batchId,
+            batch_size: generatedLabels.length,
+            generated_count: generatedLabels.length,
+            pdf_url: pdfUrl,
+            export_format: 'pdf'
+          })
+          .eq('id', label.id)
+      }
+
+      // Trigger download
+      const link = document.createElement('a')
+      link.href = pdfUrl
+      link.download = `shipping_labels_${Date.now()}.pdf`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      setSuccess(`PDF exported successfully with ${generatedLabels.length} labels`)
     } catch (err) {
       setError('Failed to export PDF: ' + err.message)
       console.error('Error:', err)
+    } finally {
+      setLoading(false)
     }
   }
 
