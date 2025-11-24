@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { addCheckpoint, searchLabelByTrackingCode } from '../lib/shippingLabelService'
+import { addCheckpointToJsonbArray, getLabelWithCheckpoints } from '../lib/shippingLabelService'
 import './BarcodeScanner.css'
 
 export default function BarcodeScanner({ userId, onCheckpointAdded }) {
