@@ -3,6 +3,7 @@
   padding: 20px;
   background: #f9fafb;
   border-radius: 8px;
+  box-sizing: border-box;
 }
 
 .generator-tabs {
