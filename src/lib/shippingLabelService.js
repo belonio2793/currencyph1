@@ -52,20 +52,38 @@ export async function generateMultipleTrackingCodes(count = 1) {
 // ============================================
 
 /**
- * Generate SVG barcode using CODE128 format
+ * Generate SVG barcode representation (simple pattern-based)
+ * Creates a visual barcode-like SVG without external libraries
  */
 export function generateBarcodeSVG(trackingCode) {
   try {
-    const canvas = document.createElement('canvas')
-    JsBarcode(canvas, trackingCode, {
-      format: 'CODE128',
-      width: 2,
-      height: 100,
-      displayValue: true,
-      fontSize: 14,
-      margin: 10
-    })
-    return canvas.toDataURL('image/svg+xml')
+    const width = 300
+    const height = 120
+    const barWidth = 2
+    const margin = 10
+
+    let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`
+    svg += `<rect width="${width}" height="${height}" fill="white"/>`
+
+    // Generate barcode pattern from tracking code
+    let x = margin
+    for (let i = 0; i < trackingCode.length; i++) {
+      const charCode = trackingCode.charCodeAt(i)
+      const barPattern = (charCode % 15) + 3
+
+      for (let j = 0; j < barPattern; j++) {
+        const barHeight = ((charCode + j) % 2 === 0) ? 80 : 60
+        const yOffset = height - margin - barHeight
+        svg += `<rect x="${x}" y="${yOffset}" width="${barWidth}" height="${barHeight}" fill="black"/>`
+        x += barWidth + 1
+      }
+    }
+
+    // Add text label
+    svg += `<text x="${width / 2}" y="${height - 5}" text-anchor="middle" font-size="12" font-family="monospace" font-weight="bold">${trackingCode}</text>`
+    svg += `</svg>`
+
+    return `data:image/svg+xml;base64,${btoa(svg)}`
   } catch (err) {
     console.error('Barcode generation error:', err)
     return null
