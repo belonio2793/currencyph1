@@ -74,13 +74,13 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
       setError('Please enter a tracking code')
       return
     }
-    
+
     setLoading(true)
     setError('')
-    
+
     try {
-      const label = await searchLabelByTrackingCode(trackingCode.toUpperCase())
-      
+      const label = await getLabelWithCheckpoints(trackingCode.toUpperCase())
+
       if (!label) {
         setError('Shipping label not found')
         setScannedLabel(null)
