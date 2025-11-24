@@ -405,6 +405,27 @@
   word-break: break-word;
 }
 
+.checkpoint-details .checkpoint-type {
+  margin: 2px 0;
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.checkpoint-details .coordinates {
+  margin: 2px 0;
+  font-size: 11px;
+  color: #6b7280;
+  font-family: monospace;
+}
+
+.checkpoint-details .notes {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  color: #6b7280;
+  font-style: italic;
+}
+
 .map-container {
   background: white;
   position: relative;
