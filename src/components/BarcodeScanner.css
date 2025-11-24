@@ -57,9 +57,11 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
+  border: none;
+  padding-bottom: 0;
 }
 
 .form-label {
