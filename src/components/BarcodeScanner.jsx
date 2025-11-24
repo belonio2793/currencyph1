@@ -119,44 +119,27 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
 
     try {
       const checkpointData = {
-        status: checkpointStatus,
         checkpointName: checkpointName.trim(),
+        checkpointType: checkpointStatus,
         latitude: location?.latitude || 0,
         longitude: location?.longitude || 0,
         addressText: location?.address || checkpointName,
-        scannedBy: userId,
+        userId: userId,
         notes: checkpointNotes.trim(),
+        status: checkpointStatus,
         metadata: {
-          timestamp: new Date().toISOString(),
           userAgent: navigator.userAgent,
           accuracy: location?.accuracy,
           source: 'barcode_scan'
         }
       }
 
-      const checkpoint = await addCheckpoint(scannedLabel.tracking_code, checkpointData)
+      const result = await addCheckpointToJsonbArray(scannedLabel.tracking_code, checkpointData)
 
-      // Update scanned label's tracking history
-      const updatedHistory = (scannedLabel.tracking_history || [])
-      updatedHistory.unshift({
-        id: checkpoint.id,
-        tracking_code: checkpoint.tracking_code,
-        status: checkpoint.status,
-        checkpoint_name: checkpoint.checkpoint_name,
-        latitude: checkpoint.latitude,
-        longitude: checkpoint.longitude,
-        address_text: checkpoint.address_text,
-        created_at: checkpoint.created_at
-      })
-
+      // Update scanned label with new checkpoint data
       setScannedLabel({
-        ...scannedLabel,
-        tracking_history: updatedHistory,
-        status: checkpointStatus,
-        last_scanned_at: new Date().toISOString(),
-        last_scanned_lat: location?.latitude,
-        last_scanned_lng: location?.longitude,
-        current_checkpoint: checkpointName
+        ...result.label,
+        checkpoints: result.label.checkpoints_jsonb || []
       })
 
       setCheckpointName('')
@@ -164,7 +147,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
       setCheckpointStatus('scanned')
 
       if (onCheckpointAdded) {
-        onCheckpointAdded(checkpoint)
+        onCheckpointAdded(result.checkpoint)
       }
     } catch (err) {
       setError(err.message || 'Failed to add checkpoint')
