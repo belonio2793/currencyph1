@@ -37,7 +37,7 @@ const createMarkerIcon = (type = 'checkpoint') => {
   })
 }
 
-export default function PackageTracker({ userId }) {
+export default function PackageTracker({ userId, onViewMap }) {
   const mapRef = useRef(null)
   const [allLabels, setAllLabels] = useState([])
   const [selectedLabel, setSelectedLabel] = useState(null)
