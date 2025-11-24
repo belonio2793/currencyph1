@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { ALL_BARANGAYS, searchBarangays } from '../data/philippinesBarangays'
 
 // Fix default marker icons
 delete L.Icon.Default.prototype._getIconUrl
