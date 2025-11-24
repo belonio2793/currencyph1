@@ -245,7 +245,10 @@ export default function ShippingTrackingTab({ userId }) {
         {/* Map View */}
         <div className="shipping-map-section" style={{ height: `${mapHeight}px` }}>
           <div className="map-header">
-            <h3>Shipment Routes Map</h3>
+            <div className="map-header-content">
+              <h4>Shipment Routes Map</h4>
+              <p className="map-subtitle">Visualize shipping routes across the Philippines</p>
+            </div>
           </div>
           <div className="map-container shipping-map">
             <div className="map-overlay-controls">
