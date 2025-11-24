@@ -407,7 +407,6 @@ export default function PackageTracker({ userId, onViewMap }) {
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; OpenStreetMap contributors'
                 />
 
                 {selectedLabel.origin_address && selectedLabel.origin_address.addresses_latitude && (
