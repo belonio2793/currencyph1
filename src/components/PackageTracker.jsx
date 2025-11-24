@@ -96,18 +96,28 @@ export default function PackageTracker({ userId }) {
       setError('Please enter a serial ID')
       return
     }
-    
+
     setLoading(true)
     setError('')
-    
+
     try {
       const label = await searchShippingLabelBySerialId(userId, searchQuery.toUpperCase())
-      
+
       if (!label) {
         setError('Package not found')
         setSelectedLabel(null)
       } else {
-        setSelectedLabel(label)
+        // Fetch checkpoints from shipment tracking
+        const { data: checkpoints } = await supabase
+          .from('addresses_shipment_tracking')
+          .select('*')
+          .eq('shipment_id', label.id)
+          .order('scanned_at', { ascending: false })
+
+        setSelectedLabel({
+          ...label,
+          checkpoints: checkpoints || []
+        })
         setViewMode('map')
       }
     } catch (err) {
