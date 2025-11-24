@@ -231,7 +231,6 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
                     ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
                     : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
                 }
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               />
               
               {/* Render property markers */}
