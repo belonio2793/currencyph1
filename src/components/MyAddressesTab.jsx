@@ -1588,13 +1588,77 @@ export default function MyAddressesTab({ userId }) {
                   <div className="form-row">
                     <div className="form-group">
                       <label>Barangay</label>
-                      <input
-                        type="text"
-                        name="barangay"
-                        value={formData.barangay}
-                        onChange={handleInputChange}
-                        placeholder="Barangay name"
-                      />
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="text"
+                          name="barangay"
+                          value={formData.barangay}
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            const query = e.target.value.toLowerCase()
+                            if (query) {
+                              setFilteredBarangays(searchBarangays(query).slice(0, 100))
+                              setBarangaySearchOpen(true)
+                            } else {
+                              setFilteredBarangays(ALL_BARANGAYS)
+                              setBarangaySearchOpen(false)
+                            }
+                          }}
+                          onFocus={() => {
+                            setBarangaySearchOpen(true)
+                            setFilteredBarangays(ALL_BARANGAYS)
+                          }}
+                          onBlur={() => setTimeout(() => setBarangaySearchOpen(false), 200)}
+                          placeholder="e.g., Brgy. San Juan"
+                          autoComplete="off"
+                        />
+                        {barangaySearchOpen && filteredBarangays.length > 0 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            backgroundColor: 'white',
+                            border: '1px solid #ccc',
+                            borderTop: 'none',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            zIndex: 1000,
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          }}>
+                            {filteredBarangays.slice(0, 10).map(barangay => (
+                              <div
+                                key={barangay}
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, barangay }))
+                                  setBarangaySearchOpen(false)
+                                }}
+                                style={{
+                                  padding: '10px',
+                                  cursor: 'pointer',
+                                  borderBottom: '1px solid #f0f0f0',
+                                  backgroundColor: barangay === formData.barangay ? '#f5f5f5' : 'white',
+                                  transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = barangay === formData.barangay ? '#f5f5f5' : 'white'}
+                              >
+                                {barangay}
+                              </div>
+                            ))}
+                            {filteredBarangays.length > 10 && (
+                              <div style={{
+                                padding: '10px',
+                                textAlign: 'center',
+                                color: '#999',
+                                fontSize: '12px'
+                              }}>
+                                Showing 10 of {filteredBarangays.length} barangays
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
