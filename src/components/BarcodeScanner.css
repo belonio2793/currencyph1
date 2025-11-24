@@ -269,6 +269,24 @@
   color: #10b981;
 }
 
+.checkpoint-actions {
+  background: white;
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  gap: 12px;
+}
+
+.checkpoint-actions .quick-checkpoint-button {
+  flex: 1;
+}
+
+.checkpoint-actions .btn-checkpoint {
+  width: 100%;
+}
+
 .checkpoint-form {
   background: white;
   padding: 20px;
