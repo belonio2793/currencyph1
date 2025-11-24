@@ -403,7 +403,7 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
               </div>
 
               <div className="form-group">
-                <label>Dimensions (LxWxH cm)</label>
+                <label>Dimensions (Length, Width, Height Centimeters [CM])</label>
                 <input
                   type="text"
                   value={bulkLabel.packageDimensions}
