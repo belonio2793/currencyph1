@@ -421,7 +421,9 @@ export default function PackageTracker({ userId }) {
 
                 {selectedLabel.checkpoints.length > 0 && (
                   <Polyline
-                    positions={selectedLabel.checkpoints.map(cp => [cp.latitude, cp.longitude])}
+                    positions={selectedLabel.checkpoints
+                      .filter(cp => cp.latitude && cp.longitude)
+                      .map(cp => [parseFloat(cp.latitude), parseFloat(cp.longitude)])}
                     color="#3b82f6"
                     weight={2}
                     opacity={0.7}
