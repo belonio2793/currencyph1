@@ -1,5 +1,4 @@
 import { supabase } from './supabaseClient'
-import JsBarcode from 'jsbarcode'
 
 // ============================================
 // TRACKING CODE GENERATION
