@@ -211,6 +211,13 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
 
   return (
     <div className="shipping-label-generator">
+      <div className="map-header">
+        <div className="map-header-content">
+          <h4>Shipping Labels</h4>
+          <p className="map-subtitle">Create and manage shipping labels for your packages</p>
+        </div>
+      </div>
+
       <div className="generator-tabs">
         <button
           className={`tab-btn ${activeTab === 'single' ? 'active' : ''}`}
