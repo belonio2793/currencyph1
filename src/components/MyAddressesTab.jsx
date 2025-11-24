@@ -493,11 +493,15 @@ export default function MyAddressesTab({ userId }) {
         elevation: formData.elevation ? parseFloat(formData.elevation) : null
       }
 
-      const { error: insertError } = await supabase
+      const { data, error: insertError } = await supabase
         .from('addresses')
         .insert([propertyData])
+        .select()
 
-      if (insertError) throw insertError
+      if (insertError) {
+        console.error('Insert error details:', insertError)
+        throw new Error(insertError.message || 'Failed to insert address')
+      }
 
       setFormData({
         addresses_address: '',
@@ -525,10 +529,11 @@ export default function MyAddressesTab({ userId }) {
       })
       setShowForm(false)
       setIsCreatingFromMap(false)
+      setError('')
       await loadAddresses()
     } catch (err) {
       console.error('Error saving address:', err?.message || err)
-      setError(err?.message || 'Failed to save address')
+      setError(err?.message || 'Failed to save address. Please check the address fields.')
     } finally {
       setLoading(false)
     }
