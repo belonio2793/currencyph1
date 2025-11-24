@@ -105,21 +105,21 @@
 }
 
 .btn-search {
-  background: #3b82f6;
+  background: #1f2937;
   color: white;
 }
 
 .btn-search:hover:not(:disabled) {
-  background: #2563eb;
+  background: #111827;
 }
 
 .btn-refresh {
-  background: #10b981;
+  background: #6b7280;
   color: white;
 }
 
 .btn-refresh:hover:not(:disabled) {
-  background: #059669;
+  background: #4b5563;
 }
 
 .btn-primary {
