@@ -830,7 +830,7 @@ export default function MyAddressesTab({ userId }) {
               className="btn-add-address"
               title="Add new address"
             >
-              +
+              Add Address
             </button>
           </div>
 
