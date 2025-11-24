@@ -179,11 +179,12 @@ export async function getShippingLabelsWithCheckpoints(userId, status = null) {
 }
 
 // Add checkpoint for package
+// Note: shipment_id field is used to track which label this checkpoint belongs to
 export async function addCheckpoint(shippingLabelId, checkpointData) {
   const { data, error } = await supabase
     .from('addresses_shipment_tracking')
     .insert([{
-      shipment_id: null,
+      shipment_id: shippingLabelId,
       status: checkpointData.status || 'scanned',
       location: checkpointData.locationAddress,
       checkpoint_name: checkpointData.checkpointName,
@@ -191,23 +192,26 @@ export async function addCheckpoint(shippingLabelId, checkpointData) {
       latitude: checkpointData.latitude,
       longitude: checkpointData.longitude,
       location_address: checkpointData.locationAddress,
-      scanned_at: new Date().toISOString(),
+      scanned_at: checkpointData.scannedAt || new Date().toISOString(),
       scanned_by_user_id: checkpointData.scannedByUserId,
       notes: checkpointData.notes,
-      metadata: checkpointData.metadata
+      metadata: checkpointData.metadata || {}
     }])
     .select()
 
   if (error) throw error
 
-  // Update shipping label current checkpoint
-  await supabase
-    .from('addresses_shipment_labels')
-    .update({
-      current_checkpoint_id: data[0].id,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', shippingLabelId)
+  // Update shipping label status if it's the first checkpoint
+  if (data && data.length > 0) {
+    await supabase
+      .from('addresses_shipment_labels')
+      .update({
+        current_checkpoint_id: data[0].id,
+        status: 'in_transit',
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', shippingLabelId)
+  }
 
   return data[0]
 }
