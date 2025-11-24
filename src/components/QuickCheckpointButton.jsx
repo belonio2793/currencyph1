@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { addCheckpointToJsonbArray } from '../lib/shippingLabelService'
 import './QuickCheckpointButton.css'
 
-export default function QuickCheckpointButton({ trackingCode, onCheckpointAdded, buttonText = '⚡ Mark Checkpoint' }) {
+export default function QuickCheckpointButton({ trackingCode, onCheckpointAdded, buttonText = 'Mark Checkpoint' }) {
   const [isOpen, setIsOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -120,7 +120,7 @@ export default function QuickCheckpointButton({ trackingCode, onCheckpointAdded,
                 onClick={handleReset}
                 className="close-btn"
               >
-                ✕
+                ×
               </button>
             </div>
 
@@ -177,7 +177,7 @@ export default function QuickCheckpointButton({ trackingCode, onCheckpointAdded,
 
               {location && (
                 <div className="location-display">
-                  ✓ Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+                  Location: {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
                 </div>
               )}
 
