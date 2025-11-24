@@ -1332,6 +1332,33 @@ export default function MyAddressesTab({ userId }) {
                             </div>
 
                             <div className="legend-section">
+                              <label className="legend-label">Map Layer</label>
+                              <div className="layer-buttons">
+                                <button
+                                  onClick={() => setModalMapLayer('street')}
+                                  className={`layer-btn ${modalMapLayer === 'street' ? 'active' : ''}`}
+                                  title="Street view"
+                                >
+                                  Street
+                                </button>
+                                <button
+                                  onClick={() => setModalMapLayer('satellite')}
+                                  className={`layer-btn ${modalMapLayer === 'satellite' ? 'active' : ''}`}
+                                  title="Satellite view"
+                                >
+                                  Satellite
+                                </button>
+                                <button
+                                  onClick={() => setModalMapLayer('terrain')}
+                                  className={`layer-btn ${modalMapLayer === 'terrain' ? 'active' : ''}`}
+                                  title="Terrain view"
+                                >
+                                  Terrain
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="legend-section">
                               <label className="legend-label">Legend</label>
                               <div className="legend-items">
                                 <div className="legend-item">
