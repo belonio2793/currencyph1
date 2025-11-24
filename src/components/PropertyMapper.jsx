@@ -174,6 +174,14 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     <div className="property-mapper-container">
       {/* Map Section */}
       <div className="map-section" style={{ flex: `1 1 ${mapWidth}%` }}>
+        {/* Map Header */}
+        <div className="map-header">
+          <div className="map-header-content">
+            <h4>Properties Map</h4>
+            <p className="map-subtitle">View all your properties across the Philippines</p>
+          </div>
+        </div>
+
         {/* Map Search Bar */}
         <div className="map-search-section">
           <div className="map-search-input-group">
