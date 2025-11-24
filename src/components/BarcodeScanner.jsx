@@ -138,20 +138,20 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
       setError('No label selected')
       return
     }
-    
+
     if (!location && useGeolocation) {
       setError('Waiting for location... Please try again.')
       return
     }
-    
+
     if (!checkpointName.trim()) {
       setError('Checkpoint name is required')
       return
     }
-    
+
     setLoading(true)
     setError('')
-    
+
     try {
       const checkpointData = {
         checkpointName: checkpointName.trim(),
@@ -167,18 +167,37 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
           accuracy: location?.accuracy
         }
       }
-      
+
       const checkpoint = await addCheckpoint(scannedLabel.id, checkpointData)
-      
+
+      // Update scanned label's checkpoints array
+      const updatedCheckpoints = (scannedLabel.checkpoints || []).map(cp => ({
+        ...cp,
+        id: cp.id,
+        checkpoint_name: cp.checkpoint_name,
+        checkpoint_type: cp.checkpoint_type,
+        scanned_at: cp.scanned_at,
+        location_address: cp.location_address,
+        notes: cp.notes
+      }))
+      updatedCheckpoints.push({
+        id: checkpoint.id,
+        checkpoint_name: checkpoint.checkpoint_name,
+        checkpoint_type: checkpoint.checkpoint_type,
+        scanned_at: checkpoint.scanned_at,
+        location_address: checkpoint.location_address,
+        notes: checkpoint.notes
+      })
+
       setScannedLabel({
         ...scannedLabel,
-        checkpoints: [...(scannedLabel.checkpoints || []), checkpoint]
+        checkpoints: updatedCheckpoints
       })
-      
+
       setCheckpointName('')
       setCheckpointNotes('')
       setCheckpointType('scanned')
-      
+
       if (onCheckpointAdded) {
         onCheckpointAdded(checkpoint)
       }
