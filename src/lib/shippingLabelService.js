@@ -5,19 +5,19 @@ export async function generateUniqueSerialId(prefix = 'PKG') {
   const timestamp = Date.now().toString(36).toUpperCase()
   const randomPart = Math.random().toString(36).substring(2, 8).toUpperCase()
   const serialId = `${prefix}-${timestamp}-${randomPart}`
-  
+
   // Check if it already exists
   const { data } = await supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .select('id')
     .eq('serial_id', serialId)
     .single()
-  
+
   // If exists, try again recursively
   if (data) {
     return generateUniqueSerialId(prefix)
   }
-  
+
   return serialId
 }
 
@@ -34,9 +34,9 @@ export async function generateMultipleSerialIds(count = 1, prefix = 'PKG') {
 // Create shipping label with QR/barcode data
 export async function createShippingLabel(userId, labelData) {
   const serialId = await generateUniqueSerialId(labelData.prefix || 'PKG')
-  
+
   const { data, error } = await supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .insert([{
       user_id: userId,
       serial_id: serialId,
@@ -58,7 +58,7 @@ export async function createShippingLabel(userId, labelData) {
       notes: labelData.notes
     }])
     .select()
-  
+
   if (error) throw error
   return data[0]
 }
@@ -67,7 +67,7 @@ export async function createShippingLabel(userId, labelData) {
 export async function bulkCreateShippingLabels(userId, count = 1, labelData = {}) {
   const serialIds = await generateMultipleSerialIds(count, labelData.prefix || 'PKG')
   const batchId = `BATCH-${Date.now()}`
-  
+
   const labels = serialIds.map(serialId => ({
     user_id: userId,
     serial_id: serialId,
@@ -89,17 +89,17 @@ export async function bulkCreateShippingLabels(userId, count = 1, labelData = {}
     destination_address_id: labelData.destinationAddressId,
     notes: labelData.notes
   }))
-  
+
   const { data, error } = await supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .insert(labels)
     .select()
-  
+
   if (error) throw error
-  
+
   // Record batch generation
   await supabase
-    .from('shipping_label_generated_codes')
+    .from('addresses_shipment_label_generated_codes')
     .insert([{
       user_id: userId,
       batch_id: batchId,
@@ -107,24 +107,24 @@ export async function bulkCreateShippingLabels(userId, count = 1, labelData = {}
       generated_count: data.length,
       status: 'completed'
     }])
-  
+
   return data
 }
 
 // Search for shipping label by serial ID
 export async function searchShippingLabelBySerialId(userId, serialId) {
   const { data, error } = await supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .select(`
       *,
       origin_address:origin_address_id(*),
       destination_address:destination_address_id(*),
-      checkpoints:shipping_checkpoints(*)
+      checkpoints:addresses_shipment_checkpoints(*)
     `)
     .eq('user_id', userId)
     .eq('serial_id', serialId)
     .single()
-  
+
   if (error && error.code !== 'PGRST116') throw error
   return data
 }
@@ -132,21 +132,21 @@ export async function searchShippingLabelBySerialId(userId, serialId) {
 // Get all shipping labels with checkpoints
 export async function getShippingLabelsWithCheckpoints(userId, status = null) {
   let query = supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .select(`
       *,
       origin_address:origin_address_id(*),
       destination_address:destination_address_id(*),
-      checkpoints:shipping_checkpoints(*)
+      checkpoints:addresses_shipment_checkpoints(*)
     `)
     .eq('user_id', userId)
-  
+
   if (status) {
     query = query.eq('status', status)
   }
-  
+
   const { data, error } = await query.order('created_at', { ascending: false })
-  
+
   if (error) throw error
   return data
 }
@@ -154,7 +154,7 @@ export async function getShippingLabelsWithCheckpoints(userId, status = null) {
 // Add checkpoint for package
 export async function addCheckpoint(shippingLabelId, checkpointData) {
   const { data, error } = await supabase
-    .from('shipping_checkpoints')
+    .from('addresses_shipment_checkpoints')
     .insert([{
       shipping_label_id: shippingLabelId,
       checkpoint_name: checkpointData.checkpointName,
@@ -168,29 +168,29 @@ export async function addCheckpoint(shippingLabelId, checkpointData) {
       metadata: checkpointData.metadata
     }])
     .select()
-  
+
   if (error) throw error
-  
+
   // Update shipping label current checkpoint
   await supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .update({
       current_checkpoint_id: data[0].id,
       updated_at: new Date().toISOString()
     })
     .eq('id', shippingLabelId)
-  
+
   return data[0]
 }
 
 // Get checkpoint history for a label
 export async function getCheckpointHistory(shippingLabelId) {
   const { data, error } = await supabase
-    .from('shipping_checkpoints')
+    .from('addresses_shipment_checkpoints')
     .select('*')
     .eq('shipping_label_id', shippingLabelId)
     .order('scanned_at', { ascending: false })
-  
+
   if (error) throw error
   return data
 }
@@ -198,14 +198,14 @@ export async function getCheckpointHistory(shippingLabelId) {
 // Update shipping label status
 export async function updateShippingLabelStatus(shippingLabelId, status) {
   const { data, error } = await supabase
-    .from('shipping_labels')
+    .from('addresses_shipment_labels')
     .update({
       status,
       updated_at: new Date().toISOString()
     })
     .eq('id', shippingLabelId)
     .select()
-  
+
   if (error) throw error
   return data[0]
 }
