@@ -854,6 +854,14 @@ export default function MyAddressesTab({ userId }) {
       <div className="my-addresses-layout">
         {/* Map Section */}
         <div className="map-section" style={{ flex: `0 0 ${mapHeight}px` }}>
+          {/* Map Header */}
+          <div className="map-header">
+            <div className="map-header-content">
+              <h4>Addresses Map</h4>
+              <p className="map-subtitle">View all your saved addresses across the Philippines</p>
+            </div>
+          </div>
+
           {/* Map Search Bar */}
           <div className="map-search-section">
             <div className="map-search-input-group">
