@@ -154,15 +154,17 @@ export async function getShippingLabelsWithCheckpoints(userId, status = null) {
 // Add checkpoint for package
 export async function addCheckpoint(shippingLabelId, checkpointData) {
   const { data, error } = await supabase
-    .from('addresses_shipment_checkpoints')
+    .from('addresses_shipment_tracking')
     .insert([{
-      shipping_label_id: shippingLabelId,
+      shipment_id: null,
+      status: checkpointData.status || 'scanned',
+      location: checkpointData.locationAddress,
       checkpoint_name: checkpointData.checkpointName,
       checkpoint_type: checkpointData.checkpointType || 'scanned',
       latitude: checkpointData.latitude,
       longitude: checkpointData.longitude,
       location_address: checkpointData.locationAddress,
-      status: checkpointData.status || 'scanned',
+      scanned_at: new Date().toISOString(),
       scanned_by_user_id: checkpointData.scannedByUserId,
       notes: checkpointData.notes,
       metadata: checkpointData.metadata
@@ -186,9 +188,9 @@ export async function addCheckpoint(shippingLabelId, checkpointData) {
 // Get checkpoint history for a label
 export async function getCheckpointHistory(shippingLabelId) {
   const { data, error } = await supabase
-    .from('addresses_shipment_checkpoints')
+    .from('addresses_shipment_tracking')
     .select('*')
-    .eq('shipping_label_id', shippingLabelId)
+    .eq('shipment_id', shippingLabelId)
     .order('scanned_at', { ascending: false })
 
   if (error) throw error
