@@ -357,18 +357,31 @@ export default function PackageTracker({ userId }) {
 
             {selectedLabel.checkpoints && selectedLabel.checkpoints.length > 0 && (
               <div className="checkpoints-sidebar">
-                <h4>Checkpoint History</h4>
+                <h4>Checkpoint History ({selectedLabel.checkpoints.length})</h4>
                 <div className="checkpoints-list">
                   {selectedLabel.checkpoints.map((checkpoint, index) => (
-                    <div key={checkpoint.id} className="checkpoint-item">
+                    <div key={checkpoint.id || index} className="checkpoint-item">
                       <div className="checkpoint-number">{index + 1}</div>
                       <div className="checkpoint-details">
-                        <h5>{checkpoint.checkpoint_name}</h5>
-                        <p className="timestamp">
-                          {new Date(checkpoint.scanned_at).toLocaleString()}
-                        </p>
+                        <h5>{checkpoint.checkpoint_name || 'Checkpoint'}</h5>
+                        {checkpoint.checkpoint_type && (
+                          <p className="checkpoint-type">{checkpoint.checkpoint_type}</p>
+                        )}
+                        {checkpoint.scanned_at && (
+                          <p className="timestamp">
+                            {new Date(checkpoint.scanned_at).toLocaleString()}
+                          </p>
+                        )}
                         {checkpoint.location_address && (
-                          <p className="address">{checkpoint.location_address}</p>
+                          <p className="address">📍 {checkpoint.location_address}</p>
+                        )}
+                        {checkpoint.latitude && checkpoint.longitude && (
+                          <p className="coordinates">
+                            {checkpoint.latitude.toFixed(4)}, {checkpoint.longitude.toFixed(4)}
+                          </p>
+                        )}
+                        {checkpoint.notes && (
+                          <p className="notes">{checkpoint.notes}</p>
                         )}
                       </div>
                     </div>
