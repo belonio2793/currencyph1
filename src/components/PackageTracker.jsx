@@ -403,6 +403,7 @@ export default function PackageTracker({ userId, onViewMap }) {
                 center={mapCenter}
                 zoom={zoomLevel}
                 style={{ width: '100%', height: '100%' }}
+                attributionControl={false}
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
