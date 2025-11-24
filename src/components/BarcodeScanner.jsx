@@ -201,7 +201,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
                 onClick={startCamera}
                 className="btn btn-secondary"
               >
-                📷 Open Camera
+                Open Camera
               </button>
             </div>
           </form>
@@ -217,7 +217,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
             </label>
             {location && (
               <p className="location-info">
-                ✓ Location available ({location.latitude.toFixed(4)}, {location.longitude.toFixed(4)})
+                Location available ({location.latitude.toFixed(4)}, {location.longitude.toFixed(4)})
               </p>
             )}
           </div>
@@ -300,7 +300,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
                   onCheckpointAdded(checkpoint)
                 }
               }}
-              buttonText="⚡ Quick Checkpoint"
+              buttonText="Quick Checkpoint"
             />
           </div>
 
@@ -376,7 +376,7 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
                         </p>
                       )}
                       {checkpoint.address_text && (
-                        <p className="location">📍 {checkpoint.address_text}</p>
+                        <p className="location">{checkpoint.address_text}</p>
                       )}
                       {checkpoint.latitude && checkpoint.longitude && (
                         <p className="coordinates">
