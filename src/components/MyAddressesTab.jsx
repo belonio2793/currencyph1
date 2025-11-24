@@ -355,16 +355,64 @@ export default function MyAddressesTab({ userId }) {
     }))
   }
 
-  const handleFetchLocation = async () => {
-    if (!formData.addresses_latitude || !formData.addresses_longitude) {
-      setError('Please select a location on the map first')
+  const handleFetchUserLocation = () => {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser')
       return
     }
 
+    setFetchingLocation(true)
+    setError('')
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords
+        const lat = parseFloat(latitude).toFixed(6)
+        const lng = parseFloat(longitude).toFixed(6)
+
+        setFormData(prev => ({
+          ...prev,
+          addresses_latitude: lat,
+          addresses_longitude: lng
+        }))
+
+        if (modalMapRef) {
+          try {
+            modalMapRef.setView([latitude, longitude], 19, { animate: true, duration: 1 })
+          } catch (err) {
+            console.error('Error centering map:', err)
+          }
+        }
+
+        setFetchingLocation(false)
+        handleFetchLocationDetails(lat, lng)
+      },
+      (error) => {
+        setFetchingLocation(false)
+        let errorMessage = 'Unable to get your location'
+
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMessage = 'Location information is unavailable.'
+        } else if (error.code === error.TIMEOUT) {
+          errorMessage = 'Location request timed out. Please try again.'
+        }
+
+        setError(errorMessage)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    )
+  }
+
+  const handleFetchLocationDetails = async (lat, lng) => {
     try {
-      setLoading(true)
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${formData.addresses_latitude}&lon=${formData.addresses_longitude}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
       )
       const data = await response.json()
 
@@ -379,6 +427,20 @@ export default function MyAddressesTab({ userId }) {
           barangay: address.suburb || prev.barangay || ''
         }))
       }
+    } catch (err) {
+      console.error('Error fetching location details:', err)
+    }
+  }
+
+  const handleFetchLocation = async () => {
+    if (!formData.addresses_latitude || !formData.addresses_longitude) {
+      setError('Please select a location on the map first')
+      return
+    }
+
+    try {
+      setLoading(true)
+      await handleFetchLocationDetails(formData.addresses_latitude, formData.addresses_longitude)
     } catch (err) {
       console.error('Error fetching location:', err)
       setError('Unable to fetch location details. Please try again.')
