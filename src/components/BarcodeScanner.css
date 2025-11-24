@@ -52,6 +52,8 @@
   width: 100%;
   box-sizing: border-box;
   border: none;
+  display: flex;
+  flex-direction: column;
 }
 
 .input-row {
