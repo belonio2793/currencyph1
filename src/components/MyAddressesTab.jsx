@@ -760,38 +760,6 @@ export default function MyAddressesTab({ userId }) {
           )}
 
           {/* Lat/Lon Input Fields (Compact) */}
-          {!showLegend && (
-            <div className="coordinates-section-compact">
-              <div className="coordinate-inputs">
-                <div className="form-group">
-                  <label>Latitude</label>
-                  <input
-                    type="number"
-                    name="addresses_latitude"
-                    value={formData.addresses_latitude}
-                    onChange={handleInputChange}
-                    placeholder="14.5549"
-                    step="0.000001"
-                    readOnly={isCreatingFromMap}
-                    className="coordinate-input"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Longitude</label>
-                  <input
-                    type="number"
-                    name="addresses_longitude"
-                    value={formData.addresses_longitude}
-                    onChange={handleInputChange}
-                    placeholder="121.0175"
-                    step="0.000001"
-                    readOnly={isCreatingFromMap}
-                    className="coordinate-input"
-                  />
-                </div>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Address List Section */}
