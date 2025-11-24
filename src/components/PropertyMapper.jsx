@@ -191,34 +191,32 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
           </div>
         </div>
 
-        {/* Map Controls Bar */}
-        <div className="map-controls-bar">
-          <div className="map-resize-controls">
+        <div className="map-container">
+          <div className="map-overlay-controls">
+            <div className="map-resize-controls">
+              <button
+                onClick={() => setMapWidth(prev => Math.max(prev - 10, 30))}
+                className="btn-map-resize"
+                title="Collapse map"
+              >
+                ‹
+              </button>
+              <button
+                onClick={() => setMapWidth(prev => Math.min(prev + 10, 80))}
+                className="btn-map-resize"
+                title="Expand map"
+              >
+                ›
+              </button>
+            </div>
             <button
-              onClick={() => setMapWidth(prev => Math.max(prev - 10, 30))}
-              className="btn-map-resize"
-              title="Collapse map"
+              onClick={() => setShowLegend(!showLegend)}
+              className="btn-legend-toggle"
+              title={showLegend ? 'Hide map controls' : 'Show map controls'}
             >
-              ‹
-            </button>
-            <button
-              onClick={() => setMapWidth(prev => Math.min(prev + 10, 80))}
-              className="btn-map-resize"
-              title="Expand map"
-            >
-              ›
+              {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
             </button>
           </div>
-          <button
-            onClick={() => setShowLegend(!showLegend)}
-            className="btn-legend-toggle"
-            title={showLegend ? 'Hide map controls' : 'Show map controls'}
-          >
-            {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-          </button>
-        </div>
-
-        <div className="map-container">
           {loading ? (
             <div className="mapper-loading">Loading properties...</div>
           ) : (
