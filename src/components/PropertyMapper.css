@@ -74,6 +74,7 @@
   overflow: hidden;
   display: flex;
   align-items: stretch;
+  z-index: 1;
 }
 
 .map-overlay-controls {
