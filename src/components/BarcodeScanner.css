@@ -138,12 +138,17 @@
   gap: 10px;
   width: 100%;
   box-sizing: border-box;
+  border: none;
+  border-top: none;
+  padding-top: 0;
+  margin-top: 0;
 }
 
 .form-actions .btn {
   padding: 10px 16px;
   font-size: 13px;
   margin: 0;
+  border: none;
 }
 
 @media (max-width: 480px) {
