@@ -182,14 +182,14 @@ export default function RouteCalculatorTab({ userId }) {
               <div className="map-resize-controls">
                 <button
                   onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
-                  className="btn-map-resize-overlay"
+                  className="btn-map-resize"
                   title="Decrease map size"
                 >
                   −
                 </button>
                 <button
                   onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
-                  className="btn-map-resize-overlay"
+                  className="btn-map-resize"
                   title="Increase map size"
                 >
                   +
@@ -197,7 +197,7 @@ export default function RouteCalculatorTab({ userId }) {
               </div>
               <button
                 onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle-overlay"
+                className="btn-legend-toggle"
                 title={showLegend ? 'Hide map controls' : 'Show map controls'}
               >
                 {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
