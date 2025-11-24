@@ -4,7 +4,6 @@ import ShippingLabelGenerator from './ShippingLabelGenerator'
 import BarcodeScanner from './BarcodeScanner'
 import PackageTracker from './PackageTracker'
 import PackageCheckpointMap from './PackageCheckpointMap'
-import QuickCheckpointButton from './QuickCheckpointButton'
 import { supabase } from '../lib/supabaseClient'
 import './DefaultAddressesTab.css'
 
@@ -14,7 +13,6 @@ export default function DefaultAddressesTab({ userId, onClose }) {
   const [addresses, setAddresses] = useState([])
   const [loadingAddresses, setLoadingAddresses] = useState(true)
   const [viewingMapForTrackingCode, setViewingMapForTrackingCode] = useState(null)
-  const [quickCheckpointTrackingCode, setQuickCheckpointTrackingCode] = useState('')
 
   const handlePropertyAdded = () => {
     setRefreshKey(prev => prev + 1)
@@ -55,52 +53,6 @@ export default function DefaultAddressesTab({ userId, onClose }) {
         <h2>Default</h2>
       </div>
 
-      {/* Quick Checkpoint Access */}
-      {quickCheckpointTrackingCode && (
-        <div className="quick-checkpoint-section">
-          <QuickCheckpointButton
-            trackingCode={quickCheckpointTrackingCode}
-            onCheckpointAdded={() => {
-              setQuickCheckpointTrackingCode('')
-            }}
-            buttonText="Mark Checkpoint"
-          />
-          <button
-            type="button"
-            onClick={() => setQuickCheckpointTrackingCode('')}
-            className="btn-close-checkpoint-modal"
-            title="Close quick checkpoint"
-          >
-            ✕
-          </button>
-        </div>
-      )}
-
-      {/* Quick Checkpoint Input */}
-      {!quickCheckpointTrackingCode && (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault()
-            const code = e.target.trackingCode.value.toUpperCase().trim()
-            if (code) {
-              setQuickCheckpointTrackingCode(code)
-              e.target.trackingCode.value = ''
-            }
-          }}
-          className="quick-checkpoint-input-form"
-        >
-          <input
-            type="text"
-            name="trackingCode"
-            placeholder="🚀 Quick Checkpoint - Enter tracking code..."
-            className="quick-checkpoint-input"
-            autoComplete="off"
-          />
-          <button type="submit" className="btn btn-checkpoint-quick">
-            Mark
-          </button>
-        </form>
-      )}
 
       {/* Sub-tabs for shipping and tracking features */}
       <div className="subtab-navigation">
