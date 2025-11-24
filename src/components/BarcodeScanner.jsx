@@ -345,21 +345,21 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
             </form>
           </div>
 
-          {scannedLabel.tracking_history && scannedLabel.tracking_history.length > 0 && (
+          {scannedLabel.checkpoints && scannedLabel.checkpoints.length > 0 && (
             <div className="checkpoint-history">
-              <h4>Checkpoint History ({scannedLabel.tracking_history.length})</h4>
+              <h4>Checkpoint History ({scannedLabel.checkpoints.length})</h4>
               <div className="timeline">
-                {scannedLabel.tracking_history.map((checkpoint, index) => (
+                {scannedLabel.checkpoints.map((checkpoint, index) => (
                   <div key={checkpoint.id || index} className="timeline-item">
                     <div className="timeline-marker" />
                     <div className="timeline-content">
                       <h5>{checkpoint.checkpoint_name || 'Checkpoint'}</h5>
-                      {checkpoint.status && (
-                        <p className="status-type">{checkpoint.status.toUpperCase()}</p>
+                      {checkpoint.checkpoint_type && (
+                        <p className="status-type">{checkpoint.checkpoint_type.toUpperCase()}</p>
                       )}
-                      {checkpoint.created_at && (
+                      {checkpoint.timestamp && (
                         <p className="timestamp">
-                          {new Date(checkpoint.created_at).toLocaleString()}
+                          {new Date(checkpoint.timestamp).toLocaleString()}
                         </p>
                       )}
                       {checkpoint.address_text && (
@@ -369,6 +369,9 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
                         <p className="coordinates">
                           {checkpoint.latitude.toFixed(4)}, {checkpoint.longitude.toFixed(4)}
                         </p>
+                      )}
+                      {checkpoint.notes && (
+                        <p className="notes">{checkpoint.notes}</p>
                       )}
                     </div>
                   </div>
