@@ -192,7 +192,7 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn-map-resize-overlay {
+.btn-map-resize {
   width: 32px;
   height: 32px;
   padding: 0;
@@ -210,16 +210,16 @@
   line-height: 1;
 }
 
-.btn-map-resize-overlay:hover {
+.btn-map-resize:hover {
   background: #f8fafc;
   color: #0f172a;
 }
 
-.btn-map-resize-overlay:active {
+.btn-map-resize:active {
   transform: scale(0.95);
 }
 
-.btn-legend-toggle-overlay {
+.btn-legend-toggle {
   padding: 8px 16px;
   background: white;
   border: 1px solid #cbd5e1;
@@ -233,13 +233,13 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.btn-legend-toggle-overlay:hover {
+.btn-legend-toggle:hover {
   background: #f8fafc;
   border-color: #94a3b8;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.btn-legend-toggle-overlay:active {
+.btn-legend-toggle:active {
   background: #f1f5f9;
 }
 
