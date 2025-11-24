@@ -389,16 +389,17 @@ export default function PackageTracker({ userId }) {
                   </Marker>
                 )}
 
-                {selectedLabel.checkpoints.map((checkpoint, index) => (
+                {selectedLabel.checkpoints.filter(cp => cp.latitude && cp.longitude).map((checkpoint, index) => (
                   <Marker
-                    key={checkpoint.id}
-                    position={[checkpoint.latitude, checkpoint.longitude]}
+                    key={checkpoint.id || index}
+                    position={[parseFloat(checkpoint.latitude), parseFloat(checkpoint.longitude)]}
                     icon={createMarkerIcon(index === selectedLabel.checkpoints.length - 1 ? 'current' : 'checkpoint')}
                   >
                     <Popup>
-                      <strong>{checkpoint.checkpoint_name}</strong><br />
-                      {new Date(checkpoint.scanned_at).toLocaleString()}<br />
-                      {checkpoint.location_address}
+                      <strong>{checkpoint.checkpoint_name || 'Checkpoint'}</strong><br />
+                      {checkpoint.checkpoint_type && <span>{checkpoint.checkpoint_type}<br /></span>}
+                      {checkpoint.scanned_at && <span>{new Date(checkpoint.scanned_at).toLocaleString()}<br /></span>}
+                      {checkpoint.location_address && <span>{checkpoint.location_address}</span>}
                     </Popup>
                   </Marker>
                 ))}
