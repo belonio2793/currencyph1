@@ -1205,7 +1205,7 @@ export default function MyAddressesTab({ userId }) {
                           className="btn-edit-address"
                           title="Edit address"
                         >
-                          ✎
+                          Edit
                         </button>
                         <button
                           onClick={(e) => {
@@ -1215,7 +1215,7 @@ export default function MyAddressesTab({ userId }) {
                           className="btn-delete-address"
                           title="Delete address"
                         >
-                          🗑
+                          Delete
                         </button>
                         <button
                           onClick={(e) => {
@@ -1227,7 +1227,7 @@ export default function MyAddressesTab({ userId }) {
                           className="btn-history"
                           title="View history"
                         >
-                          ℹ
+                          History
                         </button>
                       </div>
                     </div>
