@@ -90,6 +90,7 @@ export default function MyAddressesTab({ userId }) {
   const [mapHeight, setMapHeight] = useState(400)
   const [mapLayer, setMapLayer] = useState('street')
   const [showLegend, setShowLegend] = useState(false)
+  const [showModalMapControls, setShowModalMapControls] = useState(false)
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mapSearchQuery, setMapSearchQuery] = useState('')
   const [mapSearchResults, setMapSearchResults] = useState([])
@@ -102,6 +103,7 @@ export default function MyAddressesTab({ userId }) {
   const citiesDropdownRef = useRef(null)
   const [fetchingLocation, setFetchingLocation] = useState(false)
   const [modalMapRef, setModalMapRef] = useState(null)
+  const [modalMapHeight, setModalMapHeight] = useState(300)
 
   const allCities = [
     "Abuyog", "Alaminos", "Alcala", "Angeles", "Antipolo", "Aroroy", "Bacolod", "Bacoor", "Bago",
