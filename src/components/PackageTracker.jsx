@@ -31,7 +31,6 @@ const createMarkerIcon = (type = 'checkpoint') => {
   
   return L.divIcon({
     html: `<div style="background-color: ${color}; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
-      <span style="color: white; font-size: 16px;">📍</span>
     </div>`,
     iconSize: [30, 30],
     className: 'custom-marker'
@@ -192,13 +191,13 @@ export default function PackageTracker({ userId, onViewMap }) {
             className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
             onClick={() => setViewMode('list')}
           >
-            📋 List
+            List
           </button>
           <button
             className={`toggle-btn ${viewMode === 'map' ? 'active' : ''}`}
             onClick={() => setViewMode('map')}
           >
-            🗺️ Map
+            Map
           </button>
         </div>
       </div>
@@ -214,7 +213,7 @@ export default function PackageTracker({ userId, onViewMap }) {
           className="search-input"
         />
         <button type="submit" disabled={loading} className="btn btn-search">
-          🔍 Search
+          Search
         </button>
         <button
           type="button"
@@ -222,7 +221,7 @@ export default function PackageTracker({ userId, onViewMap }) {
           disabled={loading}
           className="btn btn-refresh"
         >
-          🔄 Refresh
+          Refresh
         </button>
       </form>
 
@@ -277,14 +276,14 @@ export default function PackageTracker({ userId, onViewMap }) {
                   
                   <div className="card-meta">
                     {label.tracking_history && label.tracking_history.length > 0 && (
-                      <span>📍 {label.tracking_history.length} checkpoints</span>
+                      <span>{label.tracking_history.length} checkpoints</span>
                     )}
-                    <span>📅 {new Date(label.created_at).toLocaleDateString()}</span>
+                    <span>{new Date(label.created_at).toLocaleDateString()}</span>
                   </div>
 
                   {label.current_checkpoint && (
                     <p className="current-location">
-                      📌 {label.current_checkpoint}
+                      {label.current_checkpoint}
                     </p>
                   )}
                 </div>
@@ -304,7 +303,7 @@ export default function PackageTracker({ userId, onViewMap }) {
                 className="close-btn"
                 title="Close"
               >
-                ✕
+                ×
               </button>
             </div>
 
@@ -360,7 +359,7 @@ export default function PackageTracker({ userId, onViewMap }) {
               <QuickCheckpointButton
                 trackingCode={selectedLabel.tracking_code}
                 onCheckpointAdded={() => loadLabels()}
-                buttonText="⚡ Add Checkpoint"
+                buttonText="Add Checkpoint"
               />
             </div>
 
@@ -382,7 +381,7 @@ export default function PackageTracker({ userId, onViewMap }) {
                           </p>
                         )}
                         {checkpoint.address_text && (
-                          <p className="address">📍 {checkpoint.address_text}</p>
+                          <p className="address">{checkpoint.address_text}</p>
                         )}
                         {checkpoint.latitude && checkpoint.longitude && (
                           <p className="coordinates">
