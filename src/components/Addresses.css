@@ -2646,6 +2646,63 @@
   border-color: #94a3b8;
 }
 
+/* Modal Map Section Styles */
+.modal-map-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.modal-map-container {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.modal-map-container .leaflet-container {
+  background: white;
+}
+
+.btn-fetch-location {
+  padding: 10px 16px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-self: flex-start;
+}
+
+.btn-fetch-location:hover:not(:disabled) {
+  background: #5568d3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-fetch-location:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.coordinate-input-readonly {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  cursor: default;
+}
+
+.coordinate-input-readonly:focus {
+  outline: none;
+  border-color: #cbd5e1;
+  box-shadow: none;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .shipment-detail-panel {
