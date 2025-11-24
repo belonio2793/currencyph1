@@ -3,6 +3,7 @@ import PropertyMapper from './PropertyMapper'
 import ShippingLabelGenerator from './ShippingLabelGenerator'
 import BarcodeScanner from './BarcodeScanner'
 import PackageTracker from './PackageTracker'
+import PackageCheckpointMap from './PackageCheckpointMap'
 import { supabase } from '../lib/supabaseClient'
 import './DefaultAddressesTab.css'
 
