@@ -2666,6 +2666,12 @@
   background: white;
 }
 
+.modal-map-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .btn-fetch-location {
   padding: 10px 16px;
   background: #667eea;
@@ -2676,7 +2682,8 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  align-self: flex-start;
+  flex: 1;
+  min-width: 150px;
 }
 
 .btn-fetch-location:hover:not(:disabled) {
