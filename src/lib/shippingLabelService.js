@@ -216,16 +216,17 @@ export async function addCheckpoint(shippingLabelId, checkpointData) {
   return data[0]
 }
 
-// Get checkpoint history for a label
+// Get checkpoint history for a shipping label
+// Checkpoints are stored in addresses_shipment_tracking with shipment_id = label id
 export async function getCheckpointHistory(shippingLabelId) {
   const { data, error } = await supabase
     .from('addresses_shipment_tracking')
     .select('*')
     .eq('shipment_id', shippingLabelId)
-    .order('scanned_at', { ascending: false })
+    .order('scanned_at', { ascending: true })
 
   if (error) throw error
-  return data
+  return data || []
 }
 
 // Update shipping label status
