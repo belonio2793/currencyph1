@@ -1154,20 +1154,80 @@ export default function MyAddressesTab({ userId }) {
                   <div className="form-row">
                     <div className="form-group">
                       <label>City *</label>
-                      <input
-                        type="text"
-                        name="addresses_city"
-                        value={formData.addresses_city}
-                        onChange={handleInputChange}
-                        placeholder="e.g., Manila"
-                        required
-                        list="city-suggestions"
-                      />
-                      <datalist id="city-suggestions">
-                        {popularCities.map(city => (
-                          <option key={city.name} value={city.name} />
-                        ))}
-                      </datalist>
+                      <div style={{ position: 'relative' }}>
+                        <input
+                          type="text"
+                          name="addresses_city"
+                          value={formData.addresses_city}
+                          onChange={(e) => {
+                            handleInputChange(e)
+                            const query = e.target.value.toLowerCase()
+                            if (query) {
+                              setFilteredCities(allCities.filter(city =>
+                                city.toLowerCase().includes(query)
+                              ))
+                              setCitySearchOpen(true)
+                            } else {
+                              setFilteredCities(allCities)
+                              setCitySearchOpen(false)
+                            }
+                          }}
+                          onFocus={() => {
+                            setCitySearchOpen(true)
+                            setFilteredCities(allCities)
+                          }}
+                          onBlur={() => setTimeout(() => setCitySearchOpen(false), 200)}
+                          placeholder="e.g., Manila"
+                          required
+                          autoComplete="off"
+                        />
+                        {citySearchOpen && filteredCities.length > 0 && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '100%',
+                            left: 0,
+                            right: 0,
+                            backgroundColor: 'white',
+                            border: '1px solid #ccc',
+                            borderTop: 'none',
+                            maxHeight: '200px',
+                            overflowY: 'auto',
+                            zIndex: 1000,
+                            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)'
+                          }}>
+                            {filteredCities.slice(0, 10).map(city => (
+                              <div
+                                key={city}
+                                onClick={() => {
+                                  setFormData(prev => ({ ...prev, addresses_city: city }))
+                                  setCitySearchOpen(false)
+                                }}
+                                style={{
+                                  padding: '10px',
+                                  cursor: 'pointer',
+                                  borderBottom: '1px solid #f0f0f0',
+                                  backgroundColor: city === formData.addresses_city ? '#f5f5f5' : 'white',
+                                  transition: 'background-color 0.2s'
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f5f5f5'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = city === formData.addresses_city ? '#f5f5f5' : 'white'}
+                              >
+                                {city}
+                              </div>
+                            ))}
+                            {filteredCities.length > 10 && (
+                              <div style={{
+                                padding: '10px',
+                                textAlign: 'center',
+                                color: '#999',
+                                fontSize: '12px'
+                              }}>
+                                Showing 10 of {filteredCities.length} cities
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <div className="form-group">
                       <label>Province</label>
