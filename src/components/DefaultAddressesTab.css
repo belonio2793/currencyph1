@@ -1,0 +1,117 @@
+.default-addresses-tab {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f9fafb;
+}
+
+.page-title {
+  padding: 20px;
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.page-title h2 {
+  margin: 0;
+  font-size: 28px;
+  color: #1f2937;
+}
+
+.subtab-navigation {
+  display: flex;
+  gap: 5px;
+  padding: 15px 20px;
+  background: white;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
+  flex-wrap: wrap;
+}
+
+.subtab-btn {
+  padding: 10px 16px;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  border-bottom: 3px solid transparent;
+}
+
+.subtab-btn:hover {
+  background: #e5e7eb;
+  border-bottom-color: #9ca3af;
+}
+
+.subtab-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+  border-bottom-color: #1e40af;
+}
+
+.subtab-content {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure property mapper and other components fit properly */
+.subtab-content > * {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .page-title h2 {
+    font-size: 22px;
+  }
+
+  .subtab-navigation {
+    padding: 10px 15px;
+    gap: 3px;
+  }
+
+  .subtab-btn {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    padding: 15px;
+  }
+
+  .page-title h2 {
+    font-size: 18px;
+  }
+
+  .subtab-navigation {
+    padding: 10px;
+    gap: 5px;
+  }
+
+  .subtab-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
