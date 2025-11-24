@@ -1080,6 +1080,62 @@ export default function MyAddressesTab({ userId }) {
                 <div className="form-section">
                   <h3 className="form-section-title">Geolocation *</h3>
 
+                  <div className="modal-map-section">
+                    <div className="modal-map-container" style={{ height: '300px', marginBottom: '16px' }}>
+                      <MapContainer
+                        center={[
+                          parseFloat(formData.addresses_latitude) || 12.8797,
+                          parseFloat(formData.addresses_longitude) || 121.7740
+                        ]}
+                        zoom={formData.addresses_latitude ? 15 : 6}
+                        style={{ height: '100%', width: '100%' }}
+                        attributionControl={false}
+                      >
+                        <TileLayer
+                          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                        />
+                        <ModalMapClickHandler
+                          onMapClick={handleModalMapClick}
+                          latitude={formData.addresses_latitude}
+                          longitude={formData.addresses_longitude}
+                        />
+                        {formData.addresses_latitude && formData.addresses_longitude && (
+                          <Marker
+                            position={[
+                              parseFloat(formData.addresses_latitude),
+                              parseFloat(formData.addresses_longitude)
+                            ]}
+                            draggable={true}
+                            eventHandlers={{
+                              dragend: (e) => {
+                                const newLat = e.target.getLatLng().lat
+                                const newLng = e.target.getLatLng().lng
+                                handleModalMapClick({ latitude: newLat, longitude: newLng })
+                              }
+                            }}
+                          >
+                            <Popup>
+                              <div className="marker-popup">
+                                <p>Lat: {parseFloat(formData.addresses_latitude).toFixed(6)}</p>
+                                <p>Lon: {parseFloat(formData.addresses_longitude).toFixed(6)}</p>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        )}
+                      </MapContainer>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={handleFetchLocation}
+                      className="btn-fetch-location"
+                      disabled={!formData.addresses_latitude || !formData.addresses_longitude}
+                    >
+                      Search Address from Map
+                    </button>
+                  </div>
+
                   <div className="form-row">
                     <div className="form-group">
                       <label>Latitude *</label>
@@ -1087,9 +1143,9 @@ export default function MyAddressesTab({ userId }) {
                         type="number"
                         name="addresses_latitude"
                         value={formData.addresses_latitude}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 14.5549"
-                        step="0.000001"
+                        readOnly
+                        placeholder="Click map to set"
+                        className="coordinate-input-readonly"
                         required
                       />
                     </div>
@@ -1099,9 +1155,9 @@ export default function MyAddressesTab({ userId }) {
                         type="number"
                         name="addresses_longitude"
                         value={formData.addresses_longitude}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 121.0175"
-                        step="0.000001"
+                        readOnly
+                        placeholder="Click map to set"
+                        className="coordinate-input-readonly"
                         required
                       />
                     </div>
