@@ -183,7 +183,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
           <div className="map-search-input-group">
             <input
               type="text"
-              placeholder="🔍 Search location..."
+              placeholder="Search location..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="map-search-input"

@@ -491,7 +491,7 @@ export default function MyAddressesTab({ userId }) {
             <div className="map-search-input-group">
               <input
                 type="text"
-                placeholder="🔍 Search location..."
+                placeholder="Search location..."
                 value={mapSearchQuery}
                 onChange={(e) => {
                   setMapSearchQuery(e.target.value)
