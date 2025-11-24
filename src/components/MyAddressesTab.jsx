@@ -52,6 +52,19 @@ function ModalMapClickHandler({ onMapClick }) {
   return null
 }
 
+// Modal map ref handler - captures map instance for programmatic control
+function ModalMapRefHandler({ onMapReady }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (map) {
+      onMapReady(map)
+    }
+  }, [map, onMapReady])
+
+  return null
+}
+
 export default function MyAddressesTab({ userId }) {
   const mapRef = useRef(null)
   const [showForm, setShowForm] = useState(false)
