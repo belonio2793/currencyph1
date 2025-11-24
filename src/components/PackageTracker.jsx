@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, Polyline, GeoJSON } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabaseClient'
 import { 
-  getShippingLabelsWithCheckpoints,
-  searchShippingLabelBySerialId,
-  getCheckpointHistory
+  getUserShippingLabels,
+  searchLabelByTrackingCode,
+  getTrackingHistory
 } from '../lib/shippingLabelService'
 import './PackageTracker.css'
 
@@ -46,7 +46,7 @@ export default function PackageTracker({ userId }) {
   const [error, setError] = useState('')
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [zoomLevel, setZoomLevel] = useState(6)
-  const [viewMode, setViewMode] = useState('list') // 'list' or 'map'
+  const [viewMode, setViewMode] = useState('list')
   const [filterStatus, setFilterStatus] = useState('all')
   const [mapInstance, setMapInstance] = useState(null)
 
@@ -59,8 +59,8 @@ export default function PackageTracker({ userId }) {
 
   // Update map when selected label changes
   useEffect(() => {
-    if (selectedLabel && selectedLabel.checkpoints && selectedLabel.checkpoints.length > 0) {
-      const checkpoints = selectedLabel.checkpoints.filter(cp => cp.latitude && cp.longitude)
+    if (selectedLabel && selectedLabel.tracking_history && selectedLabel.tracking_history.length > 0) {
+      const checkpoints = selectedLabel.tracking_history.filter(cp => cp.latitude && cp.longitude)
       if (checkpoints.length > 0) {
         const latLngs = checkpoints.map(cp => [cp.latitude, cp.longitude])
         const bounds = L.latLngBounds(latLngs)
@@ -79,7 +79,7 @@ export default function PackageTracker({ userId }) {
       setLoading(true)
       setError('')
       
-      const labels = await getShippingLabelsWithCheckpoints(userId)
+      const labels = await getUserShippingLabels(userId)
       setAllLabels(labels || [])
     } catch (err) {
       setError(err.message || 'Failed to load packages')
@@ -93,7 +93,7 @@ export default function PackageTracker({ userId }) {
   const handleSearch = async (e) => {
     e.preventDefault()
     if (!searchQuery.trim()) {
-      setError('Please enter a serial ID')
+      setError('Please enter a tracking code')
       return
     }
 
@@ -101,23 +101,13 @@ export default function PackageTracker({ userId }) {
     setError('')
 
     try {
-      const label = await searchShippingLabelBySerialId(userId, searchQuery.toUpperCase())
+      const label = await searchLabelByTrackingCode(searchQuery.toUpperCase())
 
       if (!label) {
         setError('Package not found')
         setSelectedLabel(null)
       } else {
-        // Fetch checkpoints from shipment tracking
-        const { data: checkpoints } = await supabase
-          .from('addresses_shipment_tracking')
-          .select('*')
-          .eq('shipment_id', label.id)
-          .order('scanned_at', { ascending: false })
-
-        setSelectedLabel({
-          ...label,
-          checkpoints: checkpoints || []
-        })
+        setSelectedLabel(label)
         setViewMode('map')
       }
     } catch (err) {
@@ -133,13 +123,13 @@ export default function PackageTracker({ userId }) {
     if (filterStatus !== 'all' && label.status !== filterStatus) {
       return false
     }
-    if (searchQuery.trim() && !label.serial_id.includes(searchQuery.toUpperCase())) {
+    if (searchQuery.trim() && !label.tracking_code.includes(searchQuery.toUpperCase())) {
       return false
     }
     return true
   })
 
-  // Calculate route distance and ETA
+  // Calculate route distance
   const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371 // Earth's radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180
@@ -160,27 +150,19 @@ export default function PackageTracker({ userId }) {
 
     let fromLat, fromLon, toLat, toLon
 
-    // Start from origin
-    if (selectedLabel.origin_address && selectedLabel.origin_address.addresses_latitude) {
+    // Start from origin or last known location
+    if (selectedLabel.last_scanned_lat && selectedLabel.last_scanned_lng) {
+      fromLat = selectedLabel.last_scanned_lat
+      fromLon = selectedLabel.last_scanned_lng
+    } else if (selectedLabel.origin_address && selectedLabel.origin_address.addresses_latitude) {
       fromLat = selectedLabel.origin_address.addresses_latitude
       fromLon = selectedLabel.origin_address.addresses_longitude
     } else {
       return null
     }
 
-    // End at last checkpoint or destination
-    if (selectedLabel.checkpoints && selectedLabel.checkpoints.length > 0) {
-      const lastCheckpoint = selectedLabel.checkpoints[selectedLabel.checkpoints.length - 1]
-      if (lastCheckpoint.latitude && lastCheckpoint.longitude) {
-        toLat = lastCheckpoint.latitude
-        toLon = lastCheckpoint.longitude
-      } else if (selectedLabel.destination_address && selectedLabel.destination_address.addresses_latitude) {
-        toLat = selectedLabel.destination_address.addresses_latitude
-        toLon = selectedLabel.destination_address.addresses_longitude
-      } else {
-        return null
-      }
-    } else if (selectedLabel.destination_address && selectedLabel.destination_address.addresses_latitude) {
+    // End at destination
+    if (selectedLabel.destination_address && selectedLabel.destination_address.addresses_latitude) {
       toLat = selectedLabel.destination_address.addresses_latitude
       toLon = selectedLabel.destination_address.addresses_longitude
     } else {
@@ -188,9 +170,7 @@ export default function PackageTracker({ userId }) {
     }
 
     const distance = calculateDistance(fromLat, fromLon, toLat, toLon)
-
-    // Estimate delivery time (assuming average speed of 40 km/h for courier)
-    const estimatedHours = distance / 40
+    const estimatedHours = Math.max(1, distance / 40) // 40 km/h average
     const estimatedDays = Math.ceil(estimatedHours / 8)
 
     return {
@@ -229,7 +209,7 @@ export default function PackageTracker({ userId }) {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search by Serial ID..."
+          placeholder="Search by Tracking Code..."
           className="search-input"
         />
         <button type="submit" disabled={loading} className="btn btn-search">
@@ -256,8 +236,11 @@ export default function PackageTracker({ userId }) {
             >
               <option value="all">All</option>
               <option value="created">Created</option>
+              <option value="printed">Printed</option>
               <option value="in_transit">In Transit</option>
               <option value="delivered">Delivered</option>
+              <option value="returned">Returned</option>
+              <option value="lost">Lost</option>
             </select>
           </div>
 
@@ -277,7 +260,7 @@ export default function PackageTracker({ userId }) {
                   }}
                 >
                   <div className="card-header">
-                    <h4>{label.serial_id}</h4>
+                    <h4>{label.tracking_code}</h4>
                     <span className={`status-badge status-${label.status}`}>
                       {label.status?.toUpperCase()}
                     </span>
@@ -288,11 +271,17 @@ export default function PackageTracker({ userId }) {
                   )}
                   
                   <div className="card-meta">
-                    {label.checkpoints && label.checkpoints.length > 0 && (
-                      <span>📍 {label.checkpoints.length} checkpoints</span>
+                    {label.tracking_history && label.tracking_history.length > 0 && (
+                      <span>📍 {label.tracking_history.length} checkpoints</span>
                     )}
                     <span>📅 {new Date(label.created_at).toLocaleDateString()}</span>
                   </div>
+
+                  {label.current_checkpoint && (
+                    <p className="current-location">
+                      📌 {label.current_checkpoint}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -304,7 +293,7 @@ export default function PackageTracker({ userId }) {
         <div className="map-view">
           <div className="map-sidebar">
             <div className="sidebar-header">
-              <h3>{selectedLabel.serial_id}</h3>
+              <h3>{selectedLabel.tracking_code}</h3>
               <button
                 onClick={() => setSelectedLabel(null)}
                 className="close-btn"
@@ -329,10 +318,17 @@ export default function PackageTracker({ userId }) {
                 </span>
               </div>
 
-              {selectedLabel.package_weight && (
+              {selectedLabel.weight_kg && (
                 <div className="info-item">
                   <span className="label">Weight:</span>
-                  <span className="value">{selectedLabel.package_weight} kg</span>
+                  <span className="value">{selectedLabel.weight_kg} kg</span>
+                </div>
+              )}
+
+              {selectedLabel.last_scanned_at && (
+                <div className="info-item">
+                  <span className="label">Last Scanned:</span>
+                  <span className="value">{new Date(selectedLabel.last_scanned_at).toLocaleString()}</span>
                 </div>
               )}
 
@@ -355,33 +351,30 @@ export default function PackageTracker({ userId }) {
               )}
             </div>
 
-            {selectedLabel.checkpoints && selectedLabel.checkpoints.length > 0 && (
+            {selectedLabel.tracking_history && selectedLabel.tracking_history.length > 0 && (
               <div className="checkpoints-sidebar">
-                <h4>Checkpoint History ({selectedLabel.checkpoints.length})</h4>
+                <h4>Checkpoint History ({selectedLabel.tracking_history.length})</h4>
                 <div className="checkpoints-list">
-                  {selectedLabel.checkpoints.map((checkpoint, index) => (
+                  {selectedLabel.tracking_history.map((checkpoint, index) => (
                     <div key={checkpoint.id || index} className="checkpoint-item">
                       <div className="checkpoint-number">{index + 1}</div>
                       <div className="checkpoint-details">
                         <h5>{checkpoint.checkpoint_name || 'Checkpoint'}</h5>
-                        {checkpoint.checkpoint_type && (
-                          <p className="checkpoint-type">{checkpoint.checkpoint_type}</p>
+                        {checkpoint.status && (
+                          <p className="checkpoint-type">{checkpoint.status.toUpperCase()}</p>
                         )}
-                        {checkpoint.scanned_at && (
+                        {checkpoint.created_at && (
                           <p className="timestamp">
-                            {new Date(checkpoint.scanned_at).toLocaleString()}
+                            {new Date(checkpoint.created_at).toLocaleString()}
                           </p>
                         )}
-                        {checkpoint.location_address && (
-                          <p className="address">📍 {checkpoint.location_address}</p>
+                        {checkpoint.address_text && (
+                          <p className="address">📍 {checkpoint.address_text}</p>
                         )}
                         {checkpoint.latitude && checkpoint.longitude && (
                           <p className="coordinates">
                             {checkpoint.latitude.toFixed(4)}, {checkpoint.longitude.toFixed(4)}
                           </p>
-                        )}
-                        {checkpoint.notes && (
-                          <p className="notes">{checkpoint.notes}</p>
                         )}
                       </div>
                     </div>
@@ -392,7 +385,7 @@ export default function PackageTracker({ userId }) {
           </div>
 
           <div className="map-container">
-            {selectedLabel.checkpoints && selectedLabel.checkpoints.length > 0 ? (
+            {selectedLabel.tracking_history && selectedLabel.tracking_history.length > 0 ? (
               <MapContainer
                 ref={mapRef}
                 center={mapCenter}
@@ -419,17 +412,17 @@ export default function PackageTracker({ userId }) {
                   </Marker>
                 )}
 
-                {selectedLabel.checkpoints.filter(cp => cp.latitude && cp.longitude).map((checkpoint, index) => (
+                {selectedLabel.tracking_history.filter(cp => cp.latitude && cp.longitude).map((checkpoint, index) => (
                   <Marker
                     key={checkpoint.id || index}
                     position={[parseFloat(checkpoint.latitude), parseFloat(checkpoint.longitude)]}
-                    icon={createMarkerIcon(index === selectedLabel.checkpoints.length - 1 ? 'current' : 'checkpoint')}
+                    icon={createMarkerIcon(index === 0 ? 'current' : 'checkpoint')}
                   >
                     <Popup>
                       <strong>{checkpoint.checkpoint_name || 'Checkpoint'}</strong><br />
-                      {checkpoint.checkpoint_type && <span>{checkpoint.checkpoint_type}<br /></span>}
-                      {checkpoint.scanned_at && <span>{new Date(checkpoint.scanned_at).toLocaleString()}<br /></span>}
-                      {checkpoint.location_address && <span>{checkpoint.location_address}</span>}
+                      {checkpoint.status && <span>{checkpoint.status.toUpperCase()}<br /></span>}
+                      {checkpoint.created_at && <span>{new Date(checkpoint.created_at).toLocaleString()}<br /></span>}
+                      {checkpoint.address_text && <span>{checkpoint.address_text}</span>}
                     </Popup>
                   </Marker>
                 ))}
@@ -449,10 +442,11 @@ export default function PackageTracker({ userId }) {
                   </Marker>
                 )}
 
-                {selectedLabel.checkpoints.length > 0 && (
+                {selectedLabel.tracking_history.length > 1 && (
                   <Polyline
-                    positions={selectedLabel.checkpoints
+                    positions={selectedLabel.tracking_history
                       .filter(cp => cp.latitude && cp.longitude)
+                      .reverse()
                       .map(cp => [parseFloat(cp.latitude), parseFloat(cp.longitude)])}
                     color="#3b82f6"
                     weight={2}
