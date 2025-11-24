@@ -1329,6 +1329,38 @@
   gap: 4px;
 }
 
+.btn-edit-address {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s, color 0.2s;
+  color: #667eea;
+}
+
+.btn-edit-address:hover {
+  opacity: 1;
+  color: #5568d3;
+}
+
+.btn-delete-address {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px;
+  opacity: 0.6;
+  transition: opacity 0.2s, color 0.2s;
+  color: #dc2626;
+}
+
+.btn-delete-address:hover {
+  opacity: 1;
+  color: #b91c1c;
+}
+
 .btn-history {
   background: none;
   border: none;
