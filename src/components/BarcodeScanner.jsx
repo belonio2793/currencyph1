@@ -292,9 +292,21 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
             )}
           </div>
 
+          <div className="checkpoint-actions">
+            <QuickCheckpointButton
+              trackingCode={scannedLabel.tracking_code}
+              onCheckpointAdded={(checkpoint) => {
+                if (onCheckpointAdded) {
+                  onCheckpointAdded(checkpoint)
+                }
+              }}
+              buttonText="⚡ Quick Checkpoint"
+            />
+          </div>
+
           <div className="checkpoint-form">
             <h4>Add Checkpoint</h4>
-            
+
             <form onSubmit={handleAddCheckpoint}>
               <div className="form-group">
                 <label>Checkpoint Name *</label>
