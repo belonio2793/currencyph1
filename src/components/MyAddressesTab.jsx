@@ -105,6 +105,8 @@ export default function MyAddressesTab({ userId }) {
   const [modalMapRef, setModalMapRef] = useState(null)
   const [modalMapHeight, setModalMapHeight] = useState(300)
   const [modalMapLayer, setModalMapLayer] = useState('street')
+  const [citySearchOpen, setCitySearchOpen] = useState(false)
+  const [filteredCities, setFilteredCities] = useState(allCities)
 
   const allCities = [
     "Abuyog", "Alaminos", "Alcala", "Angeles", "Antipolo", "Aroroy", "Bacolod", "Bacoor", "Bago",
