@@ -12,6 +12,7 @@ export default function DefaultAddressesTab({ userId, onClose }) {
   const [activeSubTab, setActiveSubTab] = useState('properties')
   const [addresses, setAddresses] = useState([])
   const [loadingAddresses, setLoadingAddresses] = useState(true)
+  const [viewingMapForTrackingCode, setViewingMapForTrackingCode] = useState(null)
 
   const handlePropertyAdded = () => {
     setRefreshKey(prev => prev + 1)
