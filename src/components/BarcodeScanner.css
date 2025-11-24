@@ -371,6 +371,13 @@
   font-style: italic;
 }
 
+.timeline-content .coordinates {
+  margin: 4px 0 0 0;
+  font-size: 11px;
+  color: #6b7280;
+  font-family: monospace;
+}
+
 .btn {
   padding: 12px 16px;
   border: none;
