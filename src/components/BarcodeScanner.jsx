@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { addCheckpointToJsonbArray, getLabelWithCheckpoints } from '../lib/shippingLabelService'
+import QuickCheckpointButton from './QuickCheckpointButton'
 import './BarcodeScanner.css'
 
 export default function BarcodeScanner({ userId, onCheckpointAdded }) {
