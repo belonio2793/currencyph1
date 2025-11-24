@@ -342,6 +342,49 @@ export default function MyAddressesTab({ userId }) {
     setShowSearchResults(false)
   }
 
+  const handleModalMapClick = (coords) => {
+    const latitude = parseFloat(coords.latitude).toFixed(6)
+    const longitude = parseFloat(coords.longitude).toFixed(6)
+
+    setFormData(prev => ({
+      ...prev,
+      addresses_latitude: latitude,
+      addresses_longitude: longitude
+    }))
+  }
+
+  const handleFetchLocation = async () => {
+    if (!formData.addresses_latitude || !formData.addresses_longitude) {
+      setError('Please select a location on the map first')
+      return
+    }
+
+    try {
+      setLoading(true)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${formData.addresses_latitude}&lon=${formData.addresses_longitude}`
+      )
+      const data = await response.json()
+
+      if (data && data.address) {
+        const address = data.address
+        setFormData(prev => ({
+          ...prev,
+          addresses_street_name: address.road || address.pedestrian || address.cycleway || prev.addresses_street_name || '',
+          addresses_street_number: address.house_number || prev.addresses_street_number || '',
+          addresses_city: address.city || address.town || address.village || prev.addresses_city || '',
+          addresses_province: address.state || prev.addresses_province || '',
+          barangay: address.suburb || prev.barangay || ''
+        }))
+      }
+    } catch (err) {
+      console.error('Error fetching location:', err)
+      setError('Unable to fetch location details. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
