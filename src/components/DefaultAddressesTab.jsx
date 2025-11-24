@@ -4,6 +4,7 @@ import ShippingLabelGenerator from './ShippingLabelGenerator'
 import BarcodeScanner from './BarcodeScanner'
 import PackageTracker from './PackageTracker'
 import PackageCheckpointMap from './PackageCheckpointMap'
+import QuickCheckpointButton from './QuickCheckpointButton'
 import { supabase } from '../lib/supabaseClient'
 import './DefaultAddressesTab.css'
 
