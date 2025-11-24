@@ -476,6 +476,47 @@ export default function MyAddressesTab({ userId }) {
     }
   }
 
+  const checkAddressDuplicate = async (addressData, excludeId = null) => {
+    try {
+      let query = supabase
+        .from('addresses')
+        .select('id, addresses_street_number, addresses_street_name, addresses_city, addresses_province')
+        .eq('user_id', userId)
+        .eq('addresses_street_name', addressData.addresses_street_name)
+        .eq('addresses_city', addressData.addresses_city)
+
+      if (addressData.addresses_province) {
+        query = query.eq('addresses_province', addressData.addresses_province)
+      }
+
+      if (addressData.addresses_street_number) {
+        query = query.eq('addresses_street_number', addressData.addresses_street_number)
+      }
+
+      const { data: duplicates, error: queryError } = await query
+
+      if (queryError) throw queryError
+
+      if (duplicates && duplicates.length > 0) {
+        if (excludeId && duplicates.length === 1 && duplicates[0].id === excludeId) {
+          return null
+        }
+
+        const duplicate = duplicates[0]
+        let message = `This address already exists in your list: ${duplicate.addresses_street_name}, ${duplicate.addresses_city}`
+        if (duplicate.addresses_street_number) {
+          message = `Street number ${duplicate.addresses_street_number} at ${duplicate.addresses_street_name}, ${duplicate.addresses_city} is already taken`
+        }
+        return message
+      }
+
+      return null
+    } catch (err) {
+      console.error('Error checking for duplicates:', err)
+      return null
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
@@ -487,23 +528,49 @@ export default function MyAddressesTab({ userId }) {
 
     try {
       setLoading(true)
+
+      const duplicateError = await checkAddressDuplicate(formData, editingAddressId)
+      if (duplicateError) {
+        setError(duplicateError)
+        setLoading(false)
+        return
+      }
+
       const propertyData = {
         user_id: userId,
         ...formData,
         addresses_latitude: parseFloat(formData.addresses_latitude),
         addresses_longitude: parseFloat(formData.addresses_longitude),
         lot_area: formData.lot_area ? parseFloat(formData.lot_area) : null,
-        elevation: formData.elevation ? parseFloat(formData.elevation) : null
+        elevation: formData.elevation ? parseFloat(formData.elevation) : null,
+        updated_at: new Date().toISOString()
       }
 
-      const { data, error: insertError } = await supabase
-        .from('addresses')
-        .insert([propertyData])
-        .select()
+      let result
+      if (editingAddressId) {
+        const { data, error: updateError } = await supabase
+          .from('addresses')
+          .update(propertyData)
+          .eq('id', editingAddressId)
+          .eq('user_id', userId)
+          .select()
 
-      if (insertError) {
-        console.error('Insert error details:', insertError)
-        throw new Error(insertError.message || 'Failed to insert address')
+        if (updateError) {
+          console.error('Update error details:', updateError)
+          throw new Error(updateError.message || 'Failed to update address')
+        }
+        result = data
+      } else {
+        const { data, error: insertError } = await supabase
+          .from('addresses')
+          .insert([propertyData])
+          .select()
+
+        if (insertError) {
+          console.error('Insert error details:', insertError)
+          throw new Error(insertError.message || 'Failed to insert address')
+        }
+        result = data
       }
 
       setFormData({
@@ -532,6 +599,8 @@ export default function MyAddressesTab({ userId }) {
       })
       setShowForm(false)
       setIsCreatingFromMap(false)
+      setEditingAddressId(null)
+      setIsCreating(true)
       setError('')
       await loadAddresses()
     } catch (err) {
