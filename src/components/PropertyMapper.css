@@ -75,6 +75,7 @@
   display: flex;
   align-items: stretch;
   z-index: 1;
+  clip-path: inset(0);
 }
 
 .map-overlay-controls {
