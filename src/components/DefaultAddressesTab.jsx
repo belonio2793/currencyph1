@@ -112,7 +112,12 @@ export default function DefaultAddressesTab({ userId, onClose }) {
             userId={userId}
             onPropertyAdded={handlePropertyAdded}
             allowDelete={true}
+            showShippingPorts={false}
           />
+        )}
+
+        {activeSubTab === 'shipping-ports' && (
+          <ShippingPorts />
         )}
 
         {activeSubTab === 'generate' && (
