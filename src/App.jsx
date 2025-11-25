@@ -40,6 +40,7 @@ import Rides from './components/Rides'
 import TradingDashboard from './components/Trading/TradingDashboard'
 import Addresses from './components/Addresses'
 import BusinessMarketplace from './components/BusinessMarketplace'
+import BusinessMarketplaceDetail from './components/BusinessMarketplaceDetail'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
@@ -52,6 +53,7 @@ export default function App() {
   const [authInitialTab, setAuthInitialTab] = useState('login')
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
+  const [currentProductId, setCurrentProductId] = useState(null)
   const [totalBalancePHP, setTotalBalancePHP] = useState(0)
   const [totalBalanceConverted, setTotalBalanceConverted] = useState(0)
   const [totalDebtConverted, setTotalDebtConverted] = useState(0)
