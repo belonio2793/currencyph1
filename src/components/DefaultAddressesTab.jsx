@@ -64,13 +64,6 @@ export default function DefaultAddressesTab({ userId, onClose }) {
           Properties
         </button>
         <button
-          className={`subtab-btn ${activeSubTab === 'shipping-ports' ? 'active' : ''}`}
-          onClick={() => setActiveSubTab('shipping-ports')}
-          title="View Shipping Ports"
-        >
-          Shipping Ports
-        </button>
-        <button
           className={`subtab-btn ${activeSubTab === 'generate' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('generate')}
           title="Generate Shipping Labels"
