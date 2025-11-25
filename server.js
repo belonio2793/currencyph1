@@ -173,7 +173,13 @@ app.get('/api/didit/session-status/:sessionId', async (req, res) => {
     )
 
     if (!response.ok) {
-      const errorText = await response.text()
+      let errorText = ''
+      try {
+        const clonedResponse = response.clone()
+        errorText = await clonedResponse.text()
+      } catch (e) {
+        errorText = `Failed to parse error: ${response.status}`
+      }
       return res.status(response.status).json({
         error: `DIDIT API error: ${response.status}`,
         details: errorText.slice(0, 500),
