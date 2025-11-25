@@ -1,38 +1,40 @@
-import { supabase } from './supabaseClient'
+import { supabase, executeWithRetry } from './supabaseClient'
 
 /**
- * Fetch all public shipping ports
+ * Fetch all public shipping ports with retry logic
  */
 export async function fetchShippingPorts(filters = {}) {
   try {
-    let query = supabase
-      .from('shipping_ports')
-      .select('*')
-      .eq('is_public', true)
-      .order('name', { ascending: true })
+    return await executeWithRetry(async () => {
+      let query = supabase
+        .from('shipping_ports')
+        .select('*')
+        .eq('is_public', true)
+        .order('name', { ascending: true })
 
-    // Apply filters
-    if (filters.city) {
-      query = query.eq('city', filters.city)
-    }
-    if (filters.region) {
-      query = query.eq('region', filters.region)
-    }
-    if (filters.status) {
-      query = query.eq('status', filters.status)
-    }
-    if (filters.portType) {
-      query = query.eq('port_type', filters.portType)
-    }
+      // Apply filters
+      if (filters.city) {
+        query = query.eq('city', filters.city)
+      }
+      if (filters.region) {
+        query = query.eq('region', filters.region)
+      }
+      if (filters.status) {
+        query = query.eq('status', filters.status)
+      }
+      if (filters.portType) {
+        query = query.eq('port_type', filters.portType)
+      }
 
-    const { data, error } = await query
+      const { data, error } = await query
 
-    if (error) {
-      console.error('Error fetching shipping ports - Status:', error.status, 'Message:', error.message, 'Details:', error)
-      throw new Error(`Failed to fetch shipping ports: ${error.message} (${error.status})`)
-    }
+      if (error) {
+        console.error('Error fetching shipping ports - Status:', error.status, 'Message:', error.message, 'Details:', error)
+        throw new Error(`Failed to fetch shipping ports: ${error.message} (${error.status})`)
+      }
 
-    return data || []
+      return data || []
+    }, 3)
   } catch (err) {
     console.error('Error in fetchShippingPorts:', err.message || err)
     throw err
@@ -40,26 +42,28 @@ export async function fetchShippingPorts(filters = {}) {
 }
 
 /**
- * Fetch shipping ports in a specific region/city
+ * Fetch shipping ports in a specific region/city with retry logic
  */
 export async function fetchShippingPortsByLocation(city = null, region = null) {
   try {
-    let query = supabase
-      .from('shipping_ports')
-      .select('*')
-      .eq('is_public', true)
+    return await executeWithRetry(async () => {
+      let query = supabase
+        .from('shipping_ports')
+        .select('*')
+        .eq('is_public', true)
 
-    if (city) {
-      query = query.eq('city', city)
-    }
-    if (region && !city) {
-      query = query.eq('region', region)
-    }
+      if (city) {
+        query = query.eq('city', city)
+      }
+      if (region && !city) {
+        query = query.eq('region', region)
+      }
 
-    const { data, error } = await query.order('name', { ascending: true })
+      const { data, error } = await query.order('name', { ascending: true })
 
-    if (error) throw error
-    return data || []
+      if (error) throw error
+      return data || []
+    }, 3)
   } catch (err) {
     console.error('Error fetching ports by location:', err)
     throw err
