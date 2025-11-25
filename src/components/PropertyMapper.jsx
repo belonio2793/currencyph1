@@ -529,6 +529,9 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
                   <div className="empty-state-info">
                     <p className="empty-message">No properties with location data yet</p>
                     <p className="empty-hint">Use the + button to add your first property</p>
+                    <a href="#add-property" className="btn-primary" style={{ marginTop: '12px', display: 'inline-block', padding: '8px 16px', backgroundColor: '#10b981', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}>
+                      + Add Your First Property
+                    </a>
                   </div>
                 ) : (
                   <div className="properties-list">
