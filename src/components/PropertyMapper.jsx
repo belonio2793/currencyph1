@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, GeoJSON } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabaseClient'
+import { fetchShippingPorts } from '../lib/shippingPortsService'
 import MapControls from './MapControls'
 import './PropertyMapper.css'
 
