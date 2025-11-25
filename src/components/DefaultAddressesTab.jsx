@@ -108,10 +108,6 @@ export default function DefaultAddressesTab({ userId, onClose }) {
           />
         )}
 
-        {activeSubTab === 'shipping-ports' && (
-          <ShippingPorts />
-        )}
-
         {activeSubTab === 'generate' && (
           <ShippingLabelGenerator
             userId={userId}
