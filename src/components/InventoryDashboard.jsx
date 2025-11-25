@@ -661,6 +661,11 @@ export default function InventoryDashboard({ userId, businessId, setActiveTab })
       )}
 
       {/* Products List */}
+      {/* Advanced Features */}
+      {!showAddForm && products.length > 0 && (
+        <AdvancedInventoryFeatures products={products} userId={userId} />
+      )}
+
       {!showAddForm && (
         <>
           <div className="products-controls">
