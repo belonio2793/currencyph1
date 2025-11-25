@@ -153,57 +153,61 @@ export async function deleteShippingPort(portId) {
 }
 
 /**
- * Get unique cities with shipping ports
+ * Get unique cities with shipping ports with retry logic
  */
 export async function getShippingPortCities() {
   try {
-    const { data, error } = await supabase
-      .from('shipping_ports')
-      .select('city')
-      .eq('is_public', true)
-      .order('city', { ascending: true })
+    return await executeWithRetry(async () => {
+      const { data, error } = await supabase
+        .from('shipping_ports')
+        .select('city')
+        .eq('is_public', true)
+        .order('city', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching port cities - Status:', error.status, 'Message:', error.message)
-      throw new Error(`Failed to fetch cities: ${error.message}`)
-    }
+      if (error) {
+        console.error('Error fetching port cities - Status:', error.status, 'Message:', error.message)
+        throw new Error(`Failed to fetch cities: ${error.message}`)
+      }
 
-    // Get unique cities
-    const uniqueCities = [...new Set(data.map(item => item.city))]
-    return uniqueCities
+      // Get unique cities
+      const uniqueCities = [...new Set(data.map(item => item.city))]
+      return uniqueCities
+    }, 3)
   } catch (err) {
     console.error('Error fetching port cities:', err.message || err)
-    throw err
+    return []
   }
 }
 
 /**
- * Get unique regions with shipping ports
+ * Get unique regions with shipping ports with retry logic
  */
 export async function getShippingPortRegions() {
   try {
-    const { data, error } = await supabase
-      .from('shipping_ports')
-      .select('region')
-      .eq('is_public', true)
-      .order('region', { ascending: true })
+    return await executeWithRetry(async () => {
+      const { data, error } = await supabase
+        .from('shipping_ports')
+        .select('region')
+        .eq('is_public', true)
+        .order('region', { ascending: true })
 
-    if (error) {
-      console.error('Error fetching port regions - Status:', error.status, 'Message:', error.message)
-      throw new Error(`Failed to fetch regions: ${error.message}`)
-    }
+      if (error) {
+        console.error('Error fetching port regions - Status:', error.status, 'Message:', error.message)
+        throw new Error(`Failed to fetch regions: ${error.message}`)
+      }
 
-    // Get unique regions
-    const uniqueRegions = [...new Set(data.map(item => item.region).filter(Boolean))]
-    return uniqueRegions
+      // Get unique regions
+      const uniqueRegions = [...new Set(data.map(item => item.region).filter(Boolean))]
+      return uniqueRegions
+    }, 3)
   } catch (err) {
     console.error('Error fetching port regions:', err.message || err)
-    throw err
+    return []
   }
 }
 
 /**
- * Search shipping ports by name or description
+ * Search shipping ports by name or description with retry logic
  */
 export async function searchShippingPorts(query) {
   try {
@@ -211,56 +215,68 @@ export async function searchShippingPorts(query) {
       return []
     }
 
-    const searchTerm = query.toLowerCase()
-    const { data, error } = await supabase
-      .from('shipping_ports')
-      .select('*')
-      .eq('is_public', true)
+    return await executeWithRetry(async () => {
+      const searchTerm = query.toLowerCase()
+      const { data, error } = await supabase
+        .from('shipping_ports')
+        .select('*')
+        .eq('is_public', true)
 
-    if (error) throw error
+      if (error) throw error
 
-    // Client-side search for name and description
-    const results = data.filter(port =>
-      port.name.toLowerCase().includes(searchTerm) ||
-      (port.description && port.description.toLowerCase().includes(searchTerm)) ||
-      (port.city && port.city.toLowerCase().includes(searchTerm))
-    )
+      // Client-side search for name and description
+      const results = data.filter(port =>
+        port.name.toLowerCase().includes(searchTerm) ||
+        (port.description && port.description.toLowerCase().includes(searchTerm)) ||
+        (port.city && port.city.toLowerCase().includes(searchTerm))
+      )
 
-    return results
+      return results
+    }, 3)
   } catch (err) {
     console.error('Error searching shipping ports:', err)
-    throw err
+    return []
   }
 }
 
 /**
- * Get shipping port statistics
+ * Get shipping port statistics with retry logic
  */
 export async function getShippingPortStats() {
   try {
-    const { data, error } = await supabase
-      .from('shipping_ports')
-      .select('*')
-      .eq('is_public', true)
+    return await executeWithRetry(async () => {
+      const { data, error } = await supabase
+        .from('shipping_ports')
+        .select('*')
+        .eq('is_public', true)
 
-    if (error) {
-      console.error('Error fetching port stats - Status:', error.status, 'Message:', error.message, 'Details:', error)
-      throw new Error(`Failed to fetch port stats: ${error.message}`)
-    }
+      if (error) {
+        console.error('Error fetching port stats - Status:', error.status, 'Message:', error.message, 'Details:', error)
+        throw new Error(`Failed to fetch port stats: ${error.message}`)
+      }
 
-    const stats = {
-      totalPorts: data.length,
-      activePortsCount: data.filter(p => p.status === 'active').length,
-      internationalPorts: data.filter(p => p.port_type === 'international').length,
-      domesticPorts: data.filter(p => p.port_type === 'domestic').length,
-      uniqueCities: [...new Set(data.map(p => p.city))].length,
-      uniqueRegions: [...new Set(data.map(p => p.region).filter(Boolean))].length,
-      totalCapacity: data.reduce((sum, p) => sum + (p.annual_capacity_teu || 0), 0)
-    }
+      const stats = {
+        totalPorts: data.length,
+        activePortsCount: data.filter(p => p.status === 'active').length,
+        internationalPorts: data.filter(p => p.port_type === 'international').length,
+        domesticPorts: data.filter(p => p.port_type === 'domestic').length,
+        uniqueCities: [...new Set(data.map(p => p.city))].length,
+        uniqueRegions: [...new Set(data.map(p => p.region).filter(Boolean))].length,
+        totalCapacity: data.reduce((sum, p) => sum + (p.annual_capacity_teu || 0), 0)
+      }
 
-    return stats
+      return stats
+    }, 3)
   } catch (err) {
     console.error('Error fetching port stats:', err.message || err)
-    throw err
+    return {
+      totalPorts: 0,
+      activePortsCount: 0,
+      internationalPorts: 0,
+      domesticPorts: 0,
+      uniqueCities: 0,
+      uniqueRegions: 0,
+      totalCapacity: 0
+    }
   }
 }
