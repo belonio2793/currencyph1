@@ -358,6 +358,9 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
               <div className="empty-state-content">
                 <p className="empty-title">Login to view properties</p>
                 <p className="empty-subtitle">Sign in to see and manage your properties</p>
+                <a href="/auth" className="btn-primary" style={{ marginTop: '16px', display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+                  Sign In Now
+                </a>
               </div>
             </div>
           ) : (
