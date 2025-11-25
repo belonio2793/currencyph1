@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import { fetchShippingPorts, searchShippingPorts, getShippingPortCities, getShippingPortRegions, getShippingPortStats } from '../lib/shippingPortsService'
+import PortDetailsModal from './PortDetailsModal'
 import './PublicShippingPorts.css'
 
 // Fix default marker icons
@@ -28,6 +29,7 @@ export default function PublicShippingPorts() {
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [mapWidth, setMapWidth] = useState(70)
   const [showStats, setShowStats] = useState(true)
+  const [modalPort, setModalPort] = useState(null)
 
   useEffect(() => {
     loadInitialData()
@@ -254,7 +256,7 @@ export default function PublicShippingPorts() {
                           onClick={(e) => {
                             e.preventDefault()
                             e.stopPropagation()
-                            handlePortClick(port)
+                            setModalPort(port)
                           }}
                         >
                           View Details
