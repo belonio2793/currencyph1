@@ -4,6 +4,7 @@ import MyAddressesTab from './MyAddressesTab'
 import ShippingTrackingTab from './ShippingTrackingTab'
 import RouteCalculatorTab from './RouteCalculatorTab'
 import PartnersHandlersTab from './PartnersHandlersTab'
+import PublicShippingPorts from './PublicShippingPorts'
 import './Addresses.css'
 
 export default function Addresses({ userId, onClose }) {
