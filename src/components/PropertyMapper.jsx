@@ -138,6 +138,12 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
   const handleMarkerClick = (property) => {
     setSelectedProperty(property)
+    setSelectedPort(null)
+  }
+
+  const handlePortMarkerClick = (port) => {
+    setSelectedPort(port)
+    setSelectedProperty(null)
   }
 
   const handleCenterLocation = (preset) => {
