@@ -288,7 +288,9 @@ export default function BusinessMarketplaceDetail({ productId, userId, onBack, s
           {/* Logistics */}
           <div className="logistics-section">
             <div className="logistics-item">
-              <Truck size={20} />
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
               <div>
                 <p className="logistics-title">Shipping</p>
                 {product.shipping_available ? (
@@ -303,7 +305,10 @@ export default function BusinessMarketplaceDetail({ productId, userId, onBack, s
             </div>
             {product.origin_city && (
               <div className="logistics-item">
-                <MapPin size={20} />
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
                 <div>
                   <p className="logistics-title">Origin</p>
                   <p className="logistics-detail">{product.origin_city}, {product.origin_country || 'Philippines'}</p>
