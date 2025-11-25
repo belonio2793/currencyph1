@@ -554,6 +554,7 @@ export default function App() {
             {activeTab === 'my-business' && <MyBusiness userId={userId} />}
             {activeTab === 'business-marketplace' && <BusinessMarketplace userId={userId} setActiveTab={setActiveTab} setCurrentProductId={setCurrentProductId} />}
             {activeTab === 'product-detail' && currentProductId && <BusinessMarketplaceDetail productId={currentProductId} userId={userId} setActiveTab={setActiveTab} onBack={() => { setActiveTab('business-marketplace'); setCurrentProductId(null) }} />}
+            {activeTab === 'inventory' && <InventoryDashboard userId={userId} businessId={currentBusinessId} setActiveTab={setActiveTab} />}
             {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'rides' && <Rides userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
