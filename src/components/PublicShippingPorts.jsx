@@ -137,7 +137,36 @@ export default function PublicShippingPorts() {
   if (loading) {
     return (
       <div className="public-shipping-ports">
-        <div className="loading-state">Loading shipping ports...</div>
+        <div className="loading-state">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1rem', marginBottom: '8px' }}>Loading shipping ports...</div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>This may take a moment on first load</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (error && filteredPorts.length === 0) {
+    return (
+      <div className="public-shipping-ports">
+        <div className="ports-page-header">
+          <div className="header-content">
+            <h2>Philippine Shipping Ports</h2>
+            <p>Explore all public shipping ports across the Philippines</p>
+          </div>
+        </div>
+        <div style={{ padding: '24px', textAlign: 'center' }}>
+          <div style={{ backgroundColor: '#fee2e2', border: '1px solid #fca5a5', color: '#991b1b', padding: '16px', borderRadius: '6px', marginBottom: '16px' }}>
+            <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>⚠️ {error}</p>
+            <button
+              onClick={loadInitialData}
+              style={{ background: '#dc2626', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: '500' }}
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
       </div>
     )
   }
