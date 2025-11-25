@@ -185,7 +185,11 @@ export default function PublicShippingPorts() {
                         <h4>{port.name}</h4>
                         <p><strong>City:</strong> {port.city}</p>
                         <p><strong>Type:</strong> {port.port_type || 'N/A'}</p>
-                        <button onClick={() => handlePortClick(port)}>View Details</button>
+                        <button onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handlePortClick(port)
+                        }}>View Details</button>
                       </div>
                     </Popup>
                   </Marker>
