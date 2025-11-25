@@ -159,13 +159,16 @@ export async function getShippingPortCities() {
       .eq('is_public', true)
       .order('city', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.error('Error fetching port cities - Status:', error.status, 'Message:', error.message)
+      throw new Error(`Failed to fetch cities: ${error.message}`)
+    }
 
     // Get unique cities
     const uniqueCities = [...new Set(data.map(item => item.city))]
     return uniqueCities
   } catch (err) {
-    console.error('Error fetching port cities:', err)
+    console.error('Error fetching port cities:', err.message || err)
     throw err
   }
 }
