@@ -276,7 +276,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
                 return (
                   <Marker
-                    key={property.id}
+                    key={`property-${property.id}`}
                     position={[
                       parseFloat(property.addresses_latitude),
                       parseFloat(property.addresses_longitude)
@@ -305,6 +305,38 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
                   </Marker>
                 )
               })}
+
+              {/* Render shipping port markers */}
+              {showPorts && shippingPorts.map(port => (
+                <Marker
+                  key={`port-${port.id}`}
+                  position={[
+                    parseFloat(port.latitude),
+                    parseFloat(port.longitude)
+                  ]}
+                  icon={L.icon({
+                    iconUrl: `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#ef4444"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/><path d="M9 15h6M9 11h6"/></svg>`)}`,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 24],
+                    popupAnchor: [0, -24],
+                    className: 'shipping-port-marker'
+                  })}
+                  eventHandlers={{
+                    click: () => handlePortMarkerClick(port)
+                  }}
+                >
+                  <Popup>
+                    <div className="marker-popup">
+                      <h4>{port.name}</h4>
+                      <p><strong>Type:</strong> {port.port_type || 'N/A'}</p>
+                      <p><strong>City:</strong> {port.city}</p>
+                      {port.contact_phone && (
+                        <p><strong>Phone:</strong> {port.contact_phone}</p>
+                      )}
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
             </MapContainer>
           )}
         </div>
