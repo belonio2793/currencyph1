@@ -14,10 +14,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
 
-export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = false, highlightCity = null }) {
+export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = false, highlightCity = null, showShippingPorts = false }) {
   const mapRef = useRef(null)
   const [properties, setProperties] = useState([])
+  const [shippingPorts, setShippingPorts] = useState([])
   const [selectedProperty, setSelectedProperty] = useState(null)
+  const [selectedPort, setSelectedPort] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
@@ -29,6 +31,7 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
   const [mapLayer, setMapLayer] = useState('street')
   const [showLegend, setShowLegend] = useState(false)
   const [mapWidth, setMapWidth] = useState(70)
+  const [showPorts, setShowPorts] = useState(showShippingPorts || false)
 
   // Load properties from database
   useEffect(() => {
