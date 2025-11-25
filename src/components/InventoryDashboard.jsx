@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import AdvancedInventoryFeatures from './AdvancedInventoryFeatures'
 import './InventoryDashboard.css'
 
 const PRODUCT_CATEGORIES = [
