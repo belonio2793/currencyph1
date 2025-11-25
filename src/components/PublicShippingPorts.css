@@ -589,8 +589,7 @@
   padding: 16px;
   border-bottom: 1px solid #e5e7eb;
   background: white;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .search-group {
@@ -607,6 +606,8 @@
   background: white;
   transition: all 0.2s;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  height: 42px;
+  box-sizing: border-box;
 }
 
 .search-input::placeholder {
@@ -621,6 +622,7 @@
 
 .filter-group {
   min-width: 150px;
+  flex: 0 0 auto;
 }
 
 .city-filter {
@@ -632,6 +634,8 @@
   background: white;
   transition: all 0.2s;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  height: 42px;
+  box-sizing: border-box;
 }
 
 .city-filter:focus {
@@ -651,6 +655,9 @@
   cursor: pointer;
   transition: all 0.2s;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  height: 42px;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .btn-reset:hover {
