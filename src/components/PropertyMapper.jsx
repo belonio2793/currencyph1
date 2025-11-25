@@ -247,6 +247,15 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
             >
               {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
             </button>
+            {shippingPorts.length > 0 && (
+              <button
+                onClick={() => setShowPorts(!showPorts)}
+                className={`btn-legend-toggle ${showPorts ? 'active' : ''}`}
+                title={showPorts ? 'Hide shipping ports' : 'Show shipping ports'}
+              >
+                {showPorts ? 'Hide Ports' : 'Show Ports'} ({shippingPorts.length})
+              </button>
+            )}
           </div>
           {loading ? (
             <div className="mapper-loading">Loading properties...</div>
