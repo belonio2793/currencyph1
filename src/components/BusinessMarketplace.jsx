@@ -24,7 +24,7 @@ const SORT_OPTIONS = [
   { value: 'best_seller', label: 'Best Sellers' },
 ]
 
-export default function BusinessMarketplace({ userId, setActiveTab }) {
+export default function BusinessMarketplace({ userId, setActiveTab, setCurrentProductId }) {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
