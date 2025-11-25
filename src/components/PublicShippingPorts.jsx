@@ -30,6 +30,7 @@ export default function PublicShippingPorts() {
   const [mapWidth, setMapWidth] = useState(70)
   const [showStats, setShowStats] = useState(true)
   const [modalPort, setModalPort] = useState(null)
+  const [viewMode, setViewMode] = useState('map')
 
   useEffect(() => {
     loadInitialData()
