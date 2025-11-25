@@ -40,6 +40,13 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     }
   }, [userId])
 
+  // Load shipping ports
+  useEffect(() => {
+    if (showPorts) {
+      loadShippingPorts()
+    }
+  }, [showPorts])
+
   // Reload properties when a new one is added
   useEffect(() => {
     if (onPropertyAdded) {
