@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { Trash2, Edit, Plus, X } from 'lucide-react'
 import './ProductListingManager.css'
 
 const PRODUCT_CATEGORIES = [
