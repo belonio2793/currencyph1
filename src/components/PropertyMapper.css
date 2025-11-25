@@ -1032,6 +1032,33 @@ details[open] .controls-summary::before {
   }
 }
 
+/* Port Details Panel Styling */
+.port-details-panel {
+  border: 1px solid #fca5a5;
+  background: #fff7ed;
+}
+
+.port-details-panel .panel-header {
+  background: #fed7aa;
+  border-bottom: 2px solid #fca5a5;
+}
+
+.port-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+/* Shipping Port Marker */
+.shipping-port-marker {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.shipping-port-marker:hover {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+}
+
 @media (max-width: 480px) {
   .mapper-search-bar {
     padding: 12px;
