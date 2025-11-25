@@ -41,6 +41,7 @@ import TradingDashboard from './components/Trading/TradingDashboard'
 import Addresses from './components/Addresses'
 import BusinessMarketplace from './components/BusinessMarketplace'
 import BusinessMarketplaceDetail from './components/BusinessMarketplaceDetail'
+import InventoryDashboard from './components/InventoryDashboard'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
