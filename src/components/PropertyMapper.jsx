@@ -440,7 +440,142 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
                 </div>
               )}
 
-              {selectedProperty ? (
+              {selectedPort ? (
+            <div className="property-details-panel port-details-panel">
+              <div className="panel-header">
+                <h3>Shipping Port Details</h3>
+                <button onClick={() => setSelectedPort(null)} className="panel-close">×</button>
+              </div>
+
+              <div className="property-details-content">
+                {/* Port Information */}
+                <div className="details-section">
+                  <h4 className="section-title">{selectedPort.name}</h4>
+                  {selectedPort.description && (
+                    <p className="port-description">{selectedPort.description}</p>
+                  )}
+                </div>
+
+                {/* Port Type & Status */}
+                <div className="details-section">
+                  <div className="detail-item">
+                    <span className="label">Type:</span>
+                    <span className="value">{selectedPort.port_type || 'N/A'}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Status:</span>
+                    <span className="value" style={{
+                      padding: '2px 8px',
+                      borderRadius: '4px',
+                      backgroundColor: selectedPort.status === 'active' ? '#10b981' : '#f97316',
+                      color: 'white',
+                      fontSize: '12px'
+                    }}>
+                      {selectedPort.status}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Location */}
+                <div className="details-section">
+                  <h4 className="section-title">Location</h4>
+                  <div className="detail-item">
+                    <span className="label">City:</span>
+                    <span className="value">{selectedPort.city}</span>
+                  </div>
+                  {selectedPort.province && (
+                    <div className="detail-item">
+                      <span className="label">Province:</span>
+                      <span className="value">{selectedPort.province}</span>
+                    </div>
+                  )}
+                  {selectedPort.region && (
+                    <div className="detail-item">
+                      <span className="label">Region:</span>
+                      <span className="value">{selectedPort.region}</span>
+                    </div>
+                  )}
+                  <div className="detail-item">
+                    <span className="label">Latitude:</span>
+                    <span className="value">{selectedPort.latitude}</span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Longitude:</span>
+                    <span className="value">{selectedPort.longitude}</span>
+                  </div>
+                </div>
+
+                {/* Port Details */}
+                {selectedPort.berth_count && (
+                  <div className="details-section">
+                    <h4 className="section-title">Port Specifications</h4>
+                    <div className="detail-item">
+                      <span className="label">Berths:</span>
+                      <span className="value">{selectedPort.berth_count}</span>
+                    </div>
+                    {selectedPort.max_depth_meters && (
+                      <div className="detail-item">
+                        <span className="label">Max Depth:</span>
+                        <span className="value">{selectedPort.max_depth_meters}m</span>
+                      </div>
+                    )}
+                    {selectedPort.max_vessel_length_meters && (
+                      <div className="detail-item">
+                        <span className="label">Max Vessel Length:</span>
+                        <span className="value">{selectedPort.max_vessel_length_meters}m</span>
+                      </div>
+                    )}
+                    {selectedPort.annual_capacity_teu && (
+                      <div className="detail-item">
+                        <span className="label">Annual Capacity:</span>
+                        <span className="value">{selectedPort.annual_capacity_teu.toLocaleString()} TEU</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Services */}
+                {(selectedPort.container_terminal || selectedPort.ro_ro_services || selectedPort.breakbulk_services) && (
+                  <div className="details-section">
+                    <h4 className="section-title">Services</h4>
+                    <ul style={{ listStyle: 'none', padding: 0 }}>
+                      {selectedPort.container_terminal && <li style={{ padding: '4px 0' }}>✓ Container Terminal</li>}
+                      {selectedPort.ro_ro_services && <li style={{ padding: '4px 0' }}>✓ RoRo Services</li>}
+                      {selectedPort.breakbulk_services && <li style={{ padding: '4px 0' }}>✓ Breakbulk Services</li>}
+                      {selectedPort.bulk_cargo && <li style={{ padding: '4px 0' }}>✓ Bulk Cargo</li>}
+                      {selectedPort.refrigerated_containers && <li style={{ padding: '4px 0' }}>✓ Refrigerated Containers</li>}
+                      {selectedPort.dangerous_cargo && <li style={{ padding: '4px 0' }}>✓ Dangerous Cargo Handling</li>}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Contact Information */}
+                {(selectedPort.contact_phone || selectedPort.contact_email || selectedPort.website) && (
+                  <div className="details-section">
+                    <h4 className="section-title">Contact</h4>
+                    {selectedPort.contact_phone && (
+                      <div className="detail-item">
+                        <span className="label">Phone:</span>
+                        <span className="value"><a href={`tel:${selectedPort.contact_phone}`}>{selectedPort.contact_phone}</a></span>
+                      </div>
+                    )}
+                    {selectedPort.contact_email && (
+                      <div className="detail-item">
+                        <span className="label">Email:</span>
+                        <span className="value"><a href={`mailto:${selectedPort.contact_email}`}>{selectedPort.contact_email}</a></span>
+                      </div>
+                    )}
+                    {selectedPort.website && (
+                      <div className="detail-item">
+                        <span className="label">Website:</span>
+                        <span className="value"><a href={selectedPort.website} target="_blank" rel="noopener noreferrer">{selectedPort.website}</a></span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+              ) : selectedProperty ? (
             <div className="property-details-panel">
               <div className="panel-header">
                 <h3>Property Details</h3>
