@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { ChevronLeft, Heart, Share2, Star, MessageSquare, MapPin, Truck } from 'lucide-react'
 import './BusinessMarketplaceDetail.css'
 
 export default function BusinessMarketplaceDetail({ productId, userId, onBack, setActiveTab }) {
