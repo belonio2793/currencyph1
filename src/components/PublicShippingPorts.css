@@ -15,15 +15,18 @@
 
 .header-content h2 {
   margin: 0 0 4px 0;
-  font-size: 20px;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .header-content p {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.875rem;
+  font-weight: 400;
   color: #d1d5db;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 /* Main Container */
@@ -55,9 +58,10 @@
 
 .map-header h3 {
   margin: 0;
-  font-size: 16px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .map-controls {
@@ -71,10 +75,11 @@
   border: none;
   border-radius: 4px;
   color: #374151;
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .btn-resize:hover {
@@ -99,14 +104,16 @@
 
 .marker-popup h4 {
   margin: 0 0 8px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .marker-popup p {
   margin: 4px 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #6b7280;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .marker-popup button {
@@ -117,10 +124,11 @@
   color: white;
   border: none;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .marker-popup button:hover {
@@ -136,9 +144,11 @@
   background: #fee2e2;
   border: 1px solid #fca5a5;
   color: #991b1b;
-  font-size: 14px;
+  font-size: 0.875rem;
+  font-weight: 500;
   margin: 12px;
   border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .error-close {
@@ -158,7 +168,8 @@
   justify-content: center;
   height: 100%;
   color: #9ca3af;
-  font-size: 16px;
+  font-size: 1rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 /* Sidebar */
@@ -186,9 +197,10 @@
 
 .stats-header h4 {
   margin: 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .stats-close {
@@ -219,15 +231,18 @@
 }
 
 .stat-value {
-  font-size: 20px;
+  font-size: 1.5rem;
   font-weight: 700;
   color: #667eea;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
   color: #6b7280;
   margin-top: 4px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 /* Filters Section */
@@ -247,12 +262,13 @@
 
 .filter-group label {
   display: block;
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 600;
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .filter-input,
@@ -261,9 +277,10 @@
   padding: 8px 10px;
   border: 1px solid #e5e7eb;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   background: white;
   transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .filter-input:focus,
@@ -286,11 +303,12 @@
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 8px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .btn-reset-filters:hover {
@@ -309,9 +327,10 @@
 
 .ports-list-section h4 {
   margin: 0 0 12px 0;
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .empty-list {
@@ -321,7 +340,8 @@
   height: 100px;
   color: #9ca3af;
   text-align: center;
-  font-size: 13px;
+  font-size: 0.8125rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .ports-list {
@@ -362,20 +382,22 @@
 
 .port-item-header h5 {
   margin: 0;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 600;
   color: #1f2937;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .type-badge {
   padding: 2px 6px;
   border-radius: 3px;
-  font-size: 10px;
+  font-size: 0.625rem;
   font-weight: 600;
   text-transform: uppercase;
   white-space: nowrap;
   background: #e0e7ff;
   color: #4338ca;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .type-badge.international {
@@ -390,32 +412,37 @@
 
 .port-item-city {
   margin: 4px 0 0 0;
-  font-size: 12px;
+  font-size: 0.75rem;
   color: #6b7280;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .port-item-details {
   margin-top: 8px;
   padding-top: 8px;
   border-top: 1px solid #e5e7eb;
-  font-size: 12px;
+  font-size: 0.75rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .port-item-details p {
   margin: 4px 0;
   color: #6b7280;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .port-item-details .description {
-  font-size: 11px;
+  font-size: 0.6875rem;
   line-height: 1.4;
   color: #9ca3af;
   margin-bottom: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .port-item-details a {
   color: #667eea;
   text-decoration: none;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .port-item-details a:hover {
