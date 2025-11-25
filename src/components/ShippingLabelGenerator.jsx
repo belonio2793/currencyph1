@@ -223,6 +223,26 @@ export default function ShippingLabelGenerator({ userId, addresses = [] }) {
     }
   }
 
+  if (!userId) {
+    return (
+      <div className="shipping-label-generator">
+        <div className="map-header">
+          <div className="map-header-content">
+            <h4>Shipping Labels</h4>
+            <p className="map-subtitle">Create and manage shipping labels for your packages</p>
+          </div>
+        </div>
+        <div className="generator-content" style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <p style={{ fontSize: '18px', fontWeight: '500', marginBottom: '16px' }}>Login to generate shipping labels</p>
+          <p style={{ color: '#666', marginBottom: '24px' }}>Sign in to create and manage your package shipping labels</p>
+          <a href="/auth" className="btn-primary" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+            Sign In Now
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="shipping-label-generator">
       <div className="map-header">
