@@ -182,6 +182,22 @@ export default function PublicShippingPorts() {
           <h2>Philippine Shipping Ports</h2>
           <p>Explore all public shipping ports across the Philippines</p>
         </div>
+        <div className="view-mode-toggle">
+          <button
+            className={`view-toggle-btn ${viewMode === 'map' ? 'active' : ''}`}
+            onClick={() => setViewMode('map')}
+            title="Map View"
+          >
+            🗺️ Map
+          </button>
+          <button
+            className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+            onClick={() => setViewMode('list')}
+            title="List View"
+          >
+            📋 List
+          </button>
+        </div>
       </div>
 
       {/* Main Content with Map and Sidebar */}
