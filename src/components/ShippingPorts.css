@@ -1,10 +1,8 @@
 .shipping-ports-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
   background: #f9fafb;
   padding: 20px;
-  overflow-y: auto;
 }
 
 .ports-header {
@@ -121,12 +119,9 @@
 
 /* Ports List */
 .ports-list {
-  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 0;
-  overflow-y: auto;
 }
 
 .empty-state {
