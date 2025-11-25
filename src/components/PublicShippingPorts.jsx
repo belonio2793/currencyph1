@@ -91,7 +91,9 @@ export default function PublicShippingPorts() {
   const handlePortClick = (port) => {
     setSelectedPort(port)
     if (mapRef.current) {
-      mapRef.current.flyTo([parseFloat(port.latitude), parseFloat(port.longitude)], 12, { duration: 1 })
+      setTimeout(() => {
+        mapRef.current.flyTo([parseFloat(port.latitude), parseFloat(port.longitude)], 12, { duration: 1 })
+      }, 0)
     }
   }
 
@@ -180,16 +182,25 @@ export default function PublicShippingPorts() {
                       click: () => handlePortClick(port)
                     }}
                   >
-                    <Popup>
-                      <div className="marker-popup">
+                    <Popup closeButton={true} autoClose={false} closeOnClick={false}>
+                      <div className="marker-popup" onClick={(e) => e.stopPropagation()}>
                         <h4>{port.name}</h4>
                         <p><strong>City:</strong> {port.city}</p>
                         <p><strong>Type:</strong> {port.port_type || 'N/A'}</p>
-                        <button onClick={(e) => {
-                          e.preventDefault()
-                          e.stopPropagation()
-                          handlePortClick(port)
-                        }}>View Details</button>
+                        <button
+                          className="view-details-btn"
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            handlePortClick(port)
+                          }}
+                        >
+                          View Details
+                        </button>
                       </div>
                     </Popup>
                   </Marker>
