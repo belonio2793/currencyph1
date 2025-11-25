@@ -402,6 +402,14 @@ export default function PublicShippingPorts() {
           </div>
         </div>
       </div>
+
+      {/* Port Details Modal */}
+      {modalPort && (
+        <PortDetailsModal
+          port={modalPort}
+          onClose={() => setModalPort(null)}
+        />
+      )}
     </div>
   )
 }
