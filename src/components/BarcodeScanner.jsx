@@ -170,6 +170,26 @@ export default function BarcodeScanner({ userId, onCheckpointAdded }) {
     setError('')
   }
 
+  if (!userId) {
+    return (
+      <div className="barcode-scanner">
+        <div className="map-header">
+          <div className="map-header-content">
+            <h4>Scan Package Checkpoint</h4>
+            <p className="map-subtitle">Use barcode scanning to track package checkpoints</p>
+          </div>
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <p style={{ fontSize: '18px', fontWeight: '500', marginBottom: '16px' }}>Login to scan packages</p>
+          <p style={{ color: '#666', marginBottom: '24px' }}>Sign in to track and manage package checkpoints</p>
+          <a href="/auth" className="btn-primary" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+            Sign In Now
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="barcode-scanner">
       {error && <div className="alert alert-error">{error}</div>}
