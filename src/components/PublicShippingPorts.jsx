@@ -40,22 +40,51 @@ export default function PublicShippingPorts() {
   const loadInitialData = async () => {
     try {
       setLoading(true)
-      const [portsData, citiesData, regionsData, statsData] = await Promise.all([
-        fetchShippingPorts(),
-        getShippingPortCities(),
-        getShippingPortRegions(),
-        getShippingPortStats()
-      ])
-      
+      setError('')
+
+      let portsData = []
+      let citiesData = []
+      let regionsData = []
+      let statsData = null
+      let hasError = false
+
+      try {
+        portsData = await fetchShippingPorts()
+      } catch (err) {
+        console.error('Error loading ports:', err)
+        hasError = true
+      }
+
+      try {
+        citiesData = await getShippingPortCities()
+      } catch (err) {
+        console.error('Error loading cities:', err)
+      }
+
+      try {
+        regionsData = await getShippingPortRegions()
+      } catch (err) {
+        console.error('Error loading regions:', err)
+      }
+
+      try {
+        statsData = await getShippingPortStats()
+      } catch (err) {
+        console.error('Error loading stats:', err)
+      }
+
       setAllPorts(portsData)
       setFilteredPorts(portsData)
       setCities(citiesData)
       setRegions(regionsData)
       setStats(statsData)
-      setError('')
+
+      if (hasError && portsData.length === 0) {
+        setError('Unable to load shipping ports. Please check your internet connection and try again.')
+      }
     } catch (err) {
-      console.error('Error loading shipping ports data:', err)
-      setError('Failed to load shipping ports')
+      console.error('Error in loadInitialData:', err)
+      setError('An unexpected error occurred. Please refresh the page.')
     } finally {
       setLoading(false)
     }
