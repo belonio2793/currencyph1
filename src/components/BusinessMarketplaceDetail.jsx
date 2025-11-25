@@ -155,7 +155,10 @@ export default function BusinessMarketplaceDetail({ productId, userId, onBack, s
     <div className="product-detail-container">
       {/* Header */}
       <button onClick={onBack} className="back-btn">
-        <ChevronLeft size={20} /> Back to Marketplace
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to Marketplace
       </button>
 
       <div className="detail-content">
