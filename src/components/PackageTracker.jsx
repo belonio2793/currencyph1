@@ -182,6 +182,23 @@ export default function PackageTracker({ userId, onViewMap }) {
 
   const routeInfo = getRouteInfo()
 
+  if (!userId) {
+    return (
+      <div className="package-tracker">
+        <div className="tracker-header">
+          <h2>Package Tracking</h2>
+        </div>
+        <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+          <p style={{ fontSize: '18px', fontWeight: '500', marginBottom: '16px' }}>Login to track packages</p>
+          <p style={{ color: '#666', marginBottom: '24px' }}>Sign in to view and track your shipped packages</p>
+          <a href="/auth" className="btn-primary" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+            Sign In Now
+          </a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="package-tracker">
       <div className="tracker-header">
