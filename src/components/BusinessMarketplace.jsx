@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
-import { ChevronDown, Search, Filter, Heart } from 'lucide-react'
 import './BusinessMarketplace.css'
 
 const PRODUCT_CATEGORIES = [
