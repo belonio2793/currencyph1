@@ -552,6 +552,7 @@ export default function App() {
             {activeTab === 'jobs' && <Jobs userId={userId} />}
             {activeTab === 'my-business' && <MyBusiness userId={userId} />}
             {activeTab === 'business-marketplace' && <BusinessMarketplace userId={userId} setActiveTab={setActiveTab} />}
+            {activeTab === 'product-detail' && currentProductId && <BusinessMarketplaceDetail productId={currentProductId} userId={userId} setActiveTab={setActiveTab} onBack={() => { setActiveTab('business-marketplace'); setCurrentProductId(null) }} />}
             {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
             {activeTab === 'rides' && <Rides userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
