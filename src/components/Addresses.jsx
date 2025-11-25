@@ -35,6 +35,11 @@ export default function Addresses({ userId, onClose }) {
       id: 'partners-handlers',
       label: 'Shipping Handlers',
       component: PartnersHandlersTab
+    },
+    {
+      id: 'public-ports',
+      label: 'Public Shipping Ports',
+      component: PublicShippingPorts
     }
   ]
 
