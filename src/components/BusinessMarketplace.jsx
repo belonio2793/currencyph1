@@ -197,9 +197,13 @@ export default function BusinessMarketplace({ userId, setActiveTab, setCurrentPr
           onClick={() => setShowFilters(!showFilters)}
           className="filter-toggle-btn"
         >
-          <Filter size={20} />
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+          </svg>
           Filters
-          <ChevronDown size={16} className={showFilters ? 'rotated' : ''} />
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" className={showFilters ? 'rotated' : ''}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
         </button>
       </div>
 
