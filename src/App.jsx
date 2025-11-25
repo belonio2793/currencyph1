@@ -39,6 +39,7 @@ import ChessPage from './components/ChessPage'
 import Rides from './components/Rides'
 import TradingDashboard from './components/Trading/TradingDashboard'
 import Addresses from './components/Addresses'
+import BusinessMarketplace from './components/BusinessMarketplace'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
