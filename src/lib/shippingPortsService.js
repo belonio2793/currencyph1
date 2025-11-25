@@ -233,7 +233,10 @@ export async function getShippingPortStats() {
       .select('*')
       .eq('is_public', true)
 
-    if (error) throw error
+    if (error) {
+      console.error('Error fetching port stats - Status:', error.status, 'Message:', error.message, 'Details:', error)
+      throw new Error(`Failed to fetch port stats: ${error.message}`)
+    }
 
     const stats = {
       totalPorts: data.length,
@@ -247,7 +250,7 @@ export async function getShippingPortStats() {
 
     return stats
   } catch (err) {
-    console.error('Error fetching port stats:', err)
+    console.error('Error fetching port stats:', err.message || err)
     throw err
   }
 }
