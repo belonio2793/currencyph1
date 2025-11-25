@@ -264,7 +264,12 @@ export default function PackageTracker({ userId, onViewMap }) {
           {loading ? (
             <div className="loading">Loading packages...</div>
           ) : filteredLabels.length === 0 ? (
-            <div className="empty-state">No packages found</div>
+            <div className="empty-state">
+              <p style={{ marginBottom: '16px' }}>No packages found</p>
+              <a href="#generate-labels" className="btn-primary" style={{ display: 'inline-block', padding: '8px 16px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none', fontSize: '14px' }}>
+                Generate Shipping Labels
+              </a>
+            </div>
           ) : (
             <div className="labels-list">
               {filteredLabels.map(label => (
