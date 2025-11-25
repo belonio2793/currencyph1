@@ -71,18 +71,20 @@ export async function fetchShippingPortsByLocation(city = null, region = null) {
 }
 
 /**
- * Get a single shipping port by ID
+ * Get a single shipping port by ID with retry logic
  */
 export async function getShippingPort(portId) {
   try {
-    const { data, error } = await supabase
-      .from('shipping_ports')
-      .select('*')
-      .eq('id', portId)
-      .single()
+    return await executeWithRetry(async () => {
+      const { data, error } = await supabase
+        .from('shipping_ports')
+        .select('*')
+        .eq('id', portId)
+        .single()
 
-    if (error) throw error
-    return data
+      if (error) throw error
+      return data
+    }, 3)
   } catch (err) {
     console.error('Error fetching shipping port:', err)
     throw err
