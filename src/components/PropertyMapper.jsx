@@ -353,14 +353,23 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
 
       {/* Sidebar */}
       <div className="mapper-sidebar" style={{ flex: `1 1 ${100 - mapWidth}%` }}>
-          {error && (
-            <div className="sidebar-error">
-              {error}
-              <button onClick={() => setError('')} className="error-close">×</button>
+          {!userId ? (
+            <div className="sidebar-empty">
+              <div className="empty-state-content">
+                <p className="empty-title">Login to view properties</p>
+                <p className="empty-subtitle">Sign in to see and manage your properties</p>
+              </div>
             </div>
-          )}
+          ) : (
+            <>
+              {error && (
+                <div className="sidebar-error">
+                  {error}
+                  <button onClick={() => setError('')} className="error-close">×</button>
+                </div>
+              )}
 
-          {selectedProperty ? (
+              {selectedProperty ? (
             <div className="property-details-panel">
               <div className="panel-header">
                 <h3>Property Details</h3>
@@ -507,8 +516,8 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
                 </button>
               </div>
             </div>
-          ) : (
-            <div className="sidebar-empty">
+              ) : (
+                <div className="sidebar-empty">
               <div className="empty-state-content">
                 <p className="empty-title">No Property Selected</p>
                 <p className="empty-subtitle">Click on a marker on the map to view property details</p>
@@ -557,6 +566,8 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
                 )}
               </div>
             </div>
+              )}
+            </>
           )}
       </div>
     </div>
