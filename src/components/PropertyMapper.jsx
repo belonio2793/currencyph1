@@ -116,6 +116,15 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
     }
   }
 
+  const loadShippingPorts = async () => {
+    try {
+      const ports = await fetchShippingPorts()
+      setShippingPorts(ports)
+    } catch (err) {
+      console.error('Error loading shipping ports:', err)
+    }
+  }
+
   const handlePropertyClick = (property) => {
     setSelectedProperty(property)
     if (mapRef.current && property.addresses_latitude && property.addresses_longitude) {
