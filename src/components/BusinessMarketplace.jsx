@@ -361,7 +361,10 @@ export default function BusinessMarketplace({ userId, setActiveTab, setCurrentPr
                           <span className="price">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
                         <button
-                          onClick={() => setActiveTab('product-detail')}
+                          onClick={() => {
+                            setCurrentProductId(product.id)
+                            setActiveTab('product-detail')
+                          }}
                           className="view-btn"
                         >
                           View Details
