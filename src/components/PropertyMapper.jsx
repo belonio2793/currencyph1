@@ -78,10 +78,11 @@ export default function PropertyMapper({ userId, onPropertyAdded, allowDelete = 
       setPropertyCount(count || data?.length || 0)
       setError('')
     } catch (err) {
-      console.error('Error loading properties (attempt ' + (retryCount + 1) + '):', err)
+      const errorMsg = err?.message || JSON.stringify(err)
+      console.error('Error loading properties (attempt ' + (retryCount + 1) + '):', errorMsg, err)
 
       // Check if it's a network error (Failed to fetch)
-      const isNetworkError = err?.message?.includes('fetch') || err instanceof TypeError
+      const isNetworkError = err?.message?.includes('fetch') || err?.message?.includes('body stream') || err instanceof TypeError
 
       if (isNetworkError && retryCount < 2) {
         // Retry after delay for network errors
