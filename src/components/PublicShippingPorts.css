@@ -536,17 +536,17 @@
 }
 
 /* View Mode Toggle */
-.ports-page-header {
+.header-content {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 16px;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
 }
 
 .view-mode-toggle {
   display: flex;
   gap: 8px;
+  width: fit-content;
 }
 
 .view-toggle-btn {
