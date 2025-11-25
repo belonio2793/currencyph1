@@ -62,7 +62,14 @@ app.post('/api/didit/create-session', async (req, res) => {
     })
 
     if (!diditResponse.ok) {
-      const errorText = await diditResponse.text()
+      // Clone response to read body without consuming it for the next read
+      let errorText = ''
+      try {
+        const clonedResponse = diditResponse.clone()
+        errorText = await clonedResponse.text()
+      } catch (e) {
+        errorText = `Failed to parse error: ${diditResponse.status}`
+      }
       console.error('DIDIT API error:', diditResponse.status, errorText)
       return res.status(diditResponse.status).json({
         error: `DIDIT API returned ${diditResponse.status}`,
