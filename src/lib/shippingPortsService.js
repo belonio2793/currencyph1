@@ -28,13 +28,13 @@ export async function fetchShippingPorts(filters = {}) {
     const { data, error } = await query
 
     if (error) {
-      console.error('Error fetching shipping ports:', error)
-      throw error
+      console.error('Error fetching shipping ports - Status:', error.status, 'Message:', error.message, 'Details:', error)
+      throw new Error(`Failed to fetch shipping ports: ${error.message} (${error.status})`)
     }
 
     return data || []
   } catch (err) {
-    console.error('Error in fetchShippingPorts:', err)
+    console.error('Error in fetchShippingPorts:', err.message || err)
     throw err
   }
 }
