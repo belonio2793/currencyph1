@@ -184,13 +184,16 @@ export async function getShippingPortRegions() {
       .eq('is_public', true)
       .order('region', { ascending: true })
 
-    if (error) throw error
+    if (error) {
+      console.error('Error fetching port regions - Status:', error.status, 'Message:', error.message)
+      throw new Error(`Failed to fetch regions: ${error.message}`)
+    }
 
     // Get unique regions
     const uniqueRegions = [...new Set(data.map(item => item.region).filter(Boolean))]
     return uniqueRegions
   } catch (err) {
-    console.error('Error fetching port regions:', err)
+    console.error('Error fetching port regions:', err.message || err)
     throw err
   }
 }
