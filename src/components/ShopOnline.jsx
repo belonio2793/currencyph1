@@ -406,9 +406,9 @@ export default function ShopOnline({ onProductSelect = null }) {
           ) : (
             <>
               {/* Products Container */}
-              <div className={`products-container products-${viewMode}`}>
+              <div className="products-container products-list">
                 {filteredProducts.map(product => (
-                  <div key={product.id} className="product-item">
+                  <div key={product.id} className="product-item product-item-list">
                     <div className="product-link" onClick={() => onProductSelect && onProductSelect(product.id)}>
                       <div className="product-image-wrapper">
                         <img
