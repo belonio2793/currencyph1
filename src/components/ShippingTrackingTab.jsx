@@ -161,8 +161,9 @@ export default function ShippingTrackingTab({ userId }) {
       setShowForm(false)
       await loadShipments()
     } catch (err) {
-      console.error('Error saving shipment:', err)
-      setError(err.message || 'Failed to save shipment')
+      logErrorSafely('ShippingTrackingTab.handleSubmit', err)
+      const safeErrorMessage = getSafeErrorMessage(err)
+      setError(safeErrorMessage || 'Failed to save shipment')
     } finally {
       setLoading(false)
     }
