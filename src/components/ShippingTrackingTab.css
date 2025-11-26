@@ -23,47 +23,66 @@
 .subtab-navigation {
   display: flex;
   gap: 8px;
-  padding: 12px 24px;
+  padding: 16px 24px;
   background: white;
-  border-bottom: 2px solid #e2e8f0;
+  border-bottom: 2px solid #e5e7eb;
+  overflow-x: auto;
   flex-wrap: wrap;
+  flex-shrink: 0;
   align-items: center;
 }
 
 .subtab-btn {
   padding: 10px 16px;
-  background: transparent;
-  border: none;
-  border-bottom: 3px solid transparent;
-  font-size: 14px;
-  font-weight: 500;
-  color: #64748b;
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.3s ease;
   white-space: nowrap;
-  position: relative;
-  bottom: -2px;
 }
 
 .subtab-btn:hover {
-  color: #334155;
-  background: #f8fafc;
-  border-bottom-color: #cbd5e1;
+  background: #e5e7eb;
+  border-color: #9ca3af;
 }
 
 .subtab-btn.active {
-  color: #667eea;
-  border-bottom-color: #667eea;
-  font-weight: 600;
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
 }
 
 /* Sub-tab Content */
 .subtab-content {
-  flex: 1;
+  flex: 1 1 auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  animation: fadeIn 0.3s ease;
+  width: 100%;
   background: #f8fafc;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Ensure content fits properly */
+.subtab-content > * {
+  flex: 1 1 auto;
+  overflow-y: visible;
+  width: 100%;
 }
 
 .modal-overlay {
