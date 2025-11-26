@@ -108,7 +108,7 @@ export default function ShippingTrackingTab({ userId }) {
 
       return data || []
     } catch (err) {
-      console.error('Error loading tracking history:', err?.message || err)
+      logErrorSafely('ShippingTrackingTab.loadShipmentTrackingHistory', err)
       return []
     }
   }
