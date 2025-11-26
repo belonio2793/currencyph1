@@ -40,6 +40,7 @@ import Rides from './components/Rides'
 import TradingDashboard from './components/Trading/TradingDashboard'
 import Addresses from './components/Addresses'
 import BusinessMarketplace from './components/BusinessMarketplace'
+import IntegratedMarketplace from './components/IntegratedMarketplace'
 import BusinessMarketplaceDetail from './components/BusinessMarketplaceDetail'
 import InventoryDashboard from './components/InventoryDashboard'
 
