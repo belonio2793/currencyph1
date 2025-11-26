@@ -1,12 +1,9 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
 import { getProductById, getProductReviews } from '../lib/shopProductService'
 import { useShoppingCart } from '../context/ShoppingCartContext'
 import './ShopProductDetail.css'
 
-export default function ShopProductDetail() {
-  const { productId } = useParams()
-  const navigate = useNavigate()
+export default function ShopProductDetail({ productId, onNavigate }) {
   const { addItemToCart, cart } = useShoppingCart()
   
   const [product, setProduct] = useState(null)
@@ -70,9 +67,9 @@ export default function ShopProductDetail() {
   }
 
   const handleBuyNow = async () => {
-    const success = await handleAddToCart()
-    if (success) {
-      navigate('/shop/cart')
+    await handleAddToCart()
+    if (onNavigate) {
+      onNavigate('shop-cart')
     }
   }
 
@@ -84,7 +81,7 @@ export default function ShopProductDetail() {
     return (
       <div className="product-detail-error">
         <p>{error || 'Product not found'}</p>
-        <Link to="/shop" className="btn-back-to-shop">Back to Shop</Link>
+        <button onClick={() => onNavigate?.('shop')} className="btn-back-to-shop">Back to Shop</button>
       </div>
     )
   }
@@ -97,7 +94,7 @@ export default function ShopProductDetail() {
     <div className="product-detail-container">
       {/* Breadcrumb */}
       <div className="breadcrumb">
-        <Link to="/shop">Shop</Link>
+        <button onClick={() => onNavigate?.('shop')} className="breadcrumb-link">Shop</button>
         {product.shop_categories && <span>/ {product.shop_categories?.name || 'Product'}</span>}
         <span>/ {product.name}</span>
       </div>
@@ -323,9 +320,9 @@ export default function ShopProductDetail() {
       {/* Related Products Placeholder */}
       <div className="related-products-section">
         <h2>More Products from This Category</h2>
-        <Link to="/shop" className="btn-view-more">
+        <button onClick={() => onNavigate?.('shop')} className="btn-view-more">
           View All Products
-        </Link>
+        </button>
       </div>
     </div>
   )
