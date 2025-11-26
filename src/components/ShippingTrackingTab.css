@@ -85,6 +85,9 @@
   flex: 1 1 auto;
   overflow-y: visible;
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .modal-overlay {
