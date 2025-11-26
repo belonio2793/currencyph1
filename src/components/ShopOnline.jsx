@@ -196,10 +196,11 @@ export default function ShopOnline({ onProductSelect = null }) {
             <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
-                placeholder="Search products..."
+                placeholder=""
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
+                aria-label="Search products"
               />
               <button type="submit" className="btn-search">Search</button>
             </form>
