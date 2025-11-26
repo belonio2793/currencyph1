@@ -448,7 +448,7 @@ export default function ShopOnline({ onProductSelect = null }) {
                         </div>
                       )}
 
-                      {viewMode === 'list' && product.description && (
+                      {product.description && (
                         <p className="product-desc">{product.description.substring(0, 100)}...</p>
                       )}
 
