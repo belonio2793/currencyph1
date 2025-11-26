@@ -12,19 +12,14 @@ export default function Addresses({ userId, onClose, onShowAuth }) {
 
   const tabs = [
     {
-      id: 'default',
-      label: 'Default',
-      component: DefaultAddressesTab
+      id: 'shipping-tracking',
+      label: 'Shipping',
+      component: ShippingTrackingTab
     },
     {
       id: 'my-addresses',
       label: 'My Addresses',
       component: MyAddressesTab
-    },
-    {
-      id: 'shipping-tracking',
-      label: 'Shipping',
-      component: ShippingTrackingTab
     },
     {
       id: 'route-calculator',
