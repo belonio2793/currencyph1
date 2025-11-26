@@ -38,7 +38,7 @@ export default function Addresses({ userId, onClose }) {
     },
     {
       id: 'public-ports',
-      label: 'Public Shipping Ports',
+      label: 'Shipping Ports',
       component: PublicShippingPorts
     }
   ]
