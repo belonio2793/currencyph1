@@ -5,13 +5,20 @@ import './ShopOnline.css'
 export default function ShopOnline({ onProductSelect = null }) {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
+  const [brands, setBrands] = useState([])
+  const [suppliers, setSuppliers] = useState([])
+  const [originCountries, setOriginCountries] = useState([])
+  const [warranties, setWarranties] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [viewMode, setViewMode] = useState('grid')
-  
+
   // Filter states
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
+  const [selectedBrand, setSelectedBrand] = useState('')
+  const [selectedSupplier, setSelectedSupplier] = useState('')
+  const [selectedOriginCountry, setSelectedOriginCountry] = useState('')
+  const [selectedWarranty, setSelectedWarranty] = useState('')
   const [priceMin, setPriceMin] = useState(0)
   const [priceMax, setPriceMax] = useState(100000)
   const [sortBy, setSortBy] = useState('newest')
