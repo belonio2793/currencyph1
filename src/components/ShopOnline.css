@@ -378,8 +378,8 @@
 /* Product Link and Image */
 .product-link {
   display: block;
-  text-decoration: none;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .products-grid .product-link {
