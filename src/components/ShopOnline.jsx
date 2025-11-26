@@ -26,15 +26,16 @@ export default function ShopOnline({ onProductSelect = null }) {
   
   const pageSize = 12
 
-  // Load categories on mount
+  // Load categories and filter options on mount
   useEffect(() => {
     loadCategories()
+    loadFilterOptions()
   }, [])
 
   // Load products when filters change
   useEffect(() => {
     loadProducts()
-  }, [selectedCategory, priceMin, priceMax, sortBy, page])
+  }, [selectedCategory, selectedBrand, selectedSupplier, selectedOriginCountry, selectedWarranty, priceMin, priceMax, sortBy, page])
 
   const loadCategories = async () => {
     try {
