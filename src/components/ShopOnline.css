@@ -34,20 +34,6 @@
   margin: 0 auto;
 }
 
-@media (max-width: 1024px) {
-  .shop-content {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .shop-content {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-}
-
 /* Sidebar */
 .shop-sidebar {
   position: sticky;
