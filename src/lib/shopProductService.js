@@ -23,6 +23,15 @@ export async function getProducts(filters = {}, page = 1, pageSize = 20) {
       if (filters.brand) {
         query = query.eq('brand', filters.brand)
       }
+      if (filters.supplier_name) {
+        query = query.eq('supplier_name', filters.supplier_name)
+      }
+      if (filters.origin_country) {
+        query = query.eq('origin_country', filters.origin_country)
+      }
+      if (filters.warranty_months) {
+        query = query.eq('warranty_months', filters.warranty_months)
+      }
       if (filters.is_featured) {
         query = query.eq('is_featured', true)
       }
