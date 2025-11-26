@@ -762,6 +762,11 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
               <div className="stat-content">
                 <p className="stat-label">Inventory Value</p>
                 <p className="stat-value">₱{sellerStats.totalValue.toLocaleString('en-PH', { maximumFractionDigits: 0 })}</p>
+                {exchangeRate && (
+                  <div style={{ fontSize: '12px', color: '#667eea', marginTop: '4px' }}>
+                    ≈ ${(sellerStats.totalValue * exchangeRate).toFixed(2)} USD
+                  </div>
+                )}
               </div>
             </div>
             <div className="stat-card">
