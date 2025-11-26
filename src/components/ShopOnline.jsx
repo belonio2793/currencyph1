@@ -47,6 +47,35 @@ export default function ShopOnline({ onProductSelect = null }) {
     }
   }
 
+  const loadFilterOptions = async () => {
+    try {
+      const { data: brandsData } = await getProducts({ limit: 1000 })
+      const { data: suppliersData } = await getProducts({ limit: 1000 })
+      const { data: countriesData } = await getProducts({ limit: 1000 })
+      const { data: warrantiesData } = await getProducts({ limit: 1000 })
+
+      const uniqueBrands = [...new Set(brandsData?.products?.filter(p => p.brand)?.map(p => p.brand))]
+        .filter(Boolean)
+        .sort()
+      const uniqueSuppliers = [...new Set(suppliersData?.products?.filter(p => p.supplier_name)?.map(p => p.supplier_name))]
+        .filter(Boolean)
+        .sort()
+      const uniqueCountries = [...new Set(countriesData?.products?.filter(p => p.origin_country)?.map(p => p.origin_country))]
+        .filter(Boolean)
+        .sort()
+      const uniqueWarranties = [...new Set(warrantiesData?.products?.filter(p => p.warranty_months)?.map(p => p.warranty_months))]
+        .filter(Boolean)
+        .sort((a, b) => a - b)
+
+      setBrands(uniqueBrands)
+      setSuppliers(uniqueSuppliers)
+      setOriginCountries(uniqueCountries)
+      setWarranties(uniqueWarranties)
+    } catch (err) {
+      console.error('Error loading filter options:', err)
+    }
+  }
+
   const loadProducts = async () => {
     try {
       setLoading(true)
@@ -333,7 +362,7 @@ export default function ShopOnline({ onProductSelect = null }) {
 
                       {product.rating > 0 && (
                         <div className="product-rating">
-                          <span className="stars">{'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}</span>
+                          <span className="stars">{'��'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}</span>
                           <span className="review-count">({product.review_count})</span>
                         </div>
                       )}
