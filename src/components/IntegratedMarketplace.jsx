@@ -662,7 +662,14 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
 
                           <div className="product-footer">
                             <div className="price-section">
-                              <span className="price">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              <div>
+                                <span className="price">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                              </div>
+                              {exchangeRate && (
+                                <div style={{ fontSize: '12px', color: '#667eea', marginTop: '4px' }}>
+                                  ≈ ${(product.price * exchangeRate).toFixed(2)} USD
+                                </div>
+                              )}
                             </div>
                             <button
                               onClick={() => {
