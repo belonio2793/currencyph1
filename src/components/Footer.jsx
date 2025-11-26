@@ -1,27 +1,23 @@
-import { useNavigate } from 'react-router-dom'
-
-export default function Footer() {
-  const navigate = useNavigate()
-
+export default function Footer({ onNavigate }) {
   const footerLinks = {
     Products: [
-      { name: 'Currency Exchange', path: '/' },
-      { name: 'Jobs', path: '/jobs' },
-      { name: 'Loans', path: '/loans' },
-      { name: 'Rides', path: '/rides' }
+      { name: 'Currency Exchange', tab: 'home' },
+      { name: 'Jobs', tab: 'jobs' },
+      { name: 'Loans', tab: 'p2p-loans' },
+      { name: 'Rides', tab: 'rides' }
     ],
     Maps: [
-      { name: 'Addresses', path: '/addresses' }
+      { name: 'Addresses', tab: 'addresses' }
     ],
     Company: [
-      { name: 'About', path: '#' },
-      { name: 'Blog', path: '#' },
-      { name: 'Contact', path: '#' }
+      { name: 'About', tab: 'about' },
+      { name: 'Blog', tab: null },
+      { name: 'Contact', tab: null }
     ],
     Legal: [
-      { name: 'Privacy Policy', path: '#' },
-      { name: 'Terms of Service', path: '#' },
-      { name: 'Disclaimer', path: '#' }
+      { name: 'Privacy Policy', tab: null },
+      { name: 'Terms of Service', tab: null },
+      { name: 'Disclaimer', tab: null }
     ]
   }
 
@@ -37,8 +33,9 @@ export default function Footer() {
                 {links.map(link => (
                   <li key={link.name}>
                     <button
-                      onClick={() => navigate(link.path)}
+                      onClick={() => link.tab && onNavigate?.(link.tab)}
                       className="text-sm text-gray-600 hover:text-blue-600 transition-colors"
+                      disabled={!link.tab}
                     >
                       {link.name}
                     </button>
