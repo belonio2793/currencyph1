@@ -563,51 +563,217 @@
 }
 
 @media (max-width: 768px) {
+  .shop-online-container {
+    padding: 12px;
+  }
+
   .shop-header {
-    padding: 30px 15px;
+    padding: 25px 15px;
+    margin-bottom: 30px;
   }
 
   .shop-header h1 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    margin-bottom: 8px;
   }
 
   .shop-header p {
-    font-size: 1rem;
+    font-size: 0.95rem;
+  }
+
+  .shop-content {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .shop-sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .filter-section,
+  .filter-group {
+    padding: 15px;
+    margin-bottom: 15px;
+  }
+
+  .filter-section h3 {
+    font-size: 1.1rem;
+  }
+
+  .filter-group h4 {
+    font-size: 0.95rem;
   }
 
   .shop-main {
-    padding: 15px;
+    padding: 12px;
+  }
+
+  .view-controls {
+    margin-bottom: 20px;
   }
 
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
   }
 
   .product-card.list {
-    grid-template-columns: 100px 1fr;
+    grid-template-columns: 80px 1fr;
     padding: 10px;
   }
 
   .product-card.list .product-image-container {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
+    margin-right: 10px;
+  }
+
+  .product-info {
+    padding: 10px;
   }
 
   .product-info h3 {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    margin-bottom: 6px;
+  }
+
+  .brand-name {
+    font-size: 0.8rem;
+    margin-bottom: 6px;
   }
 
   .product-price {
+    margin: 8px 0;
+    font-size: 0.95rem;
+  }
+
+  .sale-price,
+  .price {
     font-size: 1.1rem;
   }
 
+  .btn-view-details {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+  }
+
   .pagination {
+    gap: 6px;
+    margin: 20px 0 15px;
+  }
+
+  .pagination-btn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .page-number {
+    min-width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .results-info {
+    font-size: 0.85rem;
+    padding-top: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .shop-online-container {
+    padding: 8px;
+    min-height: auto;
+  }
+
+  .shop-header {
+    padding: 20px 12px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+  }
+
+  .shop-header h1 {
+    font-size: 1.3rem;
+    margin-bottom: 6px;
+  }
+
+  .shop-header p {
+    font-size: 0.9rem;
+  }
+
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
 
+  .product-card.list {
+    grid-template-columns: 1fr;
+    padding: 8px;
+  }
+
+  .product-card.list .product-image-container {
+    width: 100%;
+    padding-bottom: 100%;
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+
+  .product-info {
+    padding: 8px;
+  }
+
+  .product-info h3 {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+  }
+
+  .brand-name {
+    font-size: 0.75rem;
+  }
+
+  .filter-section,
+  .filter-group {
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .search-input,
+  .search-btn,
+  .sort-select {
+    font-size: 0.9rem;
+    padding: 8px;
+  }
+
+  .btn-view-details {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .view-controls {
+    gap: 8px;
+  }
+
+  .view-toggle {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  .pagination {
+    gap: 4px;
+  }
+
   .page-numbers {
-    max-width: 100%;
-    overflow-x: auto;
+    gap: 4px;
+  }
+
+  .pagination-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .page-number {
+    min-width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
   }
 }
