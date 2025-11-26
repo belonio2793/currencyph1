@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import { getProducts, getCategories } from '../lib/shopProductService'
 import './ShopOnline.css'
 
-export default function ShopOnline() {
+export default function ShopOnline({ onProductSelect = null }) {
   const [products, setProducts] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
