@@ -243,6 +243,94 @@ export default function ShopOnline({ onProductSelect = null }) {
             </div>
           )}
 
+          {/* Brand Filter */}
+          {brands.length > 0 && (
+            <div className="filter-block">
+              <h4>Brand</h4>
+              <select
+                value={selectedBrand}
+                onChange={(e) => {
+                  setSelectedBrand(e.target.value)
+                  setPage(1)
+                }}
+                className="filter-select"
+              >
+                <option value="">All Brands</option>
+                {brands.map(brand => (
+                  <option key={brand} value={brand}>
+                    {brand}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Supplier Filter */}
+          {suppliers.length > 0 && (
+            <div className="filter-block">
+              <h4>Supplier</h4>
+              <select
+                value={selectedSupplier}
+                onChange={(e) => {
+                  setSelectedSupplier(e.target.value)
+                  setPage(1)
+                }}
+                className="filter-select"
+              >
+                <option value="">All Suppliers</option>
+                {suppliers.map(supplier => (
+                  <option key={supplier} value={supplier}>
+                    {supplier}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Origin Country Filter */}
+          {originCountries.length > 0 && (
+            <div className="filter-block">
+              <h4>Origin Country</h4>
+              <select
+                value={selectedOriginCountry}
+                onChange={(e) => {
+                  setSelectedOriginCountry(e.target.value)
+                  setPage(1)
+                }}
+                className="filter-select"
+              >
+                <option value="">All Countries</option>
+                {originCountries.map(country => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Warranty Filter */}
+          {warranties.length > 0 && (
+            <div className="filter-block">
+              <h4>Warranty (months)</h4>
+              <select
+                value={selectedWarranty}
+                onChange={(e) => {
+                  setSelectedWarranty(e.target.value)
+                  setPage(1)
+                }}
+                className="filter-select"
+              >
+                <option value="">All Warranties</option>
+                {warranties.map(warranty => (
+                  <option key={warranty} value={warranty}>
+                    {warranty} months
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           {/* Price Range */}
           <div className="filter-block">
             <h4>Price Range</h4>
