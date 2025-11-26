@@ -56,11 +56,13 @@
 }
 
 .subtab-content {
-  flex: 1;
+  flex: 0 1 auto;
   overflow-y: visible;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.3s ease;
+  width: 100%;
+  height: auto;
 }
 
 @keyframes fadeIn {
@@ -76,8 +78,10 @@
 
 /* Ensure property mapper and other components fit properly */
 .subtab-content > * {
-  flex: 1;
+  flex: 0 1 auto;
   overflow-y: visible;
+  width: 100%;
+  height: auto;
 }
 
 /* Quick Checkpoint Section */
