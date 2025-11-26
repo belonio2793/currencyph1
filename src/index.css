@@ -219,6 +219,19 @@ html.dark .light-mode-widget .focus\:outline-none:focus {
   outline: none !important;
 }
 
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: visible;
+}
+
 input, button {
   font-family: inherit;
 }
