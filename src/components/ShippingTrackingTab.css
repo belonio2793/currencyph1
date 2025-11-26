@@ -246,7 +246,7 @@
 /* Shipments List */
 .shipments-list {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   padding: 16px 24px;
   display: flex;
   flex-direction: column;
