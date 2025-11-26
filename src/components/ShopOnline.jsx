@@ -377,24 +377,8 @@ export default function ShopOnline({ onProductSelect = null }) {
 
         {/* Main Content */}
         <main className="shop-main">
-          {/* View Controls */}
-          <div className="view-controls">
-            <div className="view-buttons">
-              <button
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                title="Grid View"
-              >
-                ⊞ Grid
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-                title="List View"
-              >
-                ≡ List
-              </button>
-            </div>
+          {/* Results Count */}
+          <div className="results-header">
             <div className="results-count">
               {filteredProducts.length} products found
             </div>
