@@ -94,7 +94,7 @@
 /* Tab Content Area */
 .addresses-content {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   display: flex;
   flex-direction: column;
@@ -103,7 +103,7 @@
 
 .addresses-tab-content {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   display: flex;
   flex-direction: column;
