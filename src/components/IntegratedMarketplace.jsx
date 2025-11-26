@@ -80,6 +80,8 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
   const [newTag, setNewTag] = useState('')
   const [formErrors, setFormErrors] = useState({})
   const [submitting, setSubmitting] = useState(false)
+  const [exchangeRate, setExchangeRate] = useState(null)
+  const [usdPrice, setUsdPrice] = useState('')
 
   // Load all products and user's products
   useEffect(() => {
@@ -87,6 +89,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
     if (userId) {
       loadFavorites()
     }
+    fetchExchangeRate()
   }, [currentPage, searchQuery, selectedCategory, sortBy, priceRange, userId])
 
   const loadProducts = async () => {
