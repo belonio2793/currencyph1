@@ -111,7 +111,7 @@ export default function DefaultAddressesTab({ userId, onClose, onShowAuth }) {
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
               <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to view properties</p>
               <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to see and manage your properties</p>
-              <button onClick={() => onClose?.()} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
                 Sign In Now
               </button>
             </div>
