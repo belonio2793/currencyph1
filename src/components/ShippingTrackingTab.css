@@ -368,7 +368,7 @@
   flex-direction: column;
   z-index: 1000;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .detail-panel-header {
@@ -520,7 +520,7 @@
   justify-content: center;
   z-index: 100;
   padding: 20px;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .form-modal {
@@ -528,7 +528,7 @@
   border-radius: 12px;
   width: 100%;
   max-width: 600px;
-  overflow-y: auto;
+  overflow-y: visible;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
@@ -550,7 +550,7 @@
 .form-body {
   flex: 1;
   padding: 24px;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .form-group {
