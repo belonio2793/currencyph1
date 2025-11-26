@@ -49,21 +49,18 @@ export default function ShopOnline({ onProductSelect = null }) {
 
   const loadFilterOptions = async () => {
     try {
-      const { data: brandsData } = await getProducts({ limit: 1000 })
-      const { data: suppliersData } = await getProducts({ limit: 1000 })
-      const { data: countriesData } = await getProducts({ limit: 1000 })
-      const { data: warrantiesData } = await getProducts({ limit: 1000 })
+      const result = await getProducts({}, 1, 1000)
 
-      const uniqueBrands = [...new Set(brandsData?.products?.filter(p => p.brand)?.map(p => p.brand))]
+      const uniqueBrands = [...new Set(result.products?.filter(p => p.brand)?.map(p => p.brand))]
         .filter(Boolean)
         .sort()
-      const uniqueSuppliers = [...new Set(suppliersData?.products?.filter(p => p.supplier_name)?.map(p => p.supplier_name))]
+      const uniqueSuppliers = [...new Set(result.products?.filter(p => p.supplier_name)?.map(p => p.supplier_name))]
         .filter(Boolean)
         .sort()
-      const uniqueCountries = [...new Set(countriesData?.products?.filter(p => p.origin_country)?.map(p => p.origin_country))]
+      const uniqueCountries = [...new Set(result.products?.filter(p => p.origin_country)?.map(p => p.origin_country))]
         .filter(Boolean)
         .sort()
-      const uniqueWarranties = [...new Set(warrantiesData?.products?.filter(p => p.warranty_months)?.map(p => p.warranty_months))]
+      const uniqueWarranties = [...new Set(result.products?.filter(p => p.warranty_months)?.map(p => p.warranty_months))]
         .filter(Boolean)
         .sort((a, b) => a - b)
 
