@@ -43,6 +43,12 @@ import BusinessMarketplace from './components/BusinessMarketplace'
 import IntegratedMarketplace from './components/IntegratedMarketplace'
 import BusinessMarketplaceDetail from './components/BusinessMarketplaceDetail'
 import InventoryDashboard from './components/InventoryDashboard'
+import ShopOnline from './components/ShopOnline'
+import ShopProductDetail from './components/ShopProductDetail'
+import ShoppingCart from './components/ShoppingCart'
+import ShopCheckout from './components/ShopCheckout'
+import OrderConfirmation from './components/OrderConfirmation'
+import { ShoppingCartProvider } from './context/ShoppingCartContext'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
