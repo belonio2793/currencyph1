@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import DefaultAddressesTab from './DefaultAddressesTab'
 import MyAddressesTab from './MyAddressesTab'
 import ShippingTrackingTab from './ShippingTrackingTab'
 import RouteCalculatorTab from './RouteCalculatorTab'
