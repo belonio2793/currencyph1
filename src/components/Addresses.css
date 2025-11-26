@@ -478,7 +478,7 @@
 /* DefaultAddressesTab Styles */
 .default-addresses-tab {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   background: #f8fafc;
 }
