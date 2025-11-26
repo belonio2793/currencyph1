@@ -62,6 +62,7 @@ export default function App() {
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
   const [currentListingSlug, setCurrentListingSlug] = useState(null)
   const [currentProductId, setCurrentProductId] = useState(null)
+  const [currentOrderId, setCurrentOrderId] = useState(null)
   const [totalBalancePHP, setTotalBalancePHP] = useState(0)
   const [totalBalanceConverted, setTotalBalanceConverted] = useState(0)
   const [totalDebtConverted, setTotalDebtConverted] = useState(0)
@@ -584,9 +585,9 @@ export default function App() {
               setActiveTab('shop-product')
             }} />}
             {activeTab === 'shop-product' && currentProductId && <ShopProductDetail productId={currentProductId} onNavigate={setActiveTab} />}
-            {activeTab === 'shop-cart' && <ShoppingCart />}
-            {activeTab === 'shop-checkout' && <ShopCheckout />}
-            {activeTab === 'shop-order-confirmation' && currentProductId && <OrderConfirmation />}
+            {activeTab === 'shop-cart' && <ShoppingCart onNavigate={setActiveTab} />}
+            {activeTab === 'shop-checkout' && <ShopCheckout onNavigate={setActiveTab} onOrderCreated={setCurrentOrderId} />}
+            {activeTab === 'shop-order-confirmation' && currentOrderId && <OrderConfirmation orderId={currentOrderId} onNavigate={setActiveTab} />}
           </>
         )}
       </main>
