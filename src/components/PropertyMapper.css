@@ -390,9 +390,10 @@
 }
 
 .property-details-content {
-  flex: 1;
+  flex: 1 1 auto;
   overflow-y: auto;
   padding: 16px;
+  min-height: 0;
 }
 
 .details-section {
