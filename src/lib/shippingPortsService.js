@@ -219,15 +219,16 @@ export async function searchShippingPorts(query) {
       const { data, error } = await supabase
         .from('shipping_ports')
         .select('*')
-        .eq('is_public', true)
+        .eq('is_active', true)
 
       if (error) throw error
 
-      // Client-side search for name and description
+      // Client-side search for port_name and city
       const results = data.filter(port =>
-        port.name.toLowerCase().includes(searchTerm) ||
-        (port.description && port.description.toLowerCase().includes(searchTerm)) ||
-        (port.city && port.city.toLowerCase().includes(searchTerm))
+        port.port_name.toLowerCase().includes(searchTerm) ||
+        (port.port_code && port.port_code.toLowerCase().includes(searchTerm)) ||
+        (port.city && port.city.toLowerCase().includes(searchTerm)) ||
+        (port.province && port.province.toLowerCase().includes(searchTerm))
       )
 
       return results
