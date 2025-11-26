@@ -132,6 +132,10 @@ export default function ShopOnline({ onProductSelect = null }) {
   const handleResetFilters = () => {
     setSearchQuery('')
     setSelectedCategory('')
+    setSelectedBrand('')
+    setSelectedSupplier('')
+    setSelectedOriginCountry('')
+    setSelectedWarranty('')
     setPriceMin(0)
     setPriceMax(100000)
     setSortBy('newest')
