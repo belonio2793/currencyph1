@@ -668,6 +668,32 @@
     padding: 15px;
   }
 
+  .search-filters-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .search-bar-form {
+    min-width: unset;
+    flex: unset;
+  }
+
+  .quick-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .quick-filter-select {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .btn-search-bar,
+  .btn-reset-bar {
+    width: 100%;
+  }
+
   .results-header {
     flex-direction: column;
     align-items: flex-start;
