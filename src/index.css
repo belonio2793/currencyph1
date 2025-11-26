@@ -9,11 +9,6 @@
   box-sizing: border-box;
 }
 
-html, body, #root {
-  height: 100%;
-  width: 100%;
-}
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
@@ -22,13 +17,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: #f8fafc;
   color: #000000;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
 }
 
 /* Force ChatBar to always use light mode - comprehensive dark mode override */
