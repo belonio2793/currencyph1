@@ -431,6 +431,8 @@
 .map-container {
   background: white;
   position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 .map-container :global(.leaflet-container) {
