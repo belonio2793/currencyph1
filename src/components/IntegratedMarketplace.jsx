@@ -1114,6 +1114,11 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
 
                       <div className="col-pricing">
                         <div className="price">₱{product.price.toLocaleString('en-PH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                        {exchangeRate && (
+                          <div style={{ fontSize: '11px', color: '#667eea' }}>
+                            ≈ ${(product.price * exchangeRate).toFixed(2)} USD
+                          </div>
+                        )}
                         {product.unit_of_measurement && (
                           <div className="unit">per {product.unit_of_measurement}</div>
                         )}
