@@ -8,14 +8,31 @@ const corsHeaders = {
 };
 
 interface AlibabaSyncRequest {
-  action: "sync" | "manual" | "queue-sync" | "get-status";
+  action: "sync" | "manual" | "queue-sync" | "get-status" | "trigger-full";
   syncType?: "full" | "incremental" | "manual";
   alibabaProductIds?: string[];
   businessId?: string;
 }
 
+interface AlibabaConfig {
+  id: string;
+  app_id: string;
+  sync_enabled: boolean;
+  sync_frequency_minutes: number;
+  auto_sync_on_startup: boolean;
+  filter_by_category: boolean;
+  allowed_categories: string[];
+  min_price: number;
+  max_price: number;
+  import_images: boolean;
+  import_certifications: boolean;
+  max_products_per_sync: number;
+  last_full_sync: string | null;
+  last_incremental_sync: string | null;
+  is_active: boolean;
+}
+
 serve(async (req) => {
-  // Handle CORS
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
@@ -28,7 +45,6 @@ serve(async (req) => {
 
     const body = (await req.json()) as AlibabaSyncRequest;
 
-    // Route to appropriate handler
     switch (body.action) {
       case "sync":
         return await handleSync(
@@ -49,6 +65,9 @@ serve(async (req) => {
 
       case "get-status":
         return await handleGetStatus(supabase);
+
+      case "trigger-full":
+        return await handleTriggerFullSync(supabase, body.businessId);
 
       default:
         return new Response(JSON.stringify({ error: "Unknown action" }), {
@@ -78,7 +97,6 @@ async function handleSync(
   syncType: "full" | "incremental",
   businessId?: string
 ) {
-  // Create sync log entry
   const { data: syncLog, error: syncLogError } = await supabase
     .from("alibaba_sync_log")
     .insert({
@@ -93,17 +111,23 @@ async function handleSync(
   }
 
   try {
-    // Get Alibaba config
-    const { data: config, error: configError } = await supabase
+    const { data: config } = await supabase
       .from("alibaba_config")
       .select("*")
+      .eq("is_active", true)
       .single();
 
-    if (configError || !config?.app_id) {
-      throw new Error("Alibaba not configured. Please add API credentials.");
+    if (!config?.is_active || !config?.app_id) {
+      throw new Error("Alibaba not configured or disabled");
     }
 
-    // Get business (if not specified, use first business)
+    const appId = Deno.env.get("VITE_ALIBABA_APP_ID");
+    const apiKey = Deno.env.get("VITE_ALIBABA_API_KEY");
+
+    if (!appId || !apiKey) {
+      throw new Error("Alibaba API credentials not configured");
+    }
+
     const { data: business } = await supabase
       .from("businesses")
       .select("id, user_id")
@@ -112,64 +136,49 @@ async function handleSync(
       .single();
 
     if (!business) {
-      throw new Error("No business found. Please set up a business first.");
+      throw new Error("No business found");
     }
 
-    // TODO: Call Alibaba API here when API keys are available
-    // For now, we'll prepare the infrastructure
-    console.log("Alibaba sync prepared for:", {
+    const queueItems = [];
+    let productsImported = 0;
+
+    // TODO: Integrate with Alibaba API when credentials available
+    console.log("Alibaba sync initialized:", {
       syncType,
       businessId: business.id,
-      sellerId: business.user_id,
+      maxProducts: config.max_products_per_sync,
     });
 
-    // Simulate sync queue
-    const queueItems = [];
-    // const alibabaProducts = await callAlibabaAPI(config, syncType);
-
-    // Queue products for processing
-    // for (const product of alibabaProducts) {
-    //   queueItems.push({
-    //     status: 'pending',
-    //     sync_type: syncType,
-    //     alibaba_product_id: product.id,
-    //     metadata: { businessId: business.id, sellerId: business.user_id }
-    //   });
-    // }
-
-    // Insert queue items
-    if (queueItems.length > 0) {
-      const { error: queueError } = await supabase
-        .from("alibaba_sync_queue")
-        .insert(queueItems);
-
-      if (queueError) {
-        throw new Error(`Failed to queue products: ${queueError.message}`);
-      }
-    }
-
-    // Update sync log
     await supabase
       .from("alibaba_sync_log")
       .update({
         status: "completed",
         end_time: new Date().toISOString(),
-        products_imported: queueItems.length,
+        products_imported: productsImported,
       })
       .eq("id", syncLog.id);
+
+    if (syncType === "full") {
+      await supabase
+        .from("alibaba_config")
+        .update({ last_full_sync: new Date().toISOString() })
+        .eq("id", config.id);
+    } else {
+      await supabase
+        .from("alibaba_config")
+        .update({ last_incremental_sync: new Date().toISOString() })
+        .eq("id", config.id);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
-        message: `${syncType} sync queued for ${queueItems.length} products`,
+        message: `${syncType} sync completed. Products imported: ${productsImported}`,
         syncLogId: syncLog.id,
       }),
-      {
-        headers: { "Content-Type": "application/json" },
-      }
+      { headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
-    // Update sync log with error
     await supabase
       .from("alibaba_sync_log")
       .update({
@@ -202,7 +211,6 @@ async function handleManualSync(
   const { data: business } = await supabase
     .from("businesses")
     .select("id, user_id")
-    .eq("id", businessId || "")
     .limit(1)
     .single();
 
@@ -213,7 +221,6 @@ async function handleManualSync(
     );
   }
 
-  // Queue specific products
   const queueItems = alibabaProductIds.map((productId) => ({
     status: "pending",
     sync_type: "manual",
@@ -234,6 +241,7 @@ async function handleManualSync(
     JSON.stringify({
       success: true,
       message: `Queued ${queueItems.length} products for manual sync`,
+      queuedItems: queueItems.length,
     }),
     { headers: { "Content-Type": "application/json" } }
   );
@@ -277,30 +285,66 @@ async function handleQueueSync(
 }
 
 /**
- * Get sync status
+ * Get sync status and statistics
  */
 async function handleGetStatus(supabase: any) {
   const { data: recentSyncs } = await supabase
     .from("alibaba_sync_log")
     .select("*")
     .order("created_at", { ascending: false })
-    .limit(5);
+    .limit(10);
 
-  const { data: queueStatus } = await supabase
+  const { data: queueStats } = await supabase
     .from("alibaba_sync_queue")
-    .select("status, COUNT(*) as count")
-    .group_by("status");
+    .select("status")
+    .order("created_at", { ascending: false });
 
-  const { data: mappedProducts } = await supabase
+  const { data: config } = await supabase
+    .from("alibaba_config")
+    .select("*")
+    .single();
+
+  const { count: totalMapped } = await supabase
     .from("alibaba_product_mapping")
-    .select("COUNT(*)", { count: "exact" });
+    .select("*", { count: "exact", head: true });
+
+  const queueStatusMap = {
+    pending: 0,
+    processing: 0,
+    completed: 0,
+    failed: 0,
+  };
+
+  (queueStats || []).forEach((item: { status: string }) => {
+    if (item.status in queueStatusMap) {
+      queueStatusMap[item.status as keyof typeof queueStatusMap]++;
+    }
+  });
 
   return new Response(
     JSON.stringify({
-      recentSyncs,
-      queueStatus,
-      totalImportedProducts: mappedProducts?.length || 0,
+      config: {
+        is_active: config?.is_active || false,
+        sync_enabled: config?.sync_enabled || false,
+        sync_frequency_minutes: config?.sync_frequency_minutes || 60,
+        last_full_sync: config?.last_full_sync,
+        last_incremental_sync: config?.last_incremental_sync,
+      },
+      recentSyncs: recentSyncs || [],
+      queueStatus: queueStatusMap,
+      totalImportedProducts: totalMapped || 0,
+      timestamp: new Date().toISOString(),
     }),
     { headers: { "Content-Type": "application/json" } }
   );
+}
+
+/**
+ * Trigger a full sync (manual endpoint)
+ */
+async function handleTriggerFullSync(
+  supabase: any,
+  businessId?: string
+) {
+  return await handleSync(supabase, "full", businessId);
 }
