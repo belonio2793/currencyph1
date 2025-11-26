@@ -363,7 +363,7 @@ export default function InventoryDashboard({ userId, businessId, setActiveTab })
       {error && (
         <div className="alert alert-error">
           <span>{error}</span>
-          <button onClick={() => setError('')} className="alert-close">✕</button>
+          <button onClick={() => setError('')} className="alert-close">x</button>
         </div>
       )}
 
