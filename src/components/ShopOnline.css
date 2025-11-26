@@ -458,10 +458,6 @@
   font-size: 0.85rem;
   color: #666;
   line-height: 1.4;
-  display: none;
-}
-
-.products-list .product-desc {
   display: block;
 }
 
