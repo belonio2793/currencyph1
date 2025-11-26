@@ -2177,10 +2177,11 @@
   background: white;
   border-radius: 8px;
   margin: 20px;
-  overflow: auto;
+  overflow: visible;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
+  height: auto;
 }
 
 .routes-grid {
