@@ -360,6 +360,62 @@ export default function ShopOnline({ onProductSelect = null }) {
 
         {/* Main Content */}
         <main className="shop-main">
+          {/* Search and Quick Filters Bar */}
+          <div className="search-filters-bar">
+            {/* Search Form */}
+            <form onSubmit={handleSearch} className="search-bar-form">
+              <input
+                type="text"
+                placeholder=""
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-bar-input"
+                aria-label="Search products"
+              />
+              <button type="submit" className="btn-search-bar">Search</button>
+            </form>
+
+            {/* Quick Filters */}
+            <div className="quick-filters">
+              {/* Category Quick Filter */}
+              {categories.length > 0 && (
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => {
+                    setSelectedCategory(e.target.value)
+                    setPage(1)
+                  }}
+                  className="quick-filter-select"
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              {/* Sort By Quick Filter */}
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="quick-filter-select"
+              >
+                <option value="newest">Newest</option>
+                <option value="price_low">Price: Low to High</option>
+                <option value="price_high">Price: High to Low</option>
+                <option value="rating">Top Rated</option>
+                <option value="bestseller">Best Sellers</option>
+              </select>
+
+              {/* Reset Filters Button */}
+              <button className="btn-reset-bar" onClick={handleResetFilters}>
+                Reset All
+              </button>
+            </div>
+          </div>
+
           {/* Results Count */}
           <div className="results-header">
             <div className="results-count">
