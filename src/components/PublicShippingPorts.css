@@ -1,9 +1,10 @@
 .public-shipping-ports {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
+  width: 100%;
   background: #f9fafb;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Page Header */
@@ -32,10 +33,10 @@
 /* Main Container */
 .ports-page-container {
   display: flex;
-  flex: 1;
-  min-height: 0;
+  flex: 0 1 auto;
   gap: 0;
   background: #f9fafb;
+  width: 100%;
 }
 
 /* Map Section */

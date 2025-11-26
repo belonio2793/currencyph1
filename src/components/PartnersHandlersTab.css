@@ -1,7 +1,7 @@
 .partners-handlers-tab {
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  height: auto;
+  overflow: visible;
   background: #f8fafc;
   display: flex;
   flex-direction: column;
@@ -9,10 +9,10 @@
 
 .partners-container {
   width: 100%;
-  flex: 1;
+  height: auto;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   position: relative;
 }
 
