@@ -1,10 +1,11 @@
 .addresses-container {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   position: relative;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 /* Page Title - Consistent across all tabs */
@@ -94,19 +95,21 @@
 /* Tab Content Area */
 .addresses-content {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   display: flex;
   flex-direction: column;
   background: #f8fafc;
+  flex: 1;
 }
 
 .addresses-tab-content {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .addresses-tab-content.fade-in {
