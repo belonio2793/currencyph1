@@ -849,6 +849,11 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                         className={formErrors.price ? 'input-error' : ''}
                       />
                       {formErrors.price && <span className="error-text">{formErrors.price}</span>}
+                      {exchangeRate && usdPrice && (
+                        <div className="currency-conversion" style={{ marginTop: '8px', fontSize: '13px', color: '#667eea' }}>
+                          ≈ ${usdPrice} USD
+                        </div>
+                      )}
                     </div>
 
                     <div className="form-group">
