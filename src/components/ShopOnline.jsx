@@ -345,9 +345,12 @@ export default function ShopOnline({ onProductSelect = null }) {
                         )}
                       </div>
 
-                      <Link to={`/shop/product/${product.id}`} className="btn-primary btn-view">
+                      <button
+                        onClick={() => onProductSelect && onProductSelect(product.id)}
+                        className="btn-primary btn-view"
+                      >
                         View Details
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 ))}
