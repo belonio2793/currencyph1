@@ -362,7 +362,7 @@
 
 .ports-list {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -662,7 +662,7 @@
 
 .ports-list {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   padding: 16px;
   display: flex;
   flex-direction: column;
