@@ -187,22 +187,6 @@ export default function ShopOnline({ onProductSelect = null }) {
             </button>
           </div>
 
-          {/* Search */}
-          <div className="filter-block">
-            <h4>Search</h4>
-            <form onSubmit={handleSearch} className="search-form">
-              <input
-                type="text"
-                placeholder=""
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="search-input"
-                aria-label="Search products"
-              />
-              <button type="submit" className="btn-search">Search</button>
-            </form>
-          </div>
-
           {/* Categories */}
           {categories.length > 0 && (
             <div className="filter-block">
