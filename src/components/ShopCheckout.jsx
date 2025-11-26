@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { useShoppingCart } from '../context/ShoppingCartContext'
 import { getCustomerByEmail, getOrCreateCustomer, getCustomerAddresses, addCustomerAddress, getDefaultAddress, setDefaultAddress } from '../lib/shopCustomerService'
 import { processCheckout, calculateCheckoutTotals, applyPromoCode } from '../lib/shopCheckoutService'
 import { supabase } from '../lib/supabaseClient'
 import './ShopCheckout.css'
 
-export default function ShopCheckout() {
-  const navigate = useNavigate()
+export default function ShopCheckout({ onNavigate, onOrderCreated }) {
   const { cart, clearCartItems, customerId, setCustomerAndLoadCart } = useShoppingCart()
   
   // Customer Info
@@ -197,7 +195,12 @@ export default function ShopCheckout() {
 
       if (order) {
         await clearCartItems()
-        navigate(`/shop/order-confirmation/${order.id}`)
+        if (onOrderCreated) {
+          onOrderCreated(order.id)
+        }
+        if (onNavigate) {
+          onNavigate('shop-order-confirmation')
+        }
       }
     } catch (err) {
       setError(err.message || 'Error processing checkout')
@@ -221,7 +224,7 @@ export default function ShopCheckout() {
     return (
       <div className="checkout-empty">
         <p>Your cart is empty</p>
-        <button onClick={() => navigate('/shop')} className="btn-back">
+        <button onClick={() => onNavigate?.('shop')} className="btn-back">
           Back to Shop
         </button>
       </div>
