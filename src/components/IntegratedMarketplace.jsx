@@ -270,6 +270,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
     })
     setFormErrors({})
     setNewTag('')
+    setUsdPrice('')
   }
 
   const handleAddProduct = async (e) => {
