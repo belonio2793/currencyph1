@@ -67,14 +67,14 @@
 }
 
 .map-container {
-  flex: 0 0 400px;
+  flex: 1 1 auto;
   position: relative;
   background: white;
-  overflow: visible;
+  overflow: hidden;
   display: flex;
   align-items: stretch;
   z-index: 1;
-  height: 400px;
+  height: 100%;
 }
 
 .map-overlay-controls {
