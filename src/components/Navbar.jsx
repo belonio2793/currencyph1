@@ -268,6 +268,21 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {mobileMenuOpen && (
           <div className="md:hidden pb-2 border-t border-slate-100">
             <div className="space-y-1">
+              {/* Shop Online tab for mobile - First tab */}
+              <button
+                onClick={() => {
+                  onTabChange('shop')
+                  setMobileMenuOpen(false)
+                }}
+                className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  activeTab === 'shop'
+                    ? 'text-blue-600 bg-blue-50'
+                    : 'text-blue-600 hover:bg-blue-50'
+                }`}
+              >
+                Shop Online
+              </button>
+
               {/* Jobs tab for mobile */}
               {userEmail && (
                 <button
