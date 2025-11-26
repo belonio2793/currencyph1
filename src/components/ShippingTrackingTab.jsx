@@ -3,6 +3,11 @@ import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
 import { getSafeErrorMessage, logErrorSafely } from '../lib/safeErrorHandler'
+import PropertyMapper from './PropertyMapper'
+import ShippingLabelGenerator from './ShippingLabelGenerator'
+import BarcodeScanner from './BarcodeScanner'
+import PackageTracker from './PackageTracker'
+import PackageCheckpointMap from './PackageCheckpointMap'
 import './ShippingTrackingTab.css'
 
 delete L.Icon.Default.prototype._getIconUrl
@@ -12,8 +17,13 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
 
-export default function ShippingTrackingTab({ userId }) {
+export default function ShippingTrackingTab({ userId, onShowAuth }) {
   const mapRef = useRef(null)
+  const [activeSubTab, setActiveSubTab] = useState('shipping')
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [addresses, setAddresses] = useState([])
+  const [loadingAddresses, setLoadingAddresses] = useState(true)
+  const [viewingMapForTrackingCode, setViewingMapForTrackingCode] = useState(null)
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(null)
   const [trackingHistory, setTrackingHistory] = useState([])
@@ -28,6 +38,38 @@ export default function ShippingTrackingTab({ userId }) {
   const [mapLayer, setMapLayer] = useState('street')
   const [mapInstance, setMapInstance] = useState(null)
   const [showLegend, setShowLegend] = useState(false)
+
+  const handlePropertyAdded = () => {
+    setRefreshKey(prev => prev + 1)
+    loadAddresses()
+  }
+
+  // Load addresses for shipping label form
+  useEffect(() => {
+    if (userId) {
+      loadAddresses()
+    }
+  }, [userId])
+
+  const loadAddresses = async () => {
+    try {
+      setLoadingAddresses(true)
+      const { data, error } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('user_id', userId)
+        .not('addresses_latitude', 'is', null)
+        .not('addresses_longitude', 'is', null)
+
+      if (!error) {
+        setAddresses(data || [])
+      }
+    } catch (err) {
+      console.error('Error loading addresses:', err)
+    } finally {
+      setLoadingAddresses(false)
+    }
+  }
 
   const [formData, setFormData] = useState({
     tracking_number: '',
