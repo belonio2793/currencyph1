@@ -336,7 +336,8 @@ export default function ShopOnline({ onProductSelect = null }) {
                 <label>Min: ₱</label>
                 <input
                   type="number"
-                  value={priceMin}
+                  placeholder="0"
+                  value={priceMin || ''}
                   onChange={(e) => setPriceMin(Math.max(0, parseInt(e.target.value) || 0))}
                   min="0"
                   className="price-field"
@@ -346,7 +347,8 @@ export default function ShopOnline({ onProductSelect = null }) {
                 <label>Max: ₱</label>
                 <input
                   type="number"
-                  value={priceMax}
+                  placeholder="100000"
+                  value={priceMax || ''}
                   onChange={(e) => setPriceMax(Math.max(priceMin, parseInt(e.target.value) || 100000))}
                   min={priceMin}
                   className="price-field"
