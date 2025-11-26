@@ -21,6 +21,7 @@
   color: #0f172a;
   margin: 0;
   line-height: 1.2;
+  font-style: normal;
 }
 
 /* Tab Navigation */
@@ -460,7 +461,7 @@
 .my-addresses-tab {
   width: 100%;
   height: 100%;
-  overflow: hidden;
+  overflow: auto;
   display: flex;
   flex-direction: column;
 }
@@ -471,6 +472,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
+  min-height: 0;
 }
 
 .my-addresses-layout-no-map {
@@ -1033,11 +1035,12 @@
 
 .addresses-list-full-width {
   width: 100%;
-  height: 100%;
+  height: auto;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   background: #f8fafc;
-  overflow: hidden;
+  overflow: visible;
   max-width: 100%;
 }
 
@@ -1070,6 +1073,8 @@
   padding: 12px 16px;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
+  display: flex;
+  gap: 12px;
 }
 
 .addresses-list-full-width .popular-cities-section {
@@ -1147,10 +1152,13 @@
   padding: 12px 16px;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
+  display: flex;
+  gap: 12px;
 }
 
 .filter-group {
-  margin-bottom: 10px;
+  flex: 1;
+  min-width: 150px;
 }
 
 .filter-group:last-child {
