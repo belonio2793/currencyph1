@@ -724,7 +724,6 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">📦</div>
               <div className="stat-content">
                 <p className="stat-label">Total Stock</p>
                 <p className="stat-value">{sellerStats.totalStock}</p>
