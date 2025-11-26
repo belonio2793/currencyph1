@@ -552,7 +552,7 @@
     padding: 15px;
   }
 
-  .view-controls {
+  .results-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 15px;
@@ -563,30 +563,18 @@
     width: 100%;
   }
 
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-  }
-
-  .products-list .product-item {
+  .product-item {
     grid-template-columns: 100px 1fr;
+    border-radius: 6px;
   }
 
-  .products-list .product-link {
+  .product-link {
     width: 100px;
     height: 100px;
   }
 
-  .product-item {
-    border-radius: 6px;
-  }
-
   .product-details {
     padding: 12px;
-  }
-
-  .products-list .product-details {
-    padding: 0 12px;
   }
 
   .product-details h3 {
