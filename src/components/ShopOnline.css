@@ -615,40 +615,26 @@
     padding: 12px;
   }
 
-  .view-controls {
+  .results-header {
     margin-bottom: 15px;
     padding-bottom: 15px;
-  }
-
-  .view-btn {
-    padding: 6px 12px;
-    font-size: 0.8rem;
   }
 
   .results-count {
     font-size: 0.85rem;
   }
 
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-  }
-
-  .products-list .product-item {
+  .product-item {
     grid-template-columns: 80px 1fr;
   }
 
-  .products-list .product-link {
+  .product-link {
     width: 80px;
     height: 80px;
   }
 
   .product-details {
     padding: 10px;
-  }
-
-  .products-list .product-details {
-    padding: 0 10px;
   }
 
   .product-details h3 {
@@ -686,7 +672,8 @@
   .search-input,
   .btn-search,
   .price-field,
-  .sort-dropdown {
+  .sort-dropdown,
+  .filter-select {
     font-size: 0.85rem;
     padding: 8px;
   }
