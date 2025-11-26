@@ -384,11 +384,13 @@
 
 .products-grid .product-link {
   width: 100%;
+  cursor: pointer;
 }
 
 .products-list .product-link {
   width: 120px;
   height: 120px;
+  cursor: pointer;
 }
 
 .product-image-wrapper {
