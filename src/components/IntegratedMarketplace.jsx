@@ -385,6 +385,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
       visibility: product.visibility || 'public',
       tags: product.tags || [],
     })
+    setUsdPrice(calculateUsdPrice(product.price.toString()))
     setEditingProduct(product)
     setShowAddForm(true)
   }
