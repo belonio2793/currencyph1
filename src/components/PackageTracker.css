@@ -5,6 +5,7 @@
   flex-direction: column;
   background: #f9fafb;
   overflow: hidden;
+  flex: 1;
 }
 
 .tracker-header {
