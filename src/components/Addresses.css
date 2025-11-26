@@ -433,6 +433,21 @@
   .popular-cities-grid {
     grid-template-columns: 1fr 1fr;
   }
+
+  .addresses-filters-section {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .addresses-list-full-width .addresses-filters-section {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .filter-group {
+    flex: 1;
+    min-width: auto;
+  }
 }
 
 @media (max-width: 480px) {
