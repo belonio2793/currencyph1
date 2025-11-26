@@ -9,18 +9,15 @@ export async function fetchShippingPorts(filters = {}) {
       let query = supabase
         .from('shipping_ports')
         .select('*')
-        .eq('is_public', true)
-        .order('name', { ascending: true })
+        .eq('is_active', true)
+        .order('port_name', { ascending: true })
 
       // Apply filters
       if (filters.city) {
         query = query.eq('city', filters.city)
       }
-      if (filters.region) {
-        query = query.eq('region', filters.region)
-      }
-      if (filters.status) {
-        query = query.eq('status', filters.status)
+      if (filters.province) {
+        query = query.eq('province', filters.province)
       }
       if (filters.portType) {
         query = query.eq('port_type', filters.portType)
