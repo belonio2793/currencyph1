@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { currencyAPI } from '../lib/currencyAPI'
 import AdvancedInventoryFeatures from './AdvancedInventoryFeatures'
 import './IntegratedMarketplace.css'
 
