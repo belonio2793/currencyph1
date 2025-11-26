@@ -1176,6 +1176,8 @@
 
 .filter-group {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 150px;
 }
 
@@ -1191,17 +1193,20 @@
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-bottom: 6px;
+  min-height: 16px;
+  line-height: 1.45;
 }
 
 .filter-select {
   width: 100%;
-  padding: 8px 10px;
+  padding: 10px 12px;
   border: 1px solid #cbd5e1;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 13px;
   background: white;
   cursor: pointer;
   transition: border-color 0.2s;
+  height: 40px;
 }
 
 .filter-select:focus {
