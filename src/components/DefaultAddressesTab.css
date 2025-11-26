@@ -1,7 +1,7 @@
 .default-addresses-tab {
   display: flex;
   flex-direction: column;
-  height: auto;
+  height: calc(100vh - 200px);
   width: 100%;
   background: #f9fafb;
 }
