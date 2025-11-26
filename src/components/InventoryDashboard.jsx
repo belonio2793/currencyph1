@@ -776,14 +776,14 @@ export default function InventoryDashboard({ userId, businessId, setActiveTab })
                       className="btn-edit"
                       title="Edit product"
                     >
-                      ✎ Edit
+                      Edit
                     </button>
                     <button
                       onClick={() => handleDeleteProduct(product.id)}
                       className="btn-delete"
                       title="Delete product"
                     >
-                      🗑 Delete
+                      Delete
                     </button>
                   </div>
                 </div>
