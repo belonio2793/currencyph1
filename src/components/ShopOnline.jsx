@@ -83,6 +83,10 @@ export default function ShopOnline({ onProductSelect = null }) {
 
       const filters = {
         category_id: selectedCategory || undefined,
+        brand: selectedBrand || undefined,
+        supplier_name: selectedSupplier || undefined,
+        origin_country: selectedOriginCountry || undefined,
+        warranty_months: selectedWarranty || undefined,
         min_price: priceMin,
         max_price: priceMax
       }
@@ -362,7 +366,7 @@ export default function ShopOnline({ onProductSelect = null }) {
 
                       {product.rating > 0 && (
                         <div className="product-rating">
-                          <span className="stars">{'��'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}</span>
+                          <span className="stars">{'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}</span>
                           <span className="review-count">({product.review_count})</span>
                         </div>
                       )}
