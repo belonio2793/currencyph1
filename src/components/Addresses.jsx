@@ -7,7 +7,7 @@ import PartnersHandlersTab from './PartnersHandlersTab'
 import PublicShippingPorts from './PublicShippingPorts'
 import './Addresses.css'
 
-export default function Addresses({ userId, onClose }) {
+export default function Addresses({ userId, onClose, onShowAuth }) {
   const [activeTab, setActiveTab] = useState('default')
 
   const tabs = [
@@ -65,7 +65,7 @@ export default function Addresses({ userId, onClose }) {
           {tabs.map(tab => {
             const Component = tab.component
             return activeTab === tab.id && (
-              <Component key={tab.id} userId={userId} onClose={onClose} />
+              <Component key={tab.id} userId={userId} onClose={onClose} onShowAuth={onShowAuth} />
             )
           })}
         </div>
