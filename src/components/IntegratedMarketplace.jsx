@@ -417,14 +417,14 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
             }}
             className={`toggle-button ${activeView === 'marketplace' ? 'active' : ''}`}
           >
-            🛍️ Browse Marketplace
+            Browse Marketplace
           </button>
           {userId && (
             <button
               onClick={() => setActiveView('inventory')}
               className={`toggle-button ${activeView === 'inventory' ? 'active' : ''}`}
             >
-              📦 My Inventory
+              My Inventory
             </button>
           )}
         </div>
@@ -693,7 +693,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
               }}
               className="btn-primary-lg"
             >
-              {showAddForm ? '✕ Cancel' : '+ Add Product'}
+              {showAddForm ? 'Cancel' : 'Add Product'}
             </button>
           </div>
 
@@ -1099,14 +1099,14 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                           className="btn-edit"
                           title="Edit product"
                         >
-                          ✎ Edit
+                          Edit
                         </button>
                         <button
                           onClick={() => handleDeleteProduct(product.id)}
                           className="btn-delete"
                           title="Delete product"
                         >
-                          🗑 Delete
+                          Delete
                         </button>
                       </div>
                     </div>
