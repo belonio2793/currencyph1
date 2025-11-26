@@ -291,7 +291,7 @@ export default function ShopOnline({ onProductSelect = null }) {
               <div className={`products-container products-${viewMode}`}>
                 {filteredProducts.map(product => (
                   <div key={product.id} className="product-item">
-                    <Link to={`/shop/product/${product.id}`} className="product-link">
+                    <div className="product-link" onClick={() => onProductSelect && onProductSelect(product.id)}>
                       <div className="product-image-wrapper">
                         <img
                           src={getPrimaryImage(product)}
@@ -309,13 +309,16 @@ export default function ShopOnline({ onProductSelect = null }) {
                           </span>
                         )}
                       </div>
-                    </Link>
+                    </div>
 
                     <div className="product-details">
                       <h3>
-                        <Link to={`/shop/product/${product.id}`}>
+                        <span
+                          className="product-name-link"
+                          onClick={() => onProductSelect && onProductSelect(product.id)}
+                        >
                           {product.name}
-                        </Link>
+                        </span>
                       </h3>
 
                       {product.brand && <p className="product-brand">{product.brand}</p>}
