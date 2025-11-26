@@ -316,7 +316,7 @@ export default function InventoryDashboard({ userId, businessId, setActiveTab })
           }}
           className="btn-primary-lg"
         >
-          {showAddForm ? '✕ Cancel' : '+ Add Product'}
+          {showAddForm ? 'Cancel' : 'Add Product'}
         </button>
       </div>
 
