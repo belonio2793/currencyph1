@@ -49,6 +49,7 @@ export default function ShippingTrackingTab({ userId }) {
     if (!userId) return
     try {
       setLoading(true)
+      setError('')
       const { data, error: fetchError } = await supabase
         .from('shipments')
         .select('*')
@@ -58,8 +59,9 @@ export default function ShippingTrackingTab({ userId }) {
       if (fetchError) throw fetchError
       setShipments(data || [])
     } catch (err) {
-      console.error('Error loading shipments:', err?.message || err)
-      setError(err?.message || 'Failed to load shipments')
+      logErrorSafely('ShippingTrackingTab.loadShipments', err)
+      const safeErrorMessage = getSafeErrorMessage(err)
+      setError(safeErrorMessage || 'Failed to load shipments')
     } finally {
       setLoading(false)
     }
