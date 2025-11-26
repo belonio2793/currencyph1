@@ -583,7 +583,7 @@ export default function App() {
               setCurrentProductId(productId)
               setActiveTab('shop-product')
             }} />}
-            {activeTab === 'shop-product' && currentProductId && <ShopProductDetail />}
+            {activeTab === 'shop-product' && currentProductId && <ShopProductDetail productId={currentProductId} onNavigate={setActiveTab} />}
             {activeTab === 'shop-cart' && <ShoppingCart />}
             {activeTab === 'shop-checkout' && <ShopCheckout />}
             {activeTab === 'shop-order-confirmation' && currentProductId && <OrderConfirmation />}
