@@ -2076,6 +2076,7 @@
   flex-direction: column;
   width: 100%;
   min-height: 100%;
+  gap: 20px;
 }
 
 .form-group-section {
