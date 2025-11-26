@@ -308,7 +308,7 @@
 /* Partners Grid */
 .partners-grid {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   padding: 16px 24px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -465,7 +465,7 @@
   flex-direction: column;
   z-index: 1000;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .detail-panel-header {
