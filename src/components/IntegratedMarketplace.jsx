@@ -945,6 +945,11 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                         placeholder="0.00"
                         step="0.01"
                       />
+                      {exchangeRate && formData.delivery_cost && (
+                        <div className="currency-conversion" style={{ marginTop: '8px', fontSize: '13px', color: '#667eea' }}>
+                          ≈ ${(parseFloat(formData.delivery_cost) * exchangeRate).toFixed(2)} USD
+                        </div>
+                      )}
                     </div>
                   </div>
 
