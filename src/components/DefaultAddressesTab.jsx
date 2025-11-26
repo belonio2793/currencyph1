@@ -128,9 +128,9 @@ export default function DefaultAddressesTab({ userId, onClose, onShowAuth }) {
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
               <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to generate labels</p>
               <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to create shipping labels</p>
-              <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
                 Sign In Now
-              </a>
+              </button>
             </div>
           )
         )}
@@ -147,9 +147,9 @@ export default function DefaultAddressesTab({ userId, onClose, onShowAuth }) {
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
               <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to scan barcodes</p>
               <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to track package checkpoints</p>
-              <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
                 Sign In Now
-              </a>
+              </button>
             </div>
           )
         )}
@@ -164,9 +164,9 @@ export default function DefaultAddressesTab({ userId, onClose, onShowAuth }) {
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
               <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to track packages</p>
               <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to view your package tracking</p>
-              <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
                 Sign In Now
-              </a>
+              </button>
             </div>
           )
         )}
