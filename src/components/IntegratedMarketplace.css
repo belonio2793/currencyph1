@@ -1122,6 +1122,7 @@
   }
 
   .filter-toggle-btn {
+    display: flex;
     width: 100%;
   }
 
