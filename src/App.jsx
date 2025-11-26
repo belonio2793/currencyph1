@@ -466,7 +466,8 @@ export default function App() {
 
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <ShoppingCartProvider>
+      <div className="min-h-screen bg-slate-50">
       <HeaderMap userId={userId} />
       <Navbar
         activeTab={activeTab}
@@ -639,5 +640,6 @@ export default function App() {
         </div>
       </footer>
     </div>
+    </ShoppingCartProvider>
   )
 }
