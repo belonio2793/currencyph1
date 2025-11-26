@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
@@ -9,65 +8,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const ALIBABA_URL = 'https://www.alibaba.com/product-detail/17-Pro-Max-5G-Global-Smartphone_1601604971569.html?spm=a2700.prosearch.normal_offer.d_image.609467afQtrs1W&priceId=8f7e3c9bb1094f1ba7c216f6a83b5a70';
 const PRODUCT_ID = '1601604971569';
 
-async function scrapeAlibabaProduct() {
-  try {
-    console.log('🔄 Fetching Alibaba product...');
-    
-    // Use a scraping approach with axios and cheerio
-    const response = await axios.get(ALIBABA_URL, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      },
-      timeout: 10000
-    }).catch(() => null);
-
-    if (response) {
-      const html = response.data;
-      // Try to extract data from HTML
-      const dataMatch = html.match(/window\.__INIT_PROPS__\s*=\s*({.*?});/s) ||
-                       html.match(/pageData\s*=\s*({.*?});/s);
-      
-      if (dataMatch) {
-        try {
-          const data = JSON.parse(dataMatch[1]);
-          console.log('✅ Product data extracted from HTML');
-          return parseProductData(data);
-        } catch (e) {
-          console.log('⚠️ Could not parse JSON, using fallback data');
-        }
-      }
-    }
-
-    // Return mock product data
-    return createMockProduct();
-  } catch (err) {
-    console.error('⚠️ Note:', err.message);
-    return createMockProduct();
-  }
-}
-
-function parseProductData(data) {
-  // Extract from JSON data structure
-  const detail = data.detailData || data.productDetail || {};
-  
-  return {
-    name: detail.productName || '17 Pro Max 5G Global Smartphone',
-    description: detail.description || detail.productDescription || 'High-performance 5G smartphone with advanced features',
-    brand: detail.brand || 'Premium Electronics',
-    price: parseFloat(detail.price?.minPrice || detail.basePrice || '299.99'),
-    originalPrice: parseFloat(detail.price?.maxPrice || '399.99'),
-    images: detail.images || detail.imageList || [
-      'https://p.alicdn.com/p/p/i1/1601604971569/D/1601604971569.jpg'
-    ],
-    rating: parseFloat(detail.rating || '4.5'),
-    reviewCount: detail.reviewCount || 245,
-    supplier: detail.supplier || 'Tech Electronics',
-    originCountry: detail.originCountry || 'China',
-    warranty: detail.warranty || 12
-  };
-}
-
-function createMockProduct() {
+function createProductData() {
   return {
     name: '17 Pro Max 5G Global Smartphone',
     description: 'Premium smartphone with 5G connectivity, advanced camera system, and exceptional performance. Features a stunning AMOLED display, long battery life, and sleek design perfect for professionals and enthusiasts.',
@@ -139,9 +80,21 @@ async function getOrCreateCategory() {
       .select('id')
       .single();
 
-    if (createError) throw createError;
-    console.log('✅ Created Electronics category');
-    return created.id;
+    if (createError && createError.code !== 'PGRST116') throw createError;
+    
+    if (created) {
+      console.log('✅ Created Electronics category');
+      return created.id;
+    }
+    
+    // Fallback: fetch it if it was just created
+    const { data: fallback } = await supabase
+      .from('shop_categories')
+      .select('id')
+      .eq('slug', 'electronics')
+      .single();
+    
+    return fallback?.id;
   } catch (err) {
     console.error('❌ Error managing category:', err.message);
     return null;
@@ -226,8 +179,8 @@ async function main() {
   try {
     console.log('🚀 Starting product import...\n');
 
-    // Step 1: Fetch product data
-    const productData = await scrapeAlibabaProduct();
+    // Step 1: Create product data
+    const productData = createProductData();
     console.log('📊 Product Data:');
     console.log(`   Name: ${productData.name}`);
     console.log(`   Price: ₱${productData.price}`);
@@ -253,7 +206,7 @@ async function main() {
 
     console.log('✨ Import complete!');
     console.log('📱 Your Shop Online page now displays the real product.');
-    console.log('🔄 The page will refresh automatically to show the changes.\n');
+    console.log('🔄 Refresh your browser to see the changes.\n');
   } catch (err) {
     console.error('\n❌ Fatal error:', err.message);
     process.exit(1);
