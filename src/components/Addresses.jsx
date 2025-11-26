@@ -8,7 +8,7 @@ import PublicShippingPorts from './PublicShippingPorts'
 import './Addresses.css'
 
 export default function Addresses({ userId, onClose, onShowAuth }) {
-  const [activeTab, setActiveTab] = useState('default')
+  const [activeTab, setActiveTab] = useState('shipping-tracking')
 
   const tabs = [
     {
