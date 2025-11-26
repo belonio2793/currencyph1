@@ -700,28 +700,24 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
           {/* Statistics Cards */}
           <div className="inventory-stats">
             <div className="stat-card">
-              <div className="stat-icon">📦</div>
               <div className="stat-content">
                 <p className="stat-label">Total Products</p>
                 <p className="stat-value">{sellerStats.totalProducts}</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">✓</div>
               <div className="stat-content">
                 <p className="stat-label">Active Products</p>
                 <p className="stat-value">{sellerStats.activeProducts}</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">👁️</div>
               <div className="stat-content">
                 <p className="stat-label">Public Products</p>
                 <p className="stat-value">{sellerStats.publicProducts}</p>
               </div>
             </div>
             <div className="stat-card">
-              <div className="stat-icon">📊</div>
               <div className="stat-content">
                 <p className="stat-label">Inventory Value</p>
                 <p className="stat-value">₱{sellerStats.totalValue.toLocaleString('en-PH', { maximumFractionDigits: 0 })}</p>
@@ -735,7 +731,6 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
               </div>
             </div>
             <div className="stat-card warning">
-              <div className="stat-icon">⚠️</div>
               <div className="stat-content">
                 <p className="stat-label">Low Stock Items</p>
                 <p className="stat-value">{userProducts.filter(p => p.stock_quantity <= 5).length}</p>
@@ -746,7 +741,7 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
           {error && (
             <div className="alert alert-error">
               <span>{error}</span>
-              <button onClick={() => setError('')} className="alert-close">✕</button>
+              <button onClick={() => setError('')} className="alert-close">×</button>
             </div>
           )}
 
