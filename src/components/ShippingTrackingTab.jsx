@@ -247,529 +247,656 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
         <h2>Shipping</h2>
       </div>
 
-      <div className="shipping-container">
-        {/* Create Shipment Button */}
-        <div className="shipping-header">
-          <button
-            onClick={() => setShowForm(true)}
-            className="btn-create-shipment"
-          >
-            + Create Shipment
-          </button>
-        </div>
+      {/* Sub-tabs for shipping and tracking features */}
+      <div className="subtab-navigation">
+        <button
+          className={`subtab-btn ${activeSubTab === 'shipping' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('shipping')}
+          title="Manage Shipments"
+        >
+          Shipping
+        </button>
+        <button
+          className={`subtab-btn ${activeSubTab === 'properties' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('properties')}
+          title="Manage Properties"
+        >
+          Properties
+        </button>
+        <button
+          className={`subtab-btn ${activeSubTab === 'generate' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('generate')}
+          title="Generate Shipping Labels"
+        >
+          Generate Labels
+        </button>
+        <button
+          className={`subtab-btn ${activeSubTab === 'scan' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('scan')}
+          title="Scan Package Checkpoints"
+        >
+          Scan Barcode
+        </button>
+        <button
+          className={`subtab-btn ${activeSubTab === 'track' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('track')}
+          title="Track Packages"
+        >
+          Track Package
+        </button>
+      </div>
 
-        {/* Search and Filter Bar with Map Controls */}
-        <div className="shipping-controls">
-          <input
-            type="text"
-            placeholder="Search by tracking number, origin, or destination..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="shipping-search"
-          />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="shipping-filter"
-          >
-            <option value="all">All Statuses</option>
-            <option value="pending">Pending</option>
-            <option value="in-transit">In Transit</option>
-            <option value="delivered">Delivered</option>
-            <option value="failed">Failed</option>
-          </select>
-
-        </div>
-
-        {error && (
-          <div className="shipping-error">
-            {error}
-            <button onClick={() => setError('')} className="error-close">×</button>
+      {/* Sub-tab Content */}
+      <div className="subtab-content">
+        {/* Map modal overlay */}
+        {viewingMapForTrackingCode && (
+          <div className="modal-overlay">
+            <PackageCheckpointMap
+              trackingCode={viewingMapForTrackingCode}
+              onClose={() => setViewingMapForTrackingCode(null)}
+            />
           </div>
         )}
 
-        {/* Map View */}
-        <div className="shipping-map-section" style={{ height: `${mapHeight}px` }}>
-          <div className="map-header">
-            <div className="map-header-content">
-              <h4>Shipment Routes Map</h4>
-              <p className="map-subtitle">Visualize shipping routes across the Philippines</p>
-            </div>
-          </div>
-          <div className="map-container shipping-map">
-            <div className="map-overlay-controls">
-              <div className="map-resize-controls">
-                <button
-                  onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
-                  className="btn-map-resize"
-                  title="Decrease map size"
-                >
-                  −
-                </button>
-                <button
-                  onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
-                  className="btn-map-resize"
-                  title="Increase map size"
-                >
-                  +
-                </button>
-              </div>
-              <button
-                onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle"
-                title={showLegend ? 'Hide map controls' : 'Show map controls'}
-              >
-                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+        {activeSubTab === 'properties' && (
+          userId ? (
+            <PropertyMapper
+              key={refreshKey}
+              userId={userId}
+              onPropertyAdded={handlePropertyAdded}
+              allowDelete={true}
+              showShippingPorts={false}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to view properties</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to see and manage your properties</p>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
+                Sign In Now
               </button>
             </div>
-            <MapContainer
-              ref={mapRef}
-              center={mapCenter}
-              zoom={zoomLevel}
-              style={{ height: '100%', width: '100%' }}
-              attributionControl={false}
-            >
-              <TileLayer
-                url={
-                  mapLayer === 'satellite'
-                    ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-                    : mapLayer === 'terrain'
-                    ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
-                    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-                }
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              />
-            </MapContainer>
+          )
+        )}
 
-            {/* Map Legend */}
-            {showLegend && (
-              <div className="map-legend">
-                <div className="legend-header">
-                  <h4>Map Controls</h4>
+        {activeSubTab === 'generate' && (
+          userId ? (
+            <ShippingLabelGenerator
+              userId={userId}
+              addresses={addresses}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to generate labels</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to create shipping labels</p>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
+                Sign In Now
+              </button>
+            </div>
+          )
+        )}
+
+        {activeSubTab === 'scan' && (
+          userId ? (
+            <BarcodeScanner
+              userId={userId}
+              onCheckpointAdded={() => {
+                // Refresh tracking data
+              }}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to scan barcodes</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to track package checkpoints</p>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
+                Sign In Now
+              </button>
+            </div>
+          )
+        )}
+
+        {activeSubTab === 'track' && (
+          userId ? (
+            <PackageTracker
+              userId={userId}
+              onViewMap={(trackingCode) => setViewingMapForTrackingCode(trackingCode)}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to track packages</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to view your package tracking</p>
+              <button onClick={() => onShowAuth?.('login')} style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>
+                Sign In Now
+              </button>
+            </div>
+          )
+        )}
+
+        {activeSubTab === 'shipping' && (
+          <div className="shipping-container">
+            {/* Create Shipment Button */}
+            <div className="shipping-header">
+              <button
+                onClick={() => setShowForm(true)}
+                className="btn-create-shipment"
+              >
+                + Create Shipment
+              </button>
+            </div>
+
+            {/* Search and Filter Bar with Map Controls */}
+            <div className="shipping-controls">
+              <input
+                type="text"
+                placeholder="Search by tracking number, origin, or destination..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="shipping-search"
+              />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="shipping-filter"
+              >
+                <option value="all">All Statuses</option>
+                <option value="pending">Pending</option>
+                <option value="in-transit">In Transit</option>
+                <option value="delivered">Delivered</option>
+                <option value="failed">Failed</option>
+              </select>
+
+            </div>
+
+            {error && (
+              <div className="shipping-error">
+                {error}
+                <button onClick={() => setError('')} className="error-close">×</button>
+              </div>
+            )}
+
+            {/* Map View */}
+            <div className="shipping-map-section" style={{ height: `${mapHeight}px` }}>
+              <div className="map-header">
+                <div className="map-header-content">
+                  <h4>Shipment Routes Map</h4>
+                  <p className="map-subtitle">Visualize shipping routes across the Philippines</p>
+                </div>
+              </div>
+              <div className="map-container shipping-map">
+                <div className="map-overlay-controls">
+                  <div className="map-resize-controls">
+                    <button
+                      onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
+                      className="btn-map-resize"
+                      title="Decrease map size"
+                    >
+                      −
+                    </button>
+                    <button
+                      onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
+                      className="btn-map-resize"
+                      title="Increase map size"
+                    >
+                      +
+                    </button>
+                  </div>
                   <button
-                    onClick={() => setShowLegend(false)}
-                    className="legend-close"
+                    onClick={() => setShowLegend(!showLegend)}
+                    className="btn-legend-toggle"
+                    title={showLegend ? 'Hide map controls' : 'Show map controls'}
                   >
-                    ✕
+                    {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
+                  </button>
+                </div>
+                <MapContainer
+                  ref={mapRef}
+                  center={mapCenter}
+                  zoom={zoomLevel}
+                  style={{ height: '100%', width: '100%' }}
+                  attributionControl={false}
+                >
+                  <TileLayer
+                    url={
+                      mapLayer === 'satellite'
+                        ? 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+                        : mapLayer === 'terrain'
+                        ? 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+                        : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+                    }
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                  />
+                </MapContainer>
+
+                {/* Map Legend */}
+                {showLegend && (
+                  <div className="map-legend">
+                    <div className="legend-header">
+                      <h4>Map Controls</h4>
+                      <button
+                        onClick={() => setShowLegend(false)}
+                        className="legend-close"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div className="legend-content">
+                      {/* Default Location */}
+                      <div className="legend-section">
+                        <button
+                          onClick={() => {
+                            const center = [12.8797, 121.7740]
+                            const zoom = 6
+                            setMapCenter(center)
+                            setZoomLevel(zoom)
+                            if (mapRef.current) {
+                              try {
+                                mapRef.current.flyTo(center, zoom, { duration: 1 })
+                              } catch (error) {
+                                console.error('Error flying to Philippines:', error)
+                              }
+                            }
+                          }}
+                          className="btn-default-location"
+                          title="Focus on Philippines"
+                        >
+                          Philippines
+                        </button>
+                      </div>
+
+                      {/* Layer Selection */}
+                      <div className="legend-section">
+                        <label className="legend-label">Map Layer</label>
+                        <div className="layer-buttons">
+                          <button
+                            onClick={() => setMapLayer('street')}
+                            className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
+                            title="Street view"
+                          >
+                            Street
+                          </button>
+                          <button
+                            onClick={() => setMapLayer('satellite')}
+                            className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
+                            title="Satellite view"
+                          >
+                            Satellite
+                          </button>
+                          <button
+                            onClick={() => setMapLayer('terrain')}
+                            className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
+                            title="Terrain view"
+                          >
+                            Terrain
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Shipments List */}
+            <div className="shipments-list">
+              {loading ? (
+                <div className="loading-state">Loading shipments...</div>
+              ) : filteredShipments.length === 0 ? (
+                <div className="empty-state">
+                  <p className="empty-title">No shipments found</p>
+                  <p className="empty-subtitle">
+                    {shipments.length === 0 
+                      ? 'Create your first shipment to track packages'
+                      : 'Try adjusting your search or filter'}
+                  </p>
+                </div>
+              ) : (
+                filteredShipments.map(shipment => (
+                  <div
+                    key={shipment.id}
+                    className="shipment-card"
+                    onClick={() => handleSelectShipment(shipment)}
+                  >
+                    <div className="shipment-card-header">
+                      <div className="shipment-info">
+                        <h4 className="tracking-number">{shipment.tracking_number}</h4>
+                        <span
+                          className="status-badge"
+                          style={{ backgroundColor: getStatusColor(shipment.status) }}
+                        >
+                          {getStatusBadge(shipment.status)}
+                        </span>
+                      </div>
+                      <span className="shipment-date">
+                        {new Date(shipment.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    <div className="shipment-details-preview">
+                      <div className="detail-item">
+                        <span className="label">From:</span>
+                        <span className="value">{shipment.origin_address}</span>
+                      </div>
+                      <div className="detail-item">
+                        <span className="label">To:</span>
+                        <span className="value">{shipment.destination_address}</span>
+                      </div>
+                      {shipment.package_weight && (
+                        <div className="detail-item">
+                          <span className="label">Weight:</span>
+                          <span className="value">{shipment.package_weight}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Selected Shipment Detail View */}
+            {selectedShipment && (
+              <div className="shipment-detail-panel">
+                <div className="detail-panel-header">
+                  <h3>Shipment Details</h3>
+                  <button
+                    onClick={() => {
+                      setSelectedShipment(null)
+                      setTrackingHistory([])
+                    }}
+                    className="detail-panel-close"
+                  >
+                    ×
                   </button>
                 </div>
 
-                <div className="legend-content">
-                  {/* Default Location */}
-                  <div className="legend-section">
-                    <button
-                      onClick={() => {
-                        const center = [12.8797, 121.7740]
-                        const zoom = 6
-                        setMapCenter(center)
-                        setZoomLevel(zoom)
-                        if (mapRef.current) {
-                          try {
-                            mapRef.current.flyTo(center, zoom, { duration: 1 })
-                          } catch (error) {
-                            console.error('Error flying to Philippines:', error)
-                          }
-                        }
-                      }}
-                      className="btn-default-location"
-                      title="Focus on Philippines"
-                    >
-                      Philippines
-                    </button>
-                  </div>
-
-                  {/* Layer Selection */}
-                  <div className="legend-section">
-                    <label className="legend-label">Map Layer</label>
-                    <div className="layer-buttons">
-                      <button
-                        onClick={() => setMapLayer('street')}
-                        className={`layer-btn ${mapLayer === 'street' ? 'active' : ''}`}
-                        title="Street view"
+                <div className="detail-panel-content">
+                  <div className="detail-section">
+                    <h4 className="section-title">Tracking Information</h4>
+                    <div className="detail-item">
+                      <span className="label">Tracking Number:</span>
+                      <span className="value">{selectedShipment.tracking_number}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Status:</span>
+                      <span
+                        className="status-badge"
+                        style={{ backgroundColor: getStatusColor(selectedShipment.status) }}
                       >
-                        Street
-                      </button>
-                      <button
-                        onClick={() => setMapLayer('satellite')}
-                        className={`layer-btn ${mapLayer === 'satellite' ? 'active' : ''}`}
-                        title="Satellite view"
-                      >
-                        Satellite
-                      </button>
-                      <button
-                        onClick={() => setMapLayer('terrain')}
-                        className={`layer-btn ${mapLayer === 'terrain' ? 'active' : ''}`}
-                        title="Terrain view"
-                      >
-                        Terrain
-                      </button>
+                        {getStatusBadge(selectedShipment.status)}
+                      </span>
                     </div>
                   </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
 
-        {/* Shipments List */}
-        <div className="shipments-list">
-          {loading ? (
-            <div className="loading-state">Loading shipments...</div>
-          ) : filteredShipments.length === 0 ? (
-            <div className="empty-state">
-              <p className="empty-title">No shipments found</p>
-              <p className="empty-subtitle">
-                {shipments.length === 0 
-                  ? 'Create your first shipment to track packages'
-                  : 'Try adjusting your search or filter'}
-              </p>
-            </div>
-          ) : (
-            filteredShipments.map(shipment => (
-              <div
-                key={shipment.id}
-                className="shipment-card"
-                onClick={() => handleSelectShipment(shipment)}
-              >
-                <div className="shipment-card-header">
-                  <div className="shipment-info">
-                    <h4 className="tracking-number">{shipment.tracking_number}</h4>
-                    <span
-                      className="status-badge"
-                      style={{ backgroundColor: getStatusColor(shipment.status) }}
-                    >
-                      {getStatusBadge(shipment.status)}
-                    </span>
-                  </div>
-                  <span className="shipment-date">
-                    {new Date(shipment.created_at).toLocaleDateString()}
-                  </span>
-                </div>
-
-                <div className="shipment-details-preview">
-                  <div className="detail-item">
-                    <span className="label">From:</span>
-                    <span className="value">{shipment.origin_address}</span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">To:</span>
-                    <span className="value">{shipment.destination_address}</span>
-                  </div>
-                  {shipment.package_weight && (
+                  <div className="detail-section">
+                    <h4 className="section-title">Package Information</h4>
                     <div className="detail-item">
-                      <span className="label">Weight:</span>
-                      <span className="value">{shipment.package_weight}</span>
+                      <span className="label">Origin Address:</span>
+                      <span className="value">{selectedShipment.origin_address}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Destination Address:</span>
+                      <span className="value">{selectedShipment.destination_address}</span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Carrier:</span>
+                      <span className="value">{selectedShipment.carrier || 'N/A'}</span>
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <h4 className="section-title">Package Details</h4>
+                    {selectedShipment.package_weight && (
+                      <div className="detail-item">
+                        <span className="label">Weight:</span>
+                        <span className="value">{selectedShipment.package_weight}</span>
+                      </div>
+                    )}
+                    {selectedShipment.package_dimensions && (
+                      <div className="detail-item">
+                        <span className="label">Dimensions:</span>
+                        <span className="value">{selectedShipment.package_dimensions}</span>
+                      </div>
+                    )}
+                    {selectedShipment.estimated_delivery && (
+                      <div className="detail-item">
+                        <span className="label">Est. Delivery:</span>
+                        <span className="value">
+                          {new Date(selectedShipment.estimated_delivery).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="detail-section">
+                    <h4 className="section-title">Labels</h4>
+                    <div className="labels-container">
+                      <div className="label-box">
+                        <p className="label-title">Barcode Label</p>
+                        <img
+                          src={generateBarcode(selectedShipment.tracking_number)}
+                          alt="Barcode"
+                          className="barcode-image"
+                        />
+                        <button className="btn-download-label">Download</button>
+                      </div>
+                      <div className="label-box">
+                        <p className="label-title">QR Code Label</p>
+                        <img
+                          src={generateQRCode(selectedShipment.tracking_number)}
+                          alt="QR Code"
+                          className="qr-image"
+                        />
+                        <button className="btn-download-label">Download</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="detail-section">
+                    <h4 className="section-title">Tracking History</h4>
+                    {trackingHistory.length === 0 ? (
+                      <p className="notes-text">No tracking updates yet. Shipment will be updated when in transit.</p>
+                    ) : (
+                      <div className="tracking-history-list">
+                        {trackingHistory.map((entry) => (
+                          <div key={entry.id} className="tracking-history-item">
+                            <div className="history-timestamp">
+                              {new Date(entry.timestamp).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                              })}
+                            </div>
+                            <div className="history-status">{entry.status}</div>
+                            {entry.location && <div className="history-location">📍 {entry.location}</div>}
+                            {entry.notes && <div className="history-notes">{entry.notes}</div>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedShipment.notes && (
+                    <div className="detail-section">
+                      <h4 className="section-title">Notes</h4>
+                      <p className="notes-text">{selectedShipment.notes}</p>
                     </div>
                   )}
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            )}
 
-        {/* Selected Shipment Detail View */}
-        {selectedShipment && (
-          <div className="shipment-detail-panel">
-            <div className="detail-panel-header">
-              <h3>Shipment Details</h3>
-              <button
-                onClick={() => {
-                  setSelectedShipment(null)
-                  setTrackingHistory([])
-                }}
-                className="detail-panel-close"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="detail-panel-content">
-              <div className="detail-section">
-                <h4 className="section-title">Tracking Information</h4>
-                <div className="detail-item">
-                  <span className="label">Tracking Number:</span>
-                  <span className="value">{selectedShipment.tracking_number}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Status:</span>
-                  <span
-                    className="status-badge"
-                    style={{ backgroundColor: getStatusColor(selectedShipment.status) }}
-                  >
-                    {getStatusBadge(selectedShipment.status)}
-                  </span>
-                </div>
-              </div>
-
-              <div className="detail-section">
-                <h4 className="section-title">Package Information</h4>
-                <div className="detail-item">
-                  <span className="label">Origin Address:</span>
-                  <span className="value">{selectedShipment.origin_address}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Destination Address:</span>
-                  <span className="value">{selectedShipment.destination_address}</span>
-                </div>
-                <div className="detail-item">
-                  <span className="label">Carrier:</span>
-                  <span className="value">{selectedShipment.carrier || 'N/A'}</span>
-                </div>
-              </div>
-
-              <div className="detail-section">
-                <h4 className="section-title">Package Details</h4>
-                {selectedShipment.package_weight && (
-                  <div className="detail-item">
-                    <span className="label">Weight:</span>
-                    <span className="value">{selectedShipment.package_weight}</span>
+            {/* Create Shipment Form Modal */}
+            {showForm && (
+              <div className="form-overlay" onClick={() => setShowForm(false)}>
+                <div className="form-modal" onClick={e => e.stopPropagation()}>
+                  <div className="form-modal-header">
+                    <h2>Create New Shipment</h2>
+                    <button
+                      onClick={() => setShowForm(false)}
+                      className="form-modal-close"
+                    >
+                      ×
+                    </button>
                   </div>
-                )}
-                {selectedShipment.package_dimensions && (
-                  <div className="detail-item">
-                    <span className="label">Dimensions:</span>
-                    <span className="value">{selectedShipment.package_dimensions}</span>
-                  </div>
-                )}
-                {selectedShipment.estimated_delivery && (
-                  <div className="detail-item">
-                    <span className="label">Est. Delivery:</span>
-                    <span className="value">
-                      {new Date(selectedShipment.estimated_delivery).toLocaleDateString()}
-                    </span>
-                  </div>
-                )}
-              </div>
 
-              <div className="detail-section">
-                <h4 className="section-title">Labels</h4>
-                <div className="labels-container">
-                  <div className="label-box">
-                    <p className="label-title">Barcode Label</p>
-                    <img
-                      src={generateBarcode(selectedShipment.tracking_number)}
-                      alt="Barcode"
-                      className="barcode-image"
-                    />
-                    <button className="btn-download-label">Download</button>
-                  </div>
-                  <div className="label-box">
-                    <p className="label-title">QR Code Label</p>
-                    <img
-                      src={generateQRCode(selectedShipment.tracking_number)}
-                      alt="QR Code"
-                      className="qr-image"
-                    />
-                    <button className="btn-download-label">Download</button>
-                  </div>
-                </div>
-              </div>
-
-              <div className="detail-section">
-                <h4 className="section-title">Tracking History</h4>
-                {trackingHistory.length === 0 ? (
-                  <p className="notes-text">No tracking updates yet. Shipment will be updated when in transit.</p>
-                ) : (
-                  <div className="tracking-history-list">
-                    {trackingHistory.map((entry) => (
-                      <div key={entry.id} className="tracking-history-item">
-                        <div className="history-timestamp">
-                          {new Date(entry.timestamp).toLocaleDateString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
+                  <form onSubmit={handleSubmit} className="shipping-form">
+                    <div className="form-section">
+                      <h3 className="form-section-title">Tracking Number</h3>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Tracking Number *</label>
+                          <div className="tracking-input-group">
+                            <input
+                              type="text"
+                              name="tracking_number"
+                              value={formData.tracking_number}
+                              onChange={handleInputChange}
+                              placeholder="Auto-generated or enter custom"
+                              required
+                            />
+                            <button
+                              type="button"
+                              onClick={handleGenerateTracking}
+                              className="btn-generate-tracking"
+                            >
+                              Generate
+                            </button>
+                          </div>
                         </div>
-                        <div className="history-status">{entry.status}</div>
-                        {entry.location && <div className="history-location">📍 {entry.location}</div>}
-                        {entry.notes && <div className="history-notes">{entry.notes}</div>}
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                    </div>
 
-              {selectedShipment.notes && (
-                <div className="detail-section">
-                  <h4 className="section-title">Notes</h4>
-                  <p className="notes-text">{selectedShipment.notes}</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+                    <div className="form-section">
+                      <h3 className="form-section-title">Package Information</h3>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Weight</label>
+                          <input
+                            type="text"
+                            name="package_weight"
+                            value={formData.package_weight}
+                            onChange={handleInputChange}
+                            placeholder="e.g., 2.5 kg"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Dimensions</label>
+                          <input
+                            type="text"
+                            name="package_dimensions"
+                            value={formData.package_dimensions}
+                            onChange={handleInputChange}
+                            placeholder="e.g., 20x30x40 cm"
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-        {/* Create Shipment Form Modal */}
-        {showForm && (
-          <div className="form-overlay" onClick={() => setShowForm(false)}>
-            <div className="form-modal" onClick={e => e.stopPropagation()}>
-              <div className="form-modal-header">
-                <h2>Create New Shipment</h2>
-                <button
-                  onClick={() => setShowForm(false)}
-                  className="form-modal-close"
-                >
-                  ×
-                </button>
-              </div>
+                    <div className="form-section">
+                      <h3 className="form-section-title">Addresses</h3>
+                      <div className="form-row full">
+                        <div className="form-group">
+                          <label>Origin Address *</label>
+                          <input
+                            type="text"
+                            name="origin_address"
+                            value={formData.origin_address}
+                            onChange={handleInputChange}
+                            placeholder="Sender's address"
+                            required
+                          />
+                        </div>
+                      </div>
+                      <div className="form-row full">
+                        <div className="form-group">
+                          <label>Destination Address *</label>
+                          <input
+                            type="text"
+                            name="destination_address"
+                            value={formData.destination_address}
+                            onChange={handleInputChange}
+                            placeholder="Recipient's address"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-              <form onSubmit={handleSubmit} className="shipping-form">
-                <div className="form-section">
-                  <h3 className="form-section-title">Tracking Number</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Tracking Number *</label>
-                      <div className="tracking-input-group">
-                        <input
-                          type="text"
-                          name="tracking_number"
-                          value={formData.tracking_number}
+                    <div className="form-section">
+                      <h3 className="form-section-title">Carrier & Delivery</h3>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Carrier</label>
+                          <input
+                            type="text"
+                            name="carrier"
+                            value={formData.carrier}
+                            onChange={handleInputChange}
+                            placeholder="e.g., JNT, LBC, Lazada"
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Status</label>
+                          <select
+                            name="status"
+                            value={formData.status}
+                            onChange={handleInputChange}
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="in-transit">In Transit</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="failed">Failed</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="form-row">
+                        <div className="form-group">
+                          <label>Estimated Delivery</label>
+                          <input
+                            type="date"
+                            name="estimated_delivery"
+                            value={formData.estimated_delivery}
+                            onChange={handleInputChange}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="form-section">
+                      <h3 className="form-section-title">Additional Notes</h3>
+                      <div className="form-group full-width">
+                        <label>Notes</label>
+                        <textarea
+                          name="notes"
+                          value={formData.notes}
                           onChange={handleInputChange}
-                          placeholder="Auto-generated or enter custom"
-                          required
+                          placeholder="Any additional information..."
+                          rows="4"
                         />
-                        <button
-                          type="button"
-                          onClick={handleGenerateTracking}
-                          className="btn-generate-tracking"
-                        >
-                          Generate
-                        </button>
                       </div>
                     </div>
-                  </div>
-                </div>
 
-                <div className="form-section">
-                  <h3 className="form-section-title">Package Information</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Weight</label>
-                      <input
-                        type="text"
-                        name="package_weight"
-                        value={formData.package_weight}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 2.5 kg"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Dimensions</label>
-                      <input
-                        type="text"
-                        name="package_dimensions"
-                        value={formData.package_dimensions}
-                        onChange={handleInputChange}
-                        placeholder="e.g., 20x30x40 cm"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <h3 className="form-section-title">Addresses</h3>
-                  <div className="form-row full">
-                    <div className="form-group">
-                      <label>Origin Address *</label>
-                      <input
-                        type="text"
-                        name="origin_address"
-                        value={formData.origin_address}
-                        onChange={handleInputChange}
-                        placeholder="Sender's address"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="form-row full">
-                    <div className="form-group">
-                      <label>Destination Address *</label>
-                      <input
-                        type="text"
-                        name="destination_address"
-                        value={formData.destination_address}
-                        onChange={handleInputChange}
-                        placeholder="Recipient's address"
-                        required
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-section">
-                  <h3 className="form-section-title">Carrier & Delivery</h3>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Carrier</label>
-                      <input
-                        type="text"
-                        name="carrier"
-                        value={formData.carrier}
-                        onChange={handleInputChange}
-                        placeholder="e.g., JNT, LBC, Lazada"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Status</label>
-                      <select
-                        name="status"
-                        value={formData.status}
-                        onChange={handleInputChange}
+                    <div className="form-actions">
+                      <button
+                        type="button"
+                        onClick={() => setShowForm(false)}
+                        className="btn-form-cancel"
+                        disabled={loading}
                       >
-                        <option value="pending">Pending</option>
-                        <option value="in-transit">In Transit</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="failed">Failed</option>
-                      </select>
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="btn-form-save"
+                        disabled={loading}
+                      >
+                        {loading ? 'Creating...' : 'Create Shipment'}
+                      </button>
                     </div>
-                  </div>
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Estimated Delivery</label>
-                      <input
-                        type="date"
-                        name="estimated_delivery"
-                        value={formData.estimated_delivery}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  </div>
+                  </form>
                 </div>
-
-                <div className="form-section">
-                  <h3 className="form-section-title">Additional Notes</h3>
-                  <div className="form-group full-width">
-                    <label>Notes</label>
-                    <textarea
-                      name="notes"
-                      value={formData.notes}
-                      onChange={handleInputChange}
-                      placeholder="Any additional information..."
-                      rows="4"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    onClick={() => setShowForm(false)}
-                    className="btn-form-cancel"
-                    disabled={loading}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="btn-form-save"
-                    disabled={loading}
-                  >
-                    {loading ? 'Creating...' : 'Create Shipment'}
-                  </button>
-                </div>
-              </form>
-            </div>
+              </div>
+            )}
           </div>
         )}
       </div>
