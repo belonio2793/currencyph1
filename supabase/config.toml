@@ -9,6 +9,14 @@ enable_http_edge_function_runner = true
 # Enable Edge Runtime
 policy = "per_request"
 
+# Cron Job Configuration for Alibaba Sync Queue Processor
+[[functions]]
+slug = "process-alibaba-sync"
+
+[functions.scheduling]
+# Run every 5 minutes to process queued items
+cron = "*/5 * * * *"
+
 # Cron Job Configuration for TripAdvisor Sync
 [[functions]]
 slug = "sync-tripadvisor-hourly"
