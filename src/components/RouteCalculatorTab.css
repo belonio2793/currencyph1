@@ -155,7 +155,7 @@
   display: flex;
   flex-direction: column;
   max-height: calc(100vh - 400px);
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .legend-header {
@@ -378,7 +378,7 @@
 .calculator-form {
   width: 100%;
   padding: 24px;
-  overflow-y: auto;
+  overflow-y: visible;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -487,7 +487,7 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 .results-header {
