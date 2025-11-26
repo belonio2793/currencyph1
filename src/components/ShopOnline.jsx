@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { getProducts, getCategories, searchProducts } from '../lib/shopProductService'
+import { getProducts, getCategories } from '../lib/shopProductService'
 import './ShopOnline.css'
 
 export default function ShopOnline() {
@@ -8,23 +8,27 @@ export default function ShopOnline() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [viewMode, setViewMode] = useState('grid')
+  
+  // Filter states
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100000 })
+  const [priceMin, setPriceMin] = useState(0)
+  const [priceMax, setPriceMax] = useState(100000)
   const [sortBy, setSortBy] = useState('newest')
   const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [viewMode, setViewMode] = useState('grid')
+  
   const pageSize = 12
 
+  // Load categories on mount
   useEffect(() => {
     loadCategories()
-    loadProducts()
   }, [])
 
+  // Load products when filters change
   useEffect(() => {
     loadProducts()
-  }, [selectedCategory, priceRange, sortBy, page])
+  }, [selectedCategory, priceMin, priceMax, sortBy, page])
 
   const loadCategories = async () => {
     try {
@@ -32,6 +36,7 @@ export default function ShopOnline() {
       setCategories(cats)
     } catch (err) {
       console.error('Error loading categories:', err)
+      setError('Failed to load categories')
     }
   }
 
@@ -40,33 +45,38 @@ export default function ShopOnline() {
       setLoading(true)
       setError('')
 
-      let productsData
-
-      if (searchQuery.trim()) {
-        const searchResults = await searchProducts(searchQuery, 100)
-        productsData = {
-          products: searchResults,
-          total: searchResults.length,
-          page: 1,
-          pageSize,
-          totalPages: Math.ceil(searchResults.length / pageSize)
-        }
-      } else {
-        const filters = {
-          category_id: selectedCategory || undefined,
-          min_price: priceRange.min,
-          max_price: priceRange.max
-        }
-
-        productsData = await getProducts(filters, page, pageSize)
+      const filters = {
+        category_id: selectedCategory || undefined,
+        min_price: priceMin,
+        max_price: priceMax
       }
 
-      setProducts(productsData.products)
-      setTotalPages(productsData.totalPages)
-      setPage(1)
+      const result = await getProducts(filters, page, pageSize)
+      
+      let productsToSort = [...result.products]
+      
+      // Apply sorting
+      productsToSort = productsToSort.sort((a, b) => {
+        switch (sortBy) {
+          case 'price_low':
+            return (a.final_price || a.base_price) - (b.final_price || b.base_price)
+          case 'price_high':
+            return (b.final_price || b.base_price) - (a.final_price || a.base_price)
+          case 'rating':
+            return (b.rating || 0) - (a.rating || 0)
+          case 'bestseller':
+            return (b.sales_count || 0) - (a.sales_count || 0)
+          case 'newest':
+          default:
+            return new Date(b.created_at) - new Date(a.created_at)
+        }
+      })
+
+      setProducts(productsToSort)
     } catch (err) {
       console.error('Error loading products:', err)
-      setError('Failed to load products. Please try again.')
+      setError('Failed to load products')
+      setProducts([])
     } finally {
       setLoading(false)
     }
@@ -75,31 +85,29 @@ export default function ShopOnline() {
   const handleSearch = (e) => {
     e.preventDefault()
     setPage(1)
+    // Apply search filter by filtering products locally
     loadProducts()
   }
 
   const handleResetFilters = () => {
     setSearchQuery('')
     setSelectedCategory('')
-    setPriceRange({ min: 0, max: 100000 })
+    setPriceMin(0)
+    setPriceMax(100000)
     setSortBy('newest')
     setPage(1)
   }
 
-  const filteredAndSortedProducts = [...products].sort((a, b) => {
-    switch (sortBy) {
-      case 'price_low_high':
-        return a.final_price - b.final_price
-      case 'price_high_low':
-        return b.final_price - a.final_price
-      case 'rating':
-        return b.rating - a.rating
-      case 'bestseller':
-        return b.sales_count - a.sales_count
-      case 'newest':
-      default:
-        return new Date(b.created_at) - new Date(a.created_at)
-    }
+  // Filter products based on search query
+  const filteredProducts = products.filter(product => {
+    if (!searchQuery.trim()) return true
+    const query = searchQuery.toLowerCase()
+    return (
+      product.name?.toLowerCase().includes(query) ||
+      product.brand?.toLowerCase().includes(query) ||
+      product.sku?.toLowerCase().includes(query) ||
+      product.description?.toLowerCase().includes(query)
+    )
   })
 
   const getPrimaryImage = (product) => {
@@ -107,47 +115,58 @@ export default function ShopOnline() {
       return 'https://via.placeholder.com/300x300?text=No+Image'
     }
     const primaryImage = product.shop_product_images.find(img => img.is_primary)
-    return primaryImage?.image_url || product.shop_product_images[0]?.image_url || 'https://via.placeholder.com/300x300?text=No+Image'
+    return primaryImage?.image_url || product.shop_product_images[0]?.image_url
+  }
+
+  const getPrice = (product) => {
+    return product.final_price || product.selling_price || product.base_price || 0
+  }
+
+  const getOriginalPrice = (product) => {
+    if (product.discount_percentage > 0 || product.discount_amount > 0) {
+      return product.base_price || 0
+    }
+    return null
   }
 
   return (
-    <div className="shop-online-container">
-      <div className="shop-header">
+    <div className="shop-container">
+      <div className="shop-header-section">
         <h1>Shop Online</h1>
         <p>Browse our extensive collection of quality products</p>
       </div>
 
-      <div className="shop-content">
-        {/* Sidebar Filters */}
+      <div className="shop-wrapper">
+        {/* Sidebar */}
         <aside className="shop-sidebar">
-          <div className="filter-section">
+          <div className="sidebar-section filters-header">
             <h3>Filters</h3>
-            <button className="reset-filters-btn" onClick={handleResetFilters}>
-              Reset All Filters
+            <button className="btn-reset" onClick={handleResetFilters}>
+              Reset All
             </button>
           </div>
 
           {/* Search */}
-          <div className="filter-group">
-            <h4>Search Products</h4>
-            <form onSubmit={handleSearch}>
+          <div className="filter-block">
+            <h4>Search</h4>
+            <form onSubmit={handleSearch} className="search-form">
               <input
                 type="text"
-                placeholder="Search by name, brand..."
+                placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-input"
               />
-              <button type="submit" className="search-btn">Search</button>
+              <button type="submit" className="btn-search">Search</button>
             </form>
           </div>
 
           {/* Categories */}
           {categories.length > 0 && (
-            <div className="filter-group">
+            <div className="filter-block">
               <h4>Categories</h4>
-              <div className="category-filter">
-                <label>
+              <div className="category-list">
+                <label className="category-item">
                   <input
                     type="radio"
                     name="category"
@@ -158,11 +177,10 @@ export default function ShopOnline() {
                       setPage(1)
                     }}
                   />
-                  All Categories
+                  <span>All Categories</span>
                 </label>
-
                 {categories.map(cat => (
-                  <label key={cat.id}>
+                  <label key={cat.id} className="category-item">
                     <input
                       type="radio"
                       name="category"
@@ -173,7 +191,7 @@ export default function ShopOnline() {
                         setPage(1)
                       }}
                     />
-                    {cat.name}
+                    <span>{cat.name}</span>
                   </label>
                 ))}
               </div>
@@ -181,37 +199,43 @@ export default function ShopOnline() {
           )}
 
           {/* Price Range */}
-          <div className="filter-group">
+          <div className="filter-block">
             <h4>Price Range</h4>
-            <div className="price-filter">
-              <div className="price-input">
+            <div className="price-inputs">
+              <div className="price-input-group">
                 <label>Min: ₱</label>
                 <input
                   type="number"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange({ ...priceRange, min: parseInt(e.target.value) || 0 })}
-                  className="price-input-field"
+                  value={priceMin}
+                  onChange={(e) => setPriceMin(Math.max(0, parseInt(e.target.value) || 0))}
+                  min="0"
+                  className="price-field"
                 />
               </div>
-              <div className="price-input">
+              <div className="price-input-group">
                 <label>Max: ₱</label>
                 <input
                   type="number"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange({ ...priceRange, max: parseInt(e.target.value) || 100000 })}
-                  className="price-input-field"
+                  value={priceMax}
+                  onChange={(e) => setPriceMax(Math.max(priceMin, parseInt(e.target.value) || 100000))}
+                  min={priceMin}
+                  className="price-field"
                 />
               </div>
             </div>
           </div>
 
           {/* Sort By */}
-          <div className="filter-group">
+          <div className="filter-block">
             <h4>Sort By</h4>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="sort-dropdown"
+            >
               <option value="newest">Newest</option>
-              <option value="price_low_high">Price: Low to High</option>
-              <option value="price_high_low">Price: High to Low</option>
+              <option value="price_low">Price: Low to High</option>
+              <option value="price_high">Price: High to Low</option>
               <option value="rating">Top Rated</option>
               <option value="bestseller">Best Sellers</option>
             </select>
@@ -220,143 +244,111 @@ export default function ShopOnline() {
 
         {/* Main Content */}
         <main className="shop-main">
-          {/* View Mode Toggle */}
+          {/* View Controls */}
           <div className="view-controls">
-            <button
-              className={`view-toggle ${viewMode === 'grid' ? 'active' : ''}`}
-              onClick={() => setViewMode('grid')}
-              title="Grid View"
-            >
-              ⊞ Grid
-            </button>
-            <button
-              className={`view-toggle ${viewMode === 'list' ? 'active' : ''}`}
-              onClick={() => setViewMode('list')}
-              title="List View"
-            >
-              ≡ List
-            </button>
+            <div className="view-buttons">
+              <button
+                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                onClick={() => setViewMode('grid')}
+                title="Grid View"
+              >
+                ⊞ Grid
+              </button>
+              <button
+                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+                title="List View"
+              >
+                ≡ List
+              </button>
+            </div>
+            <div className="results-count">
+              {filteredProducts.length} products found
+            </div>
           </div>
 
+          {/* Error Message */}
           {error && (
-            <div className="error-message">
+            <div className="alert alert-error">
               <p>{error}</p>
             </div>
           )}
 
+          {/* Loading State */}
           {loading ? (
-            <div className="loading-state">
+            <div className="empty-state">
               <p>Loading products...</p>
             </div>
-          ) : filteredAndSortedProducts.length === 0 ? (
+          ) : filteredProducts.length === 0 ? (
             <div className="empty-state">
               <p>No products found matching your criteria.</p>
-              <button onClick={handleResetFilters} className="reset-btn">
-                Clear Filters and Try Again
+              <button onClick={handleResetFilters} className="btn-secondary">
+                Clear Filters
               </button>
             </div>
           ) : (
             <>
-              {/* Products Display */}
-              <div className={`products-${viewMode}`}>
-                {filteredAndSortedProducts.map(product => (
-                  <div key={product.id} className={`product-card ${viewMode}`}>
-                    <Link to={`/shop/product/${product.id}`} className="product-image-link">
-                      <div className="product-image-container">
+              {/* Products Container */}
+              <div className={`products-container products-${viewMode}`}>
+                {filteredProducts.map(product => (
+                  <div key={product.id} className="product-item">
+                    <Link to={`/shop/product/${product.id}`} className="product-link">
+                      <div className="product-image-wrapper">
                         <img
                           src={getPrimaryImage(product)}
                           alt={product.name}
                           className="product-image"
                           onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/300x300?text=Product+Image'
+                            e.target.src = 'https://via.placeholder.com/300x300?text=Product'
                           }}
                         />
-                        {product.is_featured && <span className="badge-featured">Featured</span>}
-                        {product.is_bestseller && <span className="badge-bestseller">Bestseller</span>}
-                        {product.discount_percentage > 0 && (
-                          <span className="badge-discount">-{product.discount_percentage}%</span>
+                        {product.is_featured && <span className="badge badge-featured">Featured</span>}
+                        {product.is_bestseller && <span className="badge badge-bestseller">Bestseller</span>}
+                        {(product.discount_percentage > 0 || product.discount_amount > 0) && (
+                          <span className="badge badge-discount">
+                            {product.discount_percentage > 0 ? `-${product.discount_percentage}%` : 'Sale'}
+                          </span>
                         )}
                       </div>
                     </Link>
 
-                    <div className="product-info">
+                    <div className="product-details">
                       <h3>
-                        <Link to={`/shop/product/${product.id}`}>{product.name}</Link>
+                        <Link to={`/shop/product/${product.id}`}>
+                          {product.name}
+                        </Link>
                       </h3>
 
-                      {product.brand && <p className="brand-name">{product.brand}</p>}
+                      {product.brand && <p className="product-brand">{product.brand}</p>}
 
-                      <div className="product-rating">
-                        {product.rating > 0 ? (
-                          <>
-                            <span className="stars">{'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}</span>
-                            <span className="rating-count">({product.review_count})</span>
-                          </>
-                        ) : (
-                          <span className="no-reviews">No reviews yet</span>
-                        )}
-                      </div>
-
-                      {viewMode === 'list' && product.description && (
-                        <p className="product-description">{product.description.substring(0, 100)}...</p>
+                      {product.rating > 0 && (
+                        <div className="product-rating">
+                          <span className="stars">{'★'.repeat(Math.round(product.rating))}{'☆'.repeat(5 - Math.round(product.rating))}</span>
+                          <span className="review-count">({product.review_count})</span>
+                        </div>
                       )}
 
-                      <div className="product-price">
-                        {product.discount_percentage > 0 ? (
+                      {viewMode === 'list' && product.description && (
+                        <p className="product-desc">{product.description.substring(0, 100)}...</p>
+                      )}
+
+                      <div className="product-price-section">
+                        {getOriginalPrice(product) ? (
                           <>
-                            <span className="original-price">₱{product.base_price.toLocaleString('en-PH', { maximumFractionDigits: 2 })}</span>
-                            <span className="sale-price">₱{product.final_price.toLocaleString('en-PH', { maximumFractionDigits: 2 })}</span>
+                            <span className="price-original">₱{getOriginalPrice(product).toLocaleString()}</span>
+                            <span className="price-current">₱{getPrice(product).toLocaleString()}</span>
                           </>
                         ) : (
-                          <span className="price">₱{product.final_price.toLocaleString('en-PH', { maximumFractionDigits: 2 })}</span>
+                          <span className="price-current">₱{getPrice(product).toLocaleString()}</span>
                         )}
                       </div>
 
-                      <div className="product-actions">
-                        <Link to={`/shop/product/${product.id}`} className="btn-view-details">
-                          View Details
-                        </Link>
-                      </div>
+                      <Link to={`/shop/product/${product.id}`} className="btn-primary btn-view">
+                        View Details
+                      </Link>
                     </div>
                   </div>
                 ))}
-              </div>
-
-              {/* Pagination */}
-              {totalPages > 1 && (
-                <div className="pagination">
-                  <button
-                    onClick={() => setPage(Math.max(1, page - 1))}
-                    disabled={page === 1}
-                    className="pagination-btn"
-                  >
-                    ← Previous
-                  </button>
-
-                  <div className="page-numbers">
-                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
-                      <button
-                        key={p}
-                        onClick={() => setPage(p)}
-                        className={`page-number ${page === p ? 'active' : ''}`}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                  </div>
-
-                  <button
-                    onClick={() => setPage(Math.min(totalPages, page + 1))}
-                    disabled={page === totalPages}
-                    className="pagination-btn"
-                  >
-                    Next →
-                  </button>
-                </div>
-              )}
-
-              <div className="results-info">
-                <p>Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, products.length)} of {products.length} products</p>
               </div>
             </>
           )}
