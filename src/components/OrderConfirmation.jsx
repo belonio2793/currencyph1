@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
 import { getOrderById } from '../lib/shopOrderService'
 import './OrderConfirmation.css'
 
-export default function OrderConfirmation() {
-  const { orderId } = useParams()
+export default function OrderConfirmation({ orderId, onNavigate }) {
   const [order, setOrder] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -68,12 +66,12 @@ export default function OrderConfirmation() {
           </div>
 
           <div className="confirmation-actions">
-            <Link to="/shop" className="btn-continue-shopping">
+            <button onClick={() => onNavigate?.('shop')} className="btn-continue-shopping">
               Continue Shopping
-            </Link>
-            <Link to="/shop/orders" className="btn-view-orders">
+            </button>
+            <button onClick={() => onNavigate?.('shop')} className="btn-view-orders">
               View My Orders
-            </Link>
+            </button>
           </div>
         </div>
       )}
