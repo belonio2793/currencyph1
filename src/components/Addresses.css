@@ -2079,10 +2079,12 @@
 }
 
 .form-group-section {
-  margin-bottom: 20px;
+  margin-bottom: 0;
   min-height: auto;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  gap: 16px;
 }
 
 .group-title {
