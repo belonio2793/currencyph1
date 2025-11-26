@@ -94,7 +94,7 @@
 /* Tab Content Area */
 .addresses-content {
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   background: #f8fafc;
@@ -102,7 +102,7 @@
 
 .addresses-tab-content {
   flex: 1;
-  overflow-y: visible;
+  overflow: visible;
   display: flex;
   flex-direction: column;
   min-height: 0;
