@@ -41,22 +41,22 @@ export async function fetchShippingPorts(filters = {}) {
 /**
  * Fetch shipping ports in a specific region/city with retry logic
  */
-export async function fetchShippingPortsByLocation(city = null, region = null) {
+export async function fetchShippingPortsByLocation(city = null, province = null) {
   try {
     return await executeWithRetry(async () => {
       let query = supabase
         .from('shipping_ports')
         .select('*')
-        .eq('is_public', true)
+        .eq('is_active', true)
 
       if (city) {
         query = query.eq('city', city)
       }
-      if (region && !city) {
-        query = query.eq('region', region)
+      if (province && !city) {
+        query = query.eq('province', province)
       }
 
-      const { data, error } = await query.order('name', { ascending: true })
+      const { data, error } = await query.order('port_name', { ascending: true })
 
       if (error) throw error
       return data || []
