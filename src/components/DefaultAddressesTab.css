@@ -56,7 +56,7 @@
 
 .subtab-content {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.3s ease;
@@ -76,7 +76,7 @@
 /* Ensure property mapper and other components fit properly */
 .subtab-content > * {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: visible;
 }
 
 /* Quick Checkpoint Section */
