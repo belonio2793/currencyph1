@@ -2072,22 +2072,21 @@
 
 .shipping-form,
 .calculator-form {
-  flex: 1;
+  flex: 0 1 auto;
   padding: 24px;
-  overflow-y: auto;
+  overflow-y: visible;
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 100%;
   gap: 20px;
 }
 
 .form-group-section {
   margin-bottom: 0;
-  min-height: auto;
+  height: auto;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 0 1 auto;
   gap: 16px;
 }
 
