@@ -578,6 +578,11 @@ export default function App() {
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
             {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
+            {activeTab === 'shop' && <ShopOnline />}
+            {activeTab === 'shop-product' && currentProductId && <ShopProductDetail />}
+            {activeTab === 'shop-cart' && <ShoppingCart />}
+            {activeTab === 'shop-checkout' && <ShopCheckout />}
+            {activeTab === 'shop-order-confirmation' && currentProductId && <OrderConfirmation />}
           </>
         )}
       </main>
