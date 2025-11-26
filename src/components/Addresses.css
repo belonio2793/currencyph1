@@ -254,9 +254,11 @@
 }
 
 .form-section {
-  margin-bottom: 24px;
+  margin-bottom: 0;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  gap: 16px;
 }
 
 .form-section-title {
