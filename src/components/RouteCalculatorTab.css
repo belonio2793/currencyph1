@@ -650,6 +650,8 @@
 
   .form-group-section {
     padding: 16px;
+    flex: 1;
+    min-height: 150px;
   }
 }
 
