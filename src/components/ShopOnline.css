@@ -510,9 +510,13 @@
     grid-column: 1 / -1;
   }
 
-  .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 15px;
+  .product-item {
+    grid-template-columns: 120px 1fr;
+  }
+
+  .product-link {
+    width: 120px;
+    height: 120px;
   }
 }
 
