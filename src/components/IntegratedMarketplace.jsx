@@ -184,6 +184,24 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
     }
   }
 
+  const fetchExchangeRate = async () => {
+    try {
+      const result = await currencyAPI.convert(1, 'PHP', 'USD')
+      if (result) {
+        setExchangeRate(result.convertedAmount)
+      }
+    } catch (err) {
+      console.error('Error fetching exchange rate:', err)
+      setExchangeRate(null)
+    }
+  }
+
+  const calculateUsdPrice = (phpPrice) => {
+    if (!phpPrice || !exchangeRate) return ''
+    const usd = (parseFloat(phpPrice) * exchangeRate).toFixed(2)
+    return usd
+  }
+
   const toggleFavorite = async (productId) => {
     if (!userId) {
       setActiveTab('profile')
