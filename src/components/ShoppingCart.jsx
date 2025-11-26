@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
 import { useShoppingCart } from '../context/ShoppingCartContext'
 import './ShoppingCart.css'
 
-export default function ShoppingCart() {
+export default function ShoppingCart({ onNavigate }) {
   const { cart, removeItem, updateQuantity, clearCartItems } = useShoppingCart()
-  const navigate = useNavigate()
   const [promoCode, setPromoCode] = useState('')
   const [discount, setDiscount] = useState(0)
 
@@ -35,13 +33,15 @@ export default function ShoppingCart() {
   }
 
   const handleProceedToCheckout = () => {
-    if (cart.items && cart.items.length > 0) {
-      navigate('/shop/checkout')
+    if (cart.items && cart.items.length > 0 && onNavigate) {
+      onNavigate('shop-checkout')
     }
   }
 
   const handleContinueShopping = () => {
-    navigate('/shop')
+    if (onNavigate) {
+      onNavigate('shop')
+    }
   }
 
   return (
@@ -57,9 +57,9 @@ export default function ShoppingCart() {
             <div className="empty-icon">🛒</div>
             <h2>Your cart is empty</h2>
             <p>Add some products to get started!</p>
-            <Link to="/shop" className="btn-continue-shopping">
+            <button onClick={() => onNavigate?.('shop')} className="btn-continue-shopping">
               Continue Shopping
-            </Link>
+            </button>
           </div>
         </div>
       ) : (
@@ -87,9 +87,7 @@ export default function ShoppingCart() {
 
                 <div className="item-details">
                   <h3>
-                    <Link to={`/shop/product/${item.product_id}`}>
-                      {item.product?.name}
-                    </Link>
+                    {item.product?.name}
                   </h3>
                   {item.variant?.option_value && (
                     <p className="variant-info">{item.variant.option_value}</p>
