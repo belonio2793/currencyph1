@@ -247,12 +247,13 @@
 }
 
 .map-view {
-  flex: 1;
+  flex: 1 1 auto;
   display: grid;
   grid-template-columns: 350px 1fr;
   gap: 1px;
   background: #e5e7eb;
   overflow: hidden;
+  min-height: 400px;
 }
 
 .map-sidebar {
