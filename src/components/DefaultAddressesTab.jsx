@@ -98,7 +98,7 @@ export default function DefaultAddressesTab({ userId, onClose }) {
           </div>
         )}
 
-        {activeSubTab === 'properties' && (
+        {activeSubTab === 'properties' && userId ? (
           <PropertyMapper
             key={refreshKey}
             userId={userId}
@@ -106,7 +106,21 @@ export default function DefaultAddressesTab({ userId, onClose }) {
             allowDelete={true}
             showShippingPorts={false}
           />
-        )}
+        ) : activeSubTab === 'properties' ? (
+          <div className="property-mapper-container">
+            <div className="mapper-sidebar" style={{ flex: '1 1 30%' }}>
+              <div className="sidebar-empty">
+                <div className="empty-state-content">
+                  <p className="empty-title">Login to view properties</p>
+                  <p className="empty-subtitle">Sign in to see and manage your properties</p>
+                  <a href="/login" className="btn-primary" style={{ marginTop: '16px', display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+                    Sign In Now
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {activeSubTab === 'generate' && (
           <ShippingLabelGenerator
