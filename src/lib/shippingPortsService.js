@@ -160,7 +160,7 @@ export async function getShippingPortCities() {
       const { data, error } = await supabase
         .from('shipping_ports')
         .select('city')
-        .eq('is_public', true)
+        .eq('is_active', true)
         .order('city', { ascending: true })
 
       if (error) {
@@ -169,7 +169,7 @@ export async function getShippingPortCities() {
       }
 
       // Get unique cities
-      const uniqueCities = [...new Set(data.map(item => item.city))]
+      const uniqueCities = [...new Set(data.map(item => item.city).filter(Boolean))]
       return uniqueCities
     }, 3)
   } catch (err) {
