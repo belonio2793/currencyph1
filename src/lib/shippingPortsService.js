@@ -248,7 +248,7 @@ export async function getShippingPortStats() {
       const { data, error } = await supabase
         .from('shipping_ports')
         .select('*')
-        .eq('is_public', true)
+        .eq('is_active', true)
 
       if (error) {
         console.error('Error fetching port stats - Status:', error.status, 'Message:', error.message, 'Details:', error)
@@ -257,11 +257,11 @@ export async function getShippingPortStats() {
 
       const stats = {
         totalPorts: data.length,
-        activePortsCount: data.filter(p => p.status === 'active').length,
+        activePortsCount: data.filter(p => p.is_active).length,
         internationalPorts: data.filter(p => p.port_type === 'international').length,
         domesticPorts: data.filter(p => p.port_type === 'domestic').length,
         uniqueCities: [...new Set(data.map(p => p.city))].length,
-        uniqueRegions: [...new Set(data.map(p => p.region).filter(Boolean))].length,
+        uniqueRegions: [...new Set(data.map(p => p.province).filter(Boolean))].length,
         totalCapacity: data.reduce((sum, p) => sum + (p.annual_capacity_teu || 0), 0)
       }
 
