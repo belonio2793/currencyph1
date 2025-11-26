@@ -7,7 +7,7 @@ import PackageCheckpointMap from './PackageCheckpointMap'
 import { supabase } from '../lib/supabaseClient'
 import './DefaultAddressesTab.css'
 
-export default function DefaultAddressesTab({ userId, onClose }) {
+export default function DefaultAddressesTab({ userId, onClose, onShowAuth }) {
   const [refreshKey, setRefreshKey] = useState(0)
   const [activeSubTab, setActiveSubTab] = useState('properties')
   const [addresses, setAddresses] = useState([])
