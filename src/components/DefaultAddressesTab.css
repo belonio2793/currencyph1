@@ -56,13 +56,13 @@
 }
 
 .subtab-content {
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   overflow-y: visible;
   display: flex;
   flex-direction: column;
   animation: fadeIn 0.3s ease;
   width: 100%;
-  height: auto;
+  height: 100%;
 }
 
 @keyframes fadeIn {
