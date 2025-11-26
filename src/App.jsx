@@ -579,7 +579,10 @@ export default function App() {
             {activeTab === 'about' && <About />}
             {activeTab === 'inbox' && <Inbox userId={userId} />}
             {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
-            {activeTab === 'shop' && <ShopOnline />}
+            {activeTab === 'shop' && <ShopOnline onProductSelect={(productId) => {
+              setCurrentProductId(productId)
+              setActiveTab('shop-product')
+            }} />}
             {activeTab === 'shop-product' && currentProductId && <ShopProductDetail />}
             {activeTab === 'shop-cart' && <ShoppingCart />}
             {activeTab === 'shop-checkout' && <ShopCheckout />}
