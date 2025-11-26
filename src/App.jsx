@@ -179,6 +179,12 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Direct /addresses route should activate addresses tab
+    if (path === '/addresses') {
+      setActiveTab('addresses')
+      setShowAuth(false)
+    }
+
     // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
