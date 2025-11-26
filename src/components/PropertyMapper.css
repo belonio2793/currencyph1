@@ -5,6 +5,8 @@
   width: 100%;
   background: #f8fafc;
   gap: 0;
+  flex: 1;
+  min-height: 600px;
 }
 
 .map-section {
