@@ -394,6 +394,9 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
+    if (name === 'price' && value) {
+      setUsdPrice(calculateUsdPrice(value))
+    }
     if (formErrors[name]) {
       setFormErrors(prev => ({ ...prev, [name]: '' }))
     }
