@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
 import L from 'leaflet'
+import { getSafeErrorMessage, logErrorSafely } from '../lib/safeErrorHandler'
 import './ShippingTrackingTab.css'
 
 delete L.Icon.Default.prototype._getIconUrl
