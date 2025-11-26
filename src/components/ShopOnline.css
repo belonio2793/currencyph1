@@ -465,13 +465,13 @@
   line-height: 1.3;
 }
 
-.product-details h3 a {
-  color: #1a1a1a;
-  text-decoration: none;
+.product-name-link {
+  cursor: pointer;
   transition: color 0.2s;
+  color: #1a1a1a;
 }
 
-.product-details h3 a:hover {
+.product-name-link:hover {
   color: #3b82f6;
 }
 
