@@ -186,21 +186,21 @@ export async function getShippingPortRegions() {
     return await executeWithRetry(async () => {
       const { data, error } = await supabase
         .from('shipping_ports')
-        .select('region')
-        .eq('is_public', true)
-        .order('region', { ascending: true })
+        .select('province')
+        .eq('is_active', true)
+        .order('province', { ascending: true })
 
       if (error) {
-        console.error('Error fetching port regions - Status:', error.status, 'Message:', error.message)
-        throw new Error(`Failed to fetch regions: ${error.message}`)
+        console.error('Error fetching port provinces - Status:', error.status, 'Message:', error.message)
+        throw new Error(`Failed to fetch provinces: ${error.message}`)
       }
 
-      // Get unique regions
-      const uniqueRegions = [...new Set(data.map(item => item.region).filter(Boolean))]
-      return uniqueRegions
+      // Get unique provinces
+      const uniqueProvinces = [...new Set(data.map(item => item.province).filter(Boolean))]
+      return uniqueProvinces
     }, 3)
   } catch (err) {
-    console.error('Error fetching port regions:', err.message || err)
+    console.error('Error fetching port provinces:', err.message || err)
     return []
   }
 }
