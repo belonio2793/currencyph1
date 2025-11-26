@@ -757,6 +757,33 @@
     padding: 12px;
   }
 
+  .search-filters-bar {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    gap: 10px;
+  }
+
+  .search-bar-form {
+    flex-direction: column;
+  }
+
+  .search-bar-input,
+  .btn-search-bar {
+    font-size: 0.85rem;
+    padding: 8px;
+    width: 100%;
+  }
+
+  .quick-filter-select {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  .btn-reset-bar {
+    font-size: 0.8rem;
+    padding: 8px 12px;
+  }
+
   .results-header {
     margin-bottom: 15px;
     padding-bottom: 15px;
