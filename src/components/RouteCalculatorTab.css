@@ -670,7 +670,13 @@
   }
 
   .form-group-section {
-    margin-bottom: 16px;
+    margin-bottom: 0;
+    flex: 1;
+    min-height: 120px;
+  }
+
+  .calculator-form {
+    gap: 12px;
   }
 
   .route-map-section {
