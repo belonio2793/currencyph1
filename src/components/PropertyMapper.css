@@ -77,6 +77,13 @@
   align-items: stretch;
   z-index: 1;
   height: 100%;
+  width: 100%;
+  min-height: 400px;
+}
+
+.map-container .leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
 }
 
 .map-overlay-controls {
