@@ -7,6 +7,11 @@ export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
   useEffect(() => {
     if (initialTab) setActiveTab(initialTab)
   }, [initialTab])
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   const [identifier, setIdentifier] = useState('') // email or phone or 'guest'
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
