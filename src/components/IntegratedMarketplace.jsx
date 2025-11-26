@@ -559,11 +559,26 @@ export default function IntegratedMarketplace({ userId, setActiveTab, setCurrent
                     className="price-input"
                   />
                 </div>
-                {exchangeRate && (priceRange.min > 0 || priceRange.max > 0) && (
-                  <div style={{ marginTop: '8px', fontSize: '12px', color: '#667eea' }}>
-                    {priceRange.min > 0 && `≈ $${(priceRange.min * exchangeRate).toFixed(2)}`}
-                    {priceRange.min > 0 && priceRange.max > 0 && ' - '}
-                    {priceRange.max > 0 && `$${(priceRange.max * exchangeRate).toFixed(2)} USD`}
+                {exchangeRate && (
+                  <div style={{
+                    marginTop: '12px',
+                    padding: '10px 12px',
+                    backgroundColor: '#f0f4ff',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    color: '#667eea',
+                    fontWeight: '500',
+                    border: '1px solid #e0e8ff'
+                  }}>
+                    {priceRange.min > 0 || priceRange.max > 0 ? (
+                      <>
+                        {priceRange.min > 0 && `≈ $${(priceRange.min * exchangeRate).toFixed(2)}`}
+                        {priceRange.min > 0 && priceRange.max > 0 && ' - '}
+                        {priceRange.max > 0 && `$${(priceRange.max * exchangeRate).toFixed(2)} USD`}
+                      </>
+                    ) : (
+                      `≈ $0.00 - $${(100000 * exchangeRate).toFixed(2)} USD`
+                    )}
                   </div>
                 )}
               </div>
