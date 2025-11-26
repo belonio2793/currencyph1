@@ -1,10 +1,11 @@
 .shipping-tracking-tab {
   width: 100%;
-  height: auto;
+  height: 100%;
   overflow: visible;
   background: #f8fafc;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .page-title {
