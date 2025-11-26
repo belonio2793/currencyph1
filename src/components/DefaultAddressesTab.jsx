@@ -119,26 +119,56 @@ export default function DefaultAddressesTab({ userId, onClose }) {
         )}
 
         {activeSubTab === 'generate' && (
-          <ShippingLabelGenerator
-            userId={userId}
-            addresses={addresses}
-          />
+          userId ? (
+            <ShippingLabelGenerator
+              userId={userId}
+              addresses={addresses}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to generate labels</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to create shipping labels</p>
+              <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+                Sign In Now
+              </a>
+            </div>
+          )
         )}
 
         {activeSubTab === 'scan' && (
-          <BarcodeScanner
-            userId={userId}
-            onCheckpointAdded={() => {
-              // Refresh tracking data
-            }}
-          />
+          userId ? (
+            <BarcodeScanner
+              userId={userId}
+              onCheckpointAdded={() => {
+                // Refresh tracking data
+              }}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to scan barcodes</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to track package checkpoints</p>
+              <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+                Sign In Now
+              </a>
+            </div>
+          )
         )}
 
         {activeSubTab === 'track' && (
-          <PackageTracker
-            userId={userId}
-            onViewMap={(trackingCode) => setViewingMapForTrackingCode(trackingCode)}
-          />
+          userId ? (
+            <PackageTracker
+              userId={userId}
+              onViewMap={(trackingCode) => setViewingMapForTrackingCode(trackingCode)}
+            />
+          ) : (
+            <div style={{ padding: '40px 20px', textAlign: 'center' }}>
+              <p style={{ fontSize: '18px', marginBottom: '12px' }}>Login to track packages</p>
+              <p style={{ color: '#666', marginBottom: '20px' }}>Sign in to view your package tracking</p>
+              <a href="/login" style={{ display: 'inline-block', padding: '10px 20px', backgroundColor: '#3b82f6', color: 'white', borderRadius: '4px', textDecoration: 'none' }}>
+                Sign In Now
+              </a>
+            </div>
+          )
         )}
       </div>
     </div>
