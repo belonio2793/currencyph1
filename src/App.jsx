@@ -598,7 +598,6 @@ export default function App() {
               <ul className="space-y-3 text-sm">
                 <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
                 <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Multi-Currency</a></li>
               </ul>
             </div>
             <div>
