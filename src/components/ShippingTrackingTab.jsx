@@ -643,7 +643,7 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
                               })}
                             </div>
                             <div className="history-status">{entry.status}</div>
-                            {entry.location && <div className="history-location">📍 {entry.location}</div>}
+                            {entry.location && <div className="history-location">[Location] {entry.location}</div>}
                             {entry.notes && <div className="history-notes">{entry.notes}</div>}
                           </div>
                         ))}
