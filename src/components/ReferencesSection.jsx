@@ -142,7 +142,7 @@ export default function ReferencesSection({ applicationId, onNext, onBack, loadi
                   {item.years_known && ` • ${item.years_known} ${item.years_known == 1 ? 'year' : 'years'}`}
                 </p>
                 {!item.can_be_contacted && (
-                  <p className="warning">⚠️ Permission not granted to contact</p>
+                  <p className="warning">[Warning] Permission not granted to contact</p>
                 )}
               </div>
               <div className="item-actions">

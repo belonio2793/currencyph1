@@ -175,7 +175,7 @@ export default function LoanProgressTracker({ loanId, userId, onClose }) {
           {/* Penalties Warning */}
           {totalPenalties > 0 && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-              <p className="font-semibold text-red-900 mb-1">⚠️ Late Payment Penalties</p>
+              <p className="font-semibold text-red-900 mb-1">[Warning] Late Payment Penalties</p>
               <p className="text-sm text-red-700">
                 Total penalties: {totalPenalties.toFixed(2)} {loan.currency_code}
               </p>

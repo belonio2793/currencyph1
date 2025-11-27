@@ -80,7 +80,7 @@ export default function ActiveJobCard({ job, userId }) {
       {isOverdue && (
         <div className="mb-4 bg-red-50 border border-red-200 rounded p-3">
           <p className="text-xs text-red-700 font-semibold">
-            ⚠️ Deadline has passed
+            [Warning] Deadline has passed
           </p>
         </div>
       )}

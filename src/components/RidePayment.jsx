@@ -240,7 +240,7 @@ export default function RidePayment({
                 />
                 {parseFloat(customOfferAmount) < finalPrice && (
                   <p className="text-xs text-orange-600">
-                    ⚠️ Drivers may decline offers below the estimated fare
+                    [Warning] Drivers may decline offers below the estimated fare
                   </p>
                 )}
                 <button
