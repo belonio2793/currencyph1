@@ -7,6 +7,8 @@ import ShippingLabelGenerator from './ShippingLabelGenerator'
 import BarcodeScanner from './BarcodeScanner'
 import PackageTracker from './PackageTracker'
 import PackageCheckpointMap from './PackageCheckpointMap'
+import ShippingRouteManager from './ShippingRouteManager'
+import NetworkOrdersDashboard from './NetworkOrdersDashboard'
 import './ShippingTrackingTab.css'
 
 delete L.Icon.Default.prototype._getIconUrl
