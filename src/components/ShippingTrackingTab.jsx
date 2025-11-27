@@ -35,38 +35,6 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
   const [mapInstance, setMapInstance] = useState(null)
   const [showLegend, setShowLegend] = useState(false)
 
-  const handlePropertyAdded = () => {
-    setRefreshKey(prev => prev + 1)
-    loadAddresses()
-  }
-
-  // Load addresses for shipping label form
-  useEffect(() => {
-    if (userId) {
-      loadAddresses()
-    }
-  }, [userId])
-
-  const loadAddresses = async () => {
-    try {
-      setLoadingAddresses(true)
-      const { data, error } = await supabase
-        .from('addresses')
-        .select('*')
-        .eq('user_id', userId)
-        .not('addresses_latitude', 'is', null)
-        .not('addresses_longitude', 'is', null)
-
-      if (!error) {
-        setAddresses(data || [])
-      }
-    } catch (err) {
-      console.error('Error loading addresses:', err)
-    } finally {
-      setLoadingAddresses(false)
-    }
-  }
-
   const [formData, setFormData] = useState({
     tracking_number: '',
     package_weight: '',
