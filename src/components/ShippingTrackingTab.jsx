@@ -259,7 +259,6 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
           userId ? (
             <ShippingLabelGenerator
               userId={userId}
-              addresses={addresses}
             />
           ) : (
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
@@ -366,7 +365,7 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
                       className="btn-map-resize"
                       title="Decrease map size"
                     >
-                      −
+                      ��
                     </button>
                     <button
                       onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
