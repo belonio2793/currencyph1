@@ -245,6 +245,72 @@ export default function PackageTracker({ userId, onViewMap }) {
 
       {error && <div className="alert alert-error">{error}</div>}
 
+      {/* Properties Map Section - Moved to Top */}
+      <div className="properties-map-section">
+        <div className="map-header">
+          <div className="map-header-content">
+            <h4>Properties Map</h4>
+            <p className="map-subtitle">View all your properties across the Philippines</p>
+          </div>
+          <button
+            onClick={() => setShowPropertiesMap(!showPropertiesMap)}
+            className="btn-legend-toggle"
+            title={showPropertiesMap ? 'Hide map' : 'Show map'}
+          >
+            {showPropertiesMap ? 'Hide Map Controls' : 'Show Map Controls'}
+          </button>
+        </div>
+
+        {showPropertiesMap && (
+          <div className="map-container properties-map-container">
+            {properties && properties.length > 0 ? (
+              <MapContainer
+                ref={propertiesMapRef}
+                center={propertiesMapCenter}
+                zoom={propertiesZoom}
+                style={{ height: '100%', width: '100%' }}
+                attributionControl={false}
+              >
+                <TileLayer
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                />
+                {properties.map(property => (
+                  property.addresses_latitude && property.addresses_longitude && (
+                    <Marker
+                      key={property.id}
+                      position={[
+                        parseFloat(property.addresses_latitude),
+                        parseFloat(property.addresses_longitude)
+                      ]}
+                    >
+                      <Popup>
+                        <div className="property-popup">
+                          <strong>{property.addresses_address}</strong>
+                          <br />
+                          <small>{property.property_type || 'Property'}</small>
+                          <br />
+                          <small className="coordinates">
+                            {property.addresses_latitude.toFixed(6)}, {property.addresses_longitude.toFixed(6)}
+                          </small>
+                        </div>
+                      </Popup>
+                    </Marker>
+                  )
+                ))}
+              </MapContainer>
+            ) : (
+              <div className="map-container properties-map-container">
+                <div className="empty-properties-message">
+                  <p>No properties with location data yet</p>
+                  <p className="subtitle">Add properties with coordinates to see them on the map</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <form onSubmit={handleSearch} className="search-box">
         <input
           type="text"
@@ -535,72 +601,6 @@ export default function PackageTracker({ userId, onViewMap }) {
           </button>
         </div>
       )}
-
-      {/* Properties Map Section */}
-      <div className="properties-map-section">
-        <div className="map-header">
-          <div className="map-header-content">
-            <h4>Properties Map</h4>
-            <p className="map-subtitle">View all your properties across the Philippines</p>
-          </div>
-          <button
-            onClick={() => setShowPropertiesMap(!showPropertiesMap)}
-            className="btn-legend-toggle"
-            title={showPropertiesMap ? 'Hide map' : 'Show map'}
-          >
-            {showPropertiesMap ? 'Hide Map Controls' : 'Show Map Controls'}
-          </button>
-        </div>
-
-        {showPropertiesMap && (
-          <div className="map-container properties-map-container">
-            {properties && properties.length > 0 ? (
-              <MapContainer
-                ref={propertiesMapRef}
-                center={propertiesMapCenter}
-                zoom={propertiesZoom}
-                style={{ height: '100%', width: '100%' }}
-                attributionControl={false}
-              >
-                <TileLayer
-                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                />
-                {properties.map(property => (
-                  property.addresses_latitude && property.addresses_longitude && (
-                    <Marker
-                      key={property.id}
-                      position={[
-                        parseFloat(property.addresses_latitude),
-                        parseFloat(property.addresses_longitude)
-                      ]}
-                    >
-                      <Popup>
-                        <div className="property-popup">
-                          <strong>{property.addresses_address}</strong>
-                          <br />
-                          <small>{property.property_type || 'Property'}</small>
-                          <br />
-                          <small className="coordinates">
-                            {property.addresses_latitude.toFixed(6)}, {property.addresses_longitude.toFixed(6)}
-                          </small>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  )
-                ))}
-              </MapContainer>
-            ) : (
-              <div className="map-container properties-map-container">
-                <div className="empty-properties-message">
-                  <p>No properties with location data yet</p>
-                  <p className="subtitle">Add properties with coordinates to see them on the map</p>
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
     </div>
   )
 }
