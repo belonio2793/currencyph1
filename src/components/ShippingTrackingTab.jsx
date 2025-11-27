@@ -365,7 +365,7 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
                       className="btn-map-resize"
                       title="Decrease map size"
                     >
-                      ��
+                      -
                     </button>
                     <button
                       onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
