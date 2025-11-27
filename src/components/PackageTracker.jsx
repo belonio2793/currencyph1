@@ -39,6 +39,7 @@ const createMarkerIcon = (type = 'checkpoint') => {
 
 export default function PackageTracker({ userId, onViewMap }) {
   const mapRef = useRef(null)
+  const propertiesMapRef = useRef(null)
   const [allLabels, setAllLabels] = useState([])
   const [selectedLabel, setSelectedLabel] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
@@ -49,6 +50,10 @@ export default function PackageTracker({ userId, onViewMap }) {
   const [viewMode, setViewMode] = useState('list')
   const [filterStatus, setFilterStatus] = useState('all')
   const [mapInstance, setMapInstance] = useState(null)
+  const [properties, setProperties] = useState([])
+  const [propertiesZoom, setPropertiesZoom] = useState(6)
+  const [propertiesMapCenter, setPropertiesMapCenter] = useState([12.8797, 121.7740])
+  const [showPropertiesMap, setShowPropertiesMap] = useState(true)
 
   // Load all shipping labels
   useEffect(() => {
