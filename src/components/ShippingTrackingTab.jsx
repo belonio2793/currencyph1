@@ -5,10 +5,10 @@ import L from 'leaflet'
 import { getSafeErrorMessage, logErrorSafely } from '../lib/safeErrorHandler'
 import ShippingLabelGenerator from './ShippingLabelGenerator'
 import BarcodeScanner from './BarcodeScanner'
-import PackageTracker from './PackageTracker'
 import PackageCheckpointMap from './PackageCheckpointMap'
 import ShippingRouteManager from './ShippingRouteManager'
 import NetworkOrdersDashboard from './NetworkOrdersDashboard'
+import TrackPackageTab from './TrackPackageTab'
 import './ShippingTrackingTab.css'
 
 delete L.Icon.Default.prototype._getIconUrl
