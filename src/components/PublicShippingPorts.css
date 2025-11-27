@@ -573,9 +573,9 @@
 
 .view-toggle-btn {
   padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: #f3f4f6;
+  color: #6b7280;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 500;
@@ -585,14 +585,15 @@
 }
 
 .view-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: #e5e7eb;
+  border-color: #d1d5db;
+  color: #374151;
 }
 
 .view-toggle-btn.active {
-  background: white;
-  color: #374151;
-  border-color: white;
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
 }
 
 /* List View Container */
