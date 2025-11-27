@@ -267,7 +267,7 @@ export default function LoanDetailsModal({ loan, userId, onClose, onSubmitOffer 
                   {!isViewingOwnLoan && !hasAcceptedOffer && (
                     <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-xs text-blue-800">
-                        ℹ️ Full contact details will be shared once an offer is accepted.
+                        [Info] Full contact details will be shared once an offer is accepted.
                       </p>
                     </div>
                   )}
