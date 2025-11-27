@@ -307,7 +307,7 @@ export default function HeaderMap({ userId: headerUserId }) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4v2m0-10a9 9 0 110-18 9 9 0 010 18z" />
                 </svg>
                 <div className="text-xs text-amber-900">
-                  <p className="font-semibold mb-1">⚠️ Location Accuracy Notice</p>
+                  <p className="font-semibold mb-1">[Warning] Location Accuracy Notice</p>
                   <p>Your location may not always be 100% accurate due to GPS limitations, network factors, or device settings. If your location appears incorrect, you can <span className="font-medium">drag the pin on the map</span> to your actual location before sending it.</p>
                 </div>
               </div>
