@@ -59,8 +59,27 @@ export default function PackageTracker({ userId, onViewMap }) {
   useEffect(() => {
     if (userId) {
       loadLabels()
+      loadProperties()
     }
   }, [userId])
+
+  // Load properties from addresses table
+  const loadProperties = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('addresses')
+        .select('*')
+        .eq('user_id', userId)
+        .not('addresses_latitude', 'is', null)
+        .not('addresses_longitude', 'is', null)
+
+      if (!error) {
+        setProperties(data || [])
+      }
+    } catch (err) {
+      console.error('Error loading properties:', err)
+    }
+  }
 
   // Update map when selected label changes
   useEffect(() => {
