@@ -957,7 +957,7 @@ export default function MyAddressesTab({ userId }) {
                 >
                   <Popup>
                     <div className="marker-popup">
-                      <p><strong>📍 Your Location</strong></p>
+                      <p><strong>[Location] Your Location</strong></p>
                       <p>Lat: {currentLocation.latitude.toFixed(4)}</p>
                       <p>Lon: {currentLocation.longitude.toFixed(4)}</p>
                     </div>

@@ -63,7 +63,7 @@ export default function CoinsPhLogin({ onLoginSuccess }) {
             {/* Error Alert */}
             {error && (
               <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded">
-                <p className="text-red-700 font-medium">⚠️ Connection Failed</p>
+                <p className="text-red-700 font-medium">[Warning] Connection Failed</p>
                 <p className="text-red-600 text-sm mt-1">{error}</p>
               </div>
             )}

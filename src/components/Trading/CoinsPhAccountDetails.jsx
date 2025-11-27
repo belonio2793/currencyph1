@@ -126,7 +126,7 @@ export default function CoinsPhAccountDetails({ userId }) {
       <div className="space-y-6">
         <div className="bg-red-50 p-8 rounded-xl border-2 border-red-200">
           <div className="flex items-start gap-4">
-            <div className="text-red-600 text-2xl">⚠️</div>
+            <div className="text-red-600 text-2xl">[!]</div>
             <div className="flex-1">
               <p className="text-red-900 font-bold text-lg mb-2">Error Loading Account</p>
               <p className="text-red-700 mb-4">{error}</p>

@@ -314,7 +314,7 @@ export default function SupremacyFund({ userId }) {
       <h2 className="text-2xl font-bold text-gray-900">Automated Trading Strategies</h2>
       
       <div className="bg-green-50 border-2 border-green-300 rounded-lg p-6 mb-6">
-        <h3 className="text-lg font-semibold text-green-900 mb-2">⚠️ Coming Soon</h3>
+        <h3 className="text-lg font-semibold text-green-900 mb-2">[Warning] Coming Soon</h3>
         <p className="text-green-800">Auto-trading requires coins.ph API connection. Set up your API keys in the Overview tab to enable.</p>
       </div>
 
@@ -334,7 +334,7 @@ export default function SupremacyFund({ userId }) {
         <StrategyCard
           title="Grid Trading"
           description="Place buy/sell orders every 0.5% in a range to profit from volatility"
-          icon="🔲"
+          icon="����"
           features={['Profits from sideways', 'No need to time perfect', 'Passive income']}
         />
         <StrategyCard
