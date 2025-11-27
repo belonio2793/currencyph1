@@ -3,6 +3,7 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet'
 import L from 'leaflet'
 import { supabase } from '../lib/supabaseClient'
 import { logErrorSafely, getSafeErrorMessage } from '../lib/safeErrorHandler'
+import './ShippingTrackingTab.css'
 
 delete L.Icon.Default.prototype._getIconUrl
 L.Icon.Default.mergeOptions({
