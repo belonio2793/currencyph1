@@ -223,6 +223,20 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
           Shipping
         </button>
         <button
+          className={`subtab-btn ${activeSubTab === 'routes' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('routes')}
+          title="Manage Shipping Routes"
+        >
+          Routes
+        </button>
+        <button
+          className={`subtab-btn ${activeSubTab === 'network' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('network')}
+          title="Network Orders Dashboard"
+        >
+          Network Orders
+        </button>
+        <button
           className={`subtab-btn ${activeSubTab === 'generate' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('generate')}
           title="Generate Shipping Labels"
