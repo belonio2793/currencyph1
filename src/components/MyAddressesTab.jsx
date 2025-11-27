@@ -925,6 +925,7 @@ export default function MyAddressesTab({ userId }) {
               style={{ height: '100%', width: '100%' }}
               ref={mapRef}
               attributionControl={false}
+              zoomControl={!showForm && !showHistory}
             >
               {mapLayer === 'street' && (
                 <TileLayer
