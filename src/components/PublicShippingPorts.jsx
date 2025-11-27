@@ -161,7 +161,7 @@ export default function PublicShippingPorts() {
         </div>
         <div style={{ padding: '24px', textAlign: 'center' }}>
           <div style={{ backgroundColor: '#fee2e2', border: '1px solid #fca5a5', color: '#991b1b', padding: '16px', borderRadius: '6px', marginBottom: '16px' }}>
-            <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>⚠️ {error}</p>
+            <p style={{ margin: '0 0 8px 0', fontWeight: '600' }}>[Warning] {error}</p>
             <button
               onClick={loadInitialData}
               style={{ background: '#dc2626', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer', fontWeight: '500' }}

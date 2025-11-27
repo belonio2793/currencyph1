@@ -440,7 +440,7 @@ export default function MapComponent({
                 </svg>
               </div>
               <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#1F2937', marginBottom: '8px' }}>
-                ⚠️ Location Unavailable
+                [Warning] Location Unavailable
               </h3>
               <p style={{ fontSize: '14px', color: '#6B7280', marginBottom: '16px', maxWidth: '320px' }}>
                 {locationError || 'Please enable location services to use this feature'}
