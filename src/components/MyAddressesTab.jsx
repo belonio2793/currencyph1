@@ -1107,7 +1107,7 @@ export default function MyAddressesTab({ userId }) {
                       <span>New Address</span>
                     </div>
                     <div className="legend-item">
-                      <span className="legend-marker-current">📍</span>
+                      <span className="legend-marker-current">[•]</span>
                       <span>Your Location</span>
                     </div>
                   </div>
