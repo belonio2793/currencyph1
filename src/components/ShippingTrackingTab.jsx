@@ -19,9 +19,6 @@ L.Icon.Default.mergeOptions({
 export default function ShippingTrackingTab({ userId, onShowAuth }) {
   const mapRef = useRef(null)
   const [activeSubTab, setActiveSubTab] = useState('shipping')
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [addresses, setAddresses] = useState([])
-  const [loadingAddresses, setLoadingAddresses] = useState(true)
   const [viewingMapForTrackingCode, setViewingMapForTrackingCode] = useState(null)
   const [shipments, setShipments] = useState([])
   const [selectedShipment, setSelectedShipment] = useState(null)
