@@ -343,9 +343,8 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
 
         {activeSubTab === 'track' && (
           userId ? (
-            <PackageTracker
+            <TrackPackageTab
               userId={userId}
-              onViewMap={(trackingCode) => setViewingMapForTrackingCode(trackingCode)}
             />
           ) : (
             <div style={{ padding: '40px 20px', textAlign: 'center' }}>
