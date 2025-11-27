@@ -892,31 +892,33 @@ export default function MyAddressesTab({ userId }) {
             )}
           </div>
           <div className="map-container">
-            <div className="map-overlay-controls">
-              <div className="map-resize-controls">
+            {!showForm && !showHistory && (
+              <div className="map-overlay-controls">
+                <div className="map-resize-controls">
+                  <button
+                    onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
+                    className="btn-map-resize"
+                    title="Decrease map size"
+                  >
+                    −
+                  </button>
+                  <button
+                    onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
+                    className="btn-map-resize"
+                    title="Increase map size"
+                  >
+                    +
+                  </button>
+                </div>
                 <button
-                  onClick={() => setMapHeight(prev => Math.max(prev - 50, 200))}
-                  className="btn-map-resize"
-                  title="Decrease map size"
+                  onClick={() => setShowLegend(!showLegend)}
+                  className="btn-legend-toggle"
+                  title={showLegend ? 'Hide map controls' : 'Show map controls'}
                 >
-                  −
-                </button>
-                <button
-                  onClick={() => setMapHeight(prev => Math.min(prev + 50, 600))}
-                  className="btn-map-resize"
-                  title="Increase map size"
-                >
-                  +
+                  {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
                 </button>
               </div>
-              <button
-                onClick={() => setShowLegend(!showLegend)}
-                className="btn-legend-toggle"
-                title={showLegend ? 'Hide map controls' : 'Show map controls'}
-              >
-                {showLegend ? 'Hide Map Controls' : 'Show Map Controls'}
-              </button>
-            </div>
+            )}
             <MapContainer
               center={mapCenter}
               zoom={zoomLevel}
