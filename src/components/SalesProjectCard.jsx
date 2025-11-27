@@ -59,7 +59,7 @@ export default function SalesProjectCard({
       {/* Urgency Badge */}
       {urgencyLevel === 'critical' && (
         <div className="absolute top-4 right-4 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full animate-pulse">
-          🔥 FILLING FAST
+          [Hot] FILLING FAST
         </div>
       )}
       {urgencyLevel === 'moderate' && (

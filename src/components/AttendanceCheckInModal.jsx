@@ -73,7 +73,7 @@ export default function AttendanceCheckInModal({ onClose, onSubmit, isLoading })
                 onClick={handleGetCurrentLocation}
                 disabled={isLoading || gettingLocation}
               >
-                {gettingLocation ? 'Getting location...' : '📍'}
+                {gettingLocation ? 'Getting location...' : '[GPS]'}
               </button>
             </div>
             {useCurrentLocation && (

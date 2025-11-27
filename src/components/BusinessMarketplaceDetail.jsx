@@ -407,7 +407,7 @@ export default function BusinessMarketplaceDetail({ productId, userId, onBack, s
 
             <div className="seller-info">
               {seller.city_of_registration && (
-                <p>📍 Located in {seller.city_of_registration}</p>
+                <p>[Location] Located in {seller.city_of_registration}</p>
               )}
               <p>Member since {new Date(seller.created_at).getFullYear()}</p>
             </div>
