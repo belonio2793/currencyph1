@@ -1099,7 +1099,7 @@ export default function MyAddressesTab({ userId }) {
                   <label className="legend-label">Legend</label>
                   <div className="legend-items">
                     <div className="legend-item">
-                      <span className="legend-marker-default">📍</span>
+                      <span className="legend-marker-default">[•]</span>
                       <span>Saved Address</span>
                     </div>
                     <div className="legend-item">
@@ -1820,7 +1820,7 @@ export default function MyAddressesTab({ userId }) {
                               <label className="legend-label">Legend</label>
                               <div className="legend-items">
                                 <div className="legend-item">
-                                  <span className="legend-marker-default">📍</span>
+                                  <span className="legend-marker-default">[•]</span>
                                   <span>Selected Location</span>
                                 </div>
                               </div>
