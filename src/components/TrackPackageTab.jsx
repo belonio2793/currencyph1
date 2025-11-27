@@ -23,6 +23,8 @@ export default function TrackPackageTab({ userId }) {
   const [filterStatus, setFilterStatus] = useState('all')
   const [mapCenter, setMapCenter] = useState([12.8797, 121.7740])
   const [zoomLevel, setZoomLevel] = useState(6)
+  const [showLegend, setShowLegend] = useState(false)
+  const [mapHeight, setMapHeight] = useState(400)
 
   useEffect(() => {
     if (userId) {
