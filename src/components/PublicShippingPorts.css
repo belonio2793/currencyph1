@@ -427,6 +427,26 @@
   color: #b45309;
 }
 
+.type-badge.seaport {
+  background: #dbeafe;
+  color: #0c4a6e;
+}
+
+.type-badge.airport {
+  background: #f3e8ff;
+  color: #6b21a8;
+}
+
+.type-badge.inland {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.type-badge.border {
+  background: #fed7aa;
+  color: #92400e;
+}
+
 .port-item-city {
   margin: 4px 0 0 0;
   font-size: 0.75rem;
@@ -663,7 +683,7 @@
 
 .ports-list {
   flex: 1;
-  overflow-y: visible;
+  overflow-y: auto;
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -695,10 +715,48 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.port-card.selected {
+.port-card.expanded {
   border-color: #667eea;
   background: #f0f9ff;
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+.port-header-info {
+  flex: 1;
+}
+
+.port-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.region-text {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.expand-btn {
+  padding: 6px 10px;
+  background: #e5e7eb;
+  border: none;
+  border-radius: 4px;
+  color: #374151;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.expand-btn:hover {
+  background: #d1d5db;
 }
 
 .port-card-header {
@@ -723,27 +781,74 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
-.port-description {
-  margin: 0 0 12px 0;
+.port-basic-info {
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.port-basic-info .info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 0.8125rem;
+}
+
+.port-basic-info .info-row .label {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+.port-basic-info .info-row .value {
+  color: #1f2937;
+  font-weight: 500;
+  text-align: right;
+}
+
+/* Port Details Expanded Section */
+.port-details-expanded {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-section {
+  padding: 12px;
+  background: #f9fafb;
+  border-radius: 6px;
+  border-left: 3px solid #667eea;
+}
+
+.detail-section .description {
+  margin: 0;
   font-size: 0.8125rem;
   line-height: 1.5;
   color: #6b7280;
 }
 
-.port-info-grid {
+.detail-section .section-title {
+  margin: 0 0 8px 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.details-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 8px;
 }
 
-.port-info-item {
+.details-grid .detail-item {
   padding: 8px;
-  background: #f9fafb;
+  background: white;
   border-radius: 4px;
+  border: 1px solid #e5e7eb;
 }
 
-.port-info-item .label {
+.details-grid .detail-item .label {
   display: block;
   font-size: 0.6875rem;
   font-weight: 600;
@@ -753,84 +858,103 @@
   margin-bottom: 2px;
 }
 
-.port-info-item .value {
+.details-grid .detail-item .value {
   display: block;
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 600;
   color: #1f2937;
 }
 
-.port-card-details {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 6px 0;
-  font-size: 0.8125rem;
-}
-
-.detail-row .label {
-  font-weight: 600;
-  color: #6b7280;
-}
-
-.detail-row .value {
-  color: #1f2937;
-  font-weight: 500;
-}
-
-.services-section {
-  margin-top: 12px;
-}
-
-.section-label {
-  display: block;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-
-.services-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
+.services-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
 
-.services-list li {
+.service-badge {
   padding: 6px 8px;
   background: #f0fdf4;
   border-left: 2px solid #22c55e;
   border-radius: 3px;
   font-size: 0.75rem;
   color: #166534;
+  font-weight: 500;
 }
 
-.contact-section {
-  margin-top: 12px;
+.facility-badge {
+  padding: 6px 8px;
+  background: #eff6ff;
+  border-left: 2px solid #3b82f6;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  color: #0c4a6e;
+  font-weight: 500;
 }
 
-.contact-section p {
-  margin: 4px 0;
+.contact-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   font-size: 0.8125rem;
 }
 
-.contact-section a {
-  color: #667eea;
-  text-decoration: none;
+.contact-info p {
+  margin: 0;
+  color: #6b7280;
 }
 
-.contact-section a:hover {
+.contact-info strong {
+  color: #374151;
+  font-weight: 600;
+}
+
+.contact-info a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.contact-info a:hover {
   text-decoration: underline;
+}
+
+.website-link {
+  display: inline-block;
+  padding: 4px 0;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.view-details-modal-btn {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 12px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.view-details-modal-btn:hover {
+  background: #2563eb;
+}
+
+.port-item-info {
+  margin: 4px 0 0 0;
+  font-size: 0.8125rem;
+  color: #6b7280;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 }
 
 .ports-footer {
@@ -841,23 +965,4 @@
   font-size: 0.8125rem;
   color: #6b7280;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-}
-
-/* Scrollbar for list view */
-.ports-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.ports-list::-webkit-scrollbar-track {
-  background: #f3f4f6;
-  border-radius: 3px;
-}
-
-.ports-list::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 3px;
-}
-
-.ports-list::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
 }
