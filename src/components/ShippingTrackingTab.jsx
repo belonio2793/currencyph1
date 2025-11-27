@@ -257,13 +257,6 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
           Shipping
         </button>
         <button
-          className={`subtab-btn ${activeSubTab === 'properties' ? 'active' : ''}`}
-          onClick={() => setActiveSubTab('properties')}
-          title="Manage Properties"
-        >
-          Properties
-        </button>
-        <button
           className={`subtab-btn ${activeSubTab === 'generate' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('generate')}
           title="Generate Shipping Labels"
