@@ -264,7 +264,7 @@ export default function PlanningChat() {
     )
   }
 
-  const showAuthModal = !isAuthenticated || !planningUser || (planningUser && planningUser.status !== 'active')
+  const showAuthModal = !isAuthenticated && (!planningUser || planningUser.status !== 'active')
 
   const defaultMarkers = [
     { id: '1', name: 'Processing Facility 1', latitude: 14.5994, longitude: 120.9842, marker_type: 'facility', status: 'planned' },
