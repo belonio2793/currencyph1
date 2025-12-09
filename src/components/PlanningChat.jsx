@@ -163,15 +163,20 @@ export default function PlanningChat() {
 
   const loadMessages = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('planning_messages')
-        .select('*, planning_users!inner(name, email)')
+        .select('*, planning_users(name, email)')
         .order('created_at', { ascending: true })
         .limit(100)
 
+      if (error) {
+        console.debug('Message loading error (table may not exist yet):', error.code)
+        return
+      }
+
       setMessages(data || [])
     } catch (error) {
-      console.error('Error loading messages:', error)
+      console.debug('Error loading messages:', error?.message)
     }
   }
 
