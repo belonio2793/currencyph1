@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
-import { MapContainer, TileLayer } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
@@ -11,6 +11,21 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
+
+// Map click handler component - captures clicks to create locations
+function MapClickHandler({ isCreating, onLocationClick }) {
+  useMapEvents({
+    click: (e) => {
+      if (isCreating) {
+        onLocationClick({
+          latitude: e.latlng.lat,
+          longitude: e.latlng.lng
+        })
+      }
+    }
+  })
+  return null
+}
 
 export default function PlanningChat() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -30,6 +45,15 @@ export default function PlanningChat() {
   const [authChecked, setAuthChecked] = useState(false)
   const [showProfileSettings, setShowProfileSettings] = useState(false)
   const [editingName, setEditingName] = useState('')
+  const [locations, setLocations] = useState([])
+  const [isCreatingLocation, setIsCreatingLocation] = useState(false)
+  const [showLocationForm, setShowLocationForm] = useState(false)
+  const [locationForm, setLocationForm] = useState({
+    name: '',
+    description: '',
+    latitude: null,
+    longitude: null
+  })
   const messagesEndRef = useRef(null)
 
   // Check auth on mount
@@ -60,6 +84,41 @@ export default function PlanningChat() {
       }
     } catch (error) {
       console.debug('Message subscription error (non-critical):', error?.message)
+      return () => {}
+    }
+  }, [isAuthenticated])
+
+  // Subscribe to locations updates
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    loadLocations()
+
+    try {
+      const channel = supabase
+        .channel('planning_locations')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'planning_locations'
+        }, (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setLocations(prev => [...prev, payload.new])
+          } else if (payload.eventType === 'UPDATE') {
+            setLocations(prev =>
+              prev.map(loc => loc.id === payload.new.id ? payload.new : loc)
+            )
+          } else if (payload.eventType === 'DELETE') {
+            setLocations(prev => prev.filter(loc => loc.id !== payload.old.id))
+          }
+        })
+        .subscribe()
+
+      return () => {
+        try { channel.unsubscribe() } catch (e) { /* ignore */ }
+      }
+    } catch (error) {
+      console.debug('Location subscription error (non-critical):', error?.message)
       return () => {}
     }
   }, [isAuthenticated])
@@ -185,6 +244,29 @@ export default function PlanningChat() {
     }
   }
 
+  const loadLocations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('planning_locations')
+        .select('*')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.code === '42P01') {
+          // Table doesn't exist, that's fine
+          console.debug('planning_locations table not found')
+          return
+        }
+        console.debug('Location loading error:', error.code)
+        return
+      }
+
+      setLocations(data || [])
+    } catch (error) {
+      console.debug('Error loading locations:', error?.message)
+    }
+  }
+
   const handleSignIn = async (e) => {
     e.preventDefault()
     setAuthLoading(true)
@@ -268,6 +350,7 @@ export default function PlanningChat() {
     setPlanningUser(null)
     setMessages([])
     setOnlineUsers([])
+    setLocations([])
   }
 
   const sendMessage = async () => {
@@ -298,6 +381,70 @@ export default function PlanningChat() {
     } catch (error) {
       console.error('Error sending message:', error?.message)
       setMessageInput(messageText)
+    }
+  }
+
+  const handleMapLocationClick = (coords) => {
+    setLocationForm({
+      name: '',
+      description: '',
+      latitude: coords.latitude,
+      longitude: coords.longitude
+    })
+    setShowLocationForm(true)
+  }
+
+  const handleSaveLocation = async (e) => {
+    e.preventDefault()
+    if (!locationForm.name.trim() || !planningUser) return
+
+    try {
+      const { error } = await supabase
+        .from('planning_locations')
+        .insert({
+          planning_user_id: planningUser.id,
+          user_id: userId,
+          name: locationForm.name.trim(),
+          description: locationForm.description.trim(),
+          latitude: locationForm.latitude,
+          longitude: locationForm.longitude
+        })
+
+      if (error) {
+        console.error('Error saving location:', error)
+        setAuthError('Failed to save location')
+        return
+      }
+
+      setShowLocationForm(false)
+      setIsCreatingLocation(false)
+      setLocationForm({
+        name: '',
+        description: '',
+        latitude: null,
+        longitude: null
+      })
+    } catch (error) {
+      console.error('Error saving location:', error?.message)
+      setAuthError('Error saving location')
+    }
+  }
+
+  const handleDeleteLocation = async (locationId) => {
+    try {
+      const { error } = await supabase
+        .from('planning_locations')
+        .delete()
+        .eq('id', locationId)
+
+      if (error) {
+        console.error('Error deleting location:', error)
+        return
+      }
+
+      setLocations(prev => prev.filter(loc => loc.id !== locationId))
+    } catch (error) {
+      console.error('Error deleting location:', error?.message)
     }
   }
 
@@ -373,13 +520,48 @@ export default function PlanningChat() {
 
       <div className="flex-1 flex gap-6 p-6 overflow-hidden">
         {/* Map Section */}
-        <div className="flex-1 rounded-lg overflow-hidden border border-slate-700 bg-slate-800">
-          <MapContainer center={[14.5994, 120.9842]} zoom={12} className="w-full h-full" attributionControl={false}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution=""
-            />
-          </MapContainer>
+        <div className="flex-1 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col">
+          {/* Map Controls */}
+          {isAuthenticated && (
+            <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between">
+              <span className="text-white text-sm font-medium">{locations.length} locations</span>
+              <button
+                onClick={() => {
+                  setIsCreatingLocation(!isCreatingLocation)
+                  if (!isCreatingLocation) setShowLocationForm(false)
+                }}
+                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  isCreatingLocation
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-white'
+                }`}
+              >
+                {isCreatingLocation ? '✓ Click map to add' : '+ Add Location'}
+              </button>
+            </div>
+          )}
+
+          {/* Map Container */}
+          <div className="flex-1 overflow-hidden">
+            <MapContainer center={[14.5994, 120.9842]} zoom={12} className="w-full h-full" attributionControl={false}>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution=""
+              />
+              {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
+              {locations.map(loc => (
+                <Marker key={loc.id} position={[loc.latitude, loc.longitude]}>
+                  <Popup>
+                    <div className="p-2 min-w-48">
+                      <h3 className="font-semibold text-sm">{loc.name}</h3>
+                      {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
+                      <p className="text-xs text-slate-500 mt-2">{loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
+                    </div>
+                  </Popup>
+                </Marker>
+              ))}
+            </MapContainer>
+          </div>
         </div>
 
         {/* Chat Section */}
@@ -528,6 +710,88 @@ export default function PlanningChat() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Location Form Modal */}
+      {showLocationForm && isAuthenticated && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-md bg-slate-800 rounded-lg p-8 border border-slate-700">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Add Location</h2>
+
+            {authError && (
+              <div className="p-3 rounded text-sm bg-red-900 text-red-100 mb-4">
+                {authError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveLocation} className="space-y-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">Location Name</label>
+                <input
+                  type="text"
+                  value={locationForm.name}
+                  onChange={(e) => setLocationForm({ ...locationForm, name: e.target.value })}
+                  placeholder="e.g., Manufacturing Facility A"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">Description (Optional)</label>
+                <textarea
+                  value={locationForm.description}
+                  onChange={(e) => setLocationForm({ ...locationForm, description: e.target.value })}
+                  placeholder="e.g., Primary production facility"
+                  rows="3"
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 resize-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-slate-300 text-sm font-medium mb-2">Latitude</label>
+                  <input
+                    type="number"
+                    value={locationForm.latitude}
+                    disabled
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-slate-400 cursor-not-allowed"
+                    step="0.00001"
+                  />
+                </div>
+                <div>
+                  <label className="block text-slate-300 text-sm font-medium mb-2">Longitude</label>
+                  <input
+                    type="number"
+                    value={locationForm.longitude}
+                    disabled
+                    className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-slate-400 cursor-not-allowed"
+                    step="0.00001"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowLocationForm(false)
+                    setIsCreatingLocation(false)
+                  }}
+                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors"
+                >
+                  Save Location
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
