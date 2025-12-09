@@ -96,29 +96,44 @@ export default function PlanningChat() {
       if (data?.session?.user) {
         setUserId(data.session.user.id)
         setIsAuthenticated(true)
-        loadPlanningUser(data.session.user.id)
+        await loadPlanningUser(data.session.user.id)
+      } else {
+        setIsAuthenticated(false)
       }
     } catch (error) {
       console.error('Auth check error:', error)
+      setIsAuthenticated(false)
     }
   }
 
   const loadPlanningUser = async (uid) => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('planning_users')
         .select('*')
         .eq('user_id', uid)
         .single()
 
+      if (error) {
+        // No planning_user record exists yet - user needs to register
+        setPlanningUser(null)
+        setAuthError('')
+        return
+      }
+
       if (data) {
         setPlanningUser(data)
-        if (data.status !== 'active') {
+        if (data.status === 'pending') {
           setAuthError('Your account is pending approval. Please wait for an administrator to activate your access.')
+        } else if (data.status === 'active') {
+          setAuthError('')
+        } else if (data.status === 'suspended') {
+          setAuthError('Your account has been suspended. Please contact an administrator.')
         }
       }
     } catch (error) {
       console.error('Error loading planning user:', error)
+      setPlanningUser(null)
     }
   }
 
