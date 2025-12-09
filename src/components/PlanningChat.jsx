@@ -282,13 +282,16 @@ export default function PlanningChat() {
           <h1 className="text-2xl font-bold text-white">Planning Group</h1>
           <p className="text-sm text-slate-400">Strategic partner coordination for manufacturing & distribution</p>
         </div>
-        {isAuthenticated && planningUser && (
-          <button
-            onClick={handleSignOut}
-            className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-medium transition-colors"
-          >
-            Sign Out
-          </button>
+        {isAuthenticated && (
+          <div className="flex items-center gap-4">
+            <span className="text-white text-sm">{email || userId?.substring(0, 8)}</span>
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-medium transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
         )}
       </div>
 
