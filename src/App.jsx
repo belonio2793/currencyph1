@@ -455,9 +455,14 @@ export default function App() {
     )
   }
 
+  // Planning page is a standalone fullscreen interface
+  if (activeTab === 'planning') {
+    return <PlanningChat />
+  }
+
   // If content locker is enabled, show a full black 'UNDER DEVELOPMENT' splash
   // unless user is viewing the planning page (which is publicly accessible)
-  if (contentLocked && activeTab !== 'planning') {
+  if (contentLocked) {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
         <div className="w-full max-w-3xl text-center">
