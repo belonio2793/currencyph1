@@ -298,10 +298,10 @@ export default function PlanningChat() {
       <div className="flex-1 flex gap-6 p-6 overflow-hidden">
         {/* Map Section */}
         <div className="flex-1 rounded-lg overflow-hidden border border-slate-700 bg-slate-800">
-          <MapContainer center={[14.5994, 120.9842]} zoom={12} className="w-full h-full">
+          <MapContainer center={[14.5994, 120.9842]} zoom={12} className="w-full h-full" attributionControl={false}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; OpenStreetMap contributors'
+              attribution={null}
             />
             {displayMarkers.map(marker => (
               <Marker
