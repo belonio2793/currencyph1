@@ -456,6 +456,11 @@ export default function App() {
     )
   }
 
+  // Planning Setup page - standalone fullscreen interface
+  if (activeTab === 'planning-setup') {
+    return <PlanningSetup />
+  }
+
   // Planning page is a standalone fullscreen interface
   if (activeTab === 'planning') {
     return <PlanningChat />
