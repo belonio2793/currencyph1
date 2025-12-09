@@ -561,6 +561,7 @@ export default function App() {
             {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
           </>
         )}
+        {activeTab === 'planning' && <Planning />}
         {showAuth ? (
           <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
         ) : (
