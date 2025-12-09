@@ -354,14 +354,6 @@ export default function PlanningChat() {
     )
   }
 
-  if (!planningUser) {
-    return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <div className="text-white">Loading...</div>
-      </div>
-    )
-  }
-
   if (planningUser.status !== 'active') {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
