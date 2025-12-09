@@ -70,15 +70,20 @@ export default function PlanningChat() {
 
     const loadOnlineUsers = async () => {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('planning_users')
           .select('*')
           .eq('status', 'active')
           .order('name', { ascending: true })
 
+        if (error) {
+          console.debug('Online users loading error:', error.code)
+          return
+        }
+
         setOnlineUsers(data || [])
       } catch (error) {
-        console.error('Error loading online users:', error)
+        console.debug('Error loading online users:', error?.message)
       }
     }
 
