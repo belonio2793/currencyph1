@@ -13,6 +13,7 @@ export default function PlanningChat() {
   const [authLoading, setAuthLoading] = useState(false)
 
   const [userId, setUserId] = useState(null)
+  const [userEmail, setUserEmail] = useState('')
   const [planningUser, setPlanningUser] = useState(null)
   const [messages, setMessages] = useState([])
   const [messageInput, setMessageInput] = useState('')
