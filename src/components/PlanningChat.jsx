@@ -187,6 +187,7 @@ export default function PlanningChat() {
       }
 
       setUserId(data.user.id)
+      setUserEmail(data.user.email || '')
       setIsAuthenticated(true)
       loadPlanningUser(data.user.id)
       setEmail('')
