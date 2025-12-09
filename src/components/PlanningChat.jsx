@@ -32,19 +32,26 @@ export default function PlanningChat() {
   useEffect(() => {
     if (!isAuthenticated) return
 
-    const subscription = supabase
-      .from('planning_messages')
-      .on('*', payload => {
-        if (payload.eventType === 'INSERT') {
-          setMessages(prev => [...prev, payload.new])
-        }
-      })
-      .subscribe()
-
     loadMessages()
 
-    return () => {
-      subscription.unsubscribe()
+    try {
+      const channel = supabase
+        .channel('planning_messages')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'planning_messages'
+        }, (payload) => {
+          setMessages(prev => [...prev, payload.new])
+        })
+        .subscribe()
+
+      return () => {
+        try { channel.unsubscribe() } catch (e) { /* ignore */ }
+      }
+    } catch (error) {
+      console.debug('Message subscription error (non-critical):', error?.message)
+      return () => {}
     }
   }, [isAuthenticated])
 
