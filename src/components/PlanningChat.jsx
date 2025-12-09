@@ -18,12 +18,12 @@ export default function PlanningChat() {
   const [messageInput, setMessageInput] = useState('')
   const [onlineCount, setOnlineCount] = useState(0)
   const [markers, setMarkers] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [authChecked, setAuthChecked] = useState(false)
   const messagesEndRef = useRef(null)
 
   // Check auth on mount
   useEffect(() => {
-    checkAuth()
+    checkAuth().finally(() => setAuthChecked(true))
   }, [])
 
   // Subscribe to messages
