@@ -263,7 +263,24 @@ export default function PlanningChat() {
     }
   }
 
-  if (!isAuthenticated) {
+  // Show loading while checking auth
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-white mb-4">Initializing Planning Group...</div>
+          <div className="flex items-center justify-center space-x-2">
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-150"></div>
+            <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse delay-300"></div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show auth UI if not authenticated or no planning user
+  if (!isAuthenticated || !planningUser) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4">
         <div className="w-full max-w-md bg-slate-800 rounded-lg p-8 border border-slate-700">
