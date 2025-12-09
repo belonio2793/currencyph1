@@ -99,10 +99,12 @@ export default function PlanningChat() {
         await loadPlanningUser(data.session.user.id)
       } else {
         setIsAuthenticated(false)
+        setPlanningUser(null)
       }
     } catch (error) {
       console.error('Auth check error:', error)
       setIsAuthenticated(false)
+      setPlanningUser(null)
     }
   }
 
