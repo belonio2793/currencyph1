@@ -307,18 +307,21 @@ export default function PlanningChat() {
     try {
       const { error } = await supabase
         .from('planning_users')
-        .update({ name: editingName.trim() })
+        .update({ name: editingName.trim(), updated_at: new Date().toISOString() })
         .eq('id', planningUser.id)
 
       if (error) {
-        setAuthError('Failed to update profile')
+        console.error('Profile update error:', error)
+        setAuthError('Failed to update profile: ' + error.message)
         return
       }
 
-      setPlanningUser({ ...planningUser, name: editingName.trim() })
+      const newUser = { ...planningUser, name: editingName.trim() }
+      setPlanningUser(newUser)
       setShowProfileSettings(false)
       setAuthError('')
     } catch (error) {
+      console.error('Error updating profile:', error)
       setAuthError('Error updating profile: ' + error.message)
     }
   }
