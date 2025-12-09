@@ -456,7 +456,8 @@ export default function App() {
   }
 
   // If content locker is enabled, show a full black 'UNDER DEVELOPMENT' splash
-  if (contentLocked) {
+  // unless user is viewing the planning page (which is publicly accessible)
+  if (contentLocked && activeTab !== 'planning') {
     return (
       <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
         <div className="w-full max-w-3xl text-center">
@@ -466,6 +467,14 @@ export default function App() {
             <span className="w-4 h-4 bg-white rounded-full animate-pulse" />
             <span className="w-4 h-4 bg-white rounded-full animate-pulse delay-200" />
             <span className="w-4 h-4 bg-white rounded-full animate-pulse delay-400" />
+          </div>
+          <div className="mt-8">
+            <button
+              onClick={() => setActiveTab('planning')}
+              className="text-blue-400 hover:text-blue-300 underline transition-colors"
+            >
+              View Planning Page
+            </button>
           </div>
         </div>
       </div>
