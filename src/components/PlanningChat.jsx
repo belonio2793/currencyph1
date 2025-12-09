@@ -268,15 +268,31 @@ export default function PlanningChat() {
   const sendMessage = async () => {
     if (!messageInput.trim() || !planningUser) return
 
+    const messageText = messageInput.trim()
+    setMessageInput('')
+
     try {
-      await supabase.from('planning_messages').insert({
-        user_id: userId,
-        planning_user_id: planningUser.id,
-        message: messageInput
-      })
-      setMessageInput('')
+      const { data, error } = await supabase
+        .from('planning_messages')
+        .insert({
+          user_id: userId,
+          planning_user_id: planningUser.id,
+          message: messageText
+        })
+        .select()
+
+      if (error) {
+        console.error('Error sending message:', error.code, error.message)
+        setMessageInput(messageText)
+        return
+      }
+
+      if (data && data.length > 0) {
+        setMessages(prev => [...prev, { ...data[0], planning_users: { name: planningUser.name, email: userEmail } }])
+      }
     } catch (error) {
-      console.error('Error sending message:', error)
+      console.error('Error sending message:', error?.message)
+      setMessageInput(messageText)
     }
   }
 
