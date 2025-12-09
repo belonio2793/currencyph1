@@ -248,6 +248,7 @@ export default function PlanningChat() {
     await supabase.auth.signOut()
     setIsAuthenticated(false)
     setUserId(null)
+    setUserEmail('')
     setPlanningUser(null)
     setMessages([])
     setMarkers([])
