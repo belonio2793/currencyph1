@@ -187,6 +187,12 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Direct /planning route should activate planning tab
+    if (path === '/planning') {
+      setActiveTab('planning')
+      setShowAuth(false)
+    }
+
     // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
