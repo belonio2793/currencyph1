@@ -413,22 +413,25 @@ export default function PlanningChat() {
                 No messages yet. Start the discussion!
               </div>
             ) : (
-              messages.map(msg => (
-                <div key={msg.id} className="text-sm">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="font-semibold text-blue-400">
-                      {msg.planning_users?.name || 'Unknown'}
-                    </span>
-                    <span className="text-xs text-slate-500">
-                      {new Date(msg.created_at).toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </span>
+              messages.map(msg => {
+                const userName = msg.planning_users?.name || (msg.planning_users && typeof msg.planning_users === 'object' && msg.planning_users[0]?.name) || 'Unknown'
+                return (
+                  <div key={msg.id} className="text-sm">
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-semibold text-blue-400">
+                        {userName}
+                      </span>
+                      <span className="text-xs text-slate-500">
+                        {new Date(msg.created_at).toLocaleTimeString([], {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </span>
+                    </div>
+                    <p className="text-slate-300 break-words">{msg.message}</p>
                   </div>
-                  <p className="text-slate-300 break-words">{msg.message}</p>
-                </div>
-              ))
+                )
+              })
             )}
             <div ref={messagesEndRef} />
           </div>
