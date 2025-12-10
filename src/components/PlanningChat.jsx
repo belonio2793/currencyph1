@@ -793,12 +793,31 @@ export default function PlanningChat() {
           .single()
 
         if (createError) {
-          console.error('Error creating conversation:', createError.message || JSON.stringify(createError))
-          setAuthError(`Failed to open conversation: ${createError.message || 'Unknown error'}`)
-          return
+          // Handle unique constraint violation - conversation might already exist in opposite order
+          if (createError.code === '23505' || createError.message?.includes('unique')) {
+            // Retry the fetch one more time to get the conversation
+            const { data: retryData } = await supabase
+              .from('planning_conversations')
+              .select('*')
+              .or(`and(user1_id.eq.${userId},user2_id.eq.${otherUserId}),and(user1_id.eq.${otherUserId},user2_id.eq.${userId})`)
+
+            if (retryData && retryData.length > 0) {
+              conversationId = retryData[0].id
+              existingConversation = retryData[0]
+            } else {
+              console.error('Error creating conversation:', createError.message || JSON.stringify(createError))
+              setAuthError(`Failed to open conversation: ${createError.message || 'Unknown error'}`)
+              return
+            }
+          } else {
+            console.error('Error creating conversation:', createError.message || JSON.stringify(createError))
+            setAuthError(`Failed to open conversation: ${createError.message || 'Unknown error'}`)
+            return
+          }
+        } else {
+          conversationId = newConversation.id
+          existingConversation = newConversation
         }
-        conversationId = newConversation.id
-        existingConversation = newConversation
       } else {
         conversationId = existingConversation.id
       }
