@@ -301,6 +301,31 @@ export default function PlanningChat() {
     }
   }
 
+  const loadShippingPorts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('shipping_ports')
+        .select('*')
+        .eq('is_public', true)
+        .eq('status', 'active')
+        .order('country_code', { ascending: true })
+        .order('name', { ascending: true })
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.code === '42P01') {
+          console.debug('shipping_ports table not found')
+          return
+        }
+        console.debug('Shipping ports loading error:', error.code)
+        return
+      }
+
+      setShippingPorts(data || [])
+    } catch (error) {
+      console.debug('Error loading shipping ports:', error?.message)
+    }
+  }
+
   const handleSignIn = async (e) => {
     e.preventDefault()
     setAuthLoading(true)
