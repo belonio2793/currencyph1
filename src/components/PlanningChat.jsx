@@ -63,6 +63,7 @@ export default function PlanningChat() {
   const [showProfileSettings, setShowProfileSettings] = useState(false)
   const [editingName, setEditingName] = useState('')
   const [locations, setLocations] = useState([])
+  const [shippingPorts, setShippingPorts] = useState([])
   const [isCreatingLocation, setIsCreatingLocation] = useState(false)
   const [showLocationForm, setShowLocationForm] = useState(false)
   const [locationForm, setLocationForm] = useState({
@@ -74,6 +75,12 @@ export default function PlanningChat() {
   const [mapLayer, setMapLayer] = useState('street')
   const [showMapControls, setShowMapControls] = useState(false)
   const [selectedLocationId, setSelectedLocationId] = useState('')
+  const [selectedPortId, setSelectedPortId] = useState('')
+  const [portCalculatorData, setPortCalculatorData] = useState({
+    type: 'teu',
+    quantity: 1,
+    direction: 'import'
+  })
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
