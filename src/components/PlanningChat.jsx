@@ -363,6 +363,53 @@ export default function PlanningChat() {
     }
   }
 
+  const loadProducts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('planning_products')
+        .select('*')
+        .eq('is_active', true)
+        .order('product_type', { ascending: true })
+        .order('name', { ascending: true })
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.code === '42P01') {
+          console.debug('planning_products table not found')
+          return
+        }
+        console.debug('Products loading error:', error.code)
+        return
+      }
+
+      setProducts(data || [])
+    } catch (error) {
+      console.debug('Error loading products:', error?.message)
+    }
+  }
+
+  const loadLocationsWithCreators = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('planning_markers')
+        .select('*, planning_users(name, email)')
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.code === '42P01') {
+          console.debug('planning_markers table not found')
+          return
+        }
+        console.debug('Locations loading error:', error.code)
+        return
+      }
+
+      setLocations(data || [])
+      setLocationsWithCreators(data || [])
+    } catch (error) {
+      console.debug('Error loading locations:', error?.message)
+    }
+  }
+
   const handleSignIn = async (e) => {
     e.preventDefault()
     setAuthLoading(true)
