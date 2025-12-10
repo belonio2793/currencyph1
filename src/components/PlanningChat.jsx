@@ -1143,23 +1143,11 @@ export default function PlanningChat() {
           <div className="flex-1 overflow-hidden">
             <style>{`
               .planning-map-container .leaflet-tile {
-                border: 0 !important;
-                outline: 0 !important;
-                background-clip: border-box;
-                box-shadow: none !important;
+                border: none !important;
+                outline: none !important;
               }
-              .planning-map-container .leaflet-tile-container {
-                filter: none;
-              }
-              .planning-map-container svg.leaflet-zoom-animated {
-                filter: drop-shadow(0 0 0px transparent);
-              }
-              .planning-map-container .leaflet-pane.leaflet-tile-pane {
+              .planning-map-container img.leaflet-tile {
                 opacity: 1;
-              }
-              /* Hide tile grid borders */
-              .planning-map-container .leaflet-tile-pane canvas {
-                image-rendering: pixelated;
               }
             `}</style>
             <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" attributionControl={false}>
