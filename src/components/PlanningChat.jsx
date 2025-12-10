@@ -425,7 +425,7 @@ export default function PlanningChat() {
     try {
       const { data, error } = await supabase
         .from('planning_markers')
-        .select('*, planning_users(name, email)')
+        .select('*, planning_users(id, name, email)')
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -433,7 +433,7 @@ export default function PlanningChat() {
           console.debug('planning_markers table not found')
           return
         }
-        console.debug('Locations loading error:', error.code)
+        console.debug('Locations loading error:', error.code, error.message)
         return
       }
 
