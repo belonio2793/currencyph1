@@ -29,6 +29,31 @@ function MapRefHandler({ onMapReady }) {
   return null
 }
 
+// Marker type color mapping
+const markerTypeColorMap = {
+  'Landowner': '#3B82F6',
+  'Machinery': '#F97316',
+  'Equipment': '#10B981',
+  'Warehouse': '#A855F7',
+  'Seller': '#EF4444',
+  'Vendor': '#FBBF24',
+  'Manufacturing': '#92400E',
+  'Processing': '#06B6D4',
+  'Transportation': '#6B7280'
+}
+
+const markerTypeEmojis = {
+  'Landowner': '🏘️',
+  'Machinery': '⚙️',
+  'Equipment': '🔧',
+  'Warehouse': '🏭',
+  'Seller': '🛒',
+  'Vendor': '👨‍💼',
+  'Manufacturing': '🏗️',
+  'Processing': '⚗️',
+  'Transportation': '🚚'
+}
+
 // Create colored marker icon for ports and products
 function createColoredMarker(color = 'red') {
   const colorMap = {
@@ -98,7 +123,8 @@ export default function PlanningChat() {
     name: '',
     description: '',
     latitude: null,
-    longitude: null
+    longitude: null,
+    marker_type: 'Seller'
   })
   const [mapLayer, setMapLayer] = useState('street')
   const [showMapControls, setShowMapControls] = useState(false)
@@ -571,7 +597,8 @@ export default function PlanningChat() {
       name: '',
       description: '',
       latitude: coords.latitude,
-      longitude: coords.longitude
+      longitude: coords.longitude,
+      marker_type: 'Seller'
     })
     setShowLocationForm(true)
   }
@@ -594,6 +621,7 @@ export default function PlanningChat() {
         user_id: userId,
         name: locationForm.name.trim(),
         description: locationForm.description.trim(),
+        marker_type: locationForm.marker_type,
         latitude: parseFloat(locationForm.latitude),
         longitude: parseFloat(locationForm.longitude)
       }
@@ -633,7 +661,8 @@ export default function PlanningChat() {
         name: '',
         description: '',
         latitude: null,
-        longitude: null
+        longitude: null,
+        marker_type: 'Seller'
       })
       setAuthError('')
     } catch (error) {
@@ -1107,10 +1136,19 @@ export default function PlanningChat() {
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
               {locations.map(loc => {
                 const creatorName = loc.planning_users?.name || 'Unknown User'
+                const markerColor = markerTypeColorMap[loc.marker_type] || '#EF4444'
+                const markerEmoji = markerTypeEmojis[loc.marker_type] || '📍'
+                const markerIcon = createColoredMarker(loc.marker_type ? Object.keys(markerTypeColorMap).indexOf(loc.marker_type) >= 0 ? loc.marker_type.toLowerCase() : 'red' : 'red')
                 return (
                   <Marker key={`loc-${loc.id}`} position={[loc.latitude, loc.longitude]}>
                     <Popup>
-                      <div className="p-2 min-w-48">
+                      <div className="p-3 min-w-48 bg-white rounded">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{markerEmoji}</span>
+                          <span className="text-xs font-bold px-2 py-1 rounded text-white" style={{backgroundColor: markerColor}}>
+                            {loc.marker_type || 'Unknown'}
+                          </span>
+                        </div>
                         <h3 className="font-semibold text-sm">{loc.name}</h3>
                         {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
                         <p className="text-xs text-slate-500 mt-2">📍 {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
@@ -1601,6 +1639,25 @@ export default function PlanningChat() {
             )}
 
             <form onSubmit={handleSaveLocation} className="space-y-4">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">Marker Type</label>
+                <select
+                  value={locationForm.marker_type}
+                  onChange={(e) => setLocationForm({ ...locationForm, marker_type: e.target.value })}
+                  className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                >
+                  <option value="Landowner">{markerTypeEmojis['Landowner']} Landowner</option>
+                  <option value="Machinery">{markerTypeEmojis['Machinery']} Machinery</option>
+                  <option value="Equipment">{markerTypeEmojis['Equipment']} Equipment</option>
+                  <option value="Warehouse">{markerTypeEmojis['Warehouse']} Warehouse</option>
+                  <option value="Seller">{markerTypeEmojis['Seller']} Seller</option>
+                  <option value="Vendor">{markerTypeEmojis['Vendor']} Vendor</option>
+                  <option value="Manufacturing">{markerTypeEmojis['Manufacturing']} Manufacturing</option>
+                  <option value="Processing">{markerTypeEmojis['Processing']} Processing</option>
+                  <option value="Transportation">{markerTypeEmojis['Transportation']} Transportation</option>
+                </select>
+              </div>
+
               <div>
                 <label className="block text-slate-300 text-sm font-medium mb-2">Location Name</label>
                 <input
