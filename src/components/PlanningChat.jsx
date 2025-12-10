@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { portRateCalculator } from '../lib/portRateCalculatorService'
+import { PHILIPPINE_CITIES } from '../data/philippineCitiesCoordinates'
 import L from 'leaflet'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, Circle } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
