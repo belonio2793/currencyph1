@@ -1727,6 +1727,81 @@ export default function PlanningChat() {
           </div>
         </div>
       )}
+
+      {/* User Profile Preview Modal */}
+      {showUserProfile && selectedUserForProfile && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-sm bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">User Profile</h2>
+              <button
+                onClick={() => setShowUserProfile(false)}
+                className="text-slate-400 hover:text-white text-2xl transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-slate-400 text-sm font-medium mb-1">Name</label>
+                <p className="text-white text-lg font-semibold">{selectedUserForProfile.name}</p>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm font-medium mb-1">Email</label>
+                <p className="text-slate-300 break-all">{selectedUserForProfile.email}</p>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm font-medium mb-1">User ID</label>
+                <div className="bg-slate-700 rounded px-3 py-2 flex items-center justify-between gap-2">
+                  <code className="text-slate-300 text-xs font-mono break-all">{selectedUserForProfile.user_id}</code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(selectedUserForProfile.user_id)
+                    }}
+                    className="text-blue-400 hover:text-blue-300 text-xs font-medium transition-colors flex-shrink-0"
+                    title="Copy to clipboard"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm font-medium mb-1">Status</label>
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-slate-300 capitalize">{selectedUserForProfile.status || 'active'}</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-slate-400 text-sm font-medium mb-1">Role</label>
+                <p className="text-slate-300 capitalize">{selectedUserForProfile.role || 'member'}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowUserProfile(false)}
+                className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors"
+              >
+                Close
+              </button>
+              {isAuthenticated && userId && selectedUserForProfile.user_id !== userId && (
+                <button
+                  onClick={handleStartConversationFromProfile}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors"
+                >
+                  Message
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
