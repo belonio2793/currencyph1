@@ -116,11 +116,11 @@ export default function PlanningChat() {
 
     try {
       const channel = supabase
-        .channel('planning_locations')
+        .channel('planning_markers')
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
-          table: 'planning_locations'
+          table: 'planning_markers'
         }, (payload) => {
           if (payload.eventType === 'INSERT') {
             setLocations(prev => [...prev, payload.new])
