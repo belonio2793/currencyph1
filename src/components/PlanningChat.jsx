@@ -1101,6 +1101,54 @@ export default function PlanningChat() {
                 )
               })}
 
+              {products.map(product => {
+                const productColorMap = {
+                  'water': 'water',
+                  'coconut': 'coconut',
+                  'mango': 'mango'
+                }
+                const markerColor = productColorMap[product.product_type] || 'red'
+                const creatorName = product.planning_users?.name || 'Unknown'
+
+                return (
+                  <Marker
+                    key={`product-${product.id}`}
+                    position={[parseFloat(product.latitude), parseFloat(product.longitude)]}
+                    icon={createColoredMarker(markerColor)}
+                  >
+                    <Popup>
+                      <div className="p-3 min-w-64 bg-white rounded">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className={`text-xs font-bold px-2 py-1 rounded text-white ${
+                            product.product_type === 'water' ? 'bg-blue-500' :
+                            product.product_type === 'coconut' ? 'bg-amber-700' :
+                            'bg-amber-500'
+                          }`}>
+                            {product.product_type.toUpperCase()}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-sm mb-1">{product.name}</h3>
+                        {product.description && <p className="text-xs text-slate-600 mb-1">{product.description}</p>}
+
+                        <div className="border-t pt-2 mb-2">
+                          <p className="text-xs text-slate-600"><strong>Location:</strong> {product.city}, {product.province}</p>
+                          <p className="text-xs text-slate-500">{product.latitude.toFixed(4)}, {product.longitude.toFixed(4)}</p>
+                        </div>
+
+                        {product.quantity_available && (
+                          <div className="border-t pt-2 mb-2">
+                            <p className="text-xs text-slate-600"><strong>Available:</strong> {product.quantity_available} {product.quantity_unit || 'units'}</p>
+                            {product.harvest_season && <p className="text-xs text-slate-600"><strong>Season:</strong> {product.harvest_season}</p>}
+                          </div>
+                        )}
+
+                        <p className="text-xs text-slate-500 border-t pt-2">👤 {creatorName}</p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                )
+              })}
+
               {shippingPorts.map(port => {
                 const markerColor = port.country_code === 'CN' ? 'blue' : 'red'
                 const defaultCargo = portRateCalculator.getDefaultCargo('teu')
