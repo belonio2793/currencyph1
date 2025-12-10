@@ -1152,9 +1152,9 @@ export default function PlanningChat() {
                 const creatorName = loc.planning_users?.name || 'Unknown User'
                 const markerColor = markerTypeColorMap[loc.marker_type] || '#EF4444'
                 const markerEmoji = markerTypeEmojis[loc.marker_type] || '📍'
-                const markerIcon = createColoredMarker(loc.marker_type ? Object.keys(markerTypeColorMap).indexOf(loc.marker_type) >= 0 ? loc.marker_type.toLowerCase() : 'red' : 'red')
+                const markerIcon = createColoredMarker(markerColor)
                 return (
-                  <Marker key={`loc-${loc.id}`} position={[loc.latitude, loc.longitude]}>
+                  <Marker key={`loc-${loc.id}`} position={[loc.latitude, loc.longitude]} icon={markerIcon}>
                     <Popup>
                       <div className="p-3 min-w-48 bg-white rounded">
                         <div className="flex items-center gap-2 mb-2">
