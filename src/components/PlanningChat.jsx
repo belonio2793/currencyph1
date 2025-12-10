@@ -565,6 +565,7 @@ export default function PlanningChat() {
   const handleLocationSelect = (e) => {
     const locationId = e.target.value
     setSelectedLocationId(locationId)
+    setSelectedPortId('')
 
     if (!locationId || !mapRef.current) return
 
@@ -576,6 +577,30 @@ export default function PlanningChat() {
         console.error('Error flying to location:', error)
       }
     }
+  }
+
+  const handlePortSelect = (e) => {
+    const portId = e.target.value
+    setSelectedPortId(portId)
+    setSelectedLocationId('')
+
+    if (!portId || !mapRef.current) return
+
+    const port = shippingPorts.find(p => p.id === parseInt(portId))
+    if (port) {
+      try {
+        mapRef.current.flyTo([port.latitude, port.longitude], 10, { duration: 1 })
+      } catch (error) {
+        console.error('Error flying to port:', error)
+      }
+    }
+  }
+
+  const handlePortCalculatorChange = (field, value) => {
+    setPortCalculatorData(prev => ({
+      ...prev,
+      [field]: value
+    }))
   }
 
   const getTileLayerUrl = () => {
