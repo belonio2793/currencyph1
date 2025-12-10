@@ -123,7 +123,7 @@ export const PHILIPPINE_CITIES = [
   { name: "San Pablo", lat: 14.0667, lng: 121.3167, region: "Laguna" },
   { name: "San Pedro", lat: 14.35, lng: 121.0167, region: "Laguna" },
   { name: "Santiago", lat: 15.6667, lng: 121.5, region: "Isabela" },
-  { name: "Silay", lat: 10.557, lng: 123.185, region: "Negros Occidental" },
+  { name: "Silay", lat: 10.798490067052656, lng: 122.97548006161378, region: "Negros Occidental" },
   { name: "Sipalay", lat: 10.15, lng: 122.85, region: "Negros Occidental" },
   { name: "Sorsogon City", lat: 12.9667, lng: 124.0167, region: "Sorsogon" },
   { name: "Surigao City", lat: 9.7833, lng: 125.5, region: "Surigao del Norte" },
