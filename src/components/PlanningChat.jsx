@@ -1416,7 +1416,7 @@ export default function PlanningChat() {
                   return (
                     <div key={msg.id} className="text-sm">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <button onClick={() => msg.planning_users && loadOrCreateConversation(msg.planning_users.user_id, msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
+                        <button onClick={() => msg.planning_users && handleShowUserProfile(msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
                           {userName}
                         </button>
                         <span className="text-xs text-slate-500">
