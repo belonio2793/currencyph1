@@ -84,19 +84,23 @@ CREATE INDEX IF NOT EXISTS idx_planning_shipping_ports_updated_at ON planning_sh
 ALTER TABLE planning_shipping_ports ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies - everyone can read public ports
+DROP POLICY IF EXISTS "planning_shipping_ports_public_read" ON planning_shipping_ports;
 CREATE POLICY "planning_shipping_ports_public_read" ON planning_shipping_ports
   FOR SELECT
   USING (is_public = true);
 
+DROP POLICY IF EXISTS "planning_shipping_ports_authenticated_create" ON planning_shipping_ports;
 CREATE POLICY "planning_shipping_ports_authenticated_create" ON planning_shipping_ports
   FOR INSERT
   WITH CHECK (auth.role() = 'authenticated');
 
+DROP POLICY IF EXISTS "planning_shipping_ports_owner_update" ON planning_shipping_ports;
 CREATE POLICY "planning_shipping_ports_owner_update" ON planning_shipping_ports
   FOR UPDATE
   USING (auth.uid() = created_by)
   WITH CHECK (auth.uid() = created_by);
 
+DROP POLICY IF EXISTS "planning_shipping_ports_owner_delete" ON planning_shipping_ports;
 CREATE POLICY "planning_shipping_ports_owner_delete" ON planning_shipping_ports
   FOR DELETE
   USING (auth.uid() = created_by);
