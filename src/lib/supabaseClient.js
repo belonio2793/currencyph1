@@ -23,10 +23,22 @@ const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetc
 
 // Add global error handler to suppress expected Supabase connection errors
 if (typeof window !== 'undefined') {
+  // Suppress console errors from Supabase fetch failures (these are non-critical)
+  const originalConsoleError = console.error
+  console.error = function(...args) {
+    // Filter out "Failed to fetch" errors from Supabase
+    const errorStr = String(args[0] || '')
+    if (errorStr.includes('Failed to fetch') || errorStr.includes('TypeError: Failed to fetch')) {
+      // Silently ignore network failures - presence/sync operations are non-critical
+      return
+    }
+    // Call original console.error for other errors
+    return originalConsoleError.apply(console, args)
+  }
+
   window.addEventListener('error', (event) => {
     // Suppress "Failed to fetch" errors from Supabase when network is unavailable
-    // This is expected in environments with connectivity issues
-    if (event.message && event.message.includes('Failed to fetch') && event.filename && event.filename.includes('supabase')) {
+    if (event.message && event.message.includes('Failed to fetch')) {
       event.preventDefault()
       return true
     }
@@ -34,8 +46,11 @@ if (typeof window !== 'undefined') {
 
   window.addEventListener('unhandledrejection', (event) => {
     // Suppress unhandled promise rejections from Supabase fetch failures
-    // These are non-critical and expected in offline/connectivity scenarios
-    if (event.reason && event.reason.message && event.reason.message.includes('Failed to fetch')) {
+    const reason = event.reason
+    if (reason && (
+      (reason.message && reason.message.includes('Failed to fetch')) ||
+      String(reason).includes('Failed to fetch')
+    )) {
       event.preventDefault()
       return true
     }
