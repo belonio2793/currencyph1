@@ -109,8 +109,10 @@ export default function PlanningChat() {
   const [chatTab, setChatTab] = useState('public')  // 'public' or 'private'
   const [privateConversations, setPrivateConversations] = useState([])
   const [selectedPrivateUserId, setSelectedPrivateUserId] = useState(null)
+  const [selectedConversationId, setSelectedConversationId] = useState(null)
   const [privateMessages, setPrivateMessages] = useState([])
   const [privateMessageInput, setPrivateMessageInput] = useState('')
+  const [selectedPrivateUser, setSelectedPrivateUser] = useState(null)
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
