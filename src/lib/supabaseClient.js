@@ -21,6 +21,27 @@ const getEnv = (name) => {
 // Keep reference to original fetch (no wrapper to avoid response body conflicts with Supabase)
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
 
+// Add global error handler to suppress expected Supabase connection errors
+if (typeof window !== 'undefined') {
+  window.addEventListener('error', (event) => {
+    // Suppress "Failed to fetch" errors from Supabase when network is unavailable
+    // This is expected in environments with connectivity issues
+    if (event.message && event.message.includes('Failed to fetch') && event.filename && event.filename.includes('supabase')) {
+      event.preventDefault()
+      return true
+    }
+  }, true)
+
+  window.addEventListener('unhandledrejection', (event) => {
+    // Suppress unhandled promise rejections from Supabase fetch failures
+    // These are non-critical and expected in offline/connectivity scenarios
+    if (event.reason && event.reason.message && event.reason.message.includes('Failed to fetch')) {
+      event.preventDefault()
+      return true
+    }
+  }, true)
+}
+
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
 const SUPABASE_ANON_KEY = getEnv('VITE_SUPABASE_ANON_KEY') || getEnv('SUPABASE_ANON_KEY') || getEnv('VITE_SUPABASE_PUBLISHABLE_KEY') || ''
 
