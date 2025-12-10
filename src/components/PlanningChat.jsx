@@ -1790,19 +1790,28 @@ export default function PlanningChat() {
             </div>
 
             <div className="flex gap-3">
-              <button
-                onClick={() => setShowUserProfile(false)}
-                className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors"
-              >
-                Close
-              </button>
-              {isAuthenticated && userId && selectedUserForProfile.user_id !== userId && (
+              {isAuthenticated && userId && selectedUserForProfile.user_id === userId ? (
                 <button
-                  onClick={handleStartConversationFromProfile}
-                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors"
+                  onClick={() => setShowUserProfile(false)}
+                  className="w-full px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors"
                 >
-                  Message
+                  Close
                 </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowUserProfile(false)}
+                    className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={handleStartConversationFromProfile}
+                    className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors"
+                  >
+                    Message
+                  </button>
+                </>
               )}
             </div>
           </div>
