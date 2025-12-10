@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
@@ -11,6 +11,22 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
+
+const PHILIPPINES_CENTER = [12.8797, 121.7740]
+const PHILIPPINES_ZOOM = 6
+
+// Map ref handler component - captures map instance for controls
+function MapRefHandler({ onMapReady }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (map) {
+      onMapReady(map)
+    }
+  }, [map, onMapReady])
+
+  return null
+}
 
 // Map click handler component - captures clicks to create locations
 function MapClickHandler({ isCreating, onLocationClick }) {
