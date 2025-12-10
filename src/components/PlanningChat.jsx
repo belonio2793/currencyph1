@@ -826,16 +826,21 @@ export default function PlanningChat() {
     }
   }
 
-  const sendPrivateMessage = async (conversationId) => {
-    if (!privateMessageInput.trim()) return
+  const sendPrivateMessage = async () => {
+    if (!privateMessageInput.trim() || !selectedConversationId) {
+      setAuthError('Cannot send message - conversation not loaded')
+      return
+    }
+
+    const messageText = privateMessageInput.trim()
 
     try {
       const { error } = await supabase
         .from('planning_private_messages')
         .insert({
-          conversation_id: conversationId,
+          conversation_id: selectedConversationId,
           sender_id: userId,
-          message: privateMessageInput.trim()
+          message: messageText
         })
 
       if (error) {
@@ -845,9 +850,11 @@ export default function PlanningChat() {
       }
 
       setPrivateMessageInput('')
-      await loadPrivateMessages(conversationId)
+      await loadPrivateMessages(selectedConversationId)
+      setAuthError('')
     } catch (error) {
       console.error('Error sending private message:', error?.message)
+      setAuthError('Error sending message')
     }
   }
 
