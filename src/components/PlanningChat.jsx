@@ -153,7 +153,39 @@ export default function PlanningChat() {
   useEffect(() => {
     loadShippingPorts()
     loadProducts()
+    subscribeToProducts()
   }, [])
+
+  // Subscribe to products updates
+  const subscribeToProducts = () => {
+    try {
+      const channel = supabase
+        .channel('planning_products')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'planning_products'
+        }, (payload) => {
+          if (payload.eventType === 'INSERT') {
+            setProducts(prev => [...prev, payload.new])
+          } else if (payload.eventType === 'UPDATE') {
+            setProducts(prev =>
+              prev.map(prod => prod.id === payload.new.id ? payload.new : prod)
+            )
+          } else if (payload.eventType === 'DELETE') {
+            setProducts(prev => prev.filter(prod => prod.id !== payload.old.id))
+          }
+        })
+        .subscribe()
+
+      return () => {
+        try { channel.unsubscribe() } catch (e) { /* ignore */ }
+      }
+    } catch (error) {
+      console.debug('Products subscription error (non-critical):', error?.message)
+      return () => {}
+    }
+  }
 
   // Load locations with creator information
   useEffect(() => {
