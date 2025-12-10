@@ -1141,7 +1141,15 @@ export default function PlanningChat() {
 
           {/* Map Container */}
           <div className="flex-1 overflow-hidden">
-            <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full" attributionControl={false}>
+            <style>{`
+              .planning-map-container .leaflet-tile {
+                filter: none;
+              }
+              .planning-map-container .leaflet-tile-container {
+                opacity: 1;
+              }
+            `}</style>
+            <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" attributionControl={false}>
               <TileLayer
                 url={getTileLayerUrl()}
                 attribution=""
