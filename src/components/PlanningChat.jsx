@@ -428,7 +428,7 @@ export default function PlanningChat() {
     try {
       const { data, error } = await supabase
         .from('planning_markers')
-        .select('*, planning_users(id, name, email)')
+        .select('*, planning_users!planning_markers_planning_user_id_fkey(id, name, email, user_id)')
         .order('created_at', { ascending: false })
 
       if (error) {
@@ -664,7 +664,7 @@ export default function PlanningChat() {
     try {
       const { error } = await supabase
         .from('planning_users')
-        .update({ name: editingName.trim(), updated_at: new Date().toISOString() })
+        .update({ name: editingName.trim() })
         .eq('id', planningUser.id)
 
       if (error) {
