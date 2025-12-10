@@ -762,17 +762,18 @@ export default function PlanningChat() {
     }
   }
 
-  const loadOrCreateConversation = async (otherUserId) => {
+  const loadOrCreateConversation = async (otherUserId, otherUserData = null) => {
     try {
-      // Get or create conversation
-      const { data: existingConversation, error: fetchError } = await supabase
+      // Try to find existing conversation
+      const { data: existingConversations, error: fetchError } = await supabase
         .from('planning_conversations')
         .select('*')
         .or(`and(user1_id.eq.${userId},user2_id.eq.${otherUserId}),and(user1_id.eq.${otherUserId},user2_id.eq.${userId})`)
-        .single()
 
       let conversationId
-      if (!existingConversation && !fetchError?.code === 'PGRST116') {
+      let existingConversation = existingConversations && existingConversations.length > 0 ? existingConversations[0] : null
+
+      if (!existingConversation) {
         // Create new conversation
         const { data: newConversation, error: createError } = await supabase
           .from('planning_conversations')
@@ -786,17 +787,23 @@ export default function PlanningChat() {
 
         if (createError) {
           console.error('Error creating conversation:', createError)
+          setAuthError('Failed to open conversation')
           return
         }
         conversationId = newConversation.id
+        existingConversation = newConversation
       } else {
         conversationId = existingConversation.id
       }
 
       setSelectedPrivateUserId(otherUserId)
+      setSelectedPrivateUser(otherUserData)
+      setSelectedConversationId(conversationId)
+      setChatTab('private')
       await loadPrivateMessages(conversationId)
     } catch (error) {
       console.error('Error loading conversation:', error)
+      setAuthError('Failed to open conversation')
     }
   }
 
