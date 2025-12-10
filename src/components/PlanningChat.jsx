@@ -767,11 +767,15 @@ export default function PlanningChat() {
 
   const loadOrCreateConversation = async (otherUserId, otherUserData = null) => {
     try {
-      // Try to find existing conversation
+      // Try to find existing conversation using both possible orderings
       const { data: existingConversations, error: fetchError } = await supabase
         .from('planning_conversations')
         .select('*')
         .or(`and(user1_id.eq.${userId},user2_id.eq.${otherUserId}),and(user1_id.eq.${otherUserId},user2_id.eq.${userId})`)
+
+      if (fetchError) {
+        console.error('Error fetching conversation:', fetchError.message)
+      }
 
       let conversationId
       let existingConversation = existingConversations && existingConversations.length > 0 ? existingConversations[0] : null
@@ -789,8 +793,8 @@ export default function PlanningChat() {
           .single()
 
         if (createError) {
-          console.error('Error creating conversation:', createError)
-          setAuthError('Failed to open conversation')
+          console.error('Error creating conversation:', createError.message || JSON.stringify(createError))
+          setAuthError(`Failed to open conversation: ${createError.message || 'Unknown error'}`)
           return
         }
         conversationId = newConversation.id
@@ -805,7 +809,7 @@ export default function PlanningChat() {
       setChatTab('private')
       await loadPrivateMessages(conversationId)
     } catch (error) {
-      console.error('Error loading conversation:', error)
+      console.error('Error loading conversation:', error.message || error)
       setAuthError('Failed to open conversation')
     }
   }
