@@ -1146,15 +1146,20 @@ export default function PlanningChat() {
                 border: 0 !important;
                 outline: 0 !important;
                 background-clip: border-box;
+                box-shadow: none !important;
               }
               .planning-map-container .leaflet-tile-container {
-                filter: blur(0px) brightness(1);
+                filter: none;
+              }
+              .planning-map-container svg.leaflet-zoom-animated {
+                filter: drop-shadow(0 0 0px transparent);
               }
               .planning-map-container .leaflet-pane.leaflet-tile-pane {
-                z-index: 2;
+                opacity: 1;
               }
-              .planning-map-container img.leaflet-tile {
-                image-rendering: smooth;
+              /* Hide tile grid borders */
+              .planning-map-container .leaflet-tile-pane canvas {
+                image-rendering: pixelated;
               }
             `}</style>
             <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" attributionControl={false}>
