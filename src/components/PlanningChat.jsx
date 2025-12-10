@@ -1351,7 +1351,13 @@ export default function PlanningChat() {
                       <div key={user.id} className="flex items-center gap-2 text-sm justify-between">
                         <div className="flex items-center gap-2 flex-1 min-w-0">
                           <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                          <span className="text-slate-300 truncate">{user.name}</span>
+                          <button
+                            onClick={() => handleShowUserProfile(user)}
+                            className="text-slate-300 hover:text-blue-400 truncate transition-colors text-left cursor-pointer font-medium"
+                            title="View user profile"
+                          >
+                            {user.name}
+                          </button>
                         </div>
                         {isAuthenticated && user.id !== planningUser?.id && (
                           <button
