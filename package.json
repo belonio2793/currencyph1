@@ -87,7 +87,8 @@
     "seed-all-rates": "npm run seed-currency-rates && npm run populate-cryptos-and-rates",
     "seed-property-data": "node scripts/seed-property-data.js",
     "migrate-shipping-ports": "node scripts/apply-migration-055.js",
-    "migrate-planning-ports": "node scripts/apply-migration-056.js"
+    "migrate-planning-ports": "node scripts/apply-migration-056.js",
+    "apply-planning-migrations": "node scripts/apply-all-planning-migrations.js"
   },
   "dependencies": {
     "@noble/ed25519": "^3.0.0",
