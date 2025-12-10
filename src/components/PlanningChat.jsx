@@ -453,7 +453,7 @@ export default function PlanningChat() {
   const handleDeleteLocation = async (locationId) => {
     try {
       const { error } = await supabase
-        .from('planning_locations')
+        .from('planning_markers')
         .delete()
         .eq('id', locationId)
 
