@@ -267,14 +267,14 @@ export default function PlanningChat() {
   const loadLocations = async () => {
     try {
       const { data, error } = await supabase
-        .from('planning_locations')
+        .from('planning_markers')
         .select('*')
         .order('created_at', { ascending: false })
 
       if (error) {
         if (error.code === 'PGRST116' || error.code === '42P01') {
           // Table doesn't exist, that's fine
-          console.debug('planning_locations table not found')
+          console.debug('planning_markers table not found')
           return
         }
         console.debug('Location loading error:', error.code)
