@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { portRateCalculator } from '../lib/portRateCalculatorService'
 import { PHILIPPINE_CITIES } from '../data/philippineCitiesCoordinates'
 import L from 'leaflet'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, Circle } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, Circle, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
@@ -808,7 +808,7 @@ export default function PlanningChat() {
       case 'terrain':
         return 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
       default:
-        return 'https://{s}.basemaps.cartocdn.com/positron/{z}/{x}/{y}{r}.png'
+        return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     }
   }
 
@@ -1210,30 +1210,18 @@ export default function PlanningChat() {
               <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
 
-              {PHILIPPINE_CITIES.map((city, idx) => {
-                const isSelected = selectedCity === city.name
-                return (
-                  <Circle
-                    key={`city-circle-${idx}`}
-                    center={[city.lat, city.lng]}
-                    radius={isSelected ? 8000 : 4000}
-                    pathOptions={{
-                      fillColor: isSelected ? '#3B82F6' : '#60A5FA',
-                      fillOpacity: isSelected ? 0.5 : 0.15,
-                      color: isSelected ? '#2563EB' : '#60A5FA',
-                      weight: isSelected ? 2 : 1
-                    }}
-                  >
-                    <Popup>
-                      <div className="p-2 bg-white rounded">
-                        <h3 className="font-semibold text-sm">{city.name}</h3>
-                        <p className="text-xs text-slate-600">{city.region}</p>
-                        <p className="text-xs text-slate-500 mt-1">{city.lat.toFixed(4)}°N, {city.lng.toFixed(4)}°E</p>
-                      </div>
-                    </Popup>
-                  </Circle>
-                )
-              })}
+              {selectedCity && (
+                <Circle
+                  center={[PHILIPPINE_CITIES.find(c => c.name === selectedCity)?.lat || 12.8797, PHILIPPINE_CITIES.find(c => c.name === selectedCity)?.lng || 121.7740]}
+                  radius={10000}
+                  pathOptions={{
+                    fillColor: '#3B82F6',
+                    fillOpacity: 0.2,
+                    color: '#2563EB',
+                    weight: 2
+                  }}
+                />
+              )}
 
               {locations.map(loc => {
                 const creatorName = loc.planning_users?.name || 'Unknown User'
