@@ -1271,26 +1271,93 @@ export default function PlanningChat() {
 
         {/* Chat Section */}
         <div className="w-96 rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden">
-          {/* Online Users Header */}
-          <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-white text-sm font-medium">{onlineUsers.length} members online</span>
-            </div>
+          {/* Chat Tabs */}
+          <div className="bg-slate-700 px-4 py-2 border-b border-slate-600 flex gap-2">
+            <button
+              onClick={() => setChatTab('public')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                chatTab === 'public'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+              }`}
+            >
+              Public
+            </button>
+            <button
+              onClick={() => setChatTab('private')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                chatTab === 'private'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-slate-600 hover:bg-slate-500 text-slate-300'
+              }`}
+            >
+              Private
+            </button>
           </div>
 
-          {/* Members List */}
-          {onlineUsers.length > 0 && (
-            <div className="max-h-32 overflow-y-auto border-b border-slate-600 bg-slate-750">
-              <div className="p-3 space-y-2">
-                {onlineUsers.map(user => (
-                  <div key={user.id} className="flex items-center gap-2 text-sm">
-                    <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
-                    <span className="text-slate-300 truncate">{user.name}</span>
-                  </div>
-                ))}
+          {/* Public Chat Tab */}
+          {chatTab === 'public' && (
+            <>
+              {/* Online Users Header */}
+              <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                  <span className="text-white text-sm font-medium">{onlineUsers.length} members online</span>
+                </div>
               </div>
-            </div>
+
+              {/* Members List */}
+              {onlineUsers.length > 0 && (
+                <div className="max-h-28 overflow-y-auto border-b border-slate-600 bg-slate-750">
+                  <div className="p-3 space-y-2">
+                    {onlineUsers.map(user => (
+                      <div key={user.id} className="flex items-center gap-2 text-sm justify-between">
+                        <div className="flex items-center gap-2 flex-1 min-w-0">
+                          <div className="w-2 h-2 bg-green-500 rounded-full flex-shrink-0"></div>
+                          <span className="text-slate-300 truncate">{user.name}</span>
+                        </div>
+                        {isAuthenticated && user.id !== planningUser?.id && (
+                          <button
+                            onClick={() => loadOrCreateConversation(user.user_id, user)}
+                            className="px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded transition-colors flex-shrink-0"
+                            title="Message this user"
+                          >
+                            💬
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Private Chat Tab */}
+          {chatTab === 'private' && (
+            <>
+              <div className="bg-slate-700 px-4 py-3 border-b border-slate-600">
+                {selectedPrivateUser ? (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-white text-sm font-medium">Chat with {selectedPrivateUser.name}</span>
+                    <button
+                      onClick={() => {
+                        setSelectedPrivateUserId(null)
+                        setSelectedPrivateUser(null)
+                        setSelectedConversationId(null)
+                        setPrivateMessages([])
+                      }}
+                      className="ml-auto text-slate-400 hover:text-white text-xs"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ) : (
+                  <div className="text-slate-300 text-sm">Select a user to message</div>
+                )}
+              </div>
+            </>
           )}
 
           {/* Messages */}
