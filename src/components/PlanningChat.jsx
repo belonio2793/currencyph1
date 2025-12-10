@@ -72,6 +72,7 @@ export default function PlanningChat() {
   })
   const [mapLayer, setMapLayer] = useState('street')
   const [showMapControls, setShowMapControls] = useState(false)
+  const [selectedLocationId, setSelectedLocationId] = useState('')
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
