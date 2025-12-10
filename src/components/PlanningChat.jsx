@@ -703,6 +703,88 @@ export default function PlanningChat() {
     }
   }
 
+  const loadOrCreateConversation = async (otherUserId) => {
+    try {
+      // Get or create conversation
+      const { data: existingConversation, error: fetchError } = await supabase
+        .from('planning_conversations')
+        .select('*')
+        .or(`and(user1_id.eq.${userId},user2_id.eq.${otherUserId}),and(user1_id.eq.${otherUserId},user2_id.eq.${userId})`)
+        .single()
+
+      let conversationId
+      if (!existingConversation && !fetchError?.code === 'PGRST116') {
+        // Create new conversation
+        const { data: newConversation, error: createError } = await supabase
+          .from('planning_conversations')
+          .insert({
+            user1_id: userId,
+            user2_id: otherUserId,
+            is_active: true
+          })
+          .select()
+          .single()
+
+        if (createError) {
+          console.error('Error creating conversation:', createError)
+          return
+        }
+        conversationId = newConversation.id
+      } else {
+        conversationId = existingConversation.id
+      }
+
+      setSelectedPrivateUserId(otherUserId)
+      await loadPrivateMessages(conversationId)
+    } catch (error) {
+      console.error('Error loading conversation:', error)
+    }
+  }
+
+  const loadPrivateMessages = async (conversationId) => {
+    try {
+      const { data, error } = await supabase
+        .from('planning_private_messages')
+        .select('*, planning_users(name, email)')
+        .eq('conversation_id', conversationId)
+        .order('created_at', { ascending: true })
+
+      if (error) {
+        console.debug('Private messages loading error:', error.code)
+        return
+      }
+
+      setPrivateMessages(data || [])
+    } catch (error) {
+      console.debug('Error loading private messages:', error?.message)
+    }
+  }
+
+  const sendPrivateMessage = async (conversationId) => {
+    if (!privateMessageInput.trim()) return
+
+    try {
+      const { error } = await supabase
+        .from('planning_private_messages')
+        .insert({
+          conversation_id: conversationId,
+          sender_id: userId,
+          message: privateMessageInput.trim()
+        })
+
+      if (error) {
+        console.error('Error sending private message:', error)
+        setAuthError('Failed to send message')
+        return
+      }
+
+      setPrivateMessageInput('')
+      await loadPrivateMessages(conversationId)
+    } catch (error) {
+      console.error('Error sending private message:', error?.message)
+    }
+  }
+
   // Show loading while checking auth
   if (!authChecked) {
     return (
