@@ -150,7 +150,14 @@ export default function PlanningChat() {
   // Load shipping ports (public, available to all users)
   useEffect(() => {
     loadShippingPorts()
+    loadProducts()
   }, [])
+
+  // Load locations with creator information
+  useEffect(() => {
+    if (!isAuthenticated) return
+    loadLocationsWithCreators()
+  }, [isAuthenticated])
 
   // Subscribe to locations updates
   useEffect(() => {
