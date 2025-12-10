@@ -1362,53 +1362,112 @@ export default function PlanningChat() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 ? (
-              <div className="text-slate-500 text-center py-8 text-sm">
-                No messages yet. Start the discussion!
-              </div>
-            ) : (
-              messages.map(msg => {
-                const userName = msg.planning_users?.name || (msg.planning_users && typeof msg.planning_users === 'object' && msg.planning_users[0]?.name) || 'Unknown'
-                return (
-                  <div key={msg.id} className="text-sm">
-                    <div className="flex items-baseline gap-2 mb-1">
-                      <span className="font-semibold text-blue-400">
-                        {userName}
-                      </span>
-                      <span className="text-xs text-slate-500">
-                        {new Date(msg.created_at).toLocaleTimeString([], {
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
+            {chatTab === 'public' ? (
+              messages.length === 0 ? (
+                <div className="text-slate-500 text-center py-8 text-sm">
+                  No messages yet. Start the discussion!
+                </div>
+              ) : (
+                messages.map(msg => {
+                  const userName = msg.planning_users?.name || (msg.planning_users && typeof msg.planning_users === 'object' && msg.planning_users[0]?.name) || 'Unknown'
+                  return (
+                    <div key={msg.id} className="text-sm">
+                      <div className="flex items-baseline gap-2 mb-1">
+                        <span className="font-semibold text-blue-400">
+                          {userName}
+                        </span>
+                        <span className="text-xs text-slate-500">
+                          {new Date(msg.created_at).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-slate-300 break-words">{msg.message}</p>
                     </div>
-                    <p className="text-slate-300 break-words">{msg.message}</p>
+                  )
+                })
+              )
+            ) : (
+              selectedPrivateUser ? (
+                privateMessages.length === 0 ? (
+                  <div className="text-slate-500 text-center py-8 text-sm">
+                    No messages yet. Start a conversation!
                   </div>
+                ) : (
+                  privateMessages.map(msg => {
+                    const senderName = msg.planning_users?.name || 'Unknown'
+                    const isOwnMessage = msg.sender_id === userId
+                    return (
+                      <div key={msg.id} className="text-sm">
+                        <div className="flex items-baseline gap-2 mb-1">
+                          <span className={`font-semibold ${isOwnMessage ? 'text-green-400' : 'text-blue-400'}`}>
+                            {senderName}
+                          </span>
+                          <span className="text-xs text-slate-500">
+                            {new Date(msg.created_at).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                        </div>
+                        <p className={`break-words ${isOwnMessage ? 'text-slate-200' : 'text-slate-300'}`}>{msg.message}</p>
+                      </div>
+                    )
+                  })
                 )
-              })
+              ) : (
+                <div className="text-slate-500 text-center py-8 text-sm">
+                  Select a user from the list to start chatting
+                </div>
+              )
             )}
             <div ref={messagesEndRef} />
           </div>
 
           {/* Message Input */}
           <div className="border-t border-slate-600 p-4 bg-slate-750">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={messageInput}
-                onChange={(e) => setMessageInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder="Type a message..."
-                className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!messageInput.trim()}
-                className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
-              >
-                Send
-              </button>
-            </div>
+            {chatTab === 'public' ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={messageInput}
+                  onChange={(e) => setMessageInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  onClick={sendMessage}
+                  disabled={!messageInput.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                >
+                  Send
+                </button>
+              </div>
+            ) : selectedPrivateUser ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={privateMessageInput}
+                  onChange={(e) => setPrivateMessageInput(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendPrivateMessage()}
+                  placeholder="Type a message..."
+                  className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  onClick={sendPrivateMessage}
+                  disabled={!privateMessageInput.trim()}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                >
+                  Send
+                </button>
+              </div>
+            ) : (
+              <div className="text-slate-500 text-xs text-center py-2">
+                Select a user to send messages
+              </div>
+            )}
           </div>
         </div>
       </div>
