@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import L from 'leaflet'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
@@ -11,6 +11,22 @@ L.Icon.Default.mergeOptions({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
 })
+
+const PHILIPPINES_CENTER = [12.8797, 121.7740]
+const PHILIPPINES_ZOOM = 6
+
+// Map ref handler component - captures map instance for controls
+function MapRefHandler({ onMapReady }) {
+  const map = useMap()
+
+  useEffect(() => {
+    if (map) {
+      onMapReady(map)
+    }
+  }, [map, onMapReady])
+
+  return null
+}
 
 // Map click handler component - captures clicks to create locations
 function MapClickHandler({ isCreating, onLocationClick }) {
@@ -54,7 +70,11 @@ export default function PlanningChat() {
     latitude: null,
     longitude: null
   })
+  const [mapLayer, setMapLayer] = useState('street')
+  const [showMapControls, setShowMapControls] = useState(false)
+
   const messagesEndRef = useRef(null)
+  const mapRef = useRef(null)
 
   // Check auth on mount
   useEffect(() => {
@@ -96,11 +116,11 @@ export default function PlanningChat() {
 
     try {
       const channel = supabase
-        .channel('planning_locations')
+        .channel('planning_markers')
         .on('postgres_changes', {
           event: '*',
           schema: 'public',
-          table: 'planning_locations'
+          table: 'planning_markers'
         }, (payload) => {
           if (payload.eventType === 'INSERT') {
             setLocations(prev => [...prev, payload.new])
@@ -247,14 +267,14 @@ export default function PlanningChat() {
   const loadLocations = async () => {
     try {
       const { data, error } = await supabase
-        .from('planning_locations')
+        .from('planning_markers')
         .select('*')
         .order('created_at', { ascending: false })
 
       if (error) {
         if (error.code === 'PGRST116' || error.code === '42P01') {
           // Table doesn't exist, that's fine
-          console.debug('planning_locations table not found')
+          console.debug('planning_markers table not found')
           return
         }
         console.debug('Location loading error:', error.code)
@@ -400,7 +420,7 @@ export default function PlanningChat() {
 
     try {
       const { error } = await supabase
-        .from('planning_locations')
+        .from('planning_markers')
         .insert({
           planning_user_id: planningUser.id,
           user_id: userId,
@@ -433,7 +453,7 @@ export default function PlanningChat() {
   const handleDeleteLocation = async (locationId) => {
     try {
       const { error } = await supabase
-        .from('planning_locations')
+        .from('planning_markers')
         .delete()
         .eq('id', locationId)
 
@@ -470,6 +490,47 @@ export default function PlanningChat() {
     } catch (error) {
       console.error('Error updating profile:', error)
       setAuthError('Error updating profile: ' + error.message)
+    }
+  }
+
+  const handleCenterPhilippines = () => {
+    if (mapRef.current) {
+      try {
+        mapRef.current.flyTo(PHILIPPINES_CENTER, PHILIPPINES_ZOOM, { duration: 1 })
+      } catch (error) {
+        console.error('Error flying to Philippines:', error)
+      }
+    }
+  }
+
+  const handleZoomIn = () => {
+    if (mapRef.current) {
+      try {
+        mapRef.current.zoomIn()
+      } catch (error) {
+        console.error('Error zooming in:', error)
+      }
+    }
+  }
+
+  const handleZoomOut = () => {
+    if (mapRef.current) {
+      try {
+        mapRef.current.zoomOut()
+      } catch (error) {
+        console.error('Error zooming out:', error)
+      }
+    }
+  }
+
+  const getTileLayerUrl = () => {
+    switch (mapLayer) {
+      case 'satellite':
+        return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      case 'terrain':
+        return 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+      default:
+        return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
     }
   }
 
@@ -523,31 +584,103 @@ export default function PlanningChat() {
         <div className="flex-1 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col">
           {/* Map Controls */}
           {isAuthenticated && (
-            <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between">
+            <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between flex-wrap gap-2">
               <span className="text-white text-sm font-medium">{locations.length} locations</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCenterPhilippines}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  title="Center map on Philippines"
+                >
+                  🇵🇭
+                </button>
+                <button
+                  onClick={handleZoomOut}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  title="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  onClick={handleZoomIn}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  title="Zoom in"
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => setShowMapControls(!showMapControls)}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                    showMapControls
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-slate-600 hover:bg-slate-500 text-white'
+                  }`}
+                  title="Show/hide map layers"
+                >
+                  Layers
+                </button>
+                <button
+                  onClick={() => {
+                    setIsCreatingLocation(!isCreatingLocation)
+                    if (!isCreatingLocation) setShowLocationForm(false)
+                  }}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    isCreatingLocation
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-slate-600 hover:bg-slate-500 text-white'
+                  }`}
+                >
+                  {isCreatingLocation ? '✓ Click map to add' : '+ Add Location'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Map Layer Controls */}
+          {isAuthenticated && showMapControls && (
+            <div className="bg-slate-750 px-4 py-2 border-b border-slate-600 flex items-center gap-2">
+              <span className="text-slate-300 text-xs font-medium">Map Layer:</span>
               <button
-                onClick={() => {
-                  setIsCreatingLocation(!isCreatingLocation)
-                  if (!isCreatingLocation) setShowLocationForm(false)
-                }}
-                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                  isCreatingLocation
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                onClick={() => setMapLayer('street')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  mapLayer === 'street'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-slate-600 hover:bg-slate-500 text-white'
                 }`}
               >
-                {isCreatingLocation ? '✓ Click map to add' : '+ Add Location'}
+                Street
+              </button>
+              <button
+                onClick={() => setMapLayer('satellite')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  mapLayer === 'satellite'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-white'
+                }`}
+              >
+                Satellite
+              </button>
+              <button
+                onClick={() => setMapLayer('terrain')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  mapLayer === 'terrain'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-white'
+                }`}
+              >
+                Terrain
               </button>
             </div>
           )}
 
           {/* Map Container */}
           <div className="flex-1 overflow-hidden">
-            <MapContainer center={[14.5994, 120.9842]} zoom={12} className="w-full h-full" attributionControl={false}>
+            <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full" attributionControl={false}>
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={getTileLayerUrl()}
                 attribution=""
               />
+              <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
               {locations.map(loc => (
                 <Marker key={loc.id} position={[loc.latitude, loc.longitude]}>
@@ -556,6 +689,14 @@ export default function PlanningChat() {
                       <h3 className="font-semibold text-sm">{loc.name}</h3>
                       {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
                       <p className="text-xs text-slate-500 mt-2">{loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
+                      {isAuthenticated && (
+                        <button
+                          onClick={() => handleDeleteLocation(loc.id)}
+                          className="mt-2 px-2 py-1 rounded text-xs bg-red-600 hover:bg-red-700 text-white transition-colors"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </Popup>
                 </Marker>
