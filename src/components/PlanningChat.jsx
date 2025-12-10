@@ -145,6 +145,7 @@ export default function PlanningChat() {
   const [showMapControls, setShowMapControls] = useState(false)
   const [selectedLocationId, setSelectedLocationId] = useState('')
   const [selectedPortId, setSelectedPortId] = useState('')
+  const [selectedCity, setSelectedCity] = useState('')
   const [portCalculatorData, setPortCalculatorData] = useState({
     type: 'teu',
     quantity: 1,
