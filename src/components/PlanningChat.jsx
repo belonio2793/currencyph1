@@ -1179,7 +1179,7 @@ export default function PlanningChat() {
                           </div>
                         )}
 
-                        <p className="text-xs text-slate-500 border-t pt-2">👤 {creatorName}</p>
+                        <p className="text-xs text-slate-500 border-t pt-2">👤 <button onClick={() => product.planning_users && handleShowUserProfile(product.planning_users)} className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer underline transition-colors">{creatorName}</button></p>
                       </div>
                     </Popup>
                   </Marker>
