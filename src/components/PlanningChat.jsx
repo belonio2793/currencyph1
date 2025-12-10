@@ -660,25 +660,46 @@ export default function PlanningChat() {
           )}
         </div>
 
-        {/* Public Locations Dropdown */}
-        {locations.length > 0 && (
-          <div className="flex items-center gap-3">
-            <label htmlFor="public-locations-select" className="text-slate-300 text-sm font-medium">Locations:</label>
-            <select
-              id="public-locations-select"
-              value={selectedLocationId}
-              onChange={handleLocationSelect}
-              className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
-            >
-              <option value="">View location...</option>
-              {locations.map(loc => (
-                <option key={loc.id} value={loc.id}>
-                  {loc.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {/* Public Locations & Ports Dropdown */}
+        <div className="flex items-center gap-3 flex-wrap">
+          {locations.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label htmlFor="public-locations-select" className="text-slate-300 text-sm font-medium">Locations:</label>
+              <select
+                id="public-locations-select"
+                value={selectedLocationId}
+                onChange={handleLocationSelect}
+                className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+              >
+                <option value="">View location...</option>
+                {locations.map(loc => (
+                  <option key={loc.id} value={loc.id}>
+                    {loc.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {shippingPorts.length > 0 && (
+            <div className="flex items-center gap-2">
+              <label htmlFor="shipping-ports-select" className="text-slate-300 text-sm font-medium">Ports:</label>
+              <select
+                id="shipping-ports-select"
+                value={selectedPortId}
+                onChange={handlePortSelect}
+                className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+              >
+                <option value="">View port...</option>
+                {shippingPorts.map(port => (
+                  <option key={port.id} value={port.id}>
+                    {port.name} ({port.country_code})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 flex gap-6 p-6 overflow-hidden">
