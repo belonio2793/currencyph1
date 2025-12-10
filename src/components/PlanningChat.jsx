@@ -286,7 +286,7 @@ export default function PlanningChat() {
         setUserEmail('')
       }
     } catch (error) {
-      console.error('Auth check error:', error)
+      console.error('Auth check error:', error?.message || error)
       setIsAuthenticated(false)
       setPlanningUser(null)
       setUserEmail('')
@@ -328,7 +328,7 @@ export default function PlanningChat() {
         setEditingName(data.name)
       }
     } catch (error) {
-      console.error('Error loading planning user:', error)
+      console.error('Error loading planning user:', error?.message || error)
       setPlanningUser(null)
     }
   }
@@ -648,7 +648,7 @@ export default function PlanningChat() {
         .eq('id', locationId)
 
       if (error) {
-        console.error('Error deleting location:', error)
+        console.error('Error deleting location:', error?.message || error)
         return
       }
 
@@ -668,7 +668,7 @@ export default function PlanningChat() {
         .eq('id', planningUser.id)
 
       if (error) {
-        console.error('Profile update error:', error)
+        console.error('Profile update error:', error?.message || error)
         setAuthError('Failed to update profile: ' + error.message)
         return
       }
@@ -678,7 +678,7 @@ export default function PlanningChat() {
       setShowProfileSettings(false)
       setAuthError('')
     } catch (error) {
-      console.error('Error updating profile:', error)
+      console.error('Error updating profile:', error?.message || error)
       setAuthError('Error updating profile: ' + error.message)
     }
   }
@@ -870,7 +870,7 @@ export default function PlanningChat() {
         })
 
       if (error) {
-        console.error('Error sending private message:', error)
+        console.error('Error sending private message:', error?.message || error)
         setAuthError('Failed to send message')
         return
       }
