@@ -808,7 +808,25 @@ export default function PlanningChat() {
       case 'terrain':
         return 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
       default:
-        return 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png'
+        return 'https://{s}.basemaps.cartocdn.com/positron/{z}/{x}/{y}{r}.png'
+    }
+  }
+
+  const handleCitySelect = (e) => {
+    const cityName = e.target.value
+    setSelectedCity(cityName)
+    setSelectedLocationId('')
+    setSelectedPortId('')
+
+    if (!cityName || !mapRef.current) return
+
+    const city = PHILIPPINE_CITIES.find(c => c.name === cityName)
+    if (city) {
+      try {
+        mapRef.current.flyTo([city.lat, city.lng], 11, { duration: 1 })
+      } catch (error) {
+        console.error('Error flying to city:', error)
+      }
     }
   }
 
