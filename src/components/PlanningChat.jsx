@@ -584,31 +584,103 @@ export default function PlanningChat() {
         <div className="flex-1 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col">
           {/* Map Controls */}
           {isAuthenticated && (
-            <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between">
+            <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between flex-wrap gap-2">
               <span className="text-white text-sm font-medium">{locations.length} locations</span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCenterPhilippines}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  title="Center map on Philippines"
+                >
+                  🇵🇭
+                </button>
+                <button
+                  onClick={handleZoomOut}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  title="Zoom out"
+                >
+                  −
+                </button>
+                <button
+                  onClick={handleZoomIn}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  title="Zoom in"
+                >
+                  +
+                </button>
+                <button
+                  onClick={() => setShowMapControls(!showMapControls)}
+                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                    showMapControls
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-slate-600 hover:bg-slate-500 text-white'
+                  }`}
+                  title="Show/hide map layers"
+                >
+                  Layers
+                </button>
+                <button
+                  onClick={() => {
+                    setIsCreatingLocation(!isCreatingLocation)
+                    if (!isCreatingLocation) setShowLocationForm(false)
+                  }}
+                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                    isCreatingLocation
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-slate-600 hover:bg-slate-500 text-white'
+                  }`}
+                >
+                  {isCreatingLocation ? '✓ Click map to add' : '+ Add Location'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Map Layer Controls */}
+          {isAuthenticated && showMapControls && (
+            <div className="bg-slate-750 px-4 py-2 border-b border-slate-600 flex items-center gap-2">
+              <span className="text-slate-300 text-xs font-medium">Map Layer:</span>
               <button
-                onClick={() => {
-                  setIsCreatingLocation(!isCreatingLocation)
-                  if (!isCreatingLocation) setShowLocationForm(false)
-                }}
-                className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
-                  isCreatingLocation
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                onClick={() => setMapLayer('street')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  mapLayer === 'street'
+                    ? 'bg-blue-600 text-white'
                     : 'bg-slate-600 hover:bg-slate-500 text-white'
                 }`}
               >
-                {isCreatingLocation ? '✓ Click map to add' : '+ Add Location'}
+                Street
+              </button>
+              <button
+                onClick={() => setMapLayer('satellite')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  mapLayer === 'satellite'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-white'
+                }`}
+              >
+                Satellite
+              </button>
+              <button
+                onClick={() => setMapLayer('terrain')}
+                className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  mapLayer === 'terrain'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-600 hover:bg-slate-500 text-white'
+                }`}
+              >
+                Terrain
               </button>
             </div>
           )}
 
           {/* Map Container */}
           <div className="flex-1 overflow-hidden">
-            <MapContainer center={[14.5994, 120.9842]} zoom={12} className="w-full h-full" attributionControl={false}>
+            <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full" attributionControl={false}>
               <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                url={getTileLayerUrl()}
                 attribution=""
               />
+              <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
               {locations.map(loc => (
                 <Marker key={loc.id} position={[loc.latitude, loc.longitude]}>
@@ -617,6 +689,14 @@ export default function PlanningChat() {
                       <h3 className="font-semibold text-sm">{loc.name}</h3>
                       {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
                       <p className="text-xs text-slate-500 mt-2">{loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
+                      {isAuthenticated && (
+                        <button
+                          onClick={() => handleDeleteLocation(loc.id)}
+                          className="mt-2 px-2 py-1 rounded text-xs bg-red-600 hover:bg-red-700 text-white transition-colors"
+                        >
+                          Delete
+                        </button>
+                      )}
                     </div>
                   </Popup>
                 </Marker>
