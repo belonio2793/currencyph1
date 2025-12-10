@@ -1068,25 +1068,38 @@ export default function PlanningChat() {
               />
               <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
-              {locations.map(loc => (
-                <Marker key={`loc-${loc.id}`} position={[loc.latitude, loc.longitude]}>
-                  <Popup>
-                    <div className="p-2 min-w-48">
-                      <h3 className="font-semibold text-sm">{loc.name}</h3>
-                      {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
-                      <p className="text-xs text-slate-500 mt-2">{loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
-                      {isAuthenticated && (
-                        <button
-                          onClick={() => handleDeleteLocation(loc.id)}
-                          className="mt-2 px-2 py-1 rounded text-xs bg-red-600 hover:bg-red-700 text-white transition-colors"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
+              {locations.map(loc => {
+                const creatorName = loc.planning_users?.name || 'Unknown User'
+                return (
+                  <Marker key={`loc-${loc.id}`} position={[loc.latitude, loc.longitude]}>
+                    <Popup>
+                      <div className="p-2 min-w-48">
+                        <h3 className="font-semibold text-sm">{loc.name}</h3>
+                        {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
+                        <p className="text-xs text-slate-500 mt-2">📍 {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
+                        <p className="text-xs text-slate-500 mt-1">👤 Added by: <span className="text-blue-600 font-medium">{creatorName}</span></p>
+                        {isAuthenticated && userId && loc.planning_users && (
+                          <button
+                            onClick={() => loadOrCreateConversation(loc.planning_users.id, loc.planning_users)}
+                            className="mt-2 w-full px-2 py-1 rounded text-xs bg-blue-600 hover:bg-blue-700 text-white transition-colors mb-1"
+                            title="Send private message"
+                          >
+                            Message
+                          </button>
+                        )}
+                        {isAuthenticated && userId === loc.user_id && (
+                          <button
+                            onClick={() => handleDeleteLocation(loc.id)}
+                            className="w-full px-2 py-1 rounded text-xs bg-red-600 hover:bg-red-700 text-white transition-colors"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </Popup>
+                  </Marker>
+                )
+              })}
 
               {shippingPorts.map(port => {
                 const markerColor = port.country_code === 'CN' ? 'blue' : 'red'
