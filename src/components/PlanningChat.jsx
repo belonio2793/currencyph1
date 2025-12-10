@@ -70,7 +70,11 @@ export default function PlanningChat() {
     latitude: null,
     longitude: null
   })
+  const [mapLayer, setMapLayer] = useState('street')
+  const [showMapControls, setShowMapControls] = useState(false)
+
   const messagesEndRef = useRef(null)
+  const mapRef = useRef(null)
 
   // Check auth on mount
   useEffect(() => {
