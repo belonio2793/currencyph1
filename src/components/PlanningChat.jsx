@@ -337,7 +337,7 @@ export default function PlanningChat() {
     try {
       const { data, error } = await supabase
         .from('planning_messages')
-        .select('*, planning_users(name, email)')
+        .select('*, planning_users(id, name, email, user_id)')
         .order('created_at', { ascending: true })
         .limit(100)
 
@@ -814,7 +814,7 @@ export default function PlanningChat() {
     try {
       const { data, error } = await supabase
         .from('planning_private_messages')
-        .select('*, planning_users(name, email)')
+        .select('*, planning_users(id, name, email, user_id)')
         .eq('conversation_id', conversationId)
         .order('created_at', { ascending: true })
 
