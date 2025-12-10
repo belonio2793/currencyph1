@@ -542,22 +542,26 @@ export default function PlanningChat() {
     if (!locationForm.name.trim() || !planningUser) return
 
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('planning_markers')
         .insert({
           planning_user_id: planningUser.id,
           user_id: userId,
           name: locationForm.name.trim(),
           description: locationForm.description.trim(),
-          latitude: locationForm.latitude,
-          longitude: locationForm.longitude
+          latitude: parseFloat(locationForm.latitude),
+          longitude: parseFloat(locationForm.longitude)
         })
+        .select()
 
       if (error) {
-        console.error('Error saving location:', error)
-        setAuthError('Failed to save location')
+        console.error('Error saving location:', error.message, error.code, error.details)
+        setAuthError(`Failed to save location: ${error.message}`)
         return
       }
+
+      // Reload locations with creators
+      await loadLocationsWithCreators()
 
       setShowLocationForm(false)
       setIsCreatingLocation(false)
@@ -567,9 +571,10 @@ export default function PlanningChat() {
         latitude: null,
         longitude: null
       })
+      setAuthError('')
     } catch (error) {
       console.error('Error saving location:', error?.message)
-      setAuthError('Error saving location')
+      setAuthError(`Error saving location: ${error?.message}`)
     }
   }
 
