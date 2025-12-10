@@ -1143,10 +1143,11 @@ export default function PlanningChat() {
           <div className="flex-1 overflow-hidden">
             <style>{`
               .planning-map-container .leaflet-tile {
-                filter: none;
+                border: none !important;
+                outline: none !important;
               }
-              .planning-map-container .leaflet-tile-container {
-                opacity: 1;
+              .planning-map-container .leaflet-pane svg {
+                filter: drop-shadow(0 0 0px transparent);
               }
             `}</style>
             <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" attributionControl={false}>
