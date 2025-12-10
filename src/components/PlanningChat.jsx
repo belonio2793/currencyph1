@@ -29,6 +29,29 @@ function MapRefHandler({ onMapReady }) {
   return null
 }
 
+// Create colored marker icon for ports
+function createColoredMarker(color = 'red') {
+  const colorMap = {
+    red: '#EF4444',
+    blue: '#3B82F6',
+    green: '#10B981',
+    yellow: '#FBBF24'
+  }
+
+  const markerColor = colorMap[color] || colorMap.red
+
+  const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${markerColor}" width="32" height="32">
+    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
+  </svg>`
+
+  return new L.Icon({
+    iconUrl: `data:image/svg+xml;base64,${btoa(svgString)}`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
+  })
+}
+
 // Map click handler component - captures clicks to create locations
 function MapClickHandler({ isCreating, onLocationClick }) {
   useMapEvents({
