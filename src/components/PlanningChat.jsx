@@ -327,7 +327,7 @@ export default function PlanningChat() {
   const loadShippingPorts = async () => {
     try {
       const { data, error } = await supabase
-        .from('shipping_ports')
+        .from('planning_shipping_ports')
         .select('*')
         .eq('is_public', true)
         .eq('status', 'active')
@@ -336,7 +336,7 @@ export default function PlanningChat() {
 
       if (error) {
         if (error.code === 'PGRST116' || error.code === '42P01') {
-          console.debug('shipping_ports table not found')
+          console.debug('planning_shipping_ports table not found')
           return
         }
         console.debug('Shipping ports loading error:', error.code)
