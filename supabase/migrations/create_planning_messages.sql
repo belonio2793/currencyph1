@@ -1,5 +1,6 @@
 -- Create planning_messages table for planning chat feature
 -- This table stores messages in the planning group chat
+-- IDEMPOTENT: Safe to run multiple times
 
 CREATE TABLE IF NOT EXISTS public.planning_messages (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -19,23 +20,26 @@ CREATE INDEX IF NOT EXISTS idx_planning_messages_created_at ON public.planning_m
 -- Enable RLS (Row Level Security)
 ALTER TABLE public.planning_messages ENABLE ROW LEVEL SECURITY;
 
--- Policy: Allow authenticated users to read all messages
+-- Drop existing policies before recreating (idempotent approach)
+DROP POLICY IF EXISTS "Allow read all messages" ON public.planning_messages;
+DROP POLICY IF EXISTS "Allow authenticated to insert messages" ON public.planning_messages;
+DROP POLICY IF EXISTS "Allow users to update own messages" ON public.planning_messages;
+DROP POLICY IF EXISTS "Allow users to delete own messages" ON public.planning_messages;
+
+-- Recreate policies (now safe because we dropped them first)
 CREATE POLICY "Allow read all messages" ON public.planning_messages
   FOR SELECT USING (TRUE);
 
--- Policy: Allow authenticated users to insert messages
 CREATE POLICY "Allow authenticated to insert messages" ON public.planning_messages
   FOR INSERT WITH CHECK (auth.role() = 'authenticated' AND user_id = auth.uid());
 
--- Policy: Allow users to update their own messages
 CREATE POLICY "Allow users to update own messages" ON public.planning_messages
-  FOR UPDATE USING (user_id = auth.uid());
+  FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
--- Policy: Allow users to delete their own messages
 CREATE POLICY "Allow users to delete own messages" ON public.planning_messages
   FOR DELETE USING (user_id = auth.uid());
 
--- Create trigger to update updated_at timestamp
+-- Create or replace function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_planning_messages_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -44,6 +48,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Drop and recreate trigger (idempotent approach)
 DROP TRIGGER IF EXISTS planning_messages_timestamp_trigger ON public.planning_messages;
 
 CREATE TRIGGER planning_messages_timestamp_trigger
