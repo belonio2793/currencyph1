@@ -21,36 +21,25 @@ const getEnv = (name) => {
 // Keep reference to original fetch (no wrapper to avoid response body conflicts with Supabase)
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
 
-// Add global error handler to suppress expected Supabase connection errors
+// Add global error handler to suppress expected network connectivity errors from Supabase
 if (typeof window !== 'undefined') {
-  // Suppress console errors from Supabase fetch failures (these are non-critical)
-  const originalConsoleError = console.error
-  console.error = function(...args) {
-    // Filter out "Failed to fetch" errors from Supabase
-    const errorStr = String(args[0] || '')
-    if (errorStr.includes('Failed to fetch') || errorStr.includes('TypeError: Failed to fetch')) {
-      // Silently ignore network failures - presence/sync operations are non-critical
-      return
-    }
-    // Call original console.error for other errors
-    return originalConsoleError.apply(console, args)
-  }
-
-  window.addEventListener('error', (event) => {
-    // Suppress "Failed to fetch" errors from Supabase when network is unavailable
-    if (event.message && event.message.includes('Failed to fetch')) {
-      event.preventDefault()
-      return true
-    }
-  }, true)
-
   window.addEventListener('unhandledrejection', (event) => {
     // Suppress unhandled promise rejections from Supabase fetch failures
+    // These occur when the network is unavailable or Fly.io container can't reach Supabase
     const reason = event.reason
     if (reason && (
       (reason.message && reason.message.includes('Failed to fetch')) ||
       String(reason).includes('Failed to fetch')
     )) {
+      // Silently suppress - presence and background sync are non-critical features
+      event.preventDefault()
+      return true
+    }
+  }, true)
+
+  window.addEventListener('error', (event) => {
+    // Suppress "Failed to fetch" errors from within Supabase library
+    if (event.message && event.message.includes('Failed to fetch')) {
       event.preventDefault()
       return true
     }
