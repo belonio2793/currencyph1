@@ -1373,9 +1373,9 @@ export default function PlanningChat() {
                   return (
                     <div key={msg.id} className="text-sm">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <span className="font-semibold text-blue-400">
+                        <button onClick={() => msg.planning_users && loadOrCreateConversation(msg.planning_users.id, msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
                           {userName}
-                        </span>
+                        </button>
                         <span className="text-xs text-slate-500">
                           {new Date(msg.created_at).toLocaleTimeString([], {
                             hour: '2-digit',
