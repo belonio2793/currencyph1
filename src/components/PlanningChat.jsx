@@ -493,6 +493,47 @@ export default function PlanningChat() {
     }
   }
 
+  const handleCenterPhilippines = () => {
+    if (mapRef.current) {
+      try {
+        mapRef.current.flyTo(PHILIPPINES_CENTER, PHILIPPINES_ZOOM, { duration: 1 })
+      } catch (error) {
+        console.error('Error flying to Philippines:', error)
+      }
+    }
+  }
+
+  const handleZoomIn = () => {
+    if (mapRef.current) {
+      try {
+        mapRef.current.zoomIn()
+      } catch (error) {
+        console.error('Error zooming in:', error)
+      }
+    }
+  }
+
+  const handleZoomOut = () => {
+    if (mapRef.current) {
+      try {
+        mapRef.current.zoomOut()
+      } catch (error) {
+        console.error('Error zooming out:', error)
+      }
+    }
+  }
+
+  const getTileLayerUrl = () => {
+    switch (mapLayer) {
+      case 'satellite':
+        return 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+      case 'terrain':
+        return 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+      default:
+        return 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+    }
+  }
+
   // Show loading while checking auth
   if (!authChecked) {
     return (
