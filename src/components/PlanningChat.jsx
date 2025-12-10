@@ -524,6 +524,22 @@ export default function PlanningChat() {
     }
   }
 
+  const handleLocationSelect = (e) => {
+    const locationId = e.target.value
+    setSelectedLocationId(locationId)
+
+    if (!locationId || !mapRef.current) return
+
+    const location = locations.find(loc => loc.id === locationId)
+    if (location) {
+      try {
+        mapRef.current.flyTo([location.latitude, location.longitude], 12, { duration: 1 })
+      } catch (error) {
+        console.error('Error flying to location:', error)
+      }
+    }
+  }
+
   const getTileLayerUrl = () => {
     switch (mapLayer) {
       case 'satellite':
