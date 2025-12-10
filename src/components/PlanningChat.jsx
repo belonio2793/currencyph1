@@ -767,6 +767,18 @@ export default function PlanningChat() {
     }
   }
 
+  const handleShowUserProfile = (user) => {
+    setSelectedUserForProfile(user)
+    setShowUserProfile(true)
+  }
+
+  const handleStartConversationFromProfile = async () => {
+    if (selectedUserForProfile) {
+      setShowUserProfile(false)
+      await loadOrCreateConversation(selectedUserForProfile.user_id, selectedUserForProfile)
+    }
+  }
+
   const loadOrCreateConversation = async (otherUserId, otherUserData = null) => {
     try {
       // Try to find existing conversation using both possible orderings
