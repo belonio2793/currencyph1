@@ -66,6 +66,9 @@ async function updatePresence(status) {
   // Skip presence updates if Supabase is not healthy
   if (!isSupabaseHealthy()) return
 
+  // Skip if browser is offline
+  if (typeof navigator !== 'undefined' && !navigator.onLine) return
+
   try {
     const updateData = {
       user_id: currentUserId,
