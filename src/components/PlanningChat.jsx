@@ -187,7 +187,7 @@ export default function PlanningChat() {
   useEffect(() => {
     loadShippingPorts()
     loadProducts()
-    subscribeToProducts()
+    return subscribeToProducts()
   }, [])
 
   // Load locations with creator information
