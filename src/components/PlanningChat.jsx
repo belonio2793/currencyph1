@@ -822,7 +822,7 @@ export default function PlanningChat() {
               <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
               {locations.map(loc => (
-                <Marker key={loc.id} position={[loc.latitude, loc.longitude]}>
+                <Marker key={`loc-${loc.id}`} position={[loc.latitude, loc.longitude]}>
                   <Popup>
                     <div className="p-2 min-w-48">
                       <h3 className="font-semibold text-sm">{loc.name}</h3>
@@ -840,6 +840,123 @@ export default function PlanningChat() {
                   </Popup>
                 </Marker>
               ))}
+
+              {shippingPorts.map(port => {
+                const markerColor = port.country_code === 'CN' ? 'blue' : 'red'
+                const defaultCargo = portRateCalculator.getDefaultCargo('teu')
+                const costBreakdown = portRateCalculator.calculateTotalCost(port, defaultCargo)
+
+                return (
+                  <Marker
+                    key={`port-${port.id}`}
+                    position={[port.latitude, port.longitude]}
+                    icon={createColoredMarker(markerColor)}
+                  >
+                    <Popup>
+                      <div className="p-3 min-w-80 max-h-96 overflow-y-auto bg-white rounded">
+                        <h3 className="font-bold text-sm mb-1">{port.name}</h3>
+                        <p className="text-xs text-slate-600 mb-2">{port.description}</p>
+
+                        <div className="border-t pt-2 mb-2">
+                          <p className="text-xs font-semibold text-slate-700">📍 Location</p>
+                          <p className="text-xs text-slate-600">{port.city}, {port.province}</p>
+                          <p className="text-xs text-slate-500">{port.latitude.toFixed(4)}, {port.longitude.toFixed(4)}</p>
+                        </div>
+
+                        <div className="border-t pt-2 mb-2">
+                          <p className="text-xs font-semibold text-slate-700">📊 Port Details</p>
+                          <p className="text-xs text-slate-600">Type: {port.port_type}</p>
+                          <p className="text-xs text-slate-600">Max Depth: {port.max_depth_meters}m</p>
+                          <p className="text-xs text-slate-600">Capacity: {port.annual_capacity_teu?.toLocaleString() || 'N/A'} TEU</p>
+                        </div>
+
+                        <div className="border-t pt-2 mb-2">
+                          <p className="text-xs font-semibold text-slate-700">✈️ Services</p>
+                          <div className="text-xs text-slate-600 space-y-1">
+                            {port.container_terminal && <p>✓ Container Terminal</p>}
+                            {port.ro_ro_services && <p>✓ RoRo Services</p>}
+                            {port.breakbulk_services && <p>✓ Breakbulk</p>}
+                            {port.bulk_cargo && <p>✓ Bulk Cargo</p>}
+                            {port.refrigerated_containers && <p>✓ Refrigerated</p>}
+                            {port.dangerous_cargo && <p>✓ Dangerous Cargo</p>}
+                          </div>
+                        </div>
+
+                        <div className="border-t pt-2">
+                          <p className="text-xs font-semibold text-slate-700 mb-2">💰 Rate Calculator</p>
+
+                          <div className="space-y-1 mb-2">
+                            <div className="text-xs">
+                              <label className="text-slate-600">Cargo Type:</label>
+                              <select
+                                value={portCalculatorData.type}
+                                onChange={(e) => handlePortCalculatorChange('type', e.target.value)}
+                                className="w-full px-1 py-1 border border-slate-300 rounded text-xs"
+                              >
+                                <option value="kg">Weight (kg)</option>
+                                <option value="teu">Container (TEU)</option>
+                                <option value="cbm">Volume (CBM)</option>
+                              </select>
+                            </div>
+
+                            <div className="text-xs">
+                              <label className="text-slate-600">Quantity:</label>
+                              <input
+                                type="number"
+                                value={portCalculatorData.quantity}
+                                onChange={(e) => handlePortCalculatorChange('quantity', parseFloat(e.target.value) || 1)}
+                                min="1"
+                                step="1"
+                                className="w-full px-1 py-1 border border-slate-300 rounded text-xs"
+                              />
+                            </div>
+
+                            <div className="text-xs">
+                              <label className="text-slate-600">Direction:</label>
+                              <select
+                                value={portCalculatorData.direction}
+                                onChange={(e) => handlePortCalculatorChange('direction', e.target.value)}
+                                className="w-full px-1 py-1 border border-slate-300 rounded text-xs"
+                              >
+                                <option value="import">Import</option>
+                                <option value="export">Export</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="bg-slate-100 p-2 rounded text-xs">
+                            {(() => {
+                              const calc = portRateCalculator.calculateTotalCost(port, portCalculatorData)
+                              return (
+                                <div className="space-y-1 font-mono text-slate-700">
+                                  <p>Handling: ₱{calc.handling_fee.toLocaleString()}</p>
+                                  <p>Documentation: ₱{calc.documentation_fee.toLocaleString()}</p>
+                                  <p>Port Auth: ₱{calc.port_authority_fee.toLocaleString()}</p>
+                                  <p>Security: ₱{calc.security_fee.toLocaleString()}</p>
+                                  <p>Customs: ₱{calc.customs_clearance_fee.toLocaleString()}</p>
+                                  <p className="border-t pt-1">Surcharge ({calc.surcharge_percentage}%): ₱{calc.surcharge_amount.toLocaleString()}</p>
+                                  <p className="font-bold border-t pt-1 text-green-700">TOTAL: ₱{calc.total.toLocaleString()}</p>
+                                </div>
+                              )
+                            })()}
+                          </div>
+
+                          {port.contact_phone && (
+                            <p className="text-xs text-slate-600 mt-2">📞 {port.contact_phone}</p>
+                          )}
+                          {port.website && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              <a href={port.website} target="_blank" rel="noopener noreferrer">
+                                {port.website}
+                              </a>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                )
+              })}
             </MapContainer>
           </div>
         </div>
