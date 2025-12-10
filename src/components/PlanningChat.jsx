@@ -420,7 +420,7 @@ export default function PlanningChat() {
 
     try {
       const { error } = await supabase
-        .from('planning_locations')
+        .from('planning_markers')
         .insert({
           planning_user_id: planningUser.id,
           user_id: userId,
