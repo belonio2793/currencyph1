@@ -86,7 +86,9 @@ export default function PlanningChat() {
   const [showProfileSettings, setShowProfileSettings] = useState(false)
   const [editingName, setEditingName] = useState('')
   const [locations, setLocations] = useState([])
+  const [locationsWithCreators, setLocationsWithCreators] = useState([])
   const [shippingPorts, setShippingPorts] = useState([])
+  const [products, setProducts] = useState([])
   const [isCreatingLocation, setIsCreatingLocation] = useState(false)
   const [showLocationForm, setShowLocationForm] = useState(false)
   const [locationForm, setLocationForm] = useState({
@@ -104,6 +106,11 @@ export default function PlanningChat() {
     quantity: 1,
     direction: 'import'
   })
+  const [chatTab, setChatTab] = useState('public')  // 'public' or 'private'
+  const [privateConversations, setPrivateConversations] = useState([])
+  const [selectedPrivateUserId, setSelectedPrivateUserId] = useState(null)
+  const [privateMessages, setPrivateMessages] = useState([])
+  const [privateMessageInput, setPrivateMessageInput] = useState('')
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
