@@ -117,6 +117,11 @@ export default function PlanningChat() {
     }
   }, [isAuthenticated])
 
+  // Load shipping ports (public, available to all users)
+  useEffect(() => {
+    loadShippingPorts()
+  }, [])
+
   // Subscribe to locations updates
   useEffect(() => {
     if (!isAuthenticated) return
