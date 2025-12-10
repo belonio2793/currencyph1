@@ -573,26 +573,51 @@ export default function PlanningChat() {
 
   const handleSaveLocation = async (e) => {
     e.preventDefault()
-    if (!locationForm.name.trim() || !planningUser) return
+    if (!locationForm.name.trim() || !planningUser) {
+      setAuthError('Please enter a location name')
+      return
+    }
+
+    if (locationForm.latitude === null || locationForm.longitude === null) {
+      setAuthError('Please click on the map to select a location')
+      return
+    }
 
     try {
+      const payload = {
+        planning_user_id: planningUser.id,
+        user_id: userId,
+        name: locationForm.name.trim(),
+        description: locationForm.description.trim(),
+        latitude: parseFloat(locationForm.latitude),
+        longitude: parseFloat(locationForm.longitude)
+      }
+
+      console.debug('Saving marker with payload:', payload)
+
       const { data, error } = await supabase
         .from('planning_markers')
-        .insert({
-          planning_user_id: planningUser.id,
-          user_id: userId,
-          name: locationForm.name.trim(),
-          description: locationForm.description.trim(),
-          latitude: parseFloat(locationForm.latitude),
-          longitude: parseFloat(locationForm.longitude)
-        })
+        .insert(payload)
         .select()
 
       if (error) {
-        console.error('Error saving location:', error.message, error.code, error.details)
+        console.error('Error saving location:', {
+          message: error.message,
+          code: error.code,
+          details: error.details,
+          hint: error.hint
+        })
         setAuthError(`Failed to save location: ${error.message}`)
         return
       }
+
+      if (!data || data.length === 0) {
+        console.warn('No data returned from insert')
+        setAuthError('Location saved but unable to confirm. Please refresh.')
+        return
+      }
+
+      console.log('Location saved successfully:', data)
 
       // Reload locations with creators
       await loadLocationsWithCreators()
@@ -607,7 +632,7 @@ export default function PlanningChat() {
       })
       setAuthError('')
     } catch (error) {
-      console.error('Error saving location:', error?.message)
+      console.error('Error saving location:', error?.message, error)
       setAuthError(`Error saving location: ${error?.message}`)
     }
   }
