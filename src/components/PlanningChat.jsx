@@ -29,13 +29,16 @@ function MapRefHandler({ onMapReady }) {
   return null
 }
 
-// Create colored marker icon for ports
+// Create colored marker icon for ports and products
 function createColoredMarker(color = 'red') {
   const colorMap = {
     red: '#EF4444',
     blue: '#3B82F6',
     green: '#10B981',
-    yellow: '#FBBF24'
+    yellow: '#FBBF24',
+    water: '#3B82F6',
+    coconut: '#A16207',
+    mango: '#CA8A04'
   }
 
   const markerColor = colorMap[color] || colorMap.red
