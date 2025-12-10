@@ -1046,6 +1046,23 @@ export default function PlanningChat() {
               </select>
             </div>
           )}
+
+          <div className="flex items-center gap-2">
+            <label htmlFor="cities-select" className="text-slate-300 text-sm font-medium">Cities:</label>
+            <select
+              id="cities-select"
+              value={selectedCity}
+              onChange={handleCitySelect}
+              className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+            >
+              <option value="">Select a city...</option>
+              {PHILIPPINE_CITIES.map((city, idx) => (
+                <option key={`city-${idx}`} value={city.name}>
+                  {city.name} ({city.region})
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
