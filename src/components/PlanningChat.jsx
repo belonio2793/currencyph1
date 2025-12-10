@@ -54,7 +54,7 @@ const markerTypeEmojis = {
   'Transportation': '🚚'
 }
 
-// Create colored marker icon for ports and products
+// Create colored marker icon for ports, products, and custom markers
 function createColoredMarker(color = 'red') {
   const colorMap = {
     red: '#EF4444',
@@ -63,10 +63,24 @@ function createColoredMarker(color = 'red') {
     yellow: '#FBBF24',
     water: '#3B82F6',
     coconut: '#A16207',
-    mango: '#CA8A04'
+    mango: '#CA8A04',
+    landowner: '#3B82F6',
+    machinery: '#F97316',
+    equipment: '#10B981',
+    warehouse: '#A855F7',
+    seller: '#EF4444',
+    vendor: '#FBBF24',
+    manufacturing: '#92400E',
+    processing: '#06B6D4',
+    transportation: '#6B7280'
   }
 
-  const markerColor = colorMap[color] || colorMap.red
+  let markerColor = colorMap[color?.toLowerCase()] || colorMap[color] || colorMap.red
+
+  // Handle hex colors directly
+  if (color && color.startsWith('#')) {
+    markerColor = color
+  }
 
   const svgString = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="${markerColor}" width="32" height="32">
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-13c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z"/>
