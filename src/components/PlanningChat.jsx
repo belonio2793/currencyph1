@@ -1072,7 +1072,7 @@ export default function PlanningChat() {
           {/* Map Controls */}
           {isAuthenticated && (
             <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-white text-sm font-medium">{locations.length} locations</span>
                 {locations.length > 0 && (
                   <select
@@ -1088,6 +1088,18 @@ export default function PlanningChat() {
                     ))}
                   </select>
                 )}
+                <select
+                  value={selectedCity}
+                  onChange={handleCitySelect}
+                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 text-white border border-slate-500 hover:bg-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+                >
+                  <option value="">Jump to city...</option>
+                  {PHILIPPINE_CITIES.map((city, idx) => (
+                    <option key={`city-ctrl-${idx}`} value={city.name}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="flex items-center gap-2">
                 <button
