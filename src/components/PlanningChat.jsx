@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { portRateCalculator } from '../lib/portRateCalculatorService'
 import L from 'leaflet'
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
