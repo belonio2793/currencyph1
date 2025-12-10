@@ -152,13 +152,6 @@ export default function PlanningChat() {
     }
   }, [isAuthenticated])
 
-  // Load shipping ports (public, available to all users)
-  useEffect(() => {
-    loadShippingPorts()
-    loadProducts()
-    subscribeToProducts()
-  }, [])
-
   // Subscribe to products updates
   const subscribeToProducts = () => {
     try {
@@ -189,6 +182,13 @@ export default function PlanningChat() {
       return () => {}
     }
   }
+
+  // Load shipping ports (public, available to all users)
+  useEffect(() => {
+    loadShippingPorts()
+    loadProducts()
+    subscribeToProducts()
+  }, [])
 
   // Load locations with creator information
   useEffect(() => {
