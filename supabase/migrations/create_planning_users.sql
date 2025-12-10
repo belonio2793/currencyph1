@@ -1,5 +1,6 @@
 -- Create planning_users table for planning chat feature
 -- This table tracks users participating in the planning group
+-- IDEMPOTENT: Safe to run multiple times
 
 CREATE TABLE IF NOT EXISTS public.planning_users (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -14,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.planning_users (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Create indexes for better query performance
+-- Create indexes for better query performance (safe to run multiple times)
 CREATE INDEX IF NOT EXISTS idx_planning_users_user_id ON public.planning_users(user_id);
 CREATE INDEX IF NOT EXISTS idx_planning_users_email ON public.planning_users(email);
 CREATE INDEX IF NOT EXISTS idx_planning_users_status ON public.planning_users(status);
@@ -22,23 +23,26 @@ CREATE INDEX IF NOT EXISTS idx_planning_users_status ON public.planning_users(st
 -- Enable RLS (Row Level Security)
 ALTER TABLE public.planning_users ENABLE ROW LEVEL SECURITY;
 
--- Policy: Allow authenticated users to read all planning users
+-- Drop existing policies before recreating (idempotent approach)
+DROP POLICY IF EXISTS "Allow read all planning users" ON public.planning_users;
+DROP POLICY IF EXISTS "Allow users to create own profile" ON public.planning_users;
+DROP POLICY IF EXISTS "Allow users to update own profile" ON public.planning_users;
+DROP POLICY IF EXISTS "Allow users to delete own profile" ON public.planning_users;
+
+-- Recreate policies (now safe because we dropped them first)
 CREATE POLICY "Allow read all planning users" ON public.planning_users
   FOR SELECT USING (TRUE);
 
--- Policy: Allow users to create their own planning user profile
 CREATE POLICY "Allow users to create own profile" ON public.planning_users
   FOR INSERT WITH CHECK (user_id = auth.uid());
 
--- Policy: Allow users to update their own planning user profile
 CREATE POLICY "Allow users to update own profile" ON public.planning_users
-  FOR UPDATE USING (user_id = auth.uid());
+  FOR UPDATE USING (user_id = auth.uid()) WITH CHECK (user_id = auth.uid());
 
--- Policy: Allow users to delete their own planning user profile
 CREATE POLICY "Allow users to delete own profile" ON public.planning_users
   FOR DELETE USING (user_id = auth.uid());
 
--- Create trigger to update updated_at timestamp
+-- Create or replace function to update updated_at timestamp (safe to run multiple times)
 CREATE OR REPLACE FUNCTION update_planning_users_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -47,6 +51,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Drop and recreate trigger (idempotent approach)
 DROP TRIGGER IF EXISTS planning_users_timestamp_trigger ON public.planning_users;
 
 CREATE TRIGGER planning_users_timestamp_trigger
