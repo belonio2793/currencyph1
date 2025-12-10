@@ -1077,7 +1077,7 @@ export default function PlanningChat() {
                         <h3 className="font-semibold text-sm">{loc.name}</h3>
                         {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
                         <p className="text-xs text-slate-500 mt-2">📍 {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
-                        <p className="text-xs text-slate-500 mt-1">👤 Added by: <span className="text-blue-600 font-medium">{creatorName}</span></p>
+                        <p className="text-xs text-slate-500 mt-1">👤 Added by: <button onClick={() => loc.planning_users && loadOrCreateConversation(loc.planning_users.id, loc.planning_users)} className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer underline transition-colors">{creatorName}</button></p>
                         {isAuthenticated && userId && loc.planning_users && (
                           <button
                             onClick={() => loadOrCreateConversation(loc.planning_users.id, loc.planning_users)}
