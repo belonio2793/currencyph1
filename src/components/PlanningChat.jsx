@@ -1161,6 +1161,9 @@ export default function PlanningChat() {
               <TileLayer
                 url={getTileLayerUrl()}
                 attribution=""
+                crossOrigin="anonymous"
+                maxNativeZoom={19}
+                maxZoom={25}
               />
               <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
