@@ -1209,6 +1209,32 @@ export default function PlanningChat() {
               />
               <MapRefHandler onMapReady={(map) => { mapRef.current = map }} />
               {isCreatingLocation && <MapClickHandler isCreating={isCreatingLocation} onLocationClick={handleMapLocationClick} />}
+
+              {PHILIPPINE_CITIES.map((city, idx) => {
+                const isSelected = selectedCity === city.name
+                return (
+                  <Circle
+                    key={`city-circle-${idx}`}
+                    center={[city.lat, city.lng]}
+                    radius={isSelected ? 8000 : 4000}
+                    pathOptions={{
+                      fillColor: isSelected ? '#3B82F6' : '#60A5FA',
+                      fillOpacity: isSelected ? 0.5 : 0.15,
+                      color: isSelected ? '#2563EB' : '#60A5FA',
+                      weight: isSelected ? 2 : 1
+                    }}
+                  >
+                    <Popup>
+                      <div className="p-2 bg-white rounded">
+                        <h3 className="font-semibold text-sm">{city.name}</h3>
+                        <p className="text-xs text-slate-600">{city.region}</p>
+                        <p className="text-xs text-slate-500 mt-1">{city.lat.toFixed(4)}°N, {city.lng.toFixed(4)}°E</p>
+                      </div>
+                    </Popup>
+                  </Circle>
+                )
+              })}
+
               {locations.map(loc => {
                 const creatorName = loc.planning_users?.name || 'Unknown User'
                 const markerColor = markerTypeColorMap[loc.marker_type] || '#EF4444'
