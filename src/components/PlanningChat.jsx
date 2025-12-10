@@ -404,7 +404,7 @@ export default function PlanningChat() {
     try {
       const { data, error } = await supabase
         .from('planning_products')
-        .select('*')
+        .select('*, planning_users(id, name, email)')
         .eq('is_active', true)
         .order('product_type', { ascending: true })
         .order('name', { ascending: true })
