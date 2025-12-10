@@ -1100,10 +1100,10 @@ export default function PlanningChat() {
                         <h3 className="font-semibold text-sm">{loc.name}</h3>
                         {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
                         <p className="text-xs text-slate-500 mt-2">📍 {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
-                        <p className="text-xs text-slate-500 mt-1">👤 Added by: <button onClick={() => loc.planning_users && loadOrCreateConversation(loc.planning_users.id, loc.planning_users)} className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer underline transition-colors">{creatorName}</button></p>
+                        <p className="text-xs text-slate-500 mt-1">👤 Added by: <button onClick={() => loc.planning_users && loadOrCreateConversation(loc.planning_users.user_id, loc.planning_users)} className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer underline transition-colors">{creatorName}</button></p>
                         {isAuthenticated && userId && loc.planning_users && (
                           <button
-                            onClick={() => loadOrCreateConversation(loc.planning_users.id, loc.planning_users)}
+                            onClick={() => loadOrCreateConversation(loc.planning_users.user_id, loc.planning_users)}
                             className="mt-2 w-full px-2 py-1 rounded text-xs bg-blue-600 hover:bg-blue-700 text-white transition-colors mb-1"
                             title="Send private message"
                           >
@@ -1396,7 +1396,7 @@ export default function PlanningChat() {
                   return (
                     <div key={msg.id} className="text-sm">
                       <div className="flex items-baseline gap-2 mb-1">
-                        <button onClick={() => msg.planning_users && loadOrCreateConversation(msg.planning_users.id, msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
+                        <button onClick={() => msg.planning_users && loadOrCreateConversation(msg.planning_users.user_id, msg.planning_users)} className="font-semibold text-blue-400 hover:text-blue-300 cursor-pointer transition-colors">
                           {userName}
                         </button>
                         <span className="text-xs text-slate-500">
