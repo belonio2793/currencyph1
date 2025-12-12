@@ -162,6 +162,8 @@ export default function PlanningChat() {
   const [showUserProfile, setShowUserProfile] = useState(false)
   const [selectedUserForProfile, setSelectedUserForProfile] = useState(null)
   const [selectedMarkerType, setSelectedMarkerType] = useState('Seller')
+  const [exchangeRate, setExchangeRate] = useState(DEFAULT_EXCHANGE_RATE)
+  const [editingLocationId, setEditingLocationId] = useState(null)
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
