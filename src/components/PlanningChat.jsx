@@ -1935,6 +1935,344 @@ export default function PlanningChat() {
                 />
               </div>
 
+              {/* Dynamic Fields Based on Marker Type */}
+              {locationForm.marker_type === 'Equipment' && (
+                <div>
+                  <div className="flex items-center justify-between mb-3">
+                    <label className="block text-slate-300 text-sm font-medium">Equipment List</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const equipment = locationForm.metadata?.equipment || []
+                        setLocationForm({
+                          ...locationForm,
+                          metadata: { ...locationForm.metadata, equipment: [...equipment, { name: '', costPhp: 0 }] }
+                        })
+                      }}
+                      className="text-blue-400 hover:text-blue-300 text-xs font-medium"
+                    >
+                      + Add Equipment
+                    </button>
+                  </div>
+                  <div className="space-y-2 max-h-48 overflow-y-auto bg-slate-700 bg-opacity-30 rounded p-3">
+                    {(locationForm.metadata?.equipment || []).map((item, idx) => (
+                      <div key={idx} className="space-y-2 pb-3 border-b border-slate-600 last:border-b-0">
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => {
+                            const equipment = [...(locationForm.metadata?.equipment || [])]
+                            equipment[idx].name = e.target.value
+                            setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, equipment } })
+                          }}
+                          placeholder="Equipment name"
+                          className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-1 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        />
+                        <div className="flex gap-2 items-end">
+                          <div className="flex-1">
+                            <input
+                              type="number"
+                              value={item.costPhp}
+                              onChange={(e) => {
+                                const equipment = [...(locationForm.metadata?.equipment || [])]
+                                equipment[idx].costPhp = parseFloat(e.target.value) || 0
+                                setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, equipment } })
+                              }}
+                              placeholder="Cost in PHP"
+                              className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-1 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                              step="0.01"
+                            />
+                            <div className="text-xs text-slate-400 mt-1">
+                              {displayBothCurrencies(item.costPhp, exchangeRate)}
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const equipment = (locationForm.metadata?.equipment || []).filter((_, i) => i !== idx)
+                              setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, equipment } })
+                            }}
+                            className="text-red-400 hover:text-red-300 text-xs font-medium px-2 py-1"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {(!locationForm.metadata?.equipment || locationForm.metadata.equipment.length === 0) && (
+                      <p className="text-slate-400 text-sm text-center py-2">No equipment added yet</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {locationForm.marker_type === 'Machinery' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Model</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.model || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, model: e.target.value } })}
+                      placeholder="e.g., CNC Machine X2000"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Condition</label>
+                      <select
+                        value={locationForm.metadata?.condition || 'operational'}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, condition: e.target.value } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      >
+                        <option value="operational">Operational</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="repair">Repair</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Quantity</label>
+                      <input
+                        type="number"
+                        value={locationForm.metadata?.quantity || 1}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, quantity: parseInt(e.target.value) || 1 } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        min="1"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Cost Per Unit (PHP)</label>
+                    <input
+                      type="number"
+                      value={locationForm.metadata?.costPerUnit || 0}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, costPerUnit: parseFloat(e.target.value) || 0 } })}
+                      placeholder="0.00"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      step="0.01"
+                    />
+                    <div className="text-xs text-slate-400 mt-1">
+                      {displayBothCurrencies(locationForm.metadata?.costPerUnit || 0, exchangeRate)}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {locationForm.marker_type === 'Warehouse' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Capacity (Square Meters)</label>
+                    <input
+                      type="number"
+                      value={locationForm.metadata?.capacitySqMeters || 0}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, capacitySqMeters: parseFloat(e.target.value) || 0 } })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Storage Type</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.storageType || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, storageType: e.target.value } })}
+                      placeholder="e.g., Climate Controlled, Cold Storage"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Utilization (%)</label>
+                      <input
+                        type="number"
+                        value={locationForm.metadata?.utilizationPercent || 0}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, utilizationPercent: parseInt(e.target.value) || 0 } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        min="0"
+                        max="100"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Monthly Cost (PHP)</label>
+                      <input
+                        type="number"
+                        value={locationForm.metadata?.monthlyCostPhp || 0}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, monthlyCostPhp: parseFloat(e.target.value) || 0 } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        step="0.01"
+                      />
+                      <div className="text-xs text-slate-400 mt-1">
+                        {displayBothCurrencies(locationForm.metadata?.monthlyCostPhp || 0, exchangeRate)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(locationForm.marker_type === 'Seller' || locationForm.marker_type === 'Vendor') && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Product Name</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.productName || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, productName: e.target.value } })}
+                      placeholder="e.g., Coconut Oil, Rice"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Quantity Available</label>
+                      <input
+                        type="number"
+                        value={locationForm.metadata?.quantityAvailable || 0}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, quantityAvailable: parseFloat(e.target.value) || 0 } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        step="0.01"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Price Per Unit (PHP)</label>
+                      <input
+                        type="number"
+                        value={locationForm.metadata?.pricePerUnitPhp || 0}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, pricePerUnitPhp: parseFloat(e.target.value) || 0 } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        step="0.01"
+                      />
+                      <div className="text-xs text-slate-400 mt-1">
+                        {displayBothCurrencies(locationForm.metadata?.pricePerUnitPhp || 0, exchangeRate)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {locationForm.marker_type === 'Manufacturing' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Product Type</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.productType || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, productType: e.target.value } })}
+                      placeholder="e.g., Textiles, Electronics"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Output Capacity (Units/Day)</label>
+                    <input
+                      type="number"
+                      value={locationForm.metadata?.outputCapacityPerDay || 0}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, outputCapacityPerDay: parseFloat(e.target.value) || 0 } })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {locationForm.marker_type === 'Processing' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Process Type</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.processType || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, processType: e.target.value } })}
+                      placeholder="e.g., Milling, Packaging, Refining"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Capacity (Kg/Hour)</label>
+                    <input
+                      type="number"
+                      value={locationForm.metadata?.capacityKgPerHour || 0}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, capacityKgPerHour: parseFloat(e.target.value) || 0 } })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {locationForm.marker_type === 'Landowner' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Land Size (Square Meters)</label>
+                    <input
+                      type="number"
+                      value={locationForm.metadata?.landSizeSqMeters || 0}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, landSizeSqMeters: parseFloat(e.target.value) || 0 } })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      step="0.01"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Zoning Type</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.zoningType || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, zoningType: e.target.value } })}
+                      placeholder="e.g., Commercial, Industrial, Residential"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Available Space (%)</label>
+                    <input
+                      type="number"
+                      value={locationForm.metadata?.availableSpacePercent || 100}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, availableSpacePercent: parseInt(e.target.value) || 100 } })}
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {locationForm.marker_type === 'Transportation' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-slate-300 text-sm font-medium mb-2">Vehicle Type</label>
+                    <input
+                      type="text"
+                      value={locationForm.metadata?.vehicleType || ''}
+                      onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, vehicleType: e.target.value } })}
+                      placeholder="e.g., Truck, Van, Ship"
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Capacity (Tonnage)</label>
+                      <input
+                        type="number"
+                        value={locationForm.metadata?.capacityTonnage || 0}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, capacityTonnage: parseFloat(e.target.value) || 0 } })}
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm focus:outline-none focus:border-blue-500"
+                        step="0.01"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-slate-300 text-sm font-medium mb-2">Available Routes</label>
+                      <input
+                        type="text"
+                        value={locationForm.metadata?.availableRoutes || ''}
+                        onChange={(e) => setLocationForm({ ...locationForm, metadata: { ...locationForm.metadata, availableRoutes: e.target.value } })}
+                        placeholder="e.g., Manila-Cebu, Inter-island"
+                        className="w-full bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-slate-300 text-sm font-medium mb-2">Latitude</label>
