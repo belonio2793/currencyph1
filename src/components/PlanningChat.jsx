@@ -1197,7 +1197,7 @@ export default function PlanningChat() {
           )}
 
           {/* Map Container */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden relative">
             <style>{`
               .planning-map-container .leaflet-tile {
                 border: none !important;
@@ -1206,7 +1206,76 @@ export default function PlanningChat() {
               .planning-map-container img.leaflet-tile {
                 opacity: 1;
               }
+              .marker-type-selector {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                z-index: 1000;
+                background: rgba(15, 23, 42, 0.92);
+                border: 1px solid rgba(51, 65, 85, 0.8);
+                border-radius: 8px;
+                padding: 12px;
+                backdrop-filter: blur(8px);
+              }
+              .marker-type-label {
+                display: block;
+                font-size: 11px;
+                font-weight: 600;
+                color: rgb(148, 163, 184);
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+              }
+              .marker-type-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
+              }
+              .marker-type-btn {
+                padding: 8px 10px;
+                border-radius: 6px;
+                border: 1.5px solid transparent;
+                background: rgb(51, 65, 85);
+                color: rgb(226, 232, 240);
+                font-size: 10px;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+              .marker-type-btn:hover {
+                background: rgb(71, 85, 105);
+                border-color: rgb(100, 116, 139);
+              }
+              .marker-type-btn.active {
+                background: rgb(59, 130, 246);
+                border-color: rgb(37, 99, 235);
+                color: white;
+                box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+              }
             `}</style>
+
+            {/* Marker Type Selector Panel */}
+            {isAuthenticated && (
+              <div className="marker-type-selector">
+                <span className="marker-type-label">Select Type</span>
+                <div className="marker-type-grid">
+                  {markerTypes.map(type => (
+                    <button
+                      key={type}
+                      onClick={() => handleSelectMarkerType(type)}
+                      className={`marker-type-btn ${selectedMarkerType === type ? 'active' : ''}`}
+                      title={`${markerTypeEmojis[type]} ${type}`}
+                    >
+                      <span>{markerTypeEmojis[type]}</span> {type.substring(0, 3)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" attributionControl={false}>
               <TileLayer
                 url={getTileLayerUrl()}
