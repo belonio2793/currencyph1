@@ -1235,7 +1235,7 @@ export default function PlanningChat() {
                 border-radius: 6px;
                 border: 1.5px solid transparent;
                 background: rgba(51, 65, 85, 0.5);
-                color: rgb(226, 232, 240);
+                color: white;
                 font-size: 12px;
                 font-weight: 500;
                 cursor: pointer;
