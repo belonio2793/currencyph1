@@ -1211,11 +1211,8 @@ export default function PlanningChat() {
                 top: 16px;
                 right: 16px;
                 z-index: 1000;
-                background: rgba(15, 23, 42, 0.92);
-                border: 1px solid rgba(51, 65, 85, 0.8);
-                border-radius: 8px;
-                padding: 12px;
-                backdrop-filter: blur(8px);
+                background: transparent;
+                padding: 8px;
               }
               .marker-type-label {
                 display: block;
@@ -1228,22 +1225,26 @@ export default function PlanningChat() {
               }
               .marker-type-grid {
                 display: grid;
-                grid-template-columns: repeat(3, 1fr);
-                gap: 6px;
+                grid-template-columns: 1fr;
+                gap: 8px;
               }
               .marker-type-btn {
-                padding: 8px 10px;
+                padding: 10px 14px;
                 border-radius: 6px;
                 border: 1.5px solid transparent;
                 background: rgb(51, 65, 85);
                 color: rgb(226, 232, 240);
-                font-size: 10px;
+                font-size: 12px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                white-space: nowrap;
-                overflow: hidden;
-                text-overflow: ellipsis;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: clip;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                min-width: 150px;
               }
               .marker-type-btn:hover {
                 background: rgb(71, 85, 105);
