@@ -1406,7 +1406,73 @@ export default function PlanningChat() {
                         <h3 className="font-semibold text-sm">{loc.name}</h3>
                         {loc.description && <p className="text-xs text-slate-600 mt-1">{loc.description}</p>}
                         <p className="text-xs text-slate-500 mt-2">📍 {loc.latitude.toFixed(4)}, {loc.longitude.toFixed(4)}</p>
-                        <p className="text-xs text-slate-500 mt-1">👤 Added by: <button onClick={() => loc.planning_users && handleShowUserProfile(loc.planning_users)} className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer underline transition-colors">{creatorName}</button></p>
+
+                        {/* Display metadata based on marker type */}
+                        {loc.metadata && (
+                          <div className="border-t pt-2 mt-2">
+                            {loc.marker_type === 'Equipment' && loc.metadata.equipment && loc.metadata.equipment.length > 0 && (
+                              <div className="text-xs">
+                                <p className="font-semibold text-slate-700">Equipment:</p>
+                                {loc.metadata.equipment.map((item, idx) => (
+                                  <div key={idx} className="text-slate-600">
+                                    <p>• {item.name}: {displayBothCurrencies(item.costPhp, loc.exchange_rate)}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {loc.marker_type === 'Machinery' && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.model && <p><strong>Model:</strong> {loc.metadata.model}</p>}
+                                {loc.metadata.condition && <p><strong>Condition:</strong> {loc.metadata.condition}</p>}
+                                {loc.metadata.quantity && <p><strong>Qty:</strong> {loc.metadata.quantity}</p>}
+                                {loc.metadata.costPerUnit && <p><strong>Cost/Unit:</strong> {displayBothCurrencies(loc.metadata.costPerUnit, loc.exchange_rate)}</p>}
+                              </div>
+                            )}
+                            {loc.marker_type === 'Warehouse' && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.capacitySqMeters && <p><strong>Capacity:</strong> {loc.metadata.capacitySqMeters} sqm</p>}
+                                {loc.metadata.storageType && <p><strong>Type:</strong> {loc.metadata.storageType}</p>}
+                                {loc.metadata.utilizationPercent && <p><strong>Utilization:</strong> {loc.metadata.utilizationPercent}%</p>}
+                                {loc.metadata.monthlyCostPhp && <p><strong>Monthly:</strong> {displayBothCurrencies(loc.metadata.monthlyCostPhp, loc.exchange_rate)}</p>}
+                              </div>
+                            )}
+                            {(loc.marker_type === 'Seller' || loc.marker_type === 'Vendor') && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.productName && <p><strong>Product:</strong> {loc.metadata.productName}</p>}
+                                {loc.metadata.quantityAvailable && <p><strong>Available:</strong> {loc.metadata.quantityAvailable} units</p>}
+                                {loc.metadata.pricePerUnitPhp && <p><strong>Price/Unit:</strong> {displayBothCurrencies(loc.metadata.pricePerUnitPhp, loc.exchange_rate)}</p>}
+                              </div>
+                            )}
+                            {loc.marker_type === 'Manufacturing' && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.productType && <p><strong>Product:</strong> {loc.metadata.productType}</p>}
+                                {loc.metadata.outputCapacityPerDay && <p><strong>Capacity:</strong> {loc.metadata.outputCapacityPerDay} units/day</p>}
+                              </div>
+                            )}
+                            {loc.marker_type === 'Processing' && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.processType && <p><strong>Process:</strong> {loc.metadata.processType}</p>}
+                                {loc.metadata.capacityKgPerHour && <p><strong>Capacity:</strong> {loc.metadata.capacityKgPerHour} kg/hour</p>}
+                              </div>
+                            )}
+                            {loc.marker_type === 'Landowner' && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.landSizeSqMeters && <p><strong>Land Size:</strong> {loc.metadata.landSizeSqMeters} sqm</p>}
+                                {loc.metadata.zoningType && <p><strong>Zoning:</strong> {loc.metadata.zoningType}</p>}
+                                {loc.metadata.availableSpacePercent && <p><strong>Available:</strong> {loc.metadata.availableSpacePercent}%</p>}
+                              </div>
+                            )}
+                            {loc.marker_type === 'Transportation' && (
+                              <div className="text-xs text-slate-600">
+                                {loc.metadata.vehicleType && <p><strong>Vehicle:</strong> {loc.metadata.vehicleType}</p>}
+                                {loc.metadata.capacityTonnage && <p><strong>Capacity:</strong> {loc.metadata.capacityTonnage} tons</p>}
+                                {loc.metadata.availableRoutes && <p><strong>Routes:</strong> {loc.metadata.availableRoutes}</p>}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <p className="text-xs text-slate-500 mt-2 border-t pt-2">👤 Added by: <button onClick={() => loc.planning_users && handleShowUserProfile(loc.planning_users)} className="text-blue-600 hover:text-blue-800 font-medium cursor-pointer underline transition-colors">{creatorName}</button></p>
                         {isAuthenticated && userId && loc.planning_users && (
                           <button
                             onClick={() => loadOrCreateConversation(loc.planning_users.user_id, loc.planning_users)}
@@ -1417,12 +1483,31 @@ export default function PlanningChat() {
                           </button>
                         )}
                         {isAuthenticated && userId === loc.user_id && (
-                          <button
-                            onClick={() => handleDeleteLocation(loc.id)}
-                            className="w-full px-2 py-1 rounded text-xs bg-red-600 hover:bg-red-700 text-white transition-colors"
-                          >
-                            Delete
-                          </button>
+                          <div className="flex gap-1 mt-2">
+                            <button
+                              onClick={() => {
+                                setLocationForm({
+                                  name: loc.name,
+                                  description: loc.description || '',
+                                  latitude: loc.latitude,
+                                  longitude: loc.longitude,
+                                  marker_type: loc.marker_type,
+                                  metadata: loc.metadata || {}
+                                })
+                                setEditingLocationId(loc.id)
+                                setShowLocationForm(true)
+                              }}
+                              className="flex-1 px-2 py-1 rounded text-xs bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDeleteLocation(loc.id)}
+                              className="flex-1 px-2 py-1 rounded text-xs bg-red-600 hover:bg-red-700 text-white transition-colors"
+                            >
+                              Delete
+                            </button>
+                          </div>
                         )}
                       </div>
                     </Popup>
