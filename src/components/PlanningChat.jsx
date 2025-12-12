@@ -617,9 +617,14 @@ export default function PlanningChat() {
       description: '',
       latitude: coords.latitude,
       longitude: coords.longitude,
-      marker_type: 'Seller'
+      marker_type: selectedMarkerType
     })
     setShowLocationForm(true)
+  }
+
+  const handleSelectMarkerType = (type) => {
+    setSelectedMarkerType(type)
+    setIsCreatingLocation(true)
   }
 
   const handleSaveLocation = async (e) => {
