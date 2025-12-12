@@ -736,12 +736,14 @@ export default function PlanningChat() {
 
       setShowLocationForm(false)
       setIsCreatingLocation(false)
+      setEditingLocationId(null)
       setLocationForm({
         name: '',
         description: '',
         latitude: null,
         longitude: null,
-        marker_type: 'Seller'
+        marker_type: 'Seller',
+        metadata: {}
       })
       setAuthError('')
     } catch (error) {
