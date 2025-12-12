@@ -1206,6 +1206,33 @@ export default function PlanningChat() {
               .planning-map-container img.leaflet-tile {
                 opacity: 1;
               }
+              .planning-map-container[data-marker-type="Landowner"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%233B82F6" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">🏘️</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Machinery"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%23F97316" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">⚙️</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Equipment"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%2310B981" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">🔧</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Warehouse"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%23A855F7" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">🏭</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Seller"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%23EF4444" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">🛒</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Vendor"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%23FBBF24" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">👨‍💼</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Manufacturing"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%2392400E" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">🏗️</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Processing"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%2306B6D4" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">⚗️</text></svg>') 16 16, auto;
+              }
+              .planning-map-container[data-marker-type="Transportation"] {
+                cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><circle cx="16" cy="16" r="14" fill="%236B7280" opacity="0.7"/><text x="16" y="20" font-size="18" text-anchor="middle" dominant-baseline="middle">🚚</text></svg>') 16 16, auto;
+              }
               .marker-type-selector {
                 position: absolute;
                 top: 16px;
