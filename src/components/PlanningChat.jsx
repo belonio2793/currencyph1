@@ -1280,7 +1280,7 @@ export default function PlanningChat() {
               </div>
             )}
 
-            <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" attributionControl={false}>
+            <MapContainer center={PHILIPPINES_CENTER} zoom={PHILIPPINES_ZOOM} className="w-full h-full planning-map-container" data-marker-type={selectedMarkerType} attributionControl={false}>
               <TileLayer
                 url={getTileLayerUrl()}
                 attribution=""
