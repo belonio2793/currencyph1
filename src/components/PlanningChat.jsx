@@ -679,6 +679,8 @@ export default function PlanningChat() {
     }
 
     try {
+      const metadata = locationForm.metadata || getDefaultMetadata(locationForm.marker_type)
+
       const payload = {
         planning_user_id: planningUser.id,
         user_id: userId,
@@ -686,15 +688,29 @@ export default function PlanningChat() {
         description: locationForm.description.trim(),
         marker_type: locationForm.marker_type,
         latitude: parseFloat(locationForm.latitude),
-        longitude: parseFloat(locationForm.longitude)
+        longitude: parseFloat(locationForm.longitude),
+        metadata: metadata,
+        exchange_rate: exchangeRate,
+        rate_updated_at: new Date().toISOString()
       }
 
       console.debug('Saving marker with payload:', payload)
 
-      const { data, error } = await supabase
-        .from('planning_markers')
-        .insert(payload)
-        .select()
+      let query = supabase.from('planning_markers')
+      let result
+
+      if (editingLocationId) {
+        result = await query
+          .update(payload)
+          .eq('id', editingLocationId)
+          .select()
+      } else {
+        result = await query
+          .insert(payload)
+          .select()
+      }
+
+      const { data, error } = result
 
       if (error) {
         console.error('Error saving location:', {
