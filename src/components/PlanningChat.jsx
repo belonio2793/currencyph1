@@ -1211,8 +1211,10 @@ export default function PlanningChat() {
                 top: 16px;
                 right: 16px;
                 z-index: 1000;
-                background: transparent;
-                padding: 8px;
+                background: rgba(226, 232, 240, 0.15);
+                padding: 12px;
+                border-radius: 8px;
+                backdrop-filter: blur(4px);
               }
               .marker-type-label {
                 display: block;
