@@ -2302,6 +2302,15 @@ export default function PlanningChat() {
                   onClick={() => {
                     setShowLocationForm(false)
                     setIsCreatingLocation(false)
+                    setEditingLocationId(null)
+                    setLocationForm({
+                      name: '',
+                      description: '',
+                      latitude: null,
+                      longitude: null,
+                      marker_type: 'Seller',
+                      metadata: {}
+                    })
                   }}
                   className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors"
                 >
