@@ -1249,7 +1249,7 @@ export default function PlanningChat() {
                 min-width: 150px;
               }
               .marker-type-btn:hover {
-                background: rgb(71, 85, 105);
+                background: rgba(71, 85, 105, 0.7);
                 border-color: rgb(100, 116, 139);
               }
               .marker-type-btn.active {
