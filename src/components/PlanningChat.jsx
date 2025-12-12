@@ -160,9 +160,12 @@ export default function PlanningChat() {
   const [selectedPrivateUser, setSelectedPrivateUser] = useState(null)
   const [showUserProfile, setShowUserProfile] = useState(false)
   const [selectedUserForProfile, setSelectedUserForProfile] = useState(null)
+  const [selectedMarkerType, setSelectedMarkerType] = useState('Seller')
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
+
+  const markerTypes = ['Landowner', 'Machinery', 'Equipment', 'Warehouse', 'Seller', 'Vendor', 'Manufacturing', 'Processing', 'Transportation']
 
   // Check auth on mount
   useEffect(() => {
