@@ -315,6 +315,15 @@ export default function PlanningChat() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Fetch exchange rate on mount
+  useEffect(() => {
+    const loadExchangeRate = async () => {
+      const rate = await fetchExchangeRate()
+      setExchangeRate(rate)
+    }
+    loadExchangeRate()
+  }, [])
+
   // Initialize editing name when planning user loads
   useEffect(() => {
     if (planningUser?.name) {
