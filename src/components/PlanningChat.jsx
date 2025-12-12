@@ -1220,7 +1220,7 @@ export default function PlanningChat() {
                 display: block;
                 font-size: 11px;
                 font-weight: 600;
-                color: rgb(148, 163, 184);
+                color: white;
                 margin-bottom: 10px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
