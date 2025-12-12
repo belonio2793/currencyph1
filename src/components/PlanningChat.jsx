@@ -634,6 +634,33 @@ export default function PlanningChat() {
     setShowLocationForm(true)
   }
 
+  // Get default metadata structure based on marker type
+  const getDefaultMetadata = (markerType) => {
+    const baseMetadata = { createdAt: new Date().toISOString() }
+
+    switch (markerType) {
+      case 'Equipment':
+        return { ...baseMetadata, equipment: [] }
+      case 'Machinery':
+        return { ...baseMetadata, model: '', condition: 'operational', quantity: 1, costPerUnit: 0 }
+      case 'Warehouse':
+        return { ...baseMetadata, capacitySqMeters: 0, storageType: '', utilizationPercent: 0, monthlyCostPhp: 0 }
+      case 'Seller':
+      case 'Vendor':
+        return { ...baseMetadata, productName: '', quantityAvailable: 0, pricePerUnitPhp: 0 }
+      case 'Manufacturing':
+        return { ...baseMetadata, outputCapacityPerDay: 0, productType: '' }
+      case 'Processing':
+        return { ...baseMetadata, capacityKgPerHour: 0, processType: '' }
+      case 'Landowner':
+        return { ...baseMetadata, landSizeSqMeters: 0, zoningType: '', availableSpacePercent: 100 }
+      case 'Transportation':
+        return { ...baseMetadata, vehicleType: '', capacityTonnage: 0, availableRoutes: '' }
+      default:
+        return baseMetadata
+    }
+  }
+
   const handleSelectMarkerType = (type) => {
     setSelectedMarkerType(type)
     setIsCreatingLocation(true)
