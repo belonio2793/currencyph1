@@ -1016,10 +1016,10 @@ export default function PlanningChat() {
         </div>
 
         {/* Public Locations & Ports Dropdown */}
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap bg-slate-700 px-4 py-3 rounded-lg">
           {locations.length > 0 && (
             <div className="flex items-center gap-2">
-              <label htmlFor="public-locations-select" className="text-slate-300 text-sm font-medium">Locations:</label>
+              <label htmlFor="public-locations-select" className="text-slate-300 text-sm font-medium opacity-50">Locations:</label>
               <select
                 id="public-locations-select"
                 value={selectedLocationId}
@@ -1038,7 +1038,7 @@ export default function PlanningChat() {
 
           {shippingPorts.length > 0 && (
             <div className="flex items-center gap-2">
-              <label htmlFor="shipping-ports-select" className="text-slate-300 text-sm font-medium">Ports:</label>
+              <label htmlFor="shipping-ports-select" className="text-slate-300 text-sm font-medium opacity-50">Ports:</label>
               <select
                 id="shipping-ports-select"
                 value={selectedPortId}
@@ -1056,7 +1056,7 @@ export default function PlanningChat() {
           )}
 
           <div className="flex items-center gap-2">
-            <label htmlFor="cities-select" className="text-slate-300 text-sm font-medium">Cities:</label>
+            <label htmlFor="cities-select" className="text-slate-300 text-sm font-medium opacity-50">Cities:</label>
             <select
               id="cities-select"
               value={selectedCity}
