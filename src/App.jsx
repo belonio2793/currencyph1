@@ -70,10 +70,6 @@ export default function App() {
   const [totalDebtConverted, setTotalDebtConverted] = useState(0)
   const totalNet = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
 
-  // Content locker: enable by setting VITE_CONTENT_LOCKER=TRUE (client) or CONTENT_LOCKER=TRUE (server)
-  const contentLocked = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_CONTENT_LOCKER === 'TRUE') ||
-    (typeof process !== 'undefined' && process.env && process.env.CONTENT_LOCKER === 'TRUE')
-
   useEffect(() => {
     // Ensure default page title/meta is set
     if (typeof document !== 'undefined') {
