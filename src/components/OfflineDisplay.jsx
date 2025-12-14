@@ -84,9 +84,6 @@ export default function OfflineDisplay({ onShowAuth }) {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-slate-900 mb-4">Welcome to Currency</h1>
-          <p className="text-lg text-slate-600 mb-8">
-            Your all-in-one financial platform for crypto, payments, and business management
-          </p>
           <div className="flex gap-4 justify-center">
             <button onClick={() => onShowAuth?.('login')} className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold transition-colors">
               Sign In
