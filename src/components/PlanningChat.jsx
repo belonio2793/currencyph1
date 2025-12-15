@@ -1294,35 +1294,34 @@ export default function PlanningChat() {
               }
               .marker-type-selector {
                 position: absolute;
-                top: 16px;
-                right: 16px;
+                ${isMobile ? 'bottom: 16px; right: 8px; max-height: 300px; overflow-y-auto;' : 'top: 16px; right: 16px;'}
                 z-index: 1000;
                 background: rgba(226, 232, 240, 0.15);
-                padding: 12px;
+                ${isMobile ? 'padding: 8px;' : 'padding: 12px;'}
                 border-radius: 8px;
                 backdrop-filter: blur(4px);
               }
               .marker-type-label {
                 display: block;
-                font-size: 11px;
+                ${isMobile ? 'font-size: 9px;' : 'font-size: 11px;'}
                 font-weight: 600;
                 color: white;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
               }
               .marker-type-grid {
                 display: grid;
-                grid-template-columns: 1fr;
-                gap: 8px;
+                grid-template-columns: ${isMobile ? 'repeat(2, 1fr)' : '1fr'};
+                gap: 6px;
               }
               .marker-type-btn {
-                padding: 10px 14px;
+                ${isMobile ? 'padding: 6px 8px;' : 'padding: 10px 14px;'}
                 border-radius: 6px;
                 border: 1.5px solid transparent;
                 background: rgba(51, 65, 85, 0.5);
                 color: white;
-                font-size: 12px;
+                ${isMobile ? 'font-size: 10px;' : 'font-size: 12px;'}
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.2s ease;
@@ -1330,9 +1329,10 @@ export default function PlanningChat() {
                 overflow: visible;
                 text-overflow: clip;
                 display: flex;
+                flex-direction: column;
                 align-items: center;
-                gap: 8px;
-                min-width: 150px;
+                gap: 4px;
+                ${isMobile ? 'min-width: auto;' : 'min-width: 150px;'}
               }
               .marker-type-btn:hover {
                 background: rgba(71, 85, 105, 0.7);
