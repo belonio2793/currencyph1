@@ -84,6 +84,11 @@ export const onboardingService = {
   // Fetch user onboarding state
   async getUserOnboardingState(userId) {
     try {
+      // Skip database query for guest users or invalid UUIDs
+      if (!this.isValidUUID(userId)) {
+        return null
+      }
+
       const { data, error } = await supabase
         .from('user_onboarding_state')
         .select('*')
