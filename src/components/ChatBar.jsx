@@ -702,10 +702,10 @@ export default function ChatBar({ userId, userEmail }) {
             ? 'w-full h-screen md:h-auto md:w-96 md:rounded-t-lg'
             : 'w-96 h-[600px] rounded-t-lg'
         }`}>
-          <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className={`bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between ${!isMobile && 'rounded-t-lg'}`}>
+            <div className="flex items-center gap-3 flex-1 md:flex-none">
               <h2 className="font-bold text-lg">Messages</h2>
-              <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-2 ${isMobile && 'hidden'}`}>
                 <span className={`w-2.5 h-2.5 rounded-full ${userStatus === 'online' ? 'bg-green-400' : userStatus === 'busy' ? 'bg-red-400' : userStatus === 'away' ? 'bg-yellow-400' : userStatus === 'hide' ? 'bg-black' : 'bg-slate-400'}`} />
                 <select value={userStatus} onChange={(e) => updateUserStatus(e.target.value)} className="text-sm bg-blue-700/40 text-white px-2 py-1 rounded">
                   <option value="online">Online</option>
@@ -717,8 +717,15 @@ export default function ChatBar({ userId, userEmail }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={() => setMinimized(true)} className="hover:bg-blue-800 p-1 rounded-lg transition-colors">
-                <svg className="w-5 h-5 text-black" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+              {isMobile && (
+                <button onClick={() => setMinimized(true)} title="Minimize" className="hover:bg-blue-800 p-2 rounded-lg transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
+                </button>
+              )}
+              <button onClick={() => setMinimized(true)} className={`hover:bg-blue-800 p-1 rounded-lg transition-colors ${isMobile && 'hidden'}`}>
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
               </button>
             </div>
           </div>
