@@ -149,36 +149,63 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
           </div>
 
           {/* Menu Groups */}
-          <nav className="flex-1 px-3 py-4 space-y-2">
+          <nav className={`flex-1 ${isMobile || !isCollapsed ? 'px-3' : 'px-2'} py-4 space-y-2`}>
             {menuGroups.map(group => {
               const visibleItems = group.items.filter(isItemVisible)
               if (visibleItems.length === 0) return null
 
               const isExpanded = expandedGroups[group.id]
 
+              // On desktop collapsed, don't show group headers
+              if (!isMobile && isCollapsed) {
+                return (
+                  <div key={group.id}>
+                    <div className="space-y-1">
+                      {visibleItems.map(item => (
+                        <button
+                          key={item.id}
+                          onClick={() => handleNavClick(item.id)}
+                          className={`w-full flex items-center justify-center p-2 rounded-lg text-sm transition-colors ${
+                            activeTab === item.id
+                              ? 'bg-blue-600 text-white font-medium'
+                              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                          }`}
+                          title={item.label}
+                        >
+                          <span className="text-base">{item.label.charAt(0).toUpperCase()}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )
+              }
+
               return (
                 <div key={group.id}>
                   <button
                     onClick={() => toggleGroup(group.id)}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                    className={`w-full flex items-center justify-between ${!isMobile && isCollapsed ? 'justify-center' : ''} px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors`}
+                    title={!isMobile && isCollapsed ? group.label : ''}
                   >
-                    <span className="flex items-center gap-2">
+                    <span className={`flex items-center ${!isMobile && isCollapsed ? 'justify-center' : ''} gap-2`}>
                       <span className="text-base">{group.icon}</span>
-                      {group.label}
+                      {(isMobile || !isCollapsed) && group.label}
                     </span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
+                    {(isMobile || !isCollapsed) && (
+                      <svg
+                        className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                      </svg>
+                    )}
                   </button>
 
                   {/* Group items */}
-                  {isExpanded && (
-                    <div className="ml-2 space-y-1 mt-2">
+                  {isExpanded && (isMobile || !isCollapsed) && (
+                    <div className={`${!isMobile && isCollapsed ? '' : 'ml-2'} space-y-1 mt-2`}>
                       {visibleItems.map(item => (
                         <button
                           key={item.id}
