@@ -195,9 +195,8 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
         .from('user_addresses')
         .insert([{
           user_id: userId,
-          address_name: formData.address_name,
+          label: formData.address_name,
           street_address: formData.street_address,
-          barangay: formData.barangay,
           city: formData.city,
           province: formData.province,
           postal_code: formData.postal_code,
