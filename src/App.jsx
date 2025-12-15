@@ -8,7 +8,6 @@ import { isSupabaseConfigured } from './lib/supabaseClient'
 import { preferencesManager } from './lib/preferencesManager'
 import { deviceFingerprint } from './lib/deviceFingerprint'
 import Navbar from './components/Navbar'
-import HeaderMap from './components/HeaderMap'
 import LandingPage from './components/LandingPage'
 import HomePage from './components/HomePage'
 import Deposits from './components/Deposits'
@@ -476,7 +475,6 @@ export default function App() {
           {/* Normal layout for all other pages */}
           {activeTab !== 'planning-setup' && activeTab !== 'planning' && (
           <div className="min-h-screen bg-slate-50">
-        <HeaderMap userId={userId} />
       <Navbar
         activeTab={activeTab}
         onTabChange={setActiveTab}
