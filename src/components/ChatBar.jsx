@@ -679,9 +679,13 @@ export default function ChatBar({ userId, userEmail }) {
   }
 
   return (
-    <div className="fixed bottom-0 right-0 z-50 flex flex-col light-mode-widget">
+    <div className={`fixed z-50 flex flex-col light-mode-widget ${
+      isMobile
+        ? 'bottom-0 left-0 right-0'
+        : 'bottom-0 right-0'
+    }`}>
       {minimized && (
-        <button onClick={() => setMinimized(false)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-t-lg shadow-lg flex items-center gap-2 border-t border-l border-r border-blue-700">
+        <button onClick={() => setMinimized(false)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 shadow-lg flex items-center gap-2 border-t border-blue-700 md:rounded-t-lg md:border-l md:border-r">
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5z" /></svg>
           <span className="font-medium text-sm">Messages</span>
           {Object.values(unreadCounts).reduce((a, b) => a + b, 0) > 0 && (
@@ -691,7 +695,11 @@ export default function ChatBar({ userId, userEmail }) {
       )}
 
       {!minimized && (
-        <div className="bg-white rounded-t-lg shadow-2xl border border-slate-200 w-96 h-screen md:h-[600px] flex flex-col">
+        <div className={`bg-white shadow-2xl border border-slate-200 flex flex-col ${
+          isMobile
+            ? 'w-full h-screen md:h-auto md:w-96 md:rounded-t-lg'
+            : 'w-96 h-[600px] rounded-t-lg'
+        }`}>
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-t-lg flex items-center justify-between">
             <div className="flex items-center gap-3">
               <h2 className="font-bold text-lg">Messages</h2>
