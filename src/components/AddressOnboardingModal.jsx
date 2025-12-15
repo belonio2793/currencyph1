@@ -96,6 +96,28 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     setShowProvinceDropdown(false)
   }
 
+  // Initialize search inputs when step changes to 2
+  useEffect(() => {
+    if (step === 2) {
+      setCitySearchInput(formData.city)
+      setProvinceSearchInput(formData.province)
+    }
+  }, [step])
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (e.target.closest('.city-dropdown-container') === null) {
+        setShowCityDropdown(false)
+      }
+      if (e.target.closest('.province-dropdown-container') === null) {
+        setShowProvinceDropdown(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
   const handleFetchLocation = async () => {
     setFetchingLocation(true)
     try {
