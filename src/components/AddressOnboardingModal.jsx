@@ -286,9 +286,9 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
           ) : (
             <>
               {/* Step 2: Address Details */}
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
                     Address Name (Nickname) *
                   </label>
                   <input
@@ -297,13 +297,13 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                     value={formData.address_name}
                     onChange={handleInputChange}
                     placeholder="e.g., My Home"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-900 mb-1">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
                     Street Address
                   </label>
                   <input
@@ -312,11 +312,11 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                     value={formData.street_address}
                     onChange={handleInputChange}
                     placeholder="123 Main St"
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-900 mb-1">
                       Barangay
