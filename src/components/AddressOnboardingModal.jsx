@@ -203,8 +203,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
           country: formData.country,
           latitude: formData.latitude,
           longitude: formData.longitude,
-          is_default: true,
-          created_at: new Date().toISOString()
+          is_default: true
         }])
 
       if (error) throw error
