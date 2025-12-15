@@ -39,7 +39,7 @@ export default function LayoutSwitcher() {
                 : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
             }`}
           >
-            📱 Desktop
+            Desktop
           </button>
 
           {/* Mobile Button */}
@@ -51,7 +51,7 @@ export default function LayoutSwitcher() {
                 : 'bg-slate-700 text-slate-200 hover:bg-slate-600'
             }`}
           >
-            📲 Mobile
+            Mobile
           </button>
 
           {/* Reset Button */}
