@@ -271,14 +271,14 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                     )}
                   </MapContainer>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="text-xs text-slate-500 mt-2 break-all">
                   Latitude: {formData.latitude.toFixed(4)}, Longitude: {formData.longitude.toFixed(4)}
                 </p>
               </div>
 
               <button
                 onClick={() => setStep(2)}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+                className="w-full px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors text-sm sm:text-base"
               >
                 Next: Add Details →
               </button>
