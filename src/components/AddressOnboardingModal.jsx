@@ -39,7 +39,6 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
   const [formData, setFormData] = useState({
     address_name: 'My Home',
     street_address: '',
-    barangay: '',
     city: 'Manila',
     province: 'Metro Manila',
     postal_code: '',
