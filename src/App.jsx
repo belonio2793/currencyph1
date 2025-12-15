@@ -51,6 +51,7 @@ import ShoppingCart from './components/ShoppingCart'
 import ShopCheckout from './components/ShopCheckout'
 import OrderConfirmation from './components/OrderConfirmation'
 import { ShoppingCartProvider } from './context/ShoppingCartContext'
+import { DeviceProvider } from './context/DeviceContext'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
