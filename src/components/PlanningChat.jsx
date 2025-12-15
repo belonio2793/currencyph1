@@ -335,12 +335,12 @@ export default function PlanningChat() {
 
   const checkAuth = async () => {
     try {
-      const { data } = await supabase.auth.getSession()
-      if (data?.session?.user) {
-        setUserId(data.session.user.id)
-        setUserEmail(data.session.user.email || '')
+      const { data } = await supabase.auth.getUser()
+      if (data?.user) {
+        setUserId(data.user.id)
+        setUserEmail(data.user.email || '')
         setIsAuthenticated(true)
-        await loadPlanningUser(data.session.user.id)
+        await loadPlanningUser(data.user.id)
       } else {
         setIsAuthenticated(false)
         setPlanningUser(null)
