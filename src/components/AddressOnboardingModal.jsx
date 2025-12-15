@@ -330,7 +330,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
                     />
                   </div>
-                  <div className="relative">
+                  <div className="relative city-dropdown-container">
                     <label className="block text-sm font-medium text-slate-900 mb-1">
                       City {searchCharCount.city > 0 && <span className="text-xs text-slate-500">({searchCharCount.city} chars)</span>}
                     </label>
