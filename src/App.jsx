@@ -481,6 +481,8 @@ export default function App() {
         onTabChange={setActiveTab}
         globalCurrency={globalCurrency}
         setGlobalCurrency={setGlobalCurrency}
+        globalCryptocurrency={globalCryptocurrency}
+        setGlobalCryptocurrency={setGlobalCryptocurrency}
         userEmail={userEmail}
         userId={userId}
         totalBalancePHP={totalBalancePHP}
