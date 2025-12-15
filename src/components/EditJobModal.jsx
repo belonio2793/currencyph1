@@ -263,8 +263,8 @@ export default function EditJobModal({
           setFetchingLocation(false)
         },
         (err) => {
-          console.error('Geolocation error:', err)
-          setError(`Location error: ${err.message}`)
+          console.error('Geolocation error:', err?.message || `Code ${err?.code}: ${err?.toString() || 'Unknown error'}`)
+          setError(`Location error: ${err?.message || 'Unable to get location'}`)
           setFetchingLocation(false)
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }

@@ -418,7 +418,7 @@ export default function MyAddressesTab({ userId }) {
           setZoomLevel(13)
         },
         (error) => {
-          console.error('Geolocation error:', error)
+          console.error('Geolocation error:', error?.message || `Code ${error?.code}: ${error?.toString() || 'Unknown error'}`)
           setError('Unable to get your location. Please check permissions.')
         }
       )
