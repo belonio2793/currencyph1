@@ -27,6 +27,7 @@ function MapClickHandler({ onMapClick }) {
 export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddressCreated }) {
   const [step, setStep] = useState(1)
   const [loading, setLoading] = useState(false)
+  const [fetchingLocation, setFetchingLocation] = useState(false)
   const [mapPosition, setMapPosition] = useState(null)
   const [formData, setFormData] = useState({
     address_name: 'My Home',
@@ -39,6 +40,48 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     latitude: 14.5995,
     longitude: 120.9842
   })
+
+  const handleFetchLocation = async () => {
+    setFetchingLocation(true)
+    try {
+      if (!navigator.geolocation) {
+        alert('Geolocation is not supported by your browser')
+        setFetchingLocation(false)
+        return
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords
+          setMapPosition({ latitude, longitude })
+          setFormData(prev => ({
+            ...prev,
+            latitude: latitude,
+            longitude: longitude
+          }))
+          setFetchingLocation(false)
+        },
+        (error) => {
+          console.error('Geolocation error:', error)
+          let errorMessage = 'Unable to get your location'
+          if (error.code === error.PERMISSION_DENIED) {
+            errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
+          } else if (error.code === error.POSITION_UNAVAILABLE) {
+            errorMessage = 'Location information is unavailable.'
+          } else if (error.code === error.TIMEOUT) {
+            errorMessage = 'Location request timed out.'
+          }
+          alert(errorMessage)
+          setFetchingLocation(false)
+        },
+        { timeout: 10000 }
+      )
+    } catch (err) {
+      console.error('Error fetching location:', err)
+      alert('Error fetching your location')
+      setFetchingLocation(false)
+    }
+  }
 
   const handleMapClick = (coords) => {
     setMapPosition(coords)
@@ -122,18 +165,28 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
             <>
               {/* Step 1: Map Selection */}
               <div>
-                <label className="block text-sm font-medium text-slate-900 mb-2">
-                  📍 Select Location on Map (Click to place marker)
-                </label>
-                <div className="h-80 rounded-lg overflow-hidden border border-slate-200">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-slate-900">
+                    📍 Select Location on Map (Click to place marker)
+                  </label>
+                  <button
+                    onClick={handleFetchLocation}
+                    disabled={fetchingLocation}
+                    className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 font-medium"
+                    title="Use your current GPS location"
+                  >
+                    {fetchingLocation ? '📍 Fetching...' : '📍 Use Current Location'}
+                  </button>
+                </div>
+                <div className="h-80 rounded-lg overflow-hidden border border-slate-200 relative">
                   <MapContainer
                     center={[formData.latitude, formData.longitude]}
                     zoom={13}
                     style={{ height: '100%', width: '100%' }}
+                    attributionControl={false}
                   >
                     <TileLayer
                       url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                      attribution='&copy; OpenStreetMap contributors'
                     />
                     <MapClickHandler onMapClick={handleMapClick} />
                     {mapPosition && (
