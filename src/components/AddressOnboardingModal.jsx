@@ -183,6 +183,12 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
       return
     }
 
+    // Check if user is a guest-local account
+    if (userId && userId.includes('guest-local')) {
+      alert('Please sign up to create addresses')
+      return
+    }
+
     setLoading(true)
     try {
       const { data, error } = await supabase
