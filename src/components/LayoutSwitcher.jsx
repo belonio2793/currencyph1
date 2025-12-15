@@ -64,12 +64,6 @@ export default function LayoutSwitcher() {
             </button>
           )}
 
-          {/* Status */}
-          {isOverridden && (
-            <span className="text-xs text-amber-300 ml-2 font-semibold">
-              (Layout overridden)
-            </span>
-          )}
         </div>
       </div>
     </div>
