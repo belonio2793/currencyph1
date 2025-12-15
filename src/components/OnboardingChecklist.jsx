@@ -39,16 +39,18 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
       if (task.action === 'open-address-modal') {
         onOpenAddressModal?.()
       } else if (task.action === 'navigate-profile') {
-        onNavigate?.('profile')
+        onOpenProfileModal?.()
+      } else if (task.action === 'verify-email') {
+        onOpenVerificationModal?.()
       } else if (task.action === 'set-currency') {
-        onNavigate?.('home')
+        onOpenCurrencyModal?.()
       }
 
       await onboardingService.updateTaskCompletion(userId, task.id, true)
-      
+
       // Reload tasks to reflect changes
       await loadTasks()
-      
+
       onTaskComplete?.(task)
     } catch (err) {
       console.error('Error completing task:', err)
