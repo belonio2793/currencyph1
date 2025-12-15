@@ -52,6 +52,8 @@ import ShopCheckout from './components/ShopCheckout'
 import OrderConfirmation from './components/OrderConfirmation'
 import { ShoppingCartProvider } from './context/ShoppingCartContext'
 import { DeviceProvider } from './context/DeviceContext'
+import { LayoutOverrideProvider } from './context/LayoutOverrideContext'
+import LayoutSwitcher from './components/LayoutSwitcher'
 
 export default function App() {
   const [userId, setUserId] = useState(null)
