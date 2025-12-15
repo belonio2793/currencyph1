@@ -461,21 +461,20 @@ export default function App() {
     )
   }
 
-  // Planning Setup page - standalone fullscreen interface
-  if (activeTab === 'planning-setup') {
-    return <PlanningSetup />
-  }
-
-  // Planning page is a standalone fullscreen interface
-  if (activeTab === 'planning') {
-    return <PlanningChat />
-  }
-
   return (
     <LayoutOverrideProvider>
       <DeviceProvider>
         <ShoppingCartProvider>
           <LayoutSwitcher />
+
+          {/* Planning Setup page - standalone fullscreen interface */}
+          {activeTab === 'planning-setup' && <PlanningSetup />}
+
+          {/* Planning page is a standalone fullscreen interface */}
+          {activeTab === 'planning' && <PlanningChat />}
+
+          {/* Normal layout for all other pages */}
+          {activeTab !== 'planning-setup' && activeTab !== 'planning' && (
           <div className="min-h-screen bg-slate-50">
         <HeaderMap userId={userId} />
       <Navbar
@@ -655,6 +654,7 @@ export default function App() {
         </div>
       </footer>
         </div>
+          )}
         </ShoppingCartProvider>
       </DeviceProvider>
     </LayoutOverrideProvider>
