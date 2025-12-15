@@ -322,6 +322,26 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         }}
       />
 
+      {showProfileModal && (
+        <ProfileEditModal
+          onClose={() => setShowProfileModal(false)}
+        />
+      )}
+
+      {showVerificationModal && (
+        <UserVerificationModal
+          userId={userId}
+          onClose={() => setShowVerificationModal(false)}
+        />
+      )}
+
+      {showCurrencyModal && (
+        <CurrencyPreferenceModal
+          onClose={() => setShowCurrencyModal(false)}
+          onCurrencySelected={() => {}}
+        />
+      )}
+
       {/* Deposit Modal */}
       {showDepositModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
