@@ -318,7 +318,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-1">
+                    <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
                       Barangay
                     </label>
                     <input
@@ -327,11 +327,11 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       value={formData.barangay}
                       onChange={handleInputChange}
                       placeholder="e.g., Taguig"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                     />
                   </div>
                   <div className="relative city-dropdown-container">
-                    <label className="block text-sm font-medium text-slate-900 mb-1">
+                    <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
                       City {searchCharCount.city > 0 && <span className="text-xs text-slate-500">({searchCharCount.city} chars)</span>}
                     </label>
                     <input
@@ -340,7 +340,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       onChange={handleCitySearchChange}
                       onFocus={() => setShowCityDropdown(true)}
                       placeholder="Search cities..."
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                       autoComplete="off"
                     />
                     {showCityDropdown && (
