@@ -219,7 +219,7 @@ export function useGeolocation() {
         setLocation({ latitude, longitude })
       },
       (err) => {
-        console.debug('Geolocation error:', err)
+        console.debug('Geolocation error:', err?.message || `Code ${err?.code}: ${err?.toString() || 'Unknown error'}`)
       },
       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
     )
