@@ -213,8 +213,9 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
       onAddressCreated?.(data?.[0])
       onClose()
     } catch (err) {
-      console.error('Error creating address:', err)
-      alert('Failed to create address. Please try again.')
+      const errorMsg = err?.message || err?.error_description || String(err)
+      console.error('Error creating address:', errorMsg)
+      alert(`Failed to create address: ${errorMsg}`)
     } finally {
       setLoading(false)
     }
