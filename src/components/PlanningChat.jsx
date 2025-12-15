@@ -1133,9 +1133,9 @@ export default function PlanningChat() {
         </div>
       </div>
 
-      <div className="flex-1 flex gap-6 p-6 overflow-hidden">
+      <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-6'} ${isMobile ? 'p-3' : 'p-6'} overflow-hidden`}>
         {/* Map Section */}
-        <div className="flex-1 rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col">
+        <div className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-96' : 'flex-1'}`}>
           {/* Map Controls */}
           {isAuthenticated && (
             <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between flex-wrap gap-2">
