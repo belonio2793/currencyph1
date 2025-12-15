@@ -115,7 +115,9 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
             ? `fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-100 transform transition-transform duration-300 ${
                 isOpen ? 'translate-x-0' : '-translate-x-full'
               }`
-            : 'w-64 bg-slate-900 text-slate-100 border-r border-slate-700 hidden md:block'
+            : `hidden md:flex md:flex-col bg-slate-900 text-slate-100 border-r border-slate-700 transition-all duration-300 ${
+                isCollapsed ? 'w-20' : 'w-64'
+              }`
         }`}
       >
         <div className="h-full flex flex-col overflow-y-auto">
