@@ -476,180 +476,206 @@ export default function App() {
 
           {/* Normal layout for all other pages */}
           {activeTab !== 'planning-setup' && activeTab !== 'planning' && (
-          <div className="min-h-screen bg-slate-50">
-      <Navbar
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        globalCurrency={globalCurrency}
-        setGlobalCurrency={setGlobalCurrency}
-        globalCryptocurrency={globalCryptocurrency}
-        setGlobalCryptocurrency={setGlobalCryptocurrency}
-        userEmail={userEmail}
-        userId={userId}
-        totalBalancePHP={totalBalancePHP}
-        totalBalanceConverted={totalBalanceConverted}
-        totalDebtConverted={totalDebtConverted}
-        totalNet={totalNet}
-        onShowAuth={(tab) => {
-          setAuthInitialTab(tab || 'login')
-          setShowAuth(true)
-          if (tab === 'register') window.history.replaceState(null, '', '/register')
-          else window.history.replaceState(null, '', '/login')
-          // scroll to top so auth card is visible (if preference is enabled)
-          const autoScroll = preferencesManager.getAutoScrollToTop(userId)
-          if (autoScroll) {
-            setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
-          }
-        }}
-        onSignOut={async () => {
-          try {
-            stopPresence()
-            await supabase.auth.signOut()
-          } catch (e) {
-            console.warn('Sign out error', e)
-          }
-          // Clear guest session from localStorage
-          try {
-            localStorage.removeItem('currency_ph_guest_session')
-          } catch (e) {
-            console.warn('Could not clear guest session', e)
-          }
-          setUserId(null)
-          setUserEmail(null)
-          // Don't force the auth overlay — keep the current route visible (e.g., /nearby)
-          setShowAuth(false)
-        }}
-      />
+            <div className="min-h-screen bg-slate-50 flex">
+              <Sidebar
+                activeTab={activeTab}
+                onTabChange={setActiveTab}
+                userEmail={userEmail}
+                onShowAuth={(tab) => {
+                  setAuthInitialTab(tab || 'login')
+                  setShowAuth(true)
+                  if (tab === 'register') window.history.replaceState(null, '', '/register')
+                  else window.history.replaceState(null, '', '/login')
+                }}
+                onSignOut={async () => {
+                  try {
+                    stopPresence()
+                    await supabase.auth.signOut()
+                  } catch (e) {
+                    console.warn('Sign out error', e)
+                  }
+                  try {
+                    localStorage.removeItem('currency_ph_guest_session')
+                  } catch (e) {
+                    console.warn('Could not clear guest session', e)
+                  }
+                  setUserId(null)
+                  setUserEmail(null)
+                  setShowAuth(false)
+                }}
+              />
+              <div className="flex-1 flex flex-col">
+                <Navbar
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  globalCurrency={globalCurrency}
+                  setGlobalCurrency={setGlobalCurrency}
+                  globalCryptocurrency={globalCryptocurrency}
+                  setGlobalCryptocurrency={setGlobalCryptocurrency}
+                  userEmail={userEmail}
+                  userId={userId}
+                  totalBalancePHP={totalBalancePHP}
+                  totalBalanceConverted={totalBalanceConverted}
+                  totalDebtConverted={totalDebtConverted}
+                  totalNet={totalNet}
+                  onShowAuth={(tab) => {
+                    setAuthInitialTab(tab || 'login')
+                    setShowAuth(true)
+                    if (tab === 'register') window.history.replaceState(null, '', '/register')
+                    else window.history.replaceState(null, '', '/login')
+                    const autoScroll = preferencesManager.getAutoScrollToTop(userId)
+                    if (autoScroll) {
+                      setTimeout(() => { try { window.scrollTo({ top: 0, behavior: 'smooth' }) } catch (e) {} }, 50)
+                    }
+                  }}
+                  onSignOut={async () => {
+                    try {
+                      stopPresence()
+                      await supabase.auth.signOut()
+                    } catch (e) {
+                      console.warn('Sign out error', e)
+                    }
+                    try {
+                      localStorage.removeItem('currency_ph_guest_session')
+                    } catch (e) {
+                      console.warn('Could not clear guest session', e)
+                    }
+                    setUserId(null)
+                    setUserEmail(null)
+                    setShowAuth(false)
+                  }}
+                />
 
-              {/* User Status Bar */}
-              {activeTab !== 'home' && (
-                <div className="bg-white border-b border-slate-100">
-                  <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-                    <p className="text-xs text-slate-500 tracking-wide">
-                      <span className="text-slate-400">Account:</span> {userEmail}
-                    </p>
-                    <button
-                      onClick={() => setActiveTab('home')}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-                    >
-                      Back to Home
-                    </button>
+                {/* User Status Bar */}
+                {activeTab !== 'home' && (
+                  <div className="bg-white border-b border-slate-100">
+                    <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+                      <p className="text-xs text-slate-500 tracking-wide">
+                        <span className="text-slate-400">Account:</span> {userEmail}
+                      </p>
+                      <button
+                        onClick={() => setActiveTab('home')}
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      >
+                        Back to Home
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Error Message */}
-              {error && (
-                <div className="bg-red-50 border-b border-red-100">
-                  <div className="max-w-7xl mx-auto px-6 py-3">
-                    <p className="text-red-600 text-sm">{error}</p>
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border-b border-red-100">
+                    <div className="max-w-7xl mx-auto px-6 py-3">
+                      <p className="text-red-600 text-sm">{error}</p>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {/* Main Content */}
-              <main className="flex-1">
-        {(activeTab === 'home' || showAuth) && (
-          <>
-            {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-          </>
-        )}
-        {showAuth ? (
-          <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
-        ) : (
-          <>
-            {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
-            {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
-            {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
-            {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
-            {activeTab === 'send' && <SendMoney userId={userId} />}
-            {activeTab === 'investments' && <Investments userId={userId} />}
-            {activeTab === 'bills' && <BillPayments userId={userId} />}
-            {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
-            {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
-            {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
-            {activeTab === 'jobs' && <Jobs userId={userId} />}
-            {activeTab === 'my-business' && <MyBusiness userId={userId} />}
-            {activeTab === 'business-marketplace' && <IntegratedMarketplace userId={userId} businessId={currentBusinessId} setActiveTab={setActiveTab} setCurrentProductId={setCurrentProductId} />}
-            {activeTab === 'product-detail' && currentProductId && <BusinessMarketplaceDetail productId={currentProductId} userId={userId} setActiveTab={setActiveTab} onBack={() => { setActiveTab('business-marketplace'); setCurrentProductId(null) }} />}
-            {activeTab === 'inventory' && <IntegratedMarketplace userId={userId} businessId={currentBusinessId} setActiveTab={setActiveTab} setCurrentProductId={setCurrentProductId} />}
-            {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-            {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-            {activeTab === 'rides' && <Rides userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-            {activeTab === 'addresses' && <Addresses userId={userId} onClose={() => setActiveTab('home')} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
-            {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
-            {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
-              setActiveTab('nearby')
-              setCurrentListingSlug(null)
-              window.history.pushState(null, '', '/nearby')
-            }} /> }
-            {activeTab === 'network' && <Network userId={userId} />}
-            {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
-            {activeTab === 'p2p-loans' && <P2PLoanMarketplace userId={userId} userEmail={userEmail} onTabChange={setActiveTab} />}
-            {activeTab === 'about' && <About />}
-            {activeTab === 'inbox' && <Inbox userId={userId} />}
-            {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
-            {activeTab === 'shop' && <ShopOnline onProductSelect={(productId) => {
-              setCurrentProductId(productId)
-              setActiveTab('shop-product')
-            }} />}
-            {activeTab === 'shop-product' && currentProductId && <ShopProductDetail productId={currentProductId} onNavigate={setActiveTab} />}
-            {activeTab === 'shop-cart' && <ShoppingCart onNavigate={setActiveTab} />}
-            {activeTab === 'shop-checkout' && <ShopCheckout onNavigate={setActiveTab} onOrderCreated={setCurrentOrderId} />}
-            {activeTab === 'shop-order-confirmation' && currentOrderId && <OrderConfirmation orderId={currentOrderId} onNavigate={setActiveTab} />}
-          </>
-        )}
-      </main>
+                {/* Main Content */}
+                <main className="flex-1">
+                  {(activeTab === 'home' || showAuth) && (
+                    <>
+                      {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                    </>
+                  )}
+                  {showAuth ? (
+                    <Auth initialTab={authInitialTab} onAuthSuccess={handleAuthSuccess} />
+                  ) : (
+                    <>
+                      {activeTab === 'deposit' && <Deposits userId={userId} globalCurrency={globalCurrency} />}
+                      {activeTab === 'rates' && <Rates globalCurrency={globalCurrency} />}
+                      {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
+                      {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
+                      {activeTab === 'send' && <SendMoney userId={userId} />}
+                      {activeTab === 'investments' && <Investments userId={userId} />}
+                      {activeTab === 'bills' && <BillPayments userId={userId} />}
+                      {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
+                      {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
+                      {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
+                      {activeTab === 'jobs' && <Jobs userId={userId} />}
+                      {activeTab === 'my-business' && <MyBusiness userId={userId} />}
+                      {activeTab === 'business-marketplace' && <IntegratedMarketplace userId={userId} businessId={currentBusinessId} setActiveTab={setActiveTab} setCurrentProductId={setCurrentProductId} />}
+                      {activeTab === 'product-detail' && currentProductId && <BusinessMarketplaceDetail productId={currentProductId} userId={userId} setActiveTab={setActiveTab} onBack={() => { setActiveTab('business-marketplace'); setCurrentProductId(null) }} />}
+                      {activeTab === 'inventory' && <IntegratedMarketplace userId={userId} businessId={currentBusinessId} setActiveTab={setActiveTab} setCurrentProductId={setCurrentProductId} />}
+                      {activeTab === 'poker' && <PokerPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                      {activeTab === 'chess' && <ChessPage userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                      {activeTab === 'rides' && <Rides userId={userId} userEmail={userEmail} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                      {activeTab === 'addresses' && <Addresses userId={userId} onClose={() => setActiveTab('home')} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                      {activeTab === 'business' && <Business businessId={currentBusinessId} onBack={() => setActiveTab('nearby')} userId={userId} /> }
+                      {activeTab === 'listing' && currentListingSlug && <ListingDetail slug={currentListingSlug} onBack={() => {
+                        setActiveTab('nearby')
+                        setCurrentListingSlug(null)
+                        window.history.pushState(null, '', '/nearby')
+                      }} /> }
+                      {activeTab === 'network' && <Network userId={userId} />}
+                      {activeTab === 'network-balances' && <NetworkBalances userId={userId} />}
+                      {activeTab === 'p2p-loans' && <P2PLoanMarketplace userId={userId} userEmail={userEmail} onTabChange={setActiveTab} />}
+                      {activeTab === 'about' && <About />}
+                      {activeTab === 'inbox' && <Inbox userId={userId} />}
+                      {activeTab === 'online-users' && <OnlineUsers userId={userId} userEmail={userEmail} />}
+                      {activeTab === 'shop' && <ShopOnline onProductSelect={(productId) => {
+                        setCurrentProductId(productId)
+                        setActiveTab('shop-product')
+                      }} />}
+                      {activeTab === 'shop-product' && currentProductId && <ShopProductDetail productId={currentProductId} onNavigate={setActiveTab} />}
+                      {activeTab === 'shop-cart' && <ShoppingCart onNavigate={setActiveTab} />}
+                      {activeTab === 'shop-checkout' && <ShopCheckout onNavigate={setActiveTab} onOrderCreated={setCurrentOrderId} />}
+                      {activeTab === 'shop-order-confirmation' && currentOrderId && <OrderConfirmation orderId={currentOrderId} onNavigate={setActiveTab} />}
+                    </>
+                  )}
+                </main>
 
-      {/* Chat Bar */}
-      {userId && <ChatBar userId={userId} userEmail={userEmail} />}
+                {/* Chat Bar */}
+                {userId && <ChatBar userId={userId} userEmail={userEmail} />}
 
-      {/* Footer - On all pages */}
-      <footer className="bg-white border-t border-slate-100 mt-20">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            <div>
-              <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
-              <p className="text-sm text-slate-500 leading-relaxed">An open-source application that displays all transactions across the network.</p>
+                {/* Footer - On all pages */}
+                <footer className="bg-white border-t border-slate-100 mt-20">
+                  <div className="max-w-7xl mx-auto px-6 py-16">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                      <div>
+                        <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
+                        <p className="text-sm text-slate-500 leading-relaxed">An open-source application that displays all transactions across the network.</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
+                          <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Maps</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('addresses')} className="text-slate-600 hover:text-slate-900 transition-colors">Addresses</button></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Games</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('poker')} className="text-slate-600 hover:text-slate-900 transition-colors">Poker</button></li>
+                          <li><button onClick={() => setActiveTab('chess')} className="text-slate-600 hover:text-slate-900 transition-colors">Chess</button></li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 tracking-wide">
+                      <p>&copy; {new Date().getFullYear()} currency.ph. All rights reserved.</p>
+                      <p className="mt-3 space-x-4">
+                        <button onClick={() => setActiveTab('about')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                          About
+                        </button>
+                        <button onClick={() => setActiveTab('network-balances')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                          Network Balances
+                        </button>
+                        <button onClick={() => setActiveTab('planning')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
+                          Planning
+                        </button>
+                      </p>
+                    </div>
+                  </div>
+                </footer>
+              </div>
             </div>
-            <div>
-              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
-              <ul className="space-y-3 text-sm">
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
-                <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Maps</h4>
-              <ul className="space-y-3 text-sm">
-                <li><button onClick={() => setActiveTab('addresses')} className="text-slate-600 hover:text-slate-900 transition-colors">Addresses</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Games</h4>
-              <ul className="space-y-3 text-sm">
-                <li><button onClick={() => setActiveTab('poker')} className="text-slate-600 hover:text-slate-900 transition-colors">Poker</button></li>
-                <li><button onClick={() => setActiveTab('chess')} className="text-slate-600 hover:text-slate-900 transition-colors">Chess</button></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-slate-100 pt-8 text-center text-xs text-slate-500 tracking-wide">
-            <p>&copy; {new Date().getFullYear()} currency.ph. All rights reserved.</p>
-            <p className="mt-3 space-x-4">
-              <button onClick={() => setActiveTab('about')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
-                About
-              </button>
-              <button onClick={() => setActiveTab('network-balances')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
-                Network Balances
-              </button>
-              <button onClick={() => setActiveTab('planning')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
-                Planning
-              </button>
-            </p>
-          </div>
-        </div>
-      </footer>
-        </div>
           )}
         </ShoppingCartProvider>
       </DeviceProvider>
