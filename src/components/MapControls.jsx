@@ -76,7 +76,7 @@ export default function MapControls({
           }
         },
         (error) => {
-          console.error('Geolocation error:', error)
+          console.error('Geolocation error:', error?.message || `Code ${error?.code}: ${error?.toString() || 'Unknown error'}`)
         }
       )
     }
