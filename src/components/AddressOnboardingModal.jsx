@@ -101,8 +101,8 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
   }
 
   const handleSaveAddress = async () => {
-    if (!formData.street_address || !formData.barangay) {
-      alert('Please fill in required fields')
+    if (!formData.address_name) {
+      alert('Please enter a nickname for this address')
       return
     }
 
@@ -212,7 +212,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-900 mb-1">
-                    Address Name *
+                    Address Name (Nickname) *
                   </label>
                   <input
                     type="text"
@@ -221,12 +221,13 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                     onChange={handleInputChange}
                     placeholder="e.g., My Home"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                    required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-slate-900 mb-1">
-                    Street Address *
+                    Street Address
                   </label>
                   <input
                     type="text"
@@ -241,7 +242,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-slate-900 mb-1">
-                      Barangay *
+                      Barangay
                     </label>
                     <input
                       type="text"
