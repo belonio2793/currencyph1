@@ -81,19 +81,19 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
 
   return (
     <>
-      {/* Mobile toggle button */}
+      {/* Mobile toggle button - moved to top */}
       {isMobile && (
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="fixed bottom-6 right-6 z-40 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700"
+          className="fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-lg shadow-lg hover:bg-blue-700 md:hidden"
           title={isOpen ? 'Close sidebar' : 'Open sidebar'}
         >
           {isOpen ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           )}
@@ -103,7 +103,7 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
       {/* Overlay for mobile */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setIsOpen(false)}
         />
       )}
