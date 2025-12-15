@@ -242,20 +242,20 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
             <>
               {/* Step 1: Map Selection */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-slate-900">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2 sm:mb-3">
+                  <label className="block text-xs sm:text-sm font-medium text-slate-900">
                     📍 Select Location on Map (Click to place marker)
                   </label>
                   <button
                     onClick={handleFetchLocation}
                     disabled={fetchingLocation}
-                    className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 font-medium"
+                    className="px-2 sm:px-3 py-1 text-xs sm:text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors disabled:opacity-50 font-medium whitespace-nowrap"
                     title="Use your current GPS location"
                   >
                     {fetchingLocation ? '📍 Fetching...' : '📍 Use Current Location'}
                   </button>
                 </div>
-                <div className="h-80 rounded-lg overflow-hidden border border-slate-200 relative">
+                <div className="h-60 sm:h-80 rounded-lg overflow-hidden border border-slate-200 relative">
                   <MapContainer
                     center={[formData.latitude, formData.longitude]}
                     zoom={13}
