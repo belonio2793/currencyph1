@@ -1,40 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [borrowDropdownOpen, setBorrowDropdownOpen] = useState(false)
 
-  const mainNav = [
-    { id: 'home', label: 'Home', public: true },
-    { id: 'nearby', label: 'Nearby', auth: true },
-    { id: 'rides', label: 'Rides', auth: true },
-    { id: 'online-users', label: 'Online Users', auth: true },
-    { id: 'rates', label: 'Rates', auth: true },
-    { id: 'deposit', label: 'Deposit', auth: true }
-  ]
-
-  const secondaryNav = [
-    { id: 'investments', label: 'Community Projects', auth: true }
-  ]
-
-  // Buttons that should appear under the Community Projects row
-  const investmentsRowButtons = [
-    { id: 'wallet', label: 'Wallets', auth: true },
-    { id: 'send', label: 'Send', auth: true },
-    { id: 'bills', label: 'Bills', auth: true },
-    { id: 'transactions', label: 'History', auth: true },
-    { id: 'profile', label: 'Profile', auth: true },
-    { id: 'inbox', label: 'Inbox', auth: true },
-    { id: 'my-business', label: 'My Business', auth: true }
-  ]
-
-  // Loans dropdown options
-  const loansOptions = [
-    { id: 'p2p-loans', label: 'Peer To Peer Loan Marketplace', auth: true }
-  ]
 
   return (
     <nav className="bg-slate-50 border-b border-slate-100 sticky top-0 z-50">
@@ -56,72 +26,6 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                 )}
               </div>
             )}
-            {/* Borrow Money Dropdown - Next to Total Balance */}
-
-            {/* Desktop main navigation in the topmost header */}
-            <div className="hidden md:flex items-center gap-3 ml-4">
-              {/* Jobs tab */}
-              {userEmail && (
-                <button
-                  onClick={() => onTabChange('jobs')}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                    activeTab === 'jobs' ? 'text-slate-900 bg-slate-50' : 'text-slate-700 hover:text-slate-900'
-                  }`}
-                >
-                  Jobs
-                </button>
-              )}
-
-              {/* Loans dropdown (now in same row for consistent spacing) */}
-              {userEmail && (
-                <div className="relative">
-                  {(() => {
-                    const isLoansActive = loansOptions.some(o => o.id === activeTab) || activeTab === 'loans'
-                    return (
-                      <>
-                        <button
-                          onClick={() => setBorrowDropdownOpen(!borrowDropdownOpen)}
-                          className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${isLoansActive ? 'text-slate-900 bg-slate-50' : 'text-slate-700 hover:text-slate-900'}`}
-                        >
-                          Loans
-                        </button>
-                        {borrowDropdownOpen && (
-                          <div className="absolute left-0 mt-2 w-56 bg-slate-50 border border-slate-200 rounded-lg shadow-xl z-50">
-                            <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 rounded-t-lg">
-                              <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">Loans</p>
-                            </div>
-                            {loansOptions.map(option => (
-                              <button
-                                key={option.id}
-                                onClick={() => {
-                                  onTabChange(option.id)
-                                  setBorrowDropdownOpen(false)
-                                }}
-                                className="block w-full text-left px-4 py-3 text-sm text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-colors border-b border-slate-100 last:border-b-0"
-                              >
-                                {option.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </>
-                    )
-                  })()}
-                </div>
-              )}
-
-              {mainNav.filter(btn => (btn.public || (!btn.auth) || userEmail) && !['home','nearby','rates','online-users','rides'].includes(btn.id)).map(btn => (
-                <button
-                  key={btn.id}
-                  onClick={() => { onTabChange(btn.id); setMobileMenuOpen(false) }}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                    activeTab === btn.id ? 'text-slate-900 bg-slate-50' : 'text-slate-700 hover:text-slate-900'
-                  }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-            </div>
           </div>
           <div className="hidden md:flex items-center gap-3">
             <HeaderMap userId={userId} />
@@ -199,182 +103,21 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
             </div>
           )}
 
-          {/* Desktop navigation */}
-          <div className="hidden md:flex flex-wrap items-center gap-1">
-            {mainNav
-              .filter(btn => (btn.public || (!btn.auth) || userEmail))
-              .filter(btn => btn.id !== 'deposit')
-              .map(btn => (
-                <button
-                  key={btn.id}
-                  onClick={() => {
-                    onTabChange(btn.id)
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                    activeTab === btn.id
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-
-            {/* Auth controls will be rendered in the investments row */}
+          {/* Auth buttons - right aligned */}
+          <div className="ml-auto flex items-center gap-2">
+            {userEmail ? (
+              <>
+                <span className="text-sm font-medium text-slate-600">{userEmail}</span>
+                <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100">Sign out</button>
+              </>
+            ) : (
+              <>
+                <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100">Login</button>
+                <button onClick={() => onShowAuth && onShowAuth('register')} className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Register</button>
+              </>
+            )}
           </div>
-
-          {/* Secondary row for Community Projects (desktop) - only show when signed in */}
-          {userEmail && (
-            <div className="hidden md:flex w-full mt-2 pt-2 border-t border-slate-100">
-              <div className="w-full px-4 flex items-center">
-                <div className="flex items-center gap-2">
-                  {secondaryNav.filter(btn => !btn.auth || userEmail).map(btn => (
-                    <button
-                      key={btn.id}
-                      onClick={() => onTabChange(btn.id)}
-                      className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${
-                        activeTab === btn.id ? 'text-slate-900 bg-slate-100' : 'text-slate-700 hover:bg-slate-100'
-                      }`}
-                    >
-                      {btn.label}
-                    </button>
-                  ))}
-
-                  {/* Buttons moved into the Community Projects row */}
-                  <div className="ml-2 flex items-center gap-2">
-                    {investmentsRowButtons.filter(btn => (!btn.auth) || userEmail).map(btn => (
-                      <button key={btn.id} onClick={() => onTabChange(btn.id)} className={`px-3 py-2 text-sm font-medium transition-colors rounded-lg ${activeTab === btn.id ? 'text-slate-900 bg-slate-100' : 'text-slate-700 hover:bg-slate-100'}`}>
-                        {btn.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Right-aligned auth controls */}
-                <div className="ml-auto flex items-center gap-2">
-                  {userEmail ? (
-                    <>
-                      <span className="text-sm font-medium text-blue-600 truncate max-w-[200px]">{userEmail}</span>
-                      <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100">Sign out</button>
-                    </>
-                  ) : (
-                    <>
-                      <button onClick={() => onShowAuth && onShowAuth('login')} className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100">Login</button>
-                      <button onClick={() => onShowAuth && onShowAuth('register')} className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700">Register</button>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Mobile menu button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-slate-600 hover:text-slate-900 ml-auto"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {mobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
         </div>
-
-        {/* Mobile navigation */}
-        {mobileMenuOpen && (
-          <div className="md:hidden pb-2 border-t border-slate-100">
-            <div className="space-y-1">
-              {/* Shop Online tab for mobile - First tab */}
-              <button
-                onClick={() => {
-                  onTabChange('shop')
-                  setMobileMenuOpen(false)
-                }}
-                className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'shop'
-                    ? 'text-blue-600 bg-blue-50'
-                    : 'text-blue-600 hover:bg-blue-50'
-                }`}
-              >
-                Shop Online
-              </button>
-
-              {/* Jobs tab for mobile */}
-              {userEmail && (
-                <button
-                  onClick={() => {
-                    onTabChange('jobs')
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === 'jobs'
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  Jobs
-                </button>
-              )}
-
-              {mainNav.concat(secondaryNav, investmentsRowButtons).filter(btn => (btn.public || !btn.auth || userEmail)).map(btn => (
-                <button
-                  key={btn.id}
-                  onClick={() => {
-                    onTabChange(btn.id)
-                    setMobileMenuOpen(false)
-                  }}
-                  className={`block w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    activeTab === btn.id
-                      ? 'text-blue-600 bg-blue-50'
-                      : 'text-blue-600 hover:bg-blue-50'
-                  }`}
-                >
-                  {btn.label}
-                </button>
-              ))}
-
-
-              {/* Mobile Borrow Money dropdown */}
-              {userEmail && (
-                <div className="border-t border-slate-100 mt-2 pt-2">
-                  <div className="text-xs font-bold text-green-700 px-3 py-2 uppercase tracking-wide">Loans</div>
-                  {loansOptions.map(option => (
-                    <button
-                      key={option.id}
-                      onClick={() => {
-                        onTabChange(option.id)
-                        setMobileMenuOpen(false)
-                      }}
-                      className="block w-full text-left px-6 py-2 rounded-lg text-sm text-slate-600 hover:bg-green-50 hover:text-green-700 transition-colors hover:font-medium"
-                    >
-                      <span className="text-green-600 mr-2">→</span>
-                      {option.label}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Mobile auth buttons */}
-              <div className="pt-2 border-t border-slate-100 space-y-1">
-                {userEmail ? (
-                  <>
-                    <div className="px-3 text-sm text-slate-600">{userEmail}</div>
-                    <button onClick={() => onSignOut && onSignOut()} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200">Sign out</button>
-                  </>
-                ) : (
-                  <>
-                    <button onClick={() => { onShowAuth && onShowAuth('login'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-white border border-slate-200">Login</button>
-                    <button onClick={() => { onShowAuth && onShowAuth('register'); setMobileMenuOpen(false) }} className="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white">Register</button>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </nav>
   )
