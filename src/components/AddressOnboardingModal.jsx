@@ -363,9 +363,9 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                   <div className="relative province-dropdown-container">
-                    <label className="block text-sm font-medium text-slate-900 mb-1">
+                    <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
                       Province {searchCharCount.province > 0 && <span className="text-xs text-slate-500">({searchCharCount.province} chars)</span>}
                     </label>
                     <input
@@ -374,29 +374,29 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       onChange={handleProvinceSearchChange}
                       onFocus={() => setShowProvinceDropdown(true)}
                       placeholder="Search provinces..."
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                       autoComplete="off"
                     />
                     {showProvinceDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-48 sm:max-h-64 overflow-y-auto">
                         {filteredProvinces.length > 0 ? (
                           filteredProvinces.slice(0, 10).map((province, idx) => (
                             <div
                               key={idx}
                               onClick={() => selectProvince(province)}
-                              className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
+                              className="px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-blue-50 cursor-pointer text-xs sm:text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
                             >
                               {province}
                             </div>
                           ))
                         ) : (
-                          <div className="px-3 py-2 text-sm text-slate-500">No provinces found</div>
+                          <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-500">No provinces found</div>
                         )}
                       </div>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-900 mb-1">
+                    <label className="block text-xs sm:text-sm font-medium text-slate-900 mb-1">
                       Postal Code
                     </label>
                     <input
@@ -405,7 +405,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       value={formData.postal_code}
                       onChange={handleInputChange}
                       placeholder="1234"
-                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      className="w-full px-2 sm:px-3 py-1.5 sm:py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-sm"
                     />
                   </div>
                 </div>
