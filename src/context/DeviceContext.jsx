@@ -6,15 +6,17 @@ const DeviceContext = createContext(null)
 export function DeviceProvider({ children }) {
   const actualDevice = useDeviceDetection()
   const [effectiveDevice, setEffectiveDevice] = useState(actualDevice)
+  const [layoutOverride, setLayoutOverride] = useState(null)
 
-  useEffect(() => {
-    // Load layout override from localStorage
+  // Function to apply layout override
+  const applyLayoutOverride = (actualDev) => {
     try {
       const stored = localStorage.getItem('dev_layout_override')
 
       if (!stored) {
         // No override, use actual device detection
-        setEffectiveDevice(actualDevice)
+        setEffectiveDevice(actualDev)
+        setLayoutOverride(null)
         return
       }
 
@@ -22,28 +24,48 @@ export function DeviceProvider({ children }) {
       if (stored === 'mobile') {
         // Force mobile layout
         setEffectiveDevice({
-          ...actualDevice,
+          ...actualDev,
           isMobile: true,
           isTablet: false,
           isDesktop: false,
           deviceType: 'mobile',
           screenSize: 'sm'
         })
+        setLayoutOverride('mobile')
       } else if (stored === 'desktop') {
         // Force desktop layout
         setEffectiveDevice({
-          ...actualDevice,
+          ...actualDev,
           isMobile: false,
           isTablet: false,
           isDesktop: true,
           deviceType: 'desktop',
           screenSize: 'lg'
         })
+        setLayoutOverride('desktop')
       }
     } catch (e) {
       console.warn('Could not apply layout override', e)
-      setEffectiveDevice(actualDevice)
+      setEffectiveDevice(actualDev)
+      setLayoutOverride(null)
     }
+  }
+
+  // Apply override when actual device changes
+  useEffect(() => {
+    applyLayoutOverride(actualDevice)
+  }, [actualDevice])
+
+  // Listen for storage changes (when LayoutSwitcher updates localStorage)
+  useEffect(() => {
+    const handleStorageChange = (e) => {
+      if (e.key === 'dev_layout_override') {
+        applyLayoutOverride(actualDevice)
+      }
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
   }, [actualDevice])
 
   return (
