@@ -308,32 +308,70 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
                     />
                   </div>
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-slate-900 mb-1">
-                      City
+                      City {searchCharCount.city > 0 && <span className="text-xs text-slate-500">({searchCharCount.city} chars)</span>}
                     </label>
                     <input
                       type="text"
-                      name="city"
-                      value={formData.city}
-                      onChange={handleInputChange}
+                      value={citySearchInput}
+                      onChange={handleCitySearchChange}
+                      onFocus={() => setShowCityDropdown(true)}
+                      placeholder="Search cities..."
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      autoComplete="off"
                     />
+                    {showCityDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                        {filteredCities.length > 0 ? (
+                          filteredCities.slice(0, 10).map((city, idx) => (
+                            <div
+                              key={idx}
+                              onClick={() => selectCity(city)}
+                              className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
+                            >
+                              {city}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-slate-500">No cities found</div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
+                  <div className="relative">
                     <label className="block text-sm font-medium text-slate-900 mb-1">
-                      Province
+                      Province {searchCharCount.province > 0 && <span className="text-xs text-slate-500">({searchCharCount.province} chars)</span>}
                     </label>
                     <input
                       type="text"
-                      name="province"
-                      value={formData.province}
-                      onChange={handleInputChange}
+                      value={provinceSearchInput}
+                      onChange={handleProvinceSearchChange}
+                      onFocus={() => setShowProvinceDropdown(true)}
+                      placeholder="Search provinces..."
                       className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:border-blue-500"
+                      autoComplete="off"
                     />
+                    {showProvinceDropdown && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                        {filteredProvinces.length > 0 ? (
+                          filteredProvinces.slice(0, 10).map((province, idx) => (
+                            <div
+                              key={idx}
+                              onClick={() => selectProvince(province)}
+                              className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
+                            >
+                              {province}
+                            </div>
+                          ))
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-slate-500">No provinces found</div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-slate-900 mb-1">
