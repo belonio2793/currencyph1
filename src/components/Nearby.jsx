@@ -823,26 +823,26 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
       {viewMode === 'listings' && (
       <>
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white py-6 px-6">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-700 dark:to-blue-900 text-white py-4 sm:py-6 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-2xl font-bold mb-2 text-white">Explore Philippines</h1>
-          <p className="text-white text-lg mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2 text-white">Explore Philippines</h1>
+          <p className="text-white text-sm sm:text-base md:text-lg mb-4 sm:mb-6">Discover the best attractions, restaurants & hotels across all Philippine cities</p>
 
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-2xl font-bold text-white">Browse by City</h3>
+          <div className="mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3 sm:mb-4 gap-3">
+              <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white">Browse by City</h3>
               <button
                 onClick={() => setShowAddBusiness(true)}
-                className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-xs sm:text-sm font-medium whitespace-nowrap"
               >
                 + Add your business
               </button>
             </div>
-            <p className="text-white mb-4">Select a letter to see all cities starting with that letter</p>
+            <p className="text-white text-xs sm:text-sm mb-3 sm:mb-4">Select a letter to see all cities starting with that letter</p>
 
-            {/* Prominent A-Z Alphabet Selector */}
-            <div className="bg-transparent rounded-xl p-2 w-full">
-              <div className="flex flex-nowrap gap-0 justify-between overflow-x-auto">
+            {/* Prominent A-Z Alphabet Selector - Responsive Grid */}
+            <div className="bg-transparent rounded-xl p-1 sm:p-2 w-full">
+              <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-14 gap-0.5 sm:gap-1">
                 {/* All Button */}
                 <button
                   onClick={() => {
@@ -850,7 +850,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                     setExpandedLetter(null)
                     setPage(1)
                   }}
-                  className={`flex-1 py-2 rounded-md font-bold text-sm transition-all duration-200 whitespace-nowrap ${
+                  className={`py-1 sm:py-2 rounded-md font-bold text-xs sm:text-sm md:text-base transition-all duration-200 whitespace-nowrap ${
                     expandedLetter === null && selectedCity === null
                       ? 'bg-white/20 text-white shadow-lg'
                       : 'bg-white/5 text-white hover:bg-white/10'
@@ -872,7 +872,7 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
                         setPage(1)
                         setLetterCategoryPages({ restaurants: 1, attractions: 1, hotels: 1 })
                       }}
-                      className={`flex-1 py-2 rounded-md font-bold text-base transition-all duration-200 flex items-center justify-center ${
+                      className={`py-1 sm:py-2 rounded-md font-bold text-xs sm:text-sm md:text-base transition-all duration-200 flex items-center justify-center ${
                         expandedLetter === letter
                           ? 'bg-white/25 text-white shadow-lg'
                           : 'bg-white/5 text-white hover:bg-white/10'
