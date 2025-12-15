@@ -1049,41 +1049,41 @@ export default function PlanningChat() {
   return (
     <div className="min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}
-      <div className="bg-slate-800 border-b border-slate-700 px-6 py-4">
-        <div className="flex items-center justify-between mb-3">
+      <div className={`bg-slate-800 border-b border-slate-700 ${isMobile ? 'px-4 py-3' : 'px-6 py-4'}}`}>
+        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'items-center justify-between mb-3'}`}>
           <div>
-            <h1 className="text-2xl font-bold text-white">Planning Group</h1>
-            <p className="text-sm text-slate-400">Strategic partner coordination for manufacturing & distribution</p>
+            <h1 className={`font-bold text-white ${isMobile ? 'text-lg' : 'text-2xl'}`}>Planning Group</h1>
+            <p className={`text-slate-400 ${isMobile ? 'text-xs' : 'text-sm'}`}>Strategic partner coordination for manufacturing & distribution</p>
           </div>
           {isAuthenticated && (
-            <div className="flex items-center gap-4">
+            <div className={`flex ${isMobile ? 'items-center justify-between w-full' : 'items-center gap-4'}`}>
               <button
                 onClick={() => setShowProfileSettings(true)}
-                className="text-slate-300 hover:text-white text-sm transition-colors"
+                className={`text-slate-300 hover:text-white transition-colors ${isMobile ? 'text-xs truncate max-w-[200px]' : 'text-sm'}`}
                 title="Edit profile"
               >
                 {planningUser?.name || userEmail}
               </button>
               <button
                 onClick={handleSignOut}
-                className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded text-sm font-medium transition-colors"
+                className={`bg-slate-700 hover:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1 text-xs' : 'px-4 py-2 text-sm'}`}
               >
-                Sign Out
+                {isMobile ? 'Out' : 'Sign Out'}
               </button>
             </div>
           )}
         </div>
 
         {/* Public Locations & Ports Dropdown */}
-        <div className="flex items-center gap-3 flex-wrap bg-slate-700 px-4 py-3 rounded-lg">
+        <div className={`${isMobile ? 'flex flex-col gap-2' : 'flex items-center gap-3 flex-wrap'} bg-slate-700 px-4 py-3 rounded-lg`}>
           {locations.length > 0 && (
-            <div className="flex items-center gap-2">
-              <label htmlFor="public-locations-select" className="text-slate-300 text-sm font-medium opacity-50">Locations:</label>
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-2'}`}>
+              <label htmlFor="public-locations-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Locations:</label>
               <select
                 id="public-locations-select"
                 value={selectedLocationId}
                 onChange={handleLocationSelect}
-                className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+                className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
               >
                 <option value="">View location...</option>
                 {locations.map(loc => (
@@ -1096,13 +1096,13 @@ export default function PlanningChat() {
           )}
 
           {shippingPorts.length > 0 && (
-            <div className="flex items-center gap-2">
-              <label htmlFor="shipping-ports-select" className="text-slate-300 text-sm font-medium opacity-50">Ports:</label>
+            <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-2'}`}>
+              <label htmlFor="shipping-ports-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Ports:</label>
               <select
                 id="shipping-ports-select"
                 value={selectedPortId}
                 onChange={handlePortSelect}
-                className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+                className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
               >
                 <option value="">View port...</option>
                 {shippingPorts.map(port => (
@@ -1114,13 +1114,13 @@ export default function PlanningChat() {
             </div>
           )}
 
-          <div className="flex items-center gap-2">
-            <label htmlFor="cities-select" className="text-slate-300 text-sm font-medium opacity-50">Cities:</label>
+          <div className={`flex ${isMobile ? 'flex-col gap-1' : 'items-center gap-2'}`}>
+            <label htmlFor="cities-select" className={`text-slate-300 font-medium opacity-50 ${isMobile ? 'text-xs' : 'text-sm'}`}>Cities:</label>
             <select
               id="cities-select"
               value={selectedCity}
               onChange={handleCitySelect}
-              className="px-3 py-1 rounded text-sm bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+              className={`rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-3 py-1 text-sm'}`}
             >
               <option value="">Select a city...</option>
               {PHILIPPINE_CITIES.map((city, idx) => (
