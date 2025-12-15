@@ -12,7 +12,7 @@ export const onboardingService = {
       if (error) throw error
       return data || []
     } catch (err) {
-      console.error('Error fetching user addresses:', err)
+      console.error('Error fetching user addresses:', err?.message || String(err))
       return []
     }
   },
@@ -23,7 +23,7 @@ export const onboardingService = {
       const addresses = await this.getUserAddresses(userId)
       return addresses.length > 0
     } catch (err) {
-      console.error('Error checking user addresses:', err)
+      console.error('Error checking user addresses:', err?.message || String(err))
       return false
     }
   },
@@ -82,7 +82,7 @@ export const onboardingService = {
       if (error && error.code !== 'PGRST116') throw error
       return data || null
     } catch (err) {
-      console.error('Error fetching onboarding state:', err)
+      console.error('Error fetching onboarding state:', err?.message || String(err))
       return null
     }
   },
@@ -104,7 +104,7 @@ export const onboardingService = {
       const tasks = this.getDefaultTasks(userState)
       return tasks
     } catch (err) {
-      console.error('Error getting onboarding tasks:', err)
+      console.error('Error getting onboarding tasks:', err?.message || String(err))
       return this.getDefaultTasks({})
     }
   },
@@ -126,7 +126,7 @@ export const onboardingService = {
       if (error) throw error
       return true
     } catch (err) {
-      console.error('Error updating task completion:', err)
+      console.error('Error updating task completion:', err?.message || String(err))
       return false
     }
   },
@@ -143,7 +143,7 @@ export const onboardingService = {
         percentage
       }
     } catch (err) {
-      console.error('Error getting onboarding progress:', err)
+      console.error('Error getting onboarding progress:', err?.message || String(err))
       return { completed: 0, total: 0, percentage: 0 }
     }
   }

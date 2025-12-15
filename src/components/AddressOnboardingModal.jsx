@@ -139,7 +139,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
           setFetchingLocation(false)
         },
         (error) => {
-          console.error('Geolocation error:', error)
+          console.error('Geolocation error:', error?.message || `Code ${error?.code}: ${error?.toString() || 'Unknown error'}`)
           let errorMessage = 'Unable to get your location'
           if (error.code === error.PERMISSION_DENIED) {
             errorMessage = 'Location permission denied. Please enable location access in your browser settings.'
