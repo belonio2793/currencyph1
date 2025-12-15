@@ -138,7 +138,7 @@ export default function HeaderMap({ userId: headerUserId }) {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+    <div className="flex items-center gap-3 ml-auto">
       {/* Compact Status */}
       <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
         <div className="flex items-center gap-2">
