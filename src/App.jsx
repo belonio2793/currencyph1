@@ -8,6 +8,7 @@ import { isSupabaseConfigured } from './lib/supabaseClient'
 import { preferencesManager } from './lib/preferencesManager'
 import { deviceFingerprint } from './lib/deviceFingerprint'
 import Navbar from './components/Navbar'
+import Sidebar from './components/Sidebar'
 import LandingPage from './components/LandingPage'
 import HomePage from './components/HomePage'
 import Deposits from './components/Deposits'
@@ -520,34 +521,34 @@ export default function App() {
         }}
       />
 
-      {/* User Status Bar */}
-      {activeTab !== 'home' && (
-        <div className="bg-white border-b border-slate-100">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
-            <p className="text-xs text-slate-500 tracking-wide">
-              <span className="text-slate-400">Account:</span> {userEmail}
-            </p>
-            <button
-              onClick={() => setActiveTab('home')}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
-            >
-              Back to Home
-            </button>
-          </div>
-        </div>
-      )}
+              {/* User Status Bar */}
+              {activeTab !== 'home' && (
+                <div className="bg-white border-b border-slate-100">
+                  <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+                    <p className="text-xs text-slate-500 tracking-wide">
+                      <span className="text-slate-400">Account:</span> {userEmail}
+                    </p>
+                    <button
+                      onClick={() => setActiveTab('home')}
+                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    >
+                      Back to Home
+                    </button>
+                  </div>
+                </div>
+              )}
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-red-50 border-b border-red-100">
-          <div className="max-w-7xl mx-auto px-6 py-3">
-            <p className="text-red-600 text-sm">{error}</p>
-          </div>
-        </div>
-      )}
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border-b border-red-100">
+                  <div className="max-w-7xl mx-auto px-6 py-3">
+                    <p className="text-red-600 text-sm">{error}</p>
+                  </div>
+                </div>
+              )}
 
-      {/* Main Content */}
-      <main>
+              {/* Main Content */}
+              <main className="flex-1">
         {(activeTab === 'home' || showAuth) && (
           <>
             {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
