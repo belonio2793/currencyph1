@@ -5,6 +5,9 @@ import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import CustomizeQuickAccessModal from './CustomizeQuickAccessModal'
 import OnboardingChecklist from './OnboardingChecklist'
 import AddressOnboardingModal from './AddressOnboardingModal'
+import ProfileEditModal from './ProfileEditModal'
+import UserVerificationModal from './UserVerificationModal'
+import CurrencyPreferenceModal from './CurrencyPreferenceModal'
 import OfflineDisplay from './OfflineDisplay'
 import ReceiptHistory from './ReceiptHistory'
 import MyBusiness from './MyBusiness'
@@ -34,6 +37,9 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [showCustomizeModal, setShowCustomizeModal] = useState(false)
   const [quickAccessCards, setQuickAccessCards] = useState(() => quickAccessManager.getCardVisibility(userId))
   const [showAddressOnboardingModal, setShowAddressOnboardingModal] = useState(false)
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [showVerificationModal, setShowVerificationModal] = useState(false)
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -225,6 +231,9 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
               userEmail={userEmail}
               onTaskComplete={() => {}}
               onOpenAddressModal={() => setShowAddressOnboardingModal(true)}
+              onOpenProfileModal={() => setShowProfileModal(true)}
+              onOpenVerificationModal={() => setShowVerificationModal(true)}
+              onOpenCurrencyModal={() => setShowCurrencyModal(true)}
               onNavigate={onTabChange}
             />
           </div>
