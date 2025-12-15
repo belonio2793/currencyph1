@@ -3,6 +3,8 @@ import { currencyAPI } from '../lib/payments'
 import { quickAccessManager } from '../lib/quickAccessManager'
 import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import CustomizeQuickAccessModal from './CustomizeQuickAccessModal'
+import OnboardingChecklist from './OnboardingChecklist'
+import AddressOnboardingModal from './AddressOnboardingModal'
 import OfflineDisplay from './OfflineDisplay'
 import ReceiptHistory from './ReceiptHistory'
 import MyBusiness from './MyBusiness'
@@ -31,6 +33,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
   const [reorderKey, setReorderKey] = useState(0)
   const [showCustomizeModal, setShowCustomizeModal] = useState(false)
   const [quickAccessCards, setQuickAccessCards] = useState(() => quickAccessManager.getCardVisibility(userId))
+  const [showAddressOnboardingModal, setShowAddressOnboardingModal] = useState(false)
 
   useEffect(() => {
     loadData()
@@ -214,6 +217,19 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
           <p className="text-slate-600">Quick access to your most used features</p>
         </div>
 
+        {/* Onboarding Checklist */}
+        {userId && (
+          <div className="mb-8">
+            <OnboardingChecklist
+              userId={userId}
+              userEmail={userEmail}
+              onTaskComplete={() => {}}
+              onOpenAddressModal={() => setShowAddressOnboardingModal(true)}
+              onNavigate={onTabChange}
+            />
+          </div>
+        )}
+
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           {/* Total Balance */}
@@ -286,6 +302,15 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
         onSave={handleSaveQuickAccessPreferences}
         onCardClick={handleCardClick}
         showReorderSection={false}
+      />
+
+      <AddressOnboardingModal
+        userId={userId}
+        isOpen={showAddressOnboardingModal}
+        onClose={() => setShowAddressOnboardingModal(false)}
+        onAddressCreated={() => {
+          setShowAddressOnboardingModal(false)
+        }}
       />
 
       {/* Deposit Modal */}
