@@ -61,6 +61,7 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [globalCurrency, setGlobalCurrency] = useState('PHP')
+  const [globalCryptocurrency, setGlobalCryptocurrency] = useState('BTC')
   const [showAuth, setShowAuth] = useState(false)
   const [authInitialTab, setAuthInitialTab] = useState('login')
   const [currentBusinessId, setCurrentBusinessId] = useState(null)
