@@ -15,7 +15,7 @@ async function markListingFeatured(listingName, isFeatured = true) {
     // Find the listing
     const { data: listings, error: findError } = await supabase
       .from('nearby_listings')
-      .select('id, name, metadata')
+      .select('id, name, raw')
       .ilike('name', `%${listingName}%`)
 
     if (findError) throw findError
@@ -37,16 +37,16 @@ async function markListingFeatured(listingName, isFeatured = true) {
     const listing = listings[0]
     console.log(`Found listing: ${listing.name}`)
 
-    // Update metadata
-    const currentMetadata = listing.metadata || {}
-    const updatedMetadata = {
-      ...currentMetadata,
+    // Update raw field with featured flag
+    const currentRaw = listing.raw || {}
+    const updatedRaw = {
+      ...currentRaw,
       featured: isFeatured
     }
 
     const { error: updateError } = await supabase
       .from('nearby_listings')
-      .update({ metadata: updatedMetadata })
+      .update({ raw: updatedRaw })
       .eq('id', listing.id)
 
     if (updateError) throw updateError
