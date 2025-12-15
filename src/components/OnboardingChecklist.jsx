@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { onboardingService } from '../lib/onboardingService'
 
-export default function OnboardingChecklist({ userId, userEmail, onTaskComplete, onOpenAddressModal, onNavigate }) {
+export default function OnboardingChecklist({ userId, userEmail, onTaskComplete, onOpenAddressModal, onOpenProfileModal, onOpenVerificationModal, onOpenCurrencyModal, onNavigate }) {
   const [tasks, setTasks] = useState([])
   const [progress, setProgress] = useState({ percentage: 0, completed: 0, total: 0 })
   const [loading, setLoading] = useState(true)
