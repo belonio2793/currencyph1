@@ -32,11 +32,11 @@ const DEFAULT_VISIBILITY = {
   receipts: true,
   deposit: true,
   nearby: true,
-  messages: false,
-  p2p: false,
-  poker: false,
-  networkBalances: false,
-  myBusiness: false
+  messages: true,
+  p2p: true,
+  poker: true,
+  networkBalances: true,
+  myBusiness: true
 }
 
 export const quickAccessManager = {
