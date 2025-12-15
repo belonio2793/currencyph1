@@ -759,11 +759,11 @@ export default function ChatBar({ userId, userEmail }) {
                     {messages.length === 0 && (<div className="text-center text-sm text-slate-500 mt-4">No messages yet. Start the conversation!<div className="text-xs mt-2 text-slate-400">You can drag and drop files here to share</div></div>)}
                     {messages.map((msg) => (
                       <div key={msg.id} className={`flex ${msg.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
-                        <div className="max-w-xs">
+                        <div className={`max-w-xs ${isMobile ? 'max-w-[80%]' : ''}`}>
                           <div className={`px-3 py-2 rounded-lg text-sm ${msg.sender_id === userId ? 'bg-blue-600 text-white rounded-br-none' : 'bg-slate-200 text-slate-900 rounded-bl-none'} break-words`}>{msg.deleted_at ? (<em className="text-xs opacity-75">Message deleted</em>) : (msg.plain || '[Unable to decrypt]')}</div>
                           <div className="flex items-center justify-between mt-1 px-1 text-xs text-slate-500">
                             <span>{new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            {msg.sender_id === userId && !msg.deleted_at && (<button onClick={() => handleDeleteMessage(msg.id, msg.sender_id)} className="text-red-500 hover:text-red-700 ml-2">Delete</button>)}
+                            {msg.sender_id === userId && !msg.deleted_at && (<button onClick={() => handleDeleteMessage(msg.id, msg.sender_id)} className="text-red-500 hover:text-red-700 ml-2 touch-target">Delete</button>)}
                           </div>
                         </div>
                       </div>
