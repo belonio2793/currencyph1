@@ -1008,6 +1008,26 @@ export default function Nearby({ userId, setActiveTab, setCurrentListingSlug }) 
           </button>
         </form>
 
+        {/* Featured Listings Section */}
+        {!selectedCity && !expandedLetter && searchResults.length === 0 && featuredListings.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-4">
+              <h3 className="text-2xl font-bold text-slate-900">⭐ Featured Destinations</h3>
+              <span className="text-xs bg-amber-100 text-amber-800 px-3 py-1 rounded-full font-semibold">Recommended</span>
+            </div>
+            <p className="text-slate-600 mb-6">Discover our top-rated and most popular attractions</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredListings.map(listing => (
+                <ListingCard
+                  key={listing.slug || listing.tripadvisor_id || listing.id || `featured-${Math.random()}`}
+                  listing={listing}
+                  onNavigateToDetail={handleNavigateToListing}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Search Results */}
         {searchResults.length > 0 && (
           <div className="mb-8">
