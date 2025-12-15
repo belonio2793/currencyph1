@@ -472,10 +472,12 @@ export default function App() {
   }
 
   return (
-    <DeviceProvider>
-      <ShoppingCartProvider>
-        <div className="min-h-screen bg-slate-50">
-      <HeaderMap userId={userId} />
+    <LayoutOverrideProvider>
+      <DeviceProvider>
+        <ShoppingCartProvider>
+          <LayoutSwitcher />
+          <div className="min-h-screen bg-slate-50">
+        <HeaderMap userId={userId} />
       <Navbar
         activeTab={activeTab}
         onTabChange={setActiveTab}
@@ -653,7 +655,8 @@ export default function App() {
         </div>
       </footer>
         </div>
-      </ShoppingCartProvider>
-    </DeviceProvider>
+        </ShoppingCartProvider>
+      </DeviceProvider>
+    </LayoutOverrideProvider>
   )
 }
