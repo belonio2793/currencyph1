@@ -113,6 +113,7 @@ function MapClickHandler({ isCreating, onLocationClick }) {
 }
 
 export default function PlanningChat() {
+  const { isMobile, isTablet, isDesktop } = useDevice()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authMode, setAuthMode] = useState('login')
   const [email, setEmail] = useState('')
