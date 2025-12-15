@@ -6,8 +6,10 @@ import { getOrCreateDirectConversation } from '../lib/conversations'
 import { uploadMediaToChat, uploadVoiceMessage } from '../lib/chatMedia'
 import { subscribeToMultiplePresence, getMultipleUsersPresence } from '../lib/presence'
 import { useGeolocation } from '../lib/useGeolocation'
+import { useDevice } from '../context/DeviceContext'
 
 export default function ChatBar({ userId, userEmail }) {
+  const { isMobile } = useDevice()
   const [minimized, setMinimized] = useState(true)
   const [activeTab, setActiveTab] = useState('chats')
   const [searchQuery, setSearchQuery] = useState('')
