@@ -411,18 +411,18 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                 </div>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
                 <button
                   onClick={() => setStep(1)}
                   disabled={loading}
-                  className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 font-medium transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   ← Back
                 </button>
                 <button
                   onClick={handleSaveAddress}
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50"
+                  className="flex-1 px-3 sm:px-4 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors disabled:opacity-50 text-sm sm:text-base"
                 >
                   {loading ? 'Creating...' : '✓ Create Address'}
                 </button>
