@@ -1897,9 +1897,9 @@ export default function PlanningChat() {
       {/* Auth Modal Overlay */}
       {showAuthModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="w-full max-w-md bg-slate-800 rounded-lg p-8 border border-slate-700">
-            <h1 className="text-3xl font-bold text-white mb-2 text-center">Planning Group</h1>
-            <p className="text-slate-400 text-center mb-6 text-sm">Strategic partner coordination for manufacturing, facilities, and distribution</p>
+          <div className={`w-full bg-slate-800 rounded-lg border border-slate-700 ${isMobile ? 'max-w-sm p-6' : 'max-w-md p-8'}`}>
+            <h1 className={`font-bold text-white mb-2 text-center ${isMobile ? 'text-2xl' : 'text-3xl'}`}>Planning Group</h1>
+            <p className={`text-slate-400 text-center mb-6 ${isMobile ? 'text-xs' : 'text-sm'}`}>Strategic partner coordination for manufacturing, facilities, and distribution</p>
 
             <div className="space-y-4">
               {authError && (
