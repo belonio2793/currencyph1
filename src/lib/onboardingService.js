@@ -78,8 +78,15 @@ export const onboardingService = {
         .select('*')
         .eq('user_id', userId)
         .single()
-      
-      if (error && error.code !== 'PGRST116') throw error
+
+      if (error) {
+        // Handle table not found or other errors gracefully
+        if (error.code === 'PGRST116' || error.message?.includes('Could not find the table')) {
+          // Table doesn't exist yet or record not found - this is OK, return null
+          return null
+        }
+        throw error
+      }
       return data || null
     } catch (err) {
       console.error('Error fetching onboarding state:', err?.message || String(err))
