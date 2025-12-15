@@ -1848,46 +1848,46 @@ export default function PlanningChat() {
           </div>
 
           {/* Message Input */}
-          <div className="border-t border-slate-600 p-4 bg-slate-750">
+          <div className={`border-t border-slate-600 bg-slate-750 ${isMobile ? 'p-2' : 'p-4'}`}>
             {chatTab === 'public' ? (
-              <div className="flex gap-2">
+              <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
                 <input
                   type="text"
                   value={messageInput}
                   onChange={(e) => setMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Type a message..."
-                  className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+                  placeholder={isMobile ? 'Message...' : 'Type a message...'}
+                  className={`flex-1 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
                 />
                 <button
                   onClick={sendMessage}
                   disabled={!messageInput.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                  className={`bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
                 >
-                  Send
+                  {isMobile ? '→' : 'Send'}
                 </button>
               </div>
             ) : selectedPrivateUser ? (
-              <div className="flex gap-2">
+              <div className={`flex ${isMobile ? 'gap-1' : 'gap-2'}`}>
                 <input
                   type="text"
                   value={privateMessageInput}
                   onChange={(e) => setPrivateMessageInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendPrivateMessage()}
-                  placeholder="Type a message..."
-                  className="flex-1 bg-slate-700 border border-slate-600 rounded px-3 py-2 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-blue-500"
+                  placeholder={isMobile ? 'Message...' : 'Type a message...'}
+                  className={`flex-1 bg-slate-700 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-3 py-2 text-sm'}`}
                 />
                 <button
                   onClick={sendPrivateMessage}
                   disabled={!privateMessageInput.trim()}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white px-4 py-2 rounded text-sm font-medium transition-colors"
+                  className={`bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white rounded font-medium transition-colors ${isMobile ? 'px-2 py-1.5 text-xs' : 'px-4 py-2 text-sm'}`}
                 >
-                  Send
+                  {isMobile ? '→' : 'Send'}
                 </button>
               </div>
             ) : (
               <div className="text-slate-500 text-xs text-center py-2">
-                Select a user to send messages
+                Select a user to message
               </div>
             )}
           </div>
