@@ -227,7 +227,7 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
           </nav>
 
           {/* Footer */}
-          <div className="border-t border-slate-700 p-3 space-y-2">
+          <div className={`border-t border-slate-700 ${isMobile || !isCollapsed ? 'p-3' : 'p-2'} space-y-2`}>
             {userEmail ? (
               <>
                 <button
@@ -235,9 +235,10 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
                     onSignOut?.()
                     if (isMobile) setIsOpen(false)
                   }}
-                  className="w-full px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors"
+                  className={`w-full ${isMobile || !isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
+                  title={!isMobile && isCollapsed ? 'Sign out' : ''}
                 >
-                  Sign out
+                  {!isMobile && isCollapsed ? '⬅️' : 'Sign out'}
                 </button>
               </>
             ) : (
@@ -247,18 +248,20 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
                     onShowAuth?.('login')
                     if (isMobile) setIsOpen(false)
                   }}
-                  className="w-full px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors"
+                  className={`w-full ${isMobile || !isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
+                  title={!isMobile && isCollapsed ? 'Login' : ''}
                 >
-                  Login
+                  {!isMobile && isCollapsed ? '🔐' : 'Login'}
                 </button>
                 <button
                   onClick={() => {
                     onShowAuth?.('register')
                     if (isMobile) setIsOpen(false)
                   }}
-                  className="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className={`w-full ${isMobile || !isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
+                  title={!isMobile && isCollapsed ? 'Register' : ''}
                 >
-                  Register
+                  {!isMobile && isCollapsed ? '✏️' : 'Register'}
                 </button>
               </>
             )}
