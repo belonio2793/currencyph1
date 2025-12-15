@@ -13,8 +13,8 @@ export const diditService = {
       // Build headers: prefer current session access token, fall back to anon key
       const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': userId }
       try {
-        const sessionResp = await supabase.auth.getSession()
-        const accessToken = sessionResp?.data?.session?.access_token || sessionResp?.data?.access_token || null
+        const userResp = await supabase.auth.getUser()
+        const accessToken = userResp?.data?.user?.accessToken || null
         if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
       } catch (e) {
         // ignore
@@ -88,8 +88,8 @@ export const diditService = {
       // Build headers: prefer current session access token, fall back to anon key
       const headers = { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': userId }
       try {
-        const sessionResp = await supabase.auth.getSession()
-        const accessToken = sessionResp?.data?.session?.access_token || sessionResp?.data?.access_token || null
+        const userResp = await supabase.auth.getUser()
+        const accessToken = userResp?.data?.user?.accessToken || null
         if (accessToken) headers['Authorization'] = `Bearer ${accessToken}`
       } catch (e) {
         // ignore
