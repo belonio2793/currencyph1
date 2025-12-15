@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDevice } from '../context/DeviceContext'
 
 export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut }) {
   const { isMobile } = useDevice()
   const [isOpen, setIsOpen] = useState(!isMobile)
+  const [isCollapsed, setIsCollapsed] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('sidebar_collapsed')
+      return saved ? JSON.parse(saved) : false
+    }
+    return false
+  })
   const [expandedGroups, setExpandedGroups] = useState({
     jobs: true,
     navigation: true,
     community: userEmail ? true : false
   })
+
+  useEffect(() => {
+    localStorage.setItem('sidebar_collapsed', JSON.stringify(isCollapsed))
+  }, [isCollapsed])
 
   const toggleGroup = (groupId) => {
     setExpandedGroups(prev => ({
