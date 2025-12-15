@@ -364,7 +364,7 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="relative">
+                  <div className="relative province-dropdown-container">
                     <label className="block text-sm font-medium text-slate-900 mb-1">
                       Province {searchCharCount.province > 0 && <span className="text-xs text-slate-500">({searchCharCount.province} chars)</span>}
                     </label>
