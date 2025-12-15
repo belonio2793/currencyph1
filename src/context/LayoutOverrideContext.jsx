@@ -27,6 +27,8 @@ export function LayoutOverrideProvider({ children }) {
       } else {
         localStorage.removeItem('dev_layout_override')
       }
+      // Dispatch custom event to notify DeviceContext of the change
+      window.dispatchEvent(new CustomEvent('layoutOverrideChanged', { detail: { layout } }))
     } catch (e) {
       console.warn('Could not save layout override to localStorage', e)
     }
