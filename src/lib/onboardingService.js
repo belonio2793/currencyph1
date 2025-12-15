@@ -135,6 +135,11 @@ export const onboardingService = {
   // Update task completion status
   async updateTaskCompletion(userId, taskId, completed) {
     try {
+      // Skip database write for guest users or invalid UUIDs
+      if (!this.isValidUUID(userId)) {
+        return false
+      }
+
       const { error } = await supabase
         .from('user_onboarding_progress')
         .upsert({
@@ -145,7 +150,7 @@ export const onboardingService = {
         }, {
           onConflict: 'user_id,task_id'
         })
-      
+
       if (error) throw error
       return true
     } catch (err) {
