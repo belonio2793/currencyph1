@@ -122,10 +122,29 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
       >
         <div className="h-full flex flex-col overflow-y-auto">
           {/* Header */}
-          <div className="p-4 border-b border-slate-700">
-            <h1 className="text-xl font-light tracking-wide">currency.ph</h1>
-            {userEmail && (
-              <p className="text-xs text-slate-400 mt-2 truncate">{userEmail}</p>
+          <div className={`p-4 border-b border-slate-700 flex items-center justify-between ${isMobile ? '' : ''}`}>
+            <div className={`flex-1 ${!isMobile && isCollapsed ? 'hidden' : ''}`}>
+              <h1 className="text-xl font-light tracking-wide">currency.ph</h1>
+              {userEmail && (
+                <p className="text-xs text-slate-400 mt-2 truncate">{userEmail}</p>
+              )}
+            </div>
+            {!isMobile && (
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white flex-shrink-0"
+                title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              >
+                {isCollapsed ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7m0 0l-7 7m7-7H5" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+                  </svg>
+                )}
+              </button>
             )}
           </div>
 
