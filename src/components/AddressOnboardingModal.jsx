@@ -30,6 +30,12 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
   const [loading, setLoading] = useState(false)
   const [fetchingLocation, setFetchingLocation] = useState(false)
   const [mapPosition, setMapPosition] = useState(null)
+  const [citySearchInput, setCitySearchInput] = useState('')
+  const [provinceSearchInput, setProvinceSearchInput] = useState('')
+  const [showCityDropdown, setShowCityDropdown] = useState(false)
+  const [showProvinceDropdown, setShowProvinceDropdown] = useState(false)
+  const [searchCharCount, setSearchCharCount] = useState({ city: 0, province: 0 })
+
   const [formData, setFormData] = useState({
     address_name: 'My Home',
     street_address: '',
@@ -41,6 +47,54 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
     latitude: 14.5995,
     longitude: 120.9842
   })
+
+  // Filter cities based on search input
+  const filteredCities = useMemo(() => {
+    const searchTerm = citySearchInput.toLowerCase().trim()
+    if (!searchTerm) return PHILIPPINES_CITIES
+    return PHILIPPINES_CITIES.filter(city =>
+      city.toLowerCase().startsWith(searchTerm)
+    )
+  }, [citySearchInput])
+
+  // Filter provinces based on search input
+  const filteredProvinces = useMemo(() => {
+    const searchTerm = provinceSearchInput.toLowerCase().trim()
+    if (!searchTerm) return PHILIPPINES_PROVINCES
+    return PHILIPPINES_PROVINCES.filter(province =>
+      province.toLowerCase().startsWith(searchTerm)
+    )
+  }, [provinceSearchInput])
+
+  // Track character propagation for city
+  const handleCitySearchChange = (e) => {
+    const value = e.target.value
+    setCitySearchInput(value)
+    setSearchCharCount(prev => ({ ...prev, city: value.length }))
+    setShowCityDropdown(true)
+  }
+
+  // Track character propagation for province
+  const handleProvinceSearchChange = (e) => {
+    const value = e.target.value
+    setProvinceSearchInput(value)
+    setSearchCharCount(prev => ({ ...prev, province: value.length }))
+    setShowProvinceDropdown(true)
+  }
+
+  // Handle city selection from dropdown
+  const selectCity = (city) => {
+    setFormData(prev => ({ ...prev, city }))
+    setCitySearchInput(city)
+    setShowCityDropdown(false)
+  }
+
+  // Handle province selection from dropdown
+  const selectProvince = (province) => {
+    setFormData(prev => ({ ...prev, province }))
+    setProvinceSearchInput(province)
+    setShowProvinceDropdown(false)
+  }
 
   const handleFetchLocation = async () => {
     setFetchingLocation(true)
