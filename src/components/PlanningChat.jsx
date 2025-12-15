@@ -1686,7 +1686,7 @@ export default function PlanningChat() {
         </div>
 
         {/* Chat Section */}
-        <div className="w-96 rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden">
+        <div className={`rounded-lg border border-slate-700 bg-slate-800 flex flex-col overflow-hidden ${isMobile ? 'w-full max-h-72' : 'w-96'}`}>
           {/* Chat Tabs */}
           <div className="bg-slate-700 px-4 py-2 border-b border-slate-600 flex gap-2">
             <button
