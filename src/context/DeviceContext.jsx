@@ -56,16 +56,14 @@ export function DeviceProvider({ children }) {
     applyLayoutOverride(actualDevice)
   }, [actualDevice])
 
-  // Listen for storage changes (when LayoutSwitcher updates localStorage)
+  // Listen for layout override changes from LayoutOverrideContext
   useEffect(() => {
-    const handleStorageChange = (e) => {
-      if (e.key === 'dev_layout_override') {
-        applyLayoutOverride(actualDevice)
-      }
+    const handleLayoutOverrideChange = () => {
+      applyLayoutOverride(actualDevice)
     }
 
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
+    window.addEventListener('layoutOverrideChanged', handleLayoutOverrideChange)
+    return () => window.removeEventListener('layoutOverrideChanged', handleLayoutOverrideChange)
   }, [actualDevice])
 
   return (
