@@ -1138,14 +1138,14 @@ export default function PlanningChat() {
         <div className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-96' : 'flex-1'}`}>
           {/* Map Controls */}
           {isAuthenticated && (
-            <div className="bg-slate-700 px-4 py-3 border-b border-slate-600 flex items-center justify-between flex-wrap gap-2">
-              <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-white text-sm font-medium">{locations.length} locations</span>
+            <div className={`bg-slate-700 border-b border-slate-600 flex ${isMobile ? 'flex-col gap-2 px-2 py-2' : 'items-center justify-between flex-wrap gap-2 px-4 py-3'}`}>
+              <div className={`flex ${isMobile ? 'flex-col gap-2 w-full' : 'items-center gap-2 flex-wrap'}`}>
+                <span className={`text-white font-medium ${isMobile ? 'text-xs' : 'text-sm'}`}>{locations.length} locations</span>
                 {locations.length > 0 && (
                   <select
                     value={selectedLocationId}
                     onChange={handleLocationSelect}
-                    className="px-2 py-1 rounded text-xs font-medium bg-slate-600 text-white border border-slate-500 hover:bg-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+                    className={`rounded font-medium bg-slate-600 text-white border border-slate-500 hover:bg-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-2 py-1 text-xs'}`}
                   >
                     <option value="">Jump to location...</option>
                     {locations.map(loc => (
@@ -1158,7 +1158,7 @@ export default function PlanningChat() {
                 <select
                   value={selectedCity}
                   onChange={handleCitySelect}
-                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 text-white border border-slate-500 hover:bg-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400"
+                  className={`rounded font-medium bg-slate-600 text-white border border-slate-500 hover:bg-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 ${isMobile ? 'w-full px-2 py-1.5 text-xs' : 'px-2 py-1 text-xs'}`}
                 >
                   <option value="">Jump to city...</option>
                   {PHILIPPINE_CITIES.map((city, idx) => (
@@ -1168,51 +1168,51 @@ export default function PlanningChat() {
                   ))}
                 </select>
               </div>
-              <div className="flex items-center gap-2">
+              <div className={`flex ${isMobile ? 'w-full gap-1' : 'items-center gap-2'}`}>
                 <button
                   onClick={handleCenterPhilippines}
-                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  className={`rounded font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors ${isMobile ? 'flex-1 py-1.5 text-xs' : 'px-2 py-1 text-xs'}`}
                   title="Center map on Philippines"
                 >
                   🇵🇭
                 </button>
                 <button
                   onClick={handleZoomOut}
-                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  className={`rounded font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors ${isMobile ? 'flex-1 py-1.5 text-xs' : 'px-2 py-1 text-xs'}`}
                   title="Zoom out"
                 >
                   −
                 </button>
                 <button
                   onClick={handleZoomIn}
-                  className="px-2 py-1 rounded text-xs font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors"
+                  className={`rounded font-medium bg-slate-600 hover:bg-slate-500 text-white transition-colors ${isMobile ? 'flex-1 py-1.5 text-xs' : 'px-2 py-1 text-xs'}`}
                   title="Zoom in"
                 >
                   +
                 </button>
                 <button
                   onClick={() => setShowMapControls(!showMapControls)}
-                  className={`px-2 py-1 rounded text-xs font-medium transition-colors ${
+                  className={`rounded font-medium transition-colors ${
                     showMapControls
                       ? 'bg-blue-600 hover:bg-blue-700 text-white'
                       : 'bg-slate-600 hover:bg-slate-500 text-white'
-                  }`}
+                  } ${isMobile ? 'flex-1 py-1.5 text-xs' : 'px-2 py-1 text-xs'}`}
                   title="Show/hide map layers"
                 >
-                  Layers
+                  {isMobile ? '◧' : 'Layers'}
                 </button>
                 <button
                   onClick={() => {
                     setIsCreatingLocation(!isCreatingLocation)
                     if (!isCreatingLocation) setShowLocationForm(false)
                   }}
-                  className={`px-3 py-1 rounded text-xs font-medium transition-colors ${
+                  className={`rounded font-medium transition-colors ${
                     isCreatingLocation
                       ? 'bg-blue-600 hover:bg-blue-700 text-white'
                       : 'bg-slate-600 hover:bg-slate-500 text-white'
-                  }`}
+                  } ${isMobile ? 'flex-1 py-1.5 text-xs' : 'px-3 py-1 text-xs'}`}
                 >
-                  {isCreatingLocation ? '✓ Click map to add' : '+ Add Location'}
+                  {isMobile ? (isCreatingLocation ? '✓' : '+') : (isCreatingLocation ? '✓ Click map to add' : '+ Add Location')}
                 </button>
               </div>
             </div>
