@@ -340,7 +340,7 @@ export default function PartnersHandlersTab({ userId }) {
                           }
                         },
                         (error) => {
-                          console.error('Geolocation error:', error)
+                          console.error('Geolocation error:', error?.message || `Code ${error?.code}: ${error?.toString() || 'Unknown error'}`)
                         }
                       )
                     }
