@@ -1,8 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { PHILIPPINES_CITIES, PHILIPPINES_PROVINCES } from '../data/philippineCitiesProvinces'
 
 // Fix default marker icons
 delete L.Icon.Default.prototype._getIconUrl
