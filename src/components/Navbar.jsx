@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
+import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
+  const { isMobile, isTablet } = useDevice()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [borrowDropdownOpen, setBorrowDropdownOpen] = useState(false)
 
