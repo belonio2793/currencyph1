@@ -344,19 +344,19 @@ export default function AddressOnboardingModal({ userId, isOpen, onClose, onAddr
                       autoComplete="off"
                     />
                     {showCityDropdown && (
-                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-300 rounded-lg shadow-lg z-50 max-h-48 sm:max-h-64 overflow-y-auto">
                         {filteredCities.length > 0 ? (
                           filteredCities.slice(0, 10).map((city, idx) => (
                             <div
                               key={idx}
                               onClick={() => selectCity(city)}
-                              className="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
+                              className="px-2 sm:px-3 py-1.5 sm:py-2 hover:bg-blue-50 cursor-pointer text-xs sm:text-sm text-slate-700 border-b border-slate-100 last:border-b-0"
                             >
                               {city}
                             </div>
                           ))
                         ) : (
-                          <div className="px-3 py-2 text-sm text-slate-500">No cities found</div>
+                          <div className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-500">No cities found</div>
                         )}
                       </div>
                     )}
