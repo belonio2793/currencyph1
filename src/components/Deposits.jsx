@@ -543,19 +543,21 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
   const loadInitialData = async () => {
     try {
       setAllCurrencies(currencyAPI.getCurrencies())
-      await loadWallets().catch(err => {
-        console.debug('Wallet loading failed, continuing with defaults:', err)
-      })
-      await loadExchangeRates().catch(err => {
-        console.debug('Exchange rates loading failed, continuing with defaults:', err)
-      })
-      await loadCryptoPrices().catch(err => {
+      await Promise.all([
+        loadWallets().catch(err => {
+          console.debug('Wallet loading failed, continuing with defaults:', err)
+        }),
+        loadExchangeRates().catch(err => {
+          console.debug('Exchange rates loading failed, continuing with defaults:', err)
+        })
+      ])
+      setLoading(false)
+      loadCryptoPrices().catch(err => {
         console.debug('Crypto prices loading failed, continuing with defaults:', err)
       })
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load data')
-    } finally {
       setLoading(false)
     }
   }
