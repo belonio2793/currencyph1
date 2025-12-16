@@ -184,7 +184,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       poker: () => setShowPokerModal(true),
       networkBalances: () => setShowNetworkBalancesModal(true),
       receipts: () => setShowReceiptsModal(true),
-      myBusiness: () => setShowMyBusinessModal(true)
+      myBusiness: () => setShowMyBusinessModal(true),
+      myProfile: () => setShowProfileModal(true)
     }
 
     const handler = modalMap[cardKey]
