@@ -43,13 +43,14 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   useEffect(() => {
     if (displayType === 'crypto' && userEmail && totalBalanceConverted && globalCryptocurrency) {
       setLoadingCrypto(true)
-      convertFiatToCrypto(totalBalanceConverted, globalCurrency, globalCryptocurrency)
+      convertFiatToCryptoDb(totalBalanceConverted, globalCurrency, globalCryptocurrency)
         .then(balance => {
           setCryptoBalance(balance)
           setLoadingCrypto(false)
         })
         .catch(error => {
           console.error('Failed to fetch crypto balance:', error)
+          setCryptoBalance(null)
           setLoadingCrypto(false)
         })
     }
