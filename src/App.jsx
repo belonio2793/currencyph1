@@ -647,7 +647,11 @@ export default function App() {
                 </main>
 
                 {/* Chat Bar */}
-                {userId && <ChatBar userId={userId} userEmail={userEmail} />}
+                {userId && (
+                  <Suspense fallback={null}>
+                    <ChatBar userId={userId} userEmail={userEmail} />
+                  </Suspense>
+                )}
 
                 {/* Footer - On all pages */}
                 <footer className="bg-white border-t border-slate-100 mt-20">
