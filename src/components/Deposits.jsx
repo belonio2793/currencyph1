@@ -185,14 +185,14 @@ const PaymentMethodSelector = React.memo(function PaymentMethodSelector({ method
 })
 
 // Solana Payment Display Component
-function SolanaPaymentDisplay({ address }) {
+const SolanaPaymentDisplay = React.memo(function SolanaPaymentDisplay({ address }) {
   const [copied, setCopied] = useState(false)
-  
-  const handleCopy = () => {
+
+  const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(address)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
-  }
+  }, [address])
 
   return (
     <div className="space-y-4">
@@ -217,7 +217,7 @@ function SolanaPaymentDisplay({ address }) {
       </div>
     </div>
   )
-}
+})
 
 // GCash Payment Display Component
 function GCashPaymentDisplay({ phone, referenceCode }) {
