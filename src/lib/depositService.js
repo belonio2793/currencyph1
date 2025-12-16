@@ -106,25 +106,28 @@ export class DepositService {
    */
   async initialize(userId) {
     try {
-      // Get user
-      const { data: user, error: userError } = await this.supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single()
+      // Fetch user and wallet in parallel for better performance
+      const [userResult, walletResult] = await Promise.all([
+        this.supabase
+          .from('users')
+          .select('id, email, country, created_at')
+          .eq('id', userId)
+          .single(),
+        this.supabase
+          .from('wallets')
+          .select('id, user_id, balance, currency, created_at')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: true })
+          .limit(1)
+      ])
+
+      const { data: user, error: userError } = userResult
+      const { data: wallets, error: walletError } = walletResult
 
       if (userError) throw userError
-      this.user = user
-
-      // Get default wallet
-      const { data: wallets, error: walletError } = await this.supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: true })
-        .limit(1)
-
       if (walletError) throw walletError
+
+      this.user = user
       this.wallet = wallets?.[0]
 
       if (!this.wallet) {
