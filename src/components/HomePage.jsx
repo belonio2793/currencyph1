@@ -18,7 +18,7 @@ import PokerPage from './PokerPage'
 import NetworkBalances from './NetworkBalances'
 import P2PLoanMarketplace from './P2PLoanMarketplace'
 
-export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', onTabChange, onShowAuth }) {
+export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', setGlobalCurrency, globalCryptocurrency = 'BTC', setGlobalCryptocurrency, onTabChange, onShowAuth }) {
   const [wallets, setWallets] = useState([])
   const [loans, setLoans] = useState([])
   const [loading, setLoading] = useState(true)
