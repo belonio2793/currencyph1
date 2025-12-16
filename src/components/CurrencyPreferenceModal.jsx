@@ -30,7 +30,13 @@ export default function CurrencyPreferenceModal({ onClose, onCurrencySelected })
     const getCurrentUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
-        if (error) throw error
+        if (error) {
+          // Handle AuthSessionMissingError gracefully - user is not logged in
+          if (error?.message?.includes('Auth session missing')) {
+            return
+          }
+          throw error
+        }
         if (user) {
           setUserId(user.id)
           // Try to load existing preference
