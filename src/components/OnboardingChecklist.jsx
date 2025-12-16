@@ -7,7 +7,6 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   const [loading, setLoading] = useState(true)
   const [isExpanded, setIsExpanded] = useState(true)
   const [completingTaskId, setCompletingTaskId] = useState(null)
-  const autoDetectIntervalRef = useRef(null)
 
   const allCompleted = progress.completed === progress.total
 
