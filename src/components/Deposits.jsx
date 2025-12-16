@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
-import { currencyAPI } from '../lib/payments'
+import { currencyAPI as paymentsAPI } from '../lib/payments'
+import { currencyAPI } from '../lib/currencyAPI'
 import { supabase } from '../lib/supabaseClient'
 
 // Payment Methods Configuration
