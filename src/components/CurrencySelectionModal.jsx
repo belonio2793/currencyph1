@@ -91,14 +91,12 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
             {/* Two columns layout */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Fiat Currency Column */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-900">
-                  💵 Fiat Currency
-                </label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-slate-700">Display Currency:</label>
                 <select
                   value={localFiatCurrency}
                   onChange={(e) => setLocalFiatCurrency(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white"
+                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50"
                 >
                   {fiatCurrencies.map(curr => (
                     <option key={curr.code} value={curr.code}>
@@ -109,14 +107,12 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
               </div>
 
               {/* Cryptocurrency Column */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-slate-900">
-                  ₿ Cryptocurrency
-                </label>
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-slate-700">Display Cryptocurrency:</label>
                 <select
                   value={localCryptoCurrency}
                   onChange={(e) => setLocalCryptoCurrency(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white"
+                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50"
                 >
                   {cryptocurrencies.map(crypto => (
                     <option key={crypto.code} value={crypto.code}>
