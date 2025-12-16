@@ -48,8 +48,8 @@ const COUNTRIES = [
 
 const RELATIONSHIP_STATUS = ['Single', 'In a relationship', 'Engaged', 'Married', "It's complicated", 'Prefer not to say']
 
-export default function ProfileEditModal({ onClose }) {
-  const [userId, setUserId] = useState(null)
+export default function ProfileEditModal({ userId: propUserId, onClose }) {
+  const [userId, setUserId] = useState(propUserId || null)
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState(false)

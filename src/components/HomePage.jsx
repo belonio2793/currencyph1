@@ -325,6 +325,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
 
       {showProfileModal && (
         <ProfileEditModal
+          userId={userId}
           onClose={() => setShowProfileModal(false)}
         />
       )}
