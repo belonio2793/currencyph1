@@ -38,7 +38,8 @@ const DEFAULT_VISIBILITY = {
   p2p: true,
   poker: true,
   networkBalances: true,
-  myBusiness: true
+  myBusiness: true,
+  myProfile: true
 }
 
 export const quickAccessManager = {
