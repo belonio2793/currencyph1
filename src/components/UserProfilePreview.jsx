@@ -51,7 +51,11 @@ export default function UserProfilePreview({ userId }) {
         await loadUserStats(user.id, userData?.created_at || user.created_at)
       }
     } catch (err) {
-      console.error('Error loading user profile:', err)
+      if (err?.name === 'AuthSessionMissingError' || err?.message?.includes('Auth session missing')) {
+        // User not logged in - this is expected
+      } else {
+        console.error('Error loading user profile:', err)
+      }
       setLoading(false)
     }
   }
