@@ -51,7 +51,10 @@ export const onboardingService = {
         .single()
 
       if (error) {
-        if (error.code === 'PGRST116') return false
+        // Handle missing column or table gracefully
+        if (error.code === 'PGRST116' || error.message?.includes('does not exist')) {
+          return false
+        }
         throw error
       }
       return !!(data?.preferred_currency)
@@ -74,7 +77,10 @@ export const onboardingService = {
         .single()
 
       if (error) {
-        if (error.code === 'PGRST116') return false
+        // Handle missing table gracefully
+        if (error.code === 'PGRST116' || error.message?.includes('Could not find the table')) {
+          return false
+        }
         throw error
       }
       return !!(data?.full_name && data.full_name.trim().length > 0)
