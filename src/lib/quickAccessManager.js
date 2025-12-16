@@ -15,7 +15,8 @@ const CARD_KEYS = [
   'poker',
   'networkBalances',
   'myBusiness',
-  'myProfile'
+  'myProfile',
+  'payments'
 ]
 
 const DEFAULT_ORDER = [
@@ -27,6 +28,7 @@ const DEFAULT_ORDER = [
   'poker',
   'networkBalances',
   'myBusiness',
+  'payments',
   'myProfile'
 ]
 
@@ -39,7 +41,8 @@ const DEFAULT_VISIBILITY = {
   poker: true,
   networkBalances: true,
   myBusiness: true,
-  myProfile: true
+  myProfile: true,
+  payments: true
 }
 
 export const quickAccessManager = {
