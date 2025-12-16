@@ -38,7 +38,11 @@ export const onboardingService = {
       const addresses = await this.getUserAddresses(userId)
       return addresses.length > 0
     } catch (err) {
-      console.error('Error checking user addresses:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error checking user addresses:', errMsg)
+      }
       return false
     }
   },
