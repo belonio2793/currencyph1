@@ -177,6 +177,102 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
   )
 }
 
+// Payment Method Selector Component
+function PaymentMethodSelector({ method, selected, onClick }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`p-4 rounded-lg border-2 transition-all ${
+        selected
+          ? `${method.bgColor} ${method.borderColor} border-2`
+          : 'bg-white border-gray-200 hover:border-gray-300'
+      }`}
+    >
+      <div className="flex items-center gap-3">
+        <span className={`text-2xl ${method.color}`}>{method.icon}</span>
+        <span className="font-medium text-gray-900">{method.name}</span>
+      </div>
+    </button>
+  )
+}
+
+// Solana Payment Display Component
+function SolanaPaymentDisplay({ address }) {
+  return (
+    <div className="space-y-4">
+      <div className="text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
+        <div className="flex justify-center mb-4">
+          <QRCode
+            value={`solana:${address}`}
+            size={200}
+            level="H"
+            includeMargin={true}
+            fgColor="#1e1b4b"
+            bgColor="#ffffff"
+          />
+        </div>
+        <p className="text-sm text-gray-600 mb-2">Solana Wallet Address:</p>
+        <p className="font-mono text-xs text-gray-900 break-all">{address}</p>
+        <button
+          onClick={() => navigator.clipboard.writeText(address)}
+          className="mt-3 text-xs text-purple-600 hover:text-purple-700 font-medium"
+        >
+          Copy Address
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// GCash Payment Display Component
+function GCashPaymentDisplay({ phone, referenceCode }) {
+  return (
+    <div className="space-y-4">
+      <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
+        <p className="text-sm text-gray-600 mb-2">Send to GCash Number:</p>
+        <p className="text-2xl font-bold text-blue-600 mb-4">{phone}</p>
+
+        {referenceCode && (
+          <div className="bg-white p-3 rounded border border-blue-100 mb-4">
+            <p className="text-xs text-gray-600 mb-1">Reference Code (Optional):</p>
+            <p className="font-mono font-bold text-gray-900">{referenceCode}</p>
+            <button
+              onClick={() => navigator.clipboard.writeText(referenceCode)}
+              className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Copy Code
+            </button>
+          </div>
+        )}
+
+        <button
+          onClick={() => navigator.clipboard.writeText(phone)}
+          className="w-full text-xs text-blue-600 hover:text-blue-700 font-medium p-2 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
+        >
+          Copy GCash Number
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Instructions Component
+function InstructionsDisplay({ method }) {
+  return (
+    <div className={`p-4 rounded-lg ${method.bgColor} border ${method.borderColor}`}>
+      <h4 className="font-semibold text-gray-900 mb-3">Steps to Complete Your Deposit:</h4>
+      <ol className="space-y-2">
+        {method.instructions.map((instruction, idx) => (
+          <li key={idx} className="flex gap-3 text-sm text-gray-700">
+            <span className={`font-bold ${method.color} flex-shrink-0`}>{idx + 1}.</span>
+            <span>{instruction}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  )
+}
+
 export default function Deposits({ userId, globalCurrency = 'PHP' }) {
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('PHP')
