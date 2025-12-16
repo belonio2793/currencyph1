@@ -340,7 +340,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       {showCurrencyModal && (
         <CurrencyPreferenceModal
           onClose={() => setShowCurrencyModal(false)}
-          onCurrencySelected={() => {}}
+          setGlobalCurrency={setGlobalCurrency}
+          globalCurrency={globalCurrency}
         />
       )}
 
