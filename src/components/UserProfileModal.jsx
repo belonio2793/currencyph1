@@ -14,16 +14,32 @@ export default function UserProfileModal({ userId, onClose }) {
     const load = async () => {
       try {
         setLoading(true)
-        // Query only safe columns from users (some deployments don't have extra columns)
-        const { data: user, error: userError } = await supabase
-          .from('users')
-          .select('id, email, phone_number, created_at')
-          .eq('id', userId)
-          .maybeSingle()
 
-        if (userError) {
-          // If the error is that column doesn't exist, fall back to empty profile
-          console.debug('user fetch error', userError)
+        // Get auth user data
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+
+        let user = null
+        if (authUser) {
+          // Try to get additional profile data from profiles table
+          let profileData = null
+          try {
+            const { data } = await supabase
+              .from('profiles')
+              .select('full_name, phone_number')
+              .eq('user_id', userId)
+              .maybeSingle()
+            profileData = data
+          } catch (e) {
+            console.debug('profile fetch error', e)
+          }
+
+          user = {
+            id: authUser.id,
+            email: authUser.email,
+            phone_number: profileData?.phone_number || authUser.user_metadata?.phone_number,
+            created_at: authUser.created_at,
+            full_name: profileData?.full_name || authUser.user_metadata?.full_name
+          }
         }
 
         if (!mounted) return
