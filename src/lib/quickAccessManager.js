@@ -188,9 +188,9 @@ export const quickAccessManager = {
     try {
       // Save to localStorage immediately
       localStorage.setItem(`quick-access-cards-${userId}`, JSON.stringify(visibility))
-      
+
       // Sync to database if user is logged in
-      if (userId && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)) {
+      if (userId && this.isValidUUID(userId)) {
         await supabase
           .from('user_preferences')
           .update({
@@ -199,7 +199,7 @@ export const quickAccessManager = {
           })
           .eq('user_id', userId)
       }
-      
+
       this.notifyUpdate(userId)
       return true
     } catch (e) {
