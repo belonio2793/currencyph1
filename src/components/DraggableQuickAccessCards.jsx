@@ -290,7 +290,8 @@ export default function DraggableQuickAccessCards({
         p2p: { bg: 'bg-purple-50', border: 'border-purple-200', icon: 'text-purple-600' },
         poker: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'text-rose-600' },
         networkBalances: { bg: 'bg-teal-50', border: 'border-teal-200', icon: 'text-teal-600' },
-        myBusiness: { bg: 'bg-indigo-50', border: 'border-indigo-200', icon: 'text-indigo-600' }
+        myBusiness: { bg: 'bg-indigo-50', border: 'border-indigo-200', icon: 'text-indigo-600' },
+        myProfile: { bg: 'bg-pink-50', border: 'border-pink-200', icon: 'text-pink-600' }
       }
       return colorMap[cardKey] || { bg: 'bg-slate-50', border: 'border-slate-200', icon: 'text-slate-600' }
     }
