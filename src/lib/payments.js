@@ -570,9 +570,10 @@ export const currencyAPI = {
   async getLoans(userId) {
     if (!userId) return []
     try {
+      // Optimize: Only fetch needed columns
       const { data, error } = await supabase
         .from('loans')
-        .select('*')
+        .select('id,user_id,loan_type,amount,status,remaining_balance,total_owed,currency,currency_code,created_at,updated_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
       if (error) throw error
@@ -587,9 +588,10 @@ export const currencyAPI = {
   async getBeneficiaries(userId) {
     if (!userId) return []
     try {
+      // Optimize: Only fetch needed columns
       const { data, error } = await supabase
         .from('beneficiaries')
-        .select('*')
+        .select('id,user_id,name,account_number,bank_name,phone,email,verified,created_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
       if (error) throw error
