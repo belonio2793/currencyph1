@@ -387,24 +387,33 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
       let data = null
 
       if (supabaseUrl && anonKey) {
-        data = await fetchWithRetries(
-          `${supabaseUrl}/functions/v1/fetch-rates`,
-          {
-            headers: {
-              'Authorization': `Bearer ${anonKey}`,
-              'Content-Type': 'application/json'
-            }
-          },
-          1,
-          1000
-        )
+        try {
+          data = await fetchWithRetries(
+            `${supabaseUrl}/functions/v1/fetch-rates`,
+            {
+              headers: {
+                'Authorization': `Bearer ${anonKey}`,
+                'Content-Type': 'application/json'
+              }
+            },
+            2,
+            1000
+          )
+        } catch (err) {
+          console.debug('Supabase fetch-rates failed, using fallback:', err?.message || 'Unknown error')
+        }
       }
 
       if (!data || !data.cryptoPrices) {
         const ids = [
           'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
         ].join(',')
-        const cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 1, 500)
+        let cg = null
+        try {
+          cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 1000)
+        } catch (err) {
+          console.debug('CoinGecko API failed, using default prices:', err?.message || 'Unknown error')
+        }
 
         const cryptoData = cg || {}
         const globalExchangeRate = exchangeRates[`USD_${globalCurrency}`] || 1
