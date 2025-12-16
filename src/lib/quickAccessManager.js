@@ -136,6 +136,11 @@ export const quickAccessManager = {
   async loadCardVisibilityFromDB(userId) {
     if (!userId) return DEFAULT_VISIBILITY
 
+    // Don't query database for guest-local users
+    if (!this.isValidUUID(userId)) {
+      return this.getCardVisibility(userId)
+    }
+
     try {
       const { data, error } = await supabase
         .from('user_preferences')
