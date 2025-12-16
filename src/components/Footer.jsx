@@ -7,7 +7,7 @@ export default function Footer({ onNavigate }) {
       { name: 'Rides', tab: 'rides' }
     ],
     Maps: [
-      { name: 'Addresses', tab: 'addresses' }
+      { name: 'Shipping and Logistics', tab: 'addresses' }
     ],
     Company: [
       { name: 'About', tab: 'about' },
