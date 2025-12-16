@@ -59,7 +59,11 @@ export const onboardingService = {
       }
       return !!(data?.preferred_currency)
     } catch (err) {
-      console.error('Error checking preferred currency:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error checking preferred currency:', errMsg)
+      }
       return false
     }
   },
@@ -91,7 +95,11 @@ export const onboardingService = {
       const profileData = data[0]
       return !!(profileData?.full_name && profileData.full_name.trim().length > 0)
     } catch (err) {
-      console.error('Error checking profile completion:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error checking profile completion:', errMsg)
+      }
       return false
     }
   },
@@ -122,7 +130,11 @@ export const onboardingService = {
       }
       return !!(data?.email_verified)
     } catch (err) {
-      console.error('Error checking email verification:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error checking email verification:', errMsg)
+      }
       return false
     }
   },
@@ -236,7 +248,11 @@ export const onboardingService = {
       }
       return data || null
     } catch (err) {
-      console.error('Error fetching onboarding state:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error fetching onboarding state:', errMsg)
+      }
       return null
     }
   },
