@@ -347,7 +347,11 @@ export default function PlanningChat() {
         setUserEmail('')
       }
     } catch (error) {
-      console.error('Auth check error:', error?.message || error)
+      if (error?.name === 'AuthSessionMissingError' || error?.message?.includes('Auth session missing')) {
+        // User not logged in - this is expected
+      } else {
+        console.error('Auth check error:', error?.message || error)
+      }
       setIsAuthenticated(false)
       setPlanningUser(null)
       setUserEmail('')
