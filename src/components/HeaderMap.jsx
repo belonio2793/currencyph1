@@ -412,7 +412,11 @@ function SendLocationButton({ location, city, userId: userIdProp, shareEnabled =
           setUserId(user.id)
         }
       } catch (e) {
-        console.warn('Failed to fetch user ID:', e)
+        if (e?.name === 'AuthSessionMissingError' || e?.message?.includes('Auth session missing')) {
+          // User not logged in - this is expected
+        } else {
+          console.warn('Failed to fetch user ID:', e)
+        }
       } finally {
         setLoading(false)
       }
