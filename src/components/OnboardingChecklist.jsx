@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { onboardingService } from '../lib/onboardingService'
 
 export default function OnboardingChecklist({ userId, userEmail, onTaskComplete, onOpenAddressModal, onOpenProfileModal, onOpenVerificationModal, onOpenCurrencyModal, onNavigate }) {
@@ -7,9 +7,11 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   const [loading, setLoading] = useState(true)
   const [isExpanded, setIsExpanded] = useState(true)
   const [completingTaskId, setCompletingTaskId] = useState(null)
+  const autoDetectIntervalRef = useRef(null)
 
   const allCompleted = progress.completed === progress.total
 
+  // Load tasks once on userId change
   useEffect(() => {
     if (!userId) {
       setLoading(false)
@@ -18,11 +20,43 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     loadTasks()
   }, [userId])
 
+  // Auto-collapse when all tasks are completed
   useEffect(() => {
     if (allCompleted) {
       setIsExpanded(false)
     }
   }, [allCompleted])
+
+  // Set up periodic auto-detection (every 5 seconds)
+  useEffect(() => {
+    if (!userId || !onboardingService.isValidUUID(userId)) {
+      return
+    }
+
+    // Run initial auto-detection
+    onboardingService.autoDetectTaskCompletion(userId).then(() => {
+      loadTasks()
+    }).catch(err => console.error('Initial auto-detect failed:', err))
+
+    // Set up interval for continuous auto-detection
+    autoDetectIntervalRef.current = setInterval(async () => {
+      try {
+        const changed = await onboardingService.autoDetectTaskCompletion(userId)
+        if (changed) {
+          // Reload tasks if any changes detected
+          await loadTasks()
+        }
+      } catch (err) {
+        console.error('Auto-detect interval error:', err)
+      }
+    }, 5000) // Check every 5 seconds
+
+    return () => {
+      if (autoDetectIntervalRef.current) {
+        clearInterval(autoDetectIntervalRef.current)
+      }
+    }
+  }, [userId])
 
   const loadTasks = async () => {
     setLoading(true)
