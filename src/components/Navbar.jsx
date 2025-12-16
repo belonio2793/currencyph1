@@ -36,6 +36,24 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
   const { isMobile, isTablet } = useDevice()
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
   const [displayType, setDisplayType] = useState('fiat') // 'fiat' or 'crypto'
+  const [cryptoBalance, setCryptoBalance] = useState(null)
+  const [loadingCrypto, setLoadingCrypto] = useState(false)
+
+  // Fetch crypto balance when displayType changes to 'crypto'
+  useEffect(() => {
+    if (displayType === 'crypto' && userEmail && totalBalanceConverted && globalCryptocurrency) {
+      setLoadingCrypto(true)
+      convertFiatToCrypto(totalBalanceConverted, globalCurrency, globalCryptocurrency)
+        .then(balance => {
+          setCryptoBalance(balance)
+          setLoadingCrypto(false)
+        })
+        .catch(error => {
+          console.error('Failed to fetch crypto balance:', error)
+          setLoadingCrypto(false)
+        })
+    }
+  }, [displayType, totalBalanceConverted, globalCurrency, globalCryptocurrency, userEmail])
 
 
   return (
