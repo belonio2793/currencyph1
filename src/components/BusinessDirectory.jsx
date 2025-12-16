@@ -93,8 +93,9 @@ export default function BusinessDirectory({ userId }) {
         await loadBusinessStats(data)
       }
     } catch (err) {
-      console.error('Error loading businesses:', err?.message)
-      setError('Failed to load businesses')
+      const errorMsg = err?.message || String(err) || 'Unknown error occurred'
+      console.error('Error loading businesses:', errorMsg, err)
+      setError(`Failed to load businesses: ${errorMsg}`)
     } finally {
       setLoading(false)
     }
