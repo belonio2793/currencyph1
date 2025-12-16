@@ -123,26 +123,19 @@ export default function CurrencySelectionModal({ isOpen, onClose, globalCurrency
               </div>
             </div>
 
-            {/* Preview */}
-            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-              <p className="text-sm text-slate-600 mb-2">Preview:</p>
-              <p className="text-lg font-medium text-slate-900">
-                Display: <span className="text-blue-600">{localFiatCurrency}</span> & <span className="text-blue-600">{localCryptoCurrency}</span>
-              </p>
-            </div>
           </div>
 
           {/* Footer */}
           <div className="bg-slate-50 px-6 py-4 rounded-b-lg flex items-center justify-end gap-3 border-t border-slate-200">
             <button
               onClick={handleCancel}
-              className="px-4 py-2 text-sm font-medium text-slate-700 border border-slate-300 rounded-lg hover:bg-slate-100 transition-colors"
+              className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100"
             >
               Cancel
             </button>
             <button
               onClick={handleApply}
-              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700"
             >
               Apply
             </button>
