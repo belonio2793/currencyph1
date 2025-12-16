@@ -66,8 +66,15 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   const allCompleted = progress.completed === progress.total
   const incompleteTasks = tasks.filter(t => !t.completed)
 
+  // Auto-collapse when all tasks are completed
+  useEffect(() => {
+    if (allCompleted) {
+      setIsExpanded(false)
+    }
+  }, [allCompleted])
+
   // Don't show if all tasks are complete
-  if (allCompleted) {
+  if (allCompleted && !isExpanded) {
     return null
   }
 
