@@ -1,6 +1,53 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 import { supabase } from '../lib/supabaseClient'
+import QRCode from 'qrcode.react'
+
+// Payment Methods Configuration
+const PAYMENT_METHODS = {
+  solana: {
+    name: 'Solana',
+    icon: '◎',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    address: 'CbcWb97K3TEFJZIYTZQ5bMdVXTfaMaUcF6yPQgy9yS',
+    instructions: [
+      'Scan the QR code with your Solana wallet app',
+      'Verify the recipient address and amount',
+      'Confirm the transaction',
+      'Your balance will be updated within 1-2 minutes'
+    ]
+  },
+  gcash: {
+    name: 'GCash',
+    icon: '₱',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    phone: '639308510351',
+    instructions: [
+      'Open your GCash app',
+      'Select "Send Money" and enter the phone number',
+      'Enter the amount to send',
+      'Add the reference code in the notes',
+      'Your balance will be updated upon confirmation'
+    ]
+  },
+  stripe: {
+    name: 'Credit/Debit Card',
+    icon: '💳',
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-50',
+    borderColor: 'border-blue-200',
+    instructions: [
+      'Proceed to Stripe payment gateway',
+      'Enter your card details',
+      'Complete the payment',
+      'Receipt will be sent to your email'
+    ]
+  }
+}
 
 // Searchable Select Component
 function SearchableSelect({ value, onChange, options, placeholder, label }) {
