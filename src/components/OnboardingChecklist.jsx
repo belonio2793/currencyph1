@@ -59,7 +59,6 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   }, [userId])
 
   const loadTasks = async () => {
-    setLoading(true)
     try {
       const [tasksData, progressData] = await Promise.all([
         onboardingService.getOnboardingTasks(userId),
@@ -69,15 +68,13 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
       setProgress(progressData)
     } catch (err) {
       console.error('Error loading tasks:', err)
-    } finally {
-      setLoading(false)
     }
   }
 
   const handleTaskComplete = async (task) => {
     setCompletingTaskId(task.id)
     try {
-      // Handle specific task actions
+      // Handle specific task actions first
       if (task.action === 'open-address-modal') {
         onOpenAddressModal?.()
       } else if (task.action === 'navigate-profile') {
@@ -88,6 +85,7 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
         onOpenCurrencyModal?.()
       }
 
+      // Mark task as complete in database
       await onboardingService.updateTaskCompletion(userId, task.id, true)
 
       // Reload tasks to reflect changes
