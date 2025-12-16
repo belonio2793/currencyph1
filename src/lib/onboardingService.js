@@ -221,15 +221,27 @@ export const onboardingService = {
   // Get complete onboarding tasks with auto-detected completion
   async getOnboardingTasks(userId) {
     try {
-      // Fetch user state and addresses in parallel
-      const [onboardingState, addresses] = await Promise.all([
-        this.getUserOnboardingState(userId),
-        this.getUserAddresses(userId)
+      // Run all validators in parallel for accurate auto-detection
+      const [
+        hasAddress,
+        profileComplete,
+        emailVerified,
+        currencySet,
+        onboardingState
+      ] = await Promise.all([
+        this.hasUserAddresses(userId),
+        this.hasProfileComplete(userId),
+        this.hasEmailVerified(userId),
+        this.hasPreferredCurrency(userId),
+        this.getUserOnboardingState(userId)
       ])
 
       const userState = {
         ...onboardingState,
-        hasAddress: addresses.length > 0
+        hasAddress,
+        profileComplete,
+        emailVerified,
+        currencySet
       }
 
       const tasks = this.getDefaultTasks(userState)
