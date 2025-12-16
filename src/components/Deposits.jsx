@@ -285,7 +285,7 @@ const InstructionsDisplay = React.memo(function InstructionsDisplay({ method }) 
   )
 })
 
-export default function Deposits({ userId, globalCurrency = 'PHP' }) {
+function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('PHP')
   const [exchangeRates, setExchangeRates] = useState({})
