@@ -154,6 +154,12 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
       return
     }
 
+    // Validate UUID before attempting database insert
+    if (!isValidUUID(userId)) {
+      setError('Please sign in with a valid account to create shipments')
+      return
+    }
+
     try {
       setLoading(true)
       const { error: insertError } = await supabase
