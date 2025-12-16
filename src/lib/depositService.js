@@ -317,7 +317,151 @@ export class DepositService {
         maxAmount: 999999,
         currencies: Object.values(CURRENCY_CODES),
         requiredFields: ['sourceWalletId', 'amount'],
-        webhookSupported: false
+        webhookSupported: false,
+        available: true
+      },
+
+      // =============== MODERN FINTECH - OTHER PAYMENT METHODS ===============
+
+      [DEPOSIT_METHODS.DLOCAL]: {
+        id: DEPOSIT_METHODS.DLOCAL,
+        name: 'dLocal',
+        icon: '🌍',
+        description: 'Local payments in 50+ countries (LatAm, Africa, Asia)',
+        processingTime: 'Instant to 1 day',
+        fees: '2-3%',
+        minAmount: 10,
+        maxAmount: 500000,
+        currencies: ['USD', 'BRL', 'MXN', 'ARS', 'CLP', 'COP', 'PEN', 'UYU', 'ZAR', 'NGN', 'KES'],
+        requiredFields: ['paymentMethod', 'amount'],
+        webhookSupported: true,
+        available: false,
+        comingSoon: true,
+        regions: ['Latin America', 'Africa', 'Asia-Pacific']
+      },
+
+      [DEPOSIT_METHODS.CIRCLE]: {
+        id: DEPOSIT_METHODS.CIRCLE,
+        name: 'Circle (Stablecoin)',
+        icon: '🔵',
+        description: 'USDC stablecoin payments & crypto on/off ramps',
+        processingTime: 'Instant',
+        fees: '0-1%',
+        minAmount: 1,
+        maxAmount: 999999,
+        currencies: ['USDC', 'USD'],
+        requiredFields: ['walletAddress', 'amount'],
+        webhookSupported: true,
+        blockchainSupported: true,
+        available: false,
+        comingSoon: true,
+        chains: ['Ethereum', 'Polygon', 'Arbitrum', 'Solana']
+      },
+
+      [DEPOSIT_METHODS.FLUTTERWAVE]: {
+        id: DEPOSIT_METHODS.FLUTTERWAVE,
+        name: 'Flutterwave',
+        icon: '🌊',
+        description: 'African payment specialist (Nigeria, Kenya, Ghana)',
+        processingTime: 'Instant to 2 days',
+        fees: '1.4% + fixed',
+        minAmount: 100,
+        maxAmount: 100000,
+        currencies: ['NGN', 'KES', 'GHS', 'ZAR', 'UGX', 'TZS', 'USD'],
+        requiredFields: ['phoneNumber', 'amount'],
+        webhookSupported: true,
+        available: false,
+        comingSoon: true,
+        regions: ['Africa']
+      },
+
+      [DEPOSIT_METHODS.CHECKOUT]: {
+        id: DEPOSIT_METHODS.CHECKOUT,
+        name: 'Checkout.com',
+        icon: '🛒',
+        description: 'Modern European payment processor',
+        processingTime: '1-3 days',
+        fees: '2.75%',
+        minAmount: 1,
+        maxAmount: 500000,
+        currencies: ['EUR', 'GBP', 'USD', 'CHF', 'SEK', 'DKK', 'NOK'],
+        requiredFields: ['paymentToken', 'amount'],
+        webhookSupported: true,
+        available: false,
+        comingSoon: true,
+        regions: ['Europe']
+      },
+
+      [DEPOSIT_METHODS.MOONPAY]: {
+        id: DEPOSIT_METHODS.MOONPAY,
+        name: 'MoonPay',
+        icon: '🌙',
+        description: 'Crypto on/off ramp (buy crypto with fiat globally)',
+        processingTime: 'Instant to 1 day',
+        fees: '3.75% + fixed',
+        minAmount: 20,
+        maxAmount: 50000,
+        currencies: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'PHP', 'SGD'],
+        requiredFields: ['cryptoAddress', 'cryptoSymbol', 'amount'],
+        webhookSupported: true,
+        blockchainSupported: true,
+        available: false,
+        comingSoon: true,
+        chains: ['Ethereum', 'Polygon', 'Bitcoin', 'Solana', 'Arbitrum']
+      },
+
+      [DEPOSIT_METHODS.RAMP]: {
+        id: DEPOSIT_METHODS.RAMP,
+        name: 'Ramp',
+        icon: '🚀',
+        description: 'Crypto on/off ramp (international, privacy-focused)',
+        processingTime: 'Instant to 2 days',
+        fees: '2-4%',
+        minAmount: 1,
+        maxAmount: 1000000,
+        currencies: ['USD', 'EUR', 'GBP', 'PHP', 'INR', 'AUD'],
+        requiredFields: ['cryptoAddress', 'cryptoSymbol', 'amount'],
+        webhookSupported: true,
+        blockchainSupported: true,
+        available: false,
+        comingSoon: true,
+        chains: ['Ethereum', 'Polygon', 'Arbitrum', 'Optimism', 'Solana']
+      },
+
+      [DEPOSIT_METHODS.BINANCE_PAY]: {
+        id: DEPOSIT_METHODS.BINANCE_PAY,
+        name: 'Binance Pay',
+        icon: '📊',
+        description: 'Crypto-native payments with global reach',
+        processingTime: 'Instant',
+        fees: '0-0.2%',
+        minAmount: 1,
+        maxAmount: 999999,
+        currencies: ['BUSD', 'USDT', 'BNB', 'ETH', 'BTC'],
+        requiredFields: ['binanceEmail', 'amount', 'cryptoSymbol'],
+        webhookSupported: true,
+        blockchainSupported: true,
+        available: false,
+        comingSoon: true,
+        chains: ['BSC', 'Ethereum', 'Multiple']
+      },
+
+      [DEPOSIT_METHODS.CRYPTO_COM_PAY]: {
+        id: DEPOSIT_METHODS.CRYPTO_COM_PAY,
+        name: 'Crypto.com Pay',
+        icon: '🎯',
+        description: 'Crypto payments with fiat settlement',
+        processingTime: 'Instant to 1 day',
+        fees: '1-2%',
+        minAmount: 1,
+        maxAmount: 500000,
+        currencies: ['USDC', 'USDT', 'CRO', 'BTC', 'ETH'],
+        requiredFields: ['cryptoWallet', 'amount', 'cryptoSymbol'],
+        webhookSupported: true,
+        blockchainSupported: true,
+        available: false,
+        comingSoon: true,
+        chains: ['Ethereum', 'Polygon', 'Cronos', 'Multiple']
       }
     }
 
