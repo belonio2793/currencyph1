@@ -89,26 +89,26 @@ export const onboardingService = {
     try {
       if (!this.isValidUUID(userId)) return false
 
-      // Check user_email_verified table or auth metadata
+      // Check user_onboarding_state table for email_verified status
       const { data, error } = await supabase
-        .from('user_email_verified')
-        .select('verified')
+        .from('user_onboarding_state')
+        .select('email_verified')
         .eq('user_id', userId)
         .single()
 
       if (error) {
-        // If table doesn't exist or no record, check if current user has verified email
+        // If table doesn't exist or no record, check auth metadata
         if (error.code === 'PGRST116') {
           // Try getting current user from session
           const { data: session } = await supabase.auth.getSession()
-          if (session?.user?.user_metadata?.email_verified) {
+          if (session?.user?.email_confirmed_at) {
             return true
           }
           return false
         }
         throw error
       }
-      return !!(data?.verified)
+      return !!(data?.email_verified)
     } catch (err) {
       console.error('Error checking email verification:', err?.message || String(err))
       return false
