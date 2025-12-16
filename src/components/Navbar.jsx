@@ -57,7 +57,7 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
           <div className="ml-auto flex items-center gap-2">
             {userEmail ? (
               <>
-                <span className="text-sm font-medium text-slate-600">{userEmail}</span>
+                <span className="text-sm font-medium text-slate-600 hidden sm:inline">{userEmail}</span>
                 <button onClick={() => onSignOut && onSignOut()} className="px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-100">Sign out</button>
               </>
             ) : (
@@ -69,6 +69,16 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
           </div>
         </div>
       </div>
+
+      {/* Currency Selection Modal */}
+      <CurrencySelectionModal
+        isOpen={showCurrencyModal}
+        onClose={() => setShowCurrencyModal(false)}
+        globalCurrency={globalCurrency}
+        setGlobalCurrency={setGlobalCurrency}
+        globalCryptocurrency={globalCryptocurrency}
+        setGlobalCryptocurrency={setGlobalCryptocurrency}
+      />
     </nav>
   )
 }
