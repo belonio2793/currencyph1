@@ -166,7 +166,7 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
 }
 
 // Payment Method Selector Component
-function PaymentMethodSelector({ method, selected, onClick }) {
+const PaymentMethodSelector = React.memo(function PaymentMethodSelector({ method, selected, onClick }) {
   return (
     <button
       onClick={onClick}
@@ -182,7 +182,7 @@ function PaymentMethodSelector({ method, selected, onClick }) {
       </div>
     </button>
   )
-}
+})
 
 // Solana Payment Display Component
 function SolanaPaymentDisplay({ address }) {
