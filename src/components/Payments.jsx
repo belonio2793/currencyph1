@@ -64,6 +64,7 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📊' },
     { id: 'products', label: 'Products', icon: '📦' },
+    { id: 'pricing', label: 'Pricing', icon: '💲' },
     { id: 'invoices', label: 'Invoices', icon: '📄' },
     { id: 'payment-links', label: 'Payment Links', icon: '🔗' },
     { id: 'settings', label: 'Settings', icon: '⚙️' }
