@@ -33,6 +33,10 @@ const CARD_CONFIG = {
   myBusiness: {
     title: 'My Business',
     description: 'Manage your business and tax information'
+  },
+  myProfile: {
+    title: 'My Profile',
+    description: 'Edit your profile information and preferences'
   }
 }
 
