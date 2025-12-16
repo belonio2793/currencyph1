@@ -90,6 +90,17 @@ const CARD_CONFIG = {
     ),
     colorClasses: 'bg-indigo-100 group-hover:bg-indigo-200 text-indigo-600',
     borderClasses: 'hover:border-indigo-300'
+  },
+  myProfile: {
+    title: 'My Profile',
+    description: 'Edit your profile information and preferences',
+    icon: (
+      <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    ),
+    colorClasses: 'bg-pink-100 group-hover:bg-pink-200 text-pink-600',
+    borderClasses: 'hover:border-pink-300'
   }
 }
 
