@@ -8,6 +8,8 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
   const [isExpanded, setIsExpanded] = useState(true)
   const [completingTaskId, setCompletingTaskId] = useState(null)
 
+  const allCompleted = progress.completed === progress.total
+
   useEffect(() => {
     if (!userId) {
       setLoading(false)
@@ -15,6 +17,12 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     }
     loadTasks()
   }, [userId])
+
+  useEffect(() => {
+    if (allCompleted) {
+      setIsExpanded(false)
+    }
+  }, [allCompleted])
 
   const loadTasks = async () => {
     setLoading(true)
