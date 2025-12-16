@@ -34,6 +34,7 @@ const currencyLabels = {
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
+  const [displayType, setDisplayType] = useState('fiat') // 'fiat' or 'crypto'
 
 
   return (
