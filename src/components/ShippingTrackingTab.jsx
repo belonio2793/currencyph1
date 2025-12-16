@@ -53,8 +53,18 @@ export default function ShippingTrackingTab({ userId, onShowAuth }) {
     loadShipments()
   }, [userId])
 
+  const isValidUUID = (id) => {
+    if (!id) return false
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+  }
+
   const loadShipments = async () => {
     if (!userId) return
+    // Skip database query for guest users (guest-local-xxx IDs are not valid UUIDs)
+    if (!isValidUUID(userId)) {
+      setShipments([])
+      return
+    }
     try {
       setLoading(true)
       setError('')
