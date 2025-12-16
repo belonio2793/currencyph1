@@ -54,7 +54,7 @@ export default function UserProfilePreview({ userId }) {
       if (err?.name === 'AuthSessionMissingError' || err?.message?.includes('Auth session missing')) {
         // User not logged in - this is expected
       } else {
-        console.error('Error loading user profile:', err)
+        console.error('Error loading user profile:', err?.message || String(err))
       }
       setLoading(false)
     }

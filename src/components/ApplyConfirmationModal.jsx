@@ -27,16 +27,33 @@ export default function ApplyConfirmationModal({
   const loadUserProfile = async () => {
     try {
       setUserLoading(true)
-      const { data, error: queryError } = await supabase
-        .from('users')
-        .select('full_name, email, phone_number')
-        .eq('id', userId)
-        .single()
+      // Get current user from auth
+      const { data: authData } = await supabase.auth.getUser()
+      if (!authData?.user) {
+        setError('Not authenticated')
+        return
+      }
 
-      if (queryError) throw queryError
-      setUserProfile(data)
+      // Try to load from profiles table, fall back to auth metadata
+      let profileData = null
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name, phone_number')
+          .eq('user_id', userId)
+          .single()
+        profileData = data
+      } catch (e) {
+        // profiles table might not exist, that's ok
+      }
+
+      setUserProfile({
+        full_name: profileData?.full_name || authData.user.user_metadata?.full_name || 'User',
+        email: authData.user.email,
+        phone_number: profileData?.phone_number || authData.user.user_metadata?.phone_number
+      })
     } catch (err) {
-      console.error('Error loading user profile:', err)
+      console.error('Error loading user profile:', err?.message || String(err))
       setError('Failed to load your profile information')
     } finally {
       setUserLoading(false)
