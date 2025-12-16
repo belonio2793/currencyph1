@@ -23,7 +23,11 @@ export const onboardingService = {
       if (error) throw error
       return data || []
     } catch (err) {
-      console.error('Error fetching user addresses:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error fetching user addresses:', errMsg)
+      }
       return []
     }
   },
