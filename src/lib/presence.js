@@ -89,16 +89,14 @@ async function updatePresence(status) {
       updateData.location_updated_at = new Date().toISOString()
     }
 
-    // Use a short timeout to prevent hanging on network issues
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Presence update timeout')), 5000)
-    )
-
-    const updatePromise = supabase
-      .from('user_presence')
-      .upsert([updateData])
-
-    const { error } = await Promise.race([updatePromise, timeoutPromise])
+    const { error } = await Promise.race([
+      supabase
+        .from('user_presence')
+        .upsert([updateData]),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Presence update timeout')), 5000)
+      )
+    ]).catch(() => ({ error: null }))
 
     if (error) {
       if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
