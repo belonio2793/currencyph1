@@ -37,12 +37,15 @@ export default function ApplyConfirmationModal({
       // Try to load from profiles table, fall back to auth metadata
       let profileData = null
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('full_name, phone_number')
           .eq('user_id', userId)
-          .single()
-        profileData = data
+          .limit(1)
+
+        if (!error && data && data.length > 0) {
+          profileData = data[0]
+        }
       } catch (e) {
         // profiles table might not exist, that's ok
       }
