@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { onboardingService } from '../lib/onboardingService'
 
 export default function OnboardingChecklist({ userId, userEmail, onTaskComplete, onOpenAddressModal, onOpenProfileModal, onOpenVerificationModal, onOpenCurrencyModal, onNavigate }) {
@@ -11,14 +11,29 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
 
   const allCompleted = progress.completed === progress.total
 
+  // Load tasks - memoized to avoid recreating on each render
+  const loadTasks = useCallback(async () => {
+    try {
+      const [tasksData, progressData] = await Promise.all([
+        onboardingService.getOnboardingTasks(userId),
+        onboardingService.getOnboardingProgress(userId)
+      ])
+      setTasks(tasksData)
+      setProgress(progressData)
+    } catch (err) {
+      console.error('Error loading tasks:', err)
+    }
+  }, [userId])
+
   // Load tasks once on userId change
   useEffect(() => {
     if (!userId) {
       setLoading(false)
       return
     }
-    loadTasks()
-  }, [userId])
+    setLoading(true)
+    loadTasks().finally(() => setLoading(false))
+  }, [userId, loadTasks])
 
   // Auto-collapse when all tasks are completed
   useEffect(() => {
@@ -56,20 +71,7 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
         clearInterval(autoDetectIntervalRef.current)
       }
     }
-  }, [userId])
-
-  const loadTasks = async () => {
-    try {
-      const [tasksData, progressData] = await Promise.all([
-        onboardingService.getOnboardingTasks(userId),
-        onboardingService.getOnboardingProgress(userId)
-      ])
-      setTasks(tasksData)
-      setProgress(progressData)
-    } catch (err) {
-      console.error('Error loading tasks:', err)
-    }
-  }
+  }, [userId, loadTasks])
 
   const handleTaskComplete = async (task) => {
     setCompletingTaskId(task.id)
