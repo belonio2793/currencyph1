@@ -14,7 +14,8 @@ const CARD_KEYS = [
   'p2p',
   'poker',
   'networkBalances',
-  'myBusiness'
+  'myBusiness',
+  'myProfile'
 ]
 
 const DEFAULT_ORDER = [
