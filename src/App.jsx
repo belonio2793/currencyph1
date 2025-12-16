@@ -131,12 +131,23 @@ export default function App() {
       backgroundSync.start(24) // Sync every 24 hours
     }
 
+    // Register Service Worker for offline support and caching
+    registerServiceWorker().catch(err => {
+      console.debug('Service Worker registration failed:', err)
+    })
+
+    // Listen for online/offline status changes
+    const unsubscribeOnlineStatus = onOnlineStatusChange((isOnline) => {
+      console.log(`App is now ${isOnline ? 'online' : 'offline'}`)
+    })
+
     window.addEventListener('popstate', handleRouting)
     window.addEventListener('hashchange', handleRouting)
     return () => {
       window.removeEventListener('popstate', handleRouting)
       window.removeEventListener('hashchange', handleRouting)
       backgroundSync.stop()
+      unsubscribeOnlineStatus()
       try { if (authSubscription && typeof authSubscription.unsubscribe === 'function') authSubscription.unsubscribe() } catch (e) { /* ignore */ }
     }
   }, [])
