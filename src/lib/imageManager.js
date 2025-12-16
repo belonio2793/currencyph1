@@ -1,3 +1,4 @@
+import React from 'react'
 import { supabase } from './supabaseClient.js'
 
 const BUCKET_NAME = 'nearby_listings'
