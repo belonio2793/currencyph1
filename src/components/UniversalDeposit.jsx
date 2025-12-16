@@ -37,8 +37,10 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
         setDepositService(service)
 
         // Load available methods
-        const methods = service.getAvailableMethods(userCountry, currency)
-        setAvailableMethods(methods.methods)
+        const methodsData = service.getAvailableMethods(userCountry, currency)
+        setAvailableMethods(methodsData.methods)
+        setOtherMethods(methodsData.otherMethods)
+        setFilteredOtherMethods(methodsData.otherMethods)
       } catch (err) {
         setError(err.message)
       }
