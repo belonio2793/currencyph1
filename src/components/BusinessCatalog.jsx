@@ -25,14 +25,16 @@ export default function BusinessCatalog({ userId }) {
       const result = await businessRequestService.getAllBusinesses(ITEMS_PER_PAGE, offset)
 
       if (result.error) {
-        console.error('Error loading businesses:', result.error)
-        setError('Failed to load businesses')
+        const errorMsg = result.error?.message || String(result.error) || 'Unknown error'
+        console.error('Error loading businesses:', errorMsg, result.error)
+        setError(`Failed to load businesses: ${errorMsg}`)
       } else {
         setBusinesses(result.data || [])
       }
     } catch (err) {
-      console.error('Error in loadBusinesses:', err)
-      setError('An error occurred while loading businesses')
+      const errorMsg = err?.message || String(err) || 'Unknown error occurred'
+      console.error('Error in loadBusinesses:', errorMsg, err)
+      setError(`An error occurred while loading businesses: ${errorMsg}`)
     } finally {
       setLoading(false)
     }
