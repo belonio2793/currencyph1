@@ -230,10 +230,11 @@ export const currencyAPI = {
   async getWallets(userId) {
     if (!userId || userId === 'null' || userId === 'undefined') return []
 
+    // Optimize: Only fetch needed columns instead of all columns
     // Try querying the wallets table directly (more reliable than views for real-time data)
     const { data, error } = await supabase
       .from('wallets')
-      .select('*')
+      .select('id,user_id,currency_code,balance,total_deposited,total_withdrawn,is_active,created_at,updated_at')
       .eq('user_id', userId)
       .eq('is_active', true)
       .order('currency_code')
@@ -243,7 +244,7 @@ export const currencyAPI = {
       console.warn('Error querying wallets table, trying summary view:', error)
       const { data: summaryData, error: summaryError } = await supabase
         .from('user_wallets_summary')
-        .select('*')
+        .select('id,user_id,currency_code,balance,total_deposited,total_withdrawn,is_active')
         .eq('user_id', userId)
         .eq('is_active', true)
         .order('currency_code')
