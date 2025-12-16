@@ -39,6 +39,71 @@ export const onboardingService = {
     }
   },
 
+  // Validator: Check if user has set a preferred currency
+  async hasPreferredCurrency(userId) {
+    try {
+      if (!this.isValidUUID(userId)) return false
+
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('preferred_currency')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) {
+        if (error.code === 'PGRST116') return false
+        throw error
+      }
+      return !!(data?.preferred_currency)
+    } catch (err) {
+      console.error('Error checking preferred currency:', err?.message || String(err))
+      return false
+    }
+  },
+
+  // Validator: Check if user has completed their profile
+  async hasProfileComplete(userId) {
+    try {
+      if (!this.isValidUUID(userId)) return false
+
+      const { data: authUser } = await supabase.auth.admin.getUserById(userId)
+      const fullName = authUser?.user?.user_metadata?.full_name
+      return !!(fullName && fullName.trim().length > 0)
+    } catch (err) {
+      // Fallback: check if user has profile data in profiles table
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', userId)
+          .single()
+
+        if (error) {
+          if (error.code === 'PGRST116') return false
+          throw error
+        }
+        return !!(data?.full_name && data.full_name.trim().length > 0)
+      } catch (e) {
+        console.error('Error checking profile completion:', e?.message || String(e))
+        return false
+      }
+    }
+  },
+
+  // Validator: Check if user has verified their email
+  async hasEmailVerified(userId) {
+    try {
+      if (!this.isValidUUID(userId)) return false
+
+      const { data, error } = await supabase.auth.admin.getUserById(userId)
+      if (error) throw error
+      return !!(data?.user?.email_confirmed_at)
+    } catch (err) {
+      console.error('Error checking email verification:', err?.message || String(err))
+      return false
+    }
+  },
+
   // Create default onboarding tasks
   getDefaultTasks(userState) {
     return [
