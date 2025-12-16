@@ -638,7 +638,7 @@ export default function ChatBar({ userId, userEmail }) {
   }
 
   const updateUserStatus = async (status) => {
-    if (!userId) return
+    if (!userId || !isValidUUID(userId)) return
     setUserStatus(status)
 
     try {
