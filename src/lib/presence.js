@@ -70,6 +70,11 @@ async function updatePresence(status) {
   if (typeof navigator !== 'undefined' && !navigator.onLine) return
 
   try {
+    // Guard against supabase being undefined or not having the expected methods
+    if (!supabase || typeof supabase.from !== 'function') {
+      return
+    }
+
     const updateData = {
       user_id: currentUserId,
       status,
@@ -84,9 +89,16 @@ async function updatePresence(status) {
       updateData.location_updated_at = new Date().toISOString()
     }
 
-    const { error } = await supabase
+    // Use a short timeout to prevent hanging on network issues
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Presence update timeout')), 5000)
+    )
+
+    const updatePromise = supabase
       .from('user_presence')
       .upsert([updateData])
+
+    const { error } = await Promise.race([updatePromise, timeoutPromise])
 
     if (error) {
       if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
