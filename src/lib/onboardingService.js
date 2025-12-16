@@ -317,7 +317,11 @@ export const onboardingService = {
       if (error) throw error
       return true
     } catch (err) {
-      console.error('Error updating task completion:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error updating task completion:', errMsg)
+      }
       return false
     }
   },
@@ -334,7 +338,11 @@ export const onboardingService = {
         percentage
       }
     } catch (err) {
-      console.error('Error getting onboarding progress:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error getting onboarding progress:', errMsg)
+      }
       return { completed: 0, total: 0, percentage: 0 }
     }
   }
