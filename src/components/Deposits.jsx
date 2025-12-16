@@ -549,7 +549,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
         setWallets([])
         return
       }
-      const data = await currencyAPI.getWallets(userId)
+      const data = await paymentsAPI.getWallets(userId)
       setWallets(data)
     } catch (err) {
       setWallets([])
@@ -558,7 +558,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
 
   const loadExchangeRates = async () => {
     try {
-      const rates = await currencyAPI.getAllExchangeRates()
+      const rates = await paymentsAPI.getAllExchangeRates()
       const ratesMap = {}
       if (rates && rates.length > 0) {
         rates.forEach(r => {
