@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 import { supabase } from '../lib/supabaseClient'
-import QRCode from 'qrcode.react'
 
 // Payment Methods Configuration
 const PAYMENT_METHODS = {
@@ -32,19 +31,6 @@ const PAYMENT_METHODS = {
       'Enter the amount to send',
       'Add the reference code in the notes',
       'Your balance will be updated upon confirmation'
-    ]
-  },
-  stripe: {
-    name: 'Credit/Debit Card',
-    icon: '💳',
-    color: 'text-blue-700',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    instructions: [
-      'Proceed to Stripe payment gateway',
-      'Enter your card details',
-      'Complete the payment',
-      'Receipt will be sent to your email'
     ]
   }
 }
@@ -198,26 +184,33 @@ function PaymentMethodSelector({ method, selected, onClick }) {
 
 // Solana Payment Display Component
 function SolanaPaymentDisplay({ address }) {
+  const [copied, setCopied] = useState(false)
+  
+  const handleCopy = () => {
+    navigator.clipboard.writeText(address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <div className="space-y-4">
       <div className="text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
         <div className="flex justify-center mb-4">
-          <QRCode
-            value={`solana:${address}`}
-            size={200}
-            level="H"
-            includeMargin={true}
-            fgColor="#1e1b4b"
-            bgColor="#ffffff"
-          />
+          <div className="bg-white p-4 rounded-lg border-2 border-purple-200">
+            <svg width="150" height="150" viewBox="0 0 150 150">
+              <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="12" fill="#1e1b4b">
+                [QR Code: solana:{address}]
+              </text>
+            </svg>
+          </div>
         </div>
         <p className="text-sm text-gray-600 mb-2">Solana Wallet Address:</p>
-        <p className="font-mono text-xs text-gray-900 break-all">{address}</p>
+        <p className="font-mono text-xs text-gray-900 break-all select-all">{address}</p>
         <button
-          onClick={() => navigator.clipboard.writeText(address)}
+          onClick={handleCopy}
           className="mt-3 text-xs text-purple-600 hover:text-purple-700 font-medium"
         >
-          Copy Address
+          {copied ? '✓ Copied' : 'Copy Address'}
         </button>
       </div>
     </div>
@@ -226,30 +219,47 @@ function SolanaPaymentDisplay({ address }) {
 
 // GCash Payment Display Component
 function GCashPaymentDisplay({ phone, referenceCode }) {
+  const [copiedPhone, setCopiedPhone] = useState(false)
+  const [copiedCode, setCopiedCode] = useState(false)
+
+  const handleCopyPhone = () => {
+    navigator.clipboard.writeText(phone)
+    setCopiedPhone(true)
+    setTimeout(() => setCopiedPhone(false), 2000)
+  }
+
+  const handleCopyCode = () => {
+    if (referenceCode) {
+      navigator.clipboard.writeText(referenceCode)
+      setCopiedCode(true)
+      setTimeout(() => setCopiedCode(false), 2000)
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
         <p className="text-sm text-gray-600 mb-2">Send to GCash Number:</p>
-        <p className="text-2xl font-bold text-blue-600 mb-4">{phone}</p>
-
+        <p className="text-2xl font-bold text-blue-600 mb-4 select-all">{phone}</p>
+        
         {referenceCode && (
           <div className="bg-white p-3 rounded border border-blue-100 mb-4">
-            <p className="text-xs text-gray-600 mb-1">Reference Code (Optional):</p>
-            <p className="font-mono font-bold text-gray-900">{referenceCode}</p>
+            <p className="text-xs text-gray-600 mb-1">Reference Code (Include in notes):</p>
+            <p className="font-mono font-bold text-gray-900 select-all">{referenceCode}</p>
             <button
-              onClick={() => navigator.clipboard.writeText(referenceCode)}
+              onClick={handleCopyCode}
               className="mt-2 text-xs text-blue-600 hover:text-blue-700 font-medium"
             >
-              Copy Code
+              {copiedCode ? '✓ Copied' : 'Copy Code'}
             </button>
           </div>
         )}
-
+        
         <button
-          onClick={() => navigator.clipboard.writeText(phone)}
+          onClick={handleCopyPhone}
           className="w-full text-xs text-blue-600 hover:text-blue-700 font-medium p-2 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
         >
-          Copy GCash Number
+          {copiedPhone ? '✓ Copied Phone Number' : 'Copy GCash Number'}
         </button>
       </div>
     </div>
@@ -477,7 +487,6 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
         }
       })
 
-    // subscribe and guard against promise rejections
     try {
       const sub = channel.subscribe()
       if (sub && typeof sub.then === 'function') {
@@ -487,7 +496,6 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
       console.warn('Failed to subscribe to supabase channel:', e)
     }
 
-    // suppress noisy unhandledrejection logs for expected AbortErrors from fetch timeouts
     const unhandledRejectionHandler = (evt) => {
       try {
         const reason = evt && (evt.reason || evt.detail || null)
@@ -771,7 +779,6 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Error & Success Messages */}
         {error && (
           <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
             {error}
@@ -783,9 +790,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* Main Card */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
-          {/* Total Balance */}
           <div className="mb-8 text-center">
             <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
             <h2 className="text-5xl font-light text-slate-900">
@@ -793,23 +798,62 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
             </h2>
           </div>
 
-          {/* Side by Side Forms */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Fiat Currency Form */}
-            <form onSubmit={handleAddAmount} className="space-y-6">
-              <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Fiat Currency</h3>
+          {/* Deposit Method Tabs */}
+          <div className="mb-8 border-b border-slate-200">
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setDepositTab('direct')
+                  setShowPaymentInstructions(false)
+                }}
+                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+                  depositTab === 'direct'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Direct Payment
+              </button>
+              <button
+                onClick={() => {
+                  setDepositTab('crypto')
+                  setShowPaymentInstructions(false)
+                }}
+                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
+                  depositTab === 'crypto'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Add Cryptocurrency
+              </button>
+            </div>
+          </div>
 
-              <SearchableSelect
-                value={selectedCurrency}
-                onChange={setSelectedCurrency}
-                options={allCurrencies}
-                placeholder="Select currency"
-                label="Select Currency"
-              />
+          {/* Direct Payment Methods */}
+          {depositTab === 'direct' && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {Object.entries(PAYMENT_METHODS).map(([key, method]) => (
+                    <PaymentMethodSelector
+                      key={key}
+                      method={method}
+                      selected={selectedPaymentMethod === key}
+                      onClick={() => {
+                        setSelectedPaymentMethod(key)
+                        setReferenceCode(key === 'gcash' ? `REF-${Date.now().toString().slice(-8)}` : null)
+                        setShowPaymentInstructions(false)
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Amount ({selectedCurrency})
+                  Deposit Amount ({globalCurrency})
                 </label>
                 <input
                   type="number"
@@ -821,130 +865,214 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
                 />
               </div>
 
-              {amount && convertedAmounts[globalCurrency] && (
-                <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg p-6 border border-blue-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-slate-600 text-sm mb-1">You send</p>
-                      <p className="text-2xl font-light text-slate-900">
-                        {amount} {selectedCurrency}
-                      </p>
-                    </div>
-                    <div className="text-2xl text-slate-400">→</div>
-                    <div className="text-right">
-                      <p className="text-slate-600 text-sm mb-1">You get</p>
-                      <p className="text-2xl font-light text-blue-600">
-                        {convertedAmounts[globalCurrency]} {globalCurrency}
-                      </p>
-                    </div>
-                  </div>
-                  {getRate(selectedCurrency, globalCurrency) && (
-                    <p className="text-xs text-slate-500 border-t border-blue-200 pt-3">
-                      Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, globalCurrency)} {globalCurrency}
-                    </p>
+              {amount && (
+                <div className="space-y-6">
+                  {selectedPaymentMethod === 'solana' && (
+                    <>
+                      <SolanaPaymentDisplay address={PAYMENT_METHODS.solana.address} />
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                        <p className="font-semibold mb-2">💡 Important:</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                          <li>Deposit amount: <span className="font-bold">{amount} {globalCurrency}</span></li>
+                          <li>Your balance will be updated once confirmed on the blockchain</li>
+                          <li>Keep your SOL address for transaction tracking</li>
+                        </ul>
+                      </div>
+                      <button
+                        onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
+                        className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                      >
+                        {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
+                      </button>
+                      {showPaymentInstructions && (
+                        <InstructionsDisplay method={PAYMENT_METHODS.solana} />
+                      )}
+                    </>
                   )}
 
-                  {Object.keys(convertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-blue-200">
-                      <p className="text-xs font-medium text-slate-600 mb-2">Also worth approximately:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(convertedAmounts)
-                          .filter(([code]) => code !== globalCurrency && code !== selectedCurrency)
-                          .slice(0, 4)
-                          .map(([code, value]) => (
-                            <div key={code} className="text-xs text-slate-600">
-                              <span className="font-medium">{code}</span>: {value}
-                            </div>
-                          ))}
+                  {selectedPaymentMethod === 'gcash' && (
+                    <>
+                      <GCashPaymentDisplay 
+                        phone={PAYMENT_METHODS.gcash.phone}
+                        referenceCode={referenceCode}
+                      />
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                        <p className="font-semibold mb-2">💡 Important:</p>
+                        <ul className="list-disc pl-5 space-y-1">
+                          <li>Deposit amount: <span className="font-bold">{amount} {globalCurrency}</span></li>
+                          <li>Use the reference code to track your deposit</li>
+                          <li>Deposits are confirmed within 1-3 minutes</li>
+                          <li>Make sure to include the reference code in the GCash notes</li>
+                        </ul>
                       </div>
-                    </div>
+                      <button
+                        onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
+                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      >
+                        {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
+                      </button>
+                      {showPaymentInstructions && (
+                        <InstructionsDisplay method={PAYMENT_METHODS.gcash} />
+                      )}
+                    </>
                   )}
                 </div>
               )}
+            </div>
+          )}
 
-              <button
-                type="submit"
-                disabled={adding || !amount}
-                className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {adding ? 'Processing...' : 'Add'}
-              </button>
-            </form>
+          {/* Fiat Currency & Cryptocurrency Forms */}
+          {depositTab === 'crypto' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <form onSubmit={handleAddAmount} className="space-y-6">
+                <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Fiat Currency</h3>
 
-            {/* Cryptocurrency Form */}
-            <form onSubmit={handleAddCrypto} className="space-y-6">
-              <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Cryptocurrency</h3>
-
-              <SearchableCryptoSelect
-                value={selectedCrypto}
-                onChange={setSelectedCrypto}
-                options={cryptos}
-                prices={cryptoRates.length === 0 ? defaultCryptoPrices : cryptoRates}
-                label="Select Cryptocurrency"
-              />
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Amount ({selectedCrypto})
-                </label>
-                <input
-                  type="number"
-                  step="0.00000001"
-                  value={cryptoAmount}
-                  onChange={e => setCryptoAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
+                <SearchableSelect
+                  value={selectedCurrency}
+                  onChange={setSelectedCurrency}
+                  options={allCurrencies}
+                  placeholder="Select currency"
+                  label="Select Currency"
                 />
-              </div>
 
-              {cryptoAmount && cryptoConvertedAmounts[globalCurrency] && (
-                <div className="bg-gradient-to-br from-orange-50 to-slate-50 rounded-lg p-6 border border-orange-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <p className="text-slate-600 text-sm mb-1">You send</p>
-                      <p className="text-2xl font-light text-slate-900">
-                        {cryptoAmount} {selectedCrypto}
-                      </p>
-                    </div>
-                    <div className="text-2xl text-slate-400">→</div>
-                    <div className="text-right">
-                      <p className="text-slate-600 text-sm mb-1">You get</p>
-                      <p className="text-2xl font-light text-orange-600">
-                        {cryptoConvertedAmounts[globalCurrency]} {globalCurrency}
-                      </p>
-                    </div>
-                  </div>
-                  <p className="text-xs text-slate-500 border-t border-orange-200 pt-3">
-                    Rate: 1 {selectedCrypto} = {getCryptoPrice(selectedCrypto)} {globalCurrency}
-                  </p>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Amount ({selectedCurrency})
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={amount}
+                    onChange={e => setAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
+                  />
+                </div>
 
-                  {Object.keys(cryptoConvertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-orange-200">
-                      <p className="text-xs font-medium text-slate-600 mb-2">Also worth approximately:</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        {Object.entries(cryptoConvertedAmounts)
-                          .filter(([code]) => code !== globalCurrency)
-                          .slice(0, 4)
-                          .map(([code, value]) => (
-                            <div key={code} className="text-xs text-slate-600">
-                              <span className="font-medium">{code}</span>: {value}
-                            </div>
-                          ))}
+                {amount && convertedAmounts[globalCurrency] && (
+                  <div className="bg-gradient-to-br from-blue-50 to-slate-50 rounded-lg p-6 border border-blue-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-slate-600 text-sm mb-1">You send</p>
+                        <p className="text-2xl font-light text-slate-900">
+                          {amount} {selectedCurrency}
+                        </p>
+                      </div>
+                      <div className="text-2xl text-slate-400">→</div>
+                      <div className="text-right">
+                        <p className="text-slate-600 text-sm mb-1">You get</p>
+                        <p className="text-2xl font-light text-blue-600">
+                          {convertedAmounts[globalCurrency]} {globalCurrency}
+                        </p>
                       </div>
                     </div>
-                  )}
-                </div>
-              )}
+                    {getRate(selectedCurrency, globalCurrency) && (
+                      <p className="text-xs text-slate-500 border-t border-blue-200 pt-3">
+                        Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, globalCurrency)} {globalCurrency}
+                      </p>
+                    )}
 
-              <button
-                type="submit"
-                disabled={addingCrypto || !cryptoAmount}
-                className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {addingCrypto ? 'Processing...' : 'Add'}
-              </button>
-            </form>
-          </div>
+                    {Object.keys(convertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-blue-200">
+                        <p className="text-xs font-medium text-slate-600 mb-2">Also worth approximately:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {Object.entries(convertedAmounts)
+                            .filter(([code]) => code !== globalCurrency && code !== selectedCurrency)
+                            .slice(0, 4)
+                            .map(([code, value]) => (
+                              <div key={code} className="text-xs text-slate-600">
+                                <span className="font-medium">{code}</span>: {value}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={adding || !amount}
+                  className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {adding ? 'Processing...' : 'Add'}
+                </button>
+              </form>
+
+              <form onSubmit={handleAddCrypto} className="space-y-6">
+                <h3 className="text-xl font-light text-slate-900 tracking-tight">Add Cryptocurrency</h3>
+
+                <SearchableCryptoSelect
+                  value={selectedCrypto}
+                  onChange={setSelectedCrypto}
+                  options={cryptos}
+                  prices={cryptoRates.length === 0 ? defaultCryptoPrices : cryptoRates}
+                  label="Select Cryptocurrency"
+                />
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Amount ({selectedCrypto})
+                  </label>
+                  <input
+                    type="number"
+                    step="0.00000001"
+                    value={cryptoAmount}
+                    onChange={e => setCryptoAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
+                  />
+                </div>
+
+                {cryptoAmount && cryptoConvertedAmounts[globalCurrency] && (
+                  <div className="bg-gradient-to-br from-orange-50 to-slate-50 rounded-lg p-6 border border-orange-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="text-slate-600 text-sm mb-1">You send</p>
+                        <p className="text-2xl font-light text-slate-900">
+                          {cryptoAmount} {selectedCrypto}
+                        </p>
+                      </div>
+                      <div className="text-2xl text-slate-400">→</div>
+                      <div className="text-right">
+                        <p className="text-slate-600 text-sm mb-1">You get</p>
+                        <p className="text-2xl font-light text-orange-600">
+                          {cryptoConvertedAmounts[globalCurrency]} {globalCurrency}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-500 border-t border-orange-200 pt-3">
+                      Rate: 1 {selectedCrypto} = {getCryptoPrice(selectedCrypto)} {globalCurrency}
+                    </p>
+
+                    {Object.keys(cryptoConvertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
+                      <div className="mt-4 pt-4 border-t border-orange-200">
+                        <p className="text-xs font-medium text-slate-600 mb-2">Also worth approximately:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          {Object.entries(cryptoConvertedAmounts)
+                            .filter(([code]) => code !== globalCurrency)
+                            .slice(0, 4)
+                            .map(([code, value]) => (
+                              <div key={code} className="text-xs text-slate-600">
+                                <span className="font-medium">{code}</span>: {value}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={addingCrypto || !cryptoAmount}
+                  className="w-full bg-orange-600 text-white py-4 rounded-lg hover:bg-orange-700 transition-colors font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {addingCrypto ? 'Processing...' : 'Add'}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     </div>
