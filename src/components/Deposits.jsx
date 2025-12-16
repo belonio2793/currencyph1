@@ -396,8 +396,8 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
                 'Content-Type': 'application/json'
               }
             },
-            2,
-            1000
+            1,
+            500
           )
         } catch (err) {
           console.debug('Supabase fetch-rates failed, using fallback:', err?.message || 'Unknown error')
@@ -410,7 +410,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
         ].join(',')
         let cg = null
         try {
-          cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 2, 1000)
+          cg = await fetchWithRetries(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {}, 1, 500)
         } catch (err) {
           console.debug('CoinGecko API failed, using default prices:', err?.message || 'Unknown error')
         }
