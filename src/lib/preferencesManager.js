@@ -1,22 +1,47 @@
 import { supabase } from './supabaseClient'
 
 export const preferencesManager = {
+  // Validate UUID format
+  isValidUUID(userId) {
+    if (!userId) return false
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)
+  },
+
   // Load or create user preferences from database
   async loadUserPreferences(userId) {
     if (!userId) return null
-    
+
+    // Don't attempt database operations for guest-local users
+    if (!this.isValidUUID(userId)) {
+      return {
+        auto_scroll_enabled: true,
+        quick_access_card_order: ['deposit', 'nearby', 'receipts', 'messages', 'p2p', 'poker', 'networkBalances', 'myBusiness'],
+        quick_access_visibility: {
+          receipts: true,
+          deposit: true,
+          nearby: true,
+          messages: false,
+          p2p: false,
+          poker: false,
+          networkBalances: false,
+          myBusiness: false
+        },
+        other_preferences: {}
+      }
+    }
+
     try {
       const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', userId)
         .single()
-      
+
       if (error && error.code !== 'PGRST116') {
         console.warn('Failed to load user preferences from DB:', error)
         return null
       }
-      
+
       if (!data) {
         // Create default preferences for new user
         const defaultPrefs = {
@@ -35,21 +60,21 @@ export const preferencesManager = {
           },
           other_preferences: {}
         }
-        
+
         const { data: createdData, error: createError } = await supabase
           .from('user_preferences')
           .insert(defaultPrefs)
           .select()
           .single()
-        
+
         if (createError) {
           console.warn('Failed to create user preferences:', createError)
           return defaultPrefs
         }
-        
+
         return createdData
       }
-      
+
       return data
     } catch (e) {
       console.warn('Error loading user preferences:', e)
