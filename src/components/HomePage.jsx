@@ -187,7 +187,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       networkBalances: () => setShowNetworkBalancesModal(true),
       receipts: () => setShowReceiptsModal(true),
       myBusiness: () => setShowMyBusinessModal(true),
-      myProfile: () => setShowProfileModal(true)
+      myProfile: () => setShowProfileModal(true),
+      payments: () => setShowPaymentsModal(true)
     }
 
     const handler = modalMap[cardKey]
