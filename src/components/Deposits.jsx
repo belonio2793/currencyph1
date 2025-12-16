@@ -338,13 +338,20 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
 
     let lastErr = null
     for (let i = 0; i <= retries; i++) {
+      let controller = null
+      let timeoutId = null
       try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 5000)
+        controller = new AbortController()
+        const timeoutDuration = 15000 + (i * 5000)
+        timeoutId = setTimeout(() => {
+          try {
+            controller.abort()
+          } catch (e) {}
+        }, timeoutDuration)
 
         try {
           const resp = await fetch(url, { ...options, signal: controller.signal })
-          clearTimeout(timeoutId)
+          if (timeoutId) clearTimeout(timeoutId)
 
           if (!resp.ok) {
             let bodyText = null
@@ -359,11 +366,12 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
             return text
           }
         } finally {
-          clearTimeout(timeoutId)
+          if (timeoutId) clearTimeout(timeoutId)
         }
       } catch (err) {
+        if (timeoutId) clearTimeout(timeoutId)
         lastErr = err
-        if (i < retries) {
+        if (i < retries && !err.message?.includes('HTTP')) {
           await new Promise(r => setTimeout(r, backoff * (i + 1)))
         }
       }
