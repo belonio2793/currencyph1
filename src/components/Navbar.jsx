@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
 import CurrencySelectionModal from './CurrencySelectionModal'
+import { convertFiatToCrypto } from '../lib/cryptoRatesService'
 
 const currencyLabels = {
   'PHP': 'Philippine Peso',
