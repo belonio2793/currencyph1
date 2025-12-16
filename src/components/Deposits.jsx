@@ -648,7 +648,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     return () => clearInterval(interval)
   }, [exchangeRates, globalCurrency])
 
-  const calculateMultiCurrencyConversion = () => {
+  const calculateMultiCurrencyConversion = useCallback(() => {
     const numAmount = parseFloat(amount) || 0
     if (numAmount <= 0) {
       setConvertedAmounts({})
@@ -667,9 +667,9 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     })
 
     setConvertedAmounts(conversions)
-  }
+  }, [amount, selectedCurrency, exchangeRates, allCurrencies])
 
-  const calculateCryptoMultiConversion = () => {
+  const calculateCryptoMultiConversion = useCallback(() => {
     const numAmount = parseFloat(cryptoAmount) || 0
     if (numAmount <= 0) {
       setCryptoConvertedAmounts({})
@@ -689,7 +689,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     })
 
     setCryptoConvertedAmounts(conversions)
-  }
+  }, [cryptoAmount, selectedCrypto, cryptoRates, globalCurrency, allCurrencies])
 
   const handleAddAmount = async (e) => {
     e.preventDefault()
