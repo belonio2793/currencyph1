@@ -19,14 +19,15 @@ export default function RideUserProfileModal({ userId, userRole = 'driver', onCl
       setError(null)
 
       // Load user profile
-      const { data: profileData, error: profileError } = await supabase
+      const { data: profileDataArr, error: profileError } = await supabase
         .from('ride_profiles')
         .select('*')
         .eq('user_id', userId)
-        .single()
+        .limit(1)
 
-      if (profileError && profileError.code !== 'PGRST116') throw profileError
+      if (profileError) throw profileError
 
+      const profileData = profileDataArr && profileDataArr.length > 0 ? profileDataArr[0] : null
       setProfile(profileData || {})
 
       // Load ratings for this user
