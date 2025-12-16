@@ -26,7 +26,8 @@ const DEFAULT_ORDER = [
   'p2p',
   'poker',
   'networkBalances',
-  'myBusiness'
+  'myBusiness',
+  'myProfile'
 ]
 
 const DEFAULT_VISIBILITY = {
