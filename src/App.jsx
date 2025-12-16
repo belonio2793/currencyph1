@@ -583,7 +583,7 @@ export default function App() {
                 <main className="flex-1">
                   {(activeTab === 'home' || showAuth) && (
                     <>
-                      {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
+                      {!showAuth && <HomePage userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} globalCryptocurrency={globalCryptocurrency} setGlobalCryptocurrency={setGlobalCryptocurrency} onTabChange={setActiveTab} onShowAuth={(tab) => { setAuthInitialTab(tab || 'login'); setShowAuth(true) }} />}
                     </>
                   )}
                   {showAuth ? (
