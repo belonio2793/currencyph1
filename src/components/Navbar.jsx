@@ -3,6 +3,34 @@ import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
 import CurrencySelectionModal from './CurrencySelectionModal'
 
+const currencyLabels = {
+  'PHP': 'Philippine Peso',
+  'USD': 'US Dollar',
+  'CAD': 'Canadian Dollar',
+  'EUR': 'Euro',
+  'GBP': 'British Pound',
+  'JPY': 'Japanese Yen',
+  'CNY': 'Chinese Yuan',
+  'INR': 'Indian Rupee',
+  'AUD': 'Australian Dollar',
+  'CHF': 'Swiss Franc',
+  'SEK': 'Swedish Krona',
+  'NZD': 'New Zealand Dollar',
+  'SGD': 'Singapore Dollar',
+  'HKD': 'Hong Kong Dollar',
+  'IDR': 'Indonesian Rupiah',
+  'MYR': 'Malaysian Ringgit',
+  'THB': 'Thai Baht',
+  'VND': 'Vietnamese Dong',
+  'KRW': 'South Korean Won',
+  'ZAR': 'South African Rand',
+  'BRL': 'Brazilian Real',
+  'MXN': 'Mexican Peso',
+  'NOK': 'Norwegian Krone',
+  'DKK': 'Danish Krone',
+  'AED': 'UAE Dirham'
+}
+
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
   const [showCurrencyModal, setShowCurrencyModal] = useState(false)
