@@ -759,11 +759,11 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
-  const getTotalBalance = () => {
+  const getTotalBalance = useMemo(() => {
     return wallets.reduce((sum, w) => sum + (w.balance || 0), 0).toFixed(2)
-  }
+  }, [wallets])
 
-  const getRate = (from, to) => {
+  const getRate = useCallback((from, to) => {
     if (from === to) return '1.0000'
     const key = `${from}_${to}`
     const direct = exchangeRates[key]
@@ -779,11 +779,11 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     if (typeof reverse === 'number' && reverse > 0) return (1 / reverse).toFixed(4)
 
     return '—'
-  }
+  }, [exchangeRates])
 
-  const getCryptoPrice = (crypto) => {
+  const getCryptoPrice = useCallback((crypto) => {
     return (cryptoRates[crypto] || defaultCryptoPrices[crypto] || 0).toFixed(2)
-  }
+  }, [cryptoRates])
 
   if (loading) {
     return (
