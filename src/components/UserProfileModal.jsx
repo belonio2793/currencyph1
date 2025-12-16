@@ -23,14 +23,17 @@ export default function UserProfileModal({ userId, onClose }) {
           // Try to get additional profile data from profiles table
           let profileData = null
           try {
-            const { data } = await supabase
+            const { data, error } = await supabase
               .from('profiles')
               .select('full_name, phone_number')
               .eq('user_id', userId)
-              .maybeSingle()
-            profileData = data
+              .limit(1)
+
+            if (!error && data && data.length > 0) {
+              profileData = data[0]
+            }
           } catch (e) {
-            console.debug('profile fetch error', e)
+            console.debug('profile fetch error', e?.message || String(e))
           }
 
           user = {
