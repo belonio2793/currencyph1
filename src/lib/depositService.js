@@ -143,7 +143,8 @@ export class DepositService {
    */
   getAvailableMethods(userCountry = 'US', userCurrency = 'USD') {
     const methods = []
-    
+    const otherMethods = []
+
     // Find matching region
     let region = PAYMENT_REGIONS.GLOBAL
     for (const [regionName, regionData] of Object.entries(PAYMENT_REGIONS)) {
@@ -161,8 +162,28 @@ export class DepositService {
       methods.push(this.getMethodDetails(methodId, userCurrency))
     })
 
+    // Add "Other Payment Methods" (modern fintech)
+    const otherPaymentMethods = [
+      DEPOSIT_METHODS.DLOCAL,
+      DEPOSIT_METHODS.CIRCLE,
+      DEPOSIT_METHODS.FLUTTERWAVE,
+      DEPOSIT_METHODS.CHECKOUT,
+      DEPOSIT_METHODS.MOONPAY,
+      DEPOSIT_METHODS.RAMP,
+      DEPOSIT_METHODS.BINANCE_PAY,
+      DEPOSIT_METHODS.CRYPTO_COM_PAY
+    ]
+
+    otherPaymentMethods.forEach(methodId => {
+      const methodDetail = this.getMethodDetails(methodId, userCurrency)
+      if (methodDetail) {
+        otherMethods.push(methodDetail)
+      }
+    })
+
     return {
       methods,
+      otherMethods,
       supportedCurrencies,
       region: Object.keys(PAYMENT_REGIONS).find(k => PAYMENT_REGIONS[k] === region)
     }
