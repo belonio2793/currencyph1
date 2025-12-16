@@ -74,16 +74,22 @@ export const onboardingService = {
         .from('profiles')
         .select('full_name')
         .eq('user_id', userId)
-        .single()
+        .limit(1)
 
       if (error) {
         // Handle missing table gracefully
-        if (error.code === 'PGRST116' || error.message?.includes('Could not find the table')) {
+        if (error.message?.includes('Could not find the table')) {
           return false
         }
         throw error
       }
-      return !!(data?.full_name && data.full_name.trim().length > 0)
+
+      if (!data || data.length === 0) {
+        return false
+      }
+
+      const profileData = data[0]
+      return !!(profileData?.full_name && profileData.full_name.trim().length > 0)
     } catch (err) {
       console.error('Error checking profile completion:', err?.message || String(err))
       return false
