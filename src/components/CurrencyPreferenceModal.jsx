@@ -2,48 +2,47 @@ import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
 const CURRENCIES = [
-  { code: 'PHP', name: 'Philippine Peso', symbol: '₱' },
-  { code: 'USD', name: 'US Dollar', symbol: '$' },
-  { code: 'EUR', name: 'Euro', symbol: '€' },
-  { code: 'GBP', name: 'British Pound', symbol: '£' },
-  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
-  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
-  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
-  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
-  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
-  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$' },
-  { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM' },
-  { code: 'THB', name: 'Thai Baht', symbol: '฿' },
-  { code: 'VND', name: 'Vietnamese Dong', symbol: '₫' },
-  { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp' },
+  // Fiat currencies
+  { code: 'PHP', name: 'Philippine Peso', symbol: '₱', type: 'fiat' },
+  { code: 'USD', name: 'US Dollar', symbol: '$', type: 'fiat' },
+  { code: 'EUR', name: 'Euro', symbol: '€', type: 'fiat' },
+  { code: 'GBP', name: 'British Pound', symbol: '£', type: 'fiat' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥', type: 'fiat' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', type: 'fiat' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹', type: 'fiat' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', type: 'fiat' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', type: 'fiat' },
+  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', type: 'fiat' },
+  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$', type: 'fiat' },
+  { code: 'MYR', name: 'Malaysian Ringgit', symbol: 'RM', type: 'fiat' },
+  { code: 'THB', name: 'Thai Baht', symbol: '฿', type: 'fiat' },
+  { code: 'VND', name: 'Vietnamese Dong', symbol: '₫', type: 'fiat' },
+  { code: 'IDR', name: 'Indonesian Rupiah', symbol: 'Rp', type: 'fiat' },
+  // Cryptocurrencies
+  { code: 'BTC', name: 'Bitcoin', symbol: '₿', type: 'crypto' },
+  { code: 'ETH', name: 'Ethereum', symbol: 'Ξ', type: 'crypto' },
+  { code: 'USDT', name: 'Tether', symbol: '₮', type: 'crypto' },
+  { code: 'USDC', name: 'USD Coin', symbol: 'ⓤ', type: 'crypto' },
+  { code: 'BNB', name: 'Binance Coin', symbol: 'Ⓑ', type: 'crypto' },
 ]
 
-export default function CurrencyPreferenceModal({ onClose, onCurrencySelected }) {
-  const [selectedCurrency, setSelectedCurrency] = useState('PHP')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
+export default function CurrencyPreferenceModal({ onClose, setGlobalCurrency, globalCurrency = 'PHP' }) {
+  const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
   const [userId, setUserId] = useState(null)
 
   useEffect(() => {
     const getCurrentUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
-        if (error) {
-          // Handle AuthSessionMissingError gracefully - user is not logged in
-          if (error?.message?.includes('Auth session missing')) {
-            return
-          }
-          throw error
+        if (error?.message?.includes('Auth session missing')) {
+          return
         }
         if (user) {
           setUserId(user.id)
-          // Try to load existing preference
           loadUserPreference(user.id)
         }
       } catch (err) {
-        console.error('Error getting current user:', err)
+        // Silently fail for non-authenticated users
       }
     }
     getCurrentUser()
@@ -61,47 +60,30 @@ export default function CurrencyPreferenceModal({ onClose, onCurrencySelected })
         setSelectedCurrency(data.display_currency)
       }
     } catch (err) {
-      console.debug('Could not load user preference:', err?.message)
+      // Silently fail
     }
   }
 
-  const handleSaveCurrency = async (e) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    try {
-      if (!userId) {
-        throw new Error('User not authenticated')
-      }
-
-      // Save preference to database
-      const { error: upsertError } = await supabase
+  const handleCurrencySelect = (currencyCode) => {
+    setSelectedCurrency(currencyCode)
+    // Update global currency immediately
+    if (setGlobalCurrency) {
+      setGlobalCurrency(currencyCode)
+    }
+    // Save to localStorage for guests
+    localStorage.setItem('preferred_currency', currencyCode)
+    // Save to database if authenticated
+    if (userId) {
+      supabase
         .from('user_preferences')
         .upsert({
           user_id: userId,
-          display_currency: selectedCurrency,
+          display_currency: currencyCode,
           updated_at: new Date().toISOString()
         }, {
           onConflict: 'user_id'
         })
-
-      if (upsertError) throw upsertError
-
-      setSuccess(true)
-      
-      // Call callback if provided
-      if (onCurrencySelected) {
-        onCurrencySelected(selectedCurrency)
-      }
-
-      setTimeout(() => {
-        onClose()
-      }, 1500)
-    } catch (err) {
-      setError(err.message || 'Failed to save currency preference')
-    } finally {
-      setLoading(false)
+        .catch(err => console.debug('Could not save preference:', err?.message))
     }
   }
 
