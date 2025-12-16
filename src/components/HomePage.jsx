@@ -99,9 +99,42 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     }
   }, [globalCurrency])
 
-  const convertTotals = async (w = wallets, l = loans) => {
+  const convertTotals = useCallback(async (w = wallets, l = loans) => {
     try {
-      // Total balance: sum wallet balances converted to globalCurrency
+      // Collect unique currencies that need conversion
+      const uniqueCurrencies = new Set()
+
+      for (const wallet of (w || [])) {
+        const fromCurrency = wallet.currency_code || globalCurrency
+        if (fromCurrency !== globalCurrency) {
+          uniqueCurrencies.add(fromCurrency)
+        }
+      }
+
+      for (const loan of (l || [])) {
+        const loanCurrency = loan.currency || loan.currency_code || globalCurrency
+        if (loanCurrency !== globalCurrency) {
+          uniqueCurrencies.add(loanCurrency)
+        }
+      }
+
+      // Fetch all rates in parallel
+      const rates = {}
+      if (uniqueCurrencies.size > 0) {
+        const ratePromises = Array.from(uniqueCurrencies).map(fromCurrency =>
+          apiCache.getExchangeRate(currencyAPI, fromCurrency, globalCurrency)
+            .then(rate => {
+              rates[fromCurrency] = rate
+            })
+            .catch(err => {
+              console.warn(`Failed to fetch rate for ${fromCurrency}:`, err)
+              rates[fromCurrency] = null
+            })
+        )
+        await Promise.all(ratePromises)
+      }
+
+      // Calculate balance sum
       let balanceSum = 0
       for (const wallet of (w || [])) {
         const amt = Number(wallet.balance || 0)
@@ -110,13 +143,13 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         if (fromCurrency === globalCurrency) {
           balanceSum += amt
         } else {
-          const rate = await currencyAPI.getExchangeRate(fromCurrency, globalCurrency)
+          const rate = rates[fromCurrency]
           balanceSum += rate ? amt * Number(rate) : 0
         }
       }
       setTotalBalanceConverted(Number(balanceSum).toFixed(2))
 
-      // Total debt: sum loan remaining_balance/total_owed converted to globalCurrency
+      // Calculate debt sum
       let debtSum = 0
       for (const loan of (l || [])) {
         const amt = Number(loan.remaining_balance || loan.total_owed || 0)
@@ -125,7 +158,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         if (loanCurrency === globalCurrency) {
           debtSum += amt
         } else {
-          const rate = await currencyAPI.getExchangeRate(loanCurrency, globalCurrency)
+          const rate = rates[loanCurrency]
           debtSum += rate ? amt * Number(rate) : 0
         }
       }
@@ -135,7 +168,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       setTotalBalanceConverted(null)
       setTotalDebtConverted(null)
     }
-  }
+  }, [globalCurrency, wallets, loans])
 
   const loadData = async () => {
     try {
