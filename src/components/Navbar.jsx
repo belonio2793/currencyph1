@@ -173,3 +173,5 @@ function NavbarComponent({ activeTab, onTabChange, globalCurrency, setGlobalCurr
     </nav>
   )
 }
+
+export default React.memo(NavbarComponent)
