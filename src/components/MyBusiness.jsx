@@ -154,6 +154,7 @@ export default function MyBusiness({ userId }) {
   const [selectedBusiness, setSelectedBusiness] = useState(null)
   const [showRegistrationForm, setShowRegistrationForm] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [citySearch, setCitySearch] = useState('')
   const [showCityDropdown, setShowCityDropdown] = useState(false)
   const [businessNameAvailability, setBusinessNameAvailability] = useState(null)
