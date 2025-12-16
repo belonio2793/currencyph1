@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
+import CurrencySelectionModal from './CurrencySelectionModal'
 
 export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlobalCurrency, globalCryptocurrency, setGlobalCryptocurrency, userEmail, userId, totalBalancePHP, totalBalanceConverted, totalDebtConverted, totalNet, onShowAuth, onSignOut }) {
   const { isMobile, isTablet } = useDevice()
+  const [showCurrencyModal, setShowCurrencyModal] = useState(false)
 
 
   return (
