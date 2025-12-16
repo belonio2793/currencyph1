@@ -294,7 +294,7 @@ export default function ProfileEditModal({ userId: propUserId, onClose }) {
         privacyData?.forEach(setting => { privacyMap[setting.field_name] = setting.visibility })
         setPrivacySettings(privacyMap)
       } catch (profileErr) {
-        console.error('Error loading user profile:', profileErr)
+        console.error('Error loading user profile:', profileErr?.message || String(profileErr))
         setUser({ id: userId, email: 'user@example.com', status: 'active' })
         setFormData({ full_name: '', email: 'user@example.com', phone_number: '', phone_country_code: 'PH', username: '', country_code: 'PH', relationship_status: '', biography: '', profile_picture_url: '', display_name_type: 'full_name', display_as_username_everywhere: false })
       }
