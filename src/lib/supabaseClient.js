@@ -27,10 +27,14 @@ if (typeof window !== 'undefined') {
     // Suppress unhandled promise rejections from Supabase fetch failures
     // These occur when the network is unavailable or Fly.io container can't reach Supabase
     const reason = event.reason
-    if (reason && (
-      (reason.message && reason.message.includes('Failed to fetch')) ||
-      String(reason).includes('Failed to fetch')
-    )) {
+    const reasonStr = String(reason)
+    const reasonMsg = reason?.message ? String(reason.message) : ''
+
+    if (
+      reasonStr.includes('Failed to fetch') ||
+      reasonMsg.includes('Failed to fetch') ||
+      reasonStr.includes('TypeError') && reasonStr.includes('fetch')
+    ) {
       // Silently suppress - presence and background sync are non-critical features
       event.preventDefault()
       return true
@@ -39,7 +43,8 @@ if (typeof window !== 'undefined') {
 
   window.addEventListener('error', (event) => {
     // Suppress "Failed to fetch" errors from within Supabase library
-    if (event.message && event.message.includes('Failed to fetch')) {
+    const msgStr = String(event.message || '')
+    if (msgStr.includes('Failed to fetch') || msgStr.includes('TypeError')) {
       event.preventDefault()
       return true
     }
