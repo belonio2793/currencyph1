@@ -286,7 +286,11 @@ export const onboardingService = {
       const tasks = this.getDefaultTasks(userState)
       return tasks
     } catch (err) {
-      console.error('Error getting onboarding tasks:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error getting onboarding tasks:', errMsg)
+      }
       return this.getDefaultTasks({})
     }
   },
