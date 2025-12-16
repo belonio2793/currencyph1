@@ -512,13 +512,27 @@ export default function MyBusiness({ userId }) {
   const loadBusinesses = async () => {
     try {
       setLoading(true)
+      setError(null)
+
+      if (!userId || userId === 'null' || userId === 'undefined') {
+        setError('User ID not available. Please refresh and try again.')
+        setBusinesses([])
+        return
+      }
+
       const { data, error } = await supabase
         .from('businesses')
         .select('*')
         .eq('user_id', userId)
         .order('is_default', { ascending: false })
 
-      if (error) throw error
+      if (error) {
+        const errorMsg = error.message || error.code || 'Unknown error'
+        console.error('Failed to load businesses:', errorMsg, error)
+        setError(`Failed to load businesses: ${errorMsg}`)
+        setBusinesses([])
+        return
+      }
 
       const businessesData = data || []
       setBusinesses(businessesData)
@@ -532,7 +546,9 @@ export default function MyBusiness({ userId }) {
         }
       }
     } catch (err) {
-      console.error('Failed to load businesses:', err)
+      const errorMsg = err?.message || String(err) || 'Unknown error occurred'
+      console.error('Failed to load businesses:', errorMsg, err)
+      setError(`Failed to load businesses: ${errorMsg}`)
     } finally {
       setLoading(false)
     }
