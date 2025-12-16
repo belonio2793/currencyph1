@@ -329,9 +329,11 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', on
       )}
 
       {showVerificationModal && (
-        <UserVerificationModal
+        <EmailVerificationModal
           userId={userId}
+          userEmail={userEmail}
           onClose={() => setShowVerificationModal(false)}
+          onSuccess={() => {}}
         />
       )}
 
