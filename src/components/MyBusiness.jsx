@@ -922,7 +922,7 @@ export default function MyBusiness({ userId }) {
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">Shareholders</h3>
                     <p className="text-sm text-slate-600 mb-4">Manage ownership and shareholders</p>
-                    <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Register to access ����</div>
+                    <div className="text-sm font-medium text-yellow-600 group-hover:text-yellow-700">Register to access →</div>
                   </button>
                 </div>
               </div>
