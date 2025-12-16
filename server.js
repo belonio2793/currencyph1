@@ -261,6 +261,40 @@ app.get('/api/health', (req, res) => {
   })
 })
 
+/**
+ * GET /api/crypto-prices
+ * Fetch cryptocurrency prices from CoinGecko
+ */
+app.get('/api/crypto-prices', async (req, res) => {
+  try {
+    const ids = [
+      'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
+    ].join(',')
+
+    const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {
+      timeout: 10000
+    })
+
+    if (!response.ok) {
+      return res.status(response.status).json({
+        error: `CoinGecko API error: ${response.status}`
+      })
+    }
+
+    const data = await response.json()
+    res.json({
+      success: true,
+      cryptoPrices: data
+    })
+  } catch (error) {
+    console.error('Crypto prices fetch error:', error)
+    res.status(500).json({
+      error: 'Failed to fetch crypto prices',
+      message: error.message
+    })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`API server running on http://localhost:${PORT}`)
   console.log(`DIDIT API Key configured: ${DIDIT_API_KEY ? 'yes' : 'no'}`)
