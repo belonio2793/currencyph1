@@ -227,7 +227,11 @@ export const onboardingService = {
 
       return anyChanges
     } catch (err) {
-      console.error('Error auto-detecting task completion:', err?.message || String(err))
+      const errMsg = err?.message || String(err)
+      // Don't log network errors - they're expected and non-critical
+      if (!errMsg.includes('Failed to fetch')) {
+        console.error('Error auto-detecting task completion:', errMsg)
+      }
       return false
     }
   },
