@@ -98,7 +98,11 @@ export default function ProfileEditModal({ onClose }) {
           setUserId(user.id)
         }
       } catch (err) {
-        console.error('Error getting current user:', err)
+        if (err?.name === 'AuthSessionMissingError' || err?.message?.includes('Auth session missing')) {
+          // User not logged in - this is expected, suppress the error
+        } else {
+          console.error('Error getting current user:', err)
+        }
       }
     }
     getCurrentUser()
