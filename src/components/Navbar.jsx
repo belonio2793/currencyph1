@@ -40,17 +40,16 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {/* Row 2: Currency selector and Navigation */}
         <div className="border-t border-slate-100 py-2 flex flex-wrap items-center gap-2">
           {globalCurrency && setGlobalCurrency && (
-            <button
-              onClick={() => setShowCurrencyModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
-              </svg>
-              <span className="hidden sm:inline">Display Currency</span>
-              <span className="sm:hidden">Currency</span>
-              <span className="text-xs bg-blue-800 rounded px-2 py-0.5">{globalCurrency} & {globalCryptocurrency}</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-slate-700">Display Currency:</label>
+              <button
+                onClick={() => setShowCurrencyModal(true)}
+                className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50 text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                {globalCurrency} - {globalCurrency === 'PHP' ? 'Philippine Peso' : globalCurrency === 'USD' ? 'US Dollar' : globalCurrency === 'CAD' ? 'Canadian Dollar' : globalCurrency === 'EUR' ? 'Euro' : globalCurrency === 'GBP' ? 'British Pound' : globalCurrency === 'JPY' ? 'Japanese Yen' : globalCurrency === 'CNY' ? 'Chinese Yuan' : globalCurrency === 'INR' ? 'Indian Rupee' : globalCurrency === 'AUD' ? 'Australian Dollar' : globalCurrency === 'CHF' ? 'Swiss Franc' : globalCurrency === 'SEK' ? 'Swedish Krona' : globalCurrency === 'NZD' ? 'New Zealand Dollar' : globalCurrency === 'SGD' ? 'Singapore Dollar' : globalCurrency === 'HKD' ? 'Hong Kong Dollar' : globalCurrency === 'IDR' ? 'Indonesian Rupiah' : globalCurrency === 'MYR' ? 'Malaysian Ringgit' : globalCurrency === 'THB' ? 'Thai Baht' : globalCurrency === 'VND' ? 'Vietnamese Dong' : globalCurrency === 'KRW' ? 'South Korean Won' : globalCurrency === 'ZAR' ? 'South African Rand' : globalCurrency === 'BRL' ? 'Brazilian Real' : globalCurrency === 'MXN' ? 'Mexican Peso' : globalCurrency === 'NOK' ? 'Norwegian Krone' : globalCurrency === 'DKK' ? 'Danish Krone' : globalCurrency === 'AED' ? 'UAE Dirham' : globalCurrency}
+                <svg className="inline ml-2 w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+              </button>
+            </div>
           )}
 
           {/* Auth buttons - right aligned */}
