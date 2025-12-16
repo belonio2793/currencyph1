@@ -637,7 +637,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     }
 
     const conversions = {}
-    const allCurrencyList = currencyAPI.getCurrencies()
+    const allCurrencyList = allCurrencies
 
     allCurrencyList.forEach(curr => {
       if (curr.code !== selectedCurrency) {
@@ -658,7 +658,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
     }
 
     const conversions = {}
-    const allCurrencyList = currencyAPI.getCurrencies()
+    const allCurrencyList = allCurrencies
     const cryptoPrice = cryptoRates[selectedCrypto] || defaultCryptoPrices[selectedCrypto] || 0
 
     const valueInGlobalCurrency = numAmount * cryptoPrice
