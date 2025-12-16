@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { useSupabaseContext } from '../context/SupabaseContext'
 import DepositService, { DEPOSIT_METHODS, CURRENCY_CODES } from '../lib/depositService'
 import './UniversalDeposit.css'
@@ -6,6 +6,8 @@ import './UniversalDeposit.css'
 export default function UniversalDeposit({ onSuccess, onClose }) {
   // State management
   const { supabase } = useSupabaseContext()
+  const initializingRef = useRef(false)
+  
   const [step, setStep] = useState('method') // method, amount, confirm, processing
   const [selectedMethod, setSelectedMethod] = useState(null)
   const [amount, setAmount] = useState('')
@@ -14,7 +16,7 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
   const [availableMethods, setAvailableMethods] = useState([])
   const [otherMethods, setOtherMethods] = useState([])
   const [depositService, setDepositService] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
   const [depositResult, setDepositResult] = useState(null)
@@ -25,8 +27,11 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
   const [otherMethodsSearch, setOtherMethodsSearch] = useState('')
   const [filteredOtherMethods, setFilteredOtherMethods] = useState([])
 
-  // Initialize service
+  // Initialize service once
   useEffect(() => {
+    if (initializingRef.current) return
+    initializingRef.current = true
+
     const initializeService = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser()
@@ -35,19 +40,25 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
         const service = new DepositService(supabase)
         await service.initialize(user.id)
         setDepositService(service)
-
-        // Load available methods
-        const methodsData = service.getAvailableMethods(userCountry, currency)
-        setAvailableMethods(methodsData.methods)
-        setOtherMethods(methodsData.otherMethods)
-        setFilteredOtherMethods(methodsData.otherMethods)
+        setLoading(false)
       } catch (err) {
         setError(err.message)
+        setLoading(false)
       }
     }
 
     initializeService()
-  }, [supabase, userCountry, currency])
+  }, [supabase])
+
+  // Update available methods when country or currency changes
+  useEffect(() => {
+    if (!depositService) return
+    
+    const methodsData = depositService.getAvailableMethods(userCountry, currency)
+    setAvailableMethods(methodsData.methods)
+    setOtherMethods(methodsData.otherMethods)
+    setFilteredOtherMethods(methodsData.otherMethods)
+  }, [depositService, userCountry, currency])
 
   // Get method details
   const getMethodDetails = (methodId) => {
@@ -167,6 +178,16 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
       setLoading(false)
     }
   }
+
+  // Render loading state
+  const renderLoading = () => (
+    <div className="deposit-step">
+      <div className="loading-spinner">
+        <div className="spinner"></div>
+        <p>Loading payment methods...</p>
+      </div>
+    </div>
+  )
 
   // Render method selection step
   const renderMethodSelection = () => (
@@ -473,7 +494,8 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
           </div>
         )}
 
-        {step === 'method' && renderMethodSelection()}
+        {loading && step === 'method' ? renderLoading() : null}
+        {!loading && step === 'method' && renderMethodSelection()}
         {step === 'amount' && renderAmountInput()}
         {step === 'confirm' && renderConfirmation()}
         {step === 'processing' && renderProcessing()}
