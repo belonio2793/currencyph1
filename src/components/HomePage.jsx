@@ -204,12 +204,23 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
     return loans.reduce((sum, l) => sum + (l.remaining_balance || l.total_owed || 0), 0).toFixed(2)
   }
 
-  const personalLoans = loans.filter(l => l.loan_type === 'personal')
-  const businessLoans = loans.filter(l => l.loan_type === 'business')
+  const personalLoans = useMemo(() =>
+    loans.filter(l => l.loan_type === 'personal'),
+    [loans]
+  )
+  const businessLoans = useMemo(() =>
+    loans.filter(l => l.loan_type === 'business'),
+    [loans]
+  )
 
-  const net = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
-  const isNegativeNet = net < 0
-  const netDisplay = Number.isFinite(net) ? net.toFixed(2) : '0.00'
+  const { net, isNegativeNet, netDisplay } = useMemo(() => {
+    const netValue = Number(totalBalanceConverted || 0) - Number(totalDebtConverted || 0)
+    return {
+      net: netValue,
+      isNegativeNet: netValue < 0,
+      netDisplay: Number.isFinite(netValue) ? netValue.toFixed(2) : '0.00'
+    }
+  }, [totalBalanceConverted, totalDebtConverted])
 
   const handleCardClick = (cardKey) => {
     const modalMap = {
