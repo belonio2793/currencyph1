@@ -43,8 +43,9 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
       setSelectedMerchant(newMerchant)
       return newMerchant
     } catch (err) {
-      console.error('Error creating merchant:', err)
-      throw err
+      const errorMessage = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error'
+      console.error('Error creating merchant:', { error: err, message: errorMessage })
+      throw new Error(errorMessage)
     }
   }
 
