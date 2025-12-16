@@ -472,6 +472,47 @@ async function processWiseDeposit(
   }
 }
 
+// Process modern fintech method (stub - coming soon)
+async function processModernFintechDeposit(
+  request: DepositRequest,
+  providerName: string
+): Promise<DepositResponse> {
+  try {
+    const paymentReference = generateDepositReference(providerName.toUpperCase())
+
+    // Store deposit with "coming_soon" status
+    const { data: deposit, error: depositError } = await supabase
+      .from('deposits')
+      .insert([{
+        user_id: request.userId,
+        wallet_id: request.walletId,
+        amount: request.amount,
+        currency_code: request.currency,
+        deposit_method: request.depositMethod,
+        status: 'pending',
+        payment_reference: paymentReference,
+        description: `${providerName} deposit (Coming Soon) - ${request.amount} ${request.currency}`
+      }])
+      .select()
+      .single()
+
+    if (depositError) throw depositError
+
+    return {
+      success: true,
+      depositId: deposit.id,
+      paymentReference,
+      message: `${providerName} integration is coming soon! We'll notify you when it's ready. Your deposit request has been saved.`
+    }
+  } catch (error) {
+    console.error(`${providerName} deposit error:`, error)
+    return {
+      success: false,
+      message: `${providerName} deposit setup failed: ${error.message}`
+    }
+  }
+}
+
 // Route to appropriate processor based on method
 async function processDeposit(request: DepositRequest): Promise<DepositResponse> {
   switch (request.depositMethod) {
@@ -488,11 +529,30 @@ async function processDeposit(request: DepositRequest): Promise<DepositResponse>
     case 'wise':
       return await processWiseDeposit(request)
     case 'instapay':
-      return await processBankTransferDeposit(request) // Use bank transfer for now
+      return await processBankTransferDeposit(request)
     case 'remitly':
-      return await processBankTransferDeposit(request) // Use bank transfer for now
+      return await processBankTransferDeposit(request)
     case 'coins_ph':
-      return await processBankTransferDeposit(request) // Use bank transfer for now
+      return await processBankTransferDeposit(request)
+
+    // Modern Fintech Methods (Coming Soon)
+    case 'dlocal':
+      return await processModernFintechDeposit(request, 'dLocal')
+    case 'circle':
+      return await processModernFintechDeposit(request, 'Circle')
+    case 'flutterwave':
+      return await processModernFintechDeposit(request, 'Flutterwave')
+    case 'checkout':
+      return await processModernFintechDeposit(request, 'Checkout.com')
+    case 'moonpay':
+      return await processModernFintechDeposit(request, 'MoonPay')
+    case 'ramp':
+      return await processModernFintechDeposit(request, 'Ramp')
+    case 'binance_pay':
+      return await processModernFintechDeposit(request, 'Binance Pay')
+    case 'crypto_com_pay':
+      return await processModernFintechDeposit(request, 'Crypto.com Pay')
+
     default:
       return {
         success: false,
