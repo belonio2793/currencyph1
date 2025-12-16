@@ -104,8 +104,13 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
                     </>
                   ) : (
                     <span className="font-medium text-slate-900 text-xs">
-                      {/* Crypto balance - would need rate data */}
-                      {globalCryptocurrency} <span className="text-slate-400">(rate data needed)</span>
+                      {loadingCrypto ? (
+                        <span className="text-slate-400">Loading...</span>
+                      ) : cryptoBalance !== null ? (
+                        <>{cryptoBalance.toFixed(8)} {globalCryptocurrency}</>
+                      ) : (
+                        <span className="text-slate-400">Unable to load rate</span>
+                      )}
                     </span>
                   )}
                 </div>
