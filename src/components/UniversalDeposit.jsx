@@ -56,9 +56,35 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
 
   // Handle method selection
   const handleSelectMethod = async (methodId) => {
+    const methodDetail = getMethodDetails(methodId)
+
+    if (methodDetail?.comingSoon) {
+      setError(`${methodDetail.name} is coming soon! We'll notify you when it's available.`)
+      return
+    }
+
     setSelectedMethod(methodId)
     setError(null)
+    setShowOtherMethodsDropdown(false)
     setStep('amount')
+  }
+
+  // Handle search in other methods
+  const handleOtherMethodsSearch = (query) => {
+    setOtherMethodsSearch(query)
+
+    if (!query.trim()) {
+      setFilteredOtherMethods(otherMethods)
+      return
+    }
+
+    const filtered = otherMethods.filter(method =>
+      method.name.toLowerCase().includes(query.toLowerCase()) ||
+      method.description.toLowerCase().includes(query.toLowerCase()) ||
+      (method.regions && method.regions.some(r => r.toLowerCase().includes(query.toLowerCase())))
+    )
+
+    setFilteredOtherMethods(filtered)
   }
 
   // Handle amount submission
