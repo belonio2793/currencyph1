@@ -33,6 +33,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   const [showNetworkBalancesModal, setShowNetworkBalancesModal] = useState(false)
   const [showReceiptsModal, setShowReceiptsModal] = useState(false)
   const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
+  const [showPaymentsModal, setShowPaymentsModal] = useState(false)
   const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrderSync(userId))
   const [reorderKey, setReorderKey] = useState(0)
   const [showCustomizeModal, setShowCustomizeModal] = useState(false)
