@@ -40,69 +40,17 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {/* Row 2: Currency selector and Navigation */}
         <div className="border-t border-slate-100 py-2 flex flex-wrap items-center gap-2">
           {globalCurrency && setGlobalCurrency && (
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-slate-700">Display Currency:</label>
-                <select
-                  value={globalCurrency}
-                  onChange={(e) => setGlobalCurrency(e.target.value)}
-                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50"
-                >
-                  <option value="PHP">PHP - Philippine Peso</option>
-                  <option value="USD">USD - US Dollar</option>
-                  <option value="CAD">CAD - Canadian Dollar</option>
-                  <option value="EUR">EUR - Euro</option>
-                  <option value="GBP">GBP - British Pound</option>
-                  <option value="JPY">JPY - Japanese Yen</option>
-                  <option value="CNY">CNY - Chinese Yuan</option>
-                  <option value="INR">INR - Indian Rupee</option>
-                  <option value="AUD">AUD - Australian Dollar</option>
-                  <option value="CHF">CHF - Swiss Franc</option>
-                  <option value="SEK">SEK - Swedish Krona</option>
-                  <option value="NZD">NZD - New Zealand Dollar</option>
-                  <option value="SGD">SGD - Singapore Dollar</option>
-                  <option value="HKD">Hong Kong Dollar</option>
-                  <option value="IDR">Indonesian Rupiah</option>
-                  <option value="MYR">Malaysian Ringgit</option>
-                  <option value="THB">Thai Baht</option>
-                  <option value="VND">Vietnamese Dong</option>
-                  <option value="KRW">South Korean Won</option>
-                  <option value="ZAR">South African Rand</option>
-                  <option value="BRL">Brazilian Real</option>
-                  <option value="MXN">Mexican Peso</option>
-                  <option value="NOK">Norwegian Krone</option>
-                  <option value="DKK">Danish Krone</option>
-                  <option value="AED">UAE Dirham</option>
-                </select>
-              </div>
-
-              {globalCryptocurrency && setGlobalCryptocurrency && (
-                <div className="flex items-center gap-2">
-                  <label className="text-sm font-medium text-slate-700">Display Cryptocurrency:</label>
-                  <select
-                    value={globalCryptocurrency}
-                    onChange={(e) => setGlobalCryptocurrency(e.target.value)}
-                    className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50"
-                  >
-                    <option value="BTC">BTC - Bitcoin</option>
-                    <option value="ETH">ETH - Ethereum</option>
-                    <option value="USDT">USDT - Tether</option>
-                    <option value="BNB">BNB - Binance Coin</option>
-                    <option value="SOL">SOL - Solana</option>
-                    <option value="XRP">XRP - Ripple</option>
-                    <option value="ADA">ADA - Cardano</option>
-                    <option value="DOGE">DOGE - Dogecoin</option>
-                    <option value="DOT">DOT - Polkadot</option>
-                    <option value="BCH">BCH - Bitcoin Cash</option>
-                    <option value="LTC">LTC - Litecoin</option>
-                    <option value="USDC">USDC - USD Coin</option>
-                    <option value="LINK">LINK - Chainlink</option>
-                    <option value="MATIC">MATIC - Polygon</option>
-                    <option value="UNI">UNI - Uniswap</option>
-                  </select>
-                </div>
-              )}
-            </div>
+            <button
+              onClick={() => setShowCurrencyModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 4a2 2 0 00-2 2v4a2 2 0 002 2V6h10a2 2 0 00-2-2H4zm2 6a2 2 0 012-2h8a2 2 0 012 2v4a2 2 0 01-2 2H8a2 2 0 01-2-2v-4zm6 4a2 2 0 100-4 2 2 0 000 4z" />
+              </svg>
+              <span className="hidden sm:inline">Display Currency</span>
+              <span className="sm:hidden">Currency</span>
+              <span className="text-xs bg-blue-800 rounded px-2 py-0.5">{globalCurrency} & {globalCryptocurrency}</span>
+            </button>
           )}
 
           {/* Auth buttons - right aligned */}
