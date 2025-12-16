@@ -66,27 +66,21 @@ export const onboardingService = {
     try {
       if (!this.isValidUUID(userId)) return false
 
-      const { data: authUser } = await supabase.auth.admin.getUserById(userId)
-      const fullName = authUser?.user?.user_metadata?.full_name
-      return !!(fullName && fullName.trim().length > 0)
-    } catch (err) {
-      // Fallback: check if user has profile data in profiles table
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('full_name')
-          .eq('id', userId)
-          .single()
+      // Check profiles table for full_name
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('full_name')
+        .eq('id', userId)
+        .single()
 
-        if (error) {
-          if (error.code === 'PGRST116') return false
-          throw error
-        }
-        return !!(data?.full_name && data.full_name.trim().length > 0)
-      } catch (e) {
-        console.error('Error checking profile completion:', e?.message || String(e))
-        return false
+      if (error) {
+        if (error.code === 'PGRST116') return false
+        throw error
       }
+      return !!(data?.full_name && data.full_name.trim().length > 0)
+    } catch (err) {
+      console.error('Error checking profile completion:', err?.message || String(err))
+      return false
     }
   },
 
@@ -95,9 +89,26 @@ export const onboardingService = {
     try {
       if (!this.isValidUUID(userId)) return false
 
-      const { data, error } = await supabase.auth.admin.getUserById(userId)
-      if (error) throw error
-      return !!(data?.user?.email_confirmed_at)
+      // Check user_email_verified table or auth metadata
+      const { data, error } = await supabase
+        .from('user_email_verified')
+        .select('verified')
+        .eq('user_id', userId)
+        .single()
+
+      if (error) {
+        // If table doesn't exist or no record, check if current user has verified email
+        if (error.code === 'PGRST116') {
+          // Try getting current user from session
+          const { data: session } = await supabase.auth.getSession()
+          if (session?.user?.user_metadata?.email_verified) {
+            return true
+          }
+          return false
+        }
+        throw error
+      }
+      return !!(data?.verified)
     } catch (err) {
       console.error('Error checking email verification:', err?.message || String(err))
       return false
