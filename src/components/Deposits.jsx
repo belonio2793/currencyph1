@@ -690,7 +690,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
 
       const convertedAmt = convertedAmounts[globalCurrency] || (numAmount * (exchangeRates[`${selectedCurrency}_${globalCurrency}`] || 1)).toFixed(2)
 
-      await currencyAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
+      await paymentsAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
       setSuccess(`Successfully added ${amount} ${selectedCurrency}`)
       setAmount('')
       setConvertedAmounts({})
@@ -724,7 +724,7 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
 
       const convertedAmt = cryptoConvertedAmounts[globalCurrency] || (numAmount * (cryptoRates[selectedCrypto] || 0)).toFixed(2)
 
-      await currencyAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
+      await paymentsAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
       setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto}`)
       setCryptoAmount('')
       setCryptoConvertedAmounts({})
