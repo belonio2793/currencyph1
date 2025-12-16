@@ -3,7 +3,6 @@ import { useDevice } from '../context/DeviceContext'
 
 export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut }) {
   const { isMobile } = useDevice()
-  const [isOpen, setIsOpen] = useState(!isMobile)
   const [isCollapsed, setIsCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('sidebar_collapsed')
@@ -76,198 +75,156 @@ export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth,
 
   const handleNavClick = (tabId) => {
     onTabChange(tabId)
-    if (isMobile) setIsOpen(false)
   }
 
+  // Hide completely on mobile
+  if (isMobile) {
+    return null
+  }
+
+  // Only render sidebar on desktop
   return (
-    <>
-      {/* Mobile toggle button - moved to top */}
-      {isMobile && (
-        <button
-          onClick={() => setIsOpen(!isOpen)}
-          className="fixed top-4 left-4 z-50 bg-blue-600 text-white p-2 rounded-lg shadow-lg hover:bg-blue-700 md:hidden"
-          title={isOpen ? 'Close sidebar' : 'Open sidebar'}
-        >
-          {isOpen ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
-        </button>
-      )}
-
-      {/* Overlay for mobile */}
-      {isMobile && isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`${
-          isMobile
-            ? `fixed inset-y-0 left-0 z-40 w-64 bg-slate-900 text-slate-100 transform transition-transform duration-300 ${
-                isOpen ? 'translate-x-0' : '-translate-x-full'
-              }`
-            : `hidden md:flex md:flex-col bg-slate-900 text-slate-100 border-r border-slate-700 transition-all duration-300 ${
-                isCollapsed ? 'w-20' : 'w-64'
-              }`
-        }`}
-      >
-        <div className="h-full flex flex-col overflow-y-auto">
-          {/* Header */}
-          <div className={`p-4 border-b border-slate-700 flex items-center justify-between ${isMobile ? '' : ''}`}>
-            <div className={`flex-1 ${!isMobile && isCollapsed ? 'hidden' : ''}`}>
-              <h1 className="text-xl font-light tracking-wide">currency.ph</h1>
-              {userEmail && (
-                <p className="text-xs text-slate-400 mt-2 truncate">{userEmail}</p>
-              )}
-            </div>
-            {!isMobile && (
-              <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white flex-shrink-0"
-                title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-              >
-                {isCollapsed ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7m0 0l-7 7m7-7H5" />
-                  </svg>
-                ) : (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-                  </svg>
-                )}
-              </button>
+    <aside
+      className={`hidden md:flex md:flex-col bg-slate-900 text-slate-100 border-r border-slate-700 transition-all duration-300 ${
+        isCollapsed ? 'w-20' : 'w-64'
+      }`}
+    >
+      <div className="h-full flex flex-col overflow-y-auto">
+        {/* Header */}
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+          <div className={`flex-1 ${isCollapsed ? 'hidden' : ''}`}>
+            <h1 className="text-xl font-light tracking-wide">currency.ph</h1>
+            {userEmail && (
+              <p className="text-xs text-slate-400 mt-2 truncate">{userEmail}</p>
             )}
           </div>
+          <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 hover:bg-slate-800 rounded-lg transition-colors text-slate-300 hover:text-white flex-shrink-0"
+            title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {isCollapsed ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 5l7 7m0 0l-7 7m7-7H5" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              </svg>
+            )}
+          </button>
+        </div>
 
-          {/* Menu Groups */}
-          <nav className={`flex-1 ${isMobile || !isCollapsed ? 'px-3' : 'px-2'} py-4 space-y-2`}>
-            {menuGroups.map(group => {
-              const visibleItems = group.items.filter(isItemVisible)
-              if (visibleItems.length === 0) return null
+        {/* Menu Groups */}
+        <nav className={`flex-1 ${!isCollapsed ? 'px-3' : 'px-2'} py-4 space-y-2`}>
+          {menuGroups.map(group => {
+            const visibleItems = group.items.filter(isItemVisible)
+            if (visibleItems.length === 0) return null
 
-              const isExpanded = expandedGroups[group.id]
+            const isExpanded = expandedGroups[group.id]
 
-              // On desktop collapsed, don't show group headers
-              if (!isMobile && isCollapsed) {
-                return (
-                  <div key={group.id}>
-                    <div className="space-y-1">
-                      {visibleItems.map(item => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleNavClick(item.id)}
-                          className={`w-full flex items-center justify-center p-2 rounded-lg text-sm transition-colors ${
-                            activeTab === item.id
-                              ? 'bg-blue-600 text-white font-medium'
-                              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                          }`}
-                          title={item.label}
-                        >
-                          <span className="text-base">{item.label.charAt(0).toUpperCase()}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )
-              }
-
+            // On desktop collapsed, don't show group headers
+            if (isCollapsed) {
               return (
                 <div key={group.id}>
-                  <button
-                    onClick={() => toggleGroup(group.id)}
-                    className={`w-full flex items-center justify-between ${!isMobile && isCollapsed ? 'justify-center' : ''} px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors`}
-                    title={!isMobile && isCollapsed ? group.label : ''}
-                  >
-                    <span className={`flex items-center ${!isMobile && isCollapsed ? 'justify-center' : ''} gap-2`}>
-                      <span className="text-base">{group.icon}</span>
-                      {(isMobile || !isCollapsed) && group.label}
-                    </span>
-                    {(isMobile || !isCollapsed) && (
-                      <svg
-                        className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
+                  <div className="space-y-1">
+                    {visibleItems.map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleNavClick(item.id)}
+                        className={`w-full flex items-center justify-center p-2 rounded-lg text-sm transition-colors ${
+                          activeTab === item.id
+                            ? 'bg-blue-600 text-white font-medium'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        }`}
+                        title={item.label}
                       >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Group items */}
-                  {isExpanded && (isMobile || !isCollapsed) && (
-                    <div className={`${!isMobile && isCollapsed ? '' : 'ml-2'} space-y-1 mt-2`}>
-                      {visibleItems.map(item => (
-                        <button
-                          key={item.id}
-                          onClick={() => handleNavClick(item.id)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                            activeTab === item.id
-                              ? 'bg-blue-600 text-white font-medium'
-                              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
+                        <span className="text-base">{item.label.charAt(0).toUpperCase()}</span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               )
-            })}
-          </nav>
+            }
 
-          {/* Footer */}
-          <div className={`border-t border-slate-700 ${isMobile || !isCollapsed ? 'p-3' : 'p-2'} space-y-2`}>
-            {userEmail ? (
-              <>
+            return (
+              <div key={group.id}>
                 <button
-                  onClick={() => {
-                    onSignOut?.()
-                    if (isMobile) setIsOpen(false)
-                  }}
-                  className={`w-full ${isMobile || !isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
-                  title={!isMobile && isCollapsed ? 'Sign out' : ''}
+                  onClick={() => toggleGroup(group.id)}
+                  className={`w-full flex items-center justify-between ${isCollapsed ? 'justify-center' : ''} px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors`}
+                  title={isCollapsed ? group.label : ''}
                 >
-                  {!isMobile && isCollapsed ? '⬅️' : 'Sign out'}
+                  <span className={`flex items-center ${isCollapsed ? 'justify-center' : ''} gap-2`}>
+                    <span className="text-base">{group.icon}</span>
+                    {!isCollapsed && group.label}
+                  </span>
+                  {!isCollapsed && (
+                    <svg
+                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
+                  )}
                 </button>
-              </>
-            ) : (
-              <>
-                <button
-                  onClick={() => {
-                    onShowAuth?.('login')
-                    if (isMobile) setIsOpen(false)
-                  }}
-                  className={`w-full ${isMobile || !isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
-                  title={!isMobile && isCollapsed ? 'Login' : ''}
-                >
-                  {!isMobile && isCollapsed ? '🔐' : 'Login'}
-                </button>
-                <button
-                  onClick={() => {
-                    onShowAuth?.('register')
-                    if (isMobile) setIsOpen(false)
-                  }}
-                  className={`w-full ${isMobile || !isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
-                  title={!isMobile && isCollapsed ? 'Register' : ''}
-                >
-                  {!isMobile && isCollapsed ? '✏️' : 'Register'}
-                </button>
-              </>
-            )}
-          </div>
+
+                {/* Group items */}
+                {isExpanded && !isCollapsed && (
+                  <div className="ml-2 space-y-1 mt-2">
+                    {visibleItems.map(item => (
+                      <button
+                        key={item.id}
+                        onClick={() => handleNavClick(item.id)}
+                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                          activeTab === item.id
+                            ? 'bg-blue-600 text-white font-medium'
+                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className={`border-t border-slate-700 ${!isCollapsed ? 'p-3' : 'p-2'} space-y-2`}>
+          {userEmail ? (
+            <>
+              <button
+                onClick={() => onSignOut?.()}
+                className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
+                title={isCollapsed ? 'Sign out' : ''}
+              >
+                {isCollapsed ? '⬅️' : 'Sign out'}
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                onClick={() => onShowAuth?.('login')}
+                className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
+                title={isCollapsed ? 'Login' : ''}
+              >
+                {isCollapsed ? '🔐' : 'Login'}
+              </button>
+              <button
+                onClick={() => onShowAuth?.('register')}
+                className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
+                title={isCollapsed ? 'Register' : ''}
+              >
+                {isCollapsed ? '✏️' : 'Register'}
+              </button>
+            </>
+          )}
         </div>
-      </aside>
-    </>
+      </div>
+    </aside>
   )
 }
