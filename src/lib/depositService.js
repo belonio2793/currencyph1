@@ -184,7 +184,8 @@ export class DepositService {
         maxAmount: 99999,
         currencies: ['USD', 'EUR', 'GBP', 'CAD', 'AUD'],
         requiredFields: ['cardToken', 'amount'],
-        webhookSupported: true
+        webhookSupported: true,
+        available: true
       },
       [DEPOSIT_METHODS.GCASH]: {
         id: DEPOSIT_METHODS.GCASH,
