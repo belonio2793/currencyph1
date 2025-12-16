@@ -90,6 +90,11 @@ export default function ProfileEditModal({ userId: propUserId, onClose }) {
   }
 
   useEffect(() => {
+    // If userId is provided as prop, don't need to fetch from Supabase
+    if (propUserId) {
+      return
+    }
+
     const getCurrentUser = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser()
@@ -106,7 +111,7 @@ export default function ProfileEditModal({ userId: propUserId, onClose }) {
       }
     }
     getCurrentUser()
-  }, [])
+  }, [propUserId])
 
   useEffect(() => {
     if (!userId) return
