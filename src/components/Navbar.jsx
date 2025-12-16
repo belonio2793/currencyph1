@@ -104,15 +104,30 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
         {/* Row 2: Currency selector and Navigation */}
         <div className="border-t border-slate-100 py-2 flex flex-wrap items-center gap-2">
           {globalCurrency && setGlobalCurrency && (
-            <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-slate-700">Display Currency:</label>
-              <button
-                onClick={() => setShowCurrencyModal(true)}
-                className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50 text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-2"
-              >
-                <span>{globalCurrency} - {currencyLabels[globalCurrency] || globalCurrency}</span>
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
-              </button>
+            <div className="flex items-center gap-4 flex-wrap">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-slate-700">Display Currency:</label>
+                <button
+                  onClick={() => setShowCurrencyModal(true)}
+                  className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50 text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-2"
+                >
+                  <span>{globalCurrency} - {currencyLabels[globalCurrency] || globalCurrency}</span>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                </button>
+              </div>
+
+              {globalCryptocurrency && setGlobalCryptocurrency && (
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium text-slate-700">Display Cryptocurrency:</label>
+                  <button
+                    onClick={() => setShowCurrencyModal(true)}
+                    className="px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-slate-50 text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer flex items-center gap-2"
+                  >
+                    <span>{globalCryptocurrency}</span>
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
