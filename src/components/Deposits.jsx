@@ -220,30 +220,30 @@ const SolanaPaymentDisplay = React.memo(function SolanaPaymentDisplay({ address 
 })
 
 // GCash Payment Display Component
-function GCashPaymentDisplay({ phone, referenceCode }) {
+const GCashPaymentDisplay = React.memo(function GCashPaymentDisplay({ phone, referenceCode }) {
   const [copiedPhone, setCopiedPhone] = useState(false)
   const [copiedCode, setCopiedCode] = useState(false)
 
-  const handleCopyPhone = () => {
+  const handleCopyPhone = useCallback(() => {
     navigator.clipboard.writeText(phone)
     setCopiedPhone(true)
     setTimeout(() => setCopiedPhone(false), 2000)
-  }
+  }, [phone])
 
-  const handleCopyCode = () => {
+  const handleCopyCode = useCallback(() => {
     if (referenceCode) {
       navigator.clipboard.writeText(referenceCode)
       setCopiedCode(true)
       setTimeout(() => setCopiedCode(false), 2000)
     }
-  }
+  }, [referenceCode])
 
   return (
     <div className="space-y-4">
       <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
         <p className="text-sm text-gray-600 mb-2">Send to GCash Number:</p>
         <p className="text-2xl font-bold text-blue-600 mb-4 select-all">{phone}</p>
-        
+
         {referenceCode && (
           <div className="bg-white p-3 rounded border border-blue-100 mb-4">
             <p className="text-xs text-gray-600 mb-1">Reference Code (Include in notes):</p>
@@ -256,7 +256,7 @@ function GCashPaymentDisplay({ phone, referenceCode }) {
             </button>
           </div>
         )}
-        
+
         <button
           onClick={handleCopyPhone}
           className="w-full text-xs text-blue-600 hover:text-blue-700 font-medium p-2 border border-blue-200 rounded hover:bg-blue-100 transition-colors"
@@ -266,10 +266,10 @@ function GCashPaymentDisplay({ phone, referenceCode }) {
       </div>
     </div>
   )
-}
+})
 
 // Instructions Component
-function InstructionsDisplay({ method }) {
+const InstructionsDisplay = React.memo(function InstructionsDisplay({ method }) {
   return (
     <div className={`p-4 rounded-lg ${method.bgColor} border ${method.borderColor}`}>
       <h4 className="font-semibold text-gray-900 mb-3">Steps to Complete Your Deposit:</h4>
@@ -283,7 +283,7 @@ function InstructionsDisplay({ method }) {
       </ol>
     </div>
   )
-}
+})
 
 export default function Deposits({ userId, globalCurrency = 'PHP' }) {
   const [amount, setAmount] = useState('')
