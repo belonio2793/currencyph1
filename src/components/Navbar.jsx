@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useDevice } from '../context/DeviceContext'
 import HeaderMap from './HeaderMap'
 import CurrencySelectionModal from './CurrencySelectionModal'
