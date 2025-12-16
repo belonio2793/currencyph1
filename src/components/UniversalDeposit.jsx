@@ -12,6 +12,7 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
   const [currency, setCurrency] = useState('USD')
   const [userCountry, setUserCountry] = useState('US')
   const [availableMethods, setAvailableMethods] = useState([])
+  const [otherMethods, setOtherMethods] = useState([])
   const [depositService, setDepositService] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -20,6 +21,9 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [bankCode, setBankCode] = useState('')
   const [accountNumber, setAccountNumber] = useState('')
+  const [showOtherMethodsDropdown, setShowOtherMethodsDropdown] = useState(false)
+  const [otherMethodsSearch, setOtherMethodsSearch] = useState('')
+  const [filteredOtherMethods, setFilteredOtherMethods] = useState([])
 
   // Initialize service
   useEffect(() => {
