@@ -45,16 +45,51 @@ export default function Navbar({ activeTab, onTabChange, globalCurrency, setGlob
           <div className="flex items-center gap-3">
             <h1 className="text-2xl sm:text-2xl md:text-2xl font-light text-slate-900 tracking-wide">currency.ph</h1>
             {userEmail && (
-              <div className="ml-2 px-3 py-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex items-center">
-                <span className="text-slate-400 mr-2 text-xs">Total</span>
-                {/* Display total balance (not net) in the selected display currency */}
-                {typeof totalBalanceConverted !== 'undefined' ? (
-                  <span className={`font-medium text-slate-900`}>
-                    {Number(totalBalanceConverted || 0).toFixed(2)} {globalCurrency}
-                  </span>
-                ) : (
-                  <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
-                )}
+              <div className="ml-2 flex items-center gap-1 rounded-full bg-slate-50 border border-slate-100 text-sm text-slate-700 hidden sm:inline-flex">
+                <div className="px-3 py-1 flex items-center gap-2">
+                  <span className="text-slate-400 text-xs">Total</span>
+                  {/* Display toggle buttons */}
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setDisplayType('fiat')}
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                        displayType === 'fiat'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      Fiat
+                    </button>
+                    <button
+                      onClick={() => setDisplayType('crypto')}
+                      className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                        displayType === 'crypto'
+                          ? 'bg-blue-600 text-white'
+                          : 'text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      Crypto
+                    </button>
+                  </div>
+                </div>
+                <div className="px-3 py-1 border-l border-slate-200">
+                  {displayType === 'fiat' ? (
+                    <>
+                      {typeof totalBalanceConverted !== 'undefined' ? (
+                        <span className={`font-medium text-slate-900`}>
+                          {Number(totalBalanceConverted || 0).toFixed(2)} {globalCurrency}
+                        </span>
+                      ) : (
+                        <span className="font-medium text-slate-900">{Number(totalBalancePHP || 0).toFixed(2)} PHP</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="font-medium text-slate-900 text-xs">
+                      {/* Crypto balance - would need rate data */}
+                      {globalCryptocurrency} <span className="text-slate-400">(rate data needed)</span>
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>
