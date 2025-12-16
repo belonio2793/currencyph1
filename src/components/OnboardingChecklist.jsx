@@ -42,36 +42,8 @@ export default function OnboardingChecklist({ userId, userEmail, onTaskComplete,
     }
   }, [allCompleted])
 
-  // Set up periodic auto-detection (every 5 seconds)
-  useEffect(() => {
-    if (!userId || !onboardingService.isValidUUID(userId)) {
-      return
-    }
-
-    // Run initial auto-detection
-    onboardingService.autoDetectTaskCompletion(userId).then(() => {
-      loadTasks()
-    }).catch(err => console.error('Initial auto-detect failed:', err))
-
-    // Set up interval for continuous auto-detection
-    autoDetectIntervalRef.current = setInterval(async () => {
-      try {
-        const changed = await onboardingService.autoDetectTaskCompletion(userId)
-        if (changed) {
-          // Reload tasks if any changes detected
-          await loadTasks()
-        }
-      } catch (err) {
-        console.error('Auto-detect interval error:', err)
-      }
-    }, 5000) // Check every 5 seconds
-
-    return () => {
-      if (autoDetectIntervalRef.current) {
-        clearInterval(autoDetectIntervalRef.current)
-      }
-    }
-  }, [userId, loadTasks])
+  // Remove auto-detection to prevent unnecessary database queries
+  // Tasks are now only validated when user explicitly clicks "Start"
 
   const handleTaskComplete = async (task) => {
     setCompletingTaskId(task.id)
