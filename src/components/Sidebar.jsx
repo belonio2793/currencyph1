@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { useDevice } from '../context/DeviceContext'
 
-export default function Sidebar({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut }) {
+function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut }) {
   const { isMobile } = useDevice()
   const [isCollapsed, setIsCollapsed] = useState(() => {
     if (typeof window !== 'undefined') {
