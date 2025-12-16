@@ -61,7 +61,11 @@ export default function ShopCheckout({ onNavigate, onOrderCreated }) {
         }
       }
     } catch (err) {
-      console.error('Error loading user data:', err)
+      if (err?.name === 'AuthSessionMissingError' || err?.message?.includes('Auth session missing')) {
+        // User not logged in - this is expected for checkout, no error needed
+      } else {
+        console.error('Error loading user data:', err)
+      }
     }
   }
 
