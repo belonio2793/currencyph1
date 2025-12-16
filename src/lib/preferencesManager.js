@@ -183,6 +183,11 @@ export const preferencesManager = {
   async loadQuickAccessFromDB(userId) {
     if (!userId) return null
 
+    // Don't attempt database operations for guest-local users
+    if (!this.isValidUUID(userId)) {
+      return null
+    }
+
     try {
       const { data, error } = await supabase
         .from('user_preferences')
