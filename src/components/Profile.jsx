@@ -332,7 +332,7 @@ export default function Profile({ userId, onSignOut }) {
         setFormData({ full_name: '', email: 'user@example.com', phone_number: '', phone_country_code: 'PH', username: '', country_code: 'PH', relationship_status: '', biography: '', profile_picture_url: '', display_name_type: 'full_name', display_as_username_everywhere: false })
       }
     } catch (err) {
-      console.error('Error loading user:', err)
+      console.error('Error loading user:', err?.message || String(err))
       setError('Failed to load user profile')
     } finally {
       setLoading(false)
