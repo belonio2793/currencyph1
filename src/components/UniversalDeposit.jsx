@@ -188,6 +188,67 @@ export default function UniversalDeposit({ onSuccess, onClose }) {
         ))}
       </div>
 
+      <div className="other-methods-section">
+        <h3>Other Payment Methods</h3>
+        <p className="section-description">Modern fintech & crypto payment options</p>
+
+        <div className="other-methods-dropdown">
+          <div className="dropdown-header" onClick={() => setShowOtherMethodsDropdown(!showOtherMethodsDropdown)}>
+            <span className="dropdown-title">🌍 Browse All Options (8+ Methods)</span>
+            <span className={`dropdown-arrow ${showOtherMethodsDropdown ? 'open' : ''}`}>▼</span>
+          </div>
+
+          {showOtherMethodsDropdown && (
+            <div className="dropdown-content">
+              <input
+                type="text"
+                className="dropdown-search"
+                placeholder="Search by name, region... (dLocal, Flutterwave, Circle, etc.)"
+                value={otherMethodsSearch}
+                onChange={(e) => handleOtherMethodsSearch(e.target.value)}
+                autoFocus
+              />
+
+              {filteredOtherMethods.length > 0 ? (
+                <div className="other-methods-list">
+                  {filteredOtherMethods.map((method) => (
+                    <div
+                      key={method.id}
+                      className={`other-method-item ${method.comingSoon ? 'coming-soon' : ''}`}
+                      onClick={() => !method.comingSoon && handleSelectMethod(method.id)}
+                    >
+                      <div className="method-item-header">
+                        <span className="method-icon">{method.icon}</span>
+                        <div className="method-info">
+                          <div className="method-name">{method.name}</div>
+                          {method.comingSoon && <span className="coming-soon-badge">Coming Soon</span>}
+                        </div>
+                      </div>
+                      <div className="method-item-details">
+                        <span className="fee">{method.fees}</span>
+                        <span className="time">{method.processingTime}</span>
+                      </div>
+                      <p className="method-description">{method.description}</p>
+                      {method.regions && (
+                        <div className="method-regions">
+                          {method.regions.map((region, idx) => (
+                            <span key={idx} className="region-tag">{region}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="no-results">
+                  No payment methods found matching "{otherMethodsSearch}"
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className="country-selector">
         <label>Country:</label>
         <select value={userCountry} onChange={(e) => setUserCountry(e.target.value)}>
