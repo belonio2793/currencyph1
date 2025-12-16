@@ -70,7 +70,7 @@ export const onboardingService = {
       const { data, error } = await supabase
         .from('profiles')
         .select('full_name')
-        .eq('id', userId)
+        .eq('user_id', userId)
         .single()
 
       if (error) {
