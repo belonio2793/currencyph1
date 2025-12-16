@@ -382,27 +382,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
   const loadCryptoPrices = async () => {
     try {
-      const supabaseUrl = import.meta.env.VITE_PROJECT_URL
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-
       let data = null
 
-      if (supabaseUrl && anonKey) {
-        try {
-          data = await fetchWithRetries(
-            `${supabaseUrl}/functions/v1/fetch-rates`,
-            {
-              headers: {
-                'Authorization': `Bearer ${anonKey}`,
-                'Content-Type': 'application/json'
-              }
-            },
-            1,
-            500
-          )
-        } catch (err) {
-          console.debug('Supabase fetch-rates failed, using fallback:', err?.message || 'Unknown error')
+      try {
+        const localRes = await fetchWithRetries('/api/crypto-prices', {}, 1, 500)
+        if (localRes && localRes.cryptoPrices) {
+          data = localRes
         }
+      } catch (err) {
+        console.debug('Local crypto-prices endpoint failed:', err?.message || 'Unknown error')
       }
 
       if (!data || !data.cryptoPrices) {
