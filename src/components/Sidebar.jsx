@@ -228,3 +228,5 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     </aside>
   )
 }
+
+export default React.memo(SidebarComponent)
