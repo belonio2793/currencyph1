@@ -28,8 +28,9 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
         setSelectedMerchant(data[0])
       }
     } catch (err) {
-      console.error('Error loading merchants:', err)
-      setError('Failed to load merchants')
+      const errorMessage = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error'
+      console.error('Error loading merchants:', { error: err, message: errorMessage })
+      setError(`Failed to load merchants: ${errorMessage}`)
     } finally {
       setLoading(false)
     }
