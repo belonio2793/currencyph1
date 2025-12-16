@@ -44,10 +44,23 @@ const DEFAULT_VISIBILITY = {
 
 export const quickAccessManager = {
   /**
+   * Validate UUID format
+   */
+  isValidUUID(userId) {
+    if (!userId) return false
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(userId)
+  },
+
+  /**
    * Load card order from database, fallback to localStorage
    */
   async loadCardOrderFromDB(userId) {
     if (!userId) return DEFAULT_ORDER
+
+    // Don't query database for guest-local users
+    if (!this.isValidUUID(userId)) {
+      return this.getCardOrder(userId)
+    }
 
     try {
       const { data, error } = await supabase
