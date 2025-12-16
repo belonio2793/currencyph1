@@ -1,6 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useCallback } from 'react'
 import { currencyAPI as paymentsAPI } from '../lib/payments'
 import { currencyAPI } from '../lib/currencyAPI'
+import { apiCache } from '../lib/apiCache'
 import { supabase } from '../lib/supabaseClient'
 
 // Payment Methods Configuration
