@@ -285,6 +285,12 @@ export default function Deposits({ userId, globalCurrency = 'PHP' }) {
   const [success, setSuccess] = useState('')
   const [allCurrencies, setAllCurrencies] = useState([])
 
+  // Payment method selection
+  const [depositTab, setDepositTab] = useState('direct')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('solana')
+  const [referenceCode, setReferenceCode] = useState(null)
+  const [showPaymentInstructions, setShowPaymentInstructions] = useState(false)
+
   const [cryptoAmount, setCryptoAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('BTC')
   const [cryptoRates, setCryptoRates] = useState({})
