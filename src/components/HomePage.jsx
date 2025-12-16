@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { currencyAPI } from '../lib/payments'
+import { apiCache } from '../lib/apiCache'
 import { quickAccessManager } from '../lib/quickAccessManager'
 import DraggableQuickAccessCards from './DraggableQuickAccessCards'
 import CustomizeQuickAccessModal from './CustomizeQuickAccessModal'
