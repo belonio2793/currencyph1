@@ -479,10 +479,18 @@ export default function App() {
           <LayoutSwitcher />
 
           {/* Planning Setup page - standalone fullscreen interface */}
-          {activeTab === 'planning-setup' && <PlanningSetup />}
+          {activeTab === 'planning-setup' && (
+            <Suspense fallback={<PageLoader />}>
+              <PlanningSetup />
+            </Suspense>
+          )}
 
           {/* Planning page is a standalone fullscreen interface */}
-          {activeTab === 'planning' && <PlanningChat />}
+          {activeTab === 'planning' && (
+            <Suspense fallback={<PageLoader />}>
+              <PlanningChat />
+            </Suspense>
+          )}
 
           {/* Normal layout for all other pages */}
           {activeTab !== 'planning-setup' && activeTab !== 'planning' && (
