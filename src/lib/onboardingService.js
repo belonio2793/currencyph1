@@ -114,7 +114,8 @@ export const onboardingService = {
         icon: '📍',
         completed: userState?.hasAddress || false,
         category: 'essential',
-        action: 'open-address-modal'
+        action: 'open-address-modal',
+        validator: 'hasUserAddresses'
       },
       {
         id: 'complete-profile',
@@ -123,7 +124,8 @@ export const onboardingService = {
         icon: '👤',
         completed: userState?.profileComplete || false,
         category: 'important',
-        action: 'navigate-profile'
+        action: 'navigate-profile',
+        validator: 'hasProfileComplete'
       },
       {
         id: 'verify-email',
@@ -132,7 +134,8 @@ export const onboardingService = {
         icon: '✉️',
         completed: userState?.emailVerified || false,
         category: 'important',
-        action: 'verify-email'
+        action: 'verify-email',
+        validator: 'hasEmailVerified'
       },
       {
         id: 'set-currency',
@@ -141,9 +144,49 @@ export const onboardingService = {
         icon: '💱',
         completed: userState?.currencySet || false,
         category: 'nice-to-have',
-        action: 'set-currency'
+        action: 'set-currency',
+        validator: 'hasPreferredCurrency'
       }
     ]
+  },
+
+  // Auto-detect task completion by running validators
+  async autoDetectTaskCompletion(userId) {
+    try {
+      if (!this.isValidUUID(userId)) return false
+
+      const tasks = this.getDefaultTasks({})
+      let anyChanges = false
+
+      // Run all validators in parallel
+      const validationResults = await Promise.allSettled([
+        this.hasUserAddresses(userId),
+        this.hasProfileComplete(userId),
+        this.hasEmailVerified(userId),
+        this.hasPreferredCurrency(userId)
+      ])
+
+      // Map results to tasks
+      const completionMap = {
+        'create-address': validationResults[0].status === 'fulfilled' ? validationResults[0].value : false,
+        'complete-profile': validationResults[1].status === 'fulfilled' ? validationResults[1].value : false,
+        'verify-email': validationResults[2].status === 'fulfilled' ? validationResults[2].value : false,
+        'set-currency': validationResults[3].status === 'fulfilled' ? validationResults[3].value : false
+      }
+
+      // Update database for any task that is now completed
+      for (const [taskId, isCompleted] of Object.entries(completionMap)) {
+        if (isCompleted) {
+          const result = await this.updateTaskCompletion(userId, taskId, true)
+          if (result) anyChanges = true
+        }
+      }
+
+      return anyChanges
+    } catch (err) {
+      console.error('Error auto-detecting task completion:', err?.message || String(err))
+      return false
+    }
   },
 
   // Fetch user onboarding state
