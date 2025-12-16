@@ -212,14 +212,21 @@ export default function App() {
     try {
       // supabase.auth.getUser() may return different shapes; handle defensively
     // Protect against it hanging by racing with a timeout
-    const timeoutMs = 0
+    const timeoutMs = 5000
     let res = null
     try {
       res = await Promise.race([
         supabase.auth.getUser(),
         new Promise((resolve) => setTimeout(() => resolve(null), timeoutMs))
       ])
-    } catch (err) { throw err }
+    } catch (err) {
+      // Handle AuthSessionMissingError gracefully - means user is not logged in
+      if (err?.name === 'AuthSessionMissingError' || err?.message?.includes('Auth session missing')) {
+        res = null
+      } else {
+        throw err
+      }
+    }
     let user = null
     if (res && res.data && res.data.user) user = res.data.user
     else if (res && res.user) user = res.user
