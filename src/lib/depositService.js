@@ -12,21 +12,30 @@ export const DEPOSIT_METHODS = {
   // Fiat Payment Methods
   STRIPE: 'stripe',
   BANK_TRANSFER: 'bank_transfer',
-  
+
   // Mobile Payment Methods (Asia-Pacific focused)
   GCASH: 'gcash',
   PAYMAYA: 'paymaya',
   INSTAPAY: 'instapay',
   COINS_PH: 'coins_ph',
-  
+
   // Cryptocurrency Direct
   CRYPTO_DIRECT: 'crypto_direct',
-  
+
   // Local Transfer Systems
   WISE: 'wise',
   REMITLY: 'remitly',
-  PAYPAL: 'paypal',
-  
+
+  // Modern Fintech (Other Payment Methods)
+  DLOCAL: 'dlocal',
+  CIRCLE: 'circle',
+  FLUTTERWAVE: 'flutterwave',
+  CHECKOUT: 'checkout',
+  MOONPAY: 'moonpay',
+  RAMP: 'ramp',
+  BINANCE_PAY: 'binance_pay',
+  CRYPTO_COM_PAY: 'crypto_com_pay',
+
   // Direct Wallet
   WALLET_BALANCE: 'wallet_balance'
 }
