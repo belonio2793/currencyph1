@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense, lazy } from 'react'
 import { supabase } from './lib/supabaseClient'
 import { currencyAPI } from './lib/payments'
 import backgroundSync from './lib/backgroundSync'
@@ -10,50 +10,53 @@ import { deviceFingerprint } from './lib/deviceFingerprint'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import LandingPage from './components/LandingPage'
-import HomePage from './components/HomePage'
-import Deposits from './components/Deposits'
-import Rates from './components/Rates'
-import OnlineUsers from './components/OnlineUsers'
-import Dashboard from './components/Dashboard'
-import Wallet from './components/Wallet'
-import SendMoney from './components/SendMoney'
-import Investments from './components/Investments'
-import BillPayments from './components/BillPayments'
-import TransactionHistoryNew from './components/TransactionHistoryNew'
-import Profile from './components/Profile'
 import Auth from './components/Auth'
-import Nearby from './components/Nearby'
-import Business from './components/Business'
-import MyBusiness from './components/MyBusiness'
-import Jobs from './components/Jobs'
-import ListingDetail from './components/ListingDetail'
-import Network from './components/Network'
-import NetworkBalances from './components/NetworkBalances'
-import BorrowMoney from './components/BorrowMoney'
-import P2PLoanMarketplace from './components/P2PLoanMarketplace'
-import About from './components/About'
-import PlanningChat from './components/PlanningChat'
-import PlanningSetup from './components/PlanningSetup'
-import Inbox from './components/Inbox'
-import ChatBar from './components/ChatBar'
-import PokerPage from './components/PokerPage'
-import ChessPage from './components/ChessPage'
-import Rides from './components/Rides'
-import TradingDashboard from './components/Trading/TradingDashboard'
-import Addresses from './components/Addresses'
-import BusinessMarketplace from './components/BusinessMarketplace'
-import IntegratedMarketplace from './components/IntegratedMarketplace'
-import BusinessMarketplaceDetail from './components/BusinessMarketplaceDetail'
-import InventoryDashboard from './components/InventoryDashboard'
-import ShopOnline from './components/ShopOnline'
-import ShopProductDetail from './components/ShopProductDetail'
-import ShoppingCart from './components/ShoppingCart'
-import ShopCheckout from './components/ShopCheckout'
-import OrderConfirmation from './components/OrderConfirmation'
+import PageLoader from './components/PageLoader'
 import { ShoppingCartProvider } from './context/ShoppingCartContext'
 import { DeviceProvider } from './context/DeviceContext'
 import { LayoutOverrideProvider } from './context/LayoutOverrideContext'
 import LayoutSwitcher from './components/LayoutSwitcher'
+
+// Lazy load feature pages for code splitting
+const HomePage = lazy(() => import('./components/HomePage'))
+const Deposits = lazy(() => import('./components/Deposits'))
+const Rates = lazy(() => import('./components/Rates'))
+const OnlineUsers = lazy(() => import('./components/OnlineUsers'))
+const Dashboard = lazy(() => import('./components/Dashboard'))
+const Wallet = lazy(() => import('./components/Wallet'))
+const SendMoney = lazy(() => import('./components/SendMoney'))
+const Investments = lazy(() => import('./components/Investments'))
+const BillPayments = lazy(() => import('./components/BillPayments'))
+const TransactionHistoryNew = lazy(() => import('./components/TransactionHistoryNew'))
+const Profile = lazy(() => import('./components/Profile'))
+const Nearby = lazy(() => import('./components/Nearby'))
+const Business = lazy(() => import('./components/Business'))
+const MyBusiness = lazy(() => import('./components/MyBusiness'))
+const Jobs = lazy(() => import('./components/Jobs'))
+const ListingDetail = lazy(() => import('./components/ListingDetail'))
+const Network = lazy(() => import('./components/Network'))
+const NetworkBalances = lazy(() => import('./components/NetworkBalances'))
+const BorrowMoney = lazy(() => import('./components/BorrowMoney'))
+const P2PLoanMarketplace = lazy(() => import('./components/P2PLoanMarketplace'))
+const About = lazy(() => import('./components/About'))
+const PlanningChat = lazy(() => import('./components/PlanningChat'))
+const PlanningSetup = lazy(() => import('./components/PlanningSetup'))
+const Inbox = lazy(() => import('./components/Inbox'))
+const ChatBar = lazy(() => import('./components/ChatBar'))
+const PokerPage = lazy(() => import('./components/PokerPage'))
+const ChessPage = lazy(() => import('./components/ChessPage'))
+const Rides = lazy(() => import('./components/Rides'))
+const TradingDashboard = lazy(() => import('./components/Trading/TradingDashboard'))
+const Addresses = lazy(() => import('./components/Addresses'))
+const BusinessMarketplace = lazy(() => import('./components/BusinessMarketplace'))
+const IntegratedMarketplace = lazy(() => import('./components/IntegratedMarketplace'))
+const BusinessMarketplaceDetail = lazy(() => import('./components/BusinessMarketplaceDetail'))
+const InventoryDashboard = lazy(() => import('./components/InventoryDashboard'))
+const ShopOnline = lazy(() => import('./components/ShopOnline'))
+const ShopProductDetail = lazy(() => import('./components/ShopProductDetail'))
+const ShoppingCart = lazy(() => import('./components/ShoppingCart'))
+const ShopCheckout = lazy(() => import('./components/ShopCheckout'))
+const OrderConfirmation = lazy(() => import('./components/OrderConfirmation'))
 
 export default function App() {
   const [userId, setUserId] = useState(null)
