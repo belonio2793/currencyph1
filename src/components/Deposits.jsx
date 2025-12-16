@@ -1098,3 +1098,5 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     </div>
   )
 }
+
+export default React.memo(DepositsComponent)
