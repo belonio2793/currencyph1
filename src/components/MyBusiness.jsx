@@ -201,6 +201,8 @@ export default function MyBusiness({ userId }) {
   const [savingCost, setSavingCost] = useState(false)
   const [selectedFeatureModal, setSelectedFeatureModal] = useState(null)
   const [showEmployeesModal, setShowEmployeesModal] = useState(false)
+  const [formError, setFormError] = useState(null)
+  const [savingBusiness, setSavingBusiness] = useState(false)
   const [reportingPeriod, setReportingPeriod] = useState('annual')
   const [reportingYear, setReportingYear] = useState(new Date().getFullYear())
   const [quarterlyReports, setQuarterlyReports] = useState([])
