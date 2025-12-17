@@ -968,83 +968,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
-          <div className="flex justify-between items-start mb-8">
-            <div>
-              <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
-              <h2 className="text-5xl font-light text-slate-900">
-                {formatCurrency(getTotalBalance, globalCurrency)}
-              </h2>
-            </div>
-            <div className="text-right">
-              <p className="text-xs text-slate-500 mb-2">
-                Last synced: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Loading...'}
-              </p>
-              <button
-                onClick={refreshWallets}
-                disabled={syncStatus === 'syncing'}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  syncStatus === 'syncing'
-                    ? 'bg-slate-100 text-slate-600 cursor-not-allowed'
-                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                }`}
-              >
-                {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
-              </button>
-            </div>
-          </div>
-
-          {/* Summary Stats */}
-          {wallets && wallets.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 border-t border-slate-200">
-              <div className="text-center">
-                <p className="text-sm text-slate-600 mb-1">Active Wallets</p>
-                <p className="text-2xl font-semibold text-slate-900">{wallets.length}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-slate-600 mb-1">Total Deposited</p>
-                <p className="text-2xl font-semibold text-emerald-600">
-                  {formatCurrency(
-                    wallets.reduce((sum, w) => sum + parseFloat(w.total_deposited || 0), 0),
-                    globalCurrency
-                  )}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-slate-600 mb-1">Total Withdrawn</p>
-                <p className="text-2xl font-semibold text-orange-600">
-                  {formatCurrency(
-                    wallets.reduce((sum, w) => sum + parseFloat(w.total_withdrawn || 0), 0),
-                    globalCurrency
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Wallet Balances Grid */}
-        {wallets && wallets.length > 0 && (
-          <div className="mb-8">
-            <h3 className="text-2xl font-semibold text-slate-900 mb-6">Your Wallets</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {wallets.map(wallet => (
-                <WalletSummaryCard
-                  key={wallet.id}
-                  wallet={wallet}
-                  globalCurrency={globalCurrency}
-                  exchangeRates={exchangeRates}
-                  onDeposit={handleQuickDeposit}
-                />
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Direct Payment Methods */}
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-          <div className="space-y-6">
+          <div className="space-y-6"><h2 className="text-2xl font-semibold text-slate-900 mb-6">Add Funds</h2>
             <div>
               <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -1062,6 +989,37 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                 ))}
               </div>
             </div>
+
+            {/* Wallet Balances Reference */}
+            {wallets && wallets.length > 0 && (
+              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">Your Current Balances</h4>
+                  <button
+                    onClick={refreshWallets}
+                    disabled={syncStatus === 'syncing'}
+                    className={`text-xs font-medium transition-colors ${
+                      syncStatus === 'syncing'
+                        ? 'text-slate-400 cursor-not-allowed'
+                        : 'text-blue-600 hover:text-blue-700'
+                    }`}
+                  >
+                    {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  {wallets.map(wallet => (
+                    <WalletSummaryCard
+                      key={wallet.id}
+                      wallet={wallet}
+                      globalCurrency={globalCurrency}
+                      exchangeRates={exchangeRates}
+                      onDeposit={handleQuickDeposit}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-2">
