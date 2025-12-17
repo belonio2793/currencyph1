@@ -406,7 +406,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{table.name}</h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Stakes: {table.stake_min}/{table.stake_max} {table.currency_code}
+              Stakes: {table.stake_min}/{table.stake_max} chips
               <span className="ml-4">•</span>
               <span className="ml-4 text-emerald-400">{tableStatusText}</span>
             </p>
@@ -581,7 +581,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
                     betHistory.slice(-5).reverse().map((bet, i) => (
                       <div key={i} className="text-xs text-slate-700 dark:text-slate-300 flex justify-between">
                         <span>{bet.action}</span>
-                        <span className="text-amber-400">{bet.amount} {table.currency_code}</span>
+                        <span className="text-amber-400">{bet.amount} chips</span>
                       </div>
                     ))
                   )}
