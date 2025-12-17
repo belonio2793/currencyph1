@@ -105,13 +105,13 @@ async function seed() {
   try {
     console.log('Starting to seed poker chip packages...')
 
-    // First, delete existing packages
+    // First, delete existing packages (if any)
     const { error: deleteErr } = await supabase
       .from('poker_chip_packages')
       .delete()
-      .gte('id', 0)
+      .neq('id', 'null')
 
-    if (deleteErr) {
+    if (deleteErr && deleteErr.code !== 'PGRST116') {
       console.warn('Could not delete existing packages:', deleteErr)
     }
 
