@@ -233,7 +233,8 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       receipts: () => setShowReceiptsModal(true),
       myBusiness: () => setShowMyBusinessModal(true),
       myProfile: () => setShowProfileModal(true),
-      payments: () => setShowPaymentsModal(true)
+      payments: () => setShowPaymentsModal(true),
+      wallets: () => onTabChange('wallet')
     }
 
     const handler = modalMap[cardKey]
