@@ -132,7 +132,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     try {
       if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
         setWallets([])
-        setEnabledInternal(ALL_CURRENCIES)
+        const allCurrencyCodes = allCurrencies.map(c => c.code)
+        setEnabledInternal(allCurrencyCodes)
         setLoading(false)
         return
       }
@@ -146,11 +147,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         console.warn('Could not fetch exchange rates:', e)
       }
 
-      // Fetch all wallets from the unified wallets table
+      // Fetch all wallets with currency details
       let allWallets = []
       try {
-        const data = await currencyAPI.getWallets(userId)
-        allWallets = data || []
+        allWallets = await walletService.getUserWalletsWithDetails(userId)
       } catch (err) {
         console.warn('Could not load wallets:', err)
       }
@@ -178,7 +178,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       // Auto-populate preferences to show all currencies
       const prefs = preferencesManager.getAllPreferences(userId)
       if (!prefs.walletCurrencies) {
-        savePreferences('internal', allWallets.map(w => w.currency_code))
+        const allCodes = allWallets.map(w => w.currency_code)
+        savePreferences('internal', allCodes)
       }
 
     } catch (err) {
