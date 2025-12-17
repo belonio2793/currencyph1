@@ -39,26 +39,36 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   async function loadUserData() {
     try {
-      const { data: wallets, error: walletErr } = await supabase
-        .from('wallets')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: true })
-        .limit(1)
+      if (isGuestLocal) {
+        const storedChips = localStorage.getItem(`poker_chips_${userId}`)
+        if (storedChips) {
+          setUserChips(BigInt(storedChips))
+        } else {
+          setUserChips(0n)
+        }
+        setUserWallet(null)
+      } else {
+        const { data: wallets, error: walletErr } = await supabase
+          .from('wallets')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: true })
+          .limit(1)
 
-      if (walletErr) throw walletErr
-      if (wallets && wallets.length > 0) {
-        setUserWallet(wallets[0])
-      }
+        if (walletErr) throw walletErr
+        if (wallets && wallets.length > 0) {
+          setUserWallet(wallets[0])
+        }
 
-      const { data: chipData, error: chipErr } = await supabase
-        .from('player_poker_chips')
-        .select('total_chips')
-        .eq('user_id', userId)
-        .single()
+        const { data: chipData, error: chipErr } = await supabase
+          .from('player_poker_chips')
+          .select('total_chips')
+          .eq('user_id', userId)
+          .single()
 
-      if (!chipErr && chipData) {
-        setUserChips(BigInt(chipData.total_chips || 0))
+        if (!chipErr && chipData) {
+          setUserChips(BigInt(chipData.total_chips || 0))
+        }
       }
     } catch (err) {
       console.error('Error loading user data:', err)
