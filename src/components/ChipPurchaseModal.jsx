@@ -177,21 +177,24 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   }
 
   const getPackageLabel = (pkg) => {
-    if (pkg.is_first_purchase_special) return 'FIRST PURCHASE SPECIAL'
-    if (pkg.is_most_popular) return 'MOST POPULAR'
-    if (pkg.is_flash_sale) return '24 HOUR FLASH SALE'
+    if (!pkg) return null
+    if (pkg.is_first_purchase_special === true) return 'FIRST PURCHASE SPECIAL'
+    if (pkg.is_most_popular === true) return 'MOST POPULAR'
+    if (pkg.is_flash_sale === true) return '24 HOUR FLASH SALE'
     return null
   }
 
   const getPackageLabelColor = (pkg) => {
-    if (pkg.is_first_purchase_special) return 'bg-cyan-500'
-    if (pkg.is_most_popular) return 'bg-slate-600'
-    if (pkg.is_flash_sale) return 'bg-red-600'
+    if (!pkg) return null
+    if (pkg.is_first_purchase_special === true) return 'bg-cyan-500'
+    if (pkg.is_most_popular === true) return 'bg-slate-600'
+    if (pkg.is_flash_sale === true) return 'bg-red-600'
     return null
   }
 
   const getPackageCardBg = (pkg) => {
-    if (pkg.is_flash_sale) return 'border-red-500 border-2'
+    if (!pkg) return 'border-slate-600 border'
+    if (pkg.is_flash_sale === true) return 'border-red-500 border-2'
     return 'border-slate-600 border'
   }
 
