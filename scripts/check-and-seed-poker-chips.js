@@ -150,7 +150,7 @@ async function checkAndSeed() {
     inserted.forEach(pkg => {
       const bonusInfo = pkg.bonus_chips > 0 ? ` + ${pkg.bonus_chips.toLocaleString()} bonus` : ''
       const badge = pkg.is_first_purchase_special ? '⭐ First Purchase' : pkg.is_most_popular ? '⭐ Most Popular' : pkg.is_flash_sale ? '🔥 Flash Sale' : ''
-      console.log(`  ${pkg.name.padEnd(25)} ${String(pkg.chip_amount).padStart(10)} chips${bonusInfo} - $${pkg.usd_price} ${badge}`)
+      console.log(`  ${pkg.name.padEnd(25)} ${String(pkg.chips_amount).padStart(10)} chips${bonusInfo} - $${pkg.chips_price} ${badge}`)
     })
 
     console.log('\n✅ Poker chip packages ready!')
