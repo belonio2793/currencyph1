@@ -19,6 +19,11 @@ const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || proce
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
+// Crypto price cache (refresh every 5 minutes)
+let cryptoPriceCache = null
+let cryptoPriceCacheTime = 0
+const CRYPTO_CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
+
 // DIDIT environment variables
 const DIDIT_API_KEY = process.env.DIDIT_API_KEY || process.env.VITE_DIDIT_API_KEY
 const DIDIT_WORKFLOW_ID = process.env.DIDIT_WORKFLOW_ID || process.env.VITE_DIDIT_WORKFLOW_ID
