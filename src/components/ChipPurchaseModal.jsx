@@ -76,7 +76,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   }
 
   async function handlePurchase(packageId) {
-    console.log('Purchase clicked:', { packageId, userId, packages: packages.length })
+    console.log('Purchase clicked:', { packageId, userId, isGuestLocal, packages: packages.length })
 
     if (!packageId || !userId) {
       setError('Missing purchase information')
@@ -91,76 +91,93 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       console.log('Found package:', pkg)
       if (!pkg) throw new Error('Package not found')
 
-      if (userWallet) {
-        const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
-        const walletBalance = Number(userWallet.balance)
-
-        if (walletBalance < localPrice) {
-          setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
-          setProcessing(false)
-          return
-        }
-
-        const newWalletBalance = walletBalance - localPrice
-        const { error: walletUpdateErr } = await supabase
-          .from('wallets')
-          .update({ balance: newWalletBalance, updated_at: new Date() })
-          .eq('id', userWallet.id)
-
-        if (walletUpdateErr) throw walletUpdateErr
-      }
-
-      const totalChipsToAdd = BigInt(pkg.chip_amount || 0) + BigInt(pkg.bonus_chips || 0)
+      const chipAmount = BigInt(pkg.chip_amount || 0)
+      const bonusChips = BigInt(pkg.bonus_chips || 0)
+      const totalChipsToAdd = chipAmount + bonusChips
       const newChipBalance = userChips + totalChipsToAdd
 
-      const { error: chipUpsertErr } = await supabase
-        .from('player_poker_chips')
-        .upsert({
-          user_id: userId,
-          total_chips: newChipBalance.toString(),
-          updated_at: new Date()
-        }, { onConflict: 'user_id' })
+      if (isGuestLocal) {
+        localStorage.setItem(`poker_chips_${userId}`, newChipBalance.toString())
+        setUserChips(newChipBalance)
 
-      if (chipUpsertErr) throw chipUpsertErr
+        if (onPurchaseComplete) {
+          onPurchaseComplete({
+            chipsPurchased: Number(chipAmount),
+            bonusChips: Number(bonusChips),
+            totalChips: totalChipsToAdd.toString(),
+            newBalance: newChipBalance.toString(),
+            costDeducted: 'Free (guest account)'
+          })
+        }
+      } else {
+        if (userWallet) {
+          const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
+          const walletBalance = Number(userWallet.balance)
 
-      const paymentMethod = userWallet ? 'wallet_deduction' : 'free'
-      const { data: purchase, error: purchaseErr } = await supabase
-        .from('chip_purchases')
-        .insert([{
-          user_id: userId,
-          package_id: packageId,
-          chips_purchased: pkg.chip_amount || 0,
-          bonus_chips_awarded: pkg.bonus_chips || 0,
-          total_chips_received: (pkg.chip_amount || 0) + (pkg.bonus_chips || 0),
-          usd_price_paid: pkg.usd_price,
-          payment_status: 'completed',
-          payment_method: paymentMethod,
-          created_at: new Date()
-        }])
-        .select()
-        .single()
+          if (walletBalance < localPrice) {
+            setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
+            setProcessing(false)
+            return
+          }
 
-      if (purchaseErr) throw purchaseErr
+          const newWalletBalance = walletBalance - localPrice
+          const { error: walletUpdateErr } = await supabase
+            .from('wallets')
+            .update({ balance: newWalletBalance, updated_at: new Date() })
+            .eq('id', userWallet.id)
 
-      console.log('Purchase recorded successfully')
-      await loadUserData()
+          if (walletUpdateErr) throw walletUpdateErr
+        }
 
-      if (onPurchaseComplete) {
-        console.log('Calling onPurchaseComplete')
-        const costDeducted = userWallet 
-          ? formatPriceWithCurrency(
-              convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code),
-              userWallet.currency_code
-            )
-          : 'Free (no wallet)'
-        
-        onPurchaseComplete({
-          chipsPurchased: pkg.chip_amount || 0,
-          bonusChips: pkg.bonus_chips || 0,
-          totalChips: totalChipsToAdd.toString(),
-          newBalance: newChipBalance.toString(),
-          costDeducted: costDeducted
-        })
+        const { error: chipUpsertErr } = await supabase
+          .from('player_poker_chips')
+          .upsert({
+            user_id: userId,
+            total_chips: newChipBalance.toString(),
+            updated_at: new Date()
+          }, { onConflict: 'user_id' })
+
+        if (chipUpsertErr) throw chipUpsertErr
+
+        const paymentMethod = userWallet ? 'wallet_deduction' : 'free'
+        const { data: purchase, error: purchaseErr } = await supabase
+          .from('chip_purchases')
+          .insert([{
+            user_id: userId,
+            package_id: packageId,
+            chips_purchased: Number(chipAmount),
+            bonus_chips_awarded: Number(bonusChips),
+            total_chips_received: Number(totalChipsToAdd),
+            usd_price_paid: pkg.usd_price,
+            payment_status: 'completed',
+            payment_method: paymentMethod,
+            created_at: new Date()
+          }])
+          .select()
+          .single()
+
+        if (purchaseErr) throw purchaseErr
+
+        console.log('Purchase recorded successfully')
+        await loadUserData()
+
+        if (onPurchaseComplete) {
+          console.log('Calling onPurchaseComplete')
+          const costDeducted = userWallet
+            ? formatPriceWithCurrency(
+                convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code),
+                userWallet.currency_code
+              )
+            : 'Free (no wallet)'
+
+          onPurchaseComplete({
+            chipsPurchased: Number(chipAmount),
+            bonusChips: Number(bonusChips),
+            totalChips: totalChipsToAdd.toString(),
+            newBalance: newChipBalance.toString(),
+            costDeducted: costDeducted
+          })
+        }
       }
 
       onClose()
