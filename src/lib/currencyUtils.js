@@ -67,9 +67,7 @@ export function displayBothCurrencies(phpAmount, exchangeRate = DEFAULT_EXCHANGE
  */
 export async function fetchExchangeRate() {
   try {
-    // Try to fetch from local API endpoint first (avoids CORS issues)
-    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-    const response = await fetch(`${apiUrl}/api/exchange-rate`, {
+    const response = await fetch('/api/exchange-rate', {
       timeout: 10000
     });
 
