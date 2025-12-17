@@ -148,8 +148,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   if (!open) return null
 
-  const currency = userWallet?.currency_code || DEFAULT_CURRENCY
-  const walletBalance = userWallet ? Number(userWallet.balance) : Infinity
+  const currency = DEFAULT_CURRENCY
 
   const formatChips = (chips) => {
     if (chips === undefined || chips === null) {
