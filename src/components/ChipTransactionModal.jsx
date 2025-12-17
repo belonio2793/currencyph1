@@ -162,9 +162,9 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
       <div className="bg-slate-900 rounded-2xl shadow-2xl w-screen h-screen sm:w-full sm:h-auto sm:max-w-5xl border border-slate-700 overflow-hidden flex flex-col sm:max-h-[95vh]">
         
         {/* Header */}
-        <div className="bg-cyan-600 p-8 text-white sticky top-0 z-10">
-          <h2 className="text-3xl font-bold">Purchase Poker Chips</h2>
-          <p className="text-sm text-cyan-100 mt-2">Select a package and confirm your purchase</p>
+        <div className="bg-cyan-600 p-4 sm:p-8 text-white sticky top-0 z-10">
+          <h2 className="text-2xl sm:text-3xl font-bold">Purchase Poker Chips</h2>
+          <p className="text-xs sm:text-sm text-cyan-100 mt-2">Select a package and confirm your purchase</p>
         </div>
 
         {/* Content */}
