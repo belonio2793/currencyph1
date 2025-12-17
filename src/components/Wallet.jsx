@@ -9,6 +9,8 @@ import { fetchRatesMap, convertAmount } from '../lib/reconciliation'
 export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
   const [internalWallets, setInternalWallets] = useState([])
+  const [allCurrencies, setAllCurrencies] = useState([])
+  const [currenciesGrouped, setCurrenciesGrouped] = useState({ fiat: [], crypto: [] })
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
 
