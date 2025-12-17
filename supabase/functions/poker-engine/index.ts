@@ -9,8 +9,7 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
-// Chip system constants
-const CHIPS_PER_DOLLAR = 10000
+// Chip system constant
 const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
 
 function buildDeck() {
@@ -48,7 +47,7 @@ async function updatePlayerChips(userId: string, chipAmount: bigint): Promise<vo
   if (error) throw error
 }
 
-async function createTable(name: string, stakeMin: number, stakeMax: number, currency = 'PHP', userId?: string) {
+async function createTable(name: string, stakeMin: number, stakeMax: number, currency = 'CHIPS', userId?: string) {
   const { data, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: currency, created_by: userId || null, is_default: false }]).select().single()
   if (error) throw error
   return data
@@ -156,9 +155,6 @@ async function postBet(handId: string, userId: string, amount: number, action: s
   if (amount <= 0) throw new Error('Invalid bet amount')
 
   // For bet/raise/call: deduct from player chip balance at table and record escrow and bet
-  const { data: seat } = await supabase.from('poker_seats').select('*').eq('id', (await supabase.from('poker_seats').select('id').eq('table_id', (await supabase.from('poker_hands').select('table_id').eq('id', handId).single()).data?.table_id).eq('user_id', userId).single()).data?.id)
-  
-  // Get the seat properly
   const { data: hand } = await supabase.from('poker_hands').select('table_id').eq('id', handId).single()
   if (!hand) throw new Error('Hand not found')
   
@@ -205,7 +201,7 @@ async function processRake(userId: string, tableId: string, startingChips: numbe
     const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
     if (!seat) throw new Error('Seat not found')
 
-    // Calculate rake and tip in chips
+    // Calculate rake and tip in chips (all chip-based now)
     const rakeChips = Math.round(netProfit * (rakePercent / 100))
     const tipChips = Math.round(rakeChips * (tipPercent / 100))
     const totalDeductionChips = rakeChips + tipChips
@@ -215,27 +211,19 @@ async function processRake(userId: string, tableId: string, startingChips: numbe
     const playerChips = await getPlayerChips(userId)
     await updatePlayerChips(userId, playerChips + BigInt(playerChipsRemaining))
 
-    // Add rake and tip to house (converted to cash value)
-    const rakeInCash = rakeChips / CHIPS_PER_DOLLAR
-    const tipInCash = tipChips / CHIPS_PER_DOLLAR
+    // Add rake and tip to house (in chips)
+    const totalHouseChips = rakeChips + tipChips
+    const houseChips = await getPlayerChips(HOUSE_ID)
+    await updatePlayerChips(HOUSE_ID, houseChips + BigInt(totalHouseChips))
 
-    // Update house wallet
-    const { data: houseWallet } = await supabase.from('wallets').select('*').eq('user_id', HOUSE_ID).eq('currency_code', 'USD').single()
-    if (houseWallet) {
-      const houseCurrentBalance = Number(houseWallet.balance)
-      const houseNewBalance = houseCurrentBalance + rakeInCash + tipInCash
-      await supabase.from('wallets').update({ balance: houseNewBalance, updated_at: new Date() }).eq('user_id', HOUSE_ID).eq('currency_code', 'USD')
-    }
-
-    // Record rake transaction
+    // Record rake transaction (in chips only)
     await supabase.from('rake_transactions').insert([{
       house_id: HOUSE_ID,
       user_id: userId,
       table_id: tableId,
-      amount: rakeInCash + tipInCash,
+      amount: totalHouseChips,
       tip_percent: tipPercent,
-      currency_code: 'USD',
-      balance_after: houseWallet ? Number(houseWallet.balance) + rakeInCash + tipInCash : rakeInCash + tipInCash
+      currency_code: 'CHIPS'
     }])
 
     // Create session record for analytics
@@ -304,30 +292,10 @@ async function purchaseChips(userId: string, packageId: string): Promise<any> {
   }
 }
 
-async function cashOutChips(userId: string, chipsToCashOut: bigint): Promise<any> {
-  // Get player chips
-  const playerChips = await getPlayerChips(userId)
-  if (playerChips < chipsToCashOut) throw new Error('Insufficient chips to cash out')
-
-  // Calculate cash value (at current exchange rate)
-  const cashValue = Number(chipsToCashOut) / CHIPS_PER_DOLLAR
-
-  // Deduct chips from inventory
-  const newChipBalance = playerChips - chipsToCashOut
-  await updatePlayerChips(userId, newChipBalance)
-
-  // Add cash to player wallet (USD)
-  const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', userId).eq('currency_code', 'USD').single()
-  if (wallet) {
-    const newWalletBalance = Number(wallet.balance) + cashValue
-    await supabase.from('wallets').update({ balance: newWalletBalance, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', 'USD')
-  }
-
+async function getHouseChips(): Promise<any> {
+  const houseChips = await getPlayerChips(HOUSE_ID)
   return {
-    success: true,
-    chipsCashedOut: chipsToCashOut.toString(),
-    cashValue,
-    newChipBalance: newChipBalance.toString()
+    houseChips: houseChips.toString()
   }
 }
 
@@ -349,7 +317,7 @@ Deno.serve(async (req) => {
     const path = url.pathname
     if (path.endsWith('/create_table') && req.method === 'POST') {
       const body = await req.json()
-      const t = await createTable(body.name, Number(body.stakeMin), Number(body.stakeMax), body.currency, body.userId)
+      const t = await createTable(body.name, Number(body.stakeMin), Number(body.stakeMax), 'CHIPS', body.userId)
       return new Response(JSON.stringify(t), { headers: corsHeaders })
     }
 
@@ -407,16 +375,15 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
-    if (path.endsWith('/cash_out_chips') && req.method === 'POST') {
-      const body = await req.json()
-      const r = await cashOutChips(body.userId, BigInt(body.chipsToCashOut))
-      return new Response(JSON.stringify(r), { headers: corsHeaders })
-    }
-
     if (path.endsWith('/get_player_chips') && req.method === 'POST') {
       const body = await req.json()
       const chips = await getPlayerChips(body.userId)
       return new Response(JSON.stringify({ chips: chips.toString() }), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/get_house_chips') && req.method === 'POST') {
+      const r = await getHouseChips()
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
     return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: corsHeaders })
