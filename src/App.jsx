@@ -513,33 +513,35 @@ export default function App() {
           {/* Normal layout for all other pages */}
           {activeTab !== 'planning-setup' && activeTab !== 'planning' && (
             <div className="min-h-screen bg-slate-50 flex">
-              <Sidebar
-                activeTab={activeTab}
-                onTabChange={setActiveTab}
-                userEmail={userEmail}
-                onShowAuth={(tab) => {
-                  setAuthInitialTab(tab || 'login')
-                  setShowAuth(true)
-                  if (tab === 'register') window.history.replaceState(null, '', '/register')
-                  else window.history.replaceState(null, '', '/login')
-                }}
-                onSignOut={async () => {
-                  try {
-                    stopPresence()
-                    await supabase.auth.signOut()
-                  } catch (e) {
-                    console.warn('Sign out error', e)
-                  }
-                  try {
-                    localStorage.removeItem('currency_ph_guest_session')
-                  } catch (e) {
-                    console.warn('Could not clear guest session', e)
-                  }
-                  setUserId(null)
-                  setUserEmail(null)
-                  setShowAuth(false)
-                }}
-              />
+              {userId && (
+                <Sidebar
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  userEmail={userEmail}
+                  onShowAuth={(tab) => {
+                    setAuthInitialTab(tab || 'login')
+                    setShowAuth(true)
+                    if (tab === 'register') window.history.replaceState(null, '', '/register')
+                    else window.history.replaceState(null, '', '/login')
+                  }}
+                  onSignOut={async () => {
+                    try {
+                      stopPresence()
+                      await supabase.auth.signOut()
+                    } catch (e) {
+                      console.warn('Sign out error', e)
+                    }
+                    try {
+                      localStorage.removeItem('currency_ph_guest_session')
+                    } catch (e) {
+                      console.warn('Could not clear guest session', e)
+                    }
+                    setUserId(null)
+                    setUserEmail(null)
+                    setShowAuth(false)
+                  }}
+                />
+              )}
               <div className="flex-1 flex flex-col">
                 <Navbar
                   activeTab={activeTab}
