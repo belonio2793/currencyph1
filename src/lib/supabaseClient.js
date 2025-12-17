@@ -36,6 +36,8 @@ if (typeof window !== 'undefined') {
 
   // Wrap console.error to suppress Supabase/fetch errors before they're logged
   const originalError = console.error
+  const originalWarn = console.warn
+
   console.error = function(...args) {
     const message = args[0]?.toString?.() || String(args[0]) || ''
     const messageStr = String(message)
@@ -43,13 +45,26 @@ if (typeof window !== 'undefined') {
     // Suppress "Failed to fetch" and related errors
     if (messageStr.includes('Failed to fetch') ||
         messageStr.includes('TypeError: Failed to fetch') ||
-        (messageStr.includes('Error') && messageStr.includes('fetch')) ||
-        messageStr.includes('supabase')) {
+        messageStr.includes('TypeError') && messageStr.includes('fetch') ||
+        messageStr.includes('fetch error') ||
+        messageStr.includes('supabase') && messageStr.includes('error')) {
       return // Silently suppress
     }
 
     // Call original error handler for other errors
     return originalError.apply(console, args)
+  }
+
+  console.warn = function(...args) {
+    const message = args[0]?.toString?.() || String(args[0]) || ''
+    const messageStr = String(message)
+
+    // Suppress fetch warnings
+    if (messageStr.includes('Failed to fetch')) {
+      return
+    }
+
+    return originalWarn.apply(console, args)
   }
 
   // Suppress unhandled promise rejections from Supabase fetch failures
