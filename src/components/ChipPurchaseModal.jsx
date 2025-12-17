@@ -228,10 +228,10 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl shadow-2xl max-w-6xl w-full border border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
-        
+      <div className="bg-slate-900 rounded-2xl shadow-2xl max-w-6xl w-full border border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
+
         {/* Header */}
-        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-8 text-white sticky top-0 z-10">
+        <div className="bg-cyan-600 p-8 text-white sticky top-0 z-10">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold">Buy Poker Chips 🎰</h2>
@@ -308,14 +308,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                     )}
 
                     {/* Card Content */}
-                    <div className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 ${label ? 'pt-14' : ''} flex flex-col items-center`}>
-                      
-                      {/* Chip Icon */}
-                      <div className="mb-4">
-                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-600 flex items-center justify-center shadow-lg text-2xl">
-                          💎
-                        </div>
-                      </div>
+                    <div className={`bg-slate-800 p-6 ${label ? 'pt-14' : ''} flex flex-col items-center`}>
 
                       {/* Chip Amount */}
                       <div className="text-center mb-3">
@@ -335,7 +328,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                       )}
 
                       {/* Divider */}
-                      <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent my-4"></div>
+                      <div className="w-full h-px bg-slate-600 my-4"></div>
 
                       {/* Price */}
                       <div className="text-center mb-6">
@@ -358,7 +351,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                         disabled={processing || !affordable}
                         className={`w-full py-3 font-bold rounded-lg transition transform active:scale-95 ${
                           affordable
-                            ? 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl'
+                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl'
                             : 'bg-slate-600 text-slate-400 cursor-not-allowed opacity-50'
                         }`}
                       >
