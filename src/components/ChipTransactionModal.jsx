@@ -238,7 +238,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
 
               {/* Right: Summary */}
               <div className="space-y-4">
-                <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+                <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 flex flex-col">
                   <h3 className="text-lg font-semibold text-white mb-4">Order Summary</h3>
 
                   {/* Current Balance */}
@@ -265,6 +265,12 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                       <div className="mb-6 pb-6 border-b border-slate-700">
                         <div className="text-xs text-slate-400 mb-2">Total to Receive</div>
                         <div className="text-2xl font-bold text-emerald-400">{selectedTotalChips.toLocaleString()}</div>
+                      </div>
+
+                      {/* Price */}
+                      <div className="mb-6 pb-6 border-b border-slate-700">
+                        <div className="text-xs text-slate-400 mb-2">Price</div>
+                        <div className="text-2xl font-bold text-emerald-500">{getPhpPrice(selectedPackage.usd_price)}</div>
                       </div>
 
                       {/* New Balance */}
