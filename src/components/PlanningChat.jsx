@@ -1364,6 +1364,19 @@ export default function PlanningChat() {
                 color: white;
                 box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
               }
+              /* Ensure modals stay on top of map elements */
+              .leaflet-popup {
+                z-index: 1000 !important;
+              }
+              .leaflet-tooltip {
+                z-index: 1000 !important;
+              }
+              .leaflet-shadow-pane {
+                z-index: 200 !important;
+              }
+              .leaflet-pane {
+                z-index: 1 !important;
+              }
             `}</style>
 
             {/* Marker Type Selector Panel with Collapse/Expand */}
