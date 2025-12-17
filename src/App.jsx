@@ -429,6 +429,8 @@ export default function App() {
     if (!user.id.includes('guest-local')) {
       try {
         await currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+        // Ensure user has wallets for all active currencies
+        await currencyAPI.ensureUserWallets(user.id)
         if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id)
       } catch (err) {
         console.error('Could not initialize user profile:', err)
