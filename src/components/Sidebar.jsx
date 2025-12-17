@@ -121,8 +121,8 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
       ]
     },
     {
-      id: 'system',
-      label: 'System',
+      id: 'network',
+      label: 'Network',
       icon: '⚙️',
       items: [
         { id: 'network-balances', label: 'Network Balances', auth: true }
