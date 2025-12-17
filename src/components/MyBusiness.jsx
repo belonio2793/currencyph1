@@ -820,6 +820,8 @@ export default function MyBusiness({ userId }) {
   }
 
   const initializeForm = (mode) => {
+    const generatedId = generateCurrencyRegistrationId()
+    console.log('[MyBusiness] Initializing form with mode:', mode, 'Generated ID:', generatedId)
     setFormMode(mode)
     setShowRegistrationForm(true)
     setFormData({
@@ -827,12 +829,13 @@ export default function MyBusiness({ userId }) {
       registrationType: 'sole',
       tin: '',
       certificateOfIncorporation: '',
-      currencyRegistrationId: generateCurrencyRegistrationId(),
+      currencyRegistrationId: generatedId,
       cityOfRegistration: '',
       registrationDate: mode === 'create' ? getCurrentManillaDate() : ''
     })
     setBusinessNameAvailability(null)
     setCitySearch('')
+    setFormError(null)
   }
 
   const openEditTaxInfo = () => {
