@@ -85,7 +85,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     setError(null)
 
     try {
-      const chipAmount = BigInt(selectedPackage.chip_amount || 0)
+      const chipAmount = BigInt(selectedPackage.chips_amount || 0)
       const bonusChips = BigInt(selectedPackage.bonus_chips || 0)
       const totalChipsToAdd = chipAmount + bonusChips
       const newChipBalance = userChips + totalChipsToAdd
@@ -183,7 +183,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                 <h3 className="text-xl font-semibold text-white mb-4">Select Package</h3>
                 <div className="space-y-3 max-h-96 overflow-y-auto">
                   {packages.map((pkg) => {
-                    const chipAmount = Number(pkg.chip_amount || 0)
+                    const chipAmount = Number(pkg.chips_amount || 0)
                     const bonusChips = Number(pkg.bonus_chips || 0)
                     const total = chipAmount + bonusChips
                     const isSelected = selectedPackage?.id === pkg.id
