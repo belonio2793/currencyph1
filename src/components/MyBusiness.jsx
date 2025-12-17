@@ -1169,7 +1169,10 @@ export default function MyBusiness({ userId }) {
                   {businesses.map(business => (
                     <button
                       key={business.id}
-                      onClick={() => setSelectedBusiness(selectedBusiness?.id === business.id ? null : business)}
+                      onClick={() => {
+                        setSelectedBusiness(business)
+                        setMainTab('management')
+                      }}
                       className={`w-full text-left px-3 py-2 rounded-lg border transition-colors text-sm ${
                         selectedBusiness?.id === business.id
                           ? 'bg-blue-100 border-blue-400 text-blue-900 font-semibold'
