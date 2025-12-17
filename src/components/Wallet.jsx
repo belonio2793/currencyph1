@@ -340,9 +340,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
       {/* Fiat wallets from wallets_fiat */}
       <div className="mb-6">
-
         {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <>
+            <h3 className="text-xl font-light mb-3">Fiat Wallets - All Currencies</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => {
               const isSameCurrency = w.currency_code === globalCurrency
               const balanceInGlobalCurrency = isSameCurrency
@@ -372,6 +373,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               )
             })}
           </div>
+          </>
         )}
       </div>
 
