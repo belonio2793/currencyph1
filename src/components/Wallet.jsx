@@ -37,12 +37,20 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   // Filtered currencies for search
   const getFilteredCurrencies = () => {
     const query = searchInput.toLowerCase()
+
     if (!query) {
-      return { fiat: FIAT_CURRENCIES, crypto: CRYPTO_CURRENCIES }
+      return currenciesGrouped
     }
+
     return {
-      fiat: FIAT_CURRENCIES.filter(c => c.toLowerCase().includes(query)),
-      crypto: CRYPTO_CURRENCIES.filter(c => c.toLowerCase().includes(query))
+      fiat: currenciesGrouped.fiat.filter(c =>
+        c.code.toLowerCase().includes(query) ||
+        c.name.toLowerCase().includes(query)
+      ),
+      crypto: currenciesGrouped.crypto.filter(c =>
+        c.code.toLowerCase().includes(query) ||
+        c.name.toLowerCase().includes(query)
+      )
     }
   }
 
