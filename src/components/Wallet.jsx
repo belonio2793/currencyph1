@@ -128,9 +128,9 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     // New independent keys for fiat
     if (prefs.walletCurrencies_fiat) setEnabledFiat(prefs.walletCurrencies_fiat)
 
-    // Defaults when not set
+    // Defaults when not set - show all fiat currencies since they're auto-created
     if (!prefs.walletCurrencies) setEnabledInternal(['PHP', 'USD'])
-    if (!prefs.walletCurrencies_fiat) setEnabledFiat(['PHP', 'USD'])
+    if (!prefs.walletCurrencies_fiat) setEnabledFiat(FIAT_CURRENCIES)
   }
 
   const savePreferences = (type, currencies) => {
