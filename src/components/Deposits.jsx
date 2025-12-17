@@ -874,7 +874,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           <div className="mb-8 text-center">
             <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
             <h2 className="text-5xl font-light text-slate-900">
-              {getTotalBalance} {globalCurrency}
+              {formatCurrency(getTotalBalance, globalCurrency)}
             </h2>
           </div>
 
