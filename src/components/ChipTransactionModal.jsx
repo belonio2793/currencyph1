@@ -148,7 +148,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     return chips.toLocaleString()
   }
 
-  const selectedChipAmount = selectedPackage ? Number(selectedPackage.chip_amount || 0) : 0
+  const selectedChipAmount = selectedPackage ? Number(selectedPackage.chips_amount || 0) : 0
   const selectedBonusChips = selectedPackage ? Number(selectedPackage.bonus_chips || 0) : 0
   const selectedTotalChips = selectedChipAmount + selectedBonusChips
 
