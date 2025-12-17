@@ -370,7 +370,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                           </button>
                         </div>
                       ) : (
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                        <div className="space-y-2 flex-1 overflow-y-auto">
                           {getMyCreatedTables().map(t => {
                             const tableSeats = seats.filter(s => s.table_id === t.id)
                             const openSeats = t.max_seats - tableSeats.length
@@ -437,7 +437,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                       {getPlayerTables().length === 0 ? (
                         <div className="text-slate-400 text-center py-8">No player tables available</div>
                       ) : (
-                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                        <div className="space-y-2 flex-1 overflow-y-auto">
                           {getPlayerTables().map(t => {
                             const tableSeats = seats.filter(s => s.table_id === t.id)
                             const openSeats = t.max_seats - tableSeats.length
