@@ -62,29 +62,32 @@ if (typeof window !== 'undefined') {
     const reasonMsg = reason?.message ? String(reason.message) : ''
     const stack = reason?.stack ? String(reason.stack) : ''
 
-    const isFetchError = reasonStr.includes('Failed to fetch') || reasonMsg.includes('Failed to fetch')
-    const isTypeError = (reasonStr.includes('TypeError') && reasonStr.includes('fetch')) || reasonStr.includes('TypeError: Failed to fetch')
-    const isSupabaseStack = stack.includes('@supabase') || stack.includes('supabase-js') || stack.includes('updatePresence') || stack.includes('presence.js')
+    // Check for any fetch-related error
+    const isFetchError = reasonMsg.includes('Failed to fetch') || reasonStr.includes('Failed to fetch')
+    const isTypeError = reasonMsg?.includes('TypeError') || reasonStr.includes('TypeError')
 
-    return isFetchError || isTypeError || isSupabaseStack
+    // Check if error originated from Supabase library (most reliable indicator)
+    const isFromSupabase = stack.includes('supabase') || stack.includes('fetch')
+
+    // Suppress: all Supabase fetch errors, all "Failed to fetch" errors, or TypeError with fetch origin
+    return isFromSupabase || isFetchError || (isTypeError && isFromSupabase)
   }
 
   window.addEventListener('unhandledrejection', (event) => {
     if (suppressSupabaseErrors(event)) {
       event.preventDefault()
     }
-  }, true)
+  }, { capture: true })
 
   window.addEventListener('error', (event) => {
-    // Suppress "Failed to fetch" errors from within Supabase library or presence functionality
+    // Suppress "Failed to fetch" errors from within Supabase library
     const msgStr = String(event.message || '')
     const filenameStr = String(event.filename || '')
 
-    if (msgStr.includes('Failed to fetch') ||
-        (msgStr.includes('TypeError') && (filenameStr.includes('supabase') || filenameStr.includes('presence')))) {
+    if (msgStr.includes('Failed to fetch') || msgStr.includes('fetch')) {
       event.preventDefault()
     }
-  }, true)
+  }, { capture: true })
 }
 
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
