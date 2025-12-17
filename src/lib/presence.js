@@ -66,8 +66,20 @@ async function updatePresence(status) {
   // Skip presence updates if Supabase is not healthy
   if (!isSupabaseHealthy()) return
 
-  // Skip if browser is offline
-  if (typeof navigator !== 'undefined' && !navigator.onLine) return
+  // Skip if browser is offline - check multiple ways to detect offline
+  if (typeof navigator !== 'undefined') {
+    if (!navigator.onLine) return
+
+    // Additional offline detection: if we can't reach basic connectivity, skip
+    try {
+      if (typeof navigator.connection !== 'undefined' && navigator.connection.saveData) {
+        // Skip on save-data mode
+        return
+      }
+    } catch (e) {
+      // Ignore connection check errors
+    }
+  }
 
   try {
     // Guard against supabase being undefined or not having the expected methods
@@ -89,17 +101,27 @@ async function updatePresence(status) {
       updateData.location_updated_at = new Date().toISOString()
     }
 
-    const { error } = await supabase
-      .from('user_presence')
-      .upsert([updateData])
+    // Wrap in Promise.race with timeout to prevent hanging
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000)
 
-    if (error) {
-      if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
-        // Table doesn't exist, silently skip
-        return
+    try {
+      const { error } = await supabase
+        .from('user_presence')
+        .upsert([updateData])
+
+      clearTimeout(timeoutId)
+
+      if (error) {
+        if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
+          // Table doesn't exist, silently skip
+          return
+        }
+        // Silently skip other errors as presence is non-critical
+        // Do not log - presence is optional functionality
       }
-      // Silently skip other errors as presence is non-critical
-      // Do not log - presence is optional functionality
+    } finally {
+      clearTimeout(timeoutId)
     }
   } catch (err) {
     // Network errors, fetch failures, table might not exist, or other issues - silently ignore
