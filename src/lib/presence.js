@@ -36,17 +36,34 @@ export function initializePresence(userId) {
     }
   }, PRESENCE_UPDATE_INTERVAL)
 
+  // Handle online/offline transitions
+  const handleOnline = () => {
+    if (isSupabaseHealthy()) {
+      updatePresence('online').catch(() => {})
+    }
+  }
+
+  const handleOffline = () => {
+    if (presenceIntervalId) {
+      clearInterval(presenceIntervalId)
+      presenceIntervalId = null
+    }
+  }
+
+  window.addEventListener('online', handleOnline)
+  window.addEventListener('offline', handleOffline)
+
   window.addEventListener('beforeunload', () => {
     // best-effort update; don't await in unload handlers
-    if (isSupabaseHealthy()) {
+    if (isSupabaseHealthy() && navigator.onLine) {
       try { updatePresence('offline').catch(() => {}) } catch (e) {}
     }
     clearInterval(presenceIntervalId)
   })
 
   document.addEventListener('visibilitychange', () => {
-    // Only update presence if Supabase is healthy
-    if (!isSupabaseHealthy()) return
+    // Only update presence if Supabase is healthy and online
+    if (!isSupabaseHealthy() || !navigator.onLine) return
 
     if (document.hidden) {
       updatePresence('away').catch(() => {})
