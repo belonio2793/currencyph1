@@ -110,7 +110,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       setEnabledInternal(prefs.walletCurrencies)
     } else {
       // Default: show all currencies since they're auto-created
-      setEnabledInternal(ALL_CURRENCIES)
+      const allCurrencyCodes = allCurrencies.map(c => c.code)
+      setEnabledInternal(allCurrencyCodes)
     }
   }
 
