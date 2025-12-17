@@ -21,12 +21,17 @@ export function initializePresence(userId) {
     return
   }
 
+  // Skip presence if offline
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    return
+  }
+
   // Fire-and-forget; silently ignore all errors since presence is non-critical
   updatePresence('online').catch(() => {})
 
   presenceIntervalId = setInterval(() => {
-    // Skip updates if Supabase is not healthy
-    if (isSupabaseHealthy()) {
+    // Skip updates if Supabase is not healthy or if offline
+    if (isSupabaseHealthy() && navigator.onLine) {
       updatePresence('online').catch(() => {})
     }
   }, PRESENCE_UPDATE_INTERVAL)
