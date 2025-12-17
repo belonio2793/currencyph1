@@ -28,8 +28,15 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
         setSelectedMerchant(data[0])
       }
     } catch (err) {
-      const errorMessage = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error'
-      console.error('Error loading merchants:', { error: err, message: errorMessage })
+      let errorMessage = 'Unknown error'
+      if (err instanceof Error) {
+        errorMessage = err.message
+      } else if (typeof err === 'object' && err !== null) {
+        errorMessage = err?.message || err?.error_description || 'Failed to load merchants from database'
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      }
+      console.error('Error loading merchants:', errorMessage, err)
       setError(`Failed to load merchants: ${errorMessage}`)
     } finally {
       setLoading(false)
