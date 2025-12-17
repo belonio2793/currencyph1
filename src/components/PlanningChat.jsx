@@ -1371,13 +1371,13 @@ export default function PlanningChat() {
             {/* Marker Type Selector Panel with Collapse/Expand */}
             {isAuthenticated && (
               <div className="marker-type-selector">
-                <div className="flex items-center justify-between mb-2 gap-1">
+                <div className="flex items-center justify-between">
                   {(showMarkerTypeSelector || !isMobile) && (
-                    <span className="marker-type-label flex-shrink-0">Select Type</span>
+                    <span className="marker-type-label">Select Type</span>
                   )}
                   <button
                     onClick={() => setShowMarkerTypeSelector(!showMarkerTypeSelector)}
-                    className="text-slate-400 hover:text-white transition-colors text-sm font-medium flex-shrink-0"
+                    className="text-slate-300 hover:text-white transition-colors text-lg font-medium flex-shrink-0"
                     title={showMarkerTypeSelector ? 'Collapse' : 'Expand'}
                   >
                     {showMarkerTypeSelector ? '▼' : '▶'}
