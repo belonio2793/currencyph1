@@ -37,7 +37,8 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
       if (error && error.code !== 'PGRST116') throw error
       setPlayerChips(BigInt(data?.total_chips || 0))
     } catch (e) {
-      console.error('Error loading chips:', e)
+      const errorMsg = e?.message || e?.error_description || JSON.stringify(e)
+      console.error('Error loading chips:', errorMsg)
     }
   }
 
