@@ -32,7 +32,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'account',
       label: 'Account',
-      icon: '👤',
+      icon: '',
       items: [
         { id: 'profile', label: 'Profile', auth: true },
         { id: 'inbox', label: 'Inbox', auth: true },
@@ -53,7 +53,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'main',
       label: 'Main',
-      icon: '🏠',
+      icon: '',
       items: [
         { id: 'nearby', label: 'Nearby', auth: true },
         { id: 'rides', label: 'Rides', auth: true }
@@ -62,7 +62,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'financial',
       label: 'Financial',
-      icon: '💰',
+      icon: '',
       items: [
         { id: 'rates', label: 'Currency Rates', auth: true },
         { id: 'payments-financial', label: 'Payments', auth: true },
@@ -73,7 +73,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'marketplace',
       label: 'Marketplace',
-      icon: '🛍️',
+      icon: '',
       items: [
         { id: 'jobs', label: 'Jobs', auth: true },
         { id: 'p2p-loans', label: 'Loans', auth: true }
@@ -82,7 +82,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'community',
       label: 'Community',
-      icon: '👥',
+      icon: '',
       items: [
         { id: 'online-users', label: 'Online Users', auth: true },
         { id: 'messages', label: 'Messages', auth: true },
@@ -92,7 +92,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'personal',
       label: 'Personal',
-      icon: '📋',
+      icon: '',
       items: [
         { id: 'bills', label: 'Bills', auth: true }
       ]
@@ -100,13 +100,13 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'business',
       label: 'Business',
-      icon: '📊',
+      icon: '',
       items: []
     },
     {
       id: 'games',
       label: 'Games',
-      icon: '🎮',
+      icon: '',
       items: [
         { id: 'poker', label: 'Poker', auth: true },
         { id: 'chess', label: 'Chess', auth: true }
@@ -115,7 +115,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'maps',
       label: 'Maps',
-      icon: '🗺️',
+      icon: '',
       items: [
         { id: 'shipping', label: 'Shipping', auth: true }
       ]
@@ -123,7 +123,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     {
       id: 'network',
       label: 'Network',
-      icon: '⚙️',
+      icon: '',
       items: [
         { id: 'network-balances', label: 'Network Balances', auth: true }
       ]
@@ -368,7 +368,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
               className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
               title={isCollapsed ? 'Sign out' : ''}
             >
-              {isCollapsed ? '⬅️' : 'Sign out'}
+              {isCollapsed ? '' : 'Sign out'}
             </button>
           ) : (
             <>
@@ -377,14 +377,14 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                 className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
                 title={isCollapsed ? 'Login' : ''}
               >
-                {isCollapsed ? '🔐' : 'Login'}
+                {isCollapsed ? '' : 'Login'}
               </button>
               <button
                 onClick={() => onShowAuth?.('register')}
                 className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors`}
                 title={isCollapsed ? 'Register' : ''}
               >
-                {isCollapsed ? '✏️' : 'Register'}
+                {isCollapsed ? '' : 'Register'}
               </button>
             </>
           )}
