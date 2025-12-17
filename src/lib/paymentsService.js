@@ -42,40 +42,56 @@ export const paymentsService = {
   },
 
   async createMerchant(userId, merchantData) {
-    const { data, error } = await supabase
-      .from('merchants')
-      .insert([
-        {
-          owner_user_id: userId,
-          merchant_name: merchantData.merchant_name,
-          description: merchantData.description || '',
-          logo_url: merchantData.logo_url || null,
-          default_settlement_currency: merchantData.default_settlement_currency || 'PHP',
-          business_id: merchantData.business_id || null,
-          is_active: true,
-          metadata: merchantData.metadata || {}
-        }
-      ])
-      .select()
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('merchants')
+        .insert([
+          {
+            owner_user_id: userId,
+            merchant_name: merchantData.merchant_name,
+            description: merchantData.description || '',
+            logo_url: merchantData.logo_url || null,
+            default_settlement_currency: merchantData.default_settlement_currency || 'PHP',
+            business_id: merchantData.business_id || null,
+            is_active: true,
+            metadata: merchantData.metadata || {}
+          }
+        ])
+        .select()
+        .single()
 
-    if (error) throw error
-    return data
+      if (error) {
+        const errorMessage = error?.message || JSON.stringify(error)
+        throw new Error(errorMessage)
+      }
+      return data
+    } catch (err) {
+      console.error('createMerchant error:', err)
+      throw err
+    }
   },
 
   async updateMerchant(merchantId, updates) {
-    const { data, error } = await supabase
-      .from('merchants')
-      .update({
-        ...updates,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', merchantId)
-      .select()
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('merchants')
+        .update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', merchantId)
+        .select()
+        .single()
 
-    if (error) throw error
-    return data
+      if (error) {
+        const errorMessage = error?.message || JSON.stringify(error)
+        throw new Error(errorMessage)
+      }
+      return data
+    } catch (err) {
+      console.error('updateMerchant error:', err)
+      throw err
+    }
   },
 
   // ============ Products ============
