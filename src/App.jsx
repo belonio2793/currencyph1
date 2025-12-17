@@ -100,8 +100,15 @@ export default function App() {
           if (session && session.user) {
             setUserId(session.user.id)
             setUserEmail(session.user.email)
-            // ensure presence and balance are initialized for new session (only when Supabase is configured)
-            try { if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(session.user.id) } catch(e) {}
+            // Presence is disabled due to frequent network errors in production
+            // Try to initialize presence only if online and Supabase is healthy
+            try {
+              if (navigator.onLine && (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured)) {
+                initializePresence(session.user.id)
+              }
+            } catch(e) {
+              // Silently ignore - presence is optional
+            }
             loadTotalBalance(session.user.id).catch(() => {})
             setShowAuth(false)
           } else {
