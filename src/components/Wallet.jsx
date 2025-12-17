@@ -34,7 +34,6 @@ const CURRENCY_SYMBOLS = {
 export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
   const [internalWallets, setInternalWallets] = useState([])
-  const [fiatWallets, setFiatWallets] = useState([])
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
 
