@@ -29,11 +29,13 @@ if (typeof window !== 'undefined') {
     const reason = event.reason
     const reasonStr = String(reason)
     const reasonMsg = reason?.message ? String(reason.message) : ''
+    const stack = reason?.stack ? String(reason.stack) : ''
 
     if (
       reasonStr.includes('Failed to fetch') ||
       reasonMsg.includes('Failed to fetch') ||
-      reasonStr.includes('TypeError') && reasonStr.includes('fetch')
+      (reasonStr.includes('TypeError') && reasonStr.includes('fetch')) ||
+      stack.includes('@supabase')
     ) {
       // Silently suppress - presence and background sync are non-critical features
       event.preventDefault()
@@ -44,7 +46,8 @@ if (typeof window !== 'undefined') {
   window.addEventListener('error', (event) => {
     // Suppress "Failed to fetch" errors from within Supabase library
     const msgStr = String(event.message || '')
-    if (msgStr.includes('Failed to fetch') || msgStr.includes('TypeError')) {
+    const filenameStr = String(event.filename || '')
+    if ((msgStr.includes('Failed to fetch') || msgStr.includes('TypeError')) && filenameStr.includes('supabase')) {
       event.preventDefault()
       return true
     }
