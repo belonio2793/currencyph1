@@ -4,6 +4,52 @@ import { currencyAPI } from '../lib/currencyAPI'
 import { apiCache } from '../lib/apiCache'
 import { supabase } from '../lib/supabaseClient'
 
+// Currency symbol mapping
+const CURRENCY_SYMBOLS = {
+  USD: '$',
+  EUR: '€',
+  GBP: '£',
+  JPY: '¥',
+  CNY: '¥',
+  INR: '₹',
+  CAD: 'C$',
+  AUD: 'A$',
+  CHF: 'Fr',
+  SEK: 'kr',
+  NZD: 'NZ$',
+  SGD: 'S$',
+  HKD: 'HK$',
+  PHP: '₱',
+  IDR: 'Rp',
+  MYR: 'RM',
+  THB: '฿',
+  VND: '₫',
+  KRW: '₩',
+  ZAR: 'R',
+  BRL: 'R$',
+  MXN: '$',
+  NOK: 'kr',
+  DKK: 'kr',
+  AED: 'د.إ'
+}
+
+// Helper function to format currency with symbol
+const formatCurrency = (amount, currencyCode, showSymbol = true) => {
+  const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode
+  const numAmount = parseFloat(amount) || 0
+  const formatted = numAmount.toFixed(2)
+
+  if (showSymbol) {
+    // For USD and similar, put symbol before amount
+    if (['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'SGD', 'HKD', 'NZD'].includes(currencyCode)) {
+      return `${symbol}${formatted}`
+    }
+    // For others, put symbol after
+    return `${formatted} ${symbol}`
+  }
+  return formatted
+}
+
 // Payment Methods Configuration
 const PAYMENT_METHODS = {
   solana: {
