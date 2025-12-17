@@ -23,23 +23,25 @@ const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetc
 
 // Add global error handler to suppress expected network connectivity errors from Supabase
 if (typeof window !== 'undefined') {
-  window.addEventListener('unhandledrejection', (event) => {
-    // Suppress unhandled promise rejections from Supabase fetch failures
-    // These occur when the network is unavailable or Fly.io container can't reach Supabase
+  // Suppress unhandled promise rejections from Supabase fetch failures
+  const suppressSupabaseErrors = (event) => {
     const reason = event.reason
+    if (!reason) return false
+
     const reasonStr = String(reason)
     const reasonMsg = reason?.message ? String(reason.message) : ''
     const stack = reason?.stack ? String(reason.stack) : ''
 
-    if (
-      reasonStr.includes('Failed to fetch') ||
-      reasonMsg.includes('Failed to fetch') ||
-      (reasonStr.includes('TypeError') && reasonStr.includes('fetch')) ||
-      stack.includes('@supabase')
-    ) {
-      // Silently suppress - presence and background sync are non-critical features
+    const isFetchError = reasonStr.includes('Failed to fetch') || reasonMsg.includes('Failed to fetch')
+    const isTypeError = (reasonStr.includes('TypeError') && reasonStr.includes('fetch')) || reasonStr.includes('TypeError: Failed to fetch')
+    const isSupabaseStack = stack.includes('@supabase') || stack.includes('supabase-js')
+
+    return isFetchError || isTypeError || isSupabaseStack
+  }
+
+  window.addEventListener('unhandledrejection', (event) => {
+    if (suppressSupabaseErrors(event)) {
       event.preventDefault()
-      return true
     }
   }, true)
 
@@ -47,9 +49,9 @@ if (typeof window !== 'undefined') {
     // Suppress "Failed to fetch" errors from within Supabase library
     const msgStr = String(event.message || '')
     const filenameStr = String(event.filename || '')
-    if ((msgStr.includes('Failed to fetch') || msgStr.includes('TypeError')) && filenameStr.includes('supabase')) {
+
+    if (msgStr.includes('Failed to fetch') || (msgStr.includes('TypeError') && filenameStr.includes('supabase'))) {
       event.preventDefault()
-      return true
     }
   }, true)
 }
