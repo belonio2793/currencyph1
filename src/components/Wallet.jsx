@@ -77,18 +77,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       console.warn('Failed to subscribe to wallets realtime:', e)
     }
 
-    try {
-      const chFiat = supabase
-        .channel('public:wallets_fiat')
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'wallets_fiat', filter: `user_id=eq.${userId}` }, () => {
-          loadWallets()
-        })
-        .subscribe()
-      channels.push(chFiat)
-    } catch (e) {
-      console.warn('Failed to subscribe to wallets_fiat realtime:', e)
-    }
-
     return () => {
       try {
         channels.forEach(c => c && c.unsubscribe && c.unsubscribe())
