@@ -268,31 +268,78 @@ app.get('/api/health', (req, res) => {
 
 /**
  * GET /api/crypto-prices
- * Fetch cryptocurrency prices from CoinGecko
+ * Fetch cryptocurrency prices from CoinGecko with caching
  */
 app.get('/api/crypto-prices', async (req, res) => {
   try {
+    const now = Date.now()
+
+    // Return cached data if still valid
+    if (cryptoPriceCache && (now - cryptoPriceCacheTime) < CRYPTO_CACHE_DURATION) {
+      return res.json({
+        success: true,
+        cryptoPrices: cryptoPriceCache,
+        cached: true,
+        cacheAge: now - cryptoPriceCacheTime
+      })
+    }
+
     const ids = [
       'bitcoin','ethereum','litecoin','dogecoin','ripple','cardano','solana','avalanche-2','matic-network','polkadot','chainlink','uniswap','aave','usd-coin','tether'
     ].join(',')
 
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10000)
+
     const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, {
-      timeout: 10000
+      signal: controller.signal
     })
 
+    clearTimeout(timeout)
+
     if (!response.ok) {
+      // If fetch fails but we have cached data, return it even if stale
+      if (cryptoPriceCache) {
+        console.warn(`CoinGecko API error (${response.status}), returning stale cache`)
+        return res.json({
+          success: true,
+          cryptoPrices: cryptoPriceCache,
+          cached: true,
+          stale: true,
+          cacheAge: now - cryptoPriceCacheTime
+        })
+      }
       return res.status(response.status).json({
         error: `CoinGecko API error: ${response.status}`
       })
     }
 
     const data = await response.json()
+
+    // Update cache
+    cryptoPriceCache = data
+    cryptoPriceCacheTime = now
+
     res.json({
       success: true,
-      cryptoPrices: data
+      cryptoPrices: data,
+      cached: false
     })
   } catch (error) {
-    console.error('Crypto prices fetch error:', error)
+    console.error('Crypto prices fetch error:', error.message)
+
+    // If request was aborted or timed out, try to return cached data
+    if (error.name === 'AbortError' && cryptoPriceCache) {
+      console.warn('CoinGecko request timed out, returning cached data')
+      return res.json({
+        success: true,
+        cryptoPrices: cryptoPriceCache,
+        cached: true,
+        stale: true,
+        cacheAge: Date.now() - cryptoPriceCacheTime
+      })
+    }
+
     res.status(500).json({
       error: 'Failed to fetch crypto prices',
       message: error.message
