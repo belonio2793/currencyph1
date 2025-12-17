@@ -65,6 +65,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   }
 
   async function handlePurchase(packageId) {
+    console.log('Purchase clicked:', { packageId, userId, packages: packages.length })
+
     if (!packageId || !userId) {
       setError('Missing purchase information')
       return
@@ -75,6 +77,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
     try {
       const pkg = packages.find(p => p.id === packageId)
+      console.log('Found package:', pkg)
       if (!pkg) throw new Error('Package not found')
 
       if (userWallet) {
