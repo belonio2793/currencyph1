@@ -39,14 +39,19 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function loadPlayerChips() {
     if (!userId) return
     try {
-      const { data, error } = await supabase
-        .from('player_poker_chips')
-        .select('total_chips')
-        .eq('user_id', userId)
-        .single()
+      if (isGuestLocal) {
+        const storedChips = localStorage.getItem(`poker_chips_${userId}`)
+        setPlayerChips(BigInt(storedChips || 0))
+      } else {
+        const { data, error } = await supabase
+          .from('player_poker_chips')
+          .select('total_chips')
+          .eq('user_id', userId)
+          .single()
 
-      if (error && error.code !== 'PGRST116') throw error
-      setPlayerChips(BigInt(data?.total_chips || 0))
+        if (error && error.code !== 'PGRST116') throw error
+        setPlayerChips(BigInt(data?.total_chips || 0))
+      }
     } catch (e) {
       const errorMsg = e?.message || e?.error_description || JSON.stringify(e)
       console.error('Error loading chips:', errorMsg)
