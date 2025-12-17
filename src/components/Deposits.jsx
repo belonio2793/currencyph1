@@ -1017,7 +1017,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Amount ({selectedCurrency})
+                    Amount ({selectedCurrency} {CURRENCY_SYMBOLS[selectedCurrency] || ''})
                   </label>
                   <input
                     type="number"
@@ -1035,20 +1035,20 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       <div>
                         <p className="text-slate-600 text-sm mb-1">You send</p>
                         <p className="text-2xl font-light text-slate-900">
-                          {amount} {selectedCurrency}
+                          {formatCurrency(amount, selectedCurrency)}
                         </p>
                       </div>
                       <div className="text-2xl text-slate-400">→</div>
                       <div className="text-right">
                         <p className="text-slate-600 text-sm mb-1">You get</p>
                         <p className="text-2xl font-light text-blue-600">
-                          {convertedAmounts[globalCurrency]} {globalCurrency}
+                          {formatCurrency(convertedAmounts[globalCurrency], globalCurrency)}
                         </p>
                       </div>
                     </div>
                     {getRate(selectedCurrency, globalCurrency) && (
                       <p className="text-xs text-slate-500 border-t border-blue-200 pt-3">
-                        Rate: 1 {selectedCurrency} = {getRate(selectedCurrency, globalCurrency)} {globalCurrency}
+                        Rate: 1 {selectedCurrency} {CURRENCY_SYMBOLS[selectedCurrency] || ''} = {getRate(selectedCurrency, globalCurrency)} {globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''}
                       </p>
                     )}
 
@@ -1059,11 +1059,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                           {Object.entries(convertedAmounts)
                             .filter(([code]) => code !== globalCurrency && code !== selectedCurrency)
                             .slice(0, 4)
-                            .map(([code, value]) => (
-                              <div key={code} className="text-xs text-slate-600">
-                                <span className="font-medium">{code}</span>: {value}
-                              </div>
-                            ))}
+                            .map(([code, value]) => {
+                              const symbol = CURRENCY_SYMBOLS[code] || code
+                              return (
+                                <div key={code} className="text-xs text-slate-600">
+                                  <span className="font-medium">{code}</span>: {formatCurrency(value, code)}
+                                </div>
+                              )
+                            })}
                         </div>
                       </div>
                     )}
