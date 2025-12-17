@@ -349,7 +349,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         {(activeTab === 'my-tables' || activeTab === 'lobby') && (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[calc(100vh-280px)]">
           {/* Tables Lobby */}
-          <div className="lg:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-6">
+          <div className="lg:col-span-1 bg-slate-800 rounded-xl border border-slate-700 p-6 flex flex-col">
             {activeTab === 'my-tables' ? (
               <>
                 {loading ? (
