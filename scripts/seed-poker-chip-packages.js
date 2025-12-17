@@ -105,15 +105,10 @@ async function seed() {
   try {
     console.log('Starting to seed poker chip packages...')
 
-    // First, delete existing packages (if any)
+    // Delete all existing packages
     const { error: deleteErr } = await supabase
-      .from('poker_chip_packages')
-      .delete()
-      .neq('id', 'null')
-
-    if (deleteErr && deleteErr.code !== 'PGRST116') {
-      console.warn('Could not delete existing packages:', deleteErr)
-    }
+      .rpc('execute_sql', { sql: 'DELETE FROM poker_chip_packages' })
+      .catch(() => null) // Ignore if RPC doesn't exist
 
     // Insert new packages
     const { data, error } = await supabase
