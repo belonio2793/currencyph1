@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { useDevice } from '../context/DeviceContext'
 
 function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSignOut }) {
@@ -10,59 +10,122 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     }
     return false
   })
+  const [searchQuery, setSearchQuery] = useState('')
   const [expandedGroups, setExpandedGroups] = useState({
-    jobs: true,
-    navigation: true,
-    community: userEmail ? true : false
+    account: true,
+    main: true,
+    financial: false,
+    marketplace: false,
+    community: false,
+    personal: false,
+    business: false,
+    games: false,
+    maps: false,
+    system: false
   })
 
   useEffect(() => {
     localStorage.setItem('sidebar_collapsed', JSON.stringify(isCollapsed))
   }, [isCollapsed])
 
-  const toggleGroup = (groupId) => {
-    setExpandedGroups(prev => ({
-      ...prev,
-      [groupId]: !prev[groupId]
-    }))
-  }
-
   const menuGroups = [
     {
-      id: 'jobs',
-      label: 'Opportunities',
-      icon: '💼',
+      id: 'account',
+      label: 'Account',
+      icon: '👤',
       items: [
-        { id: 'jobs', label: 'Jobs', auth: true },
-        { id: 'p2p-loans', label: 'Loans', auth: true },
-        { id: 'deposit', label: 'Deposit', auth: true }
+        { id: 'profile', label: 'Profile', auth: true },
+        { id: 'inbox', label: 'Inbox', auth: true },
+        { id: 'my-business', label: 'My Business', auth: true, children: [
+          { id: 'bir-integration', label: 'BIR Integration', auth: true },
+          { id: 'digital-receipts', label: 'Digital Receipts', auth: true },
+          { id: 'payments', label: 'Payments', auth: true },
+          { id: 'shareholders', label: 'Shareholders', auth: true },
+          { id: 'jobs-hiring', label: 'Jobs & Hiring', auth: true },
+          { id: 'employees-payroll', label: 'Employees & Payroll', auth: true },
+          { id: 'sales-tax', label: 'Sales & Tax Reporting', auth: true }
+        ]},
+        { id: 'transactions', label: 'History', auth: true },
+        { id: 'wallet', label: 'Wallet', auth: true },
+        { id: 'deposit', label: 'Deposit Funds', auth: true }
       ]
     },
     {
-      id: 'navigation',
+      id: 'main',
       label: 'Main',
       icon: '🏠',
       items: [
-        { id: 'home', label: 'Home', public: true },
         { id: 'nearby', label: 'Nearby', auth: true },
-        { id: 'rides', label: 'Rides', auth: true },
-        { id: 'online-users', label: 'Online Users', auth: true },
-        { id: 'rates', label: 'Rates', auth: true }
+        { id: 'rides', label: 'Rides', auth: true }
+      ]
+    },
+    {
+      id: 'financial',
+      label: 'Financial',
+      icon: '💰',
+      items: [
+        { id: 'rates', label: 'Currency Rates', auth: true },
+        { id: 'payments-financial', label: 'Payments', auth: true },
+        { id: 'send', label: 'Send Money', auth: true },
+        { id: 'receive', label: 'Receive Money', auth: true }
+      ]
+    },
+    {
+      id: 'marketplace',
+      label: 'Marketplace',
+      icon: '🛍️',
+      items: [
+        { id: 'jobs', label: 'Jobs', auth: true },
+        { id: 'p2p-loans', label: 'Loans', auth: true }
       ]
     },
     {
       id: 'community',
-      label: 'Account',
+      label: 'Community',
       icon: '👥',
       items: [
-        { id: 'investments', label: 'Community Projects', auth: true },
-        { id: 'wallet', label: 'Wallets', auth: true },
-        { id: 'send', label: 'Send', auth: true },
-        { id: 'bills', label: 'Bills', auth: true },
-        { id: 'transactions', label: 'History', auth: true },
-        { id: 'profile', label: 'Profile', auth: true },
-        { id: 'inbox', label: 'Inbox', auth: true },
-        { id: 'my-business', label: 'My Business', auth: true }
+        { id: 'online-users', label: 'Online Users', auth: true },
+        { id: 'messages', label: 'Messages', auth: true },
+        { id: 'investments', label: 'Market Opportunities', auth: true }
+      ]
+    },
+    {
+      id: 'personal',
+      label: 'Personal',
+      icon: '📋',
+      items: [
+        { id: 'bills', label: 'Bills', auth: true }
+      ]
+    },
+    {
+      id: 'business',
+      label: 'Business',
+      icon: '📊',
+      items: []
+    },
+    {
+      id: 'games',
+      label: 'Games',
+      icon: '🎮',
+      items: [
+        { id: 'poker', label: 'Poker', auth: true },
+        { id: 'chess', label: 'Chess', auth: true }
+      ]
+    },
+    {
+      id: 'maps',
+      label: 'Maps',
+      icon: '🗺️',
+      items: [
+        { id: 'shipping', label: 'Shipping', auth: true }
+      ]
+    },
+    {
+      id: 'system',
+      label: 'System',
+      icon: '⚙️',
+      items: [
+        { id: 'network-balances', label: 'Network Balances', auth: true }
       ]
     }
   ]
@@ -73,29 +136,60 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     return true
   }
 
-  const handleNavClick = (tabId) => {
-    onTabChange(tabId)
+  const searchItems = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return menuGroups
+    }
+
+    const query = searchQuery.toLowerCase()
+    const filteredGroups = menuGroups.map(group => ({
+      ...group,
+      items: group.items.filter(item => {
+        const matchesItem = item.label.toLowerCase().includes(query)
+        const matchesChild = item.children?.some(child => 
+          child.label.toLowerCase().includes(query)
+        )
+        return matchesItem || matchesChild
+      }).map(item => ({
+        ...item,
+        children: item.children?.filter(child =>
+          child.label.toLowerCase().includes(query)
+        )
+      }))
+    })).filter(group => group.items.length > 0)
+
+    return filteredGroups
+  }, [searchQuery])
+
+  const toggleGroup = (groupId) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [groupId]: !prev[groupId]
+    }))
   }
 
-  // Hide completely on mobile
+  const handleNavClick = (tabId) => {
+    onTabChange(tabId)
+    setSearchQuery('')
+  }
+
   if (isMobile) {
     return null
   }
 
-  // Only render sidebar on desktop
   return (
     <aside
       className={`hidden md:flex md:flex-col bg-slate-900 text-slate-100 border-r border-slate-700 transition-all duration-300 ${
-        isCollapsed ? 'w-20' : 'w-64'
+        isCollapsed ? 'w-20' : 'w-72'
       }`}
     >
-      <div className="h-full flex flex-col overflow-y-auto">
+      <div className="h-full flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+        <div className="p-4 border-b border-slate-700 flex items-center justify-between flex-shrink-0">
           <div className={`flex-1 ${isCollapsed ? 'hidden' : ''}`}>
             <h1 className="text-xl font-light tracking-wide">currency.ph</h1>
             {userEmail && (
-              <p className="text-xs text-slate-400 mt-2 truncate">{userEmail}</p>
+              <p className="text-xs text-slate-400 mt-1 truncate">{userEmail}</p>
             )}
           </div>
           <button
@@ -115,15 +209,37 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
           </button>
         </div>
 
+        {/* Search Bar */}
+        {!isCollapsed && (
+          <div className="px-3 py-3 border-b border-slate-700 flex-shrink-0">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full px-3 py-2 text-sm bg-slate-800 border border-slate-600 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-200"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Menu Groups */}
-        <nav className={`flex-1 ${!isCollapsed ? 'px-3' : 'px-2'} py-4 space-y-2`}>
-          {menuGroups.map(group => {
+        <nav className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+          {searchItems.map(group => {
             const visibleItems = group.items.filter(isItemVisible)
             if (visibleItems.length === 0) return null
 
             const isExpanded = expandedGroups[group.id]
 
-            // On desktop collapsed, don't show group headers
             if (isCollapsed) {
               return (
                 <div key={group.id}>
@@ -132,7 +248,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                       <button
                         key={item.id}
                         onClick={() => handleNavClick(item.id)}
-                        className={`w-full flex items-center justify-center p-2 rounded-lg text-sm transition-colors ${
+                        className={`w-full flex items-center justify-center p-2.5 rounded-lg text-sm transition-colors ${
                           activeTab === item.id
                             ? 'bg-blue-600 text-white font-medium'
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white'
@@ -148,43 +264,57 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
             }
 
             return (
-              <div key={group.id}>
+              <div key={group.id} className="space-y-1">
                 <button
                   onClick={() => toggleGroup(group.id)}
-                  className={`w-full flex items-center justify-between ${isCollapsed ? 'justify-center' : ''} px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors`}
-                  title={isCollapsed ? group.label : ''}
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
                 >
-                  <span className={`flex items-center ${isCollapsed ? 'justify-center' : ''} gap-2`}>
+                  <span className="flex items-center gap-2">
                     <span className="text-base">{group.icon}</span>
-                    {!isCollapsed && group.label}
+                    <span>{group.label}</span>
                   </span>
-                  {!isCollapsed && (
-                    <svg
-                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  )}
+                  <svg
+                    className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                  </svg>
                 </button>
 
-                {/* Group items */}
-                {isExpanded && !isCollapsed && (
-                  <div className="ml-2 space-y-1 mt-2">
+                {isExpanded && (
+                  <div className="ml-1 space-y-0.5">
                     {visibleItems.map(item => (
-                      <button
-                        key={item.id}
-                        onClick={() => handleNavClick(item.id)}
-                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
-                          activeTab === item.id
-                            ? 'bg-blue-600 text-white font-medium'
-                            : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
+                      <div key={item.id}>
+                        <button
+                          onClick={() => handleNavClick(item.id)}
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
+                            activeTab === item.id
+                              ? 'bg-blue-600 text-white font-medium'
+                              : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                        {item.children && item.children.length > 0 && activeTab === item.id && (
+                          <div className="ml-2 space-y-0.5">
+                            {item.children.map(child => (
+                              <button
+                                key={child.id}
+                                onClick={() => handleNavClick(child.id)}
+                                className={`w-full text-left px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                                  activeTab === child.id
+                                    ? 'bg-blue-700 text-white'
+                                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                }`}
+                              >
+                                → {child.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 )}
@@ -194,17 +324,15 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
         </nav>
 
         {/* Footer */}
-        <div className={`border-t border-slate-700 ${!isCollapsed ? 'p-3' : 'p-2'} space-y-2`}>
+        <div className={`border-t border-slate-700 ${!isCollapsed ? 'p-3' : 'p-2'} space-y-2 flex-shrink-0`}>
           {userEmail ? (
-            <>
-              <button
-                onClick={() => onSignOut?.()}
-                className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
-                title={isCollapsed ? 'Sign out' : ''}
-              >
-                {isCollapsed ? '⬅️' : 'Sign out'}
-              </button>
-            </>
+            <button
+              onClick={() => onSignOut?.()}
+              className={`w-full ${!isCollapsed ? 'px-3 py-2' : 'p-2 flex items-center justify-center'} text-sm text-slate-300 hover:bg-slate-800 hover:text-white rounded-lg transition-colors`}
+              title={isCollapsed ? 'Sign out' : ''}
+            >
+              {isCollapsed ? '⬅️' : 'Sign out'}
+            </button>
           ) : (
             <>
               <button
