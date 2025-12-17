@@ -219,7 +219,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                             )}
                           </div>
                           <div className="text-right flex flex-col items-end gap-2">
-                            <div className="text-sm font-semibold text-emerald-400">
+                            <div className="text-xs sm:text-sm font-semibold text-emerald-400 whitespace-nowrap">
                               {getPhpPrice(pkg.usd_price)}
                             </div>
                             {isSelected && (
