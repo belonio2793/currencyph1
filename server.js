@@ -267,6 +267,56 @@ app.get('/api/health', (req, res) => {
 })
 
 /**
+ * GET /api/exchange-rate
+ * Fetch exchange rate from Open Exchange Rates API
+ */
+app.get('/api/exchange-rate', async (req, res) => {
+  try {
+    const apiKey = process.env.OPEN_EXCHANGE_RATES_API || process.env.VITE_OPEN_EXCHANGE_RATES_API
+    if (!apiKey) {
+      return res.status(400).json({
+        error: 'Exchange rate API key not configured',
+        defaultRate: 56.5
+      })
+    }
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 10000)
+
+    const response = await fetch(
+      `https://openexchangerates.org/api/latest.json?app_id=${apiKey}&base=USD&symbols=PHP`,
+      { signal: controller.signal }
+    )
+
+    clearTimeout(timeout)
+
+    if (!response.ok) {
+      console.warn(`Exchange rate API error (${response.status})`)
+      return res.status(200).json({
+        rate: 56.5,
+        defaultRate: true,
+        error: 'API error, using default rate'
+      })
+    }
+
+    const data = await response.json()
+    const rate = data.rates?.PHP || 56.5
+
+    res.json({
+      rate,
+      success: true
+    })
+  } catch (error) {
+    console.error('Exchange rate fetch error:', error.message)
+    res.status(200).json({
+      rate: 56.5,
+      defaultRate: true,
+      error: 'Failed to fetch, using default rate'
+    })
+  }
+})
+
+/**
  * GET /api/crypto-prices
  * Fetch cryptocurrency prices from CoinGecko with caching
  */
