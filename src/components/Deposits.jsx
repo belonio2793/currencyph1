@@ -770,7 +770,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const convertedAmt = convertedAmounts[globalCurrency] || (numAmount * (exchangeRates[`${selectedCurrency}_${globalCurrency}`] || 1)).toFixed(2)
 
       await paymentsAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
-      setSuccess(`Successfully added ${amount} ${selectedCurrency}`)
+      setSuccess(`Successfully added ${formatCurrency(amount, selectedCurrency)}`)
       setAmount('')
       setConvertedAmounts({})
 
