@@ -972,14 +972,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                   {selectedPaymentMethod === 'gcash' && (
                     <>
-                      <GCashPaymentDisplay 
+                      <GCashPaymentDisplay
                         phone={PAYMENT_METHODS.gcash.phone}
                         referenceCode={referenceCode}
                       />
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
                         <p className="font-semibold mb-2">💡 Important:</p>
                         <ul className="list-disc pl-5 space-y-1">
-                          <li>Deposit amount: <span className="font-bold">{amount} {globalCurrency}</span></li>
+                          <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
                           <li>Use the reference code to track your deposit</li>
                           <li>Deposits are confirmed within 1-3 minutes</li>
                           <li>Make sure to include the reference code in the GCash notes</li>
