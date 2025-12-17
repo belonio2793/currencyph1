@@ -58,6 +58,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   // Fiat modal state
   const [showFiatModal, setShowFiatModal] = useState(false)
 
+  // Exchange rates and consolidated balance
+  const [ratesMap, setRatesMap] = useState({})
+  const [consolidatedBalance, setConsolidatedBalance] = useState(0)
+
   const convertBalance = (balance, fromCurrency) => {
     // If same currency as global, return as-is
     if (fromCurrency === globalCurrency) return balance
