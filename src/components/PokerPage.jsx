@@ -114,7 +114,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleCreate(name, stakeMin, stakeMax) {
     if (!userId || !userEmail) return onShowAuth && onShowAuth('register')
     try {
-      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: 'PHP', created_by: userId, is_default: false }]).select().single()
+      const { data: table, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: 'PLAY_CHIPS', created_by: userId, is_default: false }]).select().single()
       if (error) {
         console.error('Create table error:', error)
         throw new Error(error.message)
@@ -390,7 +390,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                   <div className="flex-1">
                                     <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
                                     <div className={`text-xs mt-1 ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                                      {t.stake_min}/{t.stake_max} {t.currency_code}
+                                      {t.stake_min}/{t.stake_max} PLAY CHIPS
                                     </div>
                                     <div className={`text-xs mt-1 font-medium ${
                                       openSeats === 0 ? 'text-red-300' :
@@ -457,7 +457,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                                   <div className="flex-1">
                                     <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
                                     <div className={`text-xs mt-1 ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                                      {t.stake_min}/{t.stake_max} {t.currency_code}
+                                      {t.stake_min}/{t.stake_max} PLAY CHIPS
                                     </div>
                                     <div className={`text-xs mt-1 font-medium ${
                                       openSeats === 0 ? 'text-red-300' :
@@ -528,7 +528,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                             <div className="flex-1">
                               <div className={`font-semibold ${isSelected ? 'text-white' : 'text-slate-100'}`}>{t.name}</div>
                               <div className={`text-xs mt-1 ${isSelected ? 'text-purple-100' : 'text-slate-400'}`}>
-                                {t.stake_min}/{t.stake_max} {t.currency_code}
+                                {t.stake_min}/{t.stake_max} PLAY CHIPS
                               </div>
                               <div className={`text-xs mt-1 font-medium ${
                                 openSeats === 0 ? 'text-red-300' :
@@ -570,7 +570,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
                 <div className="bg-slate-700 rounded-lg p-4 flex items-center justify-between">
                   <div>
                     <div className="text-lg font-semibold text-white">{selectedTable.name}</div>
-                    <div className="text-sm text-slate-300 mt-1">Stakes: {selectedTable.stake_min}/{selectedTable.stake_max} {selectedTable.currency_code}</div>
+                    <div className="text-sm text-slate-300 mt-1">Stakes: {selectedTable.stake_min}/{selectedTable.stake_max} PLAY CHIPS</div>
                     {userId && seats.some(s => s.user_id === userId) && (
                       <div className="text-xs text-emerald-400 mt-1 font-semibold">You are seated at this table</div>
                     )}
