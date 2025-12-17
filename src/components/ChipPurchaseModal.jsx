@@ -10,6 +10,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   const [error, setError] = useState(null)
   const [userChips, setUserChips] = useState(0n)
   const [userWallet, setUserWallet] = useState(null)
+  const DEFAULT_CURRENCY = 'PHP'
 
   useEffect(() => {
     if (open && userId) {
@@ -70,7 +71,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   }
 
   async function handlePurchase() {
-    if (!selectedPackage || !userId || !userWallet) {
+    if (!selectedPackage || !userId) {
       setError('Missing purchase information')
       return
     }
@@ -83,25 +84,27 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       const pkg = packages.find(p => p.id === selectedPackage)
       if (!pkg) throw new Error('Package not found')
 
-      // Convert USD price to user's currency
-      const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
-      const walletBalance = Number(userWallet.balance)
+      // Only check wallet balance if wallet exists
+      if (userWallet) {
+        const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
+        const walletBalance = Number(userWallet.balance)
 
-      // Check if user has sufficient balance
-      if (walletBalance < localPrice) {
-        setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
-        setProcessing(false)
-        return
+        // Check if user has sufficient balance
+        if (walletBalance < localPrice) {
+          setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
+          setProcessing(false)
+          return
+        }
+
+        // Deduct from wallet if it exists
+        const newWalletBalance = walletBalance - localPrice
+        const { error: walletUpdateErr } = await supabase
+          .from('wallets')
+          .update({ balance: newWalletBalance, updated_at: new Date() })
+          .eq('id', userWallet.id)
+
+        if (walletUpdateErr) throw walletUpdateErr
       }
-
-      // Deduct from wallet
-      const newWalletBalance = walletBalance - localPrice
-      const { error: walletUpdateErr } = await supabase
-        .from('wallets')
-        .update({ balance: newWalletBalance, updated_at: new Date() })
-        .eq('id', userWallet.id)
-
-      if (walletUpdateErr) throw walletUpdateErr
 
       // Add chips to player inventory
       const totalChipsToAdd = BigInt(pkg.chip_amount) + BigInt(pkg.bonus_chips || 0)
@@ -119,6 +122,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       if (chipUpsertErr) throw chipUpsertErr
 
       // Record purchase transaction
+      const paymentMethod = userWallet ? 'wallet_deduction' : 'free'
       const { data: purchase, error: purchaseErr } = await supabase
         .from('chip_purchases')
         .insert([{
@@ -129,7 +133,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           total_chips_received: pkg.chip_amount + (pkg.bonus_chips || 0),
           usd_price_paid: pkg.usd_price,
           payment_status: 'completed',
-          payment_method: 'wallet_deduction',
+          payment_method: paymentMethod,
           created_at: new Date()
         }])
         .select()
@@ -141,12 +145,19 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       await loadUserData()
       
       if (onPurchaseComplete) {
+        const costDeducted = userWallet 
+          ? formatPriceWithCurrency(
+              convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code),
+              userWallet.currency_code
+            )
+          : 'Free (no wallet)'
+        
         onPurchaseComplete({
           chipsPurchased: pkg.chip_amount,
           bonusChips: pkg.bonus_chips || 0,
           totalChips: totalChipsToAdd.toString(),
           newBalance: newChipBalance.toString(),
-          costDeducted: formatPriceWithCurrency(localPrice, userWallet.currency_code)
+          costDeducted: costDeducted
         })
       }
 
@@ -161,28 +172,10 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   if (!open) return null
 
-  if (!userWallet) {
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden p-6">
-          <div className="text-center">
-            <h2 className="text-xl font-bold text-white mb-2">No Wallet Found</h2>
-            <p className="text-slate-400 mb-4">You need to set up a wallet before purchasing chips.</p>
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   const selectedPkg = packages.find(p => p.id === selectedPackage)
-  const localPrice = selectedPkg ? convertUSDToLocalCurrency(Number(selectedPkg.usd_price), userWallet.currency_code) : 0
-  const walletBalance = Number(userWallet.balance)
+  const currency = userWallet?.currency_code || DEFAULT_CURRENCY
+  const localPrice = selectedPkg ? convertUSDToLocalCurrency(Number(selectedPkg.usd_price), currency) : 0
+  const walletBalance = userWallet ? Number(userWallet.balance) : Infinity
   const canAfford = walletBalance >= localPrice
 
   const formatChips = (chips) => {
@@ -199,7 +192,15 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         <div className="bg-gradient-to-r from-amber-600 to-yellow-600 p-6 text-white">
           <h2 className="text-2xl font-bold">Buy Poker Chips 💰</h2>
           <p className="text-sm text-amber-100 mt-1">
-            Your Balance: <span className="font-bold">{formatPriceWithCurrency(walletBalance, userWallet.currency_code)}</span> • 
+            {userWallet ? (
+              <>
+                Your Balance: <span className="font-bold">{formatPriceWithCurrency(walletBalance, currency)}</span> • 
+              </>
+            ) : (
+              <>
+                Wallet: <span className="font-bold text-amber-300">Not set up</span> • 
+              </>
+            )}
             Your Chips: <span className="font-bold">{formatChips(userChips)}</span>
           </p>
         </div>
@@ -221,8 +222,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
               {/* Chip Packages Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {packages.map((pkg) => {
-                  const localPkgPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
-                  const affordable = walletBalance >= localPkgPrice
+                  const localPkgPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), currency)
+                  const affordable = !userWallet || (walletBalance >= localPkgPrice)
                   return (
                     <button
                       key={pkg.id}
@@ -246,7 +247,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                           {(Number(pkg.chip_amount) / 1000000).toFixed(1)}M
                         </div>
                         <div className="text-lg font-bold text-white">
-                          {formatPriceWithCurrency(localPkgPrice, userWallet.currency_code)}
+                          {formatPriceWithCurrency(localPkgPrice, currency)}
                         </div>
                         {pkg.bonus_chips > 0 && (
                           <div className="text-xs text-amber-200 mt-1">
@@ -283,9 +284,9 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                       <span className="text-amber-300 font-bold text-lg">{formatChips(BigInt(selectedPkg.chip_amount) + BigInt(selectedPkg.bonus_chips || 0))}</span>
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-slate-600">
-                      <span className="text-slate-400 text-sm">Price ({userWallet.currency_code}):</span>
-                      <span className={`font-bold ${canAfford ? 'text-white' : 'text-red-400'}`}>
-                        {formatPriceWithCurrency(localPrice, userWallet.currency_code)}
+                      <span className="text-slate-400 text-sm">Price ({currency}):</span>
+                      <span className={userWallet && !canAfford ? 'font-bold text-red-400' : 'font-bold text-white'}>
+                        {userWallet ? formatPriceWithCurrency(localPrice, currency) : 'Free (no wallet)'}
                       </span>
                     </div>
                   </div>
@@ -305,7 +306,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
             </button>
             <button
               onClick={handlePurchase}
-              disabled={processing || !selectedPackage || !canAfford}
+              disabled={processing || !selectedPackage || (userWallet && !canAfford)}
               className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {processing ? (
