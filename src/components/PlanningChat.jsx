@@ -1351,23 +1351,34 @@ export default function PlanningChat() {
               }
             `}</style>
 
-            {/* Marker Type Selector Panel */}
+            {/* Marker Type Selector Panel with Collapse/Expand */}
             {isAuthenticated && (
               <div className="marker-type-selector">
-                <span className="marker-type-label">Select Type</span>
-                <div className="marker-type-grid">
-                  {markerTypes.map(type => (
-                    <button
-                      key={type}
-                      onClick={() => handleSelectMarkerType(type)}
-                      className={`marker-type-btn ${selectedMarkerType === type ? 'active' : ''}`}
-                      title={`${markerTypeEmojis[type]} ${type}`}
-                    >
-                      <span>{markerTypeEmojis[type]}</span>
-                      <span>{type}</span>
-                    </button>
-                  ))}
+                <div className="flex items-center justify-between mb-2">
+                  <span className="marker-type-label">Select Type</span>
+                  <button
+                    onClick={() => setShowMarkerTypeSelector(!showMarkerTypeSelector)}
+                    className="text-slate-400 hover:text-white transition-colors text-sm font-medium"
+                    title={showMarkerTypeSelector ? 'Collapse' : 'Expand'}
+                  >
+                    {showMarkerTypeSelector ? '▼' : '▶'}
+                  </button>
                 </div>
+                {showMarkerTypeSelector && (
+                  <div className="marker-type-grid">
+                    {markerTypes.map(type => (
+                      <button
+                        key={type}
+                        onClick={() => handleSelectMarkerType(type)}
+                        className={`marker-type-btn ${selectedMarkerType === type ? 'active' : ''}`}
+                        title={`${markerTypeEmojis[type]} ${type}`}
+                      >
+                        <span>{markerTypeEmojis[type]}</span>
+                        <span>{type}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
