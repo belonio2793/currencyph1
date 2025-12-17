@@ -167,6 +167,7 @@ export default function PlanningChat() {
   const [exchangeRate, setExchangeRate] = useState(DEFAULT_EXCHANGE_RATE)
   const [editingLocationId, setEditingLocationId] = useState(null)
   const [showMarkerTypeSelector, setShowMarkerTypeSelector] = useState(true)
+  const [showFilterSelects, setShowFilterSelects] = useState(!isMobile)
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
