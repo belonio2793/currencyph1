@@ -158,7 +158,14 @@ function initClient() {
       // Initialize with default global fetch - don't override to avoid interfering with runtime fetch behavior
       console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
 
-      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      // Disable realtime features to prevent network errors in offline/edge environments
+      _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        realtime: {
+          params: {
+            eventsPerSecond: 0  // Disable realtime to prevent fetch errors
+          }
+        }
+      })
     } catch (clientErr) {
       console.error('Failed to initialize Supabase client:', clientErr)
       _client = createDummyClient()
