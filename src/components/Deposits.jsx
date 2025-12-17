@@ -312,21 +312,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
 
   const defaultCryptoPrices = {
-    BTC: 4200000,
-    ETH: 180000,
-    LTC: 12000,
-    DOGE: 8,
-    XRP: 25,
-    ADA: 35,
-    SOL: 18000,
-    AVAX: 40000,
-    MATIC: 50,
-    DOT: 8000,
-    LINK: 2500,
-    UNI: 8000,
-    AAVE: 280000,
-    USDC: 56,
-    USDT: 56
+    BTC: 5520000,
+    ETH: 205000,
+    LTC: 26000,
+    DOGE: 18,
+    XRP: 32,
+    ADA: 50,
+    SOL: 14200,
+    AVAX: 42000,
+    MATIC: 75,
+    DOT: 9500,
+    LINK: 3200,
+    UNI: 10500,
+    AAVE: 380000,
+    USDC: 56.75,
+    USDT: 56.75
   }
 
   const fetchWithRetries = async (url, options = {}, retries = 1, backoff = 500) => {
