@@ -443,73 +443,48 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
 
       {/* Add Funds Modal */}
-      {showAddFunds && (
+      {showAddFunds && selectedWallet && (
         <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4">
-            <h3 className="text-2xl font-light text-slate-900 mb-6">Add Funds</h3>
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-xl">
+            <h3 className="text-2xl font-light text-slate-900 mb-2">Add Funds</h3>
+            <p className="text-sm text-slate-600 mb-6">
+              {CRYPTO_CURRENCIES.includes(selectedWallet.currency_code) ? 'Cryptocurrency' : 'Fiat Currency'} · {selectedWallet.currency_code}
+            </p>
 
             <form onSubmit={handleAddFunds} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Amount ({selectedWallet?.currency_code})
+                  Amount ({selectedWallet.currency_code})
                 </label>
                 <input
                   type="number"
-                  step="0.01"
+                  step={CRYPTO_CURRENCIES.includes(selectedWallet.currency_code) ? "0.00000001" : "0.01"}
                   value={amount}
                   onChange={e => setAmount(e.target.value)}
                   placeholder="0.00"
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-lg"
+                  autoFocus
                 />
               </div>
 
-              <div className="flex space-x-4">
+              <div className="flex space-x-3">
                 <button
                   type="button"
                   onClick={() => setShowAddFunds(false)}
-                  className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium"
+                  className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors font-medium text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  className={`flex-1 px-4 py-3 text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm ${
+                    CRYPTO_CURRENCIES.includes(selectedWallet.currency_code)
+                      ? 'bg-orange-600 hover:bg-orange-700'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
                 >
                   Add Funds
                 </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Fiat Modal */}
-      {showFiatModal && selectedFiatWallet && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4 border border-slate-200 shadow-xl">
-            <h3 className="text-lg font-medium text-slate-900 mb-4">{fiatAction === 'deposit' ? 'Deposit' : 'Pay'} ({selectedFiatWallet.currency_code})</h3>
-            <form onSubmit={handleFiatSubmit} className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Amount</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={fiatAmount}
-                  onChange={e => setFiatAmount(e.target.value)}
-                  placeholder="0.00"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent text-base"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-slate-700">Action</label>
-                <select value={fiatAction} onChange={e => setFiatAction(e.target.value)} className="px-2 py-1 border border-slate-300 rounded-lg text-xs">
-                  <option value="deposit">Deposit</option>
-                  <option value="pay">Pay</option>
-                </select>
-              </div>
-              <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setShowFiatModal(false)} className="flex-1 px-3 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors text-xs font-medium">Cancel</button>
-                <button type="submit" className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium">Confirm</button>
               </div>
             </form>
           </div>
