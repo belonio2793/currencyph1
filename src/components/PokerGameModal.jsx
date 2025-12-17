@@ -36,6 +36,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
   const contentScrollRef = useRef(null)
 
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
+  const isGuestLocal = userId && userId.includes('guest-local')
 
   // Scroll to top when modal opens (if preference is enabled)
   useEffect(() => {
