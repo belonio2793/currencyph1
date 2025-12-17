@@ -152,10 +152,26 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
   const selectedBonusChips = selectedPackage ? Number(selectedPackage.bonus_chips || 0) : 0
   const selectedTotalChips = selectedChipAmount + selectedBonusChips
 
-  const getPhpPrice = (usdPrice) => {
-    if (!usdPrice) return '₱0 ($0.00)'
+  const PriceDisplay = ({ usdPrice, className = '' }) => {
+    if (!usdPrice) {
+      return (
+        <span className={className}>
+          <span className="text-emerald-400">₱0.00</span>
+          <span className="text-slate-400"> ($0.00)</span>
+        </span>
+      )
+    }
     const phpPrice = convertUSDToLocalCurrency(usdPrice, DEFAULT_CURRENCY)
-    return `₱${phpPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ($${usdPrice.toFixed(2)})`
+    return (
+      <span className={className}>
+        <span className="text-emerald-400">
+          ₱{phpPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        </span>
+        <span className="text-slate-400">
+          {' '}(${usdPrice.toFixed(2)})
+        </span>
+      </span>
+    )
   }
 
   return (
