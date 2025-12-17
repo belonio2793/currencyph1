@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import RakeModal from './RakeModal'
 import HouseBalanceTab from './HouseBalanceTab'
 import PokerGameModal from './PokerGameModal'
+import ChipPurchaseModal from './ChipPurchaseModal'
 import { preferencesManager } from '../lib/preferencesManager'
 
 export default function PokerPage({ userId, userEmail, onShowAuth }) {
@@ -17,9 +18,33 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const [rakeModal, setRakeModal] = useState({ open: false, startingBalance: 0, endingBalance: 0, tableId: null, currencyCode: 'PHP' })
   const [gameModalOpen, setGameModalOpen] = useState(false)
   const [gameModalTable, setGameModalTable] = useState(null)
+  const [chipModalOpen, setChipModalOpen] = useState(false)
+  const [playerChips, setPlayerChips] = useState(0n)
+  const [chipInput, setChipInput] = useState('100000')
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
-  useEffect(() => { loadTables() }, [])
+  useEffect(() => { loadTables(); loadPlayerChips() }, [])
+
+  async function loadPlayerChips() {
+    if (!userId) return
+    try {
+      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+      const res = await fetch(FUNCTIONS_BASE + '/get_player_chips', {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'Authorization': `Bearer ${anonKey}`
+        },
+        body: JSON.stringify({ userId })
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setPlayerChips(BigInt(data.chips))
+      }
+    } catch (e) {
+      console.error('Error loading chips:', e)
+    }
+  }
 
   async function loadTables() {
     setLoading(true)
@@ -122,11 +147,16 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     const seatNumber = (seats.length || 0) + 1
 
     try {
-      // Get current wallet balance
-      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
-      const currentBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
+      // Get current chip balance
+      if (playerChips === 0n) {
+        setError('You have no chips. Please buy chips to play.')
+        setChipModalOpen(true)
+        return
+      }
 
-      // Join table with starting balance
+      const chipsToBuyIn = Math.min(Number(playerChips), 1000000)
+
+      // Join table with chip buy-in
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
       const res = await fetch(FUNCTIONS_BASE + '/join_table', {
         method: 'POST',
@@ -134,7 +164,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           'content-type': 'application/json',
           'Authorization': `Bearer ${anonKey}`
         },
-        body: JSON.stringify({ tableId, userId, seatNumber, startingBalance: currentBalance })
+        body: JSON.stringify({ tableId, userId, seatNumber, chipsBuyIn: chipsToBuyIn })
       })
 
       if (!res.ok) {
@@ -149,6 +179,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
       }
 
       const json = await res.json()
+      await loadPlayerChips()
       const table = tables.find(t => t.id === tableId)
       if (table) {
         await openTable(table)
@@ -192,26 +223,23 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleLeaveTable(tableId) {
     if (!userId) return
     try {
-      // Get seat info with starting balance
+      // Get seat info with starting chip balance
       const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).eq('user_id', userId).single()
       if (!seatData) {
         alert('Seat not found')
         return
       }
 
-      // Get current wallet balance
-      const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId)
-      const endingBalance = wallets && wallets.length > 0 ? Number(wallets[0].balance) : 0
-      const currencyCode = wallets && wallets.length > 0 ? wallets[0].currency_code : 'PHP'
-      const startingBalance = Number(seatData.starting_balance) || 0
+      const startingChips = Number(seatData.chip_starting_balance) || 0
+      const currentChipBalance = Number(seatData.chip_balance) || 0
 
-      // Show rake modal
+      // Show rake modal with chip balances
       setRakeModal({
         open: true,
-        startingBalance,
-        endingBalance,
+        startingBalance: startingChips,
+        endingBalance: currentChipBalance,
         tableId,
-        currencyCode
+        currencyCode: 'CHIPS'
       })
     } catch (e) {
       alert('Could not leave table: ' + (e.message || e))
@@ -233,6 +261,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
     }
     setSelectedTable(null)
     await loadTables()
+    await loadPlayerChips()
   }
 
   const getTableStatusColor = (table) => {
@@ -282,7 +311,16 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           </div>
         )}
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-4xl font-light text-white">Poker</h2>
+          <div>
+            <h2 className="text-4xl font-light text-white">Poker</h2>
+            <div className="mt-2 flex items-center gap-4">
+              <div className="px-4 py-2 bg-amber-900/30 border border-amber-600 rounded-lg">
+                <div className="text-xs text-amber-200">Your Chips</div>
+                <div className="text-xl font-bold text-amber-400">{(playerChips / 1000000n).toLocaleString()} M</div>
+              </div>
+              <button onClick={() => setChipModalOpen(true)} className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition">💰 Buy Chips</button>
+            </div>
+          </div>
           {(activeTab === 'my-tables' || activeTab === 'lobby') && (
             <div className="flex items-center gap-2">
               <button onClick={loadTables} className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition">Refresh</button>
@@ -700,6 +738,13 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         userEmail={userEmail}
         onShowAuth={onShowAuth}
         onLeaveTable={handleLeaveTable}
+      />
+
+      <ChipPurchaseModal
+        open={chipModalOpen}
+        onClose={() => setChipModalOpen(false)}
+        userId={userId}
+        onPurchaseComplete={() => loadPlayerChips()}
       />
     </div>
   )
