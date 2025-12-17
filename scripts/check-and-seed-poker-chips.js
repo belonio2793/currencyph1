@@ -13,7 +13,7 @@ const chipPackages = [
     name: '280K Chips',
     chips_amount: 280000,
     bonus_chips: 0,
-    chips_price: 4.99,
+    usd_price: 4.99,
     display_order: 1,
     is_first_purchase_special: true,
     is_most_popular: false,
