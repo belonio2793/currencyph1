@@ -933,7 +933,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Deposit Amount ({globalCurrency})
+                  Deposit Amount ({globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''})
                 </label>
                 <input
                   type="number"
@@ -953,7 +953,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
                         <p className="font-semibold mb-2">💡 Important:</p>
                         <ul className="list-disc pl-5 space-y-1">
-                          <li>Deposit amount: <span className="font-bold">{amount} {globalCurrency}</span></li>
+                          <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
                           <li>Your balance will be updated once confirmed on the blockchain</li>
                           <li>Keep your SOL address for transaction tracking</li>
                         </ul>
