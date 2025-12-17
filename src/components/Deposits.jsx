@@ -604,6 +604,14 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const loadInitialData = async () => {
     try {
       setAllCurrencies(currencyAPI.getCurrencies())
+
+      // Ensure user has wallets for all active currencies (for existing users)
+      if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
+        paymentsAPI.ensureUserWallets(userId).catch(err => {
+          console.debug('Failed to ensure user wallets, continuing:', err)
+        })
+      }
+
       await Promise.all([
         loadWallets().catch(err => {
           console.debug('Wallet loading failed, continuing with defaults:', err)
