@@ -631,19 +631,31 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {fiatWalletsFiltered.map(wallet => {
+                    {(fiatWalletsFiltered.length > 0 ? fiatWalletsFiltered : currenciesGrouped.fiat.map(c => {
+                      const existing = internalWallets.find(w => w.currency_code === c.code)
+                      return existing || {
+                        id: `placeholder-${c.code}`,
+                        currency_code: c.code,
+                        currency_name: c.name,
+                        currency_type: c.type,
+                        symbol: c.symbol,
+                        balance: 0,
+                        is_placeholder: true
+                      }
+                    })).map(wallet => {
                       const isSameCurrency = wallet.currency_code === globalCurrency
                       let balanceInGlobalCurrency = Number(wallet.balance || 0)
                       if (!isSameCurrency) {
                         const converted = convertAmount(Number(wallet.balance || 0), wallet.currency_code, globalCurrency, ratesMap)
                         balanceInGlobalCurrency = converted !== null ? converted : Number(wallet.balance || 0)
                       }
-                      const symbol = CURRENCY_SYMBOLS[wallet.currency_code] || wallet.currency_code
+                      const symbol = wallet.symbol || wallet.currency_code
+                      const isPlaceholder = wallet.id && wallet.id.startsWith('placeholder-')
 
                       return (
-                        <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-5 hover:shadow-lg transition-all hover:border-slate-300">
+                        <div key={wallet.id} className={`bg-white border border-slate-200 rounded-lg p-5 hover:shadow-lg transition-all hover:border-slate-300 ${isPlaceholder ? 'opacity-75' : ''}`}>
                           <div className="mb-4">
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Currency</p>
+                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fiat Currency</p>
                             <div className="flex items-baseline gap-2">
                               <p className="text-2xl font-light text-slate-900">{wallet.currency_code}</p>
                               <p className="text-sm text-slate-500">{symbol}</p>
