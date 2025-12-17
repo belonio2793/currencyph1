@@ -1298,8 +1298,15 @@ export default function MyBusiness({ userId }) {
         {/* Management Tab */}
         {mainTab === 'management' && (
           <div className="max-h-[calc(100vh-300px)] overflow-y-auto">
-            <div className="sticky top-0 z-10 pb-6 pt-0">
+            <div className="sticky top-0 z-10 pb-6 pt-0 bg-slate-50">
               <h3 className="text-lg font-semibold text-slate-900">Business Management</h3>
+              {!selectedBusiness && businesses.length > 0 && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-900">
+                    <span className="font-semibold">💡 Tip:</span> Select a business from the dropdown above to access management features.
+                  </p>
+                </div>
+              )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
