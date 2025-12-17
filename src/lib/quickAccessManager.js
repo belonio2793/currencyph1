@@ -16,12 +16,14 @@ const CARD_KEYS = [
   'networkBalances',
   'myBusiness',
   'myProfile',
-  'payments'
+  'payments',
+  'wallets'
 ]
 
 const DEFAULT_ORDER = [
   'deposit',
   'nearby',
+  'wallets',
   'receipts',
   'messages',
   'p2p',
@@ -42,7 +44,8 @@ const DEFAULT_VISIBILITY = {
   networkBalances: true,
   myBusiness: true,
   myProfile: true,
-  payments: true
+  payments: true,
+  wallets: true
 }
 
 export const quickAccessManager = {
