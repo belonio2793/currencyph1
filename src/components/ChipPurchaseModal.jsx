@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { convertUSDToLocalCurrency, formatPriceWithCurrency, getCurrencySymbol } from '../lib/currencyManager'
 
 export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseComplete }) {
   const [packages, setPackages] = useState([])
@@ -7,14 +8,13 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
-  const [userChips, setUserChips] = useState(0)
-
-  const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/, '') + '/functions/v1/poker-engine'
+  const [userChips, setUserChips] = useState(0n)
+  const [userWallet, setUserWallet] = useState(null)
 
   useEffect(() => {
     if (open && userId) {
       loadPackages()
-      loadUserChips()
+      loadUserData()
     }
   }, [open, userId])
 
@@ -39,30 +39,39 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     }
   }
 
-  async function loadUserChips() {
+  async function loadUserData() {
     try {
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-      const res = await fetch(`${FUNCTIONS_BASE}/get_player_chips`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`
-        },
-        body: JSON.stringify({ userId })
-      })
-      
-      if (res.ok) {
-        const data = await res.json()
-        setUserChips(BigInt(data.chips))
+      // Get user's primary wallet
+      const { data: wallets, error: walletErr } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: true })
+        .limit(1)
+
+      if (walletErr) throw walletErr
+      if (wallets && wallets.length > 0) {
+        setUserWallet(wallets[0])
+      }
+
+      // Get user's chip balance
+      const { data: chipData, error: chipErr } = await supabase
+        .from('player_poker_chips')
+        .select('total_chips')
+        .eq('user_id', userId)
+        .single()
+
+      if (!chipErr && chipData) {
+        setUserChips(BigInt(chipData.total_chips || 0))
       }
     } catch (err) {
-      console.error('Error loading user chips:', err)
+      console.error('Error loading user data:', err)
     }
   }
 
   async function handlePurchase() {
-    if (!selectedPackage || !userId) {
-      setError('Invalid selection')
+    if (!selectedPackage || !userId || !userWallet) {
+      setError('Missing purchase information')
       return
     }
 
@@ -70,35 +79,75 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     setError(null)
 
     try {
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-      const res = await fetch(`${FUNCTIONS_BASE}/purchase_chips`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`
-        },
-        body: JSON.stringify({
-          userId,
-          packageId: selectedPackage
-        })
-      })
+      // Get package details
+      const pkg = packages.find(p => p.id === selectedPackage)
+      if (!pkg) throw new Error('Package not found')
 
-      if (!res.ok) {
-        let errorMsg = 'Purchase failed'
-        try {
-          const json = await res.json()
-          errorMsg = json.error || errorMsg
-        } catch (e) {
-          // Could not parse JSON error response
-        }
-        throw new Error(errorMsg)
+      // Convert USD price to user's currency
+      const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
+      const walletBalance = Number(userWallet.balance)
+
+      // Check if user has sufficient balance
+      if (walletBalance < localPrice) {
+        setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
+        setProcessing(false)
+        return
       }
 
-      const data = await res.json()
-      await loadUserChips()
+      // Deduct from wallet
+      const newWalletBalance = walletBalance - localPrice
+      const { error: walletUpdateErr } = await supabase
+        .from('wallets')
+        .update({ balance: newWalletBalance, updated_at: new Date() })
+        .eq('id', userWallet.id)
+
+      if (walletUpdateErr) throw walletUpdateErr
+
+      // Add chips to player inventory
+      const totalChipsToAdd = BigInt(pkg.chip_amount) + BigInt(pkg.bonus_chips || 0)
+      const newChipBalance = userChips + totalChipsToAdd
+
+      // Upsert player chips record
+      const { error: chipUpsertErr } = await supabase
+        .from('player_poker_chips')
+        .upsert({
+          user_id: userId,
+          total_chips: newChipBalance.toString(),
+          updated_at: new Date()
+        }, { onConflict: 'user_id' })
+
+      if (chipUpsertErr) throw chipUpsertErr
+
+      // Record purchase transaction
+      const { data: purchase, error: purchaseErr } = await supabase
+        .from('chip_purchases')
+        .insert([{
+          user_id: userId,
+          package_id: selectedPackage,
+          chips_purchased: pkg.chip_amount,
+          bonus_chips_awarded: pkg.bonus_chips || 0,
+          total_chips_received: pkg.chip_amount + (pkg.bonus_chips || 0),
+          usd_price_paid: pkg.usd_price,
+          payment_status: 'completed',
+          payment_method: 'wallet_deduction',
+          created_at: new Date()
+        }])
+        .select()
+        .single()
+
+      if (purchaseErr) throw purchaseErr
+
+      // Reload user data
+      await loadUserData()
       
       if (onPurchaseComplete) {
-        onPurchaseComplete(data)
+        onPurchaseComplete({
+          chipsPurchased: pkg.chip_amount,
+          bonusChips: pkg.bonus_chips || 0,
+          totalChips: totalChipsToAdd.toString(),
+          newBalance: newChipBalance.toString(),
+          costDeducted: formatPriceWithCurrency(localPrice, userWallet.currency_code)
+        })
       }
 
       onClose()
@@ -112,7 +161,29 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   if (!open) return null
 
+  if (!userWallet) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden p-6">
+          <div className="text-center">
+            <h2 className="text-xl font-bold text-white mb-2">No Wallet Found</h2>
+            <p className="text-slate-400 mb-4">You need to set up a wallet before purchasing chips.</p>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   const selectedPkg = packages.find(p => p.id === selectedPackage)
+  const localPrice = selectedPkg ? convertUSDToLocalCurrency(Number(selectedPkg.usd_price), userWallet.currency_code) : 0
+  const walletBalance = Number(userWallet.balance)
+  const canAfford = walletBalance >= localPrice
 
   const formatChips = (chips) => {
     if (typeof chips === 'bigint') {
@@ -127,7 +198,10 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         {/* Header */}
         <div className="bg-gradient-to-r from-amber-600 to-yellow-600 p-6 text-white">
           <h2 className="text-2xl font-bold">Buy Poker Chips 💰</h2>
-          <p className="text-sm text-amber-100 mt-1">Current Balance: <span className="font-bold">{formatChips(userChips)}</span> chips</p>
+          <p className="text-sm text-amber-100 mt-1">
+            Your Balance: <span className="font-bold">{formatPriceWithCurrency(walletBalance, userWallet.currency_code)}</span> • 
+            Your Chips: <span className="font-bold">{formatChips(userChips)}</span>
+          </p>
         </div>
 
         {/* Content */}
@@ -146,36 +220,48 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
             <div className="space-y-4">
               {/* Chip Packages Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {packages.map((pkg) => (
-                  <button
-                    key={pkg.id}
-                    onClick={() => setSelectedPackage(pkg.id)}
-                    className={`relative p-4 rounded-lg transition transform ${
-                      selectedPackage === pkg.id
-                        ? 'bg-gradient-to-b from-amber-500 to-yellow-600 border-2 border-amber-300 shadow-xl scale-105'
-                        : 'bg-slate-700 border-2 border-slate-600 hover:border-amber-500'
-                    }`}
-                  >
-                    {pkg.is_first_purchase_special && (
-                      <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
-                        SPECIAL
-                      </div>
-                    )}
-                    <div className="text-center">
-                      <div className="text-sm font-bold text-white mb-2">
-                        {(Number(pkg.chip_amount) / 1000000).toFixed(1)}M
-                      </div>
-                      <div className="text-lg font-bold text-white">
-                        ${pkg.usd_price}
-                      </div>
-                      {pkg.bonus_chips > 0 && (
-                        <div className="text-xs text-amber-200 mt-1">
-                          +{(Number(pkg.bonus_chips) / 1000000).toFixed(1)}M bonus
+                {packages.map((pkg) => {
+                  const localPkgPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
+                  const affordable = walletBalance >= localPkgPrice
+                  return (
+                    <button
+                      key={pkg.id}
+                      onClick={() => setSelectedPackage(pkg.id)}
+                      disabled={!affordable}
+                      className={`relative p-4 rounded-lg transition transform ${
+                        selectedPackage === pkg.id
+                          ? 'bg-gradient-to-b from-amber-500 to-yellow-600 border-2 border-amber-300 shadow-xl scale-105'
+                          : affordable
+                          ? 'bg-slate-700 border-2 border-slate-600 hover:border-amber-500'
+                          : 'bg-slate-700/50 border-2 border-slate-600 opacity-50 cursor-not-allowed'
+                      }`}
+                    >
+                      {pkg.is_first_purchase_special && (
+                        <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
+                          SPECIAL
                         </div>
                       )}
-                    </div>
-                  </button>
-                ))}
+                      <div className="text-center">
+                        <div className="text-sm font-bold text-white mb-2">
+                          {(Number(pkg.chip_amount) / 1000000).toFixed(1)}M
+                        </div>
+                        <div className="text-lg font-bold text-white">
+                          {formatPriceWithCurrency(localPkgPrice, userWallet.currency_code)}
+                        </div>
+                        {pkg.bonus_chips > 0 && (
+                          <div className="text-xs text-amber-200 mt-1">
+                            +{(Number(pkg.bonus_chips) / 1000000).toFixed(1)}M bonus
+                          </div>
+                        )}
+                        {!affordable && (
+                          <div className="text-xs text-red-300 mt-1">
+                            Not enough
+                          </div>
+                        )}
+                      </div>
+                    </button>
+                  )
+                })}
               </div>
 
               {/* Selected Package Details */}
@@ -184,21 +270,23 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-slate-300">Base Chips:</span>
-                      <span className="text-white font-bold">{formatChips(selectedPkg.chip_amount)} chips</span>
+                      <span className="text-white font-bold">{formatChips(selectedPkg.chip_amount)}</span>
                     </div>
                     {selectedPkg.bonus_chips > 0 && (
                       <div className="flex items-center justify-between">
                         <span className="text-slate-300">Bonus Chips:</span>
-                        <span className="text-amber-400 font-bold">+{formatChips(selectedPkg.bonus_chips)} chips</span>
+                        <span className="text-amber-400 font-bold">+{formatChips(selectedPkg.bonus_chips)}</span>
                       </div>
                     )}
                     <div className="border-t border-slate-600 pt-2 mt-2 flex items-center justify-between">
                       <span className="text-slate-300 font-semibold">Total Chips:</span>
-                      <span className="text-amber-300 font-bold text-lg">{formatChips(BigInt(selectedPkg.chip_amount) + BigInt(selectedPkg.bonus_chips || 0))} chips</span>
+                      <span className="text-amber-300 font-bold text-lg">{formatChips(BigInt(selectedPkg.chip_amount) + BigInt(selectedPkg.bonus_chips || 0))}</span>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-400 text-sm">Price:</span>
-                      <span className="text-white font-bold">${selectedPkg.usd_price}</span>
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-600">
+                      <span className="text-slate-400 text-sm">Price ({userWallet.currency_code}):</span>
+                      <span className={`font-bold ${canAfford ? 'text-white' : 'text-red-400'}`}>
+                        {formatPriceWithCurrency(localPrice, userWallet.currency_code)}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -217,7 +305,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
             </button>
             <button
               onClick={handlePurchase}
-              disabled={processing || !selectedPackage}
+              disabled={processing || !selectedPackage || !canAfford}
               className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {processing ? (
