@@ -622,27 +622,34 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               <div className="mb-12">
                 <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
                   <h2 className="text-2xl font-light text-slate-900 tracking-tight">Fiat Currencies</h2>
-                  <p className="text-sm text-slate-500">{fiatWalletsFiltered.length} available</p>
+                  <p className="text-sm text-slate-500">{currenciesGrouped.fiat.filter(c => enabledInternal.includes(c.code)).length} available</p>
                 </div>
 
-                {fiatWalletsFiltered.length === 0 ? (
+                {currenciesGrouped.fiat.length === 0 ? (
                   <div className="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center">
-                    <p className="text-slate-500">No fiat wallets available</p>
+                    <p className="text-slate-500">No fiat currencies available</p>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {(fiatWalletsFiltered.length > 0 ? fiatWalletsFiltered : currenciesGrouped.fiat.map(c => {
-                      const existing = internalWallets.find(w => w.currency_code === c.code)
-                      return existing || {
-                        id: `placeholder-${c.code}`,
-                        currency_code: c.code,
-                        currency_name: c.name,
-                        currency_type: c.type,
-                        symbol: c.symbol,
+                    {currenciesGrouped.fiat.filter(c => {
+                      // Apply enabled filter
+                      if (!enabledInternal.includes(c.code)) return false
+                      // Apply selected currency filter
+                      if (selectedCurrency && selectedCurrency !== c.code) return false
+                      return true
+                    }).map(currency => {
+                      const wallet = internalWallets.find(w => w.currency_code === currency.code)
+                      return wallet || {
+                        id: `placeholder-${currency.code}`,
+                        wallet_id: null,
+                        currency_code: currency.code,
+                        currency_name: currency.name,
+                        currency_type: currency.type,
+                        symbol: currency.symbol,
                         balance: 0,
                         is_placeholder: true
                       }
-                    })).map(wallet => {
+                    }).map(wallet => {
                       const isSameCurrency = wallet.currency_code === globalCurrency
                       let balanceInGlobalCurrency = Number(wallet.balance || 0)
                       if (!isSameCurrency) {
