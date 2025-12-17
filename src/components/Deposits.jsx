@@ -878,37 +878,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             </h2>
           </div>
 
-          {/* Deposit Method Tabs */}
-          <div className="mb-8 border-b border-slate-200">
-            <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  setDepositTab('direct')
-                  setShowPaymentInstructions(false)
-                }}
-                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
-                  depositTab === 'direct'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Direct Payment
-              </button>
-              <button
-                onClick={() => {
-                  setDepositTab('crypto')
-                  setShowPaymentInstructions(false)
-                }}
-                className={`px-6 py-3 font-medium border-b-2 transition-colors ${
-                  depositTab === 'crypto'
-                    ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Add Cryptocurrency
-              </button>
-            </div>
-          </div>
 
           {/* Direct Payment Methods */}
           {depositTab === 'direct' && (
