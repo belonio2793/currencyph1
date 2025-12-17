@@ -1,6 +1,12 @@
 import { supabase } from './supabaseClient'
 
 export const businessRequestService = {
+  // Validate if ID is a proper UUID
+  isValidUUID(id) {
+    if (!id) return false
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)
+  },
+
   // ===== GET BUSINESSES =====
   async getAllBusinesses(limit = 50, offset = 0) {
     try {
