@@ -339,11 +339,11 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
           <div>
             <h2 className="text-4xl font-light text-white">Poker</h2>
             <div className="mt-2 flex items-center gap-4">
-              <div className="px-4 py-2 bg-amber-900/30 border border-amber-600 rounded-lg">
-                <div className="text-xs text-amber-200">Your Chips</div>
-                <div className="text-xl font-bold text-amber-400">{playerChips.toLocaleString()}</div>
+              <div className="px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg">
+                <div className="text-xs text-slate-300">Your Chips</div>
+                <div className="text-xl font-bold text-white">{playerChips.toLocaleString()}</div>
               </div>
-              <button onClick={() => setChipModalOpen(true)} className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-semibold rounded-lg transition">💰 Buy Chips</button>
+              <button onClick={() => setChipModalOpen(true)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition">Buy Chips</button>
             </div>
           </div>
           {(activeTab === 'my-tables' || activeTab === 'lobby') && (
