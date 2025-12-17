@@ -262,11 +262,19 @@ export default function App() {
           console.warn('Could not store device fingerprint:', e)
         }
         try {
-          await currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+          // Add timeouts to prevent indefinite blocking
+          await Promise.race([
+            currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User'),
+            new Promise((resolve) => setTimeout(() => resolve(null), 3000))
+          ]).catch(e => console.warn('getOrCreateUser failed:', e))
+
           // Ensure user has wallets for all active currencies
-          await currencyAPI.ensureUserWallets(user.id).catch(e => console.warn('ensureUserWallets failed:', e))
+          await Promise.race([
+            currencyAPI.ensureUserWallets(user.id),
+            new Promise((resolve) => setTimeout(() => resolve([]), 3000))
+          ]).catch(e => console.warn('ensureUserWallets failed:', e))
         } catch (e) {
-          console.error('Failed to create user profile:', e)
+          console.error('Failed to initialize user profile:', e)
           setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
         }
         try { if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
