@@ -162,6 +162,15 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         return
       }
 
+      // Fetch exchange rates for conversion
+      let rates = {}
+      try {
+        rates = await fetchRatesMap()
+        setRatesMap(rates)
+      } catch (e) {
+        console.warn('Could not fetch exchange rates:', e)
+      }
+
       // Fetch internal (legacy) wallets and ensure each has an account number
       let internal = []
       try {
@@ -187,6 +196,21 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           source: 'fiat'
         }))
         setFiatWallets(fiatMapped)
+
+        // Calculate consolidated balance in global currency
+        let total = 0
+        fiatMapped.forEach(wallet => {
+          const converted = convertAmount(wallet.balance, wallet.currency_code, globalCurrency, rates)
+          if (converted !== null) {
+            total += converted
+          } else {
+            // Fallback to direct balance if same currency
+            if (wallet.currency_code === globalCurrency) {
+              total += wallet.balance
+            }
+          }
+        })
+        setConsolidatedBalance(total)
       } catch (e) {
         console.warn('Error loading wallets_fiat from Supabase:', e)
       }
