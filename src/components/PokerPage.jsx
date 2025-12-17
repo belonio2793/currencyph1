@@ -244,24 +244,28 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function handleLeaveTable(tableId) {
     if (!userId) return
     try {
-      // Get seat info with starting chip balance
-      const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).eq('user_id', userId).single()
-      if (!seatData) {
-        alert('Seat not found')
-        return
+      if (isGuestLocal) {
+        setSelectedTable(null)
+        await loadTables()
+        await loadPlayerChips()
+      } else {
+        const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).eq('user_id', userId).single()
+        if (!seatData) {
+          alert('Seat not found')
+          return
+        }
+
+        const startingChips = Number(seatData.chip_starting_balance) || 0
+        const currentChipBalance = Number(seatData.chip_balance) || 0
+
+        setRakeModal({
+          open: true,
+          startingBalance: startingChips,
+          endingBalance: currentChipBalance,
+          tableId,
+          currencyCode: 'CHIPS'
+        })
       }
-
-      const startingChips = Number(seatData.chip_starting_balance) || 0
-      const currentChipBalance = Number(seatData.chip_balance) || 0
-
-      // Show rake modal with chip balances
-      setRakeModal({
-        open: true,
-        startingBalance: startingChips,
-        endingBalance: currentChipBalance,
-        tableId,
-        currencyCode: 'CHIPS'
-      })
     } catch (e) {
       alert('Could not leave table: ' + (e.message || e))
     }
