@@ -166,6 +166,7 @@ export default function PlanningChat() {
   const [selectedMarkerType, setSelectedMarkerType] = useState('Seller')
   const [exchangeRate, setExchangeRate] = useState(DEFAULT_EXCHANGE_RATE)
   const [editingLocationId, setEditingLocationId] = useState(null)
+  const [showMarkerTypeSelector, setShowMarkerTypeSelector] = useState(true)
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
