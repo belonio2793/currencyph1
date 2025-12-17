@@ -804,7 +804,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       const convertedAmt = cryptoConvertedAmounts[globalCurrency] || (numAmount * (cryptoRates[selectedCrypto] || 0)).toFixed(2)
 
       await paymentsAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
-      setSuccess(`Successfully added ${cryptoAmount} ${selectedCrypto}`)
+      setSuccess(`Successfully added ${parseFloat(cryptoAmount).toFixed(8)} ${selectedCrypto}`)
       setCryptoAmount('')
       setCryptoConvertedAmounts({})
 
