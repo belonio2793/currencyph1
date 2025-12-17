@@ -49,6 +49,12 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [ratesMap, setRatesMap] = useState({})
   const [consolidatedBalance, setConsolidatedBalance] = useState(0)
 
+  // View controls
+  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
+  const [selectedCurrency, setSelectedCurrency] = useState(null)
+  const [showFiatOnly, setShowFiatOnly] = useState(false)
+  const [showCryptoOnly, setShowCryptoOnly] = useState(false)
+
 
 
   useEffect(() => {
