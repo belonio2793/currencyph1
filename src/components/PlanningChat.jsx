@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { portRateCalculator } from '../lib/portRateCalculatorService'
 import { PHILIPPINE_CITIES } from '../data/philippineCitiesCoordinates'
