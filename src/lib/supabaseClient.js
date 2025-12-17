@@ -18,38 +18,8 @@ const getEnv = (name) => {
   return undefined
 }
 
-// Keep reference to original fetch
+// Keep reference to original fetch (no wrapper to avoid response body conflicts with Supabase)
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
-
-// Wrap fetch to suppress Supabase network errors silently
-if (typeof window !== 'undefined' && typeof window.fetch !== 'undefined') {
-  const wrappedFetch = function(...args) {
-    try {
-      return originalFetch.apply(this, args).catch(err => {
-        // Silently suppress "Failed to fetch" and similar network errors from Supabase
-        // These are expected in offline or misconfigured environments
-        if (err?.message?.includes('Failed to fetch') || err?.name === 'TypeError') {
-          // Return a rejected promise that won't trigger unhandledrejection if caught
-          return Promise.reject(err)
-        }
-        return Promise.reject(err)
-      })
-    } catch (err) {
-      // If fetch itself throws, suppress network errors
-      if (err?.message?.includes('Failed to fetch') || err?.name === 'TypeError') {
-        return Promise.reject(err)
-      }
-      throw err
-    }
-  }
-
-  // Copy over properties to maintain compatibility
-  Object.defineProperty(window, 'fetch', {
-    value: wrappedFetch,
-    writable: true,
-    configurable: true
-  })
-}
 
 // Add global error handler to suppress expected network connectivity errors from Supabase
 if (typeof window !== 'undefined') {
