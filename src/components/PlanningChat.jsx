@@ -1155,7 +1155,7 @@ export default function PlanningChat() {
 
       <div className={`flex-1 flex ${isMobile ? 'flex-col gap-3' : 'gap-6'} ${isMobile ? 'p-3' : 'p-6'} overflow-hidden`}>
         {/* Map Section */}
-        <div className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-[calc(100vh-400px)]' : 'flex-1'} ${showLocationForm ? 'pointer-events-none' : ''}`}>
+        <div className={`rounded-lg overflow-hidden border border-slate-700 bg-slate-800 flex flex-col ${isMobile ? 'flex-1 min-h-[calc(100vh-400px)]' : 'flex-1'}`} style={showLocationForm ? { pointerEvents: 'none' } : {}}>
           {/* Map Controls */}
           {isAuthenticated && (
             <div className={`bg-slate-700 border-b border-slate-600 flex ${isMobile ? 'flex-col gap-2 px-2 py-2' : 'items-center justify-between flex-wrap gap-2 px-4 py-3'}`}>
