@@ -400,7 +400,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
           <div>
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white">{table.name}</h2>
             <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-              Stakes: {table.stake_min}/{table.stake_max} chips
+              Stakes: {table.stake_min}/{table.stake_max}
               <span className="ml-4">•</span>
               <span className="ml-4 text-emerald-400">{tableStatusText}</span>
             </p>
