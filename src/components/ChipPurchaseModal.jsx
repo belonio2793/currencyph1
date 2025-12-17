@@ -221,7 +221,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
             </div>
             <div className="text-right">
               <div className="text-sm text-cyan-100">Your Chips</div>
-              <div className="text-3xl font-bold text-white">{formatChips(userChips / 1000000n)}M</div>
+              <div className="text-3xl font-bold text-white">{formatChips(userChips)}</div>
             </div>
           </div>
         </div>
