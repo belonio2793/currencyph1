@@ -4,14 +4,22 @@ import { v4 as uuidv4 } from 'uuid'
 export const paymentsService = {
   // ============ Merchants ============
   async getMerchant(merchantId) {
-    const { data, error } = await supabase
-      .from('merchants')
-      .select('*')
-      .eq('id', merchantId)
-      .single()
+    try {
+      const { data, error } = await supabase
+        .from('merchants')
+        .select('*')
+        .eq('id', merchantId)
+        .single()
 
-    if (error) throw error
-    return data
+      if (error) {
+        const errorMessage = error?.message || JSON.stringify(error)
+        throw new Error(errorMessage)
+      }
+      return data
+    } catch (err) {
+      console.error('getMerchant error:', err)
+      throw err
+    }
   },
 
   async getMerchantsByUser(userId) {
