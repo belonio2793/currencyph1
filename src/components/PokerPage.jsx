@@ -28,19 +28,14 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   async function loadPlayerChips() {
     if (!userId) return
     try {
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-      const res = await fetch(FUNCTIONS_BASE + '/get_player_chips', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`
-        },
-        body: JSON.stringify({ userId })
-      })
-      if (res.ok) {
-        const data = await res.json()
-        setPlayerChips(BigInt(data.chips))
-      }
+      const { data, error } = await supabase
+        .from('player_poker_chips')
+        .select('total_chips')
+        .eq('user_id', userId)
+        .single()
+
+      if (error && error.code !== 'PGRST116') throw error
+      setPlayerChips(BigInt(data?.total_chips || 0))
     } catch (e) {
       console.error('Error loading chips:', e)
     }
