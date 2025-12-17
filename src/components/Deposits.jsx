@@ -842,7 +842,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }, [exchangeRates])
 
   const getCryptoPrice = useCallback((crypto) => {
-    return (cryptoRates[crypto] || defaultCryptoPrices[crypto] || 0).toFixed(2)
+    return cryptoRates[crypto] || defaultCryptoPrices[crypto] || 0
   }, [cryptoRates])
 
   if (loading) {
