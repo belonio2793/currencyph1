@@ -88,6 +88,29 @@ export const currencyAPI = {
     }
   },
 
+  async ensureUserWallets(userId) {
+    if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
+      return []
+    }
+
+    try {
+      // Call RPC to ensure user has wallets for all active currencies
+      const { data, error } = await supabase
+        .rpc('ensure_user_wallets', { p_user_id: userId })
+
+      if (error) {
+        console.warn('Error ensuring user wallets:', error)
+        return []
+      }
+
+      console.log('Ensured wallets for user:', userId, 'Created:', data?.length || 0, 'new wallets')
+      return data || []
+    } catch (err) {
+      console.warn('Failed to ensure user wallets:', err)
+      return []
+    }
+  },
+
   async getUserById(userId) {
     const { data, error } = await supabase
       .from('users')
