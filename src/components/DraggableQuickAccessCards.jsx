@@ -118,7 +118,7 @@ const CARD_CONFIG = {
     description: 'Manage and view all your currency wallets and balances',
     icon: (
       <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18m-9-4v8m-7 0a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2H5z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-4-4H5a4 4 0 00-4 4v10a4 4 0 004 4h2m16-4v-6a4 4 0 00-4-4h-1m0 0h-3a4 4 0 00-4 4v6" />
       </svg>
     ),
     colorClasses: 'bg-cyan-100 group-hover:bg-cyan-200 text-cyan-600',
