@@ -1338,23 +1338,20 @@ export default function PlanningChat() {
                 margin-top: 10px;
               }
               .marker-type-btn {
-                ${isMobile ? 'padding: 6px 8px;' : 'padding: 10px 14px;'}
+                padding: 10px 12px;
                 border-radius: 6px;
-                border: 1.5px solid transparent;
-                background: rgba(51, 65, 85, 0.5);
-                color: white;
-                ${isMobile ? 'font-size: 10px;' : 'font-size: 12px;'}
+                border: 1.5px solid rgba(100, 116, 139, 0.4);
+                background: rgba(51, 65, 85, 0.6);
+                color: rgb(226, 232, 240);
+                font-size: 12px;
                 font-weight: 500;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                white-space: normal;
-                overflow: visible;
-                text-overflow: clip;
                 display: flex;
-                flex-direction: column;
                 align-items: center;
-                gap: 4px;
-                ${isMobile ? 'min-width: auto;' : 'min-width: 150px;'}
+                gap: 8px;
+                width: 100%;
+                justify-content: flex-start;
               }
               .marker-type-btn:hover {
                 background: rgba(71, 85, 105, 0.7);
