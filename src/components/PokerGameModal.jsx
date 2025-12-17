@@ -415,9 +415,9 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
             <div className="text-right">
               <div className="text-xs text-slate-400 mb-1">Current Pot</div>
               <div className="text-2xl font-bold text-amber-400">
-                {pot.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {pot.toLocaleString()}
               </div>
-              <div className="text-xs text-slate-400">{table.currency_code}</div>
+              <div className="text-xs text-slate-400">chips</div>
             </div>
             <button
               onClick={onClose}
