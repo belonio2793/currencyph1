@@ -724,25 +724,39 @@ export default function MyBusiness({ userId }) {
   }
 
   const handleAddBusiness = async () => {
+    setFormError(null)
+
     // Validate common fields
-    if (!formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available) {
-      alert('Please fill all required fields and ensure business name is available')
+    if (!formData.businessName) {
+      setFormError('Business name is required')
+      return
+    }
+
+    if (!formData.cityOfRegistration) {
+      setFormError('City of registration is required')
+      return
+    }
+
+    if (!businessNameAvailability?.available) {
+      setFormError('Please ensure the business name is available')
       return
     }
 
     // Additional validation for existing business mode
     if (formMode === 'existing') {
       if (!formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate) {
-        alert('Please fill all required fields: Business Name, Type, City, TIN, BIR Certification, and Registration Date')
+        setFormError('For existing businesses, please fill: Business Name, Type, City, TIN, BIR Certification, and Registration Date')
         return
       }
     }
 
     try {
+      setSavingBusiness(true)
+
       // Check for duplicate TIN or BIR Certification
       const duplicateCheck = await checkForDuplicateCredentials()
       if (duplicateCheck.isDuplicate) {
-        alert(`The ${duplicateCheck.duplicateField} you entered is already associated with "${duplicateCheck.existingBusiness}".\n\nIf you believe this is a mistake, please contact support@currency.ph`)
+        setFormError(`The ${duplicateCheck.duplicateField} you entered is already associated with "${duplicateCheck.existingBusiness}". Please contact support@currency.ph if you believe this is incorrect.`)
         return
       }
 
@@ -757,12 +771,29 @@ export default function MyBusiness({ userId }) {
           currency_registration_id: formData.currencyRegistrationId,
           city_of_registration: formData.cityOfRegistration,
           registration_date: formData.registrationDate,
-          status: 'active'
+          status: 'active',
+          is_public: false
         }])
         .select()
 
-      if (error) throw error
-      
+      if (error) {
+        console.error('Database error:', error)
+
+        // Handle specific constraint violations
+        if (error.message?.includes('tin') && error.message?.includes('unique')) {
+          setFormError('A business with this TIN already exists. Please verify the TIN or contact support.')
+        } else if (error.message?.includes('certificate_of_incorporation') && error.message?.includes('unique')) {
+          setFormError('A business with this BIR Certification already exists. Please verify the certification or contact support.')
+        } else if (error.message?.includes('currency_registration_id') && error.message?.includes('unique')) {
+          setFormError('Currency registration ID already in use. Please try again or contact support.')
+        } else if (error.message?.includes('unique')) {
+          setFormError(`This ${error.message.includes('tin') ? 'TIN' : 'certificate'} is already registered. Please verify your information.`)
+        } else {
+          setFormError(`Failed to create business: ${error.message || 'Unknown error'}`)
+        }
+        return
+      }
+
       setBusinesses([...businesses, data[0]])
       setSelectedBusiness(data[0])
       setShowRegistrationForm(false)
@@ -779,10 +810,12 @@ export default function MyBusiness({ userId }) {
         cityOfRegistration: '',
         registrationDate: ''
       })
+      setFormError(null)
     } catch (err) {
       console.error('Failed to add business:', err)
-      alert('Failed to register business. Please try again.')
-      setFormMode(null)
+      setFormError(`Error: ${err?.message || 'Failed to register business. Please try again.'}`)
+    } finally {
+      setSavingBusiness(false)
     }
   }
 
