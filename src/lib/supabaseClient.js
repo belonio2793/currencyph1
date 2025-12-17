@@ -181,8 +181,10 @@ if (typeof window !== 'undefined' && typeof setTimeout !== 'undefined') {
     try {
       initClient()
       console.debug('[supabase-client] Supabase client initialized')
+      _supabaseHealthy = true
     } catch (err) {
       console.debug('[supabase-client] Initialization error:', err?.message)
+      _supabaseHealthy = false
     }
   }, 50)
 }
