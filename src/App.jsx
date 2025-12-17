@@ -429,17 +429,15 @@ export default function App() {
 
     // For guest-local users (not real Supabase auth), don't try database operations
     if (!user.id.includes('guest-local')) {
-      try {
-        await currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
-        // Ensure user has wallets for all active currencies (non-blocking)
-        currencyAPI.ensureUserWallets(user.id).catch(err => {
-          console.warn('Failed to ensure user wallets during initialization:', err)
-        })
-        if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id)
-      } catch (err) {
-        console.error('Could not initialize user profile:', err)
-        setError('Failed to set up your account. Please try again or contact support.')
-      }
+      // Initialize user profile and wallets non-blocking (in background)
+      currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User').catch(err => {
+        console.warn('Failed to initialize user profile:', err)
+      })
+      // Ensure user has wallets for all active currencies (non-blocking)
+      currencyAPI.ensureUserWallets(user.id).catch(err => {
+        console.warn('Failed to ensure user wallets during initialization:', err)
+      })
+      if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id)
     } else {
       // For guest-local accounts, persist to localStorage
       try {
