@@ -271,12 +271,62 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   }
 
   // Separate wallets by type
-  let fiatWalletsFiltered = internalWallets.filter(w => FIAT_CURRENCIES.includes(w.currency_code) && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
-  let cryptoWalletsFiltered = internalWallets.filter(w => CRYPTO_CURRENCIES.includes(w.currency_code) && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  let fiatWalletsFiltered = internalWallets.filter(w => w.currency_type === 'fiat' && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  let cryptoWalletsFiltered = internalWallets.filter(w => w.currency_type === 'crypto' && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
 
-  // Apply filters
+  // Build complete wallet list including placeholders for currencies without wallets
+  const buildCompleteWalletList = () => {
+    const walletMap = {}
+    internalWallets.forEach(w => {
+      walletMap[w.currency_code] = w
+    })
+
+    const completeList = []
+
+    // Get all active currencies
+    const currenciesToShow = selectedCurrency
+      ? allCurrencies.filter(c => c.code === selectedCurrency)
+      : allCurrencies.filter(c => enabledInternal.includes(c.code))
+
+    // Filter by type
+    let typedCurrencies = currenciesToShow
+    if (showFiatOnly) {
+      typedCurrencies = typedCurrencies.filter(c => c.type === 'fiat')
+    } else if (showCryptoOnly) {
+      typedCurrencies = typedCurrencies.filter(c => c.type === 'crypto')
+    }
+
+    // Build list with wallets or placeholders
+    typedCurrencies.forEach(currency => {
+      if (walletMap[currency.code]) {
+        completeList.push(walletMap[currency.code])
+      } else {
+        // Create placeholder for missing wallet
+        completeList.push({
+          id: `placeholder-${currency.code}`,
+          wallet_id: null,
+          currency_code: currency.code,
+          currency_name: currency.name,
+          currency_type: currency.type,
+          symbol: currency.symbol,
+          decimals: currency.decimals,
+          balance: 0,
+          total_deposited: 0,
+          total_withdrawn: 0,
+          is_active: true,
+          user_id: userId,
+          is_placeholder: true
+        })
+      }
+    })
+
+    return completeList.sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  }
+
+  // Apply currency filters on fiat/crypto wallets
   if (selectedCurrency) {
-    if (FIAT_CURRENCIES.includes(selectedCurrency)) {
+    const selectedCurr = allCurrencies.find(c => c.code === selectedCurrency)
+    if (selectedCurr?.type === 'fiat') {
       fiatWalletsFiltered = fiatWalletsFiltered.filter(w => w.currency_code === selectedCurrency)
       cryptoWalletsFiltered = []
     } else {
@@ -290,48 +340,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   }
   if (showCryptoOnly) {
     fiatWalletsFiltered = []
-  }
-
-  // All wallets for list view - include all currencies with zero balance placeholders
-  const buildCompleteWalletList = () => {
-    const walletMap = {}
-    internalWallets.forEach(w => {
-      walletMap[w.currency_code] = w
-    })
-
-    const completeList = []
-
-    // Add fiat currencies first (filtered if needed)
-    FIAT_CURRENCIES.forEach(code => {
-      if (enabledInternal.includes(code) && (!selectedCurrency || selectedCurrency === code) && !showCryptoOnly) {
-        completeList.push(walletMap[code] || {
-          id: `placeholder-${code}`,
-          currency_code: code,
-          balance: 0,
-          total_deposited: 0,
-          total_withdrawn: 0,
-          is_active: true,
-          user_id: userId
-        })
-      }
-    })
-
-    // Add crypto currencies (filtered if needed)
-    CRYPTO_CURRENCIES.forEach(code => {
-      if (enabledInternal.includes(code) && (!selectedCurrency || selectedCurrency === code) && !showFiatOnly) {
-        completeList.push(walletMap[code] || {
-          id: `placeholder-${code}`,
-          currency_code: code,
-          balance: 0,
-          total_deposited: 0,
-          total_withdrawn: 0,
-          is_active: true,
-          user_id: userId
-        })
-      }
-    })
-
-    return completeList.sort((a, b) => a.currency_code.localeCompare(b.currency_code))
   }
 
   const allWalletsForList = buildCompleteWalletList()
