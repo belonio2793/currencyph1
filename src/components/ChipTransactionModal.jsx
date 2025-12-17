@@ -287,7 +287,9 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                       {/* Price */}
                       <div className="mb-6 pb-6 border-b border-slate-700">
                         <div className="text-xs text-slate-400 mb-2">Price</div>
-                        <div className="text-lg sm:text-2xl font-bold text-emerald-500">{getPhpPrice(selectedPackage.usd_price)}</div>
+                        <div className="text-lg sm:text-2xl font-bold">
+                          <PriceDisplay usdPrice={selectedPackage.usd_price} />
+                        </div>
                       </div>
 
                       {/* New Balance */}
