@@ -8,23 +8,15 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
 
   if (!open) return null
 
-  const isChipBased = currencyCode === 'CHIPS'
   const netProfit = endingBalance - startingBalance
   const isWinner = netProfit > 0
-  const rakeAmount = isWinner ? Math.round(netProfit * (rakePercent / 100)) : 0
-  const tipAmount = isWinner ? Math.round(rakeAmount * (tipPercent / 100)) : 0
-  const totalDeduction = rakeAmount + tipAmount
+  const rakeChips = isWinner ? Math.round(netProfit * (rakePercent / 100)) : 0
+  const tipChips = isWinner ? Math.round(rakeChips * (tipPercent / 100)) : 0
+  const totalDeduction = rakeChips + tipChips
   const finalBalance = endingBalance - totalDeduction
 
   const formatChips = (chips) => {
     return chips.toLocaleString()
-  }
-
-  const formatCurrency = (amount) => {
-    return amount.toLocaleString('en-US', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    })
   }
 
   async function handleConfirm() {
@@ -69,7 +61,6 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
         throw new Error(errorMsg)
       }
 
-      // Call success callback
       if (onRakeProcessed) {
         onRakeProcessed(data)
       }
@@ -89,11 +80,7 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
         {/* Header */}
         <div className="bg-gradient-to-r from-emerald-600 to-teal-600 p-6 text-white">
           <h2 className="text-2xl font-bold">Session Complete 🎉</h2>
-          <p className="text-sm text-emerald-100 mt-1">
-            {isChipBased 
-              ? 'Review your chip results and tips to the house'
-              : 'Review your earnings and set your tip'}
-          </p>
+          <p className="text-sm text-emerald-100 mt-1">Review your chip results and set house rake</p>
         </div>
 
         {/* Content */}
@@ -108,18 +95,18 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
           <div className="space-y-4">
             <div className="bg-slate-700/50 rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-slate-300 text-sm">Starting {isChipBased ? 'Chips' : 'Balance'}</span>
+                <span className="text-slate-300 text-sm">Starting Chips</span>
                 <span className="text-white font-mono font-semibold">
-                  {isChipBased ? formatChips(startingBalance) : formatCurrency(startingBalance)} {isChipBased ? 'chips' : ''}
+                  {formatChips(startingBalance)} chips
                 </span>
               </div>
               
               <div className="border-t border-slate-600"></div>
               
               <div className="flex items-center justify-between">
-                <span className="text-slate-300 text-sm">Ending {isChipBased ? 'Chips' : 'Balance'}</span>
+                <span className="text-slate-300 text-sm">Ending Chips</span>
                 <span className="text-white font-mono font-semibold">
-                  {isChipBased ? formatChips(endingBalance) : formatCurrency(endingBalance)} {isChipBased ? 'chips' : ''}
+                  {formatChips(endingBalance)} chips
                 </span>
               </div>
               
@@ -130,14 +117,15 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                   Net Result
                 </span>
                 <span className={`font-mono font-bold ${isWinner ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {isWinner ? '+' : ''}{isChipBased ? formatChips(netProfit) : formatCurrency(netProfit)} {isChipBased ? 'chips' : ''}
+                  {isWinner ? '+' : ''}{formatChips(netProfit)} chips
                 </span>
               </div>
             </div>
 
-            {/* House Rake/Tip Adjustment Section */}
+            {/* House Rake & Tip Section */}
             {isWinner && (
-              <div className="bg-slate-700/50 rounded-lg p-4 space-y-4">
+              <div className="bg-slate-700/50 rounded-lg p-4 space-y-5">
+                {/* Rake Slider */}
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-slate-300 font-semibold text-sm">House Rake %</label>
@@ -162,14 +150,15 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-400 mt-3 leading-relaxed">
+                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
                     {rakePercent > 0 
-                      ? `House rake: ${isChipBased ? formatChips(rakeAmount) : formatCurrency(rakeAmount / 10000)} from your ${isChipBased ? formatChips(netProfit) : formatCurrency(netProfit / 10000)} profit.`
-                      : 'No house rake.'}
+                      ? `House takes ${formatChips(rakeChips)} chips from your ${formatChips(netProfit)} profit`
+                      : 'No house rake'}
                   </p>
                 </div>
 
-                <div className="border-t border-slate-600 pt-4">
+                {/* Tip Slider */}
+                <div className="border-t border-slate-600 pt-5">
                   <div className="flex items-center justify-between mb-3">
                     <label className="text-slate-300 font-semibold text-sm">Tip to House %</label>
                     <span className="text-amber-400 font-mono text-sm">{tipPercent}%</span>
@@ -193,8 +182,10 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-400 mt-3 leading-relaxed">
-                    Tips support the poker room. {tipPercent > 0 && `At ${tipPercent}%, you'll contribute ${isChipBased ? formatChips(tipAmount) : formatCurrency(tipAmount / 10000)} as tip.`}
+                  <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+                    {tipPercent > 0 
+                      ? `Tip ${formatChips(tipChips)} chips to the house`
+                      : 'No tip'}
                   </p>
                 </div>
               </div>
@@ -203,12 +194,12 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
             {!isWinner && (
               <div className="bg-slate-700/50 rounded-lg p-4">
                 <p className="text-slate-300 text-sm">
-                  No rake charged on losing sessions. Your remaining chips are returned to your inventory. Better luck next time! 🍀
+                  No rake on losing sessions. Your chips are returned to inventory. Better luck next time! 🍀
                 </p>
               </div>
             )}
 
-            {/* Final Amount / Summary */}
+            {/* Summary */}
             <div className={`${isWinner ? 'bg-emerald-900/30 border-emerald-700' : 'bg-slate-700/30 border-slate-600'} border rounded-lg p-4`}>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -216,12 +207,12 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                     Chips returned to inventory
                   </span>
                   <span className={`font-mono font-bold text-xl ${isWinner ? 'text-emerald-100' : 'text-slate-200'}`}>
-                    {isChipBased ? formatChips(finalBalance) : formatCurrency(finalBalance)} {isChipBased ? 'chips' : ''}
+                    {formatChips(finalBalance)} chips
                   </span>
                 </div>
-                {isWinner && (
+                {isWinner && rakeChips + tipChips > 0 && (
                   <div className="text-xs text-slate-400 text-right">
-                    (House rake: {formatChips(rakeAmount)} + tip: {formatChips(tipAmount)})
+                    (Rake: {formatChips(rakeChips)} + Tip: {formatChips(tipChips)} = {formatChips(rakeChips + tipChips)} to house)
                   </div>
                 )}
               </div>
