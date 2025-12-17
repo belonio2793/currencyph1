@@ -1637,15 +1637,15 @@ export default function MyBusiness({ userId }) {
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">Tax ID (TIN)</p>
-                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.tin}</p>
+                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.tin || 'Not set'}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">BIR Certification Number</p>
-                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.certificate_of_incorporation}</p>
+                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.certificate_of_incorporation || 'Not set'}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">Currency Registration ID</p>
-                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.currency_registration_number || 'Not assigned'}</p>
+                  <p className="text-xl font-mono font-semibold text-slate-900">{selectedBusiness.currency_registration_id || 'Not assigned'}</p>
                 </div>
                 <div className="bg-slate-50 p-6 rounded-lg border border-slate-200">
                   <p className="text-sm text-slate-500 mb-2">City of Registration</p>
@@ -1655,6 +1655,43 @@ export default function MyBusiness({ userId }) {
                   <p className="text-sm text-slate-500 mb-2">Status</p>
                   <p className={`text-xl font-semibold ${selectedBusiness.status === 'active' ? 'text-green-600' : 'text-slate-600'}`}>
                     {selectedBusiness.status ? selectedBusiness.status.charAt(0).toUpperCase() + selectedBusiness.status.slice(1) : 'Unknown'}
+                  </p>
+                </div>
+                <div className="bg-blue-50 p-6 rounded-lg border border-blue-200">
+                  <p className="text-sm text-blue-700 mb-3 font-semibold">Public Visibility</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-slate-700">{selectedBusiness.is_public ? 'Visible in Directory' : 'Private Business'}</span>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const newVisibility = !selectedBusiness.is_public
+                          const { error } = await supabase
+                            .from('businesses')
+                            .update({ is_public: newVisibility })
+                            .eq('id', selectedBusiness.id)
+
+                          if (error) throw error
+
+                          setSelectedBusiness({ ...selectedBusiness, is_public: newVisibility })
+                          setBusinesses(businesses.map(b => b.id === selectedBusiness.id ? { ...b, is_public: newVisibility } : b))
+                        } catch (err) {
+                          console.error('Failed to update visibility:', err)
+                          alert('Failed to update visibility. Please try again.')
+                        }
+                      }}
+                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                        selectedBusiness.is_public
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-slate-300 text-slate-700 hover:bg-slate-400'
+                      }`}
+                    >
+                      {selectedBusiness.is_public ? 'Make Private' : 'Make Public'}
+                    </button>
+                  </div>
+                  <p className="text-xs text-blue-600 mt-2">
+                    {selectedBusiness.is_public
+                      ? 'Your business is visible in the business directory. Users can discover your business.'
+                      : 'Your business is private. Only you can see it.'}
                   </p>
                 </div>
               </div>
