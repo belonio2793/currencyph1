@@ -1229,7 +1229,7 @@ export default function MyBusiness({ userId }) {
                     {businesses.map(business => (
                       <button
                         key={business.id}
-                        onClick={() => setSelectedBusiness(selectedBusiness?.id === business.id ? null : business)}
+                        onClick={() => setSelectedBusiness(business)}
                         className={`px-4 py-2 rounded-lg border transition-colors ${
                           selectedBusiness?.id === business.id
                             ? 'bg-blue-600 text-white border-blue-600'
