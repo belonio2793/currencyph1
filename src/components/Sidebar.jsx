@@ -325,25 +325,25 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                             {item.children.map(child => (
                               <li
                                 key={child.id}
-                                className={`flex items-start text-xs transition-colors rounded-lg overflow-hidden ${
+                                className={`flex items-start text-xs transition-all duration-200 rounded-lg overflow-hidden border-l-2 ${
                                   activeTab === child.id
-                                    ? 'bg-blue-700 text-white'
-                                    : ''
+                                    ? 'bg-blue-800/40 text-blue-100 border-l-blue-400'
+                                    : 'border-l-transparent'
                                 }`}
                               >
-                                <span className={`mr-2 pt-1.5 flex-shrink-0 ${
+                                <span className={`mr-2 pt-1.5 flex-shrink-0 transition-colors ${
                                   activeTab === child.id
-                                    ? 'text-blue-200'
-                                    : 'text-slate-500'
+                                    ? 'text-blue-300'
+                                    : 'text-slate-600'
                                 }`}>
                                   •
                                 </span>
                                 <button
                                   onClick={() => handleNavClick(child.id)}
-                                  className={`w-full text-left px-2 py-1.5 transition-colors ${
+                                  className={`w-full text-left px-2 py-1.5 transition-all duration-200 ${
                                     activeTab === child.id
-                                      ? 'bg-blue-700 text-white'
-                                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                      ? 'text-blue-100 font-medium'
+                                      : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200'
                                   }`}
                                 >
                                   {child.label}
