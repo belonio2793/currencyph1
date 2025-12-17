@@ -152,9 +152,14 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
   const selectedBonusChips = selectedPackage ? Number(selectedPackage.bonus_chips || 0) : 0
   const selectedTotalChips = selectedChipAmount + selectedBonusChips
 
+  const getPhpPrice = (usdPrice) => {
+    if (!usdPrice) return '₱0'
+    return formatPriceWithCurrency(usdPrice, DEFAULT_CURRENCY)
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
-      <div className="bg-slate-900 rounded-2xl shadow-2xl w-full max-w-4xl border border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
+      <div className="bg-slate-900 rounded-2xl shadow-2xl w-screen h-screen sm:w-full sm:h-auto sm:max-w-5xl border border-slate-700 overflow-hidden flex flex-col sm:max-h-[95vh]">
         
         {/* Header */}
         <div className="bg-cyan-600 p-8 text-white sticky top-0 z-10">
