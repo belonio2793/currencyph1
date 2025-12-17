@@ -555,10 +555,12 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                         const converted = convertAmount(Number(wallet.balance || 0), wallet.currency_code, globalCurrency, ratesMap)
                         balanceInGlobalCurrency = converted !== null ? converted : Number(wallet.balance || 0)
                       }
-                      const symbol = CURRENCY_SYMBOLS[wallet.currency_code] || wallet.currency_code
-                      const isCrypto = CRYPTO_CURRENCIES.includes(wallet.currency_code)
 
-                      const isPlaceholder = wallet.id.startsWith('placeholder-')
+                      // Get symbol from wallet object (database) or fallback
+                      const symbol = wallet.symbol || wallet.currency_code
+                      const isCrypto = wallet.currency_type === 'crypto'
+                      const isPlaceholder = wallet.id && wallet.id.startsWith('placeholder-')
+
                       return (
                         <tr key={wallet.id} className={`border-b border-slate-100 transition-colors ${
                           isPlaceholder ? 'bg-slate-50' : 'hover:bg-slate-50'
