@@ -270,9 +270,9 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                       <button
                         key={item.id}
                         onClick={() => handleNavClick(item.id)}
-                        className={`w-full flex items-center justify-center p-2.5 rounded-lg text-sm transition-colors ${
+                        className={`w-full flex items-center justify-center p-2.5 rounded-lg text-sm transition-all duration-200 ${
                           activeTab === item.id
-                            ? 'bg-blue-600 text-white font-medium'
+                            ? 'bg-gradient-to-b from-blue-600 to-blue-700 text-white font-medium shadow-lg shadow-blue-500/40'
                             : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                         }`}
                         title={item.label}
