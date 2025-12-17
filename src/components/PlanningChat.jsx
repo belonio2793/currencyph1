@@ -1354,14 +1354,15 @@ export default function PlanningChat() {
                 justify-content: flex-start;
               }
               .marker-type-btn:hover {
-                background: rgba(71, 85, 105, 0.7);
-                border-color: rgb(100, 116, 139);
+                background: rgba(71, 85, 105, 0.8);
+                border-color: rgb(148, 163, 184);
+                color: white;
               }
               .marker-type-btn.active {
-                background: rgb(59, 130, 246);
-                border-color: rgb(37, 99, 235);
+                background: linear-gradient(135deg, rgb(59, 130, 246), rgb(37, 99, 235));
+                border-color: rgb(59, 130, 246);
                 color: white;
-                box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+                box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
               }
             `}</style>
 
