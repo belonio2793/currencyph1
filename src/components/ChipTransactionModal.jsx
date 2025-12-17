@@ -21,6 +21,35 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
     }
   }, [open, userId])
 
+  const parseSupabaseError = (err) => {
+    if (!err) return 'An unknown error occurred'
+
+    const message = err.message || ''
+    const code = err.code || ''
+
+    // RLS policy violations
+    if (message.includes('row-level security policy')) {
+      return 'You do not have permission to purchase chips. Please ensure you are logged in with a valid account.'
+    }
+
+    // No rows found (406)
+    if (code === 'PGRST116' || message.includes('No rows found')) {
+      return 'Your poker account is being initialized. Please try again in a moment.'
+    }
+
+    // Generic Supabase errors
+    if (message.includes('Unauthorized') || message.includes('401')) {
+      return 'Your session has expired. Please log in again.'
+    }
+
+    if (message.includes('Forbidden') || message.includes('403')) {
+      return 'You do not have permission to perform this action.'
+    }
+
+    // Default to original message
+    return message || 'An error occurred during the transaction'
+  }
+
   async function loadData() {
     try {
       setLoading(true)
@@ -49,7 +78,13 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
           .eq('user_id', userId)
           .single()
 
-        if (!chipErr && chipData) {
+        if (chipErr) {
+          if (chipErr.code === 'PGRST116') {
+            setUserChips(0n)
+          } else {
+            throw chipErr
+          }
+        } else if (chipData) {
           setUserChips(BigInt(chipData.total_chips || 0))
         } else {
           setUserChips(0n)
@@ -69,7 +104,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
       }
     } catch (err) {
       console.error('Error loading transaction data:', err)
-      setError('Failed to load transaction data')
+      setError(parseSupabaseError(err))
     } finally {
       setLoading(false)
     }
