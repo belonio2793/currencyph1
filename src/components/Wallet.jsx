@@ -38,10 +38,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [loading, setLoading] = useState(true)
   const [showAddFunds, setShowAddFunds] = useState(false)
 
-  // Preference states (separate for each table)
+  // Preference states
   const [enabledInternal, setEnabledInternal] = useState([])
-  const [enabledFiat, setEnabledFiat] = useState([])
-  const [enabledCrypto, setEnabledCrypto] = useState([])
 
   // Which preference modal is shown
   const [showPreferencesInternal, setShowPreferencesInternal] = useState(false)
