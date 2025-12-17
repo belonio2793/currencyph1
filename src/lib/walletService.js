@@ -1,0 +1,176 @@
+import { supabase } from './supabaseClient'
+
+export const walletService = {
+  // Fetch all active currencies from the database
+  async getAllCurrencies() {
+    try {
+      const { data, error } = await supabase
+        .from('currencies')
+        .select('code, name, type, symbol, decimals, is_default')
+        .eq('active', true)
+        .order('type')
+        .order('code')
+
+      if (error) {
+        console.warn('Error fetching currencies:', error)
+        return []
+      }
+
+      return data || []
+    } catch (err) {
+      console.warn('Failed to fetch currencies from database:', err)
+      return []
+    }
+  },
+
+  // Fetch all currencies grouped by type
+  async getCurrenciesGrouped() {
+    try {
+      const currencies = await this.getAllCurrencies()
+      
+      const grouped = {
+        fiat: [],
+        crypto: []
+      }
+
+      currencies.forEach(curr => {
+        if (curr.type === 'crypto') {
+          grouped.crypto.push(curr)
+        } else if (curr.type === 'fiat') {
+          grouped.fiat.push(curr)
+        }
+      })
+
+      return grouped
+    } catch (err) {
+      console.warn('Failed to group currencies:', err)
+      return { fiat: [], crypto: [] }
+    }
+  },
+
+  // Fetch user wallets with currency details
+  async getUserWalletsWithDetails(userId) {
+    try {
+      if (!userId || userId === 'null' || userId === 'undefined') {
+        return []
+      }
+
+      const { data, error } = await supabase
+        .from('user_wallets_summary')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('currency_type')
+        .order('currency_code')
+
+      if (error) {
+        console.warn('Error fetching user wallets with details:', error)
+        return []
+      }
+
+      return data || []
+    } catch (err) {
+      console.warn('Failed to fetch user wallets with details:', err)
+      return []
+    }
+  },
+
+  // Build complete wallet list with placeholders for missing currencies
+  async buildCompleteWalletList(userId, filters = {}) {
+    try {
+      // Fetch all currencies and user wallets
+      const [allCurrencies, userWallets] = await Promise.all([
+        this.getAllCurrencies(),
+        this.getUserWalletsWithDetails(userId)
+      ])
+
+      // Create a map of existing wallets
+      const walletMap = {}
+      userWallets.forEach(w => {
+        walletMap[w.currency_code] = w
+      })
+
+      // Build complete list with placeholders
+      const completeList = allCurrencies.map(currency => {
+        if (walletMap[currency.code]) {
+          return {
+            ...walletMap[currency.code],
+            is_placeholder: false
+          }
+        }
+
+        // Return placeholder for missing wallet
+        return {
+          id: `placeholder-${currency.code}`,
+          user_id: userId,
+          wallet_id: null,
+          currency_code: currency.code,
+          currency_name: currency.name,
+          currency_type: currency.type,
+          symbol: currency.symbol,
+          decimals: currency.decimals,
+          balance: 0,
+          total_deposited: 0,
+          total_withdrawn: 0,
+          is_active: true,
+          created_at: null,
+          updated_at: null,
+          is_placeholder: true
+        }
+      })
+
+      // Apply filters
+      let filtered = completeList
+
+      if (filters.type) {
+        filtered = filtered.filter(w => w.currency_type === filters.type)
+      }
+
+      if (filters.currencyCode) {
+        filtered = filtered.filter(w => w.currency_code === filters.currencyCode)
+      }
+
+      if (filters.search) {
+        const query = filters.search.toLowerCase()
+        filtered = filtered.filter(w => 
+          w.currency_code.toLowerCase().includes(query) ||
+          (w.currency_name && w.currency_name.toLowerCase().includes(query))
+        )
+      }
+
+      return filtered
+    } catch (err) {
+      console.warn('Failed to build complete wallet list:', err)
+      return []
+    }
+  },
+
+  // Get symbol for currency (with fallback)
+  getSymbol(currency) {
+    if (!currency) return ''
+    
+    if (typeof currency === 'string') {
+      // Just the code
+      return null
+    }
+    
+    if (currency.symbol) {
+      return currency.symbol
+    }
+    
+    // Fallback symbols if not in database
+    const fallbackSymbols = {
+      'PHP': '₱', 'USD': '$', 'EUR': '€', 'GBP': '£', 'JPY': '¥',
+      'CNY': '¥', 'INR': '₹', 'AUD': '$', 'CAD': '$', 'CHF': 'CHF',
+      'SEK': 'kr', 'NZD': '$', 'SGD': '$', 'HKD': '$', 'IDR': 'Rp',
+      'MYR': 'RM', 'THB': '฿', 'VND': '₫', 'KRW': '₩', 'ZAR': 'R',
+      'BRL': 'R$', 'MXN': '$', 'NOK': 'kr', 'DKK': 'kr', 'AED': 'د.إ',
+      'BTC': '₿', 'ETH': 'Ξ', 'XRP': 'XRP', 'ADA': 'ADA', 'SOL': 'SOL',
+      'DOGE': 'Ð', 'MATIC': 'MATIC', 'LINK': 'LINK', 'LTC': 'Ł', 'BCH': 'BCH',
+      'USDT': 'USDT', 'USDC': 'USDC', 'BUSD': 'BUSD', 'SHIB': 'SHIB',
+      'AVAX': 'AVAX', 'DOT': 'DOT'
+    }
+    
+    return fallbackSymbols[currency.code || currency] || null
+  }
+}
