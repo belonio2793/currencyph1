@@ -4,7 +4,6 @@ import { convertUSDToLocalCurrency, formatPriceWithCurrency, getCurrencySymbol }
 
 export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseComplete }) {
   const [packages, setPackages] = useState([])
-  const [selectedPackage, setSelectedPackage] = useState(null)
   const [loading, setLoading] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [error, setError] = useState(null)
@@ -29,9 +28,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
       
       if (error) throw error
       setPackages(data || [])
-      if (data && data.length > 0) {
-        setSelectedPackage(data[0].id)
-      }
     } catch (err) {
       console.error('Error loading packages:', err)
       setError('Failed to load chip packages')
@@ -42,7 +38,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   async function loadUserData() {
     try {
-      // Get user's primary wallet
       const { data: wallets, error: walletErr } = await supabase
         .from('wallets')
         .select('*')
@@ -55,7 +50,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         setUserWallet(wallets[0])
       }
 
-      // Get user's chip balance
       const { data: chipData, error: chipErr } = await supabase
         .from('player_poker_chips')
         .select('total_chips')
@@ -70,8 +64,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     }
   }
 
-  async function handlePurchase() {
-    if (!selectedPackage || !userId) {
+  async function handlePurchase(packageId) {
+    if (!packageId || !userId) {
       setError('Missing purchase information')
       return
     }
@@ -80,23 +74,19 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     setError(null)
 
     try {
-      // Get package details
-      const pkg = packages.find(p => p.id === selectedPackage)
+      const pkg = packages.find(p => p.id === packageId)
       if (!pkg) throw new Error('Package not found')
 
-      // Only check wallet balance if wallet exists
       if (userWallet) {
         const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
         const walletBalance = Number(userWallet.balance)
 
-        // Check if user has sufficient balance
         if (walletBalance < localPrice) {
           setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
           setProcessing(false)
           return
         }
 
-        // Deduct from wallet if it exists
         const newWalletBalance = walletBalance - localPrice
         const { error: walletUpdateErr } = await supabase
           .from('wallets')
@@ -106,11 +96,9 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
         if (walletUpdateErr) throw walletUpdateErr
       }
 
-      // Add chips to player inventory
-      const totalChipsToAdd = BigInt(pkg.chip_amount) + BigInt(pkg.bonus_chips || 0)
+      const totalChipsToAdd = BigInt(pkg.chip_amount || 0) + BigInt(pkg.bonus_chips || 0)
       const newChipBalance = userChips + totalChipsToAdd
 
-      // Upsert player chips record
       const { error: chipUpsertErr } = await supabase
         .from('player_poker_chips')
         .upsert({
@@ -121,16 +109,15 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
       if (chipUpsertErr) throw chipUpsertErr
 
-      // Record purchase transaction
       const paymentMethod = userWallet ? 'wallet_deduction' : 'free'
       const { data: purchase, error: purchaseErr } = await supabase
         .from('chip_purchases')
         .insert([{
           user_id: userId,
-          package_id: selectedPackage,
-          chips_purchased: pkg.chip_amount,
+          package_id: packageId,
+          chips_purchased: pkg.chip_amount || 0,
           bonus_chips_awarded: pkg.bonus_chips || 0,
-          total_chips_received: pkg.chip_amount + (pkg.bonus_chips || 0),
+          total_chips_received: (pkg.chip_amount || 0) + (pkg.bonus_chips || 0),
           usd_price_paid: pkg.usd_price,
           payment_status: 'completed',
           payment_method: paymentMethod,
@@ -141,7 +128,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
       if (purchaseErr) throw purchaseErr
 
-      // Reload user data
       await loadUserData()
       
       if (onPurchaseComplete) {
@@ -153,7 +139,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           : 'Free (no wallet)'
         
         onPurchaseComplete({
-          chipsPurchased: pkg.chip_amount,
+          chipsPurchased: pkg.chip_amount || 0,
           bonusChips: pkg.bonus_chips || 0,
           totalChips: totalChipsToAdd.toString(),
           newBalance: newChipBalance.toString(),
@@ -172,11 +158,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
   if (!open) return null
 
-  const selectedPkg = packages.find(p => p.id === selectedPackage)
   const currency = userWallet?.currency_code || DEFAULT_CURRENCY
-  const localPrice = selectedPkg ? convertUSDToLocalCurrency(Number(selectedPkg.usd_price), currency) : 0
   const walletBalance = userWallet ? Number(userWallet.balance) : Infinity
-  const canAfford = walletBalance >= localPrice
 
   const formatChips = (chips) => {
     if (chips === undefined || chips === null) {
@@ -188,142 +171,181 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
     return chips.toLocaleString()
   }
 
+  const getPackageLabel = (pkg) => {
+    if (pkg.is_first_purchase_special) return 'FIRST PURCHASE SPECIAL'
+    if (pkg.is_most_popular) return 'MOST POPULAR'
+    if (pkg.is_flash_sale) return '24 HOUR FLASH SALE'
+    return null
+  }
+
+  const getPackageLabelColor = (pkg) => {
+    if (pkg.is_first_purchase_special) return 'bg-cyan-500'
+    if (pkg.is_most_popular) return 'bg-slate-600'
+    if (pkg.is_flash_sale) return 'bg-red-600'
+    return null
+  }
+
+  const getPackageCardBg = (pkg) => {
+    if (pkg.is_flash_sale) return 'border-red-500 border-2'
+    return 'border-slate-600 border'
+  }
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl shadow-2xl max-w-2xl w-full border border-slate-700 overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm">
+      <div className="bg-gradient-to-br from-slate-900 to-slate-950 rounded-2xl shadow-2xl max-w-6xl w-full border border-slate-700 overflow-hidden max-h-[90vh] flex flex-col">
+        
         {/* Header */}
-        <div className="bg-gradient-to-r from-amber-600 to-yellow-600 p-6 text-white">
-          <h2 className="text-2xl font-bold">Buy Poker Chips 💰</h2>
-          <p className="text-sm text-amber-100 mt-1">
-            {userWallet ? (
-              <>
-                Your Balance: <span className="font-bold">{formatPriceWithCurrency(walletBalance, currency)}</span> • 
-              </>
-            ) : (
-              <>
-                Wallet: <span className="font-bold text-amber-300">Not set up</span> • 
-              </>
-            )}
-            Your Chips: <span className="font-bold">{formatChips(userChips)}</span>
-          </p>
+        <div className="bg-gradient-to-r from-cyan-600 to-blue-600 p-8 text-white sticky top-0 z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-3xl font-bold">Buy Poker Chips 🎰</h2>
+              <p className="text-sm text-cyan-100 mt-2">
+                {userWallet ? (
+                  <>
+                    Your Balance: <span className="font-bold text-lg">{formatPriceWithCurrency(walletBalance, currency)}</span>
+                  </>
+                ) : (
+                  <>
+                    Wallet: <span className="font-bold text-lg text-cyan-300">Not set up</span>
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-sm text-cyan-100">Your Chips</div>
+              <div className="text-3xl font-bold text-white">{formatChips(userChips / 1000000n)}M</div>
+            </div>
+          </div>
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="flex-1 overflow-y-auto p-8">
           {error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-600 rounded-lg text-red-200 text-sm">
-              {error}
+            <div className="mb-6 p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200 text-sm flex items-start gap-3">
+              <span className="text-xl mt-0.5">⚠️</span>
+              <div>{error}</div>
             </div>
           )}
 
           {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="w-8 h-8 border-4 border-amber-300 border-t-white rounded-full animate-spin"></div>
+            <div className="flex justify-center items-center py-24">
+              <div className="w-12 h-12 border-4 border-cyan-400 border-t-white rounded-full animate-spin"></div>
+            </div>
+          ) : packages.length === 0 ? (
+            <div className="flex justify-center items-center py-24">
+              <div className="text-center">
+                <div className="text-slate-400 text-lg">No chip packages available</div>
+              </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              {/* Chip Packages Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {packages.map((pkg) => {
-                  const localPkgPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), currency)
-                  const affordable = !userWallet || (walletBalance >= localPkgPrice)
-                  return (
-                    <button
-                      key={pkg.id}
-                      onClick={() => setSelectedPackage(pkg.id)}
-                      disabled={!affordable}
-                      className={`relative p-4 rounded-lg transition transform ${
-                        selectedPackage === pkg.id
-                          ? 'bg-gradient-to-b from-amber-500 to-yellow-600 border-2 border-amber-300 shadow-xl scale-105'
-                          : affordable
-                          ? 'bg-slate-700 border-2 border-slate-600 hover:border-amber-500'
-                          : 'bg-slate-700/50 border-2 border-slate-600 opacity-50 cursor-not-allowed'
-                      }`}
-                    >
-                      {pkg.is_first_purchase_special && (
-                        <div className="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-bl-lg">
-                          SPECIAL
-                        </div>
-                      )}
-                      <div className="text-center">
-                        <div className="text-sm font-bold text-white mb-2">
-                          {(Number(pkg.chip_amount) / 1000000).toFixed(1)}M
-                        </div>
-                        <div className="text-lg font-bold text-white">
-                          {formatPriceWithCurrency(localPkgPrice, currency)}
-                        </div>
-                        {pkg.bonus_chips > 0 && (
-                          <div className="text-xs text-amber-200 mt-1">
-                            +{(Number(pkg.bonus_chips) / 1000000).toFixed(1)}M bonus
-                          </div>
-                        )}
-                        {!affordable && (
-                          <div className="text-xs text-red-300 mt-1">
-                            Not enough
-                          </div>
-                        )}
-                      </div>
-                    </button>
-                  )
-                })}
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
+              {packages.map((pkg) => {
+                const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), currency)
+                const affordable = !userWallet || (walletBalance >= localPrice)
+                const totalChips = (Number(pkg.chip_amount || 0) + Number(pkg.bonus_chips || 0))
+                const label = getPackageLabel(pkg)
+                const labelColor = getPackageLabelColor(pkg)
 
-              {/* Selected Package Details */}
-              {selectedPkg && (
-                <div className="bg-slate-700/50 rounded-lg p-4 border border-amber-600/30">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-slate-300">Base Chips:</span>
-                      <span className="text-white font-bold">{formatChips(selectedPkg.chip_amount)}</span>
-                    </div>
-                    {selectedPkg.bonus_chips > 0 && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-300">Bonus Chips:</span>
-                        <span className="text-amber-400 font-bold">+{formatChips(selectedPkg.bonus_chips)}</span>
+                return (
+                  <div
+                    key={pkg.id}
+                    className={`relative rounded-xl overflow-hidden transition transform hover:scale-105 ${getPackageCardBg(pkg)} ${
+                      pkg.is_flash_sale ? 'shadow-2xl shadow-red-500/30' : 'shadow-lg'
+                    }`}
+                  >
+                    {/* Flash Sale Highlight */}
+                    {pkg.is_flash_sale && (
+                      <div className="absolute inset-0 border-2 border-red-500 rounded-xl pointer-events-none"></div>
+                    )}
+
+                    {/* Label Badge */}
+                    {label && labelColor && (
+                      <div className={`absolute top-0 left-0 right-0 ${labelColor} text-white text-center py-2 text-xs font-bold tracking-wider`}>
+                        {label}
                       </div>
                     )}
-                    <div className="border-t border-slate-600 pt-2 mt-2 flex items-center justify-between">
-                      <span className="text-slate-300 font-semibold">Total Chips:</span>
-                      <span className="text-amber-300 font-bold text-lg">{formatChips(BigInt(selectedPkg.chip_amount) + BigInt(selectedPkg.bonus_chips || 0))}</span>
-                    </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-600">
-                      <span className="text-slate-400 text-sm">Price ({currency}):</span>
-                      <span className={userWallet && !canAfford ? 'font-bold text-red-400' : 'font-bold text-white'}>
-                        {userWallet ? formatPriceWithCurrency(localPrice, currency) : 'Free (no wallet)'}
-                      </span>
+
+                    {/* Card Content */}
+                    <div className={`bg-gradient-to-b from-slate-800 to-slate-900 p-6 ${label ? 'pt-14' : ''} flex flex-col items-center`}>
+                      
+                      {/* Chip Icon */}
+                      <div className="mb-4">
+                        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-400 to-cyan-600 flex items-center justify-center shadow-lg text-2xl">
+                          💎
+                        </div>
+                      </div>
+
+                      {/* Chip Amount */}
+                      <div className="text-center mb-3">
+                        <div className="text-3xl font-bold text-white">
+                          {(totalChips / 1000000).toFixed(1)}M
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1">CHIPS</div>
+                      </div>
+
+                      {/* Bonus Badge */}
+                      {pkg.bonus_chips > 0 && (
+                        <div className="mb-3 px-3 py-1 bg-amber-900/50 border border-amber-600 rounded-full">
+                          <div className="text-xs text-amber-300 font-semibold">
+                            +{(Number(pkg.bonus_chips) / 1000000).toFixed(1)}M BONUS
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Divider */}
+                      <div className="w-full h-px bg-gradient-to-r from-transparent via-slate-600 to-transparent my-4"></div>
+
+                      {/* Price */}
+                      <div className="text-center mb-6">
+                        <div className={`text-3xl font-bold ${!affordable && userWallet ? 'text-red-400' : 'text-white'}`}>
+                          {formatPriceWithCurrency(localPrice, currency)}
+                        </div>
+                        <div className="text-xs text-slate-400 mt-1">{currency} PRICE</div>
+                      </div>
+
+                      {/* Affordability Warning */}
+                      {!affordable && userWallet && (
+                        <div className="w-full mb-4 p-2 bg-red-900/30 border border-red-600 rounded text-center">
+                          <div className="text-xs text-red-300 font-semibold">Not enough balance</div>
+                        </div>
+                      )}
+
+                      {/* Buy Button */}
+                      <button
+                        onClick={() => handlePurchase(pkg.id)}
+                        disabled={processing || !affordable}
+                        className={`w-full py-3 font-bold rounded-lg transition transform active:scale-95 ${
+                          affordable
+                            ? 'bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white shadow-lg hover:shadow-xl'
+                            : 'bg-slate-600 text-slate-400 cursor-not-allowed opacity-50'
+                        }`}
+                      >
+                        {processing ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            PROCESSING
+                          </span>
+                        ) : (
+                          '🛒 BUY NOW'
+                        )}
+                      </button>
                     </div>
                   </div>
-                </div>
-              )}
+                )
+              })}
             </div>
           )}
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 pt-6 mt-6 border-t border-slate-600">
-            <button
-              onClick={onClose}
-              disabled={processing}
-              className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handlePurchase}
-              disabled={processing || !selectedPackage || (userWallet && !canAfford)}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-amber-600 to-yellow-600 hover:from-amber-700 hover:to-yellow-700 text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {processing ? (
-                <>
-                  <span className="inline-block w-4 h-4 border-2 border-white border-t-amber-200 rounded-full animate-spin"></span>
-                  Processing...
-                </>
-              ) : (
-                <>
-                  🛒 Buy Chips
-                </>
-              )}
-            </button>
-          </div>
+        {/* Footer Action */}
+        <div className="border-t border-slate-700 bg-slate-900/50 p-6 sticky bottom-0">
+          <button
+            onClick={onClose}
+            disabled={processing}
+            className="w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Close
+          </button>
         </div>
       </div>
     </div>
