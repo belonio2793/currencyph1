@@ -23,15 +23,28 @@ const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetc
 
 // Add global error handler to suppress expected network connectivity errors from Supabase
 if (typeof window !== 'undefined') {
+  // Track if we should suppress errors (when offline)
+  let suppressNetworkErrors = !navigator.onLine
+
+  window.addEventListener('online', () => {
+    suppressNetworkErrors = false
+  })
+
+  window.addEventListener('offline', () => {
+    suppressNetworkErrors = true
+  })
+
   // Wrap console.error to suppress Supabase/fetch errors before they're logged
   const originalError = console.error
   console.error = function(...args) {
     const message = args[0]?.toString?.() || String(args[0]) || ''
+    const messageStr = String(message)
 
     // Suppress "Failed to fetch" and related errors
-    if (message.includes('Failed to fetch') ||
-        message.includes('TypeError: Failed to fetch') ||
-        (message.includes('Error') && message.includes('fetch'))) {
+    if (messageStr.includes('Failed to fetch') ||
+        messageStr.includes('TypeError: Failed to fetch') ||
+        (messageStr.includes('Error') && messageStr.includes('fetch')) ||
+        messageStr.includes('supabase')) {
       return // Silently suppress
     }
 
@@ -45,9 +58,10 @@ if (typeof window !== 'undefined') {
     if (!reason) return false
 
     const reasonMsg = reason?.message ? String(reason.message) : ''
+    const reasonStr = String(reason)
 
     // Suppress all "Failed to fetch" errors
-    if (reasonMsg.includes('Failed to fetch') || String(reason).includes('Failed to fetch')) {
+    if (reasonMsg.includes('Failed to fetch') || reasonStr.includes('Failed to fetch')) {
       return true
     }
 
