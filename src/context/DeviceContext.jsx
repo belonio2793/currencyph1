@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 import { useDeviceDetection } from '../lib/useDeviceDetection'
 
 const DeviceContext = createContext(null)
