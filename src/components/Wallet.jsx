@@ -290,8 +290,49 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     fiatWalletsFiltered = []
   }
 
-  // All wallets for list view
-  const allWalletsForList = [...fiatWalletsFiltered, ...cryptoWalletsFiltered].sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  // All wallets for list view - include all currencies with zero balance placeholders
+  const buildCompleteWalletList = () => {
+    const walletMap = {}
+    internalWallets.forEach(w => {
+      walletMap[w.currency_code] = w
+    })
+
+    const completeList = []
+
+    // Add fiat currencies first (filtered if needed)
+    FIAT_CURRENCIES.forEach(code => {
+      if (enabledInternal.includes(code) && (!selectedCurrency || selectedCurrency === code) && !showCryptoOnly) {
+        completeList.push(walletMap[code] || {
+          id: `placeholder-${code}`,
+          currency_code: code,
+          balance: 0,
+          total_deposited: 0,
+          total_withdrawn: 0,
+          is_active: true,
+          user_id: userId
+        })
+      }
+    })
+
+    // Add crypto currencies (filtered if needed)
+    CRYPTO_CURRENCIES.forEach(code => {
+      if (enabledInternal.includes(code) && (!selectedCurrency || selectedCurrency === code) && !showFiatOnly) {
+        completeList.push(walletMap[code] || {
+          id: `placeholder-${code}`,
+          currency_code: code,
+          balance: 0,
+          total_deposited: 0,
+          total_withdrawn: 0,
+          is_active: true,
+          user_id: userId
+        })
+      }
+    })
+
+    return completeList.sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  }
+
+  const allWalletsForList = buildCompleteWalletList()
   const filteredCurrencies = getFilteredCurrencies()
 
   return (
@@ -451,16 +492,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
             {/* Right controls - View mode toggle */}
             <div className="flex gap-2 border border-slate-300 rounded-lg p-1">
               <button
-                onClick={() => setViewMode('grid')}
-                className={`px-3 py-1 rounded text-sm font-medium transition-all ${
-                  viewMode === 'grid'
-                    ? 'bg-blue-600 text-white'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                Grid
-              </button>
-              <button
                 onClick={() => setViewMode('list')}
                 className={`px-3 py-1 rounded text-sm font-medium transition-all ${
                   viewMode === 'list'
@@ -469,6 +500,16 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                 }`}
               >
                 List
+              </button>
+              <button
+                onClick={() => setViewMode('grid')}
+                className={`px-3 py-1 rounded text-sm font-medium transition-all ${
+                  viewMode === 'grid'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Grid
               </button>
             </div>
           </div>
@@ -482,18 +523,18 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           <div className="mb-12">
             {allWalletsForList.length === 0 ? (
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center">
-                <p className="text-slate-500">No wallets available</p>
+                <p className="text-slate-500">No currencies available</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-slate-200">
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Currency</th>
-                      <th className="text-left py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
-                      <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Balance (Native)</th>
-                      <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Balance ({globalCurrency})</th>
-                      <th className="text-right py-3 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Action</th>
+                    <tr className="border-b border-slate-200 bg-slate-50">
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Currency</th>
+                      <th className="text-left py-4 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Type</th>
+                      <th className="text-right py-4 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Balance (Native)</th>
+                      <th className="text-right py-4 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Balance ({globalCurrency})</th>
+                      <th className="text-right py-4 px-4 text-xs font-semibold text-slate-600 uppercase tracking-wider">Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -507,8 +548,11 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                       const symbol = CURRENCY_SYMBOLS[wallet.currency_code] || wallet.currency_code
                       const isCrypto = CRYPTO_CURRENCIES.includes(wallet.currency_code)
 
+                      const isPlaceholder = wallet.id.startsWith('placeholder-')
                       return (
-                        <tr key={wallet.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                        <tr key={wallet.id} className={`border-b border-slate-100 transition-colors ${
+                          isPlaceholder ? 'bg-slate-50' : 'hover:bg-slate-50'
+                        }`}>
                           <td className="py-4 px-4">
                             <div className="flex items-center gap-2">
                               <div>
@@ -527,10 +571,12 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                             </span>
                           </td>
                           <td className="py-4 px-4 text-right">
-                            <p className="font-mono text-slate-900">{formatNumber(Number(wallet.balance || 0))}</p>
+                            <p className="font-mono text-slate-700">{formatNumber(Number(wallet.balance || 0))}</p>
+                            {isPlaceholder && <p className="text-xs text-slate-400">—</p>}
                           </td>
                           <td className="py-4 px-4 text-right">
-                            <p className="font-mono text-slate-900">{formatNumber(balanceInGlobalCurrency)}</p>
+                            <p className="font-mono text-slate-700">{formatNumber(balanceInGlobalCurrency)}</p>
+                            {isPlaceholder && <p className="text-xs text-slate-400">—</p>}
                           </td>
                           <td className="py-4 px-4 text-right">
                             <button
