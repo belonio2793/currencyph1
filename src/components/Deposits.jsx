@@ -1091,6 +1091,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   options={cryptos}
                   prices={cryptoRates.length === 0 ? defaultCryptoPrices : cryptoRates}
                   label="Select Cryptocurrency"
+                  globalCurrency={globalCurrency}
                 />
 
                 <div>
@@ -1113,19 +1114,19 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                       <div>
                         <p className="text-slate-600 text-sm mb-1">You send</p>
                         <p className="text-2xl font-light text-slate-900">
-                          {cryptoAmount} {selectedCrypto}
+                          {parseFloat(cryptoAmount).toFixed(8)} {selectedCrypto}
                         </p>
                       </div>
                       <div className="text-2xl text-slate-400">→</div>
                       <div className="text-right">
                         <p className="text-slate-600 text-sm mb-1">You get</p>
                         <p className="text-2xl font-light text-orange-600">
-                          {cryptoConvertedAmounts[globalCurrency]} {globalCurrency}
+                          {formatCurrency(cryptoConvertedAmounts[globalCurrency], globalCurrency)}
                         </p>
                       </div>
                     </div>
                     <p className="text-xs text-slate-500 border-t border-orange-200 pt-3">
-                      Rate: 1 {selectedCrypto} = {getCryptoPrice(selectedCrypto)} {globalCurrency}
+                      Rate: 1 {selectedCrypto} = {formatCurrency(getCryptoPrice(selectedCrypto), globalCurrency)}
                     </p>
 
                     {Object.keys(cryptoConvertedAmounts).filter(c => c !== globalCurrency).length > 0 && (
@@ -1137,7 +1138,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                             .slice(0, 4)
                             .map(([code, value]) => (
                               <div key={code} className="text-xs text-slate-600">
-                                <span className="font-medium">{code}</span>: {value}
+                                <span className="font-medium">{code}</span>: {formatCurrency(value, code)}
                               </div>
                             ))}
                         </div>
