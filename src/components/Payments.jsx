@@ -15,7 +15,12 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    loadMerchants()
+    if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
+      loadMerchants()
+    } else {
+      setError('Please sign in to access the Payments module')
+      setLoading(false)
+    }
   }, [userId])
 
   const loadMerchants = async () => {
