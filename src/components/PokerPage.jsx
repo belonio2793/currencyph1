@@ -168,33 +168,42 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
 
       const chipsToBuyIn = Math.min(Number(playerChips), 1000000)
 
-      // Join table with chip buy-in
-      const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-      const res = await fetch(FUNCTIONS_BASE + '/join_table', {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'Authorization': `Bearer ${anonKey}`
-        },
-        body: JSON.stringify({ tableId, userId, seatNumber, chipsBuyIn: chipsToBuyIn })
-      })
-
-      if (!res.ok) {
-        let errorMsg = 'Failed to sit'
-        try {
-          const json = await res.json()
-          errorMsg = json.error || errorMsg
-        } catch (e) {
-          // Could not parse JSON error response
+      if (isGuestLocal) {
+        const newBalance = playerChips - BigInt(chipsToBuyIn)
+        localStorage.setItem(`poker_chips_${userId}`, newBalance.toString())
+        await loadPlayerChips()
+        const table = tables.find(t => t.id === tableId)
+        if (table) {
+          await openTable(table)
         }
-        throw new Error(errorMsg)
-      }
+      } else {
+        const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+        const res = await fetch(FUNCTIONS_BASE + '/join_table', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'Authorization': `Bearer ${anonKey}`
+          },
+          body: JSON.stringify({ tableId, userId, seatNumber, chipsBuyIn: chipsToBuyIn })
+        })
 
-      const json = await res.json()
-      await loadPlayerChips()
-      const table = tables.find(t => t.id === tableId)
-      if (table) {
-        await openTable(table)
+        if (!res.ok) {
+          let errorMsg = 'Failed to sit'
+          try {
+            const json = await res.json()
+            errorMsg = json.error || errorMsg
+          } catch (e) {
+            // Could not parse JSON error response
+          }
+          throw new Error(errorMsg)
+        }
+
+        const json = await res.json()
+        await loadPlayerChips()
+        const table = tables.find(t => t.id === tableId)
+        if (table) {
+          await openTable(table)
+        }
       }
     } catch (e) {
       setError(`Could not join table: ${e.message || e}`)
