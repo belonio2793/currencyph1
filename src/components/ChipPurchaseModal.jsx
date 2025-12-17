@@ -248,9 +248,15 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-max">
               {packages.map((pkg) => {
-                const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), currency)
+                if (!pkg || !pkg.id) return null
+
+                const usdPrice = Number(pkg.usd_price) || 0
+                const chipAmount = Number(pkg.chip_amount) || 0
+                const bonusChips = Number(pkg.bonus_chips) || 0
+
+                const localPrice = convertUSDToLocalCurrency(usdPrice, currency)
                 const affordable = !userWallet || (walletBalance >= localPrice)
-                const totalChips = (Number(pkg.chip_amount || 0) + Number(pkg.bonus_chips || 0))
+                const totalChips = chipAmount + bonusChips
                 const label = getPackageLabel(pkg)
                 const labelColor = getPackageLabelColor(pkg)
 
