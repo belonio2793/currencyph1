@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
+import { fetchRatesMap, convertAmount } from '../lib/reconciliation'
 
 
 const FIAT_CURRENCIES = [
