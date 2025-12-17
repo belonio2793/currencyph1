@@ -287,9 +287,10 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
 
             return (
               <div key={group.id} className="space-y-1">
+                <div className="pt-2 mt-1 border-t border-slate-700/50"></div>
                 <button
                   onClick={() => toggleGroup(group.id)}
-                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                  className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm font-semibold text-slate-200 hover:bg-slate-800/60 hover:text-white transition-all duration-200 uppercase tracking-wide"
                 >
                   <span className="flex items-center gap-2">
                     <span className="text-base">{group.icon}</span>
