@@ -344,15 +344,20 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {fiatWallets.filter(w => enabledFiat.includes(w.currency_code)).map(w => {
-              const balanceInGlobalCurrency = convertBalance(w.balance, w.currency_code)
               const isSameCurrency = w.currency_code === globalCurrency
+              const balanceInGlobalCurrency = isSameCurrency
+                ? Number(w.balance || 0)
+                : (convertAmount(Number(w.balance || 0), w.currency_code, globalCurrency, ratesMap) ?? Number(w.balance || 0))
+              const exchangeRate = ratesMap[`${w.currency_code}_${globalCurrency}`]
+
               return (
-                <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">FIAT</p>
+                <div key={w.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-md transition-shadow">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-sm text-slate-600 font-medium uppercase tracking-wider">{w.currency_code}</p>
+                    {exchangeRate && <p className="text-xs text-slate-400">1 = {formatNumber(exchangeRate)} {globalCurrency}</p>}
                   </div>
                   <p className="text-xs text-slate-500 uppercase tracking-wider mb-1">Balance ({globalCurrency})</p>
-                  <p className="text-2xl font-light text-slate-900 mb-2">{formatNumber(balanceInGlobalCurrency)}</p>
+                  <p className="text-3xl font-light text-slate-900 mb-2">{formatNumber(balanceInGlobalCurrency)}</p>
                   {!isSameCurrency && Number(w.balance || 0) !== 0 && (
                     <p className="text-xs text-slate-400 mb-4">({formatNumber(Number(w.balance || 0))} {w.currency_code})</p>
                   )}
