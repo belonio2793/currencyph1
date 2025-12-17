@@ -1124,8 +1124,8 @@ export default function MyBusiness({ userId }) {
                     onClick={handleAddBusiness}
                     disabled={
                       formMode === 'create'
-                        ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationNumber
-                        : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !formData.currencyRegistrationNumber || !businessNameAvailability?.available
+                        ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationId
+                        : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !formData.currencyRegistrationId || !businessNameAvailability?.available
                     }
                     className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors"
                   >
