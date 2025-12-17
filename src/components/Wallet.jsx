@@ -193,7 +193,8 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       // Auto-populate preferences based on existing wallets if not set
       const prefs = preferencesManager.getAllPreferences(userId)
       if (!prefs.walletCurrencies && internal.length > 0) savePreferences('internal', internal.map(w => w.currency_code))
-      if (!prefs.walletCurrencies_fiat && fiatMapped.length > 0) savePreferences('fiat', fiatMapped.map(w => w.currency_code))
+      // For fiat, show all available currencies (they're all auto-created)
+      if (!prefs.walletCurrencies_fiat) savePreferences('fiat', fiatMapped.map(w => w.currency_code))
 
     } catch (err) {
       console.error('Error loading wallets:', err)
