@@ -1314,26 +1314,28 @@ export default function PlanningChat() {
               }
               .marker-type-selector {
                 position: absolute;
-                ${isMobile ? 'bottom: 16px; right: 8px; max-height: 300px; overflow-y-auto;' : 'top: 16px; right: 16px;'}
+                ${isMobile ? 'bottom: 16px; right: 8px; max-height: 400px; overflow-y: auto; width: 200px;' : 'top: 16px; right: 16px; width: 180px;'}
                 z-index: 1000;
-                background: rgba(226, 232, 240, 0.15);
-                ${isMobile ? 'padding: 8px;' : 'padding: 12px;'}
+                background: rgba(15, 23, 42, 0.95);
+                ${isMobile ? 'padding: 12px;' : 'padding: 14px;'}
                 border-radius: 8px;
-                backdrop-filter: blur(4px);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(100, 116, 139, 0.3);
               }
               .marker-type-label {
-                display: block;
-                ${isMobile ? 'font-size: 9px;' : 'font-size: 11px;'}
+                display: inline-block;
+                ${isMobile ? 'font-size: 10px;' : 'font-size: 11px;'}
                 font-weight: 600;
                 color: white;
-                margin-bottom: 8px;
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
+                margin-right: 8px;
               }
               .marker-type-grid {
                 display: grid;
-                grid-template-columns: ${isMobile ? 'repeat(2, 1fr)' : '1fr'};
-                gap: 6px;
+                grid-template-columns: 1fr;
+                gap: 8px;
+                margin-top: 10px;
               }
               .marker-type-btn {
                 ${isMobile ? 'padding: 6px 8px;' : 'padding: 10px 14px;'}
