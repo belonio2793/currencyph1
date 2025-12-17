@@ -131,9 +131,11 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
       if (purchaseErr) throw purchaseErr
 
+      console.log('Purchase recorded successfully')
       await loadUserData()
-      
+
       if (onPurchaseComplete) {
+        console.log('Calling onPurchaseComplete')
         const costDeducted = userWallet 
           ? formatPriceWithCurrency(
               convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code),
