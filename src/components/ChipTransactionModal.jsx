@@ -316,11 +316,11 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-700 bg-slate-900/50 p-6 sticky bottom-0">
+        <div className="border-t border-slate-700 bg-slate-900/50 p-4 sm:p-6 sticky bottom-0">
           <button
             onClick={onClose}
             disabled={processing}
-            className="w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-4 sm:px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
