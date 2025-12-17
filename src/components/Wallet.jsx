@@ -162,9 +162,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     try {
       if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
         setWallets([])
-        setEnabledInternal(['PHP', 'USD'])
-        setEnabledFiat(['PHP', 'USD'])
-        setEnabledCrypto(['BTC', 'ETH'])
+        setEnabledInternal(ALL_CURRENCIES)
         setLoading(false)
         return
       }
@@ -178,64 +176,44 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         console.warn('Could not fetch exchange rates:', e)
       }
 
-      // Fetch internal (legacy) wallets and ensure each has an account number
-      let internal = []
+      // Fetch all wallets from the unified wallets table
+      let allWallets = []
       try {
-        const walletsWithAcct = await currencyAPI.ensureWalletsHaveAccountNumbers(userId)
-        internal = walletsWithAcct || []
-      } catch (err) {
-        console.warn('Could not ensure account numbers for wallets:', err)
         const data = await currencyAPI.getWallets(userId)
-        internal = data || []
-      }
-      setInternalWallets(internal)
-
-      // Fetch additional fiat wallets from Supabase (new tables)
-      let fiatMapped = []
-      try {
-        const { data: fData } = await supabase.from('wallets_fiat').select('*').eq('user_id', userId)
-        fiatMapped = (fData || []).map(r => ({
-          id: r.id,
-          currency_code: r.currency,
-          balance: Number(r.balance || 0),
-          account_number: r.provider_account_id || null,
-          provider: r.provider,
-          source: 'fiat'
-        }))
-        setFiatWallets(fiatMapped)
-
-        // Calculate consolidated balance in global currency
-        let total = 0
-        fiatMapped.forEach(wallet => {
-          const converted = convertAmount(wallet.balance, wallet.currency_code, globalCurrency, rates)
-          if (converted !== null) {
-            total += converted
-          } else {
-            // Fallback to direct balance if same currency
-            if (wallet.currency_code === globalCurrency) {
-              total += wallet.balance
-            }
-          }
-        })
-        setConsolidatedBalance(total)
-      } catch (e) {
-        console.warn('Error loading wallets_fiat from Supabase:', e)
+        allWallets = data || []
+      } catch (err) {
+        console.warn('Could not load wallets:', err)
       }
 
-      const combined = [...internal, ...fiatMapped]
-      setWallets(combined)
+      setInternalWallets(allWallets)
+      setWallets(allWallets)
+
+      // Calculate consolidated balance in global currency
+      let total = 0
+      allWallets.forEach(wallet => {
+        const isSameCurrency = wallet.currency_code === globalCurrency
+        let converted = 0
+        if (isSameCurrency) {
+          converted = Number(wallet.balance || 0)
+        } else {
+          converted = convertAmount(Number(wallet.balance || 0), wallet.currency_code, globalCurrency, rates)
+        }
+        if (converted !== null) {
+          total += converted
+        }
+      })
+      setConsolidatedBalance(total)
       setError('')
 
-      // Auto-populate preferences based on existing wallets if not set
+      // Auto-populate preferences to show all currencies
       const prefs = preferencesManager.getAllPreferences(userId)
-      if (!prefs.walletCurrencies && internal.length > 0) savePreferences('internal', internal.map(w => w.currency_code))
-      // For fiat, show all available currencies (they're all auto-created)
-      if (!prefs.walletCurrencies_fiat) savePreferences('fiat', fiatMapped.map(w => w.currency_code))
+      if (!prefs.walletCurrencies) {
+        savePreferences('internal', allWallets.map(w => w.currency_code))
+      }
 
     } catch (err) {
       console.error('Error loading wallets:', err)
       setWallets([])
-      setError('')
     } finally {
       setLoading(false)
     }
