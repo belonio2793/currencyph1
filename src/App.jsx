@@ -263,6 +263,8 @@ export default function App() {
         }
         try {
           await currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User')
+          // Ensure user has wallets for all active currencies
+          await currencyAPI.ensureUserWallets(user.id).catch(e => console.warn('ensureUserWallets failed:', e))
         } catch (e) {
           console.error('Failed to create user profile:', e)
           setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
