@@ -75,8 +75,10 @@ if (typeof window !== 'undefined') {
     const reasonMsg = reason?.message ? String(reason.message) : ''
     const reasonStr = String(reason)
 
-    // Suppress all "Failed to fetch" errors
-    if (reasonMsg.includes('Failed to fetch') || reasonStr.includes('Failed to fetch')) {
+    // Suppress ALL fetch-related errors
+    if (reasonMsg.includes('fetch') || reasonStr.includes('fetch') ||
+        reasonMsg.includes('Failed to fetch') || reasonStr.includes('Failed to fetch') ||
+        reasonMsg.includes('TypeError') && (reasonMsg.includes('fetch') || reasonStr.includes('fetch'))) {
       return true
     }
 
@@ -86,17 +88,21 @@ if (typeof window !== 'undefined') {
   window.addEventListener('unhandledrejection', (event) => {
     if (suppressSupabaseErrors(event)) {
       event.preventDefault()
+      return true
     }
-  }, { capture: true })
+  }, { capture: true, passive: false })
 
   window.addEventListener('error', (event) => {
-    // Suppress "Failed to fetch" errors
+    // Suppress all fetch and network errors
     const msgStr = String(event.message || '')
+    const filenameStr = String(event.filename || '')
 
-    if (msgStr.includes('Failed to fetch')) {
+    if (msgStr.includes('fetch') || msgStr.includes('Failed to fetch') ||
+        filenameStr.includes('supabase') || filenameStr.includes('fetch')) {
       event.preventDefault()
+      return true
     }
-  }, { capture: true })
+  }, { capture: true, passive: false })
 }
 
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
