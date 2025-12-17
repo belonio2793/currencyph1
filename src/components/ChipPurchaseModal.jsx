@@ -10,6 +10,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   const [userChips, setUserChips] = useState(0n)
   const [userWallet, setUserWallet] = useState(null)
   const DEFAULT_CURRENCY = 'PHP'
+  const isGuestLocal = userId && userId.includes('guest-local')
 
   useEffect(() => {
     if (open && userId) {
