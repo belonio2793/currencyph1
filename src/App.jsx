@@ -100,15 +100,10 @@ export default function App() {
           if (session && session.user) {
             setUserId(session.user.id)
             setUserEmail(session.user.email)
-            // Presence is disabled due to frequent network errors in production
-            // Try to initialize presence only if online and Supabase is healthy
-            try {
-              if (navigator.onLine && (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured)) {
-                initializePresence(session.user.id)
-              }
-            } catch(e) {
-              // Silently ignore - presence is optional
-            }
+            // Presence disabled due to network errors in edge/offline environments
+            // Presence tracking is non-critical and causes "Failed to fetch" errors
+            // TODO: Re-enable when network connectivity is reliable
+            // try { if (navigator.onLine && (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured)) initializePresence(session.user.id) } catch(e) {}
             loadTotalBalance(session.user.id).catch(() => {})
             setShowAuth(false)
           } else {
