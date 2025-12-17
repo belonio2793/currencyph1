@@ -99,6 +99,11 @@ export const currencyAPI = {
         .rpc('ensure_user_wallets', { p_user_id: userId })
 
       if (error) {
+        // If function doesn't exist (404), silently continue - it may not be deployed
+        if (error.code === 'PGRST202') {
+          console.debug('ensure_user_wallets RPC not available, skipping wallet initialization')
+          return []
+        }
         console.warn('Error ensuring user wallets:', error)
         return []
       }
