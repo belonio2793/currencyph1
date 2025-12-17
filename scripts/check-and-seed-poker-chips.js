@@ -119,10 +119,11 @@ async function checkAndSeed() {
       process.exit(1)
     }
 
-    console.log(`✓ Table exists (currently has ${data.length || 0} packages)`)
+    const existingCount = data && Array.isArray(data) ? data.length : 0
+    console.log(`✓ Table exists (currently has ${existingCount} packages)`)
 
     // Clear existing and insert new
-    if (data && data.length > 0) {
+    if (existingCount > 0) {
       console.log('Clearing existing packages...')
       const { error: deleteError } = await supabase
         .from('poker_chip_packages')
