@@ -80,6 +80,12 @@ export default function BusinessDirectory({ userId }) {
       if (filterType === 'featured') {
         query = query.eq('metadata->featured', true)
       } else if (filterType === 'mine' && userId) {
+        // Skip database query for guest-local users (invalid UUIDs)
+        if (!isValidUUID(userId)) {
+          setBusinesses([])
+          setLoading(false)
+          return
+        }
         query = query.eq('user_id', userId)
       }
 
