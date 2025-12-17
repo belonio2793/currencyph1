@@ -765,7 +765,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
             <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-xl">
               <h3 className="text-2xl font-light text-slate-900 mb-2">Add Funds</h3>
               <p className="text-sm text-slate-600 mb-6">
-                {CRYPTO_CURRENCIES.includes(selectedWallet.currency_code) ? 'Cryptocurrency' : 'Fiat Currency'} · {selectedWallet.currency_code}
+                {selectedWallet.currency_type === 'crypto' ? 'Cryptocurrency' : 'Fiat Currency'} · {selectedWallet.currency_code}
               </p>
 
               <form onSubmit={handleAddFunds} className="space-y-6">
