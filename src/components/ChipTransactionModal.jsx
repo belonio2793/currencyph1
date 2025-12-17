@@ -153,8 +153,9 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
   const selectedTotalChips = selectedChipAmount + selectedBonusChips
 
   const getPhpPrice = (usdPrice) => {
-    if (!usdPrice) return '₱0'
-    return formatPriceWithCurrency(usdPrice, DEFAULT_CURRENCY)
+    if (!usdPrice) return '₱0 ($0.00)'
+    const phpPrice = convertUSDToLocalCurrency(usdPrice, DEFAULT_CURRENCY)
+    return `₱${phpPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ($${usdPrice.toFixed(2)})`
   }
 
   return (
