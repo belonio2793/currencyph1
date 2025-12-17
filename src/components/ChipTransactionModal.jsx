@@ -168,7 +168,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-8">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8">
           {error && (
             <div className="mb-6 p-4 bg-red-900/50 border border-red-600 rounded-lg text-red-200 text-sm flex items-start gap-3">
               <span className="text-xl mt-0.5">⚠️</span>
