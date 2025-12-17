@@ -39,53 +39,72 @@ const generateUniqueAccountNumber = async (length = 12, attempts = 10) => {
 export const currencyAPI = {
   // ============ User Management ============
   async getOrCreateUser(email, fullName = 'User') {
-    try {
-      // First, try to find user by email
-      const { data: existingUser, error: selectError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .maybeSingle()
+    const maxRetries = 3
+    let lastError = null
 
-      if (existingUser) {
-        console.log('User exists:', existingUser.id)
-        return existingUser
-      }
-
-      // User doesn't exist, create one
-      const { data: newUser, error: insertError } = await supabase
-        .from('users')
-        .insert([
-          {
-            email,
-            full_name: fullName,
-            country_code: 'PH',
-            status: 'active'
-          }
-        ])
-        .select()
-        .single()
-
-      if (insertError) {
-        console.error('Error creating user:', insertError)
-        throw insertError
-      }
-
-      console.log('User created successfully:', newUser.id)
-
-      // Create default wallets for all active currencies using the function
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
-        await supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
-        console.log('Default wallets created for all currencies for user:', newUser.id)
-      } catch (rpcErr) {
-        console.warn('RPC default wallets creation failed:', rpcErr)
-      }
+        // First, try to find user by email
+        const { data: existingUser, error: selectError } = await supabase
+          .from('users')
+          .select('*')
+          .eq('email', email)
+          .maybeSingle()
 
-      return newUser
-    } catch (err) {
-      console.error('getOrCreateUser error:', err)
-      throw err
+        if (selectError && selectError.code !== 'PGRST116') {
+          throw selectError
+        }
+
+        if (existingUser) {
+          console.log('User exists:', existingUser.id)
+          return existingUser
+        }
+
+        // User doesn't exist, create one
+        const { data: newUser, error: insertError } = await supabase
+          .from('users')
+          .insert([
+            {
+              email,
+              full_name: fullName,
+              country_code: 'PH',
+              status: 'active'
+            }
+          ])
+          .select()
+          .single()
+
+        if (insertError) {
+          throw insertError
+        }
+
+        console.log('User created successfully:', newUser.id)
+
+        // Create default wallets for all active currencies using the function (non-blocking)
+        supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
+          .then(() => console.log('Default wallets created for user:', newUser.id))
+          .catch(rpcErr => console.warn('RPC default wallets creation failed:', rpcErr))
+
+        return newUser
+      } catch (err) {
+        lastError = err
+        console.warn(`getOrCreateUser attempt ${attempt + 1}/${maxRetries} failed:`, err)
+
+        // Don't retry on non-network errors
+        if (err.code === 'PGRST001' || err.code === '23505') {
+          break
+        }
+
+        // Exponential backoff before retry
+        if (attempt < maxRetries - 1) {
+          const delayMs = Math.pow(2, attempt) * 1000
+          await new Promise(resolve => setTimeout(resolve, delayMs))
+        }
+      }
     }
+
+    console.error('getOrCreateUser failed after retries:', lastError)
+    return null
   },
 
   async ensureUserWallets(userId) {
