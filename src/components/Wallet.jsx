@@ -415,17 +415,17 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                           )}
                           {filteredCurrencies.fiat.map(curr => (
                             <button
-                              key={curr}
+                              key={curr.code}
                               onClick={() => {
-                                setSelectedCurrency(curr)
+                                setSelectedCurrency(curr.code)
                                 setShowCurrencyDropdown(false)
                                 setSearchInput('')
                               }}
                               className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors ${
-                                selectedCurrency === curr ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
+                                selectedCurrency === curr.code ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
                               }`}
                             >
-                              <span className="font-medium">{curr}</span> <span className="text-slate-500">{CURRENCY_SYMBOLS[curr]}</span>
+                              <span className="font-medium">{curr.code}</span> <span className="text-slate-500">{curr.symbol || curr.code}</span>
                             </button>
                           ))}
                         </>
@@ -441,17 +441,17 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                           )}
                           {filteredCurrencies.crypto.map(curr => (
                             <button
-                              key={curr}
+                              key={curr.code}
                               onClick={() => {
-                                setSelectedCurrency(curr)
+                                setSelectedCurrency(curr.code)
                                 setShowCurrencyDropdown(false)
                                 setSearchInput('')
                               }}
                               className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors ${
-                                selectedCurrency === curr ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
+                                selectedCurrency === curr.code ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
                               }`}
                             >
-                              {curr}
+                              <span className="font-medium">{curr.code}</span> <span className="text-slate-500">{curr.symbol || curr.code}</span>
                             </button>
                           ))}
                         </>
