@@ -886,6 +886,29 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             </h2>
           </div>
 
+          {/* Wallet Balances Preview */}
+          {wallets && wallets.length > 0 && (
+            <div className="mb-8 pb-8 border-b border-slate-200">
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Wallet Balances</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {wallets.slice(0, 8).map(wallet => (
+                  <div key={wallet.id} className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-100">
+                    <div className="flex items-baseline justify-between mb-2">
+                      <p className="text-sm font-semibold text-slate-700">{wallet.currency_code}</p>
+                      <p className="text-xs text-slate-500">{CURRENCY_SYMBOLS[wallet.currency_code] || ''}</p>
+                    </div>
+                    <p className="text-lg font-light text-slate-900 font-mono">
+                      {parseFloat(wallet.balance || 0).toFixed(2)}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-1">Available to withdraw</p>
+                  </div>
+                ))}
+              </div>
+              {wallets.length > 8 && (
+                <p className="text-xs text-slate-500 mt-3 text-center">+{wallets.length - 8} more wallets</p>
+              )}
+            </div>
+          )}
 
           {/* Direct Payment Methods */}
           <div className="space-y-6">
