@@ -211,8 +211,29 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   }
 
   // Separate wallets by type
-  const fiatWalletsFiltered = internalWallets.filter(w => FIAT_CURRENCIES.includes(w.currency_code) && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
-  const cryptoWalletsFiltered = internalWallets.filter(w => CRYPTO_CURRENCIES.includes(w.currency_code) && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  let fiatWalletsFiltered = internalWallets.filter(w => FIAT_CURRENCIES.includes(w.currency_code) && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+  let cryptoWalletsFiltered = internalWallets.filter(w => CRYPTO_CURRENCIES.includes(w.currency_code) && enabledInternal.includes(w.currency_code)).sort((a, b) => a.currency_code.localeCompare(b.currency_code))
+
+  // Apply filters
+  if (selectedCurrency) {
+    if (FIAT_CURRENCIES.includes(selectedCurrency)) {
+      fiatWalletsFiltered = fiatWalletsFiltered.filter(w => w.currency_code === selectedCurrency)
+      cryptoWalletsFiltered = []
+    } else {
+      cryptoWalletsFiltered = cryptoWalletsFiltered.filter(w => w.currency_code === selectedCurrency)
+      fiatWalletsFiltered = []
+    }
+  }
+
+  if (showFiatOnly) {
+    cryptoWalletsFiltered = []
+  }
+  if (showCryptoOnly) {
+    fiatWalletsFiltered = []
+  }
+
+  // All wallets for list view
+  const allWalletsForList = [...fiatWalletsFiltered, ...cryptoWalletsFiltered].sort((a, b) => a.currency_code.localeCompare(b.currency_code))
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-6">
