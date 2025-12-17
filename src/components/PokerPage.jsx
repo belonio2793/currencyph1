@@ -21,9 +21,20 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
   const [chipModalOpen, setChipModalOpen] = useState(false)
   const [playerChips, setPlayerChips] = useState(0n)
   const [chipInput, setChipInput] = useState('100000')
+  const isGuestLocal = userId && userId.includes('guest-local')
   const FUNCTIONS_BASE = (import.meta.env.VITE_PROJECT_URL || '').replace(/\/+$/,'') + '/functions/v1/poker-engine'
 
   useEffect(() => { loadTables(); loadPlayerChips() }, [])
+
+  useEffect(() => {
+    const handleStorageChange = () => {
+      if (isGuestLocal) {
+        loadPlayerChips()
+      }
+    }
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [isGuestLocal])
 
   async function loadPlayerChips() {
     if (!userId) return
