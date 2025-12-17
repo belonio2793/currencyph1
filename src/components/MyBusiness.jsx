@@ -480,7 +480,47 @@ export default function MyBusiness({ userId }) {
     if (userId) {
       loadBusinesses()
     }
+
+    // Check for pending business section from sidebar navigation
+    try {
+      const pending = sessionStorage.getItem('pendingBusinessSection')
+      if (pending) {
+        setPendingSection(pending)
+        sessionStorage.removeItem('pendingBusinessSection')
+      }
+    } catch (e) {
+      console.debug('Could not read pending section:', e)
+    }
   }, [userId])
+
+  // Handle pending section when business loads
+  useEffect(() => {
+    if (pendingSection && !loading && businesses.length > 0) {
+      if (!selectedBusiness) {
+        setShowBusinessRequiredMessage(true)
+      } else {
+        // Business is selected, navigate to the appropriate section
+        handlePendingSectionNavigation(pendingSection)
+        setPendingSection(null)
+      }
+    }
+  }, [pendingSection, loading, businesses.length, selectedBusiness])
+
+  const handlePendingSectionNavigation = (section) => {
+    const sectionMap = {
+      'bir-integration': 'overview',
+      'digital-receipts': 'overview',
+      'payments': 'overview',
+      'shareholders': 'overview',
+      'jobs-hiring': 'overview',
+      'employees-payroll': 'overview',
+      'sales-tax': 'salesTaxReporting'
+    }
+
+    const tab = sectionMap[section] || 'overview'
+    setActiveTab(tab)
+    setMainTab('management')
+  }
 
   // Show modal when user clicks a management feature without a business selected
   // Modal is shown only when user clicks a management feature button
