@@ -73,37 +73,12 @@ export const currencyAPI = {
 
       console.log('User created successfully:', newUser.id)
 
-      // Create default wallets for new user (PHP + USD) using the function
+      // Create default wallets for all active currencies using the function
       try {
         await supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
-        console.log('Default wallets created via RPC for user:', newUser.id)
+        console.log('Default wallets created for all currencies for user:', newUser.id)
       } catch (rpcErr) {
-        console.warn('RPC default wallets creation failed, falling back to direct insert:', rpcErr)
-        try {
-          await supabase
-            .from('wallets')
-            .insert([
-              {
-                user_id: newUser.id,
-                currency_code: 'PHP',
-                balance: 0,
-                total_deposited: 0,
-                total_withdrawn: 0,
-                is_active: true
-              },
-              {
-                user_id: newUser.id,
-                currency_code: 'USD',
-                balance: 0,
-                total_deposited: 0,
-                total_withdrawn: 0,
-                is_active: true
-              }
-            ])
-          console.log('Default wallets created manually for user:', newUser.id)
-        } catch (fallbackErr) {
-          console.error('Failed to create default wallets even with fallback:', fallbackErr)
-        }
+        console.warn('RPC default wallets creation failed:', rpcErr)
       }
 
       return newUser
