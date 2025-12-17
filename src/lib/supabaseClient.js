@@ -34,7 +34,7 @@ if (typeof window !== 'undefined') {
 
     const isFetchError = reasonStr.includes('Failed to fetch') || reasonMsg.includes('Failed to fetch')
     const isTypeError = (reasonStr.includes('TypeError') && reasonStr.includes('fetch')) || reasonStr.includes('TypeError: Failed to fetch')
-    const isSupabaseStack = stack.includes('@supabase') || stack.includes('supabase-js')
+    const isSupabaseStack = stack.includes('@supabase') || stack.includes('supabase-js') || stack.includes('updatePresence') || stack.includes('presence.js')
 
     return isFetchError || isTypeError || isSupabaseStack
   }
@@ -46,11 +46,12 @@ if (typeof window !== 'undefined') {
   }, true)
 
   window.addEventListener('error', (event) => {
-    // Suppress "Failed to fetch" errors from within Supabase library
+    // Suppress "Failed to fetch" errors from within Supabase library or presence functionality
     const msgStr = String(event.message || '')
     const filenameStr = String(event.filename || '')
 
-    if (msgStr.includes('Failed to fetch') || (msgStr.includes('TypeError') && filenameStr.includes('supabase'))) {
+    if (msgStr.includes('Failed to fetch') ||
+        (msgStr.includes('TypeError') && (filenameStr.includes('supabase') || filenameStr.includes('presence')))) {
       event.preventDefault()
     }
   }, true)
