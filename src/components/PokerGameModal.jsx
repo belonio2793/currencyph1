@@ -70,20 +70,14 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
     const refreshBalance = async () => {
       try {
-        const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
-        const res = await fetch(FUNCTIONS_BASE + '/get_player_chips', {
-          method: 'POST',
-          headers: {
-            'content-type': 'application/json',
-            'Authorization': `Bearer ${anonKey}`
-          },
-          body: JSON.stringify({ userId })
-        })
+        const { data, error } = await supabase
+          .from('player_poker_chips')
+          .select('total_chips')
+          .eq('user_id', userId)
+          .single()
 
-        if (res.ok) {
-          const data = await res.json()
-          setPlayerBalance(Number(data.chips))
-        }
+        if (error && error.code !== 'PGRST116') throw error
+        setPlayerBalance(Number(data?.total_chips || 0))
       } catch (err) {
         console.error('Error loading chip balance:', err)
       }
