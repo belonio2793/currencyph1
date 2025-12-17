@@ -64,23 +64,28 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     }
   }, [table?.id])
 
-  // Refresh player balance
+  // Refresh player chip balance
   useEffect(() => {
     if (!userId) return
 
     const refreshBalance = async () => {
       try {
-        const { data: wallets } = await supabase
-          .from('wallets')
-          .select('balance')
-          .eq('user_id', userId)
-          .limit(1)
+        const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+        const res = await fetch(FUNCTIONS_BASE + '/get_player_chips', {
+          method: 'POST',
+          headers: {
+            'content-type': 'application/json',
+            'Authorization': `Bearer ${anonKey}`
+          },
+          body: JSON.stringify({ userId })
+        })
 
-        if (wallets && wallets[0]) {
-          setPlayerBalance(Number(wallets[0].balance))
+        if (res.ok) {
+          const data = await res.json()
+          setPlayerBalance(Number(data.chips))
         }
       } catch (err) {
-        console.error('Error loading balance:', err)
+        console.error('Error loading chip balance:', err)
       }
     }
 
@@ -541,11 +546,11 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
               {isSigned && (
                 <div className="bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3">
                   <div>
-                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Your Balance</div>
-                    <div className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                      {playerBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <div className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">Your Chip Balance</div>
+                    <div className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                      {playerBalance.toLocaleString()}
                     </div>
-                    <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">{table.currency_code}</div>
+                    <div className="text-xs text-slate-600 dark:text-slate-400 mt-1">chips</div>
                   </div>
 
                   {isSeated && (
