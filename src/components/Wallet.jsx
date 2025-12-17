@@ -47,6 +47,21 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   }
 
   useEffect(() => {
+    // Load currencies from database first
+    const initializeCurrencies = async () => {
+      try {
+        const grouped = await walletService.getCurrenciesGrouped()
+        setCurrenciesGrouped(grouped)
+
+        const allCurrs = await walletService.getAllCurrencies()
+        setAllCurrencies(allCurrs)
+      } catch (err) {
+        console.warn('Failed to load currencies:', err)
+      }
+    }
+
+    initializeCurrencies()
+
     // Ensure user has wallets for all active currencies (for existing users)
     if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
       currencyAPI.ensureUserWallets(userId).catch(err => {
