@@ -573,7 +573,7 @@ export const currencyAPI = {
       // Optimize: Only fetch needed columns
       const { data, error } = await supabase
         .from('loans')
-        .select('id,user_id,loan_type,status,remaining_balance,total_owed,currency,currency_code,created_at,updated_at')
+        .select('id,user_id,loan_type,status,remaining_balance,total_owed,currency_code,created_at,updated_at')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
       if (error) throw error
