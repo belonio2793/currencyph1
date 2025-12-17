@@ -1225,20 +1225,30 @@ export default function MyBusiness({ userId }) {
                   <button
                     onClick={handleAddBusiness}
                     disabled={
-                      formMode === 'create'
+                      savingBusiness ||
+                      (formMode === 'create'
                         ? !formData.businessName || !formData.cityOfRegistration || !businessNameAvailability?.available || !formData.currencyRegistrationId
-                        : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !formData.currencyRegistrationId || !businessNameAvailability?.available
+                        : !formData.businessName || !formData.cityOfRegistration || !formData.tin || !formData.certificateOfIncorporation || !formData.registrationDate || !formData.currencyRegistrationId || !businessNameAvailability?.available)
                     }
-                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors"
+                    className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed font-semibold transition-colors flex items-center justify-center gap-2"
                   >
-                    {formMode === 'create' ? 'Create Business' : 'Add Business'}
+                    {savingBusiness ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Creating...</span>
+                      </>
+                    ) : (
+                      formMode === 'create' ? 'Create Business' : 'Add Business'
+                    )}
                   </button>
                   <button
                     onClick={() => {
                       setShowRegistrationForm(false)
                       setFormMode(null)
+                      setFormError(null)
                     }}
-                    className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors"
+                    disabled={savingBusiness}
+                    className="px-6 py-3 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Cancel
                   </button>
