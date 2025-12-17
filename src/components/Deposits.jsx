@@ -165,13 +165,15 @@ function SearchableSelect({ value, onChange, options, placeholder, label }) {
 }
 
 // Searchable Crypto Select Component
-function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
+function SearchableCryptoSelect({ value, onChange, options, prices, label, globalCurrency = 'PHP' }) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
 
   const filtered = options.filter(opt =>
     opt.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  const globalCurrencySymbol = CURRENCY_SYMBOLS[globalCurrency] || globalCurrency
 
   return (
     <div className="relative">
@@ -184,7 +186,12 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-orange-600 text-sm font-medium bg-white text-left flex justify-between items-center"
         >
-          <span>{value} - {prices[value]?.toFixed(2) || '0.00'}</span>
+          <span>
+            <span className="font-semibold">{value}</span>
+            <span className="text-slate-600 ml-2">
+              {formatCurrency(prices[value] || 0, globalCurrency)}
+            </span>
+          </span>
           <span className="text-slate-500">▼</span>
         </button>
 
@@ -213,7 +220,10 @@ function SearchableCryptoSelect({ value, onChange, options, prices, label }) {
                     value === crypto ? 'bg-orange-50 text-orange-900 font-medium' : 'text-slate-700'
                   }`}
                 >
-                  {crypto} - {prices[crypto]?.toFixed(2) || '0.00'}
+                  <span className="font-semibold">{crypto}</span>
+                  <span className="text-slate-600 ml-2">
+                    {formatCurrency(prices[crypto] || 0, globalCurrency)}
+                  </span>
                 </button>
               ))}
               {filtered.length === 0 && (
