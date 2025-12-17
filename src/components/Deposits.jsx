@@ -880,8 +880,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
 
           {/* Direct Payment Methods */}
-          {depositTab === 'direct' && (
-            <div className="space-y-6">
+          <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
