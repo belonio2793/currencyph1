@@ -264,7 +264,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                   <div
                     key={pkg.id}
                     className={`relative rounded-xl overflow-hidden transition transform hover:scale-105 ${getPackageCardBg(pkg)} ${
-                      pkg.is_flash_sale ? 'shadow-2xl shadow-red-500/30' : 'shadow-lg'
+                      pkg.is_flash_sale === true ? 'shadow-2xl shadow-red-500/30' : 'shadow-lg'
                     }`}
                   >
                     {/* Flash Sale Highlight */}
