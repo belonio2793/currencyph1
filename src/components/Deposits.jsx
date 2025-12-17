@@ -93,6 +93,7 @@ function SearchableSelect({ value, onChange, options, placeholder, label }) {
   )
 
   const selectedOption = options.find(opt => opt.code === value)
+  const selectedSymbol = selectedOption ? CURRENCY_SYMBOLS[selectedOption.code] : ''
 
   return (
     <div className="relative">
@@ -105,7 +106,17 @@ function SearchableSelect({ value, onChange, options, placeholder, label }) {
           onClick={() => setIsOpen(!isOpen)}
           className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm font-medium bg-white text-left flex justify-between items-center"
         >
-          <span>{selectedOption ? `${selectedOption.code} - ${selectedOption.name}` : placeholder}</span>
+          <span>
+            {selectedOption ? (
+              <span>
+                <span className="font-semibold">{selectedOption.code}</span>
+                <span className="text-slate-600 ml-1">({selectedSymbol})</span>
+                <span className="text-slate-500"> — {selectedOption.name}</span>
+              </span>
+            ) : (
+              placeholder
+            )}
+          </span>
           <span className="text-slate-500">▼</span>
         </button>
 
@@ -121,22 +132,27 @@ function SearchableSelect({ value, onChange, options, placeholder, label }) {
               onClick={e => e.stopPropagation()}
             />
             <div className="overflow-y-auto">
-              {filtered.map(opt => (
-                <button
-                  key={opt.code}
-                  type="button"
-                  onClick={() => {
-                    onChange(opt.code)
-                    setIsOpen(false)
-                    setSearchTerm('')
-                  }}
-                  className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 ${
-                    value === opt.code ? 'bg-blue-50 text-blue-900 font-medium' : 'text-slate-700'
-                  }`}
-                >
-                  {opt.code} - {opt.name}
-                </button>
-              ))}
+              {filtered.map(opt => {
+                const symbol = CURRENCY_SYMBOLS[opt.code]
+                return (
+                  <button
+                    key={opt.code}
+                    type="button"
+                    onClick={() => {
+                      onChange(opt.code)
+                      setIsOpen(false)
+                      setSearchTerm('')
+                    }}
+                    className={`w-full px-4 py-2 text-left text-sm hover:bg-slate-100 ${
+                      value === opt.code ? 'bg-blue-50 text-blue-900 font-medium' : 'text-slate-700'
+                    }`}
+                  >
+                    <span className="font-semibold">{opt.code}</span>
+                    <span className="text-slate-500 ml-1">({symbol})</span>
+                    <span className="text-slate-500"> — {opt.name}</span>
+                  </button>
+                )
+              })}
               {filtered.length === 0 && (
                 <div className="px-4 py-3 text-slate-500 text-sm text-center">No currencies found</div>
               )}
