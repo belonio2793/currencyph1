@@ -312,10 +312,10 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                       <div key={item.id}>
                         <button
                           onClick={() => handleNavClick(item.id)}
-                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 relative ${
+                          className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-all duration-200 relative border-l-3 ${
                             activeTab === item.id
-                              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-lg shadow-blue-500/30'
-                              : 'text-slate-300 hover:bg-slate-800 hover:text-white hover:translate-x-1'
+                              ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium shadow-lg shadow-blue-500/30 border-l-sky-300'
+                              : 'text-slate-300 hover:bg-slate-800 hover:text-white hover:translate-x-1 border-l-transparent'
                           }`}
                         >
                           {item.label}
