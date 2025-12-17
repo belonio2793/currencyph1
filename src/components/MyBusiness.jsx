@@ -1091,7 +1091,7 @@ export default function MyBusiness({ userId }) {
                   </label>
                   <input
                     type="text"
-                    value={formData.currencyRegistrationNumber}
+                    value={formData.currencyRegistrationId}
                     readOnly={true}
                     className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg font-mono text-sm font-semibold bg-white text-blue-900 cursor-not-allowed"
                   />
