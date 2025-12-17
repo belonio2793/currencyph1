@@ -210,6 +210,55 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
   }
 
+  const handlePopulateDemoData = async () => {
+    if (!userId || userId.includes('guest-local')) {
+      setError('Demo data can only be added for registered users')
+      return
+    }
+
+    setError('')
+    setSuccess('')
+
+    try {
+      const demoBalances = {
+        'PHP': 50000,
+        'USD': 1000,
+        'EUR': 500,
+        'GBP': 400,
+        'JPY': 100000,
+        'BTC': 0.05,
+        'ETH': 0.5,
+        'XRP': 1000,
+        'ADA': 500,
+        'SOL': 10,
+        'USDT': 5000,
+        'USDC': 5000
+      }
+
+      let successCount = 0
+      let failedCount = 0
+
+      for (const [currency, amount] of Object.entries(demoBalances)) {
+        try {
+          await currencyAPI.addFunds(userId, currency, amount)
+          successCount++
+        } catch (err) {
+          console.warn(`Failed to add ${currency}:`, err)
+          failedCount++
+        }
+      }
+
+      setSuccess(`✓ Added demo balances! ${successCount} currencies updated.`)
+      if (failedCount > 0) {
+        setSuccess(prev => `${prev} (${failedCount} failed)`)
+      }
+
+      setTimeout(() => loadWallets(), 500)
+    } catch (err) {
+      setError('Failed to populate demo data: ' + (err.message || 'Unknown error'))
+    }
+  }
+
 
   if (loading) {
     return (
