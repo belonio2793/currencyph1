@@ -291,8 +291,8 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
                       {/* Chip Amount */}
                       <div className="text-center mb-3">
-                        <div className="text-3xl font-bold text-white">
-                          {(totalChips / 1000000).toFixed(1)}M
+                        <div className="text-2xl font-bold text-white">
+                          {totalChips.toLocaleString()}
                         </div>
                         <div className="text-xs text-slate-400 mt-1">CHIPS</div>
                       </div>
