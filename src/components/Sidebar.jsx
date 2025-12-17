@@ -298,21 +298,36 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                           {item.label}
                         </button>
                         {item.children && item.children.length > 0 && activeTab === item.id && (
-                          <div className="ml-2 space-y-0.5">
+                          <ul className="ml-4 space-y-0.5 list-none">
                             {item.children.map(child => (
-                              <button
+                              <li
                                 key={child.id}
-                                onClick={() => handleNavClick(child.id)}
-                                className={`w-full text-left px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                                className={`flex items-start text-xs transition-colors rounded-lg overflow-hidden ${
                                   activeTab === child.id
                                     ? 'bg-blue-700 text-white'
-                                    : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                    : ''
                                 }`}
                               >
-                                → {child.label}
-                              </button>
+                                <span className={`mr-2 pt-1.5 flex-shrink-0 ${
+                                  activeTab === child.id
+                                    ? 'text-blue-200'
+                                    : 'text-slate-500'
+                                }`}>
+                                  ◆
+                                </span>
+                                <button
+                                  onClick={() => handleNavClick(child.id)}
+                                  className={`w-full text-left px-2 py-1.5 transition-colors ${
+                                    activeTab === child.id
+                                      ? 'bg-blue-700 text-white'
+                                      : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                                  }`}
+                                >
+                                  {child.label}
+                                </button>
+                              </li>
                             ))}
-                          </div>
+                          </ul>
                         )}
                       </div>
                     ))}
