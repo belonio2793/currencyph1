@@ -97,7 +97,7 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
               <div className="flex items-center justify-between">
                 <span className="text-slate-300 text-sm">Starting Chips</span>
                 <span className="text-white font-mono font-semibold">
-                  {formatChips(startingBalance)} chips
+                  {formatChips(startingBalance)} PLAY CHIPS
                 </span>
               </div>
               
@@ -106,7 +106,7 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
               <div className="flex items-center justify-between">
                 <span className="text-slate-300 text-sm">Ending Chips</span>
                 <span className="text-white font-mono font-semibold">
-                  {formatChips(endingBalance)} chips
+                  {formatChips(endingBalance)} PLAY CHIPS
                 </span>
               </div>
               
@@ -117,7 +117,7 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                   Net Result
                 </span>
                 <span className={`font-mono font-bold ${isWinner ? 'text-emerald-400' : 'text-red-400'}`}>
-                  {isWinner ? '+' : ''}{formatChips(netProfit)} chips
+                  {isWinner ? '+' : ''}{formatChips(netProfit)} PLAY CHIPS
                 </span>
               </div>
             </div>
@@ -151,8 +151,8 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                   </div>
 
                   <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {rakePercent > 0 
-                      ? `House takes ${formatChips(rakeChips)} chips from your ${formatChips(netProfit)} profit`
+                    {rakePercent > 0
+                      ? `House takes ${formatChips(rakeChips)} PLAY CHIPS from your ${formatChips(netProfit)} PLAY CHIPS profit`
                       : 'No house rake'}
                   </p>
                 </div>
@@ -183,8 +183,8 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                   </div>
 
                   <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-                    {tipPercent > 0 
-                      ? `Tip ${formatChips(tipChips)} chips to the house`
+                    {tipPercent > 0
+                      ? `Tip ${formatChips(tipChips)} PLAY CHIPS to the house`
                       : 'No tip'}
                   </p>
                 </div>
@@ -207,12 +207,12 @@ export default function RakeModal({ open, onClose, startingBalance, endingBalanc
                     Chips returned to inventory
                   </span>
                   <span className={`font-mono font-bold text-xl ${isWinner ? 'text-emerald-100' : 'text-slate-200'}`}>
-                    {formatChips(finalBalance)} chips
+                    {formatChips(finalBalance)} PLAY CHIPS
                   </span>
                 </div>
                 {isWinner && rakeChips + tipChips > 0 && (
                   <div className="text-xs text-slate-400 text-right">
-                    (Rake: {formatChips(rakeChips)} + Tip: {formatChips(tipChips)} = {formatChips(rakeChips + tipChips)} to house)
+                    (Rake: {formatChips(rakeChips)} + Tip: {formatChips(tipChips)} = {formatChips(rakeChips + tipChips)} PLAY CHIPS to house)
                   </div>
                 )}
               </div>
