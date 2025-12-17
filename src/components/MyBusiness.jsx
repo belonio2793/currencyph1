@@ -1325,7 +1325,20 @@ export default function MyBusiness({ userId }) {
               </button>
 
               {/* Digital Receipts */}
-              <button onClick={() => setSelectedFeatureModal('receipts')} className="bg-white rounded-xl shadow-lg p-8 border border-slate-200 hover:shadow-xl hover:border-purple-300 transition-all group">
+              <button
+                onClick={() => {
+                  if (!selectedBusiness) {
+                    alert('Please select a business first to access this feature.')
+                    return
+                  }
+                  setSelectedFeatureModal('receipts')
+                }}
+                disabled={!selectedBusiness}
+                className={`bg-white rounded-xl shadow-lg p-8 border border-slate-200 transition-all group ${
+                  selectedBusiness
+                    ? 'hover:shadow-xl hover:border-purple-300 cursor-pointer'
+                    : 'opacity-60 cursor-not-allowed'
+                }`}>
                 <div className="flex justify-center mb-4">
                   <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
                     <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
