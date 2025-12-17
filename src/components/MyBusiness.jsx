@@ -526,6 +526,13 @@ export default function MyBusiness({ userId }) {
         return
       }
 
+      // Skip database query for guest-local users (invalid UUIDs)
+      if (!isValidUUID(userId)) {
+        setBusinesses([])
+        setLoading(false)
+        return
+      }
+
       const { data, error } = await supabase
         .from('businesses')
         .select('*')
