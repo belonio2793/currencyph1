@@ -1308,6 +1308,18 @@ export default function MyBusiness({ userId }) {
                 </div>
               )}
             </div>
+
+            {!selectedBusiness && businesses.length > 0 && (
+              <div className="p-12 text-center">
+                <svg className="w-16 h-16 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">Select a Business</h3>
+                <p className="text-slate-600">Please select a business from the dropdown at the top to access management features.</p>
+              </div>
+            )}
+
+            {selectedBusiness && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
               {/* BIR Integration */}
@@ -1460,6 +1472,7 @@ export default function MyBusiness({ userId }) {
                 <div className="text-sm font-medium text-green-600 group-hover:text-green-700">Access feature →</div>
               </button>
             </div>
+            )}
           </div>
         )}
 
