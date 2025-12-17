@@ -18,41 +18,8 @@ const getEnv = (name) => {
   return undefined
 }
 
-// Keep reference to original fetch
+// Keep reference to original fetch (no wrapper to avoid response body conflicts with Supabase)
 const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetch
-
-// Create a resilient fetch wrapper with retry logic
-function createResilientFetch() {
-  return async function resilientFetch(url, options = {}) {
-    const maxRetries = 3
-    const baseDelay = 1000 // 1 second
-
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        const response = await originalFetch(url, options)
-        return response
-      } catch (error) {
-        const isLastAttempt = attempt === maxRetries - 1
-        const delay = baseDelay * Math.pow(2, attempt)
-
-        // On failure, either retry or give up
-        if (!isLastAttempt && typeof navigator !== 'undefined' && navigator.onLine) {
-          // Exponential backoff
-          await new Promise(resolve => setTimeout(resolve, delay))
-          continue
-        }
-
-        throw error
-      }
-    }
-  }
-}
-
-// Wrap fetch for Supabase with retry logic
-const resilientFetch = createResilientFetch()
-if (typeof window !== 'undefined') {
-  window.fetch = resilientFetch
-}
 
 // Add global error handler to suppress expected network connectivity errors from Supabase
 if (typeof window !== 'undefined') {
