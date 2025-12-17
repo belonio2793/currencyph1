@@ -197,18 +197,31 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 6️⃣ FUNCTION - Create default wallets for new user (PHP + USD)
+-- 6️⃣ FUNCTION - Create default wallets for new user (All active currencies)
 CREATE OR REPLACE FUNCTION create_default_wallets(p_user_id UUID) RETURNS VOID AS $$
 BEGIN
-  -- Create PHP wallet (primary)
+  -- Create wallets for all active currencies
   INSERT INTO wallets (user_id, currency_code, balance)
-  VALUES (p_user_id, 'PHP', 0)
+  SELECT p_user_id, code, 0
+  FROM currencies
+  WHERE active = TRUE
   ON CONFLICT (user_id, currency_code) DO NOTHING;
+END;
+$$ LANGUAGE plpgsql;
 
-  -- Create USD wallet (secondary)
+-- 6️⃣ FUNCTION - Ensure user has wallets for all active currencies (for existing users)
+CREATE OR REPLACE FUNCTION ensure_user_wallets(p_user_id UUID) RETURNS TABLE(wallet_id UUID, currency_code VARCHAR) AS $$
+BEGIN
+  RETURN QUERY
   INSERT INTO wallets (user_id, currency_code, balance)
-  VALUES (p_user_id, 'USD', 0)
-  ON CONFLICT (user_id, currency_code) DO NOTHING;
+  SELECT p_user_id, code, 0
+  FROM currencies
+  WHERE active = TRUE
+    AND code NOT IN (
+      SELECT currency_code FROM wallets WHERE user_id = p_user_id
+    )
+  ON CONFLICT (user_id, currency_code) DO NOTHING
+  RETURNING wallets.id, wallets.currency_code;
 END;
 $$ LANGUAGE plpgsql;
 
