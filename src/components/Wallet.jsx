@@ -205,63 +205,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
     }
   }
 
-  const handleCreateWallet = async (currency) => {
-    try {
-      setError('')
-      setSuccess('')
-
-      if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
-        setError('Please sign in to create wallets')
-        return
-      }
-
-      await currencyAPI.createWallet(userId, currency)
-      await new Promise(resolve => setTimeout(resolve, 500))
-      await loadWallets()
-      setShowPreferencesInternal(false)
-      setSuccess(`${currency} wallet created`)
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err) {
-      console.error(`Wallet creation error for ${currency}:`, err)
-      const errorMsg = err?.message || String(err) || 'Unknown error'
-      setError(`Failed to create ${currency} wallet: ${errorMsg}`)
-      setTimeout(() => setError(''), 5000)
-    }
-  }
-
-
-  // Fiat helpers
-  const changeFiatBalance = async (walletId, delta) => {
-    const w = fiatWallets.find(f => f.id === walletId)
-    if (!w) return
-    const newBalance = Math.max(0, Number(w.balance || 0) + delta)
-    const { error: updErr } = await supabase
-      .from('wallets_fiat')
-      .update({ balance: newBalance, updated_at: new Date() })
-      .eq('id', walletId)
-    if (updErr) throw updErr
-  }
-
-  const handleFiatSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setSuccess('')
-    const amt = parseFloat(fiatAmount)
-    if (!selectedFiatWallet || !amt || amt <= 0) {
-      setError('Enter a valid amount')
-      return
-    }
-    try {
-      const delta = fiatAction === 'deposit' ? amt : -amt
-      await changeFiatBalance(selectedFiatWallet.id, delta)
-      setSuccess(`${fiatAction === 'deposit' ? 'Deposited' : 'Paid'} ${amt} ${selectedFiatWallet.currency_code}`)
-      setFiatAmount('')
-      setShowFiatModal(false)
-      loadWallets()
-    } catch (e) {
-      setError(e.message || 'Failed to update fiat wallet')
-    }
-  }
 
 
 
