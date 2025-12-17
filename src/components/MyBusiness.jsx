@@ -520,18 +520,24 @@ export default function MyBusiness({ userId }) {
       setLoading(true)
       setError(null)
 
+      console.log('[MyBusiness] loadBusinesses called with userId:', userId)
+
       if (!userId || userId === 'null' || userId === 'undefined') {
         setError('User ID not available. Please refresh and try again.')
         setBusinesses([])
+        setLoading(false)
         return
       }
 
       // Skip database query for guest-local users (invalid UUIDs)
       if (!isValidUUID(userId)) {
+        console.warn('[MyBusiness] Invalid UUID format:', userId)
         setBusinesses([])
         setLoading(false)
         return
       }
+
+      console.log('[MyBusiness] UUID is valid, querying businesses for userId:', userId)
 
       const { data, error } = await supabase
         .from('businesses')
@@ -539,21 +545,26 @@ export default function MyBusiness({ userId }) {
         .eq('user_id', userId)
         .order('is_default', { ascending: false })
 
+      console.log('[MyBusiness] Query result:', { data, error })
+
       if (error) {
         const errorMsg = error.message || error.code || 'Unknown error'
         console.error('Failed to load businesses:', errorMsg, error)
         setError(`Failed to load businesses: ${errorMsg}`)
         setBusinesses([])
+        setLoading(false)
         return
       }
 
       const businessesData = data || []
+      console.log('[MyBusiness] Loaded businesses:', businessesData)
       setBusinesses(businessesData)
 
       // Auto-select default business if it exists and no business is currently selected
       if (businessesData.length > 0 && !selectedBusiness) {
         const defaultBusiness = businessesData.find(b => b.is_default === true)
         if (defaultBusiness) {
+          console.log('[MyBusiness] Auto-selecting default business:', defaultBusiness)
           setSelectedBusiness(defaultBusiness)
           setShowRegistrationForm(false)
         }
