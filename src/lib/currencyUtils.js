@@ -76,10 +76,19 @@ export async function fetchExchangeRate() {
       return DEFAULT_EXCHANGE_RATE;
     }
 
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.warn('Exchange rate API returned non-JSON response, using default rate');
+      return DEFAULT_EXCHANGE_RATE;
+    }
+
     const data = await response.json();
     return data.rate || DEFAULT_EXCHANGE_RATE;
   } catch (error) {
-    console.error('Error fetching exchange rate:', error);
+    // Silently fail with default rate - this is a non-critical background operation
+    if (error?.name !== 'TypeError' || !error?.message?.includes('Failed to fetch')) {
+      console.error('Error fetching exchange rate:', error);
+    }
     return DEFAULT_EXCHANGE_RATE;
   }
 }
