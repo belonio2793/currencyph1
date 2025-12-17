@@ -301,7 +301,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                       {bonusChips > 0 && (
                         <div className="mb-3 px-3 py-1 bg-amber-900/50 border border-amber-600 rounded-full">
                           <div className="text-xs text-amber-300 font-semibold">
-                            +{(bonusChips / 1000000).toFixed(1)}M BONUS
+                            +{bonusChips.toLocaleString()} BONUS
                           </div>
                         </div>
                       )}
