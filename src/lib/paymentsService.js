@@ -15,14 +15,22 @@ export const paymentsService = {
   },
 
   async getMerchantsByUser(userId) {
-    const { data, error } = await supabase
-      .from('merchants')
-      .select('*')
-      .eq('owner_user_id', userId)
-      .order('created_at', { ascending: false })
+    try {
+      const { data, error } = await supabase
+        .from('merchants')
+        .select('*')
+        .eq('owner_user_id', userId)
+        .order('created_at', { ascending: false })
 
-    if (error) throw error
-    return data || []
+      if (error) {
+        const errorMessage = error?.message || JSON.stringify(error)
+        throw new Error(errorMessage)
+      }
+      return data || []
+    } catch (err) {
+      console.error('getMerchantsByUser error:', err)
+      throw err
+    }
   },
 
   async createMerchant(userId, merchantData) {
