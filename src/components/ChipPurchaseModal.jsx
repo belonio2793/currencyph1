@@ -96,25 +96,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           })
         }
       } else {
-        if (userWallet) {
-          const localPrice = convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code)
-          const walletBalance = Number(userWallet.balance)
-
-          if (walletBalance < localPrice) {
-            setError(`Insufficient balance. You have ${formatPriceWithCurrency(walletBalance, userWallet.currency_code)} but need ${formatPriceWithCurrency(localPrice, userWallet.currency_code)}`)
-            setProcessing(false)
-            return
-          }
-
-          const newWalletBalance = walletBalance - localPrice
-          const { error: walletUpdateErr } = await supabase
-            .from('wallets')
-            .update({ balance: newWalletBalance, updated_at: new Date() })
-            .eq('id', userWallet.id)
-
-          if (walletUpdateErr) throw walletUpdateErr
-        }
-
         const { error: chipUpsertErr } = await supabase
           .from('player_poker_chips')
           .upsert({
@@ -125,7 +106,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
         if (chipUpsertErr) throw chipUpsertErr
 
-        const paymentMethod = userWallet ? 'wallet_deduction' : 'free'
         const { data: purchase, error: purchaseErr } = await supabase
           .from('chip_purchases')
           .insert([{
@@ -136,7 +116,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
             total_chips_received: Number(totalChipsToAdd),
             usd_price_paid: pkg.usd_price,
             payment_status: 'completed',
-            payment_method: paymentMethod,
+            payment_method: 'free',
             created_at: new Date()
           }])
           .select()
@@ -144,24 +124,15 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
 
         if (purchaseErr) throw purchaseErr
 
-        console.log('Purchase recorded successfully')
         await loadUserData()
 
         if (onPurchaseComplete) {
-          console.log('Calling onPurchaseComplete')
-          const costDeducted = userWallet
-            ? formatPriceWithCurrency(
-                convertUSDToLocalCurrency(Number(pkg.usd_price), userWallet.currency_code),
-                userWallet.currency_code
-              )
-            : 'Free (no wallet)'
-
           onPurchaseComplete({
             chipsPurchased: Number(chipAmount),
             bonusChips: Number(bonusChips),
             totalChips: totalChipsToAdd.toString(),
             newBalance: newChipBalance.toString(),
-            costDeducted: costDeducted
+            costDeducted: 'Free'
           })
         }
       }
