@@ -219,10 +219,89 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       {/* Header with total balance */}
       <div className="mb-8">
         <h1 className="text-4xl font-light text-slate-900 tracking-tight mb-2">My Wallets</h1>
-        <div className="flex items-baseline gap-2">
+        <div className="flex items-baseline gap-2 mb-6">
           <p className="text-sm text-slate-600">Total Balance</p>
           <p className="text-3xl font-light text-slate-900">{formatNumber(consolidatedBalance > 0 ? consolidatedBalance : totalBalancePHP)}</p>
           <p className="text-sm text-slate-500">{globalCurrency}</p>
+        </div>
+
+        {/* Controls */}
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          {/* Left controls */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            {/* Currency Selector */}
+            <select
+              value={selectedCurrency || ''}
+              onChange={(e) => setSelectedCurrency(e.target.value || null)}
+              className="px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white"
+            >
+              <option value="">All Currencies</option>
+              <optgroup label="Fiat">
+                {FIAT_CURRENCIES.map(curr => (
+                  <option key={curr} value={curr}>{curr} {CURRENCY_SYMBOLS[curr]}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Crypto">
+                {CRYPTO_CURRENCIES.map(curr => (
+                  <option key={curr} value={curr}>{curr}</option>
+                ))}
+              </optgroup>
+            </select>
+
+            {/* Filter buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  setShowFiatOnly(!showFiatOnly)
+                  setShowCryptoOnly(false)
+                }}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  showFiatOnly
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Fiat Only
+              </button>
+              <button
+                onClick={() => {
+                  setShowCryptoOnly(!showCryptoOnly)
+                  setShowFiatOnly(false)
+                }}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  showCryptoOnly
+                    ? 'bg-orange-600 text-white'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                Crypto Only
+              </button>
+            </div>
+          </div>
+
+          {/* Right controls - View mode toggle */}
+          <div className="flex gap-2 border border-slate-300 rounded-lg p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-all ${
+                viewMode === 'grid'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Grid
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1 rounded text-sm font-medium transition-all ${
+                viewMode === 'list'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              List
+            </button>
+          </div>
         </div>
       </div>
 
