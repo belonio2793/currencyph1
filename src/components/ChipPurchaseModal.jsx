@@ -192,17 +192,6 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold">Buy Poker Chips 🎰</h2>
-              <p className="text-sm text-cyan-100 mt-2">
-                {userWallet ? (
-                  <>
-                    Your Balance: <span className="font-bold text-lg">{formatPriceWithCurrency(walletBalance, currency)}</span>
-                  </>
-                ) : (
-                  <>
-                    Wallet: <span className="font-bold text-lg text-cyan-300">Not set up</span>
-                  </>
-                )}
-              </p>
             </div>
             <div className="text-right">
               <div className="text-sm text-cyan-100">Your Chips</div>
@@ -238,9 +227,7 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                 const usdPrice = Number(pkg.usd_price) || 0
                 const chipAmount = Number(pkg.chip_amount) || 0
                 const bonusChips = Number(pkg.bonus_chips) || 0
-
                 const localPrice = convertUSDToLocalCurrency(usdPrice, currency)
-                const affordable = !userWallet || (walletBalance >= localPrice)
                 const totalChips = chipAmount + bonusChips
                 const label = getPackageLabel(pkg)
                 const labelColor = getPackageLabelColor(pkg)
@@ -287,30 +274,11 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
                       {/* Divider */}
                       <div className="w-full h-px bg-slate-600 my-4"></div>
 
-                      {/* Price */}
-                      <div className="text-center mb-6">
-                        <div className={`text-3xl font-bold ${!affordable && userWallet ? 'text-red-400' : 'text-white'}`}>
-                          {formatPriceWithCurrency(localPrice, currency)}
-                        </div>
-                        <div className="text-xs text-slate-400 mt-1">{currency} PRICE</div>
-                      </div>
-
-                      {/* Affordability Warning */}
-                      {!affordable && userWallet && (
-                        <div className="w-full mb-4 p-2 bg-red-900/30 border border-red-600 rounded text-center">
-                          <div className="text-xs text-red-300 font-semibold">Not enough balance</div>
-                        </div>
-                      )}
-
                       {/* Buy Button */}
                       <button
                         onClick={() => handlePurchase(pkg.id)}
-                        disabled={processing || !affordable}
-                        className={`w-full py-3 font-bold rounded-lg transition transform active:scale-95 ${
-                          affordable
-                            ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl'
-                            : 'bg-slate-600 text-slate-400 cursor-not-allowed opacity-50'
-                        }`}
+                        disabled={processing}
+                        className="w-full py-3 font-bold rounded-lg transition transform active:scale-95 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {processing ? (
                           <span className="flex items-center justify-center gap-2">
