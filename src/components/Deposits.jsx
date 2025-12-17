@@ -359,7 +359,7 @@ const InstructionsDisplay = React.memo(function InstructionsDisplay({ method }) 
 
 function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [amount, setAmount] = useState('')
-  const [selectedCurrency, setSelectedCurrency] = useState('PHP')
+  const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
   const [exchangeRates, setExchangeRates] = useState({})
   const [wallets, setWallets] = useState([])
   const [convertedAmounts, setConvertedAmounts] = useState({})
