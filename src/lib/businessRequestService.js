@@ -95,6 +95,11 @@ export const businessRequestService = {
   // ===== GET USER'S REQUESTS =====
   async getUserRequests(userId, status = null) {
     try {
+      // Skip database query for guest-local users (invalid UUIDs)
+      if (!userId || !this.isValidUUID(userId)) {
+        return { data: [], error: null }
+      }
+
       let query = supabase
         .from('business_requests')
         .select(`
