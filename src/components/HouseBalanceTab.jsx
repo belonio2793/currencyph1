@@ -6,7 +6,7 @@ export default function HouseBalanceTab() {
   const [rakeTransactions, setRakeTransactions] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [currencyFilter, setCurrencyFilter] = useState('PHP')
+  const [currencyFilter, setCurrencyFilter] = useState('PLAY_CHIPS')
   const [houseCryptoAddress, setHouseCryptoAddress] = useState(null)
 
   const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
@@ -60,8 +60,8 @@ export default function HouseBalanceTab() {
 
       if (walletError) throw walletError
 
-      const phpWallet = wallets?.find(w => w.currency_code === 'PHP')
-      setHouseBalance(phpWallet ? Number(phpWallet.balance) : 0)
+      const playChipsWallet = wallets?.find(w => w.currency_code === 'PLAY_CHIPS')
+      setHouseBalance(playChipsWallet ? Number(playChipsWallet.balance) : 0)
 
       // Also load house crypto wallets (wallets_crypto) for display (e.g., BTC address)
       try {
@@ -173,7 +173,7 @@ export default function HouseBalanceTab() {
           <div>
             <p className="text-slate-300 text-sm font-semibold mb-2">🏠 House Balance</p>
             <h2 className="text-5xl font-bold font-mono">{formatCurrency(houseBalance)}</h2>
-            <p className="text-slate-400 text-sm mt-2">{currencyFilter}</p>
+            <p className="text-slate-400 text-sm mt-2">{currencyFilter === 'PLAY_CHIPS' ? 'PLAY CHIPS' : currencyFilter}</p>
             {houseCryptoAddress && (
               <p className="text-sm text-slate-300 mt-3">
                 <strong>Network BTC Address:</strong>
@@ -195,6 +195,7 @@ export default function HouseBalanceTab() {
               onChange={(e) => setCurrencyFilter(e.target.value)}
               className="px-3 py-2 border border-slate-600/30 rounded-lg text-sm bg-slate-700/50 text-white"
             >
+              <option value="PLAY_CHIPS">PLAY CHIPS</option>
               <option value="PHP">PHP</option>
               <option value="USD">USD</option>
             </select>
