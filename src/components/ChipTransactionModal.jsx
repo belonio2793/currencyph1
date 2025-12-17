@@ -184,9 +184,9 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               
               {/* Left: Packages List */}
-              <div className="lg:col-span-2">
+              <div className="lg:col-span-2 flex flex-col">
                 <h3 className="text-xl font-semibold text-white mb-4">Select Package</h3>
-                <div className="space-y-3 max-h-96 overflow-y-auto">
+                <div className="space-y-3 overflow-y-auto flex-1">
                   {packages.map((pkg) => {
                     const chipAmount = Number(pkg.chips_amount || 0)
                     const bonusChips = Number(pkg.bonus_chips || 0)
@@ -203,8 +203,8 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                             : 'border-slate-600 bg-slate-800 hover:border-slate-500'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1">
                             <div className="font-semibold text-white">{total.toLocaleString()} Chips</div>
                             <div className="text-xs text-slate-400 mt-1">
                               {chipAmount.toLocaleString()} base + {bonusChips.toLocaleString()} bonus
@@ -217,9 +217,12 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
                               </div>
                             )}
                           </div>
-                          <div className="text-right">
+                          <div className="text-right flex flex-col items-end gap-2">
+                            <div className="text-sm font-semibold text-emerald-400">
+                              {getPhpPrice(pkg.usd_price)}
+                            </div>
                             {isSelected && (
-                              <div className="w-6 h-6 rounded-full bg-cyan-400 flex items-center justify-center">
+                              <div className="w-6 h-6 rounded-full bg-cyan-400 flex items-center justify-center flex-shrink-0">
                                 <svg className="w-4 h-4 text-slate-900" fill="currentColor" viewBox="0 0 20 20">
                                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                 </svg>
