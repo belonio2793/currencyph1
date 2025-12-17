@@ -87,6 +87,13 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
 
   useEffect(() => {
+    // Ensure user has wallets for all active currencies (for existing users)
+    if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
+      currencyAPI.ensureUserWallets(userId).catch(err => {
+        console.warn('Failed to ensure user wallets:', err)
+      })
+    }
+
     loadWallets()
     loadPreferences()
 
