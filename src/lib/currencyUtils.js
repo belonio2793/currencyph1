@@ -67,22 +67,19 @@ export function displayBothCurrencies(phpAmount, exchangeRate = DEFAULT_EXCHANGE
  */
 export async function fetchExchangeRate() {
   try {
-    const apiKey = import.meta.env.VITE_OPEN_EXCHANGE_RATES_API;
-    if (!apiKey) {
-      console.warn('Exchange rate API key not configured, using default rate');
+    // Try to fetch from local API endpoint first (avoids CORS issues)
+    const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+    const response = await fetch(`${apiUrl}/api/exchange-rate`, {
+      timeout: 10000
+    });
+
+    if (!response.ok) {
+      console.warn('Exchange rate API returned error, using default rate');
       return DEFAULT_EXCHANGE_RATE;
     }
 
-    const response = await fetch(
-      `https://openexchangerates.org/api/latest.json?app_id=${apiKey}&base=USD&symbols=PHP`
-    );
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch exchange rate');
-    }
-
     const data = await response.json();
-    return data.rates?.PHP || DEFAULT_EXCHANGE_RATE;
+    return data.rate || DEFAULT_EXCHANGE_RATE;
   } catch (error) {
     console.error('Error fetching exchange rate:', error);
     return DEFAULT_EXCHANGE_RATE;
