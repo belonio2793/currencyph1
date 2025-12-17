@@ -40,11 +40,9 @@ const formatCurrency = (amount, currencyCode, showSymbol = true) => {
   const formatted = numAmount.toFixed(2)
 
   if (showSymbol) {
-    // For USD and similar, put symbol before amount
     if (['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'SGD', 'HKD', 'NZD'].includes(currencyCode)) {
       return `${symbol}${formatted}`
     }
-    // For others, put symbol after
     return `${formatted} ${symbol}`
   }
   return formatted
@@ -357,6 +355,73 @@ const InstructionsDisplay = React.memo(function InstructionsDisplay({ method }) 
   )
 })
 
+// Wallet Summary Card Component
+const WalletSummaryCard = React.memo(function WalletSummaryCard({ wallet, globalCurrency, exchangeRates, onDeposit }) {
+  const getConvertedBalance = useCallback(() => {
+    if (wallet.currency_code === globalCurrency) {
+      return parseFloat(wallet.balance || 0).toFixed(2)
+    }
+    const rateKey = `${wallet.currency_code}_${globalCurrency}`
+    const rate = exchangeRates[rateKey] || 1
+    return (parseFloat(wallet.balance || 0) * rate).toFixed(2)
+  }, [wallet, globalCurrency, exchangeRates])
+
+  const symbol = CURRENCY_SYMBOLS[wallet.currency_code] || ''
+  const globalSymbol = CURRENCY_SYMBOLS[globalCurrency] || ''
+
+  return (
+    <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-lg p-4 border border-slate-200 hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide">
+            {wallet.currency_code}
+          </p>
+          <p className="text-sm text-slate-500 mt-1">{symbol}</p>
+        </div>
+        {wallet.is_active && (
+          <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+            Active
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-2 mb-3">
+        <div>
+          <p className="text-xs text-slate-600 mb-1">Available Balance</p>
+          <p className="text-lg font-semibold text-slate-900 font-mono">
+            {parseFloat(wallet.balance || 0).toFixed(2)} {symbol}
+          </p>
+        </div>
+        <div>
+          <p className="text-xs text-slate-600 mb-1">In {globalCurrency}</p>
+          <p className="text-sm font-medium text-slate-700 font-mono">
+            {getConvertedBalance()} {globalSymbol}
+          </p>
+        </div>
+      </div>
+
+      <div className="pt-3 border-t border-slate-200 space-y-1 mb-3 text-xs text-slate-600">
+        <div className="flex justify-between">
+          <span>Total Deposited:</span>
+          <span className="font-medium">{parseFloat(wallet.total_deposited || 0).toFixed(2)} {symbol}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Total Withdrawn:</span>
+          <span className="font-medium">{parseFloat(wallet.total_withdrawn || 0).toFixed(2)} {symbol}</span>
+        </div>
+      </div>
+
+      <button
+        onClick={() => onDeposit(wallet.currency_code)}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-2 rounded transition-colors"
+      >
+        Deposit {wallet.currency_code}
+      </button>
+    </div>
+  )
+})
+
+// Main Deposits Component
 function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
@@ -368,6 +433,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [allCurrencies, setAllCurrencies] = useState([])
+  const [lastUpdate, setLastUpdate] = useState(null)
+  const [syncStatus, setSyncStatus] = useState('synced')
 
   // Payment method selection
   const [depositTab, setDepositTab] = useState('direct')
@@ -380,6 +447,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [cryptoRates, setCryptoRates] = useState({})
   const [cryptoConvertedAmounts, setCryptoConvertedAmounts] = useState({})
   const [addingCrypto, setAddingCrypto] = useState(false)
+
+  const [selectedDepositCurrency, setSelectedDepositCurrency] = useState(null)
 
   const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
 
@@ -605,7 +674,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     try {
       setAllCurrencies(currencyAPI.getCurrencies())
 
-      // Ensure user has wallets for all active currencies (for existing users)
       if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
         paymentsAPI.ensureUserWallets(userId).catch(err => {
           console.debug('Failed to ensure user wallets, continuing:', err)
@@ -621,6 +689,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         })
       ])
       setLoading(false)
+      setLastUpdate(new Date())
       loadCryptoPrices().catch(err => {
         console.debug('Crypto prices loading failed, continuing with defaults:', err)
       })
@@ -637,10 +706,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         setWallets([])
         return
       }
+      setSyncStatus('syncing')
       const data = await paymentsAPI.getWallets(userId)
       setWallets(data)
+      setSyncStatus('synced')
     } catch (err) {
       setWallets([])
+      setSyncStatus('error')
     }
   }
 
@@ -689,6 +761,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       console.debug('Error loading exchange rates, continuing with fallback:', err?.message || String(err))
       setExchangeRates({})
     }
+  }
+
+  const refreshWallets = async () => {
+    setSyncStatus('syncing')
+    await loadWallets()
+    setLastUpdate(new Date())
   }
 
   useEffect(() => {
@@ -784,7 +862,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       setTimeout(() => {
         setSuccess('')
-        loadWallets()
+        refreshWallets()
       }, 2000)
     } catch (err) {
       setError(err.message || 'Failed to add funds')
@@ -818,7 +896,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       setTimeout(() => {
         setSuccess('')
-        loadWallets()
+        refreshWallets()
       }, 2000)
     } catch (err) {
       setError(err.message || 'Failed to add crypto')
@@ -827,9 +905,21 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }
 
+  const handleQuickDeposit = (currencyCode) => {
+    setSelectedDepositCurrency(currencyCode)
+    setSelectedCurrency(currencyCode)
+    setDepositTab('direct')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   const getTotalBalance = useMemo(() => {
-    return wallets.reduce((sum, w) => sum + (w.balance || 0), 0).toFixed(2)
-  }, [wallets])
+    let total = 0
+    wallets.forEach(wallet => {
+      const rate = exchangeRates[`${wallet.currency_code}_${globalCurrency}`] || 1
+      total += parseFloat(wallet.balance || 0) * rate
+    })
+    return total.toFixed(2)
+  }, [wallets, exchangeRates, globalCurrency])
 
   const getRate = useCallback((from, to) => {
     if (from === to) return '1.0000'
@@ -878,126 +968,169 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
+        {/* Header Section */}
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8 border border-slate-200">
-          <div className="mb-8 text-center">
-            <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
-            <h2 className="text-5xl font-light text-slate-900">
-              {formatCurrency(getTotalBalance, globalCurrency)}
-            </h2>
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <p className="text-slate-600 text-sm uppercase tracking-wider mb-2">Total Balance</p>
+              <h2 className="text-5xl font-light text-slate-900">
+                {formatCurrency(getTotalBalance, globalCurrency)}
+              </h2>
+            </div>
+            <div className="text-right">
+              <p className="text-xs text-slate-500 mb-2">
+                Last synced: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Loading...'}
+              </p>
+              <button
+                onClick={refreshWallets}
+                disabled={syncStatus === 'syncing'}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  syncStatus === 'syncing'
+                    ? 'bg-slate-100 text-slate-600 cursor-not-allowed'
+                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                }`}
+              >
+                {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
+              </button>
+            </div>
           </div>
 
-          {/* Wallet Balances Preview */}
+          {/* Summary Stats */}
           {wallets && wallets.length > 0 && (
-            <div className="mb-8 pb-8 border-b border-slate-200">
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Your Wallet Balances</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {wallets.slice(0, 8).map(wallet => (
-                  <div key={wallet.id} className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-100">
-                    <div className="flex items-baseline justify-between mb-2">
-                      <p className="text-sm font-semibold text-slate-700">{wallet.currency_code}</p>
-                      <p className="text-xs text-slate-500">{CURRENCY_SYMBOLS[wallet.currency_code] || ''}</p>
-                    </div>
-                    <p className="text-lg font-light text-slate-900 font-mono">
-                      {parseFloat(wallet.balance || 0).toFixed(2)}
-                    </p>
-                    <p className="text-xs text-slate-500 mt-1">Available to withdraw</p>
-                  </div>
-                ))}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-8 border-t border-slate-200">
+              <div className="text-center">
+                <p className="text-sm text-slate-600 mb-1">Active Wallets</p>
+                <p className="text-2xl font-semibold text-slate-900">{wallets.length}</p>
               </div>
-              {wallets.length > 8 && (
-                <p className="text-xs text-slate-500 mt-3 text-center">+{wallets.length - 8} more wallets</p>
-              )}
+              <div className="text-center">
+                <p className="text-sm text-slate-600 mb-1">Total Deposited</p>
+                <p className="text-2xl font-semibold text-emerald-600">
+                  {formatCurrency(
+                    wallets.reduce((sum, w) => sum + parseFloat(w.total_deposited || 0), 0),
+                    globalCurrency
+                  )}
+                </p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-slate-600 mb-1">Total Withdrawn</p>
+                <p className="text-2xl font-semibold text-orange-600">
+                  {formatCurrency(
+                    wallets.reduce((sum, w) => sum + parseFloat(w.total_withdrawn || 0), 0),
+                    globalCurrency
+                  )}
+                </p>
+              </div>
             </div>
           )}
+        </div>
 
-          {/* Direct Payment Methods */}
-          <div className="space-y-6">
-              <div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                  {Object.entries(PAYMENT_METHODS).map(([key, method]) => (
-                    <PaymentMethodSelector
-                      key={key}
-                      method={method}
-                      selected={selectedPaymentMethod === key}
-                      onClick={() => {
-                        setSelectedPaymentMethod(key)
-                        setReferenceCode(key === 'gcash' ? `REF-${Date.now().toString().slice(-8)}` : null)
-                        setShowPaymentInstructions(false)
-                      }}
-                    />
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
-                  Deposit Amount ({globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''})
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={amount}
-                  onChange={e => setAmount(e.target.value)}
-                  placeholder="Enter amount"
-                  className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
+        {/* Wallet Balances Grid */}
+        {wallets && wallets.length > 0 && (
+          <div className="mb-8">
+            <h3 className="text-2xl font-semibold text-slate-900 mb-6">Your Wallets</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {wallets.map(wallet => (
+                <WalletSummaryCard
+                  key={wallet.id}
+                  wallet={wallet}
+                  globalCurrency={globalCurrency}
+                  exchangeRates={exchangeRates}
+                  onDeposit={handleQuickDeposit}
                 />
-              </div>
-
-              {amount && (
-                <div className="space-y-6">
-                  {selectedPaymentMethod === 'solana' && (
-                    <>
-                      <SolanaPaymentDisplay address={PAYMENT_METHODS.solana.address} />
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                        <p className="font-semibold mb-2">💡 Important:</p>
-                        <ul className="list-disc pl-5 space-y-1">
-                          <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
-                          <li>Your balance will be updated once confirmed on the blockchain</li>
-                          <li>Keep your SOL address for transaction tracking</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
-                        className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-                      >
-                        {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
-                      </button>
-                      {showPaymentInstructions && (
-                        <InstructionsDisplay method={PAYMENT_METHODS.solana} />
-                      )}
-                    </>
-                  )}
-
-                  {selectedPaymentMethod === 'gcash' && (
-                    <>
-                      <GCashPaymentDisplay
-                        phone={PAYMENT_METHODS.gcash.phone}
-                        referenceCode={referenceCode}
-                      />
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                        <p className="font-semibold mb-2">💡 Important:</p>
-                        <ul className="list-disc pl-5 space-y-1">
-                          <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
-                          <li>Use the reference code to track your deposit</li>
-                          <li>Deposits are confirmed within 1-3 minutes</li>
-                          <li>Make sure to include the reference code in the GCash notes</li>
-                        </ul>
-                      </div>
-                      <button
-                        onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
-                        className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                      >
-                        {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
-                      </button>
-                      {showPaymentInstructions && (
-                        <InstructionsDisplay method={PAYMENT_METHODS.gcash} />
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
+              ))}
             </div>
+          </div>
+        )}
+
+        {/* Direct Payment Methods */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {Object.entries(PAYMENT_METHODS).map(([key, method]) => (
+                  <PaymentMethodSelector
+                    key={key}
+                    method={method}
+                    selected={selectedPaymentMethod === key}
+                    onClick={() => {
+                      setSelectedPaymentMethod(key)
+                      setReferenceCode(key === 'gcash' ? `REF-${Date.now().toString().slice(-8)}` : null)
+                      setShowPaymentInstructions(false)
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-2">
+                Deposit Amount ({globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''})
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={amount}
+                onChange={e => setAmount(e.target.value)}
+                placeholder="Enter amount"
+                className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
+              />
+            </div>
+
+            {amount && (
+              <div className="space-y-6">
+                {selectedPaymentMethod === 'solana' && (
+                  <>
+                    <SolanaPaymentDisplay address={PAYMENT_METHODS.solana.address} />
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                      <p className="font-semibold mb-2">💡 Important:</p>
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
+                        <li>Your balance will be updated once confirmed on the blockchain</li>
+                        <li>Keep your SOL address for transaction tracking</li>
+                      </ul>
+                    </div>
+                    <button
+                      onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
+                      className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                    >
+                      {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
+                    </button>
+                    {showPaymentInstructions && (
+                      <InstructionsDisplay method={PAYMENT_METHODS.solana} />
+                    )}
+                  </>
+                )}
+
+                {selectedPaymentMethod === 'gcash' && (
+                  <>
+                    <GCashPaymentDisplay
+                      phone={PAYMENT_METHODS.gcash.phone}
+                      referenceCode={referenceCode}
+                    />
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                      <p className="font-semibold mb-2">💡 Important:</p>
+                      <ul className="list-disc pl-5 space-y-1">
+                        <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
+                        <li>Use the reference code to track your deposit</li>
+                        <li>Deposits are confirmed within 1-3 minutes</li>
+                        <li>Make sure to include the reference code in the GCash notes</li>
+                      </ul>
+                    </div>
+                    <button
+                      onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
+                      className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    >
+                      {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
+                    </button>
+                    {showPaymentInstructions && (
+                      <InstructionsDisplay method={PAYMENT_METHODS.gcash} />
+                    )}
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
