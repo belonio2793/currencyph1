@@ -313,7 +313,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
                                     ? 'text-blue-200'
                                     : 'text-slate-500'
                                 }`}>
-                                  ◆
+                                  •
                                 </span>
                                 <button
                                   onClick={() => handleNavClick(child.id)}
