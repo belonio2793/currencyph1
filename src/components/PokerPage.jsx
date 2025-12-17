@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import RakeModal from './RakeModal'
 import HouseBalanceTab from './HouseBalanceTab'
 import PokerGameModal from './PokerGameModal'
-import ChipPurchaseModal from './ChipPurchaseModal'
+import ChipTransactionModal from './ChipTransactionModal'
 import { preferencesManager } from '../lib/preferencesManager'
 
 export default function PokerPage({ userId, userEmail, onShowAuth }) {
@@ -765,7 +765,7 @@ export default function PokerPage({ userId, userEmail, onShowAuth }) {
         onLeaveTable={handleLeaveTable}
       />
 
-      <ChipPurchaseModal
+      <ChipTransactionModal
         open={chipModalOpen}
         onClose={() => setChipModalOpen(false)}
         userId={userId}
