@@ -775,7 +775,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   </label>
                   <input
                     type="number"
-                    step={CRYPTO_CURRENCIES.includes(selectedWallet.currency_code) ? "0.00000001" : "0.01"}
+                    step={selectedWallet.currency_type === 'crypto' ? "0.00000001" : "0.01"}
                     value={amount}
                     onChange={e => setAmount(e.target.value)}
                     placeholder="0.00"
@@ -795,7 +795,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   <button
                     type="submit"
                     className={`flex-1 px-4 py-3 text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm ${
-                      CRYPTO_CURRENCIES.includes(selectedWallet.currency_code)
+                      selectedWallet.currency_type === 'crypto'
                         ? 'bg-orange-600 hover:bg-orange-700'
                         : 'bg-blue-600 hover:bg-blue-700'
                     }`}
