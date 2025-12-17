@@ -55,8 +55,15 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
       setSelectedMerchant(newMerchant)
       return newMerchant
     } catch (err) {
-      const errorMessage = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error'
-      console.error('Error creating merchant:', { error: err, message: errorMessage })
+      let errorMessage = 'Unknown error'
+      if (err instanceof Error) {
+        errorMessage = err.message
+      } else if (typeof err === 'object' && err !== null) {
+        errorMessage = err?.message || err?.error_description || 'Failed to create merchant'
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      }
+      console.error('Error creating merchant:', errorMessage, err)
       throw new Error(errorMessage)
     }
   }
@@ -70,8 +77,15 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
       }
       return updated
     } catch (err) {
-      const errorMessage = err?.message || err?.error_description || JSON.stringify(err) || 'Unknown error'
-      console.error('Error updating merchant:', { error: err, message: errorMessage })
+      let errorMessage = 'Unknown error'
+      if (err instanceof Error) {
+        errorMessage = err.message
+      } else if (typeof err === 'object' && err !== null) {
+        errorMessage = err?.message || err?.error_description || 'Failed to update merchant'
+      } else if (typeof err === 'string') {
+        errorMessage = err
+      }
+      console.error('Error updating merchant:', errorMessage, err)
       throw new Error(errorMessage)
     }
   }
