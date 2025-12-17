@@ -155,8 +155,18 @@ function initClient() {
     }
 
     try {
-      // Initialize with default global fetch - don't override to avoid interfering with runtime fetch behavior
+      // Initialize with default global fetch
       console.debug('[supabase-client] initializing client with URL', SUPABASE_URL)
+
+      // Create fetch with timeout wrapper
+      const fetchWithTimeout = (url, options) => {
+        const timeout = 15000 // 15 second timeout
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), timeout)
+
+        return originalFetch(url, { ...options, signal: controller.signal })
+          .finally(() => clearTimeout(timeoutId))
+      }
 
       // Disable realtime features to prevent network errors in offline/edge environments
       _client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
@@ -164,6 +174,9 @@ function initClient() {
           params: {
             eventsPerSecond: 0  // Disable realtime to prevent fetch errors
           }
+        },
+        global: {
+          fetch: fetchWithTimeout
         }
       })
     } catch (clientErr) {
