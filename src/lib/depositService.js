@@ -110,12 +110,12 @@ export class DepositService {
       const [userResult, walletResult] = await Promise.all([
         this.supabase
           .from('users')
-          .select('id, email, country, created_at')
+          .select('id, email, country_code, created_at')
           .eq('id', userId)
           .single(),
         this.supabase
           .from('wallets')
-          .select('id, user_id, balance, currency, created_at')
+          .select('id, user_id, balance, currency_code, created_at')
           .eq('user_id', userId)
           .order('created_at', { ascending: true })
           .limit(1)
