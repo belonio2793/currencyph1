@@ -169,7 +169,7 @@ export default function ChipTransactionModal({ open, onClose, userId, onPurchase
       onClose()
     } catch (err) {
       console.error('Purchase error:', err)
-      setError(err.message || 'An error occurred during purchase')
+      setError(parseSupabaseError(err))
     } finally {
       setProcessing(false)
     }
