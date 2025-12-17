@@ -41,46 +41,14 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   // Preference states
   const [enabledInternal, setEnabledInternal] = useState([])
 
-  // Which preference modal is shown
-  const [showPreferencesInternal, setShowPreferencesInternal] = useState(false)
-  const [showPreferencesFiat, setShowPreferencesFiat] = useState(false)
-
   const [selectedWallet, setSelectedWallet] = useState(null)
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [filterMode, setFilterMode] = useState('all') // all | favorites | owned
-  const [showConnectedMenu, setShowConnectedMenu] = useState(false)
-
-  // Fiat modal state
-  const [showFiatModal, setShowFiatModal] = useState(false)
 
   // Exchange rates and consolidated balance
   const [ratesMap, setRatesMap] = useState({})
   const [consolidatedBalance, setConsolidatedBalance] = useState(0)
-
-  const convertBalance = (balance, fromCurrency) => {
-    // If same currency as global, return as-is
-    if (fromCurrency === globalCurrency) return balance
-    // Otherwise return the balance as total balance (already converted in parent)
-    return totalBalancePHP
-  }
-
-  const fmtErr = (e) => {
-    if (!e) return ''
-    if (typeof e === 'string') return e
-    if (e instanceof Error && e.message) return e.message
-    if (e && typeof e === 'object') {
-      if (e.message) return e.message
-      if (e.error) return typeof e.error === 'string' ? e.error : (e.error.message || JSON.stringify(e.error))
-      try { return JSON.stringify(e) } catch (ex) { return String(e) }
-    }
-    return String(e)
-  }
-  const [selectedFiatWallet, setSelectedFiatWallet] = useState(null)
-  const [fiatAction, setFiatAction] = useState('deposit') // 'deposit' | 'pay'
-  const [fiatAmount, setFiatAmount] = useState('')
 
 
 
