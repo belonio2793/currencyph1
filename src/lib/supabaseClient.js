@@ -23,24 +23,35 @@ const originalFetch = typeof window !== 'undefined' ? window.fetch : global.fetc
 
 // Add global error handler to suppress expected network connectivity errors from Supabase
 if (typeof window !== 'undefined') {
+  // Wrap console.error to suppress Supabase/fetch errors before they're logged
+  const originalError = console.error
+  console.error = function(...args) {
+    const message = args[0]?.toString?.() || String(args[0]) || ''
+
+    // Suppress "Failed to fetch" and related errors
+    if (message.includes('Failed to fetch') ||
+        message.includes('TypeError: Failed to fetch') ||
+        (message.includes('Error') && message.includes('fetch'))) {
+      return // Silently suppress
+    }
+
+    // Call original error handler for other errors
+    return originalError.apply(console, args)
+  }
+
   // Suppress unhandled promise rejections from Supabase fetch failures
   const suppressSupabaseErrors = (event) => {
     const reason = event.reason
     if (!reason) return false
 
-    const reasonStr = String(reason)
     const reasonMsg = reason?.message ? String(reason.message) : ''
-    const stack = reason?.stack ? String(reason.stack) : ''
 
-    // Check for any fetch-related error
-    const isFetchError = reasonMsg.includes('Failed to fetch') || reasonStr.includes('Failed to fetch')
-    const isTypeError = reasonMsg?.includes('TypeError') || reasonStr.includes('TypeError')
+    // Suppress all "Failed to fetch" errors
+    if (reasonMsg.includes('Failed to fetch') || String(reason).includes('Failed to fetch')) {
+      return true
+    }
 
-    // Check if error originated from Supabase library (most reliable indicator)
-    const isFromSupabase = stack.includes('supabase') || stack.includes('fetch')
-
-    // Suppress: all Supabase fetch errors, all "Failed to fetch" errors, or TypeError with fetch origin
-    return isFromSupabase || isFetchError || (isTypeError && isFromSupabase)
+    return false
   }
 
   window.addEventListener('unhandledrejection', (event) => {
@@ -50,11 +61,10 @@ if (typeof window !== 'undefined') {
   }, { capture: true })
 
   window.addEventListener('error', (event) => {
-    // Suppress "Failed to fetch" errors from within Supabase library
+    // Suppress "Failed to fetch" errors
     const msgStr = String(event.message || '')
-    const filenameStr = String(event.filename || '')
 
-    if (msgStr.includes('Failed to fetch') || msgStr.includes('fetch')) {
+    if (msgStr.includes('Failed to fetch')) {
       event.preventDefault()
     }
   }, { capture: true })
