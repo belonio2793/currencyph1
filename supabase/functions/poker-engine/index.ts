@@ -9,6 +9,10 @@ if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 
+// Chip system constants
+const CHIPS_PER_DOLLAR = 10000
+const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
+
 function buildDeck() {
   const suits = ['s','h','d','c']
   const ranks = ['2','3','4','5','6','7','8','9','T','J','Q','K','A']
@@ -29,22 +33,47 @@ function shuffle(deck: string[], seedBytes?: Uint8Array) {
   return deck
 }
 
+async function getPlayerChips(userId: string): Promise<bigint> {
+  const { data, error } = await supabase.from('player_poker_chips').select('total_chips').eq('user_id', userId).single()
+  if (error && error.code !== 'PGRST116') throw error
+  return BigInt(data?.total_chips || 0)
+}
+
+async function updatePlayerChips(userId: string, chipAmount: bigint): Promise<void> {
+  const { error } = await supabase.from('player_poker_chips').upsert({
+    user_id: userId,
+    total_chips: chipAmount.toString(),
+    updated_at: new Date()
+  }, { onConflict: 'user_id' })
+  if (error) throw error
+}
+
 async function createTable(name: string, stakeMin: number, stakeMax: number, currency = 'PHP', userId?: string) {
   const { data, error } = await supabase.from('poker_tables').insert([{ name, stake_min: stakeMin, stake_max: stakeMax, currency_code: currency, created_by: userId || null, is_default: false }]).select().single()
   if (error) throw error
   return data
 }
 
-async function joinTable(tableId: string, userId: string, seatNumber: number, startingBalance: number = 0) {
-  // ensure seat available
+async function joinTable(tableId: string, userId: string, seatNumber: number, chipsBuyIn: number = 0) {
+  // Ensure seat available
   const { data: existing } = await supabase.from('poker_seats').select('*').eq('table_id', tableId).eq('seat_number', seatNumber).limit(1)
   if (existing && existing.length > 0) throw new Error('Seat already taken')
+
+  // Check player has enough chips
+  const playerChips = await getPlayerChips(userId)
+  if (playerChips < BigInt(chipsBuyIn)) throw new Error('Insufficient chips. Buy more chips to join.')
+
+  // Deduct chips from player inventory
+  const newChipBalance = playerChips - BigInt(chipsBuyIn)
+  await updatePlayerChips(userId, newChipBalance)
 
   const { data, error } = await supabase.from('poker_seats').insert([{
     table_id: tableId,
     user_id: userId,
     seat_number: seatNumber,
-    starting_balance: startingBalance
+    starting_balance: chipsBuyIn,
+    chip_balance: chipsBuyIn,
+    chip_starting_balance: chipsBuyIn
   }]).select().single()
   if (error) throw error
   return data
@@ -117,7 +146,7 @@ async function startHand(tableId: string) {
 async function postBet(handId: string, userId: string, amount: number, action: string = 'bet') {
   if (action === 'fold' || action === 'check') {
     // No amount for fold/check
-    const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount: 0, action }])
+    const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount: 0, chip_amount: 0, action }])
     if (betErr) throw betErr
 
     await supabase.from('poker_audit').insert([{ hand_id: handId, event: action, payload: { userId } }])
@@ -126,79 +155,87 @@ async function postBet(handId: string, userId: string, amount: number, action: s
 
   if (amount <= 0) throw new Error('Invalid bet amount')
 
-  // For bet/raise/call: deduct from wallets and record escrow and bet
-  const { data: wallets } = await supabase.from('wallets').select('*').eq('user_id', userId).limit(1)
-  const wallet = (wallets && wallets[0])
-  if (!wallet) throw new Error('Wallet not found')
-  if (Number(wallet.balance) < amount) throw new Error('Insufficient balance')
+  // For bet/raise/call: deduct from player chip balance at table and record escrow and bet
+  const { data: seat } = await supabase.from('poker_seats').select('*').eq('id', (await supabase.from('poker_seats').select('id').eq('table_id', (await supabase.from('poker_hands').select('table_id').eq('id', handId).single()).data?.table_id).eq('user_id', userId).single()).data?.id)
+  
+  // Get the seat properly
+  const { data: hand } = await supabase.from('poker_hands').select('table_id').eq('id', handId).single()
+  if (!hand) throw new Error('Hand not found')
+  
+  const { data: seatData } = await supabase.from('poker_seats').select('*').eq('table_id', hand.table_id).eq('user_id', userId).single()
+  if (!seatData) throw new Error('Seat not found')
 
-  // Deduct balance
-  const newBal = Number(wallet.balance) - amount
-  const { error: updErr } = await supabase.from('wallets').update({ balance: newBal, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', wallet.currency_code)
+  const currentChipBalance = Number(seatData.chip_balance)
+  if (currentChipBalance < amount) throw new Error('Insufficient chips for this bet')
+
+  // Deduct chips from seat
+  const newChipBalance = currentChipBalance - amount
+  const { error: updErr } = await supabase.from('poker_seats').update({ chip_balance: newChipBalance, updated_at: new Date() }).eq('id', seatData.id)
   if (updErr) throw updErr
 
   // Insert escrow
-  const { error: escErr } = await supabase.from('poker_escrow').insert([{ hand_id: handId, user_id: userId, amount, currency_code: wallet.currency_code }])
+  const { error: escErr } = await supabase.from('poker_escrow').insert([{ hand_id: handId, user_id: userId, amount, chip_amount: amount, currency_code: 'CHIPS' }])
   if (escErr) throw escErr
 
   // Insert bet record
-  const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount, action }])
+  const { error: betErr } = await supabase.from('poker_bets').insert([{ hand_id: handId, user_id: userId, amount, chip_amount: amount, action }])
   if (betErr) throw betErr
 
   // Audit
   await supabase.from('poker_audit').insert([{ hand_id: handId, event: action, payload: { userId, amount } }])
 
-  return { success: true, remaining: newBal, action }
+  return { success: true, remaining: newChipBalance, action }
 }
 
-async function processRake(userId: string, tableId: string, startingBalance: number, endingBalance: number, rakeAmount: number, tipPercent: number, currencyCode: string) {
+async function processRake(userId: string, tableId: string, startingChips: number, endingChips: number, rakePercent: number, tipPercent: number) {
   if (!userId || !tableId) throw new Error('Invalid parameters')
 
-  const HOUSE_ID = '00000000-0000-0000-0000-000000000000'
-  const netProfit = endingBalance - startingBalance
+  const netProfit = endingChips - startingChips
   const isWinner = netProfit > 0
 
-  if (!isWinner || rakeAmount === 0) {
-    // No rake for losers or breakeven players - just remove seat
+  if (!isWinner || rakePercent === 0) {
+    // No rake for losers or breakeven players - just return chips to player
+    const playerChips = await getPlayerChips(userId)
+    await updatePlayerChips(userId, playerChips + BigInt(endingChips))
+    
+    // Remove seat
     await supabase.from('poker_seats').delete().eq('table_id', tableId).eq('user_id', userId)
   } else {
     // Get seat ID first
     const { data: seat } = await supabase.from('poker_seats').select('id').eq('table_id', tableId).eq('user_id', userId).single()
     if (!seat) throw new Error('Seat not found')
 
-    // Calculate tip
-    const tipAmount = Math.round(rakeAmount * (tipPercent / 100))
+    // Calculate rake and tip in chips
+    const rakeChips = Math.round(netProfit * (rakePercent / 100))
+    const tipChips = Math.round(rakeChips * (tipPercent / 100))
+    const totalDeductionChips = rakeChips + tipChips
 
-    // Total deduction: rake + tip
-    const totalDeduction = rakeAmount + tipAmount
+    // Return remaining chips to player
+    const playerChipsRemaining = endingChips - totalDeductionChips
+    const playerChips = await getPlayerChips(userId)
+    await updatePlayerChips(userId, playerChips + BigInt(playerChipsRemaining))
 
-    // Deduct rake and tip from player wallet
-    const { data: playerWallet } = await supabase.from('wallets').select('*').eq('user_id', userId).eq('currency_code', currencyCode).single()
-    if (!playerWallet) throw new Error('Player wallet not found')
+    // Add rake and tip to house (converted to cash value)
+    const rakeInCash = rakeChips / CHIPS_PER_DOLLAR
+    const tipInCash = tipChips / CHIPS_PER_DOLLAR
 
-    const playerCurrentBalance = Number(playerWallet.balance)
-    if (playerCurrentBalance < totalDeduction) throw new Error('Insufficient balance for rake and tip')
+    // Update house wallet
+    const { data: houseWallet } = await supabase.from('wallets').select('*').eq('user_id', HOUSE_ID).eq('currency_code', 'USD').single()
+    if (houseWallet) {
+      const houseCurrentBalance = Number(houseWallet.balance)
+      const houseNewBalance = houseCurrentBalance + rakeInCash + tipInCash
+      await supabase.from('wallets').update({ balance: houseNewBalance, updated_at: new Date() }).eq('user_id', HOUSE_ID).eq('currency_code', 'USD')
+    }
 
-    const playerNewBalance = playerCurrentBalance - totalDeduction
-    await supabase.from('wallets').update({ balance: playerNewBalance, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', currencyCode)
-
-    // Get House wallet and update it
-    const { data: houseWallet } = await supabase.from('wallets').select('*').eq('user_id', HOUSE_ID).eq('currency_code', currencyCode).single()
-    if (!houseWallet) throw new Error('House wallet not found')
-
-    const houseCurrentBalance = Number(houseWallet.balance)
-    const houseNewBalance = houseCurrentBalance + totalDeduction
-    await supabase.from('wallets').update({ balance: houseNewBalance, updated_at: new Date() }).eq('user_id', HOUSE_ID).eq('currency_code', currencyCode)
-
-    // Record rake transaction (rake only, or total? Assuming total as amount)
+    // Record rake transaction
     await supabase.from('rake_transactions').insert([{
       house_id: HOUSE_ID,
       user_id: userId,
       table_id: tableId,
-      amount: totalDeduction,
+      amount: rakeInCash + tipInCash,
       tip_percent: tipPercent,
-      currency_code: currencyCode,
-      balance_after: houseNewBalance
+      currency_code: 'USD',
+      balance_after: houseWallet ? Number(houseWallet.balance) + rakeInCash + tipInCash : rakeInCash + tipInCash
     }])
 
     // Create session record for analytics
@@ -206,14 +243,14 @@ async function processRake(userId: string, tableId: string, startingBalance: num
       table_id: tableId,
       user_id: userId,
       seat_id: seat.id,
-      starting_balance: startingBalance,
-      ending_balance: endingBalance,
+      starting_balance: startingChips,
+      ending_balance: endingChips,
       net_profit: netProfit,
-      rake_percent: 10,
-      rake_amount: rakeAmount,
+      rake_percent: rakePercent,
+      rake_amount: rakeChips,
       tip_percent: tipPercent,
-      tip_amount: tipAmount,
-      currency_code: currencyCode,
+      tip_amount: tipChips,
+      currency_code: 'CHIPS',
       left_at: new Date()
     }])
 
@@ -232,7 +269,66 @@ async function processRake(userId: string, tableId: string, startingBalance: num
     }
   }
 
-  return { success: true, rakeAmount, tipAmount: tipPercent > 0 ? Math.round(rakeAmount * (tipPercent / 100)) : 0, finalBalance: endingBalance - rakeAmount - (tipPercent > 0 ? Math.round(rakeAmount * (tipPercent / 100)) : 0) }
+  return { success: true, chipsRaked: Math.round(netProfit * (rakePercent / 100)), chipsReturned: endingChips - Math.round(netProfit * (rakePercent / 100)) - Math.round(Math.round(netProfit * (rakePercent / 100)) * (tipPercent / 100)) }
+}
+
+async function purchaseChips(userId: string, packageId: string): Promise<any> {
+  // Get package details
+  const { data: pkg, error: pkgErr } = await supabase.from('poker_chip_packages').select('*').eq('id', packageId).single()
+  if (pkgErr) throw new Error('Package not found')
+
+  // Add chips to player inventory
+  const playerChips = await getPlayerChips(userId)
+  const totalChipsToAdd = BigInt(pkg.chip_amount) + BigInt(pkg.bonus_chips || 0)
+  await updatePlayerChips(userId, playerChips + totalChipsToAdd)
+
+  // Record purchase
+  const { data: purchase, error: purchaseErr } = await supabase.from('chip_purchases').insert([{
+    user_id: userId,
+    package_id: packageId,
+    chips_purchased: pkg.chip_amount,
+    bonus_chips_awarded: pkg.bonus_chips || 0,
+    total_chips_received: pkg.chip_amount + (pkg.bonus_chips || 0),
+    usd_price_paid: pkg.usd_price,
+    payment_status: 'completed',
+    created_at: new Date()
+  }]).select().single()
+  if (purchaseErr) throw purchaseErr
+
+  return {
+    success: true,
+    chipsPurchased: pkg.chip_amount,
+    bonusChips: pkg.bonus_chips || 0,
+    totalChips: totalChipsToAdd.toString(),
+    newBalance: (playerChips + totalChipsToAdd).toString()
+  }
+}
+
+async function cashOutChips(userId: string, chipsToCashOut: bigint): Promise<any> {
+  // Get player chips
+  const playerChips = await getPlayerChips(userId)
+  if (playerChips < chipsToCashOut) throw new Error('Insufficient chips to cash out')
+
+  // Calculate cash value (at current exchange rate)
+  const cashValue = Number(chipsToCashOut) / CHIPS_PER_DOLLAR
+
+  // Deduct chips from inventory
+  const newChipBalance = playerChips - chipsToCashOut
+  await updatePlayerChips(userId, newChipBalance)
+
+  // Add cash to player wallet (USD)
+  const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', userId).eq('currency_code', 'USD').single()
+  if (wallet) {
+    const newWalletBalance = Number(wallet.balance) + cashValue
+    await supabase.from('wallets').update({ balance: newWalletBalance, updated_at: new Date() }).eq('user_id', userId).eq('currency_code', 'USD')
+  }
+
+  return {
+    success: true,
+    chipsCashedOut: chipsToCashOut.toString(),
+    cashValue,
+    newChipBalance: newChipBalance.toString()
+  }
 }
 
 const corsHeaders = {
@@ -259,7 +355,7 @@ Deno.serve(async (req) => {
 
     if (path.endsWith('/join_table') && req.method === 'POST') {
       const body = await req.json()
-      const r = await joinTable(body.tableId, body.userId, Number(body.seatNumber), Number(body.startingBalance) || 0)
+      const r = await joinTable(body.tableId, body.userId, Number(body.seatNumber), Number(body.chipsBuyIn) || 0)
       return new Response(JSON.stringify(r), { headers: corsHeaders })
     }
 
@@ -301,8 +397,26 @@ Deno.serve(async (req) => {
 
     if (path.endsWith('/process_rake') && req.method === 'POST') {
       const body = await req.json()
-      const r = await processRake(body.userId, body.tableId, Number(body.startingBalance), Number(body.endingBalance), Number(body.rakeAmount), Number(body.tipPercent), body.currencyCode)
+      const r = await processRake(body.userId, body.tableId, Number(body.startingChips), Number(body.endingChips), Number(body.rakePercent), Number(body.tipPercent))
       return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/purchase_chips') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await purchaseChips(body.userId, body.packageId)
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/cash_out_chips') && req.method === 'POST') {
+      const body = await req.json()
+      const r = await cashOutChips(body.userId, BigInt(body.chipsToCashOut))
+      return new Response(JSON.stringify(r), { headers: corsHeaders })
+    }
+
+    if (path.endsWith('/get_player_chips') && req.method === 'POST') {
+      const body = await req.json()
+      const chips = await getPlayerChips(body.userId)
+      return new Response(JSON.stringify({ chips: chips.toString() }), { headers: corsHeaders })
     }
 
     return new Response(JSON.stringify({ error: 'Not found' }), { status: 404, headers: corsHeaders })
