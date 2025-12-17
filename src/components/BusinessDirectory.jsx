@@ -46,6 +46,12 @@ export default function BusinessDirectory({ userId }) {
 
   const loadUserBusinesses = async () => {
     try {
+      // Skip database query for guest-local users (invalid UUIDs)
+      if (!isValidUUID(userId)) {
+        setUserBusinessIds([])
+        return
+      }
+
       const { data, error: err } = await supabase
         .from('businesses')
         .select('id')
