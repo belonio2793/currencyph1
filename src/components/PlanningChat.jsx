@@ -1390,8 +1390,8 @@ export default function PlanningChat() {
                         className={`marker-type-btn ${selectedMarkerType === type ? 'active' : ''}`}
                         title={`${markerTypeEmojis[type]} ${type}`}
                       >
-                        <span>{markerTypeEmojis[type]}</span>
-                        <span>{type}</span>
+                        <span style={{ fontSize: '16px', minWidth: '20px' }}>{markerTypeEmojis[type]}</span>
+                        <span style={{ flex: 1, textAlign: 'left' }}>{type}</span>
                       </button>
                     ))}
                   </div>
