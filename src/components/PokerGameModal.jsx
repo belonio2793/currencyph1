@@ -71,14 +71,19 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
 
     const refreshBalance = async () => {
       try {
-        const { data, error } = await supabase
-          .from('player_poker_chips')
-          .select('total_chips')
-          .eq('user_id', userId)
-          .single()
+        if (isGuestLocal) {
+          const storedChips = localStorage.getItem(`poker_chips_${userId}`)
+          setPlayerBalance(Number(storedChips || 0))
+        } else {
+          const { data, error } = await supabase
+            .from('player_poker_chips')
+            .select('total_chips')
+            .eq('user_id', userId)
+            .single()
 
-        if (error && error.code !== 'PGRST116') throw error
-        setPlayerBalance(Number(data?.total_chips || 0))
+          if (error && error.code !== 'PGRST116') throw error
+          setPlayerBalance(Number(data?.total_chips || 0))
+        }
       } catch (err) {
         const errorMsg = err?.message || err?.error_description || JSON.stringify(err)
         console.error('Error loading chip balance:', errorMsg)
@@ -88,7 +93,7 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
     refreshBalance()
     const interval = setInterval(refreshBalance, 2000)
     return () => clearInterval(interval)
-  }, [userId])
+  }, [userId, isGuestLocal])
 
   // Determine if it's current player's turn
   useEffect(() => {
