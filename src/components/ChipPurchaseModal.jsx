@@ -179,6 +179,9 @@ export default function ChipPurchaseModal({ open, onClose, userId, onPurchaseCom
   const canAfford = walletBalance >= localPrice
 
   const formatChips = (chips) => {
+    if (chips === undefined || chips === null) {
+      return '0'
+    }
     if (typeof chips === 'bigint') {
       chips = Number(chips)
     }
