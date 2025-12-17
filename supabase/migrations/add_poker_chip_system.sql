@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS poker_chip_packages (
   usd_price numeric(10, 2) NOT NULL,
   bonus_chips bigint DEFAULT 0,
   is_first_purchase_special boolean DEFAULT false,
+  is_most_popular boolean DEFAULT false,
+  is_flash_sale boolean DEFAULT false,
   display_order int DEFAULT 0,
   created_at timestamptz DEFAULT now(),
   updated_at timestamptz DEFAULT now()
