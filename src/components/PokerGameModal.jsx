@@ -79,7 +79,8 @@ export default function PokerGameModal({ open, onClose, table, userId, userEmail
         if (error && error.code !== 'PGRST116') throw error
         setPlayerBalance(Number(data?.total_chips || 0))
       } catch (err) {
-        console.error('Error loading chip balance:', err)
+        const errorMsg = err?.message || err?.error_description || JSON.stringify(err)
+        console.error('Error loading chip balance:', errorMsg)
       }
     }
 
