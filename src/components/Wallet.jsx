@@ -132,15 +132,13 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const loadPreferences = () => {
     const prefs = preferencesManager.getAllPreferences(userId)
 
-    // Legacy key 'walletCurrencies' controls internal (public.wallets)
-    if (prefs.walletCurrencies) setEnabledInternal(prefs.walletCurrencies)
-
-    // New independent keys for fiat
-    if (prefs.walletCurrencies_fiat) setEnabledFiat(prefs.walletCurrencies_fiat)
-
-    // Defaults when not set - show all fiat currencies since they're auto-created
-    if (!prefs.walletCurrencies) setEnabledInternal(['PHP', 'USD'])
-    if (!prefs.walletCurrencies_fiat) setEnabledFiat(FIAT_CURRENCIES)
+    // Load enabled wallets from preferences
+    if (prefs.walletCurrencies) {
+      setEnabledInternal(prefs.walletCurrencies)
+    } else {
+      // Default: show all currencies since they're auto-created
+      setEnabledInternal(ALL_CURRENCIES)
+    }
   }
 
   const savePreferences = (type, currencies) => {
