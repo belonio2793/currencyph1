@@ -7,6 +7,7 @@ import { phpToUsd, displayBothCurrencies, formatCurrency, DEFAULT_EXCHANGE_RATE,
 import L from 'leaflet'
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, Circle, Tooltip } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
+import Auth from './Auth'
 
 // Fix default marker icons (needed for proper Leaflet functionality)
 delete L.Icon.Default.prototype._getIconUrl
@@ -115,15 +116,10 @@ function MapClickHandler({ isCreating, onLocationClick }) {
 export default function PlanningChat() {
   const { isMobile, isTablet, isDesktop } = useDevice()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [authMode, setAuthMode] = useState('login')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [name, setName] = useState('')
-  const [authError, setAuthError] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
 
   const [userId, setUserId] = useState(null)
   const [userEmail, setUserEmail] = useState('')
+  const [authError, setAuthError] = useState('')
   const [planningUser, setPlanningUser] = useState(null)
   const [onlineUsers, setOnlineUsers] = useState([])
   const [messages, setMessages] = useState([])
@@ -342,7 +338,7 @@ export default function PlanningChat() {
         setUserId(data.user.id)
         setUserEmail(data.user.email || '')
         setIsAuthenticated(true)
-        await loadPlanningUser(data.user.id)
+        await loadPlanningUser(data.user.id, data.user)
       } else {
         setIsAuthenticated(false)
         setPlanningUser(null)
@@ -360,7 +356,7 @@ export default function PlanningChat() {
     }
   }
 
-  const loadPlanningUser = async (uid) => {
+  const loadPlanningUser = async (uid, user = null) => {
     try {
       const { data, error } = await supabase
         .from('planning_users')
@@ -370,7 +366,7 @@ export default function PlanningChat() {
 
       if (error) {
         // No planning_user record exists yet - create one
-        const displayName = userEmail.split('@')[0]
+        const displayName = user?.user_metadata?.full_name || userEmail.split('@')[0]
         const { data: newUser } = await supabase
           .from('planning_users')
           .insert({
@@ -514,127 +510,11 @@ export default function PlanningChat() {
     }
   }
 
-  const handleSignIn = async (e) => {
-    e.preventDefault()
-    setAuthError('')
-
-    if (!email.trim()) {
-      setAuthError('Email is required')
-      return
-    }
-    if (!password) {
-      setAuthError('Password is required')
-      return
-    }
-
-    setAuthLoading(true)
-
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      })
-
-      if (error) {
-        setAuthError(error.message)
-        return
-      }
-
-      setUserId(data.user.id)
-      setUserEmail(data.user.email || '')
-      setIsAuthenticated(true)
-      loadPlanningUser(data.user.id)
-      setEmail('')
-      setPassword('')
-    } catch (error) {
-      setAuthError(error.message)
-    } finally {
-      setAuthLoading(false)
-    }
-  }
-
-  const validateRegistrationForm = () => {
-    if (!email.trim()) {
-      setAuthError('Email is required')
-      return false
-    }
-    if (!email.includes('@')) {
-      setAuthError('Please enter a valid email address')
-      return false
-    }
-    if (!password) {
-      setAuthError('Password is required')
-      return false
-    }
-    if (password.length < 6) {
-      setAuthError('Password must be at least 6 characters')
-      return false
-    }
-    if (!name.trim()) {
-      setAuthError('Full name is required')
-      return false
-    }
-    return true
-  }
-
-  const handleRegister = async (e) => {
-    e.preventDefault()
-    setAuthError('')
-
-    if (!validateRegistrationForm()) {
-      return
-    }
-
-    setAuthLoading(true)
-
-    try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name
-          }
-        }
-      })
-
-      if (signUpError) {
-        throw signUpError
-      }
-
-      if (data?.user?.id) {
-        // Create planning_users record for this new auth user
-        const { error: planningError } = await supabase
-          .from('planning_users')
-          .insert({
-            user_id: data.user.id,
-            email,
-            name,
-            status: 'active',
-            role: 'member'
-          })
-
-        if (planningError) {
-          console.debug('Could not create planning profile at signup (non-critical):', planningError)
-          // Don't throw - auth user was created successfully
-        }
-
-        setAuthError('Registration successful! Please check your email to confirm your account.')
-        setEmail('')
-        setPassword('')
-        setName('')
-
-        setTimeout(() => {
-          setAuthMode('login')
-          setAuthError('')
-        }, 2000)
-      }
-    } catch (error) {
-      setAuthError(error.message || 'Registration failed')
-      console.error('Registration error:', error)
-    } finally {
-      setAuthLoading(false)
-    }
+  const handleAuthSuccess = (user) => {
+    setUserId(user.id)
+    setUserEmail(user.email || '')
+    setIsAuthenticated(true)
+    loadPlanningUser(user.id, user)
   }
 
   const handleSignOut = async () => {
@@ -1988,101 +1868,10 @@ export default function PlanningChat() {
         </div>
       </div>
 
-      {/* Auth Modal Overlay */}
+      {/* Auth Overlay */}
       {showAuthModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4" style={{ zIndex: 9999 }}>
-          <div className={`w-full bg-slate-800 rounded-lg border border-slate-700 ${isMobile ? 'max-w-sm p-6' : 'max-w-md p-8'}`}>
-            <h1 className={`font-bold text-white mb-2 text-center ${isMobile ? 'text-2xl' : 'text-3xl'}`}>Planning Group</h1>
-            <p className={`text-slate-400 text-center mb-6 ${isMobile ? 'text-xs' : 'text-sm'}`}>Strategic partner coordination for manufacturing, facilities, and distribution</p>
-
-            <div className="space-y-4">
-              {authError && (
-                <div className={`p-3 rounded text-sm ${
-                  authError.includes('successful')
-                    ? 'bg-green-900 text-green-100'
-                    : 'bg-red-900 text-red-100'
-                }`}>
-                  {authError}
-                </div>
-              )}
-
-              <form onSubmit={authMode === 'login' ? handleSignIn : handleRegister} className="space-y-4">
-                {authMode === 'register' && (
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Full name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                      disabled={authLoading}
-                    />
-                    {name && name.length === 0 && authError?.includes('Full name') && (
-                      <p className="text-red-400 text-xs mt-1">Full name is required</p>
-                    )}
-                  </div>
-                )}
-
-                <div>
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                    disabled={authLoading}
-                  />
-                  {email && !email.includes('@') && (
-                    <p className="text-red-400 text-xs mt-1">Please enter a valid email</p>
-                  )}
-                </div>
-
-                <div>
-                  <input
-                    type="password"
-                    placeholder="Password (minimum 6 characters)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full bg-slate-700 border rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none ${
-                      password && password.length < 6
-                        ? 'border-red-500 focus:border-red-500'
-                        : password && password.length >= 6
-                        ? 'border-green-500 focus:border-green-500'
-                        : 'border-slate-600 focus:border-blue-500'
-                    }`}
-                    disabled={authLoading}
-                  />
-                  {authMode === 'register' && password && (
-                    <div className="mt-2 space-y-1 text-xs">
-                      <div className={password.length >= 6 ? 'text-green-400' : 'text-red-400'}>
-                        <span>{password.length >= 6 ? '✓' : '✗'} At least 6 characters ({password.length})</span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={authLoading || (authMode === 'register' && (password.length < 6 || !email || !name))}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded transition-colors"
-                >
-                  {authLoading ? 'Loading...' : authMode === 'login' ? 'Sign In' : 'Register'}
-                </button>
-              </form>
-
-              <div className="border-t border-slate-700 pt-4">
-                <button
-                  onClick={() => {
-                    setAuthMode(authMode === 'login' ? 'register' : 'login')
-                    setAuthError('')
-                  }}
-                  className="w-full text-blue-400 hover:text-blue-300 text-sm"
-                >
-                  {authMode === 'login' ? 'Need an account? Register' : 'Have an account? Sign In'}
-                </button>
-              </div>
-            </div>
-          </div>
+        <div className="fixed inset-0 z-[9999] bg-slate-900 overflow-y-auto">
+          <Auth onAuthSuccess={handleAuthSuccess} />
         </div>
       )}
 
