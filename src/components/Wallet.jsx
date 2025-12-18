@@ -364,18 +364,6 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
               </div>
             </div>
 
-            {/* Export Buttons */}
-            <div className="flex gap-2">
-              <button
-                onClick={() => walletExport.generateSummaryReport(internalWallets)}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Export CSV
-              </button>
-            </div>
           </div>
 
           {/* Controls */}
@@ -443,10 +431,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                                 setSearchInput('')
                               }}
                               className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors ${
-                                selectedCurrency === curr.code ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
-                              }`}
+                selectedCurrency === curr.code ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
+              }`}
                             >
-                              <span className="font-medium">{curr.code}</span> <span className="text-slate-500">{curr.symbol || curr.code}</span>
+                              <span className="font-medium">{curr.name}</span> <span className="text-slate-500">{curr.code}</span>
                             </button>
                           ))}
                         </>
@@ -469,10 +457,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                                 setSearchInput('')
                               }}
                               className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-100 transition-colors ${
-                                selectedCurrency === curr.code ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
-                              }`}
+                selectedCurrency === curr.code ? 'bg-blue-50 text-blue-700 font-medium' : 'text-slate-900'
+              }`}
                             >
-                              <span className="font-medium">{curr.code}</span> <span className="text-slate-500">{curr.symbol || curr.code}</span>
+                              <span className="font-medium">{curr.name}</span> <span className="text-slate-500">{curr.code}</span>
                             </button>
                           ))}
                         </>
