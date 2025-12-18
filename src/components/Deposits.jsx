@@ -240,41 +240,6 @@ const PaymentMethodSelector = React.memo(function PaymentMethodSelector({ method
   )
 })
 
-// Solana Payment Display Component
-const SolanaPaymentDisplay = React.memo(function SolanaPaymentDisplay({ address }) {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(address)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }, [address])
-
-  return (
-    <div className="space-y-4">
-      <div className="text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
-        <div className="flex justify-center mb-4">
-          <div className="bg-white p-4 rounded-lg border-2 border-purple-200">
-            <svg width="150" height="150" viewBox="0 0 150 150">
-              <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="12" fill="#1e1b4b">
-                [QR Code: solana:{address}]
-              </text>
-            </svg>
-          </div>
-        </div>
-        <p className="text-sm text-gray-600 mb-2">Solana Wallet Address:</p>
-        <p className="font-mono text-xs text-gray-900 break-all select-all">{address}</p>
-        <button
-          onClick={handleCopy}
-          className="mt-3 text-xs text-purple-600 hover:text-purple-700 font-medium"
-        >
-          {copied ? '✓ Copied' : 'Copy Address'}
-        </button>
-      </div>
-    </div>
-  )
-})
-
 // GCash Payment Display Component
 const GCashPaymentDisplay = React.memo(function GCashPaymentDisplay({ phone, referenceCode }) {
   const [copiedPhone, setCopiedPhone] = useState(false)
