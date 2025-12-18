@@ -14,7 +14,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
 
   useEffect(() => {
     loadData()
-  }, [userId, showCustomizer])
+  }, [userId])
 
   const loadData = async () => {
     try {
