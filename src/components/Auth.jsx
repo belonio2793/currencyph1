@@ -488,9 +488,9 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
             {/* Login Form */}
             {activeTab === 'login' && (
-              <form onSubmit={handleLogin} className={isModal ? "space-y-6" : "space-y-4"}>
+              <form onSubmit={handleLogin} className="space-y-4">
                 <div>
-                  <label className={`block font-medium text-slate-700 mb-3 ${isModal ? 'text-lg' : 'text-sm mb-2'}`}>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Email or Phone
                   </label>
                   <input
@@ -498,13 +498,13 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                     value={identifier}
                     onChange={(e) => setIdentifier(e.target.value)}
                     placeholder={placeholderText}
-                    className={`w-full border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isModal ? 'px-6 py-4 text-lg' : 'px-4 py-3 text-sm'}`}
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
                 </div>
 
                 <div>
-                  <label className={`block font-medium text-slate-700 mb-3 ${isModal ? 'text-lg' : 'text-sm mb-2'}`}>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
                     Password
                   </label>
                   <input
@@ -512,7 +512,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
-                    className={`w-full border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isModal ? 'px-6 py-4 text-lg' : 'px-4 py-3 text-sm'}`}
+                    className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 text-sm"
                     disabled={loading}
                   />
                 </div>
@@ -520,7 +520,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed ${isModal ? 'py-5 text-lg mt-8' : 'py-3 text-base mt-6'}`}
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                 >
                   {loading ? 'Logging in...' : 'Login'}
                 </button>
