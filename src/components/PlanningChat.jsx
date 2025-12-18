@@ -832,6 +832,35 @@ export default function PlanningChat() {
     }
   }
 
+  const handleJumpToLocation = (e) => {
+    const value = e.target.value
+    setSelectedJumpLocation(value)
+
+    if (!value || !mapRef.current) return
+
+    const [type, id] = value.split(':')
+
+    if (type === 'location') {
+      const location = locations.find(loc => loc.id === id)
+      if (location) {
+        try {
+          mapRef.current.flyTo([location.latitude, location.longitude], 13, { duration: 1 })
+        } catch (error) {
+          console.error('Error flying to location:', error)
+        }
+      }
+    } else if (type === 'city') {
+      const city = PHILIPPINE_CITIES.find(c => c.name === id)
+      if (city) {
+        try {
+          mapRef.current.flyTo([city.lat, city.lng], 11, { duration: 1 })
+        } catch (error) {
+          console.error('Error flying to city:', error)
+        }
+      }
+    }
+  }
+
   const handleShowUserProfile = (user) => {
     setSelectedUserForProfile(user)
     setShowUserProfile(true)
