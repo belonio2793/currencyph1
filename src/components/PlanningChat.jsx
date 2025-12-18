@@ -1870,8 +1870,8 @@ export default function PlanningChat() {
 
       {/* Auth Overlay */}
       {showAuthModal && (
-        <div className="fixed inset-0 z-[9999] bg-slate-900 overflow-y-auto">
-          <Auth onAuthSuccess={handleAuthSuccess} />
+        <div className="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <Auth onAuthSuccess={handleAuthSuccess} isModal={true} />
         </div>
       )}
 
