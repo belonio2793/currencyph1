@@ -141,6 +141,13 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         return
       }
 
+      // Ensure user has a PHP wallet
+      try {
+        await walletService.ensurePhpWallet(userId)
+      } catch (err) {
+        console.warn('Could not ensure PHP wallet:', err)
+      }
+
       // Fetch exchange rates for conversion
       let rates = {}
       try {
