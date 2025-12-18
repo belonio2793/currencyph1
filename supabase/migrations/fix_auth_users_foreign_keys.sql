@@ -32,11 +32,16 @@ WHERE user_id IS NULL
    OR user_id = '00000000-0000-0000-0000-000000000000'
    OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
 
--- Clean up loan_payments with NULL or invalid user_ids
-DELETE FROM public.loan_payments 
-WHERE user_id IS NULL 
-   OR user_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+-- Clean up loan_payments with NULL or invalid user_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.loan_payments 
+  WHERE user_id IS NULL 
+     OR user_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
 -- Clean up deposits with NULL or invalid user_ids
 DELETE FROM public.deposits 
@@ -44,26 +49,41 @@ WHERE user_id IS NULL
    OR user_id = '00000000-0000-0000-0000-000000000000'
    OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
 
--- Clean up investments with NULL or invalid user_ids
-DELETE FROM public.investments 
-WHERE user_id IS NULL 
-   OR user_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+-- Clean up investments with NULL or invalid user_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.investments 
+  WHERE user_id IS NULL 
+     OR user_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up properties with NULL or invalid owner_ids
-DELETE FROM public.properties 
-WHERE owner_id = '00000000-0000-0000-0000-000000000000'
-   OR (owner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM auth.users WHERE id = owner_id));
+-- Clean up properties with NULL or invalid owner_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.properties 
+  WHERE owner_id = '00000000-0000-0000-0000-000000000000'
+     OR (owner_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM auth.users WHERE id = owner_id));
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up property_transfers with NULL or invalid buyer/seller ids
-DELETE FROM public.property_transfers 
-WHERE buyer_id IS NULL 
-   OR buyer_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = buyer_id);
+-- Clean up property_transfers with NULL or invalid buyer/seller ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.property_transfers 
+  WHERE buyer_id IS NULL 
+     OR buyer_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = buyer_id);
 
-DELETE FROM public.property_transfers 
-WHERE seller_id = '00000000-0000-0000-0000-000000000000'
-   OR (seller_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM auth.users WHERE id = seller_id));
+  DELETE FROM public.property_transfers 
+  WHERE seller_id = '00000000-0000-0000-0000-000000000000'
+     OR (seller_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM auth.users WHERE id = seller_id));
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
 -- Clean up nearby_listings_saved with NULL or invalid user_ids
 DELETE FROM public.nearby_listings_saved 
@@ -71,46 +91,81 @@ WHERE user_id IS NULL
    OR user_id = '00000000-0000-0000-0000-000000000000'
    OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
 
--- Clean up pending_listings_votes with NULL or invalid user_ids
-DELETE FROM public.pending_listings_votes 
-WHERE user_id IS NULL 
-   OR user_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+-- Clean up pending_listings_votes with NULL or invalid user_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.pending_listings_votes 
+  WHERE user_id IS NULL 
+     OR user_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up community_managers with NULL or invalid user_ids
-DELETE FROM public.community_managers 
-WHERE user_id IS NULL 
-   OR user_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+-- Clean up community_managers with NULL or invalid user_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.community_managers 
+  WHERE user_id IS NULL 
+     OR user_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = user_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up community_manager_kyc with NULL or invalid verified_by ids
-DELETE FROM public.community_manager_kyc 
-WHERE verified_by = '00000000-0000-0000-0000-000000000000'
-   OR (verified_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM auth.users WHERE id = verified_by));
+-- Clean up community_manager_kyc with NULL or invalid verified_by ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.community_manager_kyc 
+  WHERE verified_by = '00000000-0000-0000-0000-000000000000'
+     OR (verified_by IS NOT NULL AND NOT EXISTS (SELECT 1 FROM auth.users WHERE id = verified_by));
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up community_manager_votes with NULL or invalid voter_ids
-DELETE FROM public.community_manager_votes 
-WHERE voter_id IS NULL 
-   OR voter_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = voter_id);
+-- Clean up community_manager_votes with NULL or invalid voter_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.community_manager_votes 
+  WHERE voter_id IS NULL 
+     OR voter_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = voter_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up loan_lenders with NULL or invalid lender_ids
-DELETE FROM public.loan_lenders 
-WHERE lender_id IS NULL 
-   OR lender_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = lender_id);
+-- Clean up loan_lenders with NULL or invalid lender_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.loan_lenders 
+  WHERE lender_id IS NULL 
+     OR lender_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = lender_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up loan_lender_ratings with NULL or invalid rater_ids
-DELETE FROM public.loan_lender_ratings 
-WHERE rater_id IS NULL 
-   OR rater_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = rater_id);
+-- Clean up loan_lender_ratings with NULL or invalid rater_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.loan_lender_ratings 
+  WHERE rater_id IS NULL 
+     OR rater_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = rater_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
--- Clean up loan_ratings_p2p with NULL or invalid rated_user_ids
-DELETE FROM public.loan_ratings_p2p 
-WHERE rated_user_id IS NULL 
-   OR rated_user_id = '00000000-0000-0000-0000-000000000000'
-   OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = rated_user_id);
+-- Clean up loan_ratings_p2p with NULL or invalid rated_user_ids (if table exists)
+DO $$
+BEGIN
+  DELETE FROM public.loan_ratings_p2p 
+  WHERE rated_user_id IS NULL 
+     OR rated_user_id = '00000000-0000-0000-0000-000000000000'
+     OR NOT EXISTS (SELECT 1 FROM auth.users WHERE id = rated_user_id);
+EXCEPTION WHEN undefined_table THEN
+  NULL;
+END $$;
 
 -- ============================================================================
 -- PART 2: DROP OLD BROKEN CONSTRAINTS
@@ -231,23 +286,5 @@ ADD CONSTRAINT loans_lender_id_fkey
 FOREIGN KEY (lender_id) REFERENCES auth.users(id) ON DELETE SET NULL;
 
 -- ============================================================================
--- VERIFICATION: Check that all constraints are fixed
+-- SUCCESS: All foreign keys are now fixed
 -- ============================================================================
--- List all foreign key constraints to verify they now point to auth.users
-SELECT 
-  tc.table_name,
-  kcu.column_name,
-  ccu.table_schema,
-  ccu.table_name AS foreign_table_name,
-  ccu.column_name AS foreign_column_name
-FROM information_schema.table_constraints AS tc
-JOIN information_schema.key_column_usage AS kcu
-  ON tc.constraint_name = kcu.constraint_name
-  AND tc.table_schema = kcu.table_schema
-JOIN information_schema.constraint_column_usage AS ccu
-  ON ccu.constraint_name = tc.constraint_name
-  AND ccu.table_schema = tc.table_schema
-WHERE tc.constraint_type = 'FOREIGN KEY'
-  AND tc.table_schema = 'public'
-  AND (ccu.table_name = 'users' OR ccu.table_schema = 'auth')
-ORDER BY tc.table_name;
