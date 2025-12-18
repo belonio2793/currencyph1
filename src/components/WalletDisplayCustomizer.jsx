@@ -136,8 +136,8 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       )}
 
       {/* Search and Dropdown */}
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-slate-700 mb-2">
+      <div className="mb-8">
+        <label className="block text-lg font-medium text-slate-700 mb-3">
           Search and Add Currencies
         </label>
 
@@ -151,7 +151,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
               setShowDropdown(true)
             }}
             onFocus={() => setShowDropdown(true)}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+            className="w-full px-4 py-3 border border-slate-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
           />
 
           {/* Dropdown */}
