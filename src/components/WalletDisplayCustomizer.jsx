@@ -232,10 +232,10 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       </div>
 
       {/* Action Buttons */}
-      <div className="flex gap-3 justify-end">
+      <div className="flex gap-4 justify-end">
         <button
           onClick={handleReset}
-          className="px-4 py-2 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-sm font-medium"
+          className="px-6 py-3 text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors text-base font-medium"
         >
           Reset to PHP Only
         </button>
@@ -243,7 +243,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         {onClose && (
           <button
             onClick={onClose}
-            className="px-4 py-2 text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors text-sm font-medium"
+            className="px-6 py-3 text-slate-700 border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors text-base font-medium"
           >
             Cancel
           </button>
@@ -252,7 +252,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
         <button
           onClick={handleSave}
           disabled={saving}
-          className={`px-4 py-2 text-white rounded-lg transition-colors text-sm font-medium ${
+          className={`px-6 py-3 text-white rounded-lg transition-colors text-base font-medium ${
             saving
               ? 'bg-slate-300 cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700'
