@@ -1340,10 +1340,12 @@ export default function PlanningChat() {
             {/* Marker Type Selector Panel with Collapse/Expand */}
             {isAuthenticated && (
               <div className="marker-type-selector">
-                <div className="flex items-center justify-between">
-                  {(showMarkerTypeSelector || !isMobile) && (
-                    <span className="marker-type-label">Select Type</span>
-                  )}
+                <div className="flex items-center justify-between gap-3 mb-3">
+                  <div className="flex-1">
+                    {(showMarkerTypeSelector || !isMobile) && (
+                      <span className="marker-type-label">Select Type</span>
+                    )}
+                  </div>
                   <button
                     onClick={() => setShowMarkerTypeSelector(!showMarkerTypeSelector)}
                     className="text-slate-300 hover:text-white transition-colors text-lg font-medium flex-shrink-0"
@@ -1353,19 +1355,50 @@ export default function PlanningChat() {
                   </button>
                 </div>
                 {showMarkerTypeSelector && (
-                  <div className="marker-type-grid">
-                    {markerTypes.map(type => (
-                      <button
-                        key={type}
-                        onClick={() => handleSelectMarkerType(type)}
-                        className={`marker-type-btn ${selectedMarkerType === type ? 'active' : ''}`}
-                        title={`${markerTypeEmojis[type]} ${type}`}
+                  <>
+                    <div className="marker-type-grid mb-3">
+                      {markerTypes.map(type => (
+                        <button
+                          key={type}
+                          onClick={() => handleSelectMarkerType(type)}
+                          className={`marker-type-btn ${selectedMarkerType === type ? 'active' : ''}`}
+                          title={`${markerTypeEmojis[type]} ${type}`}
+                        >
+                          <span style={{ fontSize: '16px', minWidth: '20px' }}>{markerTypeEmojis[type]}</span>
+                          <span style={{ flex: 1, textAlign: 'left' }}>{type}</span>
+                        </button>
+                      ))}
+                    </div>
+                    <div className="border-t border-slate-700 pt-3">
+                      <label htmlFor="jump-location-select" className="marker-type-label mb-2 block text-xs">Jump to Location</label>
+                      <select
+                        id="jump-location-select"
+                        value={selectedJumpLocation}
+                        onChange={handleJumpToLocation}
+                        className={`w-full rounded bg-slate-600 text-white border border-slate-500 hover:bg-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 px-2 py-1.5 text-xs`}
                       >
-                        <span style={{ fontSize: '16px', minWidth: '20px' }}>{markerTypeEmojis[type]}</span>
-                        <span style={{ flex: 1, textAlign: 'left' }}>{type}</span>
-                      </button>
-                    ))}
-                  </div>
+                        <option value="">Select location or city...</option>
+                        {locations.length > 0 && (
+                          <>
+                            <optgroup label="📍 Locations">
+                              {locations.map(loc => (
+                                <option key={`loc-${loc.id}`} value={`location:${loc.id}`}>
+                                  {markerTypeEmojis[loc.marker_type] || '📍'} {loc.name}
+                                </option>
+                              ))}
+                            </optgroup>
+                          </>
+                        )}
+                        <optgroup label="🏙️ Cities">
+                          {PHILIPPINE_CITIES.map((city, idx) => (
+                            <option key={`city-${idx}`} value={`city:${city.name}`}>
+                              {city.name} ({city.region})
+                            </option>
+                          ))}
+                        </optgroup>
+                      </select>
+                    </div>
+                  </>
                 )}
               </div>
             )}
