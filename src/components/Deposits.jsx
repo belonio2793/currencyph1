@@ -925,192 +925,89 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* GCash Fiat Deposit */}
+        {/* Deposit Solana */}
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
           <div className="p-8">
-              <div className="space-y-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Add Fiat Funds</h2>
+            <div className="space-y-6">
+              <h2 className="text-2xl font-semibold text-slate-900">Deposit Solana</h2>
 
-                <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    {Object.entries(PAYMENT_METHODS).map(([key, method]) => (
-                      <PaymentMethodSelector
-                        key={key}
-                        method={method}
-                        selected={selectedPaymentMethod === key}
-                        onClick={() => {
-                          setSelectedPaymentMethod(key)
-                          setReferenceCode(key === 'gcash' ? `REF-${Date.now().toString().slice(-8)}` : null)
-                          setShowPaymentInstructions(false)
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
+              <p className="text-slate-600">
+                Send Solana directly to the address below to add funds to your wallet. Transactions are processed automatically once confirmed on the blockchain.
+              </p>
 
-                {/* Consolidated Balance Display */}
-                {wallets && wallets.length > 0 && (
-                  <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-8 border border-slate-700 text-white">
-                    <div className="flex items-center justify-between mb-6">
-                      <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Your Total Balances</h4>
-                      <button
-                        onClick={refreshWallets}
-                        disabled={syncStatus === 'syncing'}
-                        className={`text-xs font-medium transition-colors ${
-                          syncStatus === 'syncing'
-                            ? 'text-slate-500 cursor-not-allowed'
-                            : 'text-blue-300 hover:text-blue-200'
-                        }`}
-                      >
-                        {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
-                      </button>
-                    </div>
-                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                      <p className="text-sm text-slate-300 mb-2">Total Balance</p>
-                      <p className="text-4xl font-light text-white">
-                        {formatCurrency(getTotalBalance, globalCurrency)}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Deposit Amount ({globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''})
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={fiatAmount}
-                    onChange={e => setFiatAmount(e.target.value)}
-                    placeholder="Enter amount"
-                    className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
-                  />
-                </div>
-
-                {fiatAmount && (
-                  <div className="space-y-6">
-                    {selectedPaymentMethod === 'gcash' && (
-                      <>
-                        <GCashPaymentDisplay
-                          phone={PAYMENT_METHODS.gcash.phone}
-                          referenceCode={referenceCode}
-                        />
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                          <p className="font-semibold mb-2">💡 Important:</p>
-                          <ul className="list-disc pl-5 space-y-1">
-                            <li>Deposit amount: <span className="font-bold">{formatCurrency(fiatAmount, globalCurrency)}</span></li>
-                            <li>Use the reference code to track your deposit</li>
-                            <li>Deposits are confirmed within 1-3 minutes</li>
-                            <li>Make sure to include the reference code in the GCash notes</li>
-                          </ul>
-                        </div>
-                        <button
-                          onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
-                          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                        >
-                          {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
-                        </button>
-                        {showPaymentInstructions && (
-                          <InstructionsDisplay method={PAYMENT_METHODS.gcash} />
-                        )}
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-          </div>
-        </div>
-
-        {/* Cryptocurrency Deposit */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
-          <div className="p-8">
-              <div className="space-y-6">
-                <h2 className="text-2xl font-semibold text-slate-900">Deposit Cryptocurrency</h2>
-
-                <p className="text-slate-600">
-                  Send cryptocurrency directly to add funds to your wallet. Transactions are processed automatically once confirmed on the blockchain.
-                </p>
-
-                <div>
-                  <SearchableCryptoSelect
-                    value={selectedCrypto}
-                    onChange={setSelectedCrypto}
-                    options={cryptos}
-                    prices={cryptoRates}
-                    label="Select Cryptocurrency"
-                    globalCurrency={globalCurrency}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Amount ({selectedCrypto})
-                  </label>
-                  <input
-                    type="number"
-                    step="0.00000001"
-                    value={cryptoAmount}
-                    onChange={e => setCryptoAmount(e.target.value)}
-                    placeholder="Enter amount in crypto"
-                    className="w-full px-6 py-4 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
-                  />
-                  {cryptoAmount && (
-                    <p className="text-sm text-slate-600 mt-2">
-                      Approximate value: {formatCurrency(cryptoConvertedAmounts[globalCurrency] || 0, globalCurrency)}
-                    </p>
-                  )}
-                </div>
-
-                {cryptoAmount && (
-                  <div className="space-y-6">
-                    <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
-                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Deposit Instructions</h3>
-
-                      <div className="bg-white rounded-lg p-4 mb-4 border border-orange-200">
-                        <p className="text-sm text-slate-600 mb-2">Crypto Amount:</p>
-                        <p className="text-2xl font-bold text-orange-600">
-                          {parseFloat(cryptoAmount).toFixed(8)} {selectedCrypto}
-                        </p>
-                        <p className="text-sm text-slate-600 mt-2">
-                          Equivalent to: {formatCurrency(cryptoConvertedAmounts[globalCurrency] || 0, globalCurrency)}
-                        </p>
-                      </div>
-
-                      <div className="space-y-3">
-                        <p className="text-sm font-semibold text-slate-900">Steps to deposit:</p>
-                        <ol className="space-y-2 list-decimal list-inside text-sm text-slate-700">
-                          <li>Copy your {selectedCrypto} wallet address from your Wallets section</li>
-                          <li>Send exactly <span className="font-bold">{parseFloat(cryptoAmount).toFixed(8)} {selectedCrypto}</span> to your wallet</li>
-                          <li>Wait for blockchain confirmation (usually 5-30 minutes depending on network)</li>
-                          <li>Your balance will automatically update once confirmed</li>
-                        </ol>
-                      </div>
-
-                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
-                        <p className="font-semibold mb-1">⚠️ Important:</p>
-                        <p>Make sure to send to the correct {selectedCrypto} address. Transactions cannot be reversed.</p>
-                      </div>
-                    </div>
-
+              {/* Consolidated Balance Display */}
+              {wallets && wallets.length > 0 && (
+                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-8 border border-slate-700 text-white">
+                  <div className="flex items-center justify-between mb-6">
+                    <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Your Total Balances</h4>
                     <button
-                      onClick={handleAddCrypto}
-                      disabled={addingCrypto || !cryptoAmount}
-                      className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white py-3 rounded-lg transition-colors font-medium"
+                      onClick={refreshWallets}
+                      disabled={syncStatus === 'syncing'}
+                      className={`text-xs font-medium transition-colors ${
+                        syncStatus === 'syncing'
+                          ? 'text-slate-500 cursor-not-allowed'
+                          : 'text-blue-300 hover:text-blue-200'
+                      }`}
                     >
-                      {addingCrypto ? 'Processing...' : `Confirm Deposit of ${parseFloat(cryptoAmount).toFixed(8)} ${selectedCrypto}`}
+                      {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
                     </button>
                   </div>
-                )}
-
-                {!cryptoAmount && (
-                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
-                    <p className="text-slate-600 mb-3">Enter the amount to see deposit instructions</p>
-                    <p className="text-sm text-slate-500">Crypto prices are updated every minute</p>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                    <p className="text-sm text-slate-300 mb-2">Total Balance</p>
+                    <p className="text-4xl font-light text-white">
+                      {formatCurrency(getTotalBalance, globalCurrency)}
+                    </p>
                   </div>
-                )}
+                </div>
+              )}
+
+              <div className="space-y-6">
+                <div className="text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
+                  <div className="flex justify-center mb-4">
+                    <div className="bg-white p-4 rounded-lg border-2 border-purple-200">
+                      <svg width="150" height="150" viewBox="0 0 150 150">
+                        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="12" fill="#1e1b4b">
+                          [QR Code: solana:{SOLANA_ADDRESS}]
+                        </text>
+                      </svg>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">Solana Wallet Address:</p>
+                  <p className="font-mono text-xs text-gray-900 break-all select-all">{SOLANA_ADDRESS}</p>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(SOLANA_ADDRESS)
+                      setSuccess('Address copied to clipboard')
+                      setTimeout(() => setSuccess(''), 2000)
+                    }}
+                    className="mt-3 text-xs text-purple-600 hover:text-purple-700 font-medium"
+                  >
+                    Copy Address
+                  </button>
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                  <p className="font-semibold mb-2">💡 How to Deposit:</p>
+                  <ol className="list-decimal list-inside space-y-1">
+                    <li>Scan the QR code with your Solana wallet or copy the address above</li>
+                    <li>Send any amount of Solana to this address</li>
+                    <li>Verify the recipient address and amount in your wallet</li>
+                    <li>Confirm the transaction</li>
+                    <li>Your balance will be updated within 1-2 minutes</li>
+                  </ol>
+                </div>
+
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
+                  <p className="font-semibold mb-2">⚠️ Important:</p>
+                  <ul className="list-disc list-inside space-y-1">
+                    <li>Make sure to send only Solana (SOL) to this address</li>
+                    <li>Do not send other tokens or NFTs to this address</li>
+                    <li>Transactions on the Solana blockchain cannot be reversed</li>
+                    <li>Keep the transaction hash for your records</li>
+                  </ul>
+                </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
