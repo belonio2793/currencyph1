@@ -126,7 +126,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
 
       {/* Messages */}
       {message && (
-        <div className={`mb-4 p-3 rounded-lg text-sm ${
+        <div className={`mb-6 p-4 rounded-lg text-base ${
           message.includes('✓')
             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
             : 'bg-red-50 text-red-700 border border-red-200'
