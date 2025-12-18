@@ -144,6 +144,7 @@ export const walletService = {
           is_active: true,
           created_at: null,
           updated_at: null,
+          account_number: null,
           is_placeholder: true
         }
       })
