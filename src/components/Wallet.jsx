@@ -141,11 +141,18 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
         return
       }
 
-      // Ensure user has a PHP wallet
+      // Ensure user has a PHP wallet via edge function
       try {
-        await walletService.ensurePhpWallet(userId)
+        const { data, error } = await supabase.functions.invoke('ensure_user_wallets', {
+          body: { user_id: userId }
+        })
+        if (error) {
+          console.warn('Edge function error:', error)
+        } else {
+          console.debug('PHP wallet ensured:', data)
+        }
       } catch (err) {
-        console.warn('Could not ensure PHP wallet:', err)
+        console.warn('Could not invoke ensure_user_wallets function:', err)
       }
 
       // Fetch exchange rates for conversion
