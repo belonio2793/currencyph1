@@ -65,7 +65,44 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
       setSaving(true)
       setMessage('')
 
+      // Save preferences
       await setWalletDisplayPreferences(userId, selectedCurrencies)
+
+      // Create wallets for selected currencies
+      try {
+        const { data: existingWallets, error: fetchErr } = await supabase
+          .from('wallets')
+          .select('currency_code')
+          .eq('user_id', userId)
+
+        if (!fetchErr) {
+          const existingCodes = (existingWallets || []).map(w => w.currency_code)
+          const missingCurrencies = selectedCurrencies.filter(code => !existingCodes.includes(code))
+
+          // Create wallets for missing currencies
+          if (missingCurrencies.length > 0) {
+            const walletsToCreate = missingCurrencies.map(code => ({
+              user_id: userId,
+              currency_code: code,
+              balance: 0,
+              total_deposited: 0,
+              total_withdrawn: 0,
+              is_active: true
+            }))
+
+            const { error: insertErr } = await supabase
+              .from('wallets')
+              .insert(walletsToCreate)
+
+            if (insertErr && insertErr.code !== '23505') { // 23505 = unique constraint
+              console.warn('Warning: Could not create all wallets:', insertErr)
+            }
+          }
+        }
+      } catch (walletErr) {
+        console.warn('Warning: Wallet creation failed (preferences still saved):', walletErr)
+      }
+
       setMessage('✓ Preferences saved!')
 
       // Call callback if provided
