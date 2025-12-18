@@ -1,41 +1,55 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
+import { getWalletDisplayPreferences } from '../lib/walletPreferences'
 
 export default function Dashboard({ userId, onNavigate }) {
   const [wallets, setWallets] = useState([])
   const [totalBalance, setTotalBalance] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [displayCurrencies, setDisplayCurrencies] = useState(['PHP'])
 
   useEffect(() => {
-    loadWallets()
+    loadData()
   }, [userId])
 
-  const loadWallets = async () => {
+  const loadData = async () => {
     try {
       // Skip for guest-local or invalid user IDs
       if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
         const defaultWallets = [
-          { user_id: userId, currency_code: 'PHP', balance: 0 },
-          { user_id: userId, currency_code: 'USD', balance: 0 }
+          { user_id: userId, currency_code: 'PHP', balance: 0 }
         ]
         setWallets(defaultWallets)
         setTotalBalance(0)
+        setDisplayCurrencies(['PHP'])
         setLoading(false)
         return
       }
+
+      // Load user's wallet display preferences
+      const preferences = await getWalletDisplayPreferences(userId)
+      setDisplayCurrencies(preferences || ['PHP'])
+
+      // Load all wallets for the user
       const data = await currencyAPI.getWallets(userId)
       const walletData = data || []
-      setWallets(walletData)
-      const total = walletData.reduce((sum, w) => sum + (w.balance || 0), 0)
+
+      // Filter wallets to show only selected currencies
+      const filteredWallets = walletData.filter(wallet =>
+        preferences.includes(wallet.currency_code)
+      )
+
+      setWallets(filteredWallets)
+      const total = filteredWallets.reduce((sum, w) => sum + (w.balance || 0), 0)
       setTotalBalance(total)
     } catch (err) {
       // Fallback: use default wallets with zero balance
       const defaultWallets = [
-        { user_id: userId, currency_code: 'PHP', balance: 0 },
-        { user_id: userId, currency_code: 'USD', balance: 0 }
+        { user_id: userId, currency_code: 'PHP', balance: 0 }
       ]
       setWallets(defaultWallets)
       setTotalBalance(0)
+      setDisplayCurrencies(['PHP'])
     } finally {
       setLoading(false)
     }
