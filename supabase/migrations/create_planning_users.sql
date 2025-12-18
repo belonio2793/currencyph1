@@ -58,39 +58,3 @@ CREATE TRIGGER planning_users_timestamp_trigger
   BEFORE UPDATE ON public.planning_users
   FOR EACH ROW
   EXECUTE FUNCTION update_planning_users_timestamp();
-
--- Create or replace function to auto-create planning_users on auth signup (safe to run multiple times)
-CREATE OR REPLACE FUNCTION public.create_planning_user_on_signup()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.planning_users (
-    user_id,
-    email,
-    name,
-    status,
-    role,
-    created_at,
-    updated_at
-  )
-  VALUES (
-    NEW.id,
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
-    'active',
-    'member',
-    NOW(),
-    NOW()
-  )
-  ON CONFLICT (user_id) DO NOTHING;
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- Drop and recreate trigger for auto-creation (idempotent approach)
-DROP TRIGGER IF EXISTS on_auth_user_created_planning ON auth.users;
-
-CREATE TRIGGER on_auth_user_created_planning
-  AFTER INSERT ON auth.users
-  FOR EACH ROW
-  EXECUTE FUNCTION public.create_planning_user_on_signup();
