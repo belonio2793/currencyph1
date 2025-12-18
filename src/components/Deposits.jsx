@@ -990,33 +990,56 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               </div>
             </div>
 
-            {/* Wallet Balances Reference */}
+            {/* Consolidated Balance Display */}
             {wallets && wallets.length > 0 && (
-              <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-sm font-semibold text-slate-900 uppercase tracking-wider">Your Current Balances</h4>
+              <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-8 border border-slate-700 text-white">
+                <div className="flex items-center justify-between mb-6">
+                  <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Your Total Balances</h4>
                   <button
                     onClick={refreshWallets}
                     disabled={syncStatus === 'syncing'}
                     className={`text-xs font-medium transition-colors ${
                       syncStatus === 'syncing'
-                        ? 'text-slate-400 cursor-not-allowed'
-                        : 'text-blue-600 hover:text-blue-700'
+                        ? 'text-slate-500 cursor-not-allowed'
+                        : 'text-blue-300 hover:text-blue-200'
                     }`}
                   >
                     {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
                   </button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                  {wallets.map(wallet => (
-                    <WalletSummaryCard
-                      key={wallet.id}
-                      wallet={wallet}
-                      globalCurrency={globalCurrency}
-                      exchangeRates={exchangeRates}
-                      onDeposit={handleQuickDeposit}
-                    />
-                  ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Fiat Total */}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                    <p className="text-sm text-slate-300 mb-2">Fiat Currency Total</p>
+                    <p className="text-3xl font-light text-white mb-1">
+                      {formatCurrency(getTotalBalance, globalCurrency)}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      {wallets.filter(w => w.currency_code !== 'BTC' && w.currency_code !== 'ETH' && !w.currency_code?.match(/^[A-Z]{2,}$/) || w.currency_code === 'PHP').length} currencies
+                    </p>
+                  </div>
+
+                  {/* Crypto Total */}
+                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                    <p className="text-sm text-slate-300 mb-2">Cryptocurrency Total</p>
+                    <p className="text-3xl font-light text-white mb-1">
+                      {formatCurrency(cryptoRates && Object.keys(cryptoRates).length > 0 ? '0.00' : '0.00', globalCurrency)}
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      {cryptos.length} assets tracked
+                    </p>
+                  </div>
+
+                  {/* Grand Total */}
+                  <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg p-6 border border-blue-400/30">
+                    <p className="text-sm text-blue-200 mb-2">Grand Total</p>
+                    <p className="text-4xl font-light text-blue-100 mb-1">
+                      {formatCurrency(getTotalBalance, globalCurrency)}
+                    </p>
+                    <p className="text-xs text-blue-300">
+                      All currencies combined
+                    </p>
+                  </div>
                 </div>
               </div>
             )}
