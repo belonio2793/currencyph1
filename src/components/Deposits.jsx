@@ -437,11 +437,18 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [syncStatus, setSyncStatus] = useState('synced')
 
   // Payment method selection
-  const [depositTab, setDepositTab] = useState('direct')
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('solana')
   const [referenceCode, setReferenceCode] = useState(null)
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false)
 
+  // Deposit tabs
+  const [depositTab, setDepositTab] = useState('fiat') // 'fiat' or 'crypto'
+
+  // Fiat deposit state
+  const [fiatAmount, setFiatAmount] = useState('')
+  const [fiatConvertedAmounts, setFiatConvertedAmounts] = useState({})
+
+  // Crypto deposit state
   const [cryptoAmount, setCryptoAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('BTC')
   const [cryptoRates, setCryptoRates] = useState({})
@@ -770,12 +777,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }
 
   useEffect(() => {
-    if (amount && selectedCurrency) {
-      calculateMultiCurrencyConversion()
+    if (fiatAmount && selectedCurrency) {
+      calculateFiatMultiCurrencyConversion()
     } else {
-      setConvertedAmounts({})
+      setFiatConvertedAmounts({})
     }
-  }, [amount, selectedCurrency, exchangeRates, globalCurrency])
+  }, [fiatAmount, selectedCurrency, exchangeRates, globalCurrency])
 
   useEffect(() => {
     if (cryptoAmount && selectedCrypto) {
@@ -794,10 +801,10 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     return () => clearInterval(interval)
   }, [exchangeRates, globalCurrency])
 
-  const calculateMultiCurrencyConversion = useCallback(() => {
-    const numAmount = parseFloat(amount) || 0
+  const calculateFiatMultiCurrencyConversion = useCallback(() => {
+    const numAmount = parseFloat(fiatAmount) || 0
     if (numAmount <= 0) {
-      setConvertedAmounts({})
+      setFiatConvertedAmounts({})
       return
     }
 
@@ -812,8 +819,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
     })
 
-    setConvertedAmounts(conversions)
-  }, [amount, selectedCurrency, exchangeRates, allCurrencies])
+    setFiatConvertedAmounts(conversions)
+  }, [fiatAmount, selectedCurrency, exchangeRates, allCurrencies])
 
   const calculateCryptoMultiConversion = useCallback(() => {
     const numAmount = parseFloat(cryptoAmount) || 0
@@ -835,16 +842,16 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     })
 
     setCryptoConvertedAmounts(conversions)
-  }, [cryptoAmount, selectedCrypto, cryptoRates, globalCurrency, allCurrencies])
+  }, [cryptoAmount, selectedCrypto, cryptoRates, globalCurrency, allCurrencies, exchangeRates])
 
-  const handleAddAmount = async (e) => {
+  const handleAddFiat = async (e) => {
     e.preventDefault()
     setError('')
     setSuccess('')
     setAdding(true)
 
     try {
-      const numAmount = parseFloat(amount)
+      const numAmount = parseFloat(fiatAmount)
       if (!numAmount || numAmount <= 0) {
         throw new Error('Please enter a valid amount')
       }
@@ -853,12 +860,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         throw new Error('Please select a currency')
       }
 
-      const convertedAmt = convertedAmounts[globalCurrency] || (numAmount * (exchangeRates[`${selectedCurrency}_${globalCurrency}`] || 1)).toFixed(2)
+      const convertedAmt = fiatConvertedAmounts[globalCurrency] || (numAmount * (exchangeRates[`${selectedCurrency}_${globalCurrency}`] || 1)).toFixed(2)
 
       await paymentsAPI.addFunds(userId, globalCurrency, parseFloat(convertedAmt))
-      setSuccess(`Successfully added ${formatCurrency(amount, selectedCurrency)}`)
-      setAmount('')
-      setConvertedAmounts({})
+      setSuccess(`Successfully added ${formatCurrency(fiatAmount, selectedCurrency)}`)
+      setFiatAmount('')
+      setFiatConvertedAmounts({})
 
       setTimeout(() => {
         setSuccess('')
@@ -908,7 +915,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const handleQuickDeposit = (currencyCode) => {
     setSelectedDepositCurrency(currencyCode)
     setSelectedCurrency(currencyCode)
-    setDepositTab('direct')
+    setDepositTab('fiat')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
@@ -968,150 +975,250 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-
-        {/* Direct Payment Methods */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-slate-200">
-          <div className="space-y-6"><h2 className="text-2xl font-semibold text-slate-900 mb-6">Add Funds</h2>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                {Object.entries(PAYMENT_METHODS).map(([key, method]) => (
-                  <PaymentMethodSelector
-                    key={key}
-                    method={method}
-                    selected={selectedPaymentMethod === key}
-                    onClick={() => {
-                      setSelectedPaymentMethod(key)
-                      setReferenceCode(key === 'gcash' ? `REF-${Date.now().toString().slice(-8)}` : null)
-                      setShowPaymentInstructions(false)
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Consolidated Balance Display */}
-            {wallets && wallets.length > 0 && (
-              <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-8 border border-slate-700 text-white">
-                <div className="flex items-center justify-between mb-6">
-                  <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Your Total Balances</h4>
-                  <button
-                    onClick={refreshWallets}
-                    disabled={syncStatus === 'syncing'}
-                    className={`text-xs font-medium transition-colors ${
-                      syncStatus === 'syncing'
-                        ? 'text-slate-500 cursor-not-allowed'
-                        : 'text-blue-300 hover:text-blue-200'
-                    }`}
-                  >
-                    {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
-                  </button>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Fiat Total */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                    <p className="text-sm text-slate-300 mb-2">Fiat Currency Total</p>
-                    <p className="text-3xl font-light text-white mb-1">
-                      {formatCurrency(getTotalBalance, globalCurrency)}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {wallets.filter(w => w.currency_code !== 'BTC' && w.currency_code !== 'ETH' && !w.currency_code?.match(/^[A-Z]{2,}$/) || w.currency_code === 'PHP').length} currencies
-                    </p>
-                  </div>
-
-                  {/* Crypto Total */}
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                    <p className="text-sm text-slate-300 mb-2">Cryptocurrency Total</p>
-                    <p className="text-3xl font-light text-white mb-1">
-                      {formatCurrency(cryptoRates && Object.keys(cryptoRates).length > 0 ? '0.00' : '0.00', globalCurrency)}
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      {cryptos.length} assets tracked
-                    </p>
-                  </div>
-
-                  {/* Grand Total */}
-                  <div className="bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg p-6 border border-blue-400/30">
-                    <p className="text-sm text-blue-200 mb-2">Grand Total</p>
-                    <p className="text-4xl font-light text-blue-100 mb-1">
-                      {formatCurrency(getTotalBalance, globalCurrency)}
-                    </p>
-                    <p className="text-xs text-blue-300">
-                      All currencies combined
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">
-                Deposit Amount ({globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''})
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                value={amount}
-                onChange={e => setAmount(e.target.value)}
-                placeholder="Enter amount"
-                className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
-              />
-            </div>
-
-            {amount && (
-              <div className="space-y-6">
-                {selectedPaymentMethod === 'solana' && (
-                  <>
-                    <SolanaPaymentDisplay address={PAYMENT_METHODS.solana.address} />
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                      <p className="font-semibold mb-2">💡 Important:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
-                        <li>Your balance will be updated once confirmed on the blockchain</li>
-                        <li>Keep your SOL address for transaction tracking</li>
-                      </ul>
-                    </div>
-                    <button
-                      onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
-                      className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-                    >
-                      {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
-                    </button>
-                    {showPaymentInstructions && (
-                      <InstructionsDisplay method={PAYMENT_METHODS.solana} />
-                    )}
-                  </>
-                )}
-
-                {selectedPaymentMethod === 'gcash' && (
-                  <>
-                    <GCashPaymentDisplay
-                      phone={PAYMENT_METHODS.gcash.phone}
-                      referenceCode={referenceCode}
-                    />
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                      <p className="font-semibold mb-2">💡 Important:</p>
-                      <ul className="list-disc pl-5 space-y-1">
-                        <li>Deposit amount: <span className="font-bold">{formatCurrency(amount, globalCurrency)}</span></li>
-                        <li>Use the reference code to track your deposit</li>
-                        <li>Deposits are confirmed within 1-3 minutes</li>
-                        <li>Make sure to include the reference code in the GCash notes</li>
-                      </ul>
-                    </div>
-                    <button
-                      onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
-                      className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
-                    </button>
-                    {showPaymentInstructions && (
-                      <InstructionsDisplay method={PAYMENT_METHODS.gcash} />
-                    )}
-                  </>
-                )}
-              </div>
-            )}
+        {/* Deposit Tabs */}
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
+          <div className="flex border-b border-slate-200">
+            <button
+              onClick={() => {
+                setDepositTab('fiat')
+                setError('')
+                setSuccess('')
+              }}
+              className={`flex-1 py-4 px-6 font-medium transition-colors ${
+                depositTab === 'fiat'
+                  ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600'
+                  : 'bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              💵 Fiat Currency Deposit
+            </button>
+            <button
+              onClick={() => {
+                setDepositTab('crypto')
+                setError('')
+                setSuccess('')
+              }}
+              className={`flex-1 py-4 px-6 font-medium transition-colors ${
+                depositTab === 'crypto'
+                  ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-600'
+                  : 'bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              ₿ Cryptocurrency Deposit
+            </button>
           </div>
+
+          {/* Fiat Tab Content */}
+          {depositTab === 'fiat' && (
+            <div className="p-8">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold text-slate-900">Add Fiat Funds</h2>
+
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Select Payment Method</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {Object.entries(PAYMENT_METHODS).map(([key, method]) => (
+                      <PaymentMethodSelector
+                        key={key}
+                        method={method}
+                        selected={selectedPaymentMethod === key}
+                        onClick={() => {
+                          setSelectedPaymentMethod(key)
+                          setReferenceCode(key === 'gcash' ? `REF-${Date.now().toString().slice(-8)}` : null)
+                          setShowPaymentInstructions(false)
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Consolidated Balance Display */}
+                {wallets && wallets.length > 0 && (
+                  <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-8 border border-slate-700 text-white">
+                    <div className="flex items-center justify-between mb-6">
+                      <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Your Total Balances</h4>
+                      <button
+                        onClick={refreshWallets}
+                        disabled={syncStatus === 'syncing'}
+                        className={`text-xs font-medium transition-colors ${
+                          syncStatus === 'syncing'
+                            ? 'text-slate-500 cursor-not-allowed'
+                            : 'text-blue-300 hover:text-blue-200'
+                        }`}
+                      >
+                        {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
+                      </button>
+                    </div>
+                    <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
+                      <p className="text-sm text-slate-300 mb-2">Total Balance</p>
+                      <p className="text-4xl font-light text-white">
+                        {formatCurrency(getTotalBalance, globalCurrency)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Deposit Amount ({globalCurrency} {CURRENCY_SYMBOLS[globalCurrency] || ''})
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={fiatAmount}
+                    onChange={e => setFiatAmount(e.target.value)}
+                    placeholder="Enter amount"
+                    className="w-full px-6 py-4 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 focus:ring-0 text-lg font-light"
+                  />
+                </div>
+
+                {fiatAmount && (
+                  <div className="space-y-6">
+                    {selectedPaymentMethod === 'solana' && (
+                      <>
+                        <SolanaPaymentDisplay address={PAYMENT_METHODS.solana.address} />
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                          <p className="font-semibold mb-2">💡 Important:</p>
+                          <ul className="list-disc pl-5 space-y-1">
+                            <li>Deposit amount: <span className="font-bold">{formatCurrency(fiatAmount, globalCurrency)}</span></li>
+                            <li>Your balance will be updated once confirmed on the blockchain</li>
+                            <li>Keep your SOL address for transaction tracking</li>
+                          </ul>
+                        </div>
+                        <button
+                          onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
+                          className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                        >
+                          {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
+                        </button>
+                        {showPaymentInstructions && (
+                          <InstructionsDisplay method={PAYMENT_METHODS.solana} />
+                        )}
+                      </>
+                    )}
+
+                    {selectedPaymentMethod === 'gcash' && (
+                      <>
+                        <GCashPaymentDisplay
+                          phone={PAYMENT_METHODS.gcash.phone}
+                          referenceCode={referenceCode}
+                        />
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
+                          <p className="font-semibold mb-2">💡 Important:</p>
+                          <ul className="list-disc pl-5 space-y-1">
+                            <li>Deposit amount: <span className="font-bold">{formatCurrency(fiatAmount, globalCurrency)}</span></li>
+                            <li>Use the reference code to track your deposit</li>
+                            <li>Deposits are confirmed within 1-3 minutes</li>
+                            <li>Make sure to include the reference code in the GCash notes</li>
+                          </ul>
+                        </div>
+                        <button
+                          onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
+                          className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        >
+                          {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
+                        </button>
+                        {showPaymentInstructions && (
+                          <InstructionsDisplay method={PAYMENT_METHODS.gcash} />
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Crypto Tab Content */}
+          {depositTab === 'crypto' && (
+            <div className="p-8">
+              <div className="space-y-6">
+                <h2 className="text-2xl font-semibold text-slate-900">Deposit Cryptocurrency</h2>
+
+                <p className="text-slate-600">
+                  Send cryptocurrency directly to add funds to your wallet. Transactions are processed automatically once confirmed on the blockchain.
+                </p>
+
+                <div>
+                  <SearchableCryptoSelect
+                    value={selectedCrypto}
+                    onChange={setSelectedCrypto}
+                    options={cryptos}
+                    prices={cryptoRates}
+                    label="Select Cryptocurrency"
+                    globalCurrency={globalCurrency}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-2">
+                    Amount ({selectedCrypto})
+                  </label>
+                  <input
+                    type="number"
+                    step="0.00000001"
+                    value={cryptoAmount}
+                    onChange={e => setCryptoAmount(e.target.value)}
+                    placeholder="Enter amount in crypto"
+                    className="w-full px-6 py-4 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-600 focus:ring-0 text-lg font-light"
+                  />
+                  {cryptoAmount && (
+                    <p className="text-sm text-slate-600 mt-2">
+                      Approximate value: {formatCurrency(cryptoConvertedAmounts[globalCurrency] || 0, globalCurrency)}
+                    </p>
+                  )}
+                </div>
+
+                {cryptoAmount && (
+                  <div className="space-y-6">
+                    <div className="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+                      <h3 className="text-lg font-semibold text-slate-900 mb-4">Deposit Instructions</h3>
+
+                      <div className="bg-white rounded-lg p-4 mb-4 border border-orange-200">
+                        <p className="text-sm text-slate-600 mb-2">Crypto Amount:</p>
+                        <p className="text-2xl font-bold text-orange-600">
+                          {parseFloat(cryptoAmount).toFixed(8)} {selectedCrypto}
+                        </p>
+                        <p className="text-sm text-slate-600 mt-2">
+                          Equivalent to: {formatCurrency(cryptoConvertedAmounts[globalCurrency] || 0, globalCurrency)}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-sm font-semibold text-slate-900">Steps to deposit:</p>
+                        <ol className="space-y-2 list-decimal list-inside text-sm text-slate-700">
+                          <li>Copy your {selectedCrypto} wallet address from your Wallets section</li>
+                          <li>Send exactly <span className="font-bold">{parseFloat(cryptoAmount).toFixed(8)} {selectedCrypto}</span> to your wallet</li>
+                          <li>Wait for blockchain confirmation (usually 5-30 minutes depending on network)</li>
+                          <li>Your balance will automatically update once confirmed</li>
+                        </ol>
+                      </div>
+
+                      <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-sm text-yellow-800">
+                        <p className="font-semibold mb-1">⚠️ Important:</p>
+                        <p>Make sure to send to the correct {selectedCrypto} address. Transactions cannot be reversed.</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleAddCrypto}
+                      disabled={addingCrypto || !cryptoAmount}
+                      className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white py-3 rounded-lg transition-colors font-medium"
+                    >
+                      {addingCrypto ? 'Processing...' : `Confirm Deposit of ${parseFloat(cryptoAmount).toFixed(8)} ${selectedCrypto}`}
+                    </button>
+                  </div>
+                )}
+
+                {!cryptoAmount && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-6 text-center">
+                    <p className="text-slate-600 mb-3">Enter the amount to see deposit instructions</p>
+                    <p className="text-sm text-slate-500">Crypto prices are updated every minute</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
