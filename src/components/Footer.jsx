@@ -3,16 +3,51 @@ import React from 'react'
 function Footer({ onNavigate, userEmail }) {
   const footerSections = [
     {
-      title: 'PRODUCT',
+      title: 'ACCOUNT',
       links: [
-        { label: 'Transfer Money', tab: 'send' },
-        { label: 'Pay Bills', tab: 'bills' }
+        { label: 'Profile', tab: 'profile' },
+        { label: 'Inbox', tab: 'inbox' },
+        { label: 'My Business', tab: 'my-business' },
+        { label: 'History', tab: 'transactions' },
+        { label: 'Wallet', tab: 'wallet' },
+        { label: 'Deposit Funds', tab: 'deposit' }
       ]
     },
     {
-      title: 'MAPS',
+      title: 'MAIN',
       links: [
-        { label: 'Addresses', tab: 'addresses' }
+        { label: 'Nearby', tab: 'nearby' },
+        { label: 'Rides', tab: 'rides' }
+      ]
+    },
+    {
+      title: 'FINANCIAL',
+      links: [
+        { label: 'Currency Rates', tab: 'rates' },
+        { label: 'Payments', tab: 'payments-financial' },
+        { label: 'Send Money', tab: 'send' },
+        { label: 'Receive Money', tab: 'receive' }
+      ]
+    },
+    {
+      title: 'MARKETPLACE',
+      links: [
+        { label: 'Jobs', tab: 'jobs' },
+        { label: 'Loans', tab: 'p2p-loans' }
+      ]
+    },
+    {
+      title: 'COMMUNITY',
+      links: [
+        { label: 'Online Users', tab: 'online-users' },
+        { label: 'Messages', tab: 'messages' },
+        { label: 'Market Opportunities', tab: 'investments' }
+      ]
+    },
+    {
+      title: 'PERSONAL',
+      links: [
+        { label: 'Bills', tab: 'bills' }
       ]
     },
     {
@@ -21,13 +56,28 @@ function Footer({ onNavigate, userEmail }) {
         { label: 'Poker', tab: 'poker' },
         { label: 'Chess', tab: 'chess' }
       ]
+    },
+    {
+      title: 'MAPS',
+      links: [
+        { label: 'Shipping', tab: 'shipping' },
+        { label: 'Addresses', tab: 'addresses' }
+      ]
+    },
+    {
+      title: 'NETWORK',
+      links: [
+        { label: 'Network Balances', tab: 'network-balances' }
+      ]
     }
   ]
 
   const footerLinks = [
     { label: 'About', tab: 'about' },
-    { label: 'Network Balances', tab: 'network-balances' },
-    { label: 'Planning', tab: 'planning' }
+    { label: 'Planning', tab: 'planning' },
+    { label: 'Privacy Policy', url: '#' },
+    { label: 'Terms of Service', url: '#' },
+    { label: 'Contact', url: '#' }
   ]
 
   const handleLinkClick = (tab) => {
@@ -47,7 +97,7 @@ function Footer({ onNavigate, userEmail }) {
           </div>
 
           {/* Footer Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8">
             {footerSections.map((section, idx) => (
               <div key={idx}>
                 <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">
@@ -75,15 +125,25 @@ function Footer({ onNavigate, userEmail }) {
           <p className="text-xs text-gray-500">
             © 2025 currency.ph. All rights reserved
           </p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-4 justify-center sm:justify-end">
             {footerLinks.map(link => (
-              <button
-                key={link.tab}
-                onClick={() => handleLinkClick(link.tab)}
-                className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                {link.label}
-              </button>
+              <div key={link.tab || link.url}>
+                {link.tab ? (
+                  <button
+                    onClick={() => handleLinkClick(link.tab)}
+                    className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    {link.label}
+                  </button>
+                ) : (
+                  <a
+                    href={link.url}
+                    className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    {link.label}
+                  </a>
+                )}
+              </div>
             ))}
           </div>
         </div>
