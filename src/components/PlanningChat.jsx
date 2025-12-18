@@ -1990,38 +1990,63 @@ export default function PlanningChat() {
 
               <form onSubmit={authMode === 'login' ? handleSignIn : handleRegister} className="space-y-4">
                 {authMode === 'register' && (
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Full name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      disabled={authLoading}
+                    />
+                    {name && name.length === 0 && authError?.includes('Full name') && (
+                      <p className="text-red-400 text-xs mt-1">Full name is required</p>
+                    )}
+                  </div>
+                )}
+
+                <div>
                   <input
-                    type="text"
-                    placeholder="Full name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
                     disabled={authLoading}
                   />
-                )}
+                  {email && !email.includes('@') && (
+                    <p className="text-red-400 text-xs mt-1">Please enter a valid email</p>
+                  )}
+                </div>
 
-                <input
-                  type="email"
-                  placeholder="Email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  disabled={authLoading}
-                />
-
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                  disabled={authLoading}
-                />
+                <div>
+                  <input
+                    type="password"
+                    placeholder="Password (minimum 6 characters)"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className={`w-full bg-slate-700 border rounded px-4 py-2 text-white placeholder-slate-500 focus:outline-none ${
+                      password && password.length < 6
+                        ? 'border-red-500 focus:border-red-500'
+                        : password && password.length >= 6
+                        ? 'border-green-500 focus:border-green-500'
+                        : 'border-slate-600 focus:border-blue-500'
+                    }`}
+                    disabled={authLoading}
+                  />
+                  {authMode === 'register' && password && (
+                    <div className="mt-2 space-y-1 text-xs">
+                      <div className={password.length >= 6 ? 'text-green-400' : 'text-red-400'}>
+                        <span>{password.length >= 6 ? '✓' : '✗'} At least 6 characters ({password.length})</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 <button
                   type="submit"
-                  disabled={authLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 text-white font-semibold py-2 rounded transition-colors"
+                  disabled={authLoading || (authMode === 'register' && (password.length < 6 || !email || !name))}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-semibold py-2 rounded transition-colors"
                 >
                   {authLoading ? 'Loading...' : authMode === 'login' ? 'Sign In' : 'Register'}
                 </button>
