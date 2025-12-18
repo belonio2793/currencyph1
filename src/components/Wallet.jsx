@@ -104,63 +104,86 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* PHP Wallet Card */}
+        {/* Wallets Grid */}
         {!showCustomizer && (
           <div className="mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* PHP Wallet */}
-              <div className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-all">
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
-                    Primary Currency
-                  </p>
-                  <div className="flex items-baseline gap-2 mb-2">
-                    <p className="text-3xl font-light text-slate-900">PHP</p>
-                    <p className="text-sm text-slate-500">Philippine Peso</p>
-                  </div>
-                </div>
+            {/* Action Button */}
+            <div className="mb-6 flex gap-3">
+              <button
+                onClick={() => setShowCustomizer(true)}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              >
+                ➕ Add More Currencies
+              </button>
+            </div>
 
-                {phpWallet ? (
-                  <>
-                    <div className="bg-slate-50 rounded-lg p-4 mb-6">
+            {wallets.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-lg p-8 text-center">
+                <p className="text-slate-500 mb-4">No wallets available yet</p>
+                <button
+                  onClick={() => setShowCustomizer(true)}
+                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                >
+                  Add a Currency
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {wallets.map(wallet => (
+                  <div key={wallet.id} className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-all">
+                    {/* Header */}
+                    <div className="mb-4 flex items-start justify-between">
+                      <div>
+                        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                          {wallet.currency_code}
+                        </p>
+                        <p className="text-2xl font-light text-slate-900">
+                          {wallet.currency_code === 'PHP' ? '₱' : wallet.currency_code === 'USD' ? '$' : wallet.currency_code === 'EUR' ? '€' : wallet.currency_code === 'GBP' ? '£' : wallet.currency_code}
+                        </p>
+                      </div>
+                      {wallet.is_active && (
+                        <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                          Active
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Balance */}
+                    <div className="bg-slate-50 rounded-lg p-4 mb-4">
                       <p className="text-xs text-slate-600 mb-1">Current Balance</p>
                       <p className="text-2xl font-light text-slate-900 font-mono">
-                        {formatNumber(phpWallet.balance || 0)}
+                        {formatNumber(wallet.balance || 0)}
                       </p>
                       <p className="text-xs text-slate-500 mt-2">
-                        Deposited: {formatNumber(phpWallet.total_deposited || 0)}
+                        Deposited: {formatNumber(wallet.total_deposited || 0)}
                       </p>
                     </div>
 
-                    <div className="text-xs text-slate-500">
-                      Created {new Date(phpWallet.created_at).toLocaleDateString()}
+                    {/* Wallet ID */}
+                    <div className="bg-blue-50 rounded-lg p-3 mb-4 border border-blue-200">
+                      <p className="text-xs text-blue-700 font-medium mb-2">Wallet ID</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xs font-mono text-slate-900 break-all flex-1">
+                          {wallet.id}
+                        </p>
+                        <button
+                          onClick={() => copyToClipboard(wallet.id, wallet.id)}
+                          className="flex-shrink-0 px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-xs font-medium"
+                        >
+                          {copied === wallet.id ? '✓' : 'Copy'}
+                        </button>
+                      </div>
                     </div>
-                  </>
-                ) : (
-                  <div className="text-sm text-slate-600">
-                    Wallet not available
+
+                    {/* Meta Info */}
+                    <div className="text-xs text-slate-500 space-y-1 pt-3 border-t border-slate-200">
+                      <div>Created: {new Date(wallet.created_at).toLocaleDateString()}</div>
+                      <div>Account: {wallet.account_number || 'N/A'}</div>
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
-
-              {/* Quick Actions */}
-              <div className="bg-white border border-slate-200 rounded-lg p-6">
-                <h3 className="text-lg font-light text-slate-900 mb-4">Actions</h3>
-
-                <div className="space-y-3">
-                  <button
-                    onClick={() => setShowCustomizer(true)}
-                    className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                  >
-                    Customize Dashboard Currencies
-                  </button>
-
-                  <p className="text-xs text-slate-600 p-3 bg-slate-50 rounded-lg">
-                    💡 Click above to select which currencies appear on your main dashboard. You can add USD, EUR, GBP, and more!
-                  </p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         )}
 
