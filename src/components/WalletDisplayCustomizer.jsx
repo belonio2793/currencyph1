@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { getWalletDisplayPreferences, setWalletDisplayPreferences, addWalletDisplayCurrency, removeWalletDisplayCurrency } from '../lib/walletPreferences'
+import { currencyAPI } from '../lib/payments'
 
 export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   const [allFiatCurrencies, setAllFiatCurrencies] = useState([])
