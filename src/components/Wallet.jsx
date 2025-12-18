@@ -1,398 +1,190 @@
-import { useState, useEffect, Suspense, lazy } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatNumber } from '../lib/currency'
-
-const WalletDetailPanel = lazy(() => import('./Wallets/WalletDetailPanel'))
+import WalletDisplayCustomizer from './WalletDisplayCustomizer'
 
 export default function Wallet({ userId, globalCurrency = 'PHP' }) {
-  const [allCurrencies, setAllCurrencies] = useState([])
-  const [userWallets, setUserWallets] = useState([])
+  const [phpWallet, setPhpWallet] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [showCustomizer, setShowCustomizer] = useState(false)
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState('')
-  const [creatingWallet, setCreatingWallet] = useState(null)
-  const [selectedWalletDetail, setSelectedWalletDetail] = useState(null)
 
-  // Filter options
-  const [showFiatOnly, setShowFiatOnly] = useState(false)
-  const [showCryptoOnly, setShowCryptoOnly] = useState(false)
-  const [searchInput, setSearchInput] = useState('')
-
-  // Load data on mount
   useEffect(() => {
-    loadData()
+    loadPhpWallet()
   }, [userId])
 
-  const loadData = async () => {
+  const loadPhpWallet = async () => {
     try {
       setLoading(true)
       setError('')
 
-      // Check if user is authenticated
       if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
-        setAllCurrencies([])
-        setUserWallets([])
+        setPhpWallet(null)
         setLoading(false)
         return
       }
 
-      // Fetch all active currencies
-      const { data: currencies, error: currError } = await supabase
-        .from('currencies')
-        .select('*')
-        .eq('active', true)
-        .order('type')
-        .order('code')
-
-      if (currError) {
-        console.error('Error fetching currencies:', currError)
-        setError('Failed to load currencies')
-        return
-      }
-
-      setAllCurrencies(currencies || [])
-
-      // Fetch user's existing wallets
-      const { data: wallets, error: walletError } = await supabase
+      // Fetch or create PHP wallet
+      const { data: wallet, error: fetchError } = await supabase
         .from('wallets')
         .select('*')
         .eq('user_id', userId)
+        .eq('currency_code', 'PHP')
         .eq('is_active', true)
+        .single()
 
-      if (walletError) {
-        console.error('Error fetching wallets:', walletError)
-        // Not a critical error - user just has no wallets yet
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching PHP wallet:', fetchError)
+        setError('Failed to load wallet')
+        return
       }
 
-      setUserWallets(wallets || [])
+      if (wallet) {
+        setPhpWallet(wallet)
+      } else {
+        // Create PHP wallet if it doesn't exist
+        const { data: newWallet, error: createError } = await supabase
+          .from('wallets')
+          .insert([
+            {
+              user_id: userId,
+              currency_code: 'PHP',
+              balance: 0,
+              total_deposited: 0,
+              total_withdrawn: 0,
+              is_active: true
+            }
+          ])
+          .select()
+          .single()
+
+        if (createError && createError.code !== '23505') { // 23505 = unique constraint
+          console.error('Error creating PHP wallet:', createError)
+        }
+
+        setPhpWallet(newWallet || null)
+      }
     } catch (err) {
-      console.error('Error loading data:', err)
-      setError('Failed to load wallet data')
+      console.error('Error loading PHP wallet:', err)
+      setError('Failed to load wallet')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleCreateWallet = async (currency) => {
-    try {
-      setCreatingWallet(currency.code)
-      setError('')
-
-      if (!userId || userId === 'null' || userId === 'undefined') {
-        setError('Please log in to create a wallet')
-        return
-      }
-
-      // Check if wallet already exists
-      const exists = userWallets.find(w => w.currency_code === currency.code)
-      if (exists) {
-        setError(`You already have a ${currency.name} wallet`)
-        return
-      }
-
-      // Create the wallet
-      const { data: newWallet, error: createError } = await supabase
-        .from('wallets')
-        .insert([
-          {
-            user_id: userId,
-            currency_code: currency.code,
-            balance: 0,
-            total_deposited: 0,
-            total_withdrawn: 0,
-            is_active: true
-          }
-        ])
-        .select()
-        .single()
-
-      if (createError) {
-        console.error('Error creating wallet:', createError)
-        setError(`Failed to create ${currency.name} wallet`)
-        return
-      }
-
-      setSuccess(`✓ ${currency.name} wallet created!`)
-      
-      // Refresh wallets list
-      await loadData()
-
-      // Clear success message after 3 seconds
-      setTimeout(() => setSuccess(''), 3000)
-    } catch (err) {
-      console.error('Error:', err)
-      setError('An unexpected error occurred')
-    } finally {
-      setCreatingWallet(null)
-    }
-  }
-
-  const getFilteredCurrencies = () => {
-    let filtered = allCurrencies
-
-    // Filter by type
-    if (showFiatOnly) {
-      filtered = filtered.filter(c => c.type === 'fiat')
-    } else if (showCryptoOnly) {
-      filtered = filtered.filter(c => c.type === 'crypto')
-    }
-
-    // Filter by search
-    if (searchInput) {
-      const query = searchInput.toLowerCase()
-      filtered = filtered.filter(c =>
-        c.code.toLowerCase().includes(query) ||
-        c.name.toLowerCase().includes(query)
-      )
-    }
-
-    return filtered
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
-        <div className="text-center text-slate-500">Loading currencies...</div>
+        <div className="text-center text-slate-500">Loading wallet...</div>
       </div>
     )
   }
-
-  const filteredCurrencies = getFilteredCurrencies()
-  const fiatCurrencies = filteredCurrencies.filter(c => c.type === 'fiat')
-  const cryptoCurrencies = filteredCurrencies.filter(c => c.type === 'crypto')
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col">
       <div className="w-full px-4 sm:px-6 py-6 flex-1">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-light text-slate-900 tracking-tight mb-4">
+          <h1 className="text-3xl sm:text-4xl font-light text-slate-900 tracking-tight mb-2">
             My Wallets
           </h1>
           <p className="text-slate-600">
-            Create wallets for the currencies you want to use. Each wallet will be linked to your account.
+            Manage your currency wallets and customize your dashboard.
           </p>
         </div>
 
-        {/* Messages */}
+        {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
             {error}
           </div>
         )}
-        {success && (
-          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
-            {success}
-          </div>
-        )}
 
-        {/* Controls */}
-        <div className="mb-8 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          {/* Search */}
-          <div className="flex-1 w-full sm:w-auto">
-            <input
-              type="text"
-              placeholder="Search currencies..."
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-            />
-          </div>
-
-          {/* Filter buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => {
-                setShowFiatOnly(!showFiatOnly)
-                setShowCryptoOnly(false)
-              }}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                showFiatOnly
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              Fiat
-            </button>
-            <button
-              onClick={() => {
-                setShowCryptoOnly(!showCryptoOnly)
-                setShowFiatOnly(false)
-              }}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                showCryptoOnly
-                  ? 'bg-orange-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              Crypto
-            </button>
-          </div>
-        </div>
-
-        {/* Fiat Currencies Section */}
-        {!showCryptoOnly && fiatCurrencies.length > 0 && (
+        {/* PHP Wallet Card */}
+        {!showCustomizer && (
           <div className="mb-12">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-light text-slate-900 tracking-tight">Fiat Currencies</h2>
-              <p className="text-sm text-slate-500">{fiatCurrencies.length} available</p>
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* PHP Wallet */}
+              <div className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition-all">
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    Primary Currency
+                  </p>
+                  <div className="flex items-baseline gap-2 mb-2">
+                    <p className="text-3xl font-light text-slate-900">PHP</p>
+                    <p className="text-sm text-slate-500">Philippine Peso</p>
+                  </div>
+                </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {fiatCurrencies.map(currency => {
-                const wallet = userWallets.find(w => w.currency_code === currency.code)
-                const isCreating = creatingWallet === currency.code
-
-                return (
-                  <div
-                    key={currency.code}
-                    className="bg-white border border-slate-200 rounded-lg p-5 hover:shadow-lg transition-all hover:border-slate-300"
-                  >
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                        Fiat Currency
+                {phpWallet ? (
+                  <>
+                    <div className="bg-slate-50 rounded-lg p-4 mb-6">
+                      <p className="text-xs text-slate-600 mb-1">Current Balance</p>
+                      <p className="text-2xl font-light text-slate-900 font-mono">
+                        {formatNumber(phpWallet.balance || 0)}
                       </p>
-                      <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-light text-slate-900">{currency.code}</p>
-                        <p className="text-sm text-slate-500">{currency.symbol}</p>
-                      </div>
-                      <p className="text-xs text-slate-600 mt-1">{currency.name}</p>
+                      <p className="text-xs text-slate-500 mt-2">
+                        Deposited: {formatNumber(phpWallet.total_deposited || 0)}
+                      </p>
                     </div>
 
-                    {wallet ? (
-                      <>
-                        <div className="mb-4 pb-4 border-t border-slate-100">
-                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 mt-3">
-                            Balance
-                          </p>
-                          <p className="text-lg font-light text-slate-900 font-mono">
-                            {formatNumber(wallet.balance || 0)}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">
-                            Created {new Date(wallet.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => setSelectedWalletDetail(wallet)}
-                          className="w-full py-2 px-3 bg-slate-100 text-slate-800 rounded-lg hover:bg-slate-200 transition-colors text-xs font-medium"
-                        >
-                          View Details
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => handleCreateWallet(currency)}
-                        disabled={isCreating}
-                        className={`w-full py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
-                          isCreating
-                            ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
-                        }`}
-                      >
-                        {isCreating ? 'Creating...' : 'Create Wallet'}
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Crypto Currencies Section */}
-        {!showFiatOnly && cryptoCurrencies.length > 0 && (
-          <div className="mb-12">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-light text-slate-900 tracking-tight">Cryptocurrencies</h2>
-              <p className="text-sm text-slate-500">{cryptoCurrencies.length} available</p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {cryptoCurrencies.map(currency => {
-                const wallet = userWallets.find(w => w.currency_code === currency.code)
-                const isCreating = creatingWallet === currency.code
-
-                return (
-                  <div
-                    key={currency.code}
-                    className="bg-white border border-slate-200 rounded-lg p-5 hover:shadow-lg transition-all hover:border-slate-300"
-                  >
-                    <div className="mb-4">
-                      <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                        Cryptocurrency
-                      </p>
-                      <div className="flex items-baseline gap-2">
-                        <p className="text-2xl font-light text-slate-900">{currency.code}</p>
-                        <p className="text-sm text-slate-500">{currency.symbol}</p>
-                      </div>
-                      <p className="text-xs text-slate-600 mt-1">{currency.name}</p>
+                    <div className="text-xs text-slate-500">
+                      Created {new Date(phpWallet.created_at).toLocaleDateString()}
                     </div>
-
-                    {wallet ? (
-                      <>
-                        <div className="mb-4 pb-4 border-t border-slate-100">
-                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1 mt-3">
-                            Balance
-                          </p>
-                          <p className="text-lg font-light text-slate-900 font-mono">
-                            {formatNumber(wallet.balance || 0)}
-                          </p>
-                          <p className="text-xs text-slate-400 mt-1">
-                            Created {new Date(wallet.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => setSelectedWalletDetail(wallet)}
-                          className="w-full py-2 px-3 bg-slate-100 text-slate-800 rounded-lg hover:bg-slate-200 transition-colors text-xs font-medium"
-                        >
-                          View Details
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        onClick={() => handleCreateWallet(currency)}
-                        disabled={isCreating}
-                        className={`w-full py-2 px-3 rounded-lg text-xs font-medium transition-colors ${
-                          isCreating
-                            ? 'bg-slate-100 text-slate-500 cursor-not-allowed'
-                            : 'bg-orange-600 text-white hover:bg-orange-700'
-                        }`}
-                      >
-                        {isCreating ? 'Creating...' : 'Create Wallet'}
-                      </button>
-                    )}
+                  </>
+                ) : (
+                  <div className="text-sm text-slate-600">
+                    Wallet not available
                   </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
-
-        {/* Empty state */}
-        {filteredCurrencies.length === 0 && (
-          <div className="bg-slate-50 border border-slate-200 rounded-lg p-8 text-center">
-            <p className="text-slate-500">No currencies found matching your filters</p>
-          </div>
-        )}
-
-        {/* Wallet Detail Panel */}
-        {selectedWalletDetail && (
-          <Suspense
-            fallback={
-              <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
-                <div className="text-white text-center">Loading details...</div>
+                )}
               </div>
-            }
-          >
-            <WalletDetailPanel
-              wallet={selectedWalletDetail}
-              userId={userId}
-              globalCurrency={globalCurrency}
-              onClose={() => setSelectedWalletDetail(null)}
-              ratesMap={{}}
-              convertAmount={() => selectedWalletDetail.balance}
-            />
-          </Suspense>
+
+              {/* Quick Actions */}
+              <div className="bg-white border border-slate-200 rounded-lg p-6">
+                <h3 className="text-lg font-light text-slate-900 mb-4">Actions</h3>
+
+                <div className="space-y-3">
+                  <button
+                    onClick={() => setShowCustomizer(true)}
+                    className="w-full py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  >
+                    Customize Dashboard Currencies
+                  </button>
+
+                  <p className="text-xs text-slate-600 p-3 bg-slate-50 rounded-lg">
+                    💡 Click above to select which currencies appear on your main dashboard. You can add USD, EUR, GBP, and more!
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Customizer Modal */}
+        {showCustomizer && (
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-xl font-light text-slate-900">Customize Dashboard</h2>
+                <button
+                  onClick={() => setShowCustomizer(false)}
+                  className="text-slate-500 hover:text-slate-700 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="p-6">
+                <WalletDisplayCustomizer
+                  userId={userId}
+                  onClose={() => setShowCustomizer(false)}
+                  onUpdate={() => {
+                    // Optionally refresh wallet data after update
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>
