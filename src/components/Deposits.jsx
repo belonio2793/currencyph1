@@ -1025,29 +1025,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
                 {fiatAmount && (
                   <div className="space-y-6">
-                    {selectedPaymentMethod === 'solana' && (
-                      <>
-                        <SolanaPaymentDisplay address={PAYMENT_METHODS.solana.address} />
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                          <p className="font-semibold mb-2">💡 Important:</p>
-                          <ul className="list-disc pl-5 space-y-1">
-                            <li>Deposit amount: <span className="font-bold">{formatCurrency(fiatAmount, globalCurrency)}</span></li>
-                            <li>Your balance will be updated once confirmed on the blockchain</li>
-                            <li>Keep your SOL address for transaction tracking</li>
-                          </ul>
-                        </div>
-                        <button
-                          onClick={() => setShowPaymentInstructions(!showPaymentInstructions)}
-                          className="w-full bg-purple-600 text-white py-3 rounded-lg hover:bg-purple-700 transition-colors font-medium"
-                        >
-                          {showPaymentInstructions ? 'Hide Instructions' : 'View Instructions'}
-                        </button>
-                        {showPaymentInstructions && (
-                          <InstructionsDisplay method={PAYMENT_METHODS.solana} />
-                        )}
-                      </>
-                    )}
-
                     {selectedPaymentMethod === 'gcash' && (
                       <>
                         <GCashPaymentDisplay
