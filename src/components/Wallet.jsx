@@ -664,14 +664,35 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
 
                       return (
                         <div key={wallet.id} className={`bg-white border border-slate-200 rounded-lg p-5 hover:shadow-lg transition-all hover:border-slate-300 ${isPlaceholder ? 'opacity-75' : ''}`}>
-                          <div className="mb-4">
-                            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fiat Currency</p>
-                            <div className="flex items-baseline gap-2">
-                              <p className="text-2xl font-light text-slate-900">{wallet.currency_code}</p>
-                              <p className="text-sm text-slate-500">{symbol}</p>
+                          {/* Header */}
+                          <div className="mb-3 flex items-start justify-between">
+                            <div>
+                              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Fiat Currency</p>
+                              <div className="flex items-baseline gap-2">
+                                <p className="text-2xl font-light text-slate-900">{wallet.currency_code}</p>
+                                <p className="text-sm text-slate-500">{symbol}</p>
+                              </div>
                             </div>
+                            <button
+                              onClick={() => setSelectedWalletDetail(wallet)}
+                              className="p-1.5 hover:bg-slate-100 rounded-lg transition-colors text-slate-400 hover:text-slate-900"
+                              title="View Details"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </button>
                           </div>
 
+                          {/* Account Number */}
+                          {wallet.account_number && (
+                            <div className="mb-3 pb-3 border-b border-slate-100">
+                              <p className="text-xs text-slate-500 mb-1">Account</p>
+                              <p className="text-xs font-mono text-slate-700 break-all">{wallet.account_number}</p>
+                            </div>
+                          )}
+
+                          {/* Balance */}
                           <div className="mb-4 pb-4 border-b border-slate-100">
                             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Balance ({globalCurrency})</p>
                             <p className="text-xl font-light text-slate-900 font-mono">{formatNumber(balanceInGlobalCurrency)}</p>
@@ -680,15 +701,24 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                             )}
                           </div>
 
-                          <button
-                            onClick={() => {
-                              setSelectedWallet(wallet)
-                              setShowAddFunds(true)
-                            }}
-                            className="w-full py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-                          >
-                            Add Funds
-                          </button>
+                          {/* Quick Actions */}
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedWallet(wallet)
+                                setShowAddFunds(true)
+                              }}
+                              className="flex-1 py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs font-medium"
+                            >
+                              Add
+                            </button>
+                            <button
+                              onClick={() => setSelectedWalletDetail(wallet)}
+                              className="flex-1 py-2 px-3 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors text-xs font-medium"
+                            >
+                              Details
+                            </button>
+                          </div>
                         </div>
                       )
                     })}
