@@ -50,20 +50,6 @@ const formatCurrency = (amount, currencyCode, showSymbol = true) => {
 
 // Payment Methods Configuration
 const PAYMENT_METHODS = {
-  solana: {
-    name: 'Solana',
-    icon: '◎',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
-    address: 'CbcWb97K3TEFJZIYTZQ5bMdVXTfaMaUcF6yPQgy9yS',
-    instructions: [
-      'Scan the QR code with your Solana wallet app',
-      'Verify the recipient address and amount',
-      'Confirm the transaction',
-      'Your balance will be updated within 1-2 minutes'
-    ]
-  },
   gcash: {
     name: 'GCash',
     icon: '₱',
