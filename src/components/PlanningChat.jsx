@@ -589,11 +589,11 @@ export default function PlanningChat() {
 
     try {
       // Use custom edge function instead of standard Supabase auth endpoint
-      const response = await fetch(`${window.location.origin}/functions/v1/planning-signup`, {
+      const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
+      const response = await fetch(`${supabaseUrl}/functions/v1/planning-signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`,
         },
         body: JSON.stringify({
           email,
