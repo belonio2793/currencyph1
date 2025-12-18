@@ -354,11 +354,28 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
       <div className="w-full px-4 sm:px-6 py-6 flex-1">
         {/* Header with total balance */}
         <div className="mb-8">
-          <h1 className="text-3xl sm:text-4xl font-light text-slate-900 tracking-tight mb-2">My Wallets</h1>
-          <div className="flex items-baseline gap-2 mb-6 flex-wrap">
-            <p className="text-sm text-slate-600">Total Balance</p>
-            <p className="text-2xl sm:text-3xl font-light text-slate-900">{formatNumber(consolidatedBalance > 0 ? consolidatedBalance : totalBalancePHP)}</p>
-            <p className="text-sm text-slate-500">{globalCurrency}</p>
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-4">
+            <div>
+              <h1 className="text-3xl sm:text-4xl font-light text-slate-900 tracking-tight mb-2">My Wallets</h1>
+              <div className="flex items-baseline gap-2 flex-wrap">
+                <p className="text-sm text-slate-600">Total Balance</p>
+                <p className="text-2xl sm:text-3xl font-light text-slate-900">{formatNumber(consolidatedBalance > 0 ? consolidatedBalance : totalBalancePHP)}</p>
+                <p className="text-sm text-slate-500">{globalCurrency}</p>
+              </div>
+            </div>
+
+            {/* Export Buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => walletExport.generateSummaryReport(internalWallets)}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export CSV
+              </button>
+            </div>
           </div>
 
           {/* Controls */}
