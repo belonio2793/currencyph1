@@ -1077,12 +1077,12 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+          </div>
+        </div>
 
-          {/* Crypto Tab Content */}
-          {depositTab === 'crypto' && (
-            <div className="p-8">
+        {/* Cryptocurrency Deposit */}
+        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
+          <div className="p-8">
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-slate-900">Deposit Cryptocurrency</h2>
 
