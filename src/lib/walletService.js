@@ -55,17 +55,27 @@ export const walletService = {
         return []
       }
 
-      // Try to fetch from the view first
-      const { data, error } = await supabase
-        .from('user_wallets_summary')
-        .select('*')
-        .eq('user_id', userId)
-        .eq('is_active', true)
-        .order('currency_type')
-        .order('currency_code')
+      // Ensure user has at least PHP wallet
+      try {
+        await supabase.rpc('ensure_user_wallets', { user_id: userId })
+      } catch (err) {
+        console.warn('Could not ensure user wallets:', err)
+      }
 
-      if (!error && data) {
-        return data || []
+      // Try to fetch from the view first
+      try {
+        const { data, error } = await supabase
+          .from('user_wallets_summary')
+          .select('*')
+          .eq('user_id', userId)
+          .order('currency_type')
+          .order('currency_code')
+
+        if (!error && data && data.length > 0) {
+          return data || []
+        }
+      } catch (viewErr) {
+        console.warn('View fetch failed, trying fallback:', viewErr)
       }
 
       // Fallback: fetch directly from wallets table with currency join
@@ -83,6 +93,7 @@ export const walletService = {
 
       // Transform fallback data to match expected format
       return (fallbackData || []).map(w => ({
+        id: w.id,
         wallet_id: w.id,
         user_id: w.user_id,
         currency_code: w.currency_code,
