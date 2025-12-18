@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense, lazy } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { currencyAPI } from '../lib/payments'
 import { walletService } from '../lib/walletService'
 import { preferencesManager } from '../lib/preferencesManager'
 import { formatNumber } from '../lib/currency'
 import { fetchRatesMap, convertAmount } from '../lib/reconciliation'
+
+const WalletDetailPanel = lazy(() => import('./Wallets/WalletDetailPanel'))
 
 export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
