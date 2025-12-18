@@ -116,10 +116,10 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
   }
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 p-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-light text-slate-900 mb-2">Dashboard Currencies</h2>
-        <p className="text-sm text-slate-600">
+    <div className="bg-white rounded-lg border border-slate-200 p-8">
+      <div className="mb-8">
+        <h2 className="text-4xl font-light text-slate-900 mb-3">Dashboard Currencies</h2>
+        <p className="text-base text-slate-600">
           Select which currencies to display on your dashboard. PHP is always included.
         </p>
       </div>
