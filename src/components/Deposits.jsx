@@ -990,7 +990,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   : 'bg-white text-slate-700 hover:bg-slate-50'
               }`}
             >
-              💵 Fiat Currency Deposit
+              Gcash Deposit
             </button>
             <button
               onClick={() => {
@@ -1004,7 +1004,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   : 'bg-white text-slate-700 hover:bg-slate-50'
               }`}
             >
-              ₿ Cryptocurrency Deposit
+              Solana Deposit
             </button>
           </div>
 
