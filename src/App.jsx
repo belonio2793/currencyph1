@@ -691,29 +691,86 @@ export default function App() {
                 {/* Footer - On all pages */}
                 <footer className="bg-white border-t border-slate-100 mt-20">
                   <div className="max-w-7xl mx-auto px-6 py-16">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
+                    <div className="mb-8">
+                      <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
+                      <p className="text-sm text-slate-500 leading-relaxed max-w-md">An open-source application that displays all transactions across the network.</p>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 mb-12">
+                      {/* Account */}
                       <div>
-                        <h3 className="text-xl font-light text-slate-900 mb-4 tracking-wide">currency.ph</h3>
-                        <p className="text-sm text-slate-500 leading-relaxed">An open-source application that displays all transactions across the network.</p>
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Product</h4>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Account</h4>
                         <ul className="space-y-3 text-sm">
-                          <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Transfer Money</a></li>
-                          <li><a href="#" className="text-slate-600 hover:text-slate-900 transition-colors">Pay Bills</a></li>
+                          <li><button onClick={() => setActiveTab('profile')} className="text-slate-600 hover:text-slate-900 transition-colors">Profile</button></li>
+                          <li><button onClick={() => setActiveTab('inbox')} className="text-slate-600 hover:text-slate-900 transition-colors">Inbox</button></li>
+                          <li><button onClick={() => setActiveTab('my-business')} className="text-slate-600 hover:text-slate-900 transition-colors">My Business</button></li>
+                          <li><button onClick={() => setActiveTab('transactions')} className="text-slate-600 hover:text-slate-900 transition-colors">History</button></li>
+                          <li><button onClick={() => setActiveTab('wallet')} className="text-slate-600 hover:text-slate-900 transition-colors">Wallet</button></li>
+                          <li><button onClick={() => setActiveTab('deposit')} className="text-slate-600 hover:text-slate-900 transition-colors">Deposit Funds</button></li>
                         </ul>
                       </div>
+                      {/* Main */}
                       <div>
-                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Maps</h4>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Main</h4>
                         <ul className="space-y-3 text-sm">
-                          <li><button onClick={() => setActiveTab('addresses')} className="text-slate-600 hover:text-slate-900 transition-colors">Addresses</button></li>
+                          <li><button onClick={() => setActiveTab('nearby')} className="text-slate-600 hover:text-slate-900 transition-colors">Nearby</button></li>
+                          <li><button onClick={() => setActiveTab('rides')} className="text-slate-600 hover:text-slate-900 transition-colors">Rides</button></li>
                         </ul>
                       </div>
+                      {/* Financial */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Financial</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('rates')} className="text-slate-600 hover:text-slate-900 transition-colors">Currency Rates</button></li>
+                          <li><button onClick={() => setActiveTab('payments-financial')} className="text-slate-600 hover:text-slate-900 transition-colors">Payments</button></li>
+                          <li><button onClick={() => setActiveTab('send')} className="text-slate-600 hover:text-slate-900 transition-colors">Send Money</button></li>
+                          <li><button onClick={() => setActiveTab('receive')} className="text-slate-600 hover:text-slate-900 transition-colors">Receive Money</button></li>
+                        </ul>
+                      </div>
+                      {/* Marketplace */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Marketplace</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('jobs')} className="text-slate-600 hover:text-slate-900 transition-colors">Jobs</button></li>
+                          <li><button onClick={() => setActiveTab('p2p-loans')} className="text-slate-600 hover:text-slate-900 transition-colors">Loans</button></li>
+                        </ul>
+                      </div>
+                      {/* Community */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Community</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('online-users')} className="text-slate-600 hover:text-slate-900 transition-colors">Online Users</button></li>
+                          <li><button onClick={() => setActiveTab('messages')} className="text-slate-600 hover:text-slate-900 transition-colors">Messages</button></li>
+                          <li><button onClick={() => setActiveTab('investments')} className="text-slate-600 hover:text-slate-900 transition-colors">Market Opportunities</button></li>
+                        </ul>
+                      </div>
+                      {/* Personal */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Personal</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('bills')} className="text-slate-600 hover:text-slate-900 transition-colors">Bills</button></li>
+                        </ul>
+                      </div>
+                      {/* Games */}
                       <div>
                         <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Games</h4>
                         <ul className="space-y-3 text-sm">
                           <li><button onClick={() => setActiveTab('poker')} className="text-slate-600 hover:text-slate-900 transition-colors">Poker</button></li>
                           <li><button onClick={() => setActiveTab('chess')} className="text-slate-600 hover:text-slate-900 transition-colors">Chess</button></li>
+                        </ul>
+                      </div>
+                      {/* Maps */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Maps</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('shipping')} className="text-slate-600 hover:text-slate-900 transition-colors">Shipping</button></li>
+                          <li><button onClick={() => setActiveTab('addresses')} className="text-slate-600 hover:text-slate-900 transition-colors">Addresses</button></li>
+                        </ul>
+                      </div>
+                      {/* Network */}
+                      <div>
+                        <h4 className="text-sm font-semibold text-slate-900 mb-4 uppercase tracking-wider">Network</h4>
+                        <ul className="space-y-3 text-sm">
+                          <li><button onClick={() => setActiveTab('network-balances')} className="text-slate-600 hover:text-slate-900 transition-colors">Network Balances</button></li>
                         </ul>
                       </div>
                     </div>
@@ -723,12 +780,12 @@ export default function App() {
                         <button onClick={() => setActiveTab('about')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                           About
                         </button>
-                        <button onClick={() => setActiveTab('network-balances')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
-                          Network Balances
-                        </button>
                         <button onClick={() => setActiveTab('planning')} className="text-slate-600 hover:text-slate-900 transition-colors font-medium">
                           Planning
                         </button>
+                        <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Privacy Policy</a>
+                        <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Terms of Service</a>
+                        <a href="#" className="text-slate-600 hover:text-slate-900 transition-colors font-medium">Contact</a>
                       </p>
                     </div>
                   </div>
