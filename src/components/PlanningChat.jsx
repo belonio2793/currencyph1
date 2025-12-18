@@ -516,8 +516,18 @@ export default function PlanningChat() {
 
   const handleSignIn = async (e) => {
     e.preventDefault()
-    setAuthLoading(true)
     setAuthError('')
+
+    if (!email.trim()) {
+      setAuthError('Email is required')
+      return
+    }
+    if (!password) {
+      setAuthError('Password is required')
+      return
+    }
+
+    setAuthLoading(true)
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
