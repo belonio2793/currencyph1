@@ -444,7 +444,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             ...prev,
             [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
           }))
-          setTimeout(() => loadCryptoPrices(), 50)
         } catch (e) {
           console.warn('currency_rates INSERT handler error:', e)
         }
@@ -455,7 +454,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             ...prev,
             [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
           }))
-          setTimeout(() => loadCryptoPrices(), 50)
         } catch (e) {
           console.warn('currency_rates UPDATE handler error:', e)
         }
@@ -468,7 +466,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             delete copy[key]
             return copy
           })
-          setTimeout(() => loadCryptoPrices(), 50)
         } catch (e) {
           console.warn('currency_rates DELETE handler error:', e)
         }
