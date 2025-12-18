@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { formatNumber } from '../../lib/currency'
 import { walletTransactionService } from '../../lib/walletTransactionService'
+import { walletExport } from '../../lib/walletExport'
 import TransactionHistory from './TransactionHistory'
 import WalletStatistics from './WalletStatistics'
 import BalanceTrendChart from './BalanceTrendChart'
