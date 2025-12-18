@@ -1,65 +1,6 @@
 import jsPDF from 'jspdf'
 
 export const walletExport = {
-  // Export wallet data to CSV
-  exportToCSV(wallet, transactions, stats) {
-    const lines = []
-
-    // Header
-    lines.push(`Wallet Export - ${wallet.currency_code}`)
-    lines.push(`Generated: ${new Date().toLocaleString()}`)
-    lines.push('')
-
-    // Wallet Information
-    lines.push('WALLET INFORMATION')
-    lines.push(`Currency Code,${wallet.currency_code}`)
-    lines.push(`Currency Name,${wallet.currency_name}`)
-    lines.push(`Currency Type,${wallet.currency_type}`)
-    lines.push(`Account Number,${wallet.account_number || 'N/A'}`)
-    lines.push(`Current Balance,${wallet.balance}`)
-    lines.push(`Total Deposited,${wallet.total_deposited}`)
-    lines.push(`Total Withdrawn,${wallet.total_withdrawn}`)
-    lines.push(`Status,${wallet.is_active ? 'Active' : 'Inactive'}`)
-    lines.push(`Created,${wallet.created_at ? new Date(wallet.created_at).toLocaleString() : 'N/A'}`)
-    lines.push(`Updated,${wallet.updated_at ? new Date(wallet.updated_at).toLocaleString() : 'N/A'}`)
-    lines.push('')
-
-    // Statistics
-    if (stats) {
-      lines.push('STATISTICS')
-      lines.push(`Total Transactions,${stats.transactionCount || 0}`)
-      lines.push(`Deposits Count,${stats.depositCount || 0}`)
-      lines.push(`Withdrawals Count,${stats.withdrawalCount || 0}`)
-      lines.push(`Largest Deposit,${stats.largestDeposit || 0}`)
-      lines.push(`Largest Withdrawal,${stats.largestWithdrawal || 0}`)
-      lines.push(`Average Transaction,${(stats.averageTransaction || 0).toFixed(8)}`)
-      lines.push('')
-    }
-
-    // Transactions
-    if (transactions && transactions.length > 0) {
-      lines.push('TRANSACTION HISTORY')
-      lines.push('Date,Type,Amount,Description,Balance Before,Balance After')
-      transactions.forEach(tx => {
-        const date = new Date(tx.created_at).toLocaleString()
-        const type = tx.type
-        const amount = tx.amount || 0
-        const description = (tx.description || '').replace(/,/g, ';') // Escape commas
-        const balanceBefore = tx.balance_before || ''
-        const balanceAfter = tx.balance_after || ''
-        lines.push(`"${date}","${type}",${amount},"${description}",${balanceBefore},${balanceAfter}`)
-      })
-    }
-
-    const csv = lines.join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = `wallet_${wallet.currency_code}_${new Date().toISOString().split('T')[0]}.csv`
-    link.click()
-    URL.revokeObjectURL(link.href)
-  },
-
   // Export wallet data to PDF
   exportToPDF(wallet, transactions, stats) {
     const doc = new jsPDF()
