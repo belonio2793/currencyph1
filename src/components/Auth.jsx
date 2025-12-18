@@ -410,7 +410,7 @@ export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = fa
 
   return (
     <div className={`${isModal ? '' : 'min-h-screen bg-gradient-to-br from-slate-50 to-blue-50'} flex ${isModal ? 'items-center' : 'items-start'} justify-center ${isModal ? 'p-2' : 'py-2 px-4 sm:px-6 lg:px-8'}`}>
-      <div className={`${isModal ? '' : 'max-w-md'} ${isModal ? '' : 'mt-2 mb-2'}`} style={isModal ? { width: '95%', maxWidth: '1200px' } : { width: '100%' }}>
+      <div className={`${isModal ? '' : 'max-w-md'} ${isModal ? '' : 'mt-2 mb-2'}`} style={isModal ? { width: '98%', maxWidth: '1400px' } : { width: '100%' }}>
         {/* Header */}
         {!isModal && (
           <div className="text-center mb-8">
