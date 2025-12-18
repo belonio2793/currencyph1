@@ -156,30 +156,30 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
 
           {/* Dropdown */}
           {showDropdown && filteredCurrencies.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-2 bg-white border border-slate-300 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+            <div className="absolute z-50 top-full left-0 right-0 mt-3 bg-white border border-slate-300 rounded-lg shadow-lg max-h-96 overflow-y-auto">
               {filteredCurrencies.map(currency => (
                 <div
                   key={currency.code}
                   onClick={() => handleToggleCurrency(currency.code)}
-                  className={`px-4 py-3 border-b border-slate-100 last:border-b-0 cursor-pointer transition-colors ${
+                  className={`px-5 py-4 border-b border-slate-100 last:border-b-0 cursor-pointer transition-colors ${
                     selectedCurrencies.includes(currency.code)
                       ? 'bg-blue-50'
                       : 'hover:bg-slate-50'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <input
                       type="checkbox"
                       checked={selectedCurrencies.includes(currency.code)}
                       onChange={() => {}}
-                      className="w-4 h-4 text-blue-600 rounded"
+                      className="w-5 h-5 text-blue-600 rounded"
                       disabled={currency.code === 'PHP'}
                     />
                     <div className="flex-1">
-                      <p className="font-medium text-slate-900">{currency.code}</p>
-                      <p className="text-xs text-slate-500">{currency.name}</p>
+                      <p className="font-medium text-slate-900 text-base">{currency.code}</p>
+                      <p className="text-sm text-slate-500">{currency.name}</p>
                     </div>
-                    <p className="text-sm text-slate-600">{currency.symbol}</p>
+                    <p className="text-base text-slate-600">{currency.symbol}</p>
                   </div>
                 </div>
               ))}
@@ -187,7 +187,7 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
           )}
         </div>
 
-        <p className="text-xs text-slate-500 mt-2">
+        <p className="text-sm text-slate-500 mt-3">
           Type to search by currency code (USD, EUR, etc.) or currency name
         </p>
       </div>
