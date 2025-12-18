@@ -588,38 +588,35 @@ export default function PlanningChat() {
     setAuthLoading(true)
 
     try {
-      // Use custom edge function instead of standard Supabase auth endpoint
-      const supabaseUrl = import.meta.env.VITE_PROJECT_URL || 'https://corcofbmafdxehvlbesx.supabase.co'
-      const response = await fetch(`${supabaseUrl}/functions/v1/planning-signup`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          password,
-          name
-        })
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name
+          }
+        }
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        setAuthError(data.error || 'Registration failed')
-        return
+      if (signUpError) {
+        throw signUpError
       }
 
-      setAuthError('Registration successful! Please check your email to confirm your account.')
-      setEmail('')
-      setPassword('')
-      setName('')
+      if (data?.user?.id) {
+        // The planning_users record will be auto-created by the trigger
+        // Just clear the form and inform user
+        setAuthError('Registration successful! Please check your email to confirm your account.')
+        setEmail('')
+        setPassword('')
+        setName('')
 
-      setTimeout(() => {
-        setAuthMode('login')
-        setAuthError('')
-      }, 2000)
+        setTimeout(() => {
+          setAuthMode('login')
+          setAuthError('')
+        }, 2000)
+      }
     } catch (error) {
-      setAuthError(error.message || 'Registration error')
+      setAuthError(error.message || 'Registration failed')
       console.error('Registration error:', error)
     } finally {
       setAuthLoading(false)
