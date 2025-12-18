@@ -603,8 +603,22 @@ export default function PlanningChat() {
       }
 
       if (data?.user?.id) {
-        // The planning_users record will be auto-created by the trigger
-        // Just clear the form and inform user
+        // Create planning_users record for this new auth user
+        const { error: planningError } = await supabase
+          .from('planning_users')
+          .insert({
+            user_id: data.user.id,
+            email,
+            name,
+            status: 'active',
+            role: 'member'
+          })
+
+        if (planningError) {
+          console.debug('Could not create planning profile at signup (non-critical):', planningError)
+          // Don't throw - auth user was created successfully
+        }
+
         setAuthError('Registration successful! Please check your email to confirm your account.')
         setEmail('')
         setPassword('')
