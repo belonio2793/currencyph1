@@ -141,30 +141,29 @@ export const walletService = {
     }
   },
 
-  // Ensure user has a PHP wallet
+  // Ensure user has a PHP wallet via edge function
   async ensurePhpWallet(userId) {
     try {
       if (!userId || userId === 'null' || userId === 'undefined') {
         return null
       }
 
-      // Check if PHP wallet exists
-      const { data: existing } = await supabase
-        .from('wallets')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('currency_code', 'PHP')
-        .single()
+      // Call the edge function to ensure PHP wallet
+      const { data, error } = await supabase.functions.invoke('ensure_user_wallets', {
+        body: { user_id: userId }
+      })
 
-      if (existing) {
-        return existing
+      if (error) {
+        console.warn('Edge function error:', error)
+        // Fallback: try to create locally
+        return await this.createWallet(userId, 'PHP')
       }
 
-      // Create PHP wallet if it doesn't exist
-      return await this.createWallet(userId, 'PHP')
+      return data
     } catch (err) {
       console.warn('Error ensuring PHP wallet:', err)
-      return null
+      // Fallback: try to create locally
+      return await this.createWallet(userId, 'PHP').catch(() => null)
     }
   },
 
