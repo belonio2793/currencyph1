@@ -204,9 +204,12 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               <div className="p-6">
                 <WalletDisplayCustomizer
                   userId={userId}
-                  onClose={() => setShowCustomizer(false)}
+                  onClose={() => {
+                    setShowCustomizer(false)
+                    loadData()
+                  }}
                   onUpdate={() => {
-                    // Optionally refresh wallet data after update
+                    loadData()
                   }}
                 />
               </div>
