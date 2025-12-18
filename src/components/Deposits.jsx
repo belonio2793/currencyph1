@@ -49,20 +49,21 @@ const formatCurrency = (amount, currencyCode, showSymbol = true) => {
 }
 
 // Payment Methods Configuration
+const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
+
 const PAYMENT_METHODS = {
-  gcash: {
-    name: 'GCash',
-    icon: '₱',
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-50',
-    borderColor: 'border-blue-200',
-    phone: '639308510351',
+  solana: {
+    name: 'Solana',
+    icon: '◎',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    borderColor: 'border-purple-200',
+    address: SOLANA_ADDRESS,
     instructions: [
-      'Open your GCash app',
-      'Select "Send Money" and enter the phone number',
-      'Enter the amount to send',
-      'Add the reference code in the notes',
-      'Your balance will be updated upon confirmation'
+      'Scan the QR code with your Solana wallet app',
+      'Verify the recipient address and amount',
+      'Confirm the transaction',
+      'Your balance will be updated within 1-2 minutes'
     ]
   }
 }
