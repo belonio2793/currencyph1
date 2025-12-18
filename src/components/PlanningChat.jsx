@@ -543,10 +543,39 @@ export default function PlanningChat() {
     }
   }
 
+  const validateRegistrationForm = () => {
+    if (!email.trim()) {
+      setAuthError('Email is required')
+      return false
+    }
+    if (!email.includes('@')) {
+      setAuthError('Please enter a valid email address')
+      return false
+    }
+    if (!password) {
+      setAuthError('Password is required')
+      return false
+    }
+    if (password.length < 6) {
+      setAuthError('Password must be at least 6 characters')
+      return false
+    }
+    if (!name.trim()) {
+      setAuthError('Full name is required')
+      return false
+    }
+    return true
+  }
+
   const handleRegister = async (e) => {
     e.preventDefault()
-    setAuthLoading(true)
     setAuthError('')
+
+    if (!validateRegistrationForm()) {
+      return
+    }
+
+    setAuthLoading(true)
 
     try {
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -574,14 +603,15 @@ export default function PlanningChat() {
         return
       }
 
-      setAuthError('Registration successful!')
+      setAuthError('Registration successful! Please check your email to confirm your account.')
       setEmail('')
       setPassword('')
       setName('')
       setTimeout(() => {
         setAuthMode('login')
+        setAuthError('')
         checkAuth()
-      }, 1500)
+      }, 2000)
     } catch (error) {
       setAuthError(error.message)
     } finally {
