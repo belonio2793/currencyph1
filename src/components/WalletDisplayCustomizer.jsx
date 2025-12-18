@@ -109,8 +109,8 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg p-6 border border-slate-200">
-        <p className="text-slate-500 text-center">Loading currencies...</p>
+      <div className="bg-white rounded-lg p-8 border border-slate-200">
+        <p className="text-slate-500 text-center text-lg">Loading currencies...</p>
       </div>
     )
   }
