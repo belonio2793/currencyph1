@@ -2485,6 +2485,76 @@ export default function PlanningChat() {
         </div>
       )}
 
+      {/* Marker Type Modal - Choose between Add to Existing or Create New */}
+      {showMarkerTypeModal && pendingMarkerType && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-sm bg-slate-800 rounded-lg p-6 border border-slate-700">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">Add {pendingMarkerType}</h2>
+              <button
+                onClick={() => {
+                  setShowMarkerTypeModal(false)
+                  setPendingMarkerType(null)
+                  setSelectedExistingLocationId('')
+                }}
+                className="text-slate-400 hover:text-white text-2xl transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-slate-300 text-sm font-medium mb-2">Choose an option:</label>
+              </div>
+
+              <div className="space-y-3">
+                {locations.length > 0 && (
+                  <div>
+                    <label htmlFor="existing-location-select" className="block text-slate-400 text-sm font-medium mb-2">Add to Existing Location</label>
+                    <select
+                      id="existing-location-select"
+                      value={selectedExistingLocationId}
+                      onChange={(e) => setSelectedExistingLocationId(e.target.value)}
+                      className="w-full rounded bg-slate-700 text-white border border-slate-600 hover:border-slate-500 transition-colors cursor-pointer focus:outline-none focus:border-blue-400 px-3 py-2 text-sm"
+                    >
+                      <option value="">Select a location...</option>
+                      {locations.map(loc => (
+                        <option key={loc.id} value={loc.id}>
+                          {markerTypeEmojis[loc.marker_type] || '📍'} {loc.name} ({loc.marker_type})
+                        </option>
+                      ))}
+                    </select>
+                    <button
+                      onClick={handleAddToExistingLocation}
+                      className="w-full mt-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-medium transition-colors"
+                    >
+                      Add to Selected Location
+                    </button>
+                  </div>
+                )}
+
+                <div className="border-t border-slate-700 pt-4">
+                  <p className="text-slate-400 text-sm font-medium mb-3">{locations.length > 0 ? 'Or c' : 'C'}reate a New Marker</p>
+                  <button
+                    onClick={handleCreateNewMarker}
+                    className="w-full px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded font-medium transition-colors"
+                  >
+                    Create New Marker
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {authError && (
+              <div className="bg-red-900 border border-red-700 text-red-200 px-3 py-2 rounded text-sm mb-4">
+                {authError}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* User Profile Preview Modal */}
       {showUserProfile && selectedUserForProfile && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
