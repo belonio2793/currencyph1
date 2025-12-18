@@ -206,20 +206,43 @@ export default function WalletDetailPanel({ wallet, userId, globalCurrency, onCl
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 px-8 py-4 rounded-b-2xl border-t border-slate-200 flex justify-end gap-3">
-          <button
-            onClick={onClose}
-            className="px-6 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors font-medium text-sm"
-          >
-            Close
-          </button>
-          <button
-            className={`px-6 py-2 text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm ${
-              isCrypto ? 'bg-orange-600' : 'bg-blue-600'
-            }`}
-          >
-            Add Funds
-          </button>
+        <div className="bg-slate-50 px-8 py-4 rounded-b-2xl border-t border-slate-200 flex justify-between gap-3 flex-wrap">
+          <div className="flex gap-2">
+            <button
+              onClick={() => walletExport.exportToCSV(wallet, transactions, stats)}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium text-sm flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              CSV
+            </button>
+            <button
+              onClick={() => walletExport.exportToPDF(wallet, transactions, stats)}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium text-sm flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              PDF
+            </button>
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              onClick={onClose}
+              className="px-6 py-2 bg-slate-200 text-slate-800 rounded-lg hover:bg-slate-300 transition-colors font-medium text-sm"
+            >
+              Close
+            </button>
+            <button
+              className={`px-6 py-2 text-white rounded-lg hover:opacity-90 transition-opacity font-medium text-sm ${
+                isCrypto ? 'bg-orange-600' : 'bg-blue-600'
+              }`}
+            >
+              Add Funds
+            </button>
+          </div>
         </div>
       </div>
     </div>
