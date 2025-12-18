@@ -389,7 +389,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [syncStatus, setSyncStatus] = useState('synced')
 
   // Payment method selection
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('gcash')
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('solana')
   const [referenceCode, setReferenceCode] = useState(null)
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false)
 
