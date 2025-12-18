@@ -1,186 +1,90 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 function Footer({ onNavigate, userEmail }) {
-  const [expandedGroups, setExpandedGroups] = useState({
-    account: true,
-    main: true,
-    financial: false,
-    marketplace: false,
-    community: false,
-    personal: false,
-    games: false,
-    maps: false,
-    network: false
-  })
-
-  const footerCategories = [
+  const footerSections = [
     {
-      id: 'account',
-      label: 'Account',
-      items: [
-        { label: 'Profile', tab: 'profile' },
-        { label: 'Inbox', tab: 'inbox' },
-        { label: 'My Business', tab: 'my-business' },
-        { label: 'History', tab: 'transactions' },
-        { label: 'Wallet', tab: 'wallet' },
-        { label: 'Deposit Funds', tab: 'deposit' }
+      title: 'PRODUCT',
+      links: [
+        { label: 'Transfer Money', tab: 'send' },
+        { label: 'Pay Bills', tab: 'bills' }
       ]
     },
     {
-      id: 'main',
-      label: 'Main',
-      items: [
-        { label: 'Nearby', tab: 'nearby' },
-        { label: 'Rides', tab: 'rides' }
+      title: 'MAPS',
+      links: [
+        { label: 'Addresses', tab: 'addresses' }
       ]
     },
     {
-      id: 'financial',
-      label: 'Financial',
-      items: [
-        { label: 'Currency Rates', tab: 'rates' },
-        { label: 'Payments', tab: 'payments-financial' },
-        { label: 'Send Money', tab: 'send' },
-        { label: 'Receive Money', tab: 'receive' }
-      ]
-    },
-    {
-      id: 'marketplace',
-      label: 'Marketplace',
-      items: [
-        { label: 'Jobs', tab: 'jobs' },
-        { label: 'Loans', tab: 'p2p-loans' }
-      ]
-    },
-    {
-      id: 'community',
-      label: 'Community',
-      items: [
-        { label: 'Online Users', tab: 'online-users' },
-        { label: 'Messages', tab: 'messages' },
-        { label: 'Market Opportunities', tab: 'investments' }
-      ]
-    },
-    {
-      id: 'personal',
-      label: 'Personal',
-      items: [
-        { label: 'Bills', tab: 'bills' }
-      ]
-    },
-    {
-      id: 'games',
-      label: 'Games',
-      items: [
+      title: 'GAMES',
+      links: [
         { label: 'Poker', tab: 'poker' },
         { label: 'Chess', tab: 'chess' }
-      ]
-    },
-    {
-      id: 'maps',
-      label: 'Maps',
-      items: [
-        { label: 'Shipping', tab: 'shipping' }
-      ]
-    },
-    {
-      id: 'network',
-      label: 'Network',
-      items: [
-        { label: 'Network Balances', tab: 'network-balances' }
       ]
     }
   ]
 
-  const toggleGroup = (groupId) => {
-    setExpandedGroups(prev => ({
-      ...prev,
-      [groupId]: !prev[groupId]
-    }))
-  }
+  const footerLinks = [
+    { label: 'About', tab: 'about' },
+    { label: 'Network Balances', tab: 'network-balances' },
+    { label: 'Planning', tab: 'planning' }
+  ]
 
   const handleLinkClick = (tab) => {
     onNavigate?.(tab)
   }
 
   return (
-    <footer className="mt-16 bg-slate-900 text-slate-100 border-t border-slate-700">
-      <div className="w-full">
-        {/* Footer Content Grid */}
-        <div className="px-6 py-12">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {footerCategories.map(category => {
-              const isExpanded = expandedGroups[category.id]
+    <footer className="mt-16 bg-white border-t border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="py-12 border-b border-gray-200">
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">currency.ph</h2>
+            <p className="text-sm text-gray-600 max-w-md">
+              An open source application that displays all transactions across the network.
+            </p>
+          </div>
 
-              return (
-                <div key={category.id} className="space-y-2">
-                  <button
-                    onClick={() => toggleGroup(category.id)}
-                    className="w-full flex items-center justify-between text-sm font-semibold text-slate-200 hover:text-white hover:bg-slate-800/60 px-3 py-2 rounded-lg transition-all duration-200 uppercase tracking-wide"
-                  >
-                    <span>{category.label}</span>
-                    <svg
-                      className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                    </svg>
-                  </button>
-
-                  {isExpanded && (
-                    <ul className="space-y-1 ml-1">
-                      {category.items.map(item => (
-                        <li key={item.tab}>
-                          <button
-                            onClick={() => handleLinkClick(item.tab)}
-                            className="w-full text-left px-3 py-2 text-sm text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-all duration-200 border-l-3 border-l-transparent hover:translate-x-1"
-                          >
-                            {item.label}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              )
-            })}
+          {/* Footer Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8">
+            {footerSections.map((section, idx) => (
+              <div key={idx}>
+                <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-4">
+                  {section.title}
+                </h3>
+                <ul className="space-y-3">
+                  {section.links.map(link => (
+                    <li key={link.tab}>
+                      <button
+                        onClick={() => handleLinkClick(link.tab)}
+                        className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                      >
+                        {link.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Footer Bottom */}
-        <div className="border-t border-slate-700 px-6 py-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-slate-400">
-              © {new Date().getFullYear()} currency.ph • All rights reserved
-            </p>
-            <div className="flex gap-6 text-xs">
+        {/* Bottom Section */}
+        <div className="py-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+          <p className="text-xs text-gray-500">
+            © 2025 currency.ph. All rights reserved
+          </p>
+          <div className="flex gap-6">
+            {footerLinks.map(link => (
               <button
-                onClick={() => handleLinkClick('about')}
-                className="text-slate-400 hover:text-slate-200 transition-colors"
+                key={link.tab}
+                onClick={() => handleLinkClick(link.tab)}
+                className="text-xs text-gray-600 hover:text-gray-900 transition-colors"
               >
-                About
+                {link.label}
               </button>
-              <a
-                href="#"
-                className="text-slate-400 hover:text-slate-200 transition-colors"
-              >
-                Privacy Policy
-              </a>
-              <a
-                href="#"
-                className="text-slate-400 hover:text-slate-200 transition-colors"
-              >
-                Terms of Service
-              </a>
-              <a
-                href="#"
-                className="text-slate-400 hover:text-slate-200 transition-colors"
-              >
-                Contact
-              </a>
-            </div>
+            ))}
           </div>
         </div>
       </div>
