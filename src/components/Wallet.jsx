@@ -41,8 +41,8 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
         .eq('is_active', true)
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Error fetching wallets:', fetchError)
-        setError('Failed to load wallets')
+        console.error('Error fetching wallets:', fetchError?.message || JSON.stringify(fetchError))
+        setError(`Failed to load wallets: ${fetchError?.message || 'Unknown error'}`)
         return
       }
 
