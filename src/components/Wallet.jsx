@@ -375,7 +375,10 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
                   onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent bg-white text-left flex items-center justify-between hover:border-slate-400 transition-colors"
                 >
-                  <span>{selectedCurrency ? `${selectedCurrency} ${CURRENCY_SYMBOLS[selectedCurrency] || ''}` : 'All Currencies'}</span>
+                  <span>{selectedCurrency ? (() => {
+                    const curr = allCurrencies.find(c => c.code === selectedCurrency)
+                    return curr ? `${curr.name} ${curr.code}` : selectedCurrency
+                  })() : 'All Currencies'}</span>
                   <svg className={`w-4 h-4 transition-transform ${showCurrencyDropdown ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                   </svg>
