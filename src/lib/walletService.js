@@ -55,44 +55,22 @@ export const walletService = {
         return []
       }
 
-      // Ensure user has at least PHP wallet
-      try {
-        await supabase.rpc('ensure_user_wallets', { user_id: userId })
-      } catch (err) {
-        console.warn('Could not ensure user wallets:', err)
-      }
-
-      // Try to fetch from the view first
-      try {
-        const { data, error } = await supabase
-          .from('user_wallets_summary')
-          .select('*')
-          .eq('user_id', userId)
-          .order('currency_type')
-          .order('currency_code')
-
-        if (!error && data && data.length > 0) {
-          return data || []
-        }
-      } catch (viewErr) {
-        console.warn('View fetch failed, trying fallback:', viewErr)
-      }
-
-      // Fallback: fetch directly from wallets table with currency join
-      const { data: fallbackData, error: fallbackError } = await supabase
+      // Fetch directly from wallets table with currency join
+      const { data: walletData, error: walletError } = await supabase
         .from('wallets')
         .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, currencies(name, type, symbol, decimals)')
         .eq('user_id', userId)
         .eq('is_active', true)
         .order('currency_code')
 
-      if (fallbackError) {
-        console.warn('Error fetching user wallets with details:', fallbackError)
+      if (walletError) {
+        console.warn('Error fetching user wallets with details:', walletError)
+        // Return empty array - user may not have wallets yet
         return []
       }
 
-      // Transform fallback data to match expected format
-      return (fallbackData || []).map(w => ({
+      // Transform data to match expected format
+      const wallets = (walletData || []).map(w => ({
         id: w.id,
         wallet_id: w.id,
         user_id: w.user_id,
@@ -109,6 +87,8 @@ export const walletService = {
         updated_at: w.updated_at,
         account_number: w.account_number
       }))
+
+      return wallets
     } catch (err) {
       console.warn('Failed to fetch user wallets with details:', err)
       return []
