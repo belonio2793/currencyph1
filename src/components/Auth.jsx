@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-export default function Auth({ onAuthSuccess, initialTab = 'login' }) {
+export default function Auth({ onAuthSuccess, initialTab = 'login', isModal = false }) {
   const [activeTab, setActiveTab] = useState(initialTab)
 
   useEffect(() => {
