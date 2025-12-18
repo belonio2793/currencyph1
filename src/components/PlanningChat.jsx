@@ -164,6 +164,7 @@ export default function PlanningChat() {
   const [editingLocationId, setEditingLocationId] = useState(null)
   const [showMarkerTypeSelector, setShowMarkerTypeSelector] = useState(true)
   const [showFilterSelects, setShowFilterSelects] = useState(isMobile ? false : true)
+  const [selectedJumpLocation, setSelectedJumpLocation] = useState('')
 
   const messagesEndRef = useRef(null)
   const mapRef = useRef(null)
