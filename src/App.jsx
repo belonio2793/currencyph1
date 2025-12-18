@@ -264,7 +264,7 @@ export default function App() {
         try {
           // Add timeouts to prevent indefinite blocking
           await Promise.race([
-            currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User'),
+            currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User', user.id),
             new Promise((resolve) => setTimeout(() => resolve(null), 3000))
           ]).catch(e => console.warn('getOrCreateUser failed:', e))
 
@@ -438,7 +438,7 @@ export default function App() {
     // For guest-local users (not real Supabase auth), don't try database operations
     if (!user.id.includes('guest-local')) {
       // Initialize user profile and wallets non-blocking (in background)
-      currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User').catch(err => {
+      currencyAPI.getOrCreateUser(user.email, user.user_metadata?.full_name || 'User', user.id).catch(err => {
         console.warn('Failed to initialize user profile:', err)
       })
       // Ensure user has wallets for all active currencies (non-blocking)
