@@ -602,8 +602,40 @@ export default function PlanningChat() {
   }
 
   const handleSelectMarkerType = (type) => {
-    setSelectedMarkerType(type)
+    setPendingMarkerType(type)
+    setShowMarkerTypeModal(true)
+  }
+
+  const handleAddToExistingLocation = () => {
+    if (!selectedExistingLocationId) {
+      setAuthError('Please select a location')
+      return
+    }
+    const existingLocation = locations.find(loc => loc.id === selectedExistingLocationId)
+    if (existingLocation) {
+      setSelectedMarkerType(pendingMarkerType)
+      setLocationForm({
+        name: existingLocation.name,
+        description: existingLocation.description || '',
+        latitude: existingLocation.latitude,
+        longitude: existingLocation.longitude,
+        marker_type: pendingMarkerType,
+        metadata: existingLocation.metadata || {}
+      })
+      setEditingLocationId(existingLocation.id)
+      setShowLocationForm(true)
+      setShowMarkerTypeModal(false)
+      setSelectedExistingLocationId('')
+      setPendingMarkerType(null)
+    }
+  }
+
+  const handleCreateNewMarker = () => {
+    setSelectedMarkerType(pendingMarkerType)
     setIsCreatingLocation(true)
+    setShowMarkerTypeModal(false)
+    setSelectedExistingLocationId('')
+    setPendingMarkerType(null)
   }
 
   const handleSaveLocation = async (e) => {
