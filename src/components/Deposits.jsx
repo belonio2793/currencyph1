@@ -502,14 +502,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     }
   }, [userId])
 
-  useEffect(() => {
-    setSelectedCurrency(globalCurrency)
-  }, [globalCurrency])
-
   const loadInitialData = async () => {
     try {
-      setAllCurrencies(currencyAPI.getCurrencies())
-
       if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
         paymentsAPI.ensureUserWallets(userId).catch(err => {
           console.debug('Failed to ensure user wallets, continuing:', err)
@@ -526,9 +520,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       ])
       setLoading(false)
       setLastUpdate(new Date())
-      loadCryptoPrices().catch(err => {
-        console.debug('Crypto prices loading failed, continuing with defaults:', err)
-      })
     } catch (err) {
       console.error('Error loading data:', err)
       setError('Failed to load data')
