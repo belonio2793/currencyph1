@@ -427,8 +427,6 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [referenceCode, setReferenceCode] = useState(null)
   const [showPaymentInstructions, setShowPaymentInstructions] = useState(false)
 
-  // Deposit tabs
-  const [depositTab, setDepositTab] = useState('fiat') // 'fiat' or 'crypto'
 
   // Fiat deposit state
   const [fiatAmount, setFiatAmount] = useState('')
