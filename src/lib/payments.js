@@ -38,7 +38,7 @@ const generateUniqueAccountNumber = async (length = 12, attempts = 10) => {
 
 export const currencyAPI = {
   // ============ User Management ============
-  async getOrCreateUser(email, fullName = 'User') {
+  async getOrCreateUser(email, fullName = 'User', userId = null) {
     const maxRetries = 3
     let lastError = null
 
@@ -57,20 +57,23 @@ export const currencyAPI = {
 
         if (existingUser) {
           console.log('User exists:', existingUser.id)
+          // Ensure profiles exist even for existing users
+          this.ensureAllProfiles(existingUser.id, email, fullName).catch(() => {})
           return existingUser
         }
 
         // User doesn't exist, create one
+        const insertData = {
+          email,
+          full_name: fullName,
+          country_code: 'PH',
+          status: 'active'
+        }
+        if (userId) insertData.id = userId
+
         const { data: newUser, error: insertError } = await supabase
           .from('users')
-          .insert([
-            {
-              email,
-              full_name: fullName,
-              country_code: 'PH',
-              status: 'active'
-            }
-          ])
+          .insert([insertData])
           .select()
           .single()
 
@@ -79,6 +82,9 @@ export const currencyAPI = {
         }
 
         console.log('User created successfully:', newUser.id)
+
+        // Ensure all domain-specific profiles exist
+        this.ensureAllProfiles(newUser.id, email, fullName).catch(() => {})
 
         // Create default wallets for all active currencies using the function (non-blocking)
         supabase.rpc('create_default_wallets', { p_user_id: newUser.id })
@@ -105,6 +111,36 @@ export const currencyAPI = {
 
     console.error('getOrCreateUser failed after retries:', lastError)
     return null
+  },
+
+  async ensureAllProfiles(userId, email, fullName) {
+    if (!userId || userId.includes('guest-local')) return
+
+    // 1. Ride Profile
+    supabase.from('ride_profiles').upsert({
+      user_id: userId,
+      full_name: fullName,
+      role: 'rider',
+      status: 'offline',
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' }).catch(e => console.warn('ride_profiles upsert failed:', e))
+
+    // 2. Planning User
+    supabase.from('planning_users').upsert({
+      user_id: userId,
+      email: email,
+      name: fullName,
+      status: 'active',
+      role: 'member',
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' }).catch(e => console.warn('planning_users upsert failed:', e))
+
+    // 3. Generic Profile (if profiles table exists)
+    supabase.from('profiles').upsert({
+      id: userId,
+      full_name: fullName,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' }).catch(e => console.warn('profiles upsert failed:', e))
   },
 
   async ensureUserWallets(userId) {
