@@ -95,6 +95,79 @@ export const walletService = {
     }
   },
 
+  // Create a wallet for a user and currency
+  async createWallet(userId, currencyCode) {
+    try {
+      const { data, error } = await supabase
+        .from('wallets')
+        .insert([
+          {
+            user_id: userId,
+            currency_code: currencyCode,
+            balance: 0,
+            total_deposited: 0,
+            total_withdrawn: 0,
+            is_active: true
+          }
+        ])
+        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, currencies(name, type, symbol, decimals)')
+        .single()
+
+      if (error) {
+        console.warn(`Failed to create wallet for ${currencyCode}:`, error)
+        return null
+      }
+
+      return {
+        id: data.id,
+        wallet_id: data.id,
+        user_id: data.user_id,
+        currency_code: data.currency_code,
+        currency_name: data.currencies?.name || data.currency_code,
+        currency_type: data.currencies?.type || 'fiat',
+        symbol: data.currencies?.symbol,
+        decimals: data.currencies?.decimals,
+        balance: data.balance,
+        total_deposited: data.total_deposited,
+        total_withdrawn: data.total_withdrawn,
+        is_active: data.is_active,
+        created_at: data.created_at,
+        updated_at: data.updated_at,
+        account_number: data.account_number
+      }
+    } catch (err) {
+      console.warn('Error creating wallet:', err)
+      return null
+    }
+  },
+
+  // Ensure user has a PHP wallet
+  async ensurePhpWallet(userId) {
+    try {
+      if (!userId || userId === 'null' || userId === 'undefined') {
+        return null
+      }
+
+      // Check if PHP wallet exists
+      const { data: existing } = await supabase
+        .from('wallets')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('currency_code', 'PHP')
+        .single()
+
+      if (existing) {
+        return existing
+      }
+
+      // Create PHP wallet if it doesn't exist
+      return await this.createWallet(userId, 'PHP')
+    } catch (err) {
+      console.warn('Error ensuring PHP wallet:', err)
+      return null
+    }
+  },
+
   // Build complete wallet list with placeholders for missing currencies
   async buildCompleteWalletList(userId, filters = {}) {
     try {
