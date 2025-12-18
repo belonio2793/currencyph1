@@ -2,74 +2,78 @@ import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 import { formatNumber } from '../lib/currency'
 import WalletDisplayCustomizer from './WalletDisplayCustomizer'
+import { getWalletDisplayPreferences } from '../lib/walletPreferences'
 
 export default function Wallet({ userId, globalCurrency = 'PHP' }) {
-  const [phpWallet, setPhpWallet] = useState(null)
+  const [wallets, setWallets] = useState([])
+  const [selectedCurrencies, setSelectedCurrencies] = useState(['PHP'])
   const [loading, setLoading] = useState(true)
   const [showCustomizer, setShowCustomizer] = useState(false)
   const [error, setError] = useState('')
+  const [copied, setCopied] = useState(null)
 
   useEffect(() => {
-    loadPhpWallet()
+    loadData()
   }, [userId])
 
-  const loadPhpWallet = async () => {
+  const loadData = async () => {
     try {
       setLoading(true)
       setError('')
 
       if (!userId || userId === 'null' || userId === 'undefined' || userId.includes('guest-local')) {
-        setPhpWallet(null)
+        setWallets([])
+        setSelectedCurrencies(['PHP'])
         setLoading(false)
         return
       }
 
-      // Fetch or create PHP wallet
-      const { data: wallet, error: fetchError } = await supabase
+      // Load user's saved currency preferences
+      const preferences = await getWalletDisplayPreferences(userId)
+      setSelectedCurrencies(preferences || ['PHP'])
+
+      // Fetch wallets for all selected currencies
+      const { data: userWallets, error: fetchError } = await supabase
         .from('wallets')
         .select('*')
         .eq('user_id', userId)
-        .eq('currency_code', 'PHP')
         .eq('is_active', true)
-        .single()
 
       if (fetchError && fetchError.code !== 'PGRST116') {
-        console.error('Error fetching PHP wallet:', fetchError)
-        setError('Failed to load wallet')
+        console.error('Error fetching wallets:', fetchError)
+        setError('Failed to load wallets')
         return
       }
 
-      if (wallet) {
-        setPhpWallet(wallet)
-      } else {
-        // Create PHP wallet if it doesn't exist
-        const { data: newWallet, error: createError } = await supabase
-          .from('wallets')
-          .insert([
-            {
-              user_id: userId,
-              currency_code: 'PHP',
-              balance: 0,
-              total_deposited: 0,
-              total_withdrawn: 0,
-              is_active: true
-            }
-          ])
-          .select()
-          .single()
+      const allWallets = userWallets || []
 
-        if (createError && createError.code !== '23505') { // 23505 = unique constraint
-          console.error('Error creating PHP wallet:', createError)
+      // Filter to only selected currencies
+      const filteredWallets = allWallets.filter(w =>
+        preferences?.includes(w.currency_code)
+      )
+
+      // Ensure PHP wallet exists and is in the list
+      const hasPHP = filteredWallets.some(w => w.currency_code === 'PHP')
+      if (!hasPHP) {
+        const phpWallet = allWallets.find(w => w.currency_code === 'PHP')
+        if (phpWallet) {
+          filteredWallets.unshift(phpWallet)
         }
-
-        setPhpWallet(newWallet || null)
       }
+
+      setWallets(filteredWallets)
     } catch (err) {
-      console.error('Error loading PHP wallet:', err)
-      setError('Failed to load wallet')
+      console.error('Error loading wallets:', err)
+      setError('Failed to load wallets')
     } finally {
       setLoading(false)
     }
+  }
+
+  const copyToClipboard = (text, id) => {
+    navigator.clipboard.writeText(text)
+    setCopied(id)
+    setTimeout(() => setCopied(null), 2000)
   }
 
   if (loading) {
