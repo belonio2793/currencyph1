@@ -959,42 +959,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
-        {/* Deposit Tabs */}
+        {/* GCash Fiat Deposit */}
         <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
-          <div className="flex border-b border-slate-200">
-            <button
-              onClick={() => {
-                setDepositTab('fiat')
-                setError('')
-                setSuccess('')
-              }}
-              className={`flex-1 py-4 px-6 font-medium transition-colors ${
-                depositTab === 'fiat'
-                  ? 'bg-blue-50 text-blue-700 border-b-2 border-blue-600'
-                  : 'bg-white text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Gcash Deposit
-            </button>
-            <button
-              onClick={() => {
-                setDepositTab('crypto')
-                setError('')
-                setSuccess('')
-              }}
-              className={`flex-1 py-4 px-6 font-medium transition-colors ${
-                depositTab === 'crypto'
-                  ? 'bg-orange-50 text-orange-700 border-b-2 border-orange-600'
-                  : 'bg-white text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              Solana Deposit
-            </button>
-          </div>
-
-          {/* Fiat Tab Content */}
-          {depositTab === 'fiat' && (
-            <div className="p-8">
+          <div className="p-8">
               <div className="space-y-6">
                 <h2 className="text-2xl font-semibold text-slate-900">Add Fiat Funds</h2>
 
