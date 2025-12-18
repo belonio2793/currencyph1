@@ -20,6 +20,7 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
   const [enabledInternal, setEnabledInternal] = useState([])
 
   const [selectedWallet, setSelectedWallet] = useState(null)
+  const [selectedWalletDetail, setSelectedWalletDetail] = useState(null)
   const [amount, setAmount] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
