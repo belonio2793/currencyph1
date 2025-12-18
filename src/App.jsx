@@ -101,10 +101,6 @@ export default function App() {
           if (session && session.user) {
             setUserId(session.user.id)
             setUserEmail(session.user.email)
-            // Ensure user has a PHP wallet via edge function
-            ensureUserPhpWallet(session.user.id).catch(err => {
-              console.debug('Could not ensure PHP wallet:', err)
-            })
             // Presence disabled due to network errors in edge/offline environments
             // Presence tracking is non-critical and causes "Failed to fetch" errors
             // TODO: Re-enable when network connectivity is reliable
