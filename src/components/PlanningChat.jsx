@@ -588,28 +588,24 @@ export default function PlanningChat() {
     setAuthLoading(true)
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password
+      // Use custom edge function instead of standard Supabase auth endpoint
+      const response = await fetch(`${window.location.origin}/functions/v1/planning-signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token || ''}`,
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          name
+        })
       })
 
-      if (authError) {
-        setAuthError(authError.message)
-        return
-      }
+      const data = await response.json()
 
-      const { error: insertError } = await supabase
-        .from('planning_users')
-        .insert({
-          user_id: authData.user.id,
-          email,
-          name: name || email.split('@')[0],
-          status: 'active',
-          role: 'member'
-        })
-
-      if (insertError) {
-        setAuthError(insertError.message)
+      if (!response.ok) {
+        setAuthError(data.error || 'Registration failed')
         return
       }
 
@@ -617,13 +613,14 @@ export default function PlanningChat() {
       setEmail('')
       setPassword('')
       setName('')
+
       setTimeout(() => {
         setAuthMode('login')
         setAuthError('')
-        checkAuth()
       }, 2000)
     } catch (error) {
-      setAuthError(error.message)
+      setAuthError(error.message || 'Registration error')
+      console.error('Registration error:', error)
     } finally {
       setAuthLoading(false)
     }
