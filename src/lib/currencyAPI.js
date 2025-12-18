@@ -39,7 +39,7 @@ export const currencyAPI = {
       if (OPEN_KEY) {
         try {
           const controller = new AbortController()
-          const timeout = setTimeout(() => controller.abort(), 10000)
+          const timeout = setTimeout(() => controller.abort(), 15000)
           const url = `https://openexchangerates.org/api/latest.json?app_id=${OPEN_KEY}`
           const resp = await fetch(url, {
             headers: { Accept: 'application/json' },
@@ -62,15 +62,9 @@ export const currencyAPI = {
               })
               return rates
             }
-          } else {
-            console.warn('OpenExchangeRates responded with status', resp && resp.status)
           }
         } catch (e) {
-          if (e.name === 'AbortError') {
-            console.warn('OpenExchangeRates fetch timeout after 10 seconds')
-          } else {
-            console.warn('OpenExchangeRates fetch failed:', e && e.message)
-          }
+          // Silently skip - error handling continues to fallback
         }
       }
 
