@@ -1168,8 +1168,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+          </div>
         </div>
       </div>
     </div>
