@@ -36,9 +36,9 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
       // Fetch wallets for all selected currencies
       const { data: userWallets, error: fetchError } = await supabase
         .from('wallets')
-        .select('*, currencies(type, name, symbol)')
+        .select('*')
         .eq('user_id', userId)
-        .eq('is_active', true)
+        .order('created_at', { ascending: false })
 
       if (fetchError && fetchError.code !== 'PGRST116') {
         console.error('Error fetching wallets:', fetchError?.message || JSON.stringify(fetchError))
