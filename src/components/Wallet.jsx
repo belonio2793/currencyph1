@@ -885,6 +885,24 @@ export default function Wallet({ userId, totalBalancePHP = 0, globalCurrency = '
           </div>
         )}
 
+        {/* Wallet Detail Panel */}
+        {selectedWalletDetail && (
+          <Suspense fallback={
+            <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center">
+              <div className="text-white text-center">Loading details...</div>
+            </div>
+          }>
+            <WalletDetailPanel
+              wallet={selectedWalletDetail}
+              userId={userId}
+              globalCurrency={globalCurrency}
+              onClose={() => setSelectedWalletDetail(null)}
+              ratesMap={ratesMap}
+              convertAmount={convertAmount}
+            />
+          </Suspense>
+        )}
+
       </div>
     </div>
   )
