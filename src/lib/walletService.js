@@ -55,6 +55,7 @@ export const walletService = {
         return []
       }
 
+      // Try to fetch from the view first
       const { data, error } = await supabase
         .from('user_wallets_summary')
         .select('*')
@@ -63,12 +64,40 @@ export const walletService = {
         .order('currency_type')
         .order('currency_code')
 
-      if (error) {
-        console.warn('Error fetching user wallets with details:', error)
+      if (!error && data) {
+        return data || []
+      }
+
+      // Fallback: fetch directly from wallets table with currency join
+      const { data: fallbackData, error: fallbackError } = await supabase
+        .from('wallets')
+        .select('id, user_id, currency_code, balance, total_deposited, total_withdrawn, is_active, created_at, updated_at, account_number, currencies(name, type, symbol, decimals)')
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .order('currency_code')
+
+      if (fallbackError) {
+        console.warn('Error fetching user wallets with details:', fallbackError)
         return []
       }
 
-      return data || []
+      // Transform fallback data to match expected format
+      return (fallbackData || []).map(w => ({
+        wallet_id: w.id,
+        user_id: w.user_id,
+        currency_code: w.currency_code,
+        currency_name: w.currencies?.name || w.currency_code,
+        currency_type: w.currencies?.type || 'fiat',
+        symbol: w.currencies?.symbol,
+        decimals: w.currencies?.decimals,
+        balance: w.balance,
+        total_deposited: w.total_deposited,
+        total_withdrawn: w.total_withdrawn,
+        is_active: w.is_active,
+        created_at: w.created_at,
+        updated_at: w.updated_at,
+        account_number: w.account_number
+      }))
     } catch (err) {
       console.warn('Failed to fetch user wallets with details:', err)
       return []
