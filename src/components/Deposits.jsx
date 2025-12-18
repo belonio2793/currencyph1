@@ -375,57 +375,13 @@ const WalletSummaryCard = React.memo(function WalletSummaryCard({ wallet, global
 
 // Main Deposits Component
 function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
-  const [amount, setAmount] = useState('')
-  const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
   const [exchangeRates, setExchangeRates] = useState({})
   const [wallets, setWallets] = useState([])
-  const [convertedAmounts, setConvertedAmounts] = useState({})
   const [loading, setLoading] = useState(true)
-  const [adding, setAdding] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [allCurrencies, setAllCurrencies] = useState([])
   const [lastUpdate, setLastUpdate] = useState(null)
   const [syncStatus, setSyncStatus] = useState('synced')
-
-  // Payment method selection
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('solana')
-  const [referenceCode, setReferenceCode] = useState(null)
-  const [showPaymentInstructions, setShowPaymentInstructions] = useState(false)
-
-
-  // Fiat deposit state
-  const [fiatAmount, setFiatAmount] = useState('')
-  const [fiatConvertedAmounts, setFiatConvertedAmounts] = useState({})
-
-  // Crypto deposit state
-  const [cryptoAmount, setCryptoAmount] = useState('')
-  const [selectedCrypto, setSelectedCrypto] = useState('BTC')
-  const [cryptoRates, setCryptoRates] = useState({})
-  const [cryptoConvertedAmounts, setCryptoConvertedAmounts] = useState({})
-  const [addingCrypto, setAddingCrypto] = useState(false)
-
-  const [selectedDepositCurrency, setSelectedDepositCurrency] = useState(null)
-
-  const cryptos = ['BTC', 'ETH', 'LTC', 'DOGE', 'XRP', 'ADA', 'SOL', 'AVAX', 'MATIC', 'DOT', 'LINK', 'UNI', 'AAVE', 'USDC', 'USDT']
-
-  const defaultCryptoPrices = {
-    BTC: 5520000,
-    ETH: 205000,
-    LTC: 26000,
-    DOGE: 18,
-    XRP: 32,
-    ADA: 50,
-    SOL: 14200,
-    AVAX: 42000,
-    MATIC: 75,
-    DOT: 9500,
-    LINK: 3200,
-    UNI: 10500,
-    AAVE: 380000,
-    USDC: 56.75,
-    USDT: 56.75
-  }
 
   const fetchWithRetries = async (url, options = {}, retries = 1, backoff = 500) => {
     if (!url) return null
