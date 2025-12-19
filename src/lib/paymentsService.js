@@ -638,6 +638,104 @@ export const paymentsService = {
     return data
   },
 
+  // ============ Payments (Central Ledger) ============
+  async getPaymentsByMerchant(merchantId, status = null) {
+    let query = supabase
+      .from('payments')
+      .select('*')
+      .eq('merchant_id', merchantId)
+
+    if (status) {
+      query = query.eq('status', status)
+    }
+
+    const { data, error } = await query.order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
+  },
+
+  async getPaymentsByCustomer(customerId) {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('customer_id', customerId)
+      .order('created_at', { ascending: false })
+
+    if (error) throw error
+    return data || []
+  },
+
+  async getPayment(paymentId) {
+    const { data, error } = await supabase
+      .from('payments')
+      .select('*')
+      .eq('id', paymentId)
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  async createPayment(paymentData) {
+    const { data, error } = await supabase
+      .from('payments')
+      .insert([
+        {
+          merchant_id: paymentData.merchant_id,
+          customer_id: paymentData.customer_id || null,
+          business_id: paymentData.business_id || null,
+          payment_intent_id: paymentData.payment_intent_id || null,
+          invoice_id: paymentData.invoice_id || null,
+          payment_link_id: paymentData.payment_link_id || null,
+          deposit_intent_id: paymentData.deposit_intent_id || null,
+          product_id: paymentData.product_id || null,
+          guest_email: paymentData.guest_email || null,
+          guest_name: paymentData.guest_name || null,
+          amount: paymentData.amount,
+          currency: paymentData.currency || 'PHP',
+          fee_amount: paymentData.fee_amount || 0,
+          net_amount: (paymentData.amount - (paymentData.fee_amount || 0)),
+          status: paymentData.status || 'pending',
+          payment_type: paymentData.payment_type || 'payment',
+          payment_method: paymentData.payment_method || null,
+          description: paymentData.description || null,
+          reference_number: paymentData.reference_number || null,
+          external_reference_id: paymentData.external_reference_id || null,
+          qr_code_url: paymentData.qr_code_url || null,
+          metadata: paymentData.metadata || {},
+          completed_at: paymentData.status === 'succeeded' ? new Date().toISOString() : null
+        }
+      ])
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
+  async updatePaymentStatus(paymentId, status, extraData = {}) {
+    const updates = {
+      status,
+      ...extraData,
+      updated_at: new Date().toISOString()
+    }
+
+    if (status === 'succeeded' && !extraData.completed_at) {
+      updates.completed_at = new Date().toISOString()
+    }
+
+    const { data, error } = await supabase
+      .from('payments')
+      .update(updates)
+      .eq('id', paymentId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  },
+
   // ============ Helpers ============
   generateSlug(text) {
     return text
