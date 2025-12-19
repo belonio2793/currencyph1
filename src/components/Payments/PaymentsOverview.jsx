@@ -110,31 +110,28 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
   return (
     <div className="p-6 space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="Recent Payments"
-          value={stats.totalPayments}
+          title="Gross Revenue"
+          value={`${globalCurrency} ${stats.totalReceived.toFixed(2)}`}
           color="border-blue-200"
         />
         <StatCard
-          title="Amount Received"
-          value={`${globalCurrency} ${stats.totalReceived.toFixed(2)}`}
+          title="Net Revenue"
+          value={`${globalCurrency} ${stats.netRevenue.toFixed(2)}`}
+          subtitle={`Fees: ${globalCurrency} ${stats.totalFees.toFixed(2)}`}
           color="border-emerald-200"
         />
         <StatCard
-          title="Total Invoices"
-          value={stats.totalInvoices}
+          title="Total Transactions"
+          value={stats.totalPayments}
           color="border-amber-200"
         />
         <StatCard
-          title="Products"
-          value={stats.products}
-          color="border-purple-200"
-        />
-        <StatCard
-          title="Payment Links"
-          value={stats.paymentLinks}
-          color="border-pink-200"
+          title="Pending Invoices"
+          value={stats.pendingInvoices}
+          subtitle={`of ${stats.totalInvoices}`}
+          color="border-orange-200"
         />
       </div>
 
