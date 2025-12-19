@@ -583,11 +583,31 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               onChange={(e) => setNewWalletCurrency(e.target.value)}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-6"
             >
-              {displayedCurrencies.map(c => (
-                <option key={c.code} value={c.code}>
-                  {c.code} - {c.name}
-                </option>
-              ))}
+              <option value="">Select a currency</option>
+              {fiatCurrencies.length > 0 && (
+                <>
+                  <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
+                    ━━━ FIAT CURRENCIES ━━━
+                  </option>
+                  {fiatCurrencies.map(c => (
+                    <option key={c.code} value={c.code}>
+                      {c.code} - {c.name} ({c.symbol || ''})
+                    </option>
+                  ))}
+                </>
+              )}
+              {cryptoCurrencies.length > 0 && (
+                <>
+                  <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
+                    ━━━ CRYPTOCURRENCIES ━━━
+                  </option>
+                  {cryptoCurrencies.map(c => (
+                    <option key={c.code} value={c.code}>
+                      {c.code} - {c.name} ({c.symbol || ''})
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
 
             <div className="flex gap-3">
