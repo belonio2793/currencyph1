@@ -6,31 +6,59 @@ export default function GuestCheckoutFlow({
   invoice,
   onSuccess,
   onCancel,
+  userId,
   globalCurrency = 'PHP'
 }) {
-  const [step, setStep] = useState('guest-info') // guest-info, confirm, deposit, success
+  const [step, setStep] = useState(userId ? 'payment-method' : 'guest-info') // guest-info, payment-method, confirm, deposit, success
   const [guestData, setGuestData] = useState({
     email: '',
     fullName: '',
     phone: ''
   })
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('bank_transfer')
+  const [userWallets, setUserWallets] = useState([])
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('wallet_balance')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
   const amount = invoice?.amount_due || paymentLink?.amount || 0
   const currency = invoice?.currency || paymentLink?.currency || globalCurrency
 
+  useEffect(() => {
+    if (userId) {
+      loadUserWallets()
+    }
+  }, [userId])
+
+  const loadUserWallets = async () => {
+    try {
+      const wallets = await currencyAPI.getWallets(userId)
+      setUserWallets(wallets || [])
+    } catch (err) {
+      console.error('Error loading wallets:', err)
+    }
+  }
+
   const paymentMethods = [
+    { id: 'wallet_balance', name: 'Wallet Balance', description: 'Pay using your account balance', authOnly: true },
     { id: 'bank_transfer', name: 'Bank Transfer', description: 'Transfer via online banking' },
     { id: 'credit_card', name: 'Credit/Debit Card', description: 'Visa, Mastercard, etc.' },
     { id: 'e_wallet', name: 'E-Wallet', description: 'GCash, PayMaya, etc.' },
     { id: 'crypto', name: 'Cryptocurrency', description: 'Bitcoin, Ethereum, etc.' }
   ]
 
+  const filteredPaymentMethods = userId
+    ? paymentMethods
+    : paymentMethods.filter(m => !m.authOnly)
+
+  useEffect(() => {
+    if (!userId && selectedPaymentMethod === 'wallet_balance') {
+      setSelectedPaymentMethod('bank_transfer')
+    }
+  }, [userId])
+
   const handleGuestInfoSubmit = async (e) => {
     e.preventDefault()
-    setStep('confirm')
+    setStep('payment-method')
   }
 
   const handleConfirmPayment = async () => {
@@ -38,37 +66,58 @@ export default function GuestCheckoutFlow({
       setLoading(true)
       setError(null)
 
-      // Create payment intent
+      if (selectedPaymentMethod === 'wallet_balance') {
+        const wallet = userWallets.find(w => w.currency_code === currency)
+        if (!wallet || wallet.balance < amount) {
+          throw new Error(`Insufficient balance in your ${currency} wallet`)
+        }
+
+        // Process wallet payment
+        await currencyAPI.withdrawFunds(userId, currency, amount)
+
+        // Update invoice or record transaction
+        if (invoice) {
+          await paymentsService.markInvoicePaid(invoice.id)
+        }
+
+        setStep('success')
+        return
+      }
+
+      // Create payment intent for other methods
       const paymentIntent = await paymentsService.createPaymentIntent(
         invoice?.merchant_id || paymentLink?.merchant_id,
         {
-          guest_email: guestData.email,
-          guest_name: guestData.fullName,
+          payer_id: userId || null,
+          guest_email: userId ? null : guestData.email,
+          guest_name: userId ? null : guestData.fullName,
           amount: amount,
           currency: currency,
           source_type: invoice ? 'invoice' : 'payment_link',
           reference_id: invoice?.id || paymentLink?.id,
           invoice_id: invoice?.id || null,
           payment_link_id: paymentLink?.id || null,
-          onboarding_state: 'pending'
+          onboarding_state: userId ? 'none' : 'pending'
         }
       )
 
-      // Create deposit intent
-      const depositIntent = await paymentsService.createDepositIntent(
-        null, // Will be created after guest registers
-        {
-          amount: amount,
-          currency: currency,
-          deposit_method: selectedPaymentMethod,
-          linked_payment_intent_id: paymentIntent.id
-        }
-      )
+      if (selectedPaymentMethod !== 'wallet_balance') {
+        // Create deposit intent
+        await paymentsService.createDepositIntent(
+          userId || null,
+          {
+            amount: amount,
+            currency: currency,
+            deposit_method: selectedPaymentMethod,
+            linked_payment_intent_id: paymentIntent.id
+          }
+        )
+      }
 
       setStep('deposit')
     } catch (err) {
       console.error('Error processing payment:', err)
-      setError('Failed to process payment. Please try again.')
+      setError(err.message || 'Failed to process payment. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -156,8 +205,8 @@ export default function GuestCheckoutFlow({
     )
   }
 
-  // Step 2: Confirm Payment Method
-  if (step === 'confirm') {
+  // Step 2: Select Payment Method
+  if (step === 'payment-method') {
     return (
       <div className="space-y-6">
         <div>
@@ -168,50 +217,43 @@ export default function GuestCheckoutFlow({
         </div>
 
         <div className="space-y-3">
-          {paymentMethods.map(method => (
-            <button
-              key={method.id}
-              onClick={() => setSelectedPaymentMethod(method.id)}
-              className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                selectedPaymentMethod === method.id
-                  ? 'border-emerald-600 bg-emerald-50'
-                  : 'border-slate-200 bg-white hover:border-slate-300'
-              }`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex-1">
-                  <p className="font-medium text-slate-900">{method.name}</p>
-                  <p className="text-sm text-slate-600">{method.description}</p>
-                </div>
-                {selectedPaymentMethod === method.id && (
-                  <svg className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                )}
-              </div>
-            </button>
-          ))}
-        </div>
+          {filteredPaymentMethods.map(method => {
+            const isWallet = method.id === 'wallet_balance'
+            const wallet = isWallet ? userWallets.find(w => w.currency_code === currency) : null
+            const hasEnough = isWallet ? (wallet?.balance >= amount) : true
 
-        {/* Payer Information Review */}
-        <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
-          <h4 className="font-medium text-slate-900 mb-3">Payment Details</h4>
-          <dl className="space-y-2 text-sm">
-            <div className="flex justify-between">
-              <dt className="text-slate-600">Name:</dt>
-              <dd className="font-medium text-slate-900">{guestData.fullName}</dd>
-            </div>
-            <div className="flex justify-between">
-              <dt className="text-slate-600">Email:</dt>
-              <dd className="font-medium text-slate-900">{guestData.email}</dd>
-            </div>
-            <div className="flex justify-between border-t border-slate-200 pt-2">
-              <dt className="text-slate-600">Amount:</dt>
-              <dd className="font-bold text-emerald-600">
-                {currency} {typeof amount === 'number' ? amount.toFixed(2) : '0.00'}
-              </dd>
-            </div>
-          </dl>
+            return (
+              <button
+                key={method.id}
+                onClick={() => setSelectedPaymentMethod(method.id)}
+                disabled={isWallet && !hasEnough}
+                className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
+                  selectedPaymentMethod === method.id
+                    ? 'border-emerald-600 bg-emerald-50'
+                    : 'border-slate-200 bg-white hover:border-slate-300'
+                } ${isWallet && !hasEnough ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex-1">
+                    <p className="font-medium text-slate-900">{method.name}</p>
+                    <p className="text-sm text-slate-600">
+                      {isWallet && wallet
+                        ? `Balance: ${currency} ${wallet.balance.toFixed(2)}`
+                        : method.description}
+                    </p>
+                    {isWallet && !hasEnough && (
+                      <p className="text-xs text-red-600 mt-1">Insufficient balance</p>
+                    )}
+                  </div>
+                  {selectedPaymentMethod === method.id && (
+                    <svg className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  )}
+                </div>
+              </button>
+            )
+          })}
         </div>
 
         {error && (
@@ -226,14 +268,16 @@ export default function GuestCheckoutFlow({
             disabled={loading}
             className="flex-1 px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium disabled:opacity-50"
           >
-            {loading ? 'Processing...' : 'Proceed to Deposit'}
+            {loading ? 'Processing...' : (selectedPaymentMethod === 'wallet_balance' ? 'Pay Now' : 'Continue')}
           </button>
-          <button
-            onClick={() => setStep('guest-info')}
-            className="flex-1 px-4 py-3 bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 transition-colors"
-          >
-            Back
-          </button>
+          {!userId && (
+            <button
+              onClick={() => setStep('guest-info')}
+              className="flex-1 px-4 py-3 bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 transition-colors"
+            >
+              Back
+            </button>
+          )}
         </div>
       </div>
     )
