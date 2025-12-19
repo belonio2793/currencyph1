@@ -125,8 +125,8 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
         {!showCustomizer && (
           <div className="mb-12">
             {/* Action Bar */}
-            <div className="mb-6 flex gap-3 justify-between items-center">
-              <div className="flex gap-3">
+            <div className="mb-6 flex gap-3 justify-between items-center flex-wrap">
+              <div className="flex gap-3 items-center">
                 <button
                   onClick={() => setShowCustomizer(true)}
                   className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
@@ -135,6 +135,11 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                   Add More Currencies
                 </button>
               </div>
+
+              {/* Fiat/Crypto Toggle */}
+              {wallets.length > 0 && (
+                <FiatCryptoToggle active={activeType} onChange={setActiveType} />
+              )}
 
               {/* View Mode Toggle */}
               {wallets.length > 0 && (
