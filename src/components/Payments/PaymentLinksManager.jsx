@@ -274,6 +274,12 @@ export default function PaymentLinksManager({ merchant, globalCurrency }) {
                     {/* Actions */}
                     <div className="flex flex-col gap-2">
                       <button
+                        onClick={() => window.open(paymentUrl, '_blank')}
+                        className="px-4 py-2 text-sm bg-emerald-50 text-emerald-600 rounded hover:bg-emerald-100 transition-colors"
+                      >
+                        Visit Link
+                      </button>
+                      <button
                         onClick={() => copyToClipboard(paymentUrl, link.id)}
                         className="px-4 py-2 text-sm bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors"
                       >
