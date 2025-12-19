@@ -225,31 +225,41 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
 
   return (
     <div className="p-6 space-y-6">
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Gross Revenue"
-          value={`${globalCurrency} ${stats.totalReceived.toFixed(2)}`}
-          color="border-blue-200"
-        />
-        <StatCard
-          title="Net Revenue"
-          value={`${globalCurrency} ${stats.netRevenue.toFixed(2)}`}
-          subtitle={`Fees: ${globalCurrency} ${stats.totalFees.toFixed(2)}`}
-          color="border-emerald-200"
-        />
-        <StatCard
-          title="Total Transactions"
-          value={stats.totalPayments}
-          color="border-amber-200"
-        />
-        <StatCard
-          title="Pending Invoices"
-          value={stats.pendingInvoices}
-          subtitle={`of ${stats.totalInvoices}`}
-          color="border-orange-200"
-        />
-      </div>
+      {/* Merchant Stats Grid - Only shown when merchant is selected */}
+      {merchant && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatCard
+            title="Gross Revenue"
+            value={`${globalCurrency} ${stats.totalReceived.toFixed(2)}`}
+            color="border-blue-200"
+          />
+          <StatCard
+            title="Net Revenue"
+            value={`${globalCurrency} ${stats.netRevenue.toFixed(2)}`}
+            subtitle={`Fees: ${globalCurrency} ${stats.totalFees.toFixed(2)}`}
+            color="border-emerald-200"
+          />
+          <StatCard
+            title="Total Transactions"
+            value={stats.totalPayments}
+            color="border-amber-200"
+          />
+          <StatCard
+            title="Pending Invoices"
+            value={stats.pendingInvoices}
+            subtitle={`of ${stats.totalInvoices}`}
+            color="border-orange-200"
+          />
+        </div>
+      )}
+
+      {/* Welcome Message - Only shown when no merchant is selected */}
+      {!merchant && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-4">
+          <h3 className="font-semibold text-blue-900 mb-2">Welcome to Payments</h3>
+          <p className="text-blue-800 mb-4">Select or create a merchant account to access merchant-specific features and analytics.</p>
+        </div>
+      )}
 
       {/* Payment Ledger Section */}
       <div className="space-y-4">
