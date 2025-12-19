@@ -205,7 +205,7 @@ export const paymentsService = {
   async getPricesByMerchant(merchantId) {
     const { data, error } = await supabase
       .from('prices')
-      .select('*')
+      .select('*, product:products(name)')
       .eq('merchant_id', merchantId)
       .eq('is_active', true)
       .order('created_at', { ascending: false })
