@@ -23,8 +23,6 @@ export default function SendMoney({ userId }) {
   const [step, setStep] = useState(1)
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
 
-  const currencies = ['PHP', 'USD', 'EUR', 'GBP']
-
   useEffect(() => {
     loadData()
   }, [userId])
