@@ -27,19 +27,19 @@ export function initializePresence(userId) {
   }
 
   // Fire-and-forget; silently ignore all errors since presence is non-critical
-  Promise.resolve(updatePresence('online')).catch(() => {})
+  safeUpdatePresence('online')
 
   presenceIntervalId = setInterval(() => {
     // Skip updates if Supabase is not healthy or if offline
     if (isSupabaseHealthy() && navigator.onLine) {
-      Promise.resolve(updatePresence('online')).catch(() => {})
+      safeUpdatePresence('online')
     }
   }, PRESENCE_UPDATE_INTERVAL)
 
   // Handle online/offline transitions
   const handleOnline = () => {
     if (isSupabaseHealthy()) {
-      updatePresence('online').catch(() => {})
+      safeUpdatePresence('online')
     }
   }
 
@@ -56,7 +56,7 @@ export function initializePresence(userId) {
   window.addEventListener('beforeunload', () => {
     // best-effort update; don't await in unload handlers
     if (isSupabaseHealthy() && navigator.onLine) {
-      try { updatePresence('offline').catch(() => {}) } catch (e) {}
+      try { safeUpdatePresence('offline') } catch (e) {}
     }
     clearInterval(presenceIntervalId)
   })
@@ -66,11 +66,20 @@ export function initializePresence(userId) {
     if (!isSupabaseHealthy() || !navigator.onLine) return
 
     if (document.hidden) {
-      updatePresence('away').catch(() => {})
+      safeUpdatePresence('away')
     } else {
-      updatePresence('online').catch(() => {})
+      safeUpdatePresence('online')
     }
   })
+}
+
+// Safe wrapper that prevents any errors from escaping
+function safeUpdatePresence(status) {
+  try {
+    updatePresence(status).catch(() => {})
+  } catch (e) {
+    // Silently ignore any synchronous errors too
+  }
 }
 
 export function stopPresence() {
