@@ -19,6 +19,7 @@ export default function GuestCheckoutFlow({
   })
   const [userWallets, setUserWallets] = useState([])
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('wallet_balance')
+  const [customFieldValues, setCustomFieldValues] = useState({})
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
@@ -68,6 +69,16 @@ export default function GuestCheckoutFlow({
       setLoading(true)
       setError(null)
 
+      // Merge guest data and custom fields into intent metadata
+      const intentMetadata = {
+        payment_method: selectedPaymentMethod,
+        fee_amount: feeData?.feeAmount || 0,
+        net_amount: feeData?.netAmount || amount,
+        fee_breakdown: feeData?.breakdown || {},
+        ...customFieldValues,
+        ...(paymentLink?.metadata || {})
+      }
+
       if (selectedPaymentMethod === 'wallet_balance') {
         const wallet = userWallets.find(w => w.currency_code === currency)
         if (!wallet || wallet.balance < amount) {
@@ -75,7 +86,11 @@ export default function GuestCheckoutFlow({
         }
 
         // Process wallet payment (no fees for wallet)
-        await currencyAPI.withdrawFunds(userId, currency, amount)
+        await currencyAPI.withdrawFunds(userId, currency, amount, {
+          description: `Payment for ${product?.name || paymentLink?.name || 'Order'}`,
+          reference_id: invoice?.id || paymentLink?.id,
+          metadata: intentMetadata
+        })
 
         // Update invoice or record transaction
         if (invoice) {
@@ -103,12 +118,7 @@ export default function GuestCheckoutFlow({
           invoice_id: invoice?.id || null,
           payment_link_id: paymentLink?.id || null,
           onboarding_state: userId ? 'none' : 'pending',
-          metadata: {
-            payment_method: selectedPaymentMethod,
-            fee_amount: feeData.feeAmount,
-            net_amount: feeData.netAmount,
-            fee_breakdown: feeData.breakdown
-          }
+          metadata: intentMetadata
         }
       )
 
@@ -206,6 +216,48 @@ export default function GuestCheckoutFlow({
               placeholder="+63 9xx xxx xxxx"
             />
           </div>
+
+          {/* Custom Dynamic Fields */}
+          {paymentLink?.metadata?.custom_fields && Array.isArray(paymentLink.metadata.custom_fields) && (
+            paymentLink.metadata.custom_fields.map((field, idx) => (
+              <div key={idx}>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  {field.label} {field.required && <span className="text-red-500">*</span>}
+                </label>
+                {field.type === 'textarea' ? (
+                  <textarea
+                    value={customFieldValues[field.name] || ''}
+                    onChange={(e) => setCustomFieldValues({ ...customFieldValues, [field.name]: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder={field.placeholder || ''}
+                    required={field.required}
+                    rows="2"
+                  />
+                ) : field.type === 'select' ? (
+                  <select
+                    value={customFieldValues[field.name] || ''}
+                    onChange={(e) => setCustomFieldValues({ ...customFieldValues, [field.name]: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    required={field.required}
+                  >
+                    <option value="">Select an option</option>
+                    {field.options?.map((opt, oIdx) => (
+                      <option key={oIdx} value={opt.value || opt}>{opt.label || opt}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type={field.type || 'text'}
+                    value={customFieldValues[field.name] || ''}
+                    onChange={(e) => setCustomFieldValues({ ...customFieldValues, [field.name]: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder={field.placeholder || ''}
+                    required={field.required}
+                  />
+                )}
+              </div>
+            ))
+          )}
 
           {/* Payment Amount Summary */}
           <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
