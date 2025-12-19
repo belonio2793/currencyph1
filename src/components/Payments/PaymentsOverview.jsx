@@ -104,7 +104,20 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
 
       {/* Recent Invoices */}
       <div className="bg-white rounded-lg border border-slate-200 p-6">
-        <h3 className="text-lg font-semibold text-slate-900 mb-4">Recent Invoices</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-slate-900">Recent Invoices</h3>
+          <button
+            onClick={() => {
+              // This is a bit hacky but works since setActiveTab is in parent
+              const tabs = document.querySelectorAll('button')
+              const invoicesTab = Array.from(tabs).find(t => t.textContent === 'Invoices')
+              invoicesTab?.click()
+            }}
+            className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+          >
+            View All
+          </button>
+        </div>
         {recentInvoices.length === 0 ? (
           <p className="text-slate-600 text-center py-8">No invoices yet</p>
         ) : (
@@ -121,9 +134,12 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
               <tbody>
                 {recentInvoices.map(invoice => (
                   <tr key={invoice.id} className="border-b border-slate-100 hover:bg-slate-50">
-                    <td className="py-3 px-4 text-slate-900">{invoice.customer_name}</td>
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-slate-900">{invoice.customer_name}</div>
+                      <div className="text-xs text-slate-500">{invoice.customer_email}</div>
+                    </td>
                     <td className="py-3 px-4 text-slate-900 font-medium">
-                      {globalCurrency} {invoice.amount_due.toFixed(2)}
+                      {invoice.currency} {invoice.amount_due.toFixed(2)}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
