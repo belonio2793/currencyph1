@@ -247,6 +247,11 @@ export default function Rates() {
     )
   }
 
+  const handleTypeChange = (type) => {
+    setActiveType(type)
+    setTypeFilter(type)
+  }
+
   const formatNumber = (num, decimals = 2) => {
     if (num == null || !isFinite(num)) return '—'
     return Number(num).toLocaleString(undefined, {
