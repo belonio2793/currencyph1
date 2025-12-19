@@ -224,6 +224,17 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     setError('')
   }
 
+  // Filter currencies by type
+  const fiats = ['PHP', 'USD', 'EUR', 'GBP', 'JPY', 'CNY', 'AUD', 'CAD', 'SGD', 'HKD', 'INR', 'MYR', 'THB', 'VND', 'IDR', 'KRW', 'ZAR', 'BRL', 'MXN', 'NOK', 'DKK', 'AED']
+  const fiatCurrencies = currencies.filter(c => fiats.includes(c.code))
+  const cryptoCurrencies = currencies.filter(c => !fiats.includes(c.code))
+  const displayedCurrencies = activeType === 'fiat' ? fiatCurrencies : cryptoCurrencies
+
+  // Filter wallets by type
+  const fiatWallets = wallets.filter(w => fiats.includes(w.currency_code?.toUpperCase()))
+  const cryptoWallets = wallets.filter(w => !fiats.includes(w.currency_code?.toUpperCase()))
+  const displayedWallets = activeType === 'fiat' ? fiatWallets : cryptoWallets
+
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
     setSuccess('Copied to clipboard')
