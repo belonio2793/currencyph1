@@ -6,6 +6,7 @@ import PricingManager from './Payments/PricingManager'
 import InvoicesManager from './Payments/InvoicesManager'
 import PaymentLinksManager from './Payments/PaymentLinksManager'
 import PaymentHistory from './Payments/PaymentHistory'
+import PaymentAnalytics from './Payments/PaymentAnalytics'
 import PaymentsSettings from './Payments/PaymentsSettings'
 
 export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) {
