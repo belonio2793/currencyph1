@@ -15,7 +15,8 @@ export default function Rates() {
   const [result, setResult] = useState(null)
 
   const [searchTerm, setSearchTerm] = useState('')
-  const [typeFilter, setTypeFilter] = useState('all')
+  const [typeFilter, setTypeFilter] = useState('fiat')
+  const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
   const [sortBy, setSortBy] = useState('recent')
   const [sortDirection, setSortDirection] = useState('desc')
   const [favorites, setFavorites] = useState(['PHP', 'USD', 'EUR', 'BTC', 'ETH'])
