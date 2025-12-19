@@ -75,27 +75,44 @@ export default function ReceiveMoney({ userId }) {
   }
 
   const copyToClipboard = async (text, label) => {
-    try {
-      // Try modern Clipboard API first
-      if (navigator.clipboard && navigator.clipboard.writeText) {
+    let copied = false
+
+    // Try modern Clipboard API first
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
         await navigator.clipboard.writeText(text)
-      } else {
-        // Fallback: Use older method with textarea
+        copied = true
+      } catch (clipErr) {
+        console.debug('Clipboard API blocked, using fallback:', clipErr?.message)
+        copied = false
+      }
+    }
+
+    // If Clipboard API failed or unavailable, use fallback
+    if (!copied) {
+      try {
         const textarea = document.createElement('textarea')
         textarea.value = text
         textarea.style.position = 'fixed'
         textarea.style.opacity = '0'
+        textarea.style.pointerEvents = 'none'
         document.body.appendChild(textarea)
         textarea.select()
-        document.execCommand('copy')
+        const success = document.execCommand('copy')
         document.body.removeChild(textarea)
+        copied = success
+      } catch (fallbackErr) {
+        console.debug('Fallback copy method failed:', fallbackErr?.message)
+        copied = false
       }
+    }
+
+    if (copied) {
       setCopyFeedback(label)
       setTimeout(() => setCopyFeedback(''), 2000)
-    } catch (err) {
-      console.error('Failed to copy to clipboard:', err)
-      setError('Failed to copy to clipboard')
-      setTimeout(() => setError(''), 2000)
+    } else {
+      setError('Could not copy to clipboard. Please copy manually.')
+      setTimeout(() => setError(''), 3000)
     }
   }
 
