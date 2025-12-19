@@ -736,6 +736,34 @@ export const paymentsService = {
     return data
   },
 
+  // ============ Fee Calculation ============
+  calculateFee(amount, paymentMethod = 'wallet_balance') {
+    // Fee structure by payment method (percentage or flat + percentage)
+    const feeStructure = {
+      'wallet_balance': { flat: 0, percentage: 0 },
+      'bank_transfer': { flat: 0, percentage: 0.02 }, // 2% for bank transfers
+      'credit_card': { flat: 0.50, percentage: 0.029 }, // $0.50 + 2.9%
+      'e_wallet': { flat: 0, percentage: 0.025 }, // 2.5% for GCash, PayMaya, etc.
+      'crypto': { flat: 0, percentage: 0.03 }, // 3% for crypto
+      'deposit': { flat: 0, percentage: 0.02 }, // 2% for deposits
+      'withdrawal': { flat: 0, percentage: 0.02 } // 2% for withdrawals
+    }
+
+    const structure = feeStructure[paymentMethod] || feeStructure['wallet_balance']
+    const percentageFee = amount * structure.percentage
+    const flatFee = structure.flat
+    const totalFee = flatFee + percentageFee
+
+    return {
+      feeAmount: Math.round(totalFee * 100) / 100,
+      netAmount: Math.round((amount - totalFee) * 100) / 100,
+      breakdown: {
+        flat: flatFee,
+        percentage: Math.round(percentageFee * 100) / 100
+      }
+    }
+  },
+
   // ============ Helpers ============
   generateSlug(text) {
     return text
