@@ -5,12 +5,16 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
   const [stats, setStats] = useState({
     totalInvoices: 0,
     totalReceived: 0,
+    totalFees: 0,
+    netRevenue: 0,
     pendingInvoices: 0,
     totalPayments: 0,
     products: 0,
     paymentLinks: 0
   })
   const [recentPayments, setRecentPayments] = useState([])
+  const [paymentsByType, setPaymentsByType] = useState({})
+  const [paymentsByMethod, setPaymentsByMethod] = useState({})
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
