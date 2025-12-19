@@ -1,43 +1,6 @@
 import { useState, useEffect } from 'react'
 import { currencyAPI } from '../lib/payments'
 
-// QR Code component - using canvas-based generation
-const QRCodeCanvas = ({ value, size = 256 }) => {
-  const canvasRef = useState(null)[1]
-
-  useEffect(() => {
-    if (!value) return
-
-    // Simple QR code generation using API
-    // This creates a data URL that can be displayed directly
-    const generateQR = async () => {
-      try {
-        const encodedValue = encodeURIComponent(value)
-        const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedValue}`
-        // Return the URL for img src usage
-        return qrUrl
-      } catch (err) {
-        console.error('QR generation error:', err)
-        return null
-      }
-    }
-
-    generateQR()
-  }, [value, size])
-
-  return (
-    <div className="flex justify-center">
-      <img
-        src={`https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(value)}`}
-        alt="QR Code"
-        className="border-2 border-slate-300 rounded-lg"
-        width={size}
-        height={size}
-      />
-    </div>
-  )
-}
-
 export default function ReceiveMoney({ userId }) {
   const [phpAmount, setPhpAmount] = useState('')
   const [solAmount, setSolAmount] = useState('0')
