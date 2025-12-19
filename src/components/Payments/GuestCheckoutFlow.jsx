@@ -22,10 +22,10 @@ export default function GuestCheckoutFlow({
   const currency = invoice?.currency || paymentLink?.currency || globalCurrency
 
   const paymentMethods = [
-    { id: 'bank_transfer', name: 'Bank Transfer', icon: '🏦', description: 'Transfer via online banking' },
-    { id: 'credit_card', name: 'Credit/Debit Card', icon: '💳', description: 'Visa, Mastercard, etc.' },
-    { id: 'e_wallet', name: 'E-Wallet', icon: '📱', description: 'GCash, PayMaya, etc.' },
-    { id: 'crypto', name: 'Cryptocurrency', icon: '₿', description: 'Bitcoin, Ethereum, etc.' }
+    { id: 'bank_transfer', name: 'Bank Transfer', description: 'Transfer via online banking' },
+    { id: 'credit_card', name: 'Credit/Debit Card', description: 'Visa, Mastercard, etc.' },
+    { id: 'e_wallet', name: 'E-Wallet', description: 'GCash, PayMaya, etc.' },
+    { id: 'crypto', name: 'Cryptocurrency', description: 'Bitcoin, Ethereum, etc.' }
   ]
 
   const handleGuestInfoSubmit = async (e) => {
@@ -179,7 +179,6 @@ export default function GuestCheckoutFlow({
               }`}
             >
               <div className="flex items-start gap-3">
-                <span className="text-2xl">{method.icon}</span>
                 <div className="flex-1">
                   <p className="font-medium text-slate-900">{method.name}</p>
                   <p className="text-sm text-slate-600">{method.description}</p>

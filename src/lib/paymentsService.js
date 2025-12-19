@@ -271,6 +271,18 @@ export const paymentsService = {
     return data
   },
 
+  async getPaymentLinkByUniversalSlug(slug) {
+    const { data, error } = await supabase
+      .from('payment_links')
+      .select('*')
+      .eq('url_slug', slug)
+      .eq('is_active', true)
+      .maybeSingle()
+
+    if (error) throw error
+    return { data, error: null }
+  },
+
   async getInvoicesByMerchant(merchantId, status = null) {
     let query = supabase
       .from('invoices')

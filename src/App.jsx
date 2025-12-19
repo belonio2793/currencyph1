@@ -62,7 +62,12 @@ const OrderConfirmation = lazy(() => import('./components/OrderConfirmation'))
 export default function App() {
   const [userId, setUserId] = useState(null)
   const [userEmail, setUserEmail] = useState(null)
-  const [activeTab, setActiveTab] = useState('home')
+  const [activeTab, setActiveTab] = useState(() => {
+    const path = window.location.pathname
+    if (path.startsWith('/payment/') || path.startsWith('/invoice/')) return 'checkout'
+    if (path === '/payments') return 'payments'
+    return 'home'
+  })
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [globalCurrency, setGlobalCurrency] = useState('PHP')
@@ -525,8 +530,14 @@ export default function App() {
             </Suspense>
           )}
 
+          {activeTab === 'checkout' && (
+            <Suspense fallback={<PageLoader />}>
+              <PaymentCheckoutPage userId={userId} globalCurrency={globalCurrency} />
+            </Suspense>
+          )}
+
           {/* Normal layout for all other pages */}
-          {activeTab !== 'planning-setup' && activeTab !== 'planning' && (
+          {activeTab !== 'planning-setup' && activeTab !== 'planning' && activeTab !== 'checkout' && (
             <div className="min-h-screen bg-slate-50 flex">
               {userId && (
                 <Sidebar
