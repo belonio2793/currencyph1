@@ -291,7 +291,13 @@ export default function App() {
           setError('Failed to initialize user profile. Please try refreshing or signing out and back in.')
         }
         try { if (typeof isSupabaseConfigured === 'undefined' || isSupabaseConfigured) initializePresence(user.id) } catch (e) { console.warn('initializePresence failed', e) }
-        try { await loadTotalBalance(user.id) } catch (e) { console.warn('loadTotalBalance failed', e) }
+        try {
+          // Add timeout to prevent blocking if fetch-rates is down
+          await Promise.race([
+            loadTotalBalance(user.id),
+            new Promise((resolve) => setTimeout(() => resolve(null), 5000))
+          ])
+        } catch (e) { console.warn('loadTotalBalance failed', e) }
         // If user is authenticated, don't forcibly change the current route — let handleRouting manage it
         setShowAuth(false)
       } else {
