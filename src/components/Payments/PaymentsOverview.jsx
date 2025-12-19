@@ -6,10 +6,11 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
     totalInvoices: 0,
     totalReceived: 0,
     pendingInvoices: 0,
+    totalPayments: 0,
     products: 0,
     paymentLinks: 0
   })
-  const [recentInvoices, setRecentInvoices] = useState([])
+  const [recentPayments, setRecentPayments] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -21,25 +22,30 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
   const loadStats = async () => {
     try {
       setLoading(true)
-      const [invoices, products, paymentLinks] = await Promise.all([
+      const [invoices, products, paymentLinks, payments] = await Promise.all([
         paymentsService.getInvoicesByMerchant(merchant.id),
         paymentsService.getProductsByMerchant(merchant.id),
-        paymentsService.getPaymentLinksByMerchant(merchant.id)
+        paymentsService.getPaymentLinksByMerchant(merchant.id),
+        paymentsService.getPaymentsByMerchant(merchant.id)
       ])
 
-      const paidInvoices = invoices.filter(i => i.status === 'paid')
       const pendingInvoices = invoices.filter(i => i.status === 'sent' || i.status === 'draft')
-      const totalReceived = paidInvoices.reduce((sum, i) => sum + (i.amount_due || 0), 0)
+
+      // Calculate total received from the central payments ledger
+      const totalReceived = payments
+        .filter(p => p.status === 'succeeded')
+        .reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
 
       setStats({
         totalInvoices: invoices.length,
         totalReceived: totalReceived,
         pendingInvoices: pendingInvoices.length,
+        totalPayments: payments.length,
         products: products.length,
         paymentLinks: paymentLinks.length
       })
 
-      setRecentInvoices(invoices.slice(0, 5))
+      setRecentPayments(payments.slice(0, 5))
     } catch (err) {
       console.error('Error loading stats:', err)
     } finally {
@@ -76,9 +82,9 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
-          title="Total Invoices"
-          value={stats.totalInvoices}
-          color="border-amber-200"
+          title="Recent Payments"
+          value={stats.totalPayments}
+          color="border-blue-200"
         />
         <StatCard
           title="Amount Received"
@@ -86,9 +92,9 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
           color="border-emerald-200"
         />
         <StatCard
-          title="Pending Invoices"
-          value={stats.pendingInvoices}
-          color="border-blue-200"
+          title="Total Invoices"
+          value={stats.totalInvoices}
+          color="border-amber-200"
         />
         <StatCard
           title="Products"
@@ -102,29 +108,25 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
         />
       </div>
 
-      {/* Recent Invoices */}
+      {/* Recent Payments */}
       <div className="bg-white rounded-lg border border-slate-200 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-slate-900">Recent Invoices</h3>
-          <button
-            onClick={() => {
-              // This is a bit hacky but works since setActiveTab is in parent
-              const tabs = document.querySelectorAll('button')
-              const invoicesTab = Array.from(tabs).find(t => t.textContent === 'Invoices')
-              invoicesTab?.click()
-            }}
-            className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
-          >
-            View All
-          </button>
+          <h3 className="text-lg font-semibold text-slate-900">Recent Payments</h3>
+          <div className="flex gap-2">
+            <span className="text-xs text-slate-400 self-center">Showing last 5</span>
+          </div>
         </div>
-        {recentInvoices.length === 0 ? (
-          <p className="text-slate-600 text-center py-8">No invoices yet</p>
+        {recentPayments.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-slate-600">No payments recorded in the central ledger yet.</p>
+            <p className="text-xs text-slate-400 mt-1">Successful transactions will appear here.</p>
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-slate-200">
+                  <th className="text-left py-3 px-4 font-medium text-slate-700">Reference</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Customer</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Amount</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Status</th>
@@ -132,28 +134,32 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
                 </tr>
               </thead>
               <tbody>
-                {recentInvoices.map(invoice => (
-                  <tr key={invoice.id} className="border-b border-slate-100 hover:bg-slate-50">
+                {recentPayments.map(payment => (
+                  <tr key={payment.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-3 px-4">
-                      <div className="font-medium text-slate-900">{invoice.customer_name}</div>
-                      <div className="text-xs text-slate-500">{invoice.customer_email}</div>
+                      <div className="font-mono text-xs text-slate-600">{payment.reference_number || payment.id.slice(0, 8)}</div>
+                      <div className="text-[10px] text-slate-400 uppercase tracking-tighter">{payment.payment_method || 'Unknown Method'}</div>
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="font-medium text-slate-900">{payment.guest_name || 'Anonymous'}</div>
+                      <div className="text-xs text-slate-500">{payment.guest_email || 'No email provided'}</div>
                     </td>
                     <td className="py-3 px-4 text-slate-900 font-medium">
-                      {invoice.currency} {invoice.amount_due.toFixed(2)}
+                      {payment.currency} {Number(payment.amount).toFixed(2)}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        invoice.status === 'paid'
+                        payment.status === 'succeeded'
                           ? 'bg-emerald-100 text-emerald-800'
-                          : invoice.status === 'sent'
+                          : payment.status === 'pending'
                           ? 'bg-blue-100 text-blue-800'
-                          : 'bg-slate-100 text-slate-800'
+                          : 'bg-red-100 text-red-800'
                       }`}>
-                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                        {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                       </span>
                     </td>
                     <td className="py-3 px-4 text-slate-600">
-                      {new Date(invoice.created_at).toLocaleDateString()}
+                      {new Date(payment.created_at).toLocaleDateString()}
                     </td>
                   </tr>
                 ))}
