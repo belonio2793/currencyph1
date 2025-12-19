@@ -233,7 +233,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       receipts: () => setShowReceiptsModal(true),
       myBusiness: () => setShowMyBusinessModal(true),
       myProfile: () => setShowProfileModal(true),
-      payments: () => onTabChange('payments'),
+      payments: () => setShowPaymentsModal(true),
       wallets: () => onTabChange('wallet')
     }
 
