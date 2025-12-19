@@ -36,10 +36,23 @@ export default function SendMoney({ userId }) {
         setLoading(false)
         return
       }
-      const [walletsData, beneficiariesData] = await Promise.all([
-        currencyAPI.getWallets(userId),
-        currencyAPI.getBeneficiaries(userId)
-      ])
+      let walletsData = []
+      let beneficiariesData = []
+
+      try {
+        walletsData = await currencyAPI.getWallets(userId)
+      } catch (err) {
+        console.debug('Failed to load wallets:', err)
+        walletsData = []
+      }
+
+      try {
+        beneficiariesData = await currencyAPI.getBeneficiaries(userId)
+      } catch (err) {
+        console.debug('Failed to load beneficiaries:', err)
+        beneficiariesData = []
+      }
+
       setWallets(walletsData)
       setBeneficiaries(beneficiariesData)
       if (walletsData.length > 0) {
