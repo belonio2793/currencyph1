@@ -79,23 +79,15 @@ export default function WalletDisplayCustomizer({ userId, onClose, onUpdate }) {
           const existingCodes = (existingWallets || []).map(w => w.currency_code)
           const missingCurrencies = selectedCurrencies.filter(code => !existingCodes.includes(code))
 
-          // Create wallets for missing currencies
+          // Create wallets for missing currencies using currencyAPI (which generates account numbers)
           if (missingCurrencies.length > 0) {
-            const walletsToCreate = missingCurrencies.map(code => ({
-              user_id: userId,
-              currency_code: code,
-              balance: 0,
-              total_deposited: 0,
-              total_withdrawn: 0,
-              is_active: true
-            }))
-
-            const { error: insertErr } = await supabase
-              .from('wallets')
-              .insert(walletsToCreate)
-
-            if (insertErr && insertErr.code !== '23505') { // 23505 = unique constraint
-              console.warn('Warning: Could not create all wallets:', insertErr)
+            for (const currencyCode of missingCurrencies) {
+              try {
+                await currencyAPI.createWallet(userId, currencyCode)
+              } catch (err) {
+                // Continue with next currency if one fails
+                console.warn(`Warning: Could not create wallet for ${currencyCode}:`, err)
+              }
             }
           }
         }
