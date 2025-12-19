@@ -86,8 +86,6 @@ export default function ReceiveMoney({ userId }) {
     }
   }
 
-  const qrValue = phpAmount && solAmount !== '0' ? `solana:${SOLANA_ADDRESS}?amount=${solAmount}` : `solana:${SOLANA_ADDRESS}`
-
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-6 py-6">
