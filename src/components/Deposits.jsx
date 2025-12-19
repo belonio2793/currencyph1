@@ -143,8 +143,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
 
       setLoading(false)
     } catch (err) {
-      console.error('Error loading data:', err)
-      setError('Failed to load wallet data')
+      console.error('Error loading data:', err?.message || err)
+      setError(err?.message || 'Failed to load wallet data')
       setLoading(false)
     }
   }
