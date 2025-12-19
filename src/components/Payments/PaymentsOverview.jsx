@@ -50,54 +50,80 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
   const loadStats = async () => {
     try {
       setLoading(true)
-      const [invoices, products, paymentLinks, payments] = await Promise.all([
-        paymentsService.getInvoicesByMerchant(merchant.id),
-        paymentsService.getProductsByMerchant(merchant.id),
-        paymentsService.getPaymentLinksByMerchant(merchant.id),
-        paymentsService.getPaymentsByMerchant(merchant.id)
-      ])
 
-      const pendingInvoices = invoices.filter(i => i.status === 'sent' || i.status === 'draft')
-      const succeededPayments = payments.filter(p => p.status === 'succeeded')
+      // Always load all payments from public.payments table
+      const { data: allPaymentsData, error: paymentsError } = await supabase
+        .from('payments')
+        .select('*')
+        .order('created_at', { ascending: false })
 
-      const totalReceived = succeededPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
-      const totalFees = succeededPayments.reduce((sum, p) => sum + (Number(p.fee_amount) || 0), 0)
-      const netRevenue = succeededPayments.reduce((sum, p) => sum + (Number(p.net_amount) || Number(p.amount) - Number(p.fee_amount || 0)), 0)
+      if (paymentsError) throw paymentsError
+      setAllPayments(allPaymentsData || [])
 
-      // Group by payment type
-      const byType = {}
-      payments.forEach(p => {
-        const type = p.payment_type || 'unknown'
-        if (!byType[type]) byType[type] = { count: 0, amount: 0, fees: 0 }
-        byType[type].count += 1
-        byType[type].amount += Number(p.amount) || 0
-        byType[type].fees += Number(p.fee_amount) || 0
-      })
+      // If merchant is selected, also load merchant-specific stats
+      if (merchant) {
+        const [invoices, products, paymentLinks, merchantPayments] = await Promise.all([
+          paymentsService.getInvoicesByMerchant(merchant.id),
+          paymentsService.getProductsByMerchant(merchant.id),
+          paymentsService.getPaymentLinksByMerchant(merchant.id),
+          paymentsService.getPaymentsByMerchant(merchant.id)
+        ])
 
-      // Group by payment method
-      const byMethod = {}
-      payments.forEach(p => {
-        const method = p.payment_method || 'unknown'
-        if (!byMethod[method]) byMethod[method] = { count: 0, amount: 0, fees: 0 }
-        byMethod[method].count += 1
-        byMethod[method].amount += Number(p.amount) || 0
-        byMethod[method].fees += Number(p.fee_amount) || 0
-      })
+        const pendingInvoices = invoices.filter(i => i.status === 'sent' || i.status === 'draft')
+        const succeededPayments = merchantPayments.filter(p => p.status === 'succeeded')
 
-      setStats({
-        totalInvoices: invoices.length,
-        totalReceived: totalReceived,
-        totalFees: totalFees,
-        netRevenue: netRevenue,
-        pendingInvoices: pendingInvoices.length,
-        totalPayments: payments.length,
-        products: products.length,
-        paymentLinks: paymentLinks.length
-      })
+        const totalReceived = succeededPayments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0)
+        const totalFees = succeededPayments.reduce((sum, p) => sum + (Number(p.fee_amount) || 0), 0)
+        const netRevenue = succeededPayments.reduce((sum, p) => sum + (Number(p.net_amount) || Number(p.amount) - Number(p.fee_amount || 0)), 0)
 
-      setAllPayments(payments)
-      setPaymentsByType(byType)
-      setPaymentsByMethod(byMethod)
+        // Group by payment type
+        const byType = {}
+        merchantPayments.forEach(p => {
+          const type = p.payment_type || 'unknown'
+          if (!byType[type]) byType[type] = { count: 0, amount: 0, fees: 0 }
+          byType[type].count += 1
+          byType[type].amount += Number(p.amount) || 0
+          byType[type].fees += Number(p.fee_amount) || 0
+        })
+
+        // Group by payment method
+        const byMethod = {}
+        merchantPayments.forEach(p => {
+          const method = p.payment_method || 'unknown'
+          if (!byMethod[method]) byMethod[method] = { count: 0, amount: 0, fees: 0 }
+          byMethod[method].count += 1
+          byMethod[method].amount += Number(p.amount) || 0
+          byMethod[method].fees += Number(p.fee_amount) || 0
+        })
+
+        setStats({
+          totalInvoices: invoices.length,
+          totalReceived: totalReceived,
+          totalFees: totalFees,
+          netRevenue: netRevenue,
+          pendingInvoices: pendingInvoices.length,
+          totalPayments: merchantPayments.length,
+          products: products.length,
+          paymentLinks: paymentLinks.length
+        })
+
+        setPaymentsByType(byType)
+        setPaymentsByMethod(byMethod)
+      } else {
+        // No merchant selected, reset merchant-specific stats
+        setStats({
+          totalInvoices: 0,
+          totalReceived: 0,
+          totalFees: 0,
+          netRevenue: 0,
+          pendingInvoices: 0,
+          totalPayments: allPaymentsData?.length || 0,
+          products: 0,
+          paymentLinks: 0
+        })
+        setPaymentsByType({})
+        setPaymentsByMethod({})
+      }
     } catch (err) {
       console.error('Error loading stats:', err)
     } finally {
