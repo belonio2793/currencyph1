@@ -23,15 +23,18 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
 
       if (path.startsWith('/payment/')) {
         const slug = parts[2]
-        // We need a way to find the payment link without knowing merchant_id first
-        // Or we update the service to search all merchants
-        const { data, error: linkError } = await paymentsService.getPaymentLinkByUniversalSlug(slug)
-        if (linkError) throw linkError
-        if (!data) throw new Error('Payment link not found')
+        const linkData = await paymentsService.getPaymentLinkByUniversalSlug(slug)
+        if (!linkData) throw new Error('Payment link not found')
 
-        setPaymentLink(data)
-        const merchantData = await paymentsService.getMerchant(data.merchant_id)
+        setPaymentLink(linkData)
+        const merchantData = await paymentsService.getMerchant(linkData.merchant_id)
         setMerchant(merchantData)
+
+        // Load product information if this payment link is tied to a product
+        if (linkData.product_id) {
+          const productData = await paymentsService.getProduct(linkData.product_id)
+          setProduct(productData)
+        }
       } else if (path.startsWith('/invoice/')) {
         const invoiceId = parts[2]
         const invoiceData = await paymentsService.getInvoice(invoiceId)
