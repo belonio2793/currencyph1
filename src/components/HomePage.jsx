@@ -18,7 +18,6 @@ import Inbox from './Inbox'
 import PokerPage from './PokerPage'
 import NetworkBalances from './NetworkBalances'
 import P2PLoanMarketplace from './P2PLoanMarketplace'
-import Payments from './Payments'
 
 export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', setGlobalCurrency, globalCryptocurrency = 'BTC', setGlobalCryptocurrency, onTabChange, onShowAuth }) {
   const [wallets, setWallets] = useState([])
@@ -34,7 +33,6 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
   const [showNetworkBalancesModal, setShowNetworkBalancesModal] = useState(false)
   const [showReceiptsModal, setShowReceiptsModal] = useState(false)
   const [showMyBusinessModal, setShowMyBusinessModal] = useState(false)
-  const [showPaymentsModal, setShowPaymentsModal] = useState(false)
   const [enabledCards, setEnabledCards] = useState(() => quickAccessManager.getEnabledCardsInOrderSync(userId))
   const [reorderKey, setReorderKey] = useState(0)
   const [showCustomizeModal, setShowCustomizeModal] = useState(false)
@@ -233,7 +231,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
       receipts: () => setShowReceiptsModal(true),
       myBusiness: () => setShowMyBusinessModal(true),
       myProfile: () => setShowProfileModal(true),
-      payments: () => setShowPaymentsModal(true),
+      payments: () => onTabChange('payments'),
       wallets: () => onTabChange('wallet')
     }
 
@@ -556,25 +554,6 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
         </div>
       )}
 
-      {/* Payments Modal */}
-      {showPaymentsModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between">
-              <h2 className="text-2xl font-light text-slate-900">Payments</h2>
-              <button
-                onClick={() => setShowPaymentsModal(false)}
-                className="text-slate-400 hover:text-slate-600 text-2xl"
-              >
-                ×
-              </button>
-            </div>
-            <div className="p-6">
-              <Payments userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }
