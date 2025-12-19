@@ -30,24 +30,45 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
 
       if (path.startsWith('/payment/')) {
         const slug = parts[2]
-        const { data: linkData, error: linkError } = await paymentsService.getPaymentLinkByUniversalSlug(slug)
-        if (linkError) throw linkError
-        if (!linkData) throw new Error('Payment link not found')
 
-        // Merge URL parameters into link metadata for this session
-        const mergedLinkData = {
-          ...linkData,
-          metadata: { ...linkData.metadata, ...queryMetadata }
-        }
+        if (slug === 'direct') {
+          // Ad-hoc payment via URL parameters
+          const merchantId = urlParams.get('merchant_id')
+          if (!merchantId) throw new Error('Merchant ID is required for direct payments')
 
-        setPaymentLink(mergedLinkData)
-        const merchantData = await paymentsService.getMerchant(linkData.merchant_id)
-        setMerchant(merchantData)
+          const merchantData = await paymentsService.getMerchant(merchantId)
+          setMerchant(merchantData)
 
-        // Load product information if this payment link is tied to a product
-        if (linkData.product_id) {
-          const productData = await paymentsService.getProduct(linkData.product_id)
-          setProduct(productData)
+          const adhocLink = {
+            merchant_id: merchantId,
+            name: urlParams.get('name') || 'Payment',
+            description: urlParams.get('description') || '',
+            amount: parseFloat(urlParams.get('amount')) || null,
+            currency: urlParams.get('currency') || globalCurrency,
+            metadata: queryMetadata,
+            is_active: true
+          }
+          setPaymentLink(adhocLink)
+        } else {
+          const { data: linkData, error: linkError } = await paymentsService.getPaymentLinkByUniversalSlug(slug)
+          if (linkError) throw linkError
+          if (!linkData) throw new Error('Payment link not found')
+
+          // Merge URL parameters into link metadata for this session
+          const mergedLinkData = {
+            ...linkData,
+            metadata: { ...linkData.metadata, ...queryMetadata }
+          }
+
+          setPaymentLink(mergedLinkData)
+          const merchantData = await paymentsService.getMerchant(linkData.merchant_id)
+          setMerchant(merchantData)
+
+          // Load product information if this payment link is tied to a product
+          if (linkData.product_id) {
+            const productData = await paymentsService.getProduct(linkData.product_id)
+            setProduct(productData)
+          }
         }
       } else if (path.startsWith('/invoice/')) {
         const invoiceId = parts[2]
