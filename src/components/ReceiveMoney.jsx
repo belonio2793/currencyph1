@@ -147,7 +147,7 @@ export default function ReceiveMoney({ userId }) {
               {/* QR Code Display */}
               <div className="bg-slate-50 border border-slate-200 rounded-lg p-8 flex justify-center">
                 <img
-                  src="https://cdn.builder.io/api/v1/image/assets%2F8f0d8bd21f7949af92dc642658451224%2F6f941abc16944084bb9be93b7a5dab49?format=webp&width=800"
+                  src="https://cdn.builder.io/api/v1/image/assets%2F8f0d8bd21f7949af92dc642658451224%2Ff3b8f3b7797443eb9703a9b4ae5b085f?format=webp&width=800"
                   alt="Solana Wallet QR Code"
                   className="w-80 h-80 object-contain"
                 />
