@@ -14,6 +14,7 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
   const [filteredPayments, setFilteredPayments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedPayment, setSelectedPayment] = useState(null)
   const [filters, setFilters] = useState({
     status: 'all',
     type: 'all',
@@ -158,17 +159,17 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-xs font-semibold text-blue-700 uppercase mb-1">Total Transactions</p>
             <p className="text-2xl font-bold text-blue-900">{summary.total}</p>
-            <div className="text-xs text-blue-600 mt-2">
-              <span className="inline-block mr-3">✓ {summary.succeeded}</span>
-              <span className="inline-block mr-3">⏳ {summary.pending}</span>
-              <span className="inline-block">✗ {summary.failed}</span>
+            <div className="text-xs text-blue-600 mt-2 space-y-1">
+              <div><span className="font-semibold text-emerald-600">Succeeded:</span> {summary.succeeded}</div>
+              <div><span className="font-semibold text-yellow-600">Pending:</span> {summary.pending}</div>
+              <div><span className="font-semibold text-red-600">Failed:</span> {summary.failed}</div>
             </div>
           </div>
 
           <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
             <p className="text-xs font-semibold text-emerald-700 uppercase mb-1">Gross Revenue</p>
             <p className="text-2xl font-bold text-emerald-900">{globalCurrency} {summary.totalAmount.toFixed(2)}</p>
-            <p className="text-xs text-emerald-600 mt-2">Succeeded payments</p>
+            <p className="text-xs text-emerald-600 mt-2">Succeeded payments only</p>
           </div>
 
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
@@ -271,12 +272,13 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
                   <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase">Fee</th>
                   <th className="px-6 py-3 text-right text-xs font-semibold text-slate-700 uppercase">Net</th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Status</th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedPayments.length === 0 ? (
                   <tr>
-                    <td colSpan="9" className="px-6 py-8 text-center">
+                    <td colSpan="10" className="px-6 py-8 text-center">
                       <p className="text-slate-600">No payments found</p>
                     </td>
                   </tr>
@@ -314,6 +316,14 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
                           <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusColors.badge}`}>
                             {payment.status}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <button
+                            onClick={() => setSelectedPayment(payment)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium hover:bg-blue-700 transition-colors"
+                          >
+                            View
+                          </button>
                         </td>
                       </tr>
                     )
@@ -364,6 +374,147 @@ export default function PaymentsLedger({ globalCurrency = 'PHP' }) {
           )}
         </div>
       </div>
+
+      {/* Payment Details Modal */}
+      {selectedPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 sticky top-0 bg-white">
+              <h3 className="text-2xl font-semibold text-slate-900">Payment Details</h3>
+              <button
+                onClick={() => setSelectedPayment(null)}
+                className="text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-6">
+              {/* Transaction Summary */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                  <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Amount</p>
+                  <p className="text-2xl font-bold text-slate-900">{globalCurrency} {Number(selectedPayment.amount || 0).toFixed(2)}</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                  <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Status</p>
+                  <p className={`text-lg font-bold ${STATUS_COLORS[selectedPayment.status]?.text || 'text-slate-900'}`}>
+                    {selectedPayment.status}
+                  </p>
+                </div>
+              </div>
+
+              {/* Fee Information */}
+              <div className="border-t border-slate-200 pt-6">
+                <h4 className="font-semibold text-slate-900 mb-4">Transaction Breakdown</h4>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
+                    <span className="text-slate-700">Gross Amount</span>
+                    <span className="font-semibold text-slate-900">{globalCurrency} {Number(selectedPayment.amount || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <span className="text-slate-700">Fee Amount</span>
+                    <span className="font-semibold text-red-900">-{globalCurrency} {Number(selectedPayment.fee_amount || 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border-2 border-emerald-200">
+                    <span className="font-semibold text-slate-900">Net Amount</span>
+                    <span className="font-bold text-emerald-900">{globalCurrency} {Number(selectedPayment.net_amount || selectedPayment.amount - (selectedPayment.fee_amount || 0)).toFixed(2)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Payment Information */}
+              <div className="border-t border-slate-200 pt-6">
+                <h4 className="font-semibold text-slate-900 mb-4">Payment Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Reference Number</p>
+                    <p className="text-slate-900 font-medium">{selectedPayment.reference_number || 'Not provided'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Payment Type</p>
+                    <p className="text-slate-900 font-medium">{selectedPayment.payment_type || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Payment Method</p>
+                    <p className="text-slate-900 font-medium">{selectedPayment.payment_method || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Currency</p>
+                    <p className="text-slate-900 font-medium">{selectedPayment.currency || 'PHP'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Customer Information */}
+              <div className="border-t border-slate-200 pt-6">
+                <h4 className="font-semibold text-slate-900 mb-4">Customer Information</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Name</p>
+                    <p className="text-slate-900 font-medium">{selectedPayment.guest_name || 'Guest'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Email</p>
+                    <p className="text-slate-900 font-medium text-sm">{selectedPayment.guest_email || selectedPayment.customer_id || '-'}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timestamps */}
+              <div className="border-t border-slate-200 pt-6">
+                <h4 className="font-semibold text-slate-900 mb-4">Timestamps</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Created</p>
+                    <p className="text-slate-900 text-sm">{new Date(selectedPayment.created_at).toLocaleString()}</p>
+                  </div>
+                  {selectedPayment.completed_at && (
+                    <div>
+                      <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Completed</p>
+                      <p className="text-slate-900 text-sm">{new Date(selectedPayment.completed_at).toLocaleString()}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Description */}
+              {selectedPayment.description && (
+                <div className="border-t border-slate-200 pt-6">
+                  <h4 className="font-semibold text-slate-900 mb-2">Description</h4>
+                  <p className="text-slate-700 bg-slate-50 p-3 rounded-lg">{selectedPayment.description}</p>
+                </div>
+              )}
+
+              {/* Metadata */}
+              {selectedPayment.metadata && Object.keys(selectedPayment.metadata).length > 0 && (
+                <div className="border-t border-slate-200 pt-6">
+                  <h4 className="font-semibold text-slate-900 mb-3">Additional Data</h4>
+                  <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <pre className="text-xs overflow-x-auto text-slate-700">
+                      {JSON.stringify(selectedPayment.metadata, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 bg-slate-50 sticky bottom-0">
+              <button
+                onClick={() => setSelectedPayment(null)}
+                className="px-4 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-slate-100 transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
