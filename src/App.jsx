@@ -26,6 +26,7 @@ const OnlineUsers = lazy(() => import('./components/OnlineUsers'))
 const Dashboard = lazy(() => import('./components/Dashboard'))
 const Wallet = lazy(() => import('./components/Wallet'))
 const SendMoney = lazy(() => import('./components/SendMoney'))
+const ReceiveMoney = lazy(() => import('./components/ReceiveMoney'))
 const Investments = lazy(() => import('./components/Investments'))
 const BillPayments = lazy(() => import('./components/BillPayments'))
 const TransactionHistoryNew = lazy(() => import('./components/TransactionHistoryNew'))
@@ -672,6 +673,7 @@ export default function App() {
                         {activeTab === 'dashboard' && <Dashboard userId={userId} onNavigate={setActiveTab} />}
                         {activeTab === 'wallet' && <Wallet userId={userId} totalBalancePHP={totalBalancePHP} globalCurrency={globalCurrency} />}
                         {activeTab === 'send' && <SendMoney userId={userId} />}
+                        {activeTab === 'receive' && <ReceiveMoney userId={userId} />}
                         {activeTab === 'investments' && <Investments userId={userId} />}
                         {activeTab === 'bills' && <BillPayments userId={userId} />}
                         {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
