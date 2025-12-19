@@ -65,7 +65,7 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
       icon: '',
       items: [
         { id: 'rates', label: 'Currency Rates', auth: true },
-        { id: 'payments-financial', label: 'Payments', auth: true },
+        { id: 'payments', label: 'Payments', auth: true },
         { id: 'send', label: 'Send Money', auth: true },
         { id: 'receive', label: 'Receive Money', auth: true }
       ]
@@ -173,7 +173,6 @@ function SidebarComponent({ activeTab, onTabChange, userEmail, onShowAuth, onSig
     const businessSubItems = [
       'bir-integration',
       'digital-receipts',
-      'payments',
       'shareholders',
       'jobs-hiring',
       'employees-payroll',
