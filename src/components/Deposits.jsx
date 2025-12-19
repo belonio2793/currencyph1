@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import FiatCryptoToggle from './FiatCryptoToggle'
 
 // Currency symbols
 const CURRENCY_SYMBOLS = {
