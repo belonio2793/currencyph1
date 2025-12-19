@@ -218,24 +218,37 @@ export default function SendMoney({ userId }) {
               {step === 1 && (
                 <div className="space-y-3">
                   <h3 className="text-lg font-medium text-slate-900">Select Sender Account</h3>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">From Account</label>
-                    <select
-                      value={selectedSender}
-                      onChange={e => setSelectedSender(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    >
-                      {wallets.map(wallet => (
-                        <option key={wallet.id} value={wallet.currency_code}>
-                          {getCurrencySymbol(wallet.currency_code)}{wallet.balance.toFixed(2)} ({wallet.currency_code})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {wallets.length === 0 ? (
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <p className="text-sm text-amber-800">
+                        You don't have any wallets yet. <a href="#" onClick={e => {e.preventDefault(); window.location.href = '/deposit'}} className="font-medium underline">Create a wallet</a> to send money.
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <label className="block text-sm font-medium text-slate-700 mb-2">From Account</label>
+                      <select
+                        value={selectedSender}
+                        onChange={e => setSelectedSender(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      >
+                        <option value="">Select an account</option>
+                        {wallets.map(wallet => (
+                          <option key={wallet.id} value={wallet.currency_code}>
+                            {getCurrencySymbol(wallet.currency_code)}{wallet.balance.toFixed(2)} ({wallet.currency_code})
+                          </option>
+                        ))}
+                      </select>
+                      <p className="text-xs text-slate-500 mt-2">
+                        Showing {wallets.length} {wallets.length === 1 ? 'wallet' : 'wallets'} from your account
+                      </p>
+                    </div>
+                  )}
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    disabled={wallets.length === 0 || !selectedSender}
+                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
