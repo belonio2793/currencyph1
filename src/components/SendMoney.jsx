@@ -43,8 +43,11 @@ export default function SendMoney({ userId }) {
       setWallets(walletsData)
       setBeneficiaries(beneficiariesData)
       if (walletsData.length > 0) {
-        setSelectedSender(walletsData[0].currency_code)
-        setRecipientCurrency(walletsData[0].currency_code)
+        // Prioritize PHP wallet as default
+        const phpWallet = walletsData.find(w => w.currency_code === 'PHP')
+        const defaultCurrency = phpWallet ? 'PHP' : walletsData[0].currency_code
+        setSelectedSender(defaultCurrency)
+        setRecipientCurrency(defaultCurrency)
       }
     } catch (err) {
       setError('Failed to load data')
