@@ -56,7 +56,20 @@ export default function ReceiveMoney({ userId }) {
 
   const copyToClipboard = async (text, label) => {
     try {
-      await navigator.clipboard.writeText(text)
+      // Try modern Clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        // Fallback: Use older method with textarea
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        textarea.style.position = 'fixed'
+        textarea.style.opacity = '0'
+        document.body.appendChild(textarea)
+        textarea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textarea)
+      }
       setCopyFeedback(label)
       setTimeout(() => setCopyFeedback(''), 2000)
     } catch (err) {
