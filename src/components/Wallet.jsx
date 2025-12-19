@@ -31,6 +31,13 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
+      // Auto-generate account numbers for any wallets that don't have them
+      try {
+        await currencyAPI.ensureWalletsHaveAccountNumbers(userId)
+      } catch (err) {
+        console.warn('Warning: Could not ensure account numbers for wallets:', err)
+      }
+
       // Load user's saved currency preferences
       const preferences = await getWalletDisplayPreferences(userId)
       setSelectedCurrencies(preferences || ['PHP'])
