@@ -5,6 +5,7 @@ import WalletDisplayCustomizer from './WalletDisplayCustomizer'
 import { getWalletDisplayPreferences } from '../lib/walletPreferences'
 import TransactionsList from './Wallets/TransactionsList'
 import { currencyAPI } from '../lib/payments'
+import FiatCryptoToggle from './FiatCryptoToggle'
 
 export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
@@ -14,6 +15,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(null)
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
+  const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
 
   useEffect(() => {
     loadData()
