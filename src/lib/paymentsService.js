@@ -419,7 +419,8 @@ export const paymentsService = {
   },
 
   async createPaymentLink(merchantId, linkData) {
-    const slug = linkData.url_slug || this.generateSlug(linkData.name)
+    const baseSlug = linkData.url_slug || this.generateSlug(linkData.name)
+    const slug = await this.generateUniqueSlug(merchantId, baseSlug)
 
     const { data, error } = await supabase
       .from('payment_links')
