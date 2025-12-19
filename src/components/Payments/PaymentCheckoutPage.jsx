@@ -8,6 +8,7 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
   const [paymentLink, setPaymentLink] = useState(null)
   const [invoice, setInvoice] = useState(null)
   const [merchant, setMerchant] = useState(null)
+  const [product, setProduct] = useState(null)
   const [success, setSuccess] = useState(false)
 
   useEffect(() => {
