@@ -301,6 +301,21 @@ export default function ProductsManager({ merchant, onRefresh }) {
                 {product.description && (
                   <p className="text-slate-600 text-sm mt-2">{product.description}</p>
                 )}
+                {product.payment_link && (
+                  <div className="mt-4 pt-4 border-t border-slate-200">
+                    <p className="text-xs text-slate-500 mb-2">Payment Link:</p>
+                    <div className="bg-slate-50 rounded px-3 py-2 flex items-center justify-between">
+                      <code className="text-xs text-slate-700 break-all">{getPaymentLinkUrl(product.payment_link.url_slug)}</code>
+                      <button
+                        onClick={() => navigator.clipboard.writeText(getPaymentLinkUrl(product.payment_link.url_slug))}
+                        className="ml-2 px-2 py-1 text-xs bg-slate-200 hover:bg-slate-300 rounded transition-colors flex-shrink-0"
+                        title="Copy link"
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
                   <button
                     onClick={() => handleEdit(product)}
