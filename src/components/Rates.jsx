@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import FiatCryptoToggle from './FiatCryptoToggle'
 
 export default function Rates() {
   const [currencies, setCurrencies] = useState({})
