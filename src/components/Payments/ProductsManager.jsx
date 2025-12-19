@@ -329,18 +329,23 @@ export default function ProductsManager({ merchant, onRefresh }) {
                   <p className="text-slate-600 text-sm mt-2">{product.description}</p>
                 )}
                 {product.payment_link && (
-                  <div className="mt-4 pt-4 border-t border-slate-200">
-                    <p className="text-xs text-slate-500 mb-2">Payment Link:</p>
-                    <div className="bg-slate-50 rounded px-3 py-2 flex items-center justify-between">
-                      <code className="text-xs text-slate-700 break-all">{getPaymentLinkUrl(product.payment_link.url_slug)}</code>
-                      <button
-                        onClick={() => navigator.clipboard.writeText(getPaymentLinkUrl(product.payment_link.url_slug))}
-                        className="ml-2 px-2 py-1 text-xs bg-slate-200 hover:bg-slate-300 rounded transition-colors flex-shrink-0"
-                        title="Copy link"
-                      >
-                        Copy
-                      </button>
+                  <div className="mt-4 pt-4 border-t border-emerald-200 bg-emerald-50 -m-6 mt-4 p-6 rounded-b-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <svg className="w-4 h-4 text-emerald-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.658 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                      <p className="text-sm font-medium text-emerald-900">Payment Link Generated</p>
                     </div>
+                    <div className="bg-white rounded border border-emerald-200 px-3 py-2 flex items-center justify-between mb-2">
+                      <code className="text-xs text-emerald-700 break-all font-mono">{getPaymentLinkUrl(product.payment_link.url_slug)}</code>
+                    </div>
+                    <button
+                      onClick={() => navigator.clipboard.writeText(getPaymentLinkUrl(product.payment_link.url_slug))}
+                      className="w-full px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-colors font-medium"
+                      title="Copy link"
+                    >
+                      Copy Payment Link
+                    </button>
                   </div>
                 )}
                 <div className="flex gap-2 mt-4 pt-4 border-t border-slate-200">
