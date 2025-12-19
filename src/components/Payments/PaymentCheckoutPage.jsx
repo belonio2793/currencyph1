@@ -13,13 +13,26 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
 
   useEffect(() => {
     loadCheckoutData()
+
+    // Listen for URL changes to reload checkout data if needed
+    const handlePopState = () => {
+      loadCheckoutData()
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
   }, [])
 
   const loadCheckoutData = async () => {
     try {
       setLoading(true)
+      setError(null)
       const path = window.location.pathname
-      const parts = path.split('/')
+      const parts = path.split('/').filter(Boolean)
+
+      if (!path.startsWith('/payment/') && !path.startsWith('/invoice/')) {
+        throw new Error('Invalid checkout URL')
+      }
 
       // Support for URL parameters to be appended to metadata
       const urlParams = new URLSearchParams(window.location.search)
@@ -29,7 +42,12 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
       }
 
       if (path.startsWith('/payment/')) {
-        const slug = parts[2]
+        // Extract slug from path - handle /payment/slug or /payment/slug/extra
+        const slug = parts[1] // parts[0] is 'payment'
+
+        if (!slug) {
+          throw new Error('No payment link specified in URL')
+        }
 
         if (slug === 'direct') {
           // Ad-hoc payment via URL parameters
@@ -39,20 +57,28 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
           const merchantData = await paymentsService.getMerchant(merchantId)
           setMerchant(merchantData)
 
+          const amount = parseFloat(urlParams.get('amount'))
+          if (!amount || amount <= 0) throw new Error('Valid amount is required for direct payments')
+
           const adhocLink = {
             merchant_id: merchantId,
             name: urlParams.get('name') || 'Payment',
             description: urlParams.get('description') || '',
-            amount: parseFloat(urlParams.get('amount')) || null,
-            currency: urlParams.get('currency') || globalCurrency,
+            amount: amount,
+            currency: (urlParams.get('currency') || globalCurrency).toUpperCase(),
             metadata: queryMetadata,
             is_active: true
           }
           setPaymentLink(adhocLink)
         } else {
+          // Load payment link from database by slug
           const { data: linkData, error: linkError } = await paymentsService.getPaymentLinkByUniversalSlug(slug)
-          if (linkError) throw linkError
-          if (!linkData) throw new Error('Payment link not found')
+          if (linkError) {
+            throw new Error(`Database error: ${linkError.message}`)
+          }
+          if (!linkData) {
+            throw new Error(`Payment link "${slug}" not found. Please check the URL and try again.`)
+          }
 
           // Merge URL parameters into link metadata for this session
           const mergedLinkData = {
@@ -61,27 +87,41 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
           }
 
           setPaymentLink(mergedLinkData)
+
+          // Load merchant data
           const merchantData = await paymentsService.getMerchant(linkData.merchant_id)
           setMerchant(merchantData)
 
           // Load product information if this payment link is tied to a product
           if (linkData.product_id) {
-            const productData = await paymentsService.getProduct(linkData.product_id)
-            setProduct(productData)
+            try {
+              const productData = await paymentsService.getProduct(linkData.product_id)
+              setProduct(productData)
+            } catch (err) {
+              console.warn('Error loading product data:', err)
+            }
           }
         }
       } else if (path.startsWith('/invoice/')) {
-        const invoiceId = parts[2]
-        const invoiceData = await paymentsService.getInvoice(invoiceId)
-        setInvoice(invoiceData)
-        const merchantData = await paymentsService.getMerchant(invoiceData.merchant_id)
-        setMerchant(merchantData)
-      } else {
-        throw new Error('Invalid checkout URL')
+        // Extract invoice ID from path
+        const invoiceId = parts[1] // parts[0] is 'invoice'
+
+        if (!invoiceId) {
+          throw new Error('No invoice ID specified in URL')
+        }
+
+        try {
+          const invoiceData = await paymentsService.getInvoice(invoiceId)
+          setInvoice(invoiceData)
+          const merchantData = await paymentsService.getMerchant(invoiceData.merchant_id)
+          setMerchant(merchantData)
+        } catch (err) {
+          throw new Error(`Invoice "${invoiceId}" not found. Please check the URL and try again.`)
+        }
       }
     } catch (err) {
       console.error('Checkout load error:', err)
-      setError(err.message || 'Failed to load checkout')
+      setError(err.message || 'Failed to load checkout. Please verify the payment link URL.')
     } finally {
       setLoading(false)
     }
