@@ -268,10 +268,15 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900">Add Funds</h1>
-          <p className="text-slate-600 mt-2">Deposit money into your wallet using GCash or Solana</p>
+        {/* Header with Toggle */}
+        <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-slate-900">Add Funds</h1>
+            <p className="text-slate-600 mt-2">Deposit money into your wallet using GCash or Solana</p>
+          </div>
+          {(fiatCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
+            <FiatCryptoToggle active={activeType} onChange={setActiveType} />
+          )}
         </div>
 
         {/* Error Message */}
