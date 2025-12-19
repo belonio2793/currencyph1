@@ -246,13 +246,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   }
 
   // Filter currencies by type
-  const fiatCurrencies = currencies.filter(c => c.type === 'fiat')
+  const currencyCurrencies = currencies.filter(c => c.type === 'fiat')
   const cryptoCurrencies = currencies.filter(c => c.type === 'crypto')
-  const displayedCurrencies = activeType === 'fiat' ? fiatCurrencies : cryptoCurrencies
+  const displayedCurrencies = activeType === 'currency' ? currencyCurrencies : cryptoCurrencies
 
   // Filter wallets by type
-  const fiatWallets = wallets.filter(w => w.currency_type === 'fiat')
-  const cryptoWallets = wallets.filter(w => w.currency_type === 'crypto')
+  const currencyWallets = wallets.filter(w => w.currency_type === 'fiat')
+  const cryptocurrencyWallets = wallets.filter(w => w.currency_type === 'crypto')
 
   const copyToClipboard = (text) => {
     navigator.clipboard.writeText(text)
