@@ -23,7 +23,8 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
 
       if (path.startsWith('/payment/')) {
         const slug = parts[2]
-        const linkData = await paymentsService.getPaymentLinkByUniversalSlug(slug)
+        const { data: linkData, error: linkError } = await paymentsService.getPaymentLinkByUniversalSlug(slug)
+        if (linkError) throw linkError
         if (!linkData) throw new Error('Payment link not found')
 
         setPaymentLink(linkData)
