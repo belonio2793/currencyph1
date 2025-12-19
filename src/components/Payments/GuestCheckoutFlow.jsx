@@ -5,6 +5,7 @@ import { currencyAPI } from '../../lib/payments'
 export default function GuestCheckoutFlow({
   paymentLink,
   invoice,
+  product,
   onSuccess,
   onCancel,
   userId,
