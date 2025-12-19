@@ -98,14 +98,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       // Load wallets with currency type info
       const { data: walletsData, error: walletsError } = await supabase
         .from('wallets')
-        .select(`
-          id,
-          user_id,
-          currency_code,
-          balance,
-          created_at,
-          currencies!inner(code, name, type, symbol)
-        `)
+        .select('id, user_id, currency_code, balance, created_at, currencies(code, name, type, symbol)')
         .eq('user_id', userId)
 
       if (walletsError) throw walletsError
