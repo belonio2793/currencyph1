@@ -17,18 +17,18 @@ export default function ReceiveMoney({ userId }) {
   }, [])
 
   const loadExchangeRate = async () => {
+    // Use fallback rate immediately
+    setExchangeRate(150)
+
+    // Try to fetch live rate in background, but don't block on failure
     try {
-      // Fetch SOL to PHP exchange rate
       const rate = await currencyAPI.getExchangeRate('SOL', 'PHP')
-      if (rate) {
+      if (rate && typeof rate === 'number' && rate > 0) {
         setExchangeRate(rate)
-      } else {
-        // Fallback rate if API fails
-        setExchangeRate(150) // Approximate SOL/PHP rate
       }
     } catch (err) {
-      console.debug('Failed to load exchange rate:', err)
-      setExchangeRate(150) // Use fallback rate
+      // Silently fail - use fallback rate
+      console.debug('Exchange rate fetch failed, using fallback')
     } finally {
       setLoading(false)
     }
