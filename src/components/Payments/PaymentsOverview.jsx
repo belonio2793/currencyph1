@@ -215,6 +215,47 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
         )}
       </div>
 
+      {/* Payment Breakdown */}
+      {Object.keys(paymentsByType).length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">By Payment Type</h3>
+            <div className="space-y-3">
+              {Object.entries(paymentsByType).map(([type, data]) => (
+                <div key={type} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                  <div>
+                    <p className="font-medium text-slate-900 capitalize">{type}</p>
+                    <p className="text-xs text-slate-500">{data.count} transaction(s)</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-slate-900">{globalCurrency} {Number(data.amount).toFixed(2)}</p>
+                    <p className="text-xs text-amber-600">{globalCurrency} {Number(data.fees).toFixed(2)} fees</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg border border-slate-200 p-6">
+            <h3 className="text-lg font-semibold text-slate-900 mb-4">By Payment Method</h3>
+            <div className="space-y-3">
+              {Object.entries(paymentsByMethod).map(([method, data]) => (
+                <div key={method} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+                  <div>
+                    <p className="font-medium text-slate-900 capitalize">{method || 'Unknown'}</p>
+                    <p className="text-xs text-slate-500">{data.count} transaction(s)</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-medium text-slate-900">{globalCurrency} {Number(data.amount).toFixed(2)}</p>
+                    <p className="text-xs text-amber-600">{globalCurrency} {Number(data.fees).toFixed(2)} fees</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Getting Started */}
       <div className="bg-gradient-to-r from-emerald-50 to-blue-50 rounded-lg border border-emerald-200 p-6">
         <h3 className="text-lg font-semibold text-slate-900 mb-4">Getting Started</h3>
