@@ -269,26 +269,11 @@ export default function PaymentsHub({ userId, userEmail, globalCurrency = 'PHP',
         )}
 
         {activeTab === 'overview' && (
-          selectedMerchant ? (
-            <PaymentsOverview
-              merchant={selectedMerchant}
-              userId={userId}
-              globalCurrency={globalCurrency}
-            />
-          ) : (
-            <div className="p-6">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                <h3 className="font-semibold text-blue-900 mb-2">Welcome to Payments</h3>
-                <p className="text-blue-800 mb-4">Create your first merchant account to start accepting payments.</p>
-                <button
-                  onClick={() => setActiveTab('settings')}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Create Merchant
-                </button>
-              </div>
-            </div>
-          )
+          <PaymentsOverview
+            merchant={selectedMerchant}
+            userId={userId}
+            globalCurrency={globalCurrency}
+          />
         )}
 
         {activeTab === 'history' && (
