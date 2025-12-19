@@ -68,9 +68,15 @@ export const currencyAPI = {
         }
       }
 
-      // 2) Try edge function (cached rates)
+      // 2) Try edge function (cached rates) with timeout
       try {
-        const { data, error } = await supabase.functions.invoke('fetch-rates', { method: 'GET' })
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 8000)
+        const { data, error } = await Promise.race([
+          supabase.functions.invoke('fetch-rates', { method: 'GET' }),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Edge function timeout')), 7000))
+        ])
+        clearTimeout(timeout)
         if (!error && data && data.exchangeRates) {
           const now = new Date()
           const rates = {}
