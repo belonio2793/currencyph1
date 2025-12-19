@@ -39,6 +39,32 @@ export default function ProductsManager({ merchant, onRefresh }) {
     }
   }
 
+  const autogeneratePaymentLink = async (product, merchantId) => {
+    try {
+      const defaultPrice = product.prices && product.prices.length > 0 ? product.prices[0] : null
+
+      const paymentLinkData = {
+        product_id: product.id,
+        name: product.name,
+        description: product.description || '',
+        amount: defaultPrice ? defaultPrice.amount : null,
+        currency: defaultPrice ? defaultPrice.currency : 'PHP',
+        price_id: defaultPrice ? defaultPrice.id : null
+      }
+
+      const newLink = await paymentsService.createPaymentLink(merchantId, paymentLinkData)
+      return newLink
+    } catch (err) {
+      console.error('Error autogenerating payment link:', err)
+      return null
+    }
+  }
+
+  const getPaymentLinkUrl = (linkSlug) => {
+    const baseUrl = window.location.origin
+    return `${baseUrl}/payment/${linkSlug}`
+  }
+
   const handleCreate = async (e) => {
     e.preventDefault()
     try {
