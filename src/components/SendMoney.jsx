@@ -364,17 +364,23 @@ export default function SendMoney({ userId }) {
                   {/* Recipient Currency */}
                   <div>
                     <label className="block text-sm font-medium text-slate-700 mb-2">Recipient Currency</label>
-                    <select
-                      value={recipientCurrency}
-                      onChange={e => setRecipientCurrency(e.target.value)}
-                      className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-                    >
-                      {currencies.map(curr => (
-                        <option key={curr} value={curr}>
-                          {getCurrencySymbol(curr)} {curr}
-                        </option>
-                      ))}
-                    </select>
+                    {wallets.length === 0 ? (
+                      <div className="bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-slate-600">
+                        No wallets available
+                      </div>
+                    ) : (
+                      <select
+                        value={recipientCurrency}
+                        onChange={e => setRecipientCurrency(e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                      >
+                        {wallets.map(wallet => (
+                          <option key={wallet.id} value={wallet.currency_code}>
+                            {getCurrencySymbol(wallet.currency_code)} {wallet.currency_code}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
 
                   <div className="flex space-x-4">
