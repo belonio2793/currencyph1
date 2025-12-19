@@ -736,6 +736,64 @@ export const paymentsService = {
     return data
   },
 
+  async ensurePaymentSyncedFromIntent(paymentIntentId) {
+    try {
+      const intent = await this.getPaymentIntent(paymentIntentId)
+      if (!intent) return null
+
+      if (intent.status !== 'succeeded') return null
+
+      // Check if payment record exists
+      let payment = await this.getPaymentByIntentId(paymentIntentId)
+
+      if (!payment && intent.status === 'succeeded') {
+        // Create the payment record if trigger didn't fire
+        const { fee_amount, net_amount } = intent.metadata || {}
+        const feeData = fee_amount ? { feeAmount: fee_amount, netAmount: net_amount } : this.calculateFee(intent.amount, intent.metadata?.payment_method)
+
+        payment = await this.createPayment({
+          merchant_id: intent.merchant_id,
+          customer_id: intent.payer_id,
+          payment_intent_id: intent.id,
+          invoice_id: intent.invoice_id,
+          payment_link_id: intent.payment_link_id,
+          guest_email: intent.guest_email,
+          guest_name: intent.guest_name,
+          amount: intent.amount,
+          currency: intent.currency,
+          fee_amount: feeData.feeAmount,
+          net_amount: feeData.netAmount,
+          status: 'succeeded',
+          payment_type: 'payment',
+          payment_method: intent.metadata?.payment_method,
+          metadata: intent.metadata || {},
+          completed_at: new Date().toISOString()
+        })
+      }
+
+      return payment
+    } catch (err) {
+      console.error('ensurePaymentSyncedFromIntent error:', err)
+      return null
+    }
+  },
+
+  async getPaymentByIntentId(paymentIntentId) {
+    try {
+      const { data, error } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('payment_intent_id', paymentIntentId)
+        .maybeSingle()
+
+      if (error) throw error
+      return data
+    } catch (err) {
+      console.error('getPaymentByIntentId error:', err)
+      return null
+    }
+  },
+
   // ============ Fee Calculation ============
   calculateFee(amount, paymentMethod = 'wallet_balance') {
     // Fee structure by payment method (percentage or flat + percentage)
