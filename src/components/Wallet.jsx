@@ -118,9 +118,10 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowCustomizer(true)}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2"
                 >
-                  ➕ Add More Currencies
+                  <span className="text-xl font-bold leading-none">+</span>
+                  Add More Currencies
                 </button>
               </div>
 
