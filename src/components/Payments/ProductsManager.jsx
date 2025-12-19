@@ -33,10 +33,16 @@ export default function ProductsManager({ merchant, onRefresh }) {
         console.error('Error loading payment links:', err)
       }
 
-      // Fetch prices and attach payment links for each product
+      // Fetch prices and attach/generate payment links for each product
       const productsWithData = await Promise.all((data || []).map(async (p) => {
         const prices = await paymentsService.getPricesByProduct(p.id)
-        const payment_link = allLinks.find(link => link.product_id === p.id) || null
+        let payment_link = allLinks.find(link => link.product_id === p.id) || null
+
+        // Auto-generate if missing
+        if (!payment_link) {
+          console.log(`Auto-generating missing payment link for product: ${p.name}`)
+          payment_link = await autogeneratePaymentLink({ ...p, prices }, merchant.id)
+        }
 
         return { ...p, prices, payment_link }
       }))
