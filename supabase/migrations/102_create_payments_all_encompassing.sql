@@ -37,7 +37,11 @@ CREATE TABLE IF NOT EXISTS public.payments (
     external_reference_id TEXT, -- ID from external provider (e.g., GCash ref, Stripe ID)
     qr_code_url TEXT,
     metadata JSONB DEFAULT '{}'::jsonb,
-    
+
+    -- Constraints for syncing
+    CONSTRAINT payments_payment_intent_unique UNIQUE (payment_intent_id),
+    CONSTRAINT payments_deposit_intent_unique UNIQUE (deposit_intent_id),
+
     -- Timestamps
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -113,3 +117,94 @@ CREATE TRIGGER set_payment_reference_number
 
 -- Comment on table
 COMMENT ON TABLE public.payments IS 'Centralized ledger for all finalized payment transactions in the system.';
+
+-- Sync Triggers to automatically populate the payments table
+-- 1. Sync from payment_intents
+CREATE OR REPLACE FUNCTION sync_payment_intent_to_payments()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.status = 'succeeded' AND (OLD.status IS NULL OR OLD.status <> 'succeeded') THEN
+        INSERT INTO public.payments (
+            merchant_id,
+            customer_id,
+            payment_intent_id,
+            invoice_id,
+            payment_link_id,
+            guest_email,
+            guest_name,
+            amount,
+            currency,
+            status,
+            payment_type,
+            metadata,
+            completed_at
+        ) VALUES (
+            NEW.merchant_id,
+            NEW.payer_id,
+            NEW.id,
+            NEW.invoice_id,
+            NEW.payment_link_id,
+            NEW.guest_email,
+            NEW.guest_name,
+            NEW.amount,
+            NEW.currency,
+            'succeeded',
+            'payment',
+            NEW.metadata,
+            now()
+        )
+        ON CONFLICT (payment_intent_id) DO UPDATE SET
+            status = 'succeeded',
+            completed_at = now(),
+            updated_at = now();
+    END IF;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+DROP TRIGGER IF EXISTS tr_sync_payment_intent_to_payments ON public.payment_intents;
+CREATE TRIGGER tr_sync_payment_intent_to_payments
+    AFTER UPDATE ON public.payment_intents
+    FOR EACH ROW
+    EXECUTE PROCEDURE sync_payment_intent_to_payments();
+
+-- 2. Sync from deposit_intents
+CREATE OR REPLACE FUNCTION sync_deposit_intent_to_payments()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.status = 'completed' AND (OLD.status IS NULL OR OLD.status <> 'completed') THEN
+        INSERT INTO public.payments (
+            customer_id,
+            deposit_intent_id,
+            amount,
+            currency,
+            status,
+            payment_type,
+            payment_method,
+            metadata,
+            completed_at
+        ) VALUES (
+            NEW.user_id,
+            NEW.id,
+            NEW.amount,
+            NEW.currency,
+            'succeeded',
+            'deposit',
+            NEW.deposit_method,
+            NEW.metadata,
+            now()
+        )
+        ON CONFLICT (deposit_intent_id) DO UPDATE SET
+            status = 'succeeded',
+            completed_at = now(),
+            updated_at = now();
+    END IF;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+DROP TRIGGER IF EXISTS tr_sync_deposit_intent_to_payments ON public.deposit_intents;
+CREATE TRIGGER tr_sync_deposit_intent_to_payments
+    AFTER UPDATE ON public.deposit_intents
+    FOR EACH ROW
+    EXECUTE PROCEDURE sync_deposit_intent_to_payments();
