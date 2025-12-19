@@ -72,7 +72,7 @@ export default function GuestCheckoutFlow({
           throw new Error(`Insufficient balance in your ${currency} wallet`)
         }
 
-        // Process wallet payment
+        // Process wallet payment (no fees for wallet)
         await currencyAPI.withdrawFunds(userId, currency, amount)
 
         // Update invoice or record transaction
@@ -83,6 +83,9 @@ export default function GuestCheckoutFlow({
         setStep('success')
         return
       }
+
+      // Calculate fees for the selected payment method
+      const feeData = paymentsService.calculateFee(amount, selectedPaymentMethod)
 
       // Create payment intent for other methods
       const paymentIntent = await paymentsService.createPaymentIntent(
@@ -97,7 +100,13 @@ export default function GuestCheckoutFlow({
           reference_id: invoice?.id || paymentLink?.id,
           invoice_id: invoice?.id || null,
           payment_link_id: paymentLink?.id || null,
-          onboarding_state: userId ? 'none' : 'pending'
+          onboarding_state: userId ? 'none' : 'pending',
+          metadata: {
+            payment_method: selectedPaymentMethod,
+            fee_amount: feeData.feeAmount,
+            net_amount: feeData.netAmount,
+            fee_breakdown: feeData.breakdown
+          }
         }
       )
 
@@ -109,7 +118,11 @@ export default function GuestCheckoutFlow({
             amount: amount,
             currency: currency,
             deposit_method: selectedPaymentMethod,
-            linked_payment_intent_id: paymentIntent.id
+            linked_payment_intent_id: paymentIntent.id,
+            metadata: {
+              fee_amount: feeData.feeAmount,
+              net_amount: feeData.netAmount
+            }
           }
         )
       }
