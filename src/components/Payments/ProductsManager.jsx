@@ -254,6 +254,23 @@ export default function ProductsManager({ merchant, onRefresh }) {
               />
             </div>
 
+            {editingProduct && editingProduct.payment_link && (
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">Payment Link (Auto-generated - Not Editable)</label>
+                <div className="w-full px-4 py-2 border border-slate-300 rounded-lg bg-slate-50 flex items-center justify-between">
+                  <code className="text-sm text-slate-700 break-all">{getPaymentLinkUrl(editingProduct.payment_link.url_slug)}</code>
+                  <button
+                    type="button"
+                    onClick={() => navigator.clipboard.writeText(getPaymentLinkUrl(editingProduct.payment_link.url_slug))}
+                    className="ml-2 px-2 py-1 text-xs bg-slate-200 hover:bg-slate-300 rounded transition-colors flex-shrink-0"
+                    title="Copy link"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="flex gap-2 pt-4">
               <button
                 type="submit"
