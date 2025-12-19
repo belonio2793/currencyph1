@@ -18,7 +18,7 @@ import Inbox from './Inbox'
 import PokerPage from './PokerPage'
 import NetworkBalances from './NetworkBalances'
 import P2PLoanMarketplace from './P2PLoanMarketplace'
-import Payments from './Payments'
+import PaymentsHub from './PaymentsHub'
 
 export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', setGlobalCurrency, globalCryptocurrency = 'BTC', setGlobalCryptocurrency, onTabChange, onShowAuth }) {
   const [wallets, setWallets] = useState([])
@@ -570,7 +570,7 @@ export default function HomePage({ userId, userEmail, globalCurrency = 'PHP', se
               </button>
             </div>
             <div className="p-6">
-              <Payments userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />
+              <PaymentsHub userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} setGlobalCurrency={setGlobalCurrency} />
             </div>
           </div>
         </div>
