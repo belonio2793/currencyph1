@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabaseClient'
 import { formatNumber } from '../lib/currency'
 import WalletDisplayCustomizer from './WalletDisplayCustomizer'
 import { getWalletDisplayPreferences } from '../lib/walletPreferences'
+import TransactionsList from './Wallets/TransactionsList'
 
 export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
