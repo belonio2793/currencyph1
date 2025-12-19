@@ -234,10 +234,29 @@ export default function SendMoney({ userId }) {
                         <option value="">Select an account</option>
                         {wallets.map(wallet => (
                           <option key={wallet.id} value={wallet.currency_code}>
-                            {getCurrencySymbol(wallet.currency_code)}{wallet.balance.toFixed(2)} ({wallet.currency_code})
+                            {getCurrencySymbol(wallet.currency_code)}{wallet.balance.toFixed(2)} ({wallet.currency_code}) - ID: {wallet.id}
                           </option>
                         ))}
                       </select>
+                      {selectedSender && wallets.find(w => w.currency_code === selectedSender) && (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                          <p className="text-sm font-medium text-slate-700 mb-2">Wallet Details</p>
+                          <div className="space-y-1 text-sm">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600">Wallet ID</span>
+                              <span className="font-medium text-slate-900 break-all">{wallets.find(w => w.currency_code === selectedSender)?.id}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600">Currency</span>
+                              <span className="font-medium text-slate-900">{selectedSender}</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-600">Available Balance</span>
+                              <span className="font-medium text-slate-900">{getCurrencySymbol(selectedSender)}{wallets.find(w => w.currency_code === selectedSender)?.balance.toFixed(2)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       <p className="text-xs text-slate-500 mt-2">
                         Showing {wallets.length} {wallets.length === 1 ? 'wallet' : 'wallets'} from your account
                       </p>
