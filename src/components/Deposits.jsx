@@ -110,13 +110,13 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
       }
 
       // Load currencies
-      const { data: currenciesData, error: currenciesError } = await supabase
+      const { data: allCurrencies, error: currenciesError } = await supabase
         .from('currencies')
         .select('code, name, type, symbol')
         .eq('active', true)
 
       if (currenciesError) throw currenciesError
-      setCurrencies(currenciesData || [])
+      setCurrencies(allCurrencies || [])
 
       // Load user's deposits
       const { data: depositsData, error: depositsError } = await supabase
