@@ -84,7 +84,13 @@ export default function ProductsManager({ merchant, onRefresh }) {
         })
       }
 
-      setProducts([{ ...newProduct, prices: initialPrice ? [initialPrice] : [] }, ...products])
+      const productWithPrices = { ...newProduct, prices: initialPrice ? [initialPrice] : [] }
+
+      // Autogenerate payment link for the product
+      const paymentLink = await autogeneratePaymentLink(productWithPrices, merchant.id)
+      const productWithLink = { ...productWithPrices, payment_link: paymentLink }
+
+      setProducts([productWithLink, ...products])
       setFormData({ name: '', description: '', image_url: '', initial_price: '', currency: 'PHP' })
       setShowCreateForm(false)
       onRefresh && onRefresh()
