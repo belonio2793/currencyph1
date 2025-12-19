@@ -21,13 +21,26 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
       const path = window.location.pathname
       const parts = path.split('/')
 
+      // Support for URL parameters to be appended to metadata
+      const urlParams = new URLSearchParams(window.location.search)
+      const queryMetadata = {}
+      for (const [key, value] of urlParams.entries()) {
+        queryMetadata[key] = value
+      }
+
       if (path.startsWith('/payment/')) {
         const slug = parts[2]
         const { data: linkData, error: linkError } = await paymentsService.getPaymentLinkByUniversalSlug(slug)
         if (linkError) throw linkError
         if (!linkData) throw new Error('Payment link not found')
 
-        setPaymentLink(linkData)
+        // Merge URL parameters into link metadata for this session
+        const mergedLinkData = {
+          ...linkData,
+          metadata: { ...linkData.metadata, ...queryMetadata }
+        }
+
+        setPaymentLink(mergedLinkData)
         const merchantData = await paymentsService.getMerchant(linkData.merchant_id)
         setMerchant(merchantData)
 
@@ -105,19 +118,40 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4">
+    <div
+      className="min-h-screen py-12 px-4"
+      style={{
+        backgroundColor: paymentLink?.metadata?.bg_color || '#f8fafc',
+        backgroundImage: paymentLink?.metadata?.bg_image ? `url(${paymentLink.metadata.bg_image})` : 'none',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center'
+      }}
+    >
       <div className="max-w-xl mx-auto">
         {/* Merchant Info */}
         <div className="text-center mb-8">
-          {merchant?.logo_url ? (
-            <img src={merchant.logo_url} alt={merchant.merchant_name} className="h-16 w-16 mx-auto mb-4 object-contain" />
+          {(paymentLink?.metadata?.custom_logo || merchant?.logo_url) ? (
+            <img
+              src={paymentLink?.metadata?.custom_logo || merchant.logo_url}
+              alt={merchant?.merchant_name}
+              className="h-20 w-auto mx-auto mb-4 object-contain max-w-[200px]"
+            />
           ) : (
-            <div className="h-16 w-16 bg-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+            <div
+              className="h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold"
+              style={{ backgroundColor: paymentLink?.metadata?.brand_color || '#10b981' }}
+            >
               {merchant?.merchant_name?.charAt(0)}
             </div>
           )}
-          <h1 className="text-xl font-semibold text-slate-900">{merchant?.merchant_name}</h1>
-          {merchant?.description && <p className="text-slate-500 text-sm mt-1">{merchant.description}</p>}
+          <h1 className="text-xl font-semibold text-slate-900" style={{ color: paymentLink?.metadata?.text_color || 'inherit' }}>
+            {paymentLink?.metadata?.custom_title || merchant?.merchant_name}
+          </h1>
+          {(paymentLink?.metadata?.custom_description || merchant?.description) && (
+            <p className="text-slate-500 text-sm mt-1" style={{ color: paymentLink?.metadata?.subtext_color || 'inherit' }}>
+              {paymentLink?.metadata?.custom_description || merchant.description}
+            </p>
+          )}
         </div>
 
         {/* Product Info */}
