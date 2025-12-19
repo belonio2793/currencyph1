@@ -26,11 +26,31 @@ export default function ReceiveMoney({ userId }) {
         return
       }
 
-      const [walletsData, transfersData, userData] = await Promise.all([
-        currencyAPI.getWallets(userId),
-        currencyAPI.getTransfers(userId),
-        currencyAPI.getUserById(userId)
-      ])
+      // Load data with individual error handling for resilience
+      let walletsData = []
+      let transfersData = []
+      let userData = null
+
+      try {
+        walletsData = await currencyAPI.getWallets(userId)
+      } catch (err) {
+        console.debug('Failed to load wallets:', err)
+        walletsData = []
+      }
+
+      try {
+        userData = await currencyAPI.getUserById(userId)
+      } catch (err) {
+        console.debug('Failed to load user data:', err)
+        userData = null
+      }
+
+      try {
+        transfersData = await currencyAPI.getTransfers(userId)
+      } catch (err) {
+        console.debug('Failed to load transfers:', err)
+        transfersData = []
+      }
 
       setWallets(walletsData)
       setUserEmail(userData?.email || '')
@@ -46,7 +66,7 @@ export default function ReceiveMoney({ userId }) {
         setSelectedWallet(defaultWallet)
       }
     } catch (err) {
-      setError('Failed to load data')
+      console.debug('Unexpected error in loadData:', err)
       setWallets([])
       setRecentTransfers([])
     } finally {
