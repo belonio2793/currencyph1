@@ -118,24 +118,26 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         allCurrencies.map(c => [c.code, c])
       )
 
-      // Enrich wallets with currency type info
+      // Enrich wallets with currency type and name info
       const enrichedWallets = walletsData.map(w => ({
         ...w,
-        currency_type: currencyMap[w.currency_code]?.type || 'unknown'
+        currency_type: currencyMap[w.currency_code]?.type || 'unknown',
+        currency_name: currencyMap[w.currency_code]?.name || w.currency_code,
+        currency_symbol: currencyMap[w.currency_code]?.symbol || ''
       }))
 
       setWallets(enrichedWallets)
 
-      // Set first wallet as default
-      if (enrichedWallets && enrichedWallets.length > 0) {
+      // Set PHP as default wallet if it exists, otherwise use first wallet
+      const phpWallet = enrichedWallets.find(w => w.currency_code === 'PHP')
+      if (phpWallet) {
+        setSelectedWallet(phpWallet.id)
+      } else if (enrichedWallets.length > 0) {
         setSelectedWallet(enrichedWallets[0].id)
       }
 
-      // Filter currencies to only show those where user has a wallet
-      const userWalletCurrencyCodes = new Set(enrichedWallets.map(w => w.currency_code))
-      const availableCurrencies = allCurrencies.filter(c => userWalletCurrencyCodes.has(c.code))
-
-      setCurrencies(availableCurrencies)
+      // For create wallet modal, show ALL active currencies (not just those with existing wallets)
+      setCurrencies(allCurrencies)
 
       // Load user's deposits
       const { data: depositsData, error: depositsError } = await supabase
