@@ -91,12 +91,12 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
   }
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '📊' },
-    { id: 'products', label: 'Products', icon: '📦' },
-    { id: 'pricing', label: 'Pricing', icon: '💲' },
-    { id: 'invoices', label: 'Invoices', icon: '📄' },
-    { id: 'payment-links', label: 'Payment Links', icon: '🔗' },
-    { id: 'settings', label: 'Settings', icon: '⚙️' }
+    { id: 'overview', label: 'Overview' },
+    { id: 'products', label: 'Products' },
+    { id: 'pricing', label: 'Pricing' },
+    { id: 'invoices', label: 'Invoices' },
+    { id: 'payment-links', label: 'Payment Links' },
+    { id: 'settings', label: 'Settings' }
   ]
 
   return (
@@ -149,7 +149,6 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
                   : 'border-transparent text-slate-600 hover:text-slate-900'
               }`}
             >
-              <span className="mr-2">{tab.icon}</span>
               {tab.label}
             </button>
           ))}

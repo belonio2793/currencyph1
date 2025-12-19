@@ -26,7 +26,7 @@ export const paymentsService = {
     try {
       const { data, error } = await supabase
         .from('merchants')
-        .select('*')
+        .select('*, business:businesses(*)')
         .eq('owner_user_id', userId)
         .order('created_at', { ascending: false })
 
@@ -37,6 +37,22 @@ export const paymentsService = {
       return data || []
     } catch (err) {
       console.error('getMerchantsByUser error:', err)
+      throw err
+    }
+  },
+
+  async getUserBusinesses(userId) {
+    try {
+      const { data, error } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('user_id', userId)
+        .order('business_name', { ascending: true })
+
+      if (error) throw error
+      return data || []
+    } catch (err) {
+      console.error('getUserBusinesses error:', err)
       throw err
     }
   },

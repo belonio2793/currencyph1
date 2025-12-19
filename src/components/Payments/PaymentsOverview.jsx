@@ -47,7 +47,7 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
     }
   }
 
-  const StatCard = ({ title, value, subtitle, icon, color }) => (
+  const StatCard = ({ title, value, subtitle, color }) => (
     <div className={`bg-white rounded-lg border ${color} p-6`}>
       <div className="flex items-center justify-between">
         <div>
@@ -55,7 +55,6 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
           <p className="text-3xl font-light text-slate-900 mt-2">{value}</p>
           {subtitle && <p className="text-xs text-slate-500 mt-1">{subtitle}</p>}
         </div>
-        <div className="text-4xl opacity-20">{icon}</div>
       </div>
     </div>
   )
@@ -79,31 +78,26 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
         <StatCard
           title="Total Invoices"
           value={stats.totalInvoices}
-          icon="📄"
           color="border-amber-200"
         />
         <StatCard
           title="Amount Received"
           value={`${globalCurrency} ${stats.totalReceived.toFixed(2)}`}
-          icon="💰"
           color="border-emerald-200"
         />
         <StatCard
           title="Pending Invoices"
           value={stats.pendingInvoices}
-          icon="⏳"
           color="border-blue-200"
         />
         <StatCard
           title="Products"
           value={stats.products}
-          icon="📦"
           color="border-purple-200"
         />
         <StatCard
           title="Payment Links"
           value={stats.paymentLinks}
-          icon="🔗"
           color="border-pink-200"
         />
       </div>
