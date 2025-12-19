@@ -11,13 +11,30 @@ export default function PaymentsSettings({
 }) {
   const [showCreateMerchant, setShowCreateMerchant] = useState(false)
   const [editingMerchant, setEditingMerchant] = useState(null)
+  const [userBusinesses, setUserBusinesses] = useState([])
   const [formData, setFormData] = useState({
     merchant_name: '',
     description: '',
     logo_url: '',
-    default_settlement_currency: 'PHP'
+    default_settlement_currency: 'PHP',
+    business_id: ''
   })
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (userId) {
+      loadUserBusinesses()
+    }
+  }, [userId])
+
+  const loadUserBusinesses = async () => {
+    try {
+      const businesses = await paymentsService.getUserBusinesses(userId)
+      setUserBusinesses(businesses)
+    } catch (err) {
+      console.error('Error loading businesses:', err)
+    }
+  }
 
   useEffect(() => {
     if (editingMerchant) {
@@ -25,17 +42,32 @@ export default function PaymentsSettings({
         merchant_name: editingMerchant.merchant_name,
         description: editingMerchant.description || '',
         logo_url: editingMerchant.logo_url || '',
-        default_settlement_currency: editingMerchant.default_settlement_currency || 'PHP'
+        default_settlement_currency: editingMerchant.default_settlement_currency || 'PHP',
+        business_id: editingMerchant.business_id || ''
       })
     } else if (!showCreateMerchant) {
       setFormData({
         merchant_name: '',
         description: '',
         logo_url: '',
-        default_settlement_currency: 'PHP'
+        default_settlement_currency: 'PHP',
+        business_id: ''
       })
     }
   }, [editingMerchant, showCreateMerchant])
+
+  const handleSelectBusiness = (businessId) => {
+    const business = userBusinesses.find(b => b.id === businessId)
+    if (business) {
+      setFormData({
+        ...formData,
+        business_id: businessId,
+        merchant_name: formData.merchant_name || business.business_name
+      })
+    } else {
+      setFormData({ ...formData, business_id: '' })
+    }
+  }
 
   const handleCreateMerchant = async (e) => {
     e.preventDefault()
@@ -104,6 +136,25 @@ export default function PaymentsSettings({
             {editingMerchant ? 'Edit Merchant Account' : 'Create New Merchant Account'}
           </h4>
           <form onSubmit={editingMerchant ? handleUpdateMerchant : handleCreateMerchant} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Link to Registered Business (Optional)</label>
+              <select
+                value={formData.business_id}
+                onChange={(e) => handleSelectBusiness(e.target.value)}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">No business linked (Personal/Individual)</option>
+                {userBusinesses.map(b => (
+                  <option key={b.id} value={b.id}>
+                    {b.business_name} (TIN: {b.tin})
+                  </option>
+                ))}
+              </select>
+              {formData.business_id && (
+                <p className="text-xs text-slate-500 mt-1">UUID: {formData.business_id}</p>
+              )}
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Merchant Name *</label>
               <input
@@ -214,6 +265,12 @@ export default function PaymentsSettings({
                   />
                 )}
                 <h5 className="text-lg font-semibold text-slate-900">{m.merchant_name}</h5>
+                {m.business && (
+                  <div className="mt-1 flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-[10px] font-bold uppercase rounded">Linked Business</span>
+                    <span className="text-xs text-slate-500 truncate">{m.business.business_name}</span>
+                  </div>
+                )}
                 {m.description && (
                   <p className="text-sm text-slate-600 mt-2">{m.description}</p>
                 )}
