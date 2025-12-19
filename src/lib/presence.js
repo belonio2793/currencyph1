@@ -123,19 +123,11 @@ async function updatePresence(status) {
       updateData.location_updated_at = new Date().toISOString()
     }
 
-    // Set a timeout for the presence update to prevent hanging
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Presence update timeout')), 8000)
-    )
-
     try {
-      // Race the update against the timeout
-      const updatePromise = supabase
+      const { error } = await supabase
         .from('user_presence')
         .upsert([updateData])
-
-      const result = await Promise.race([updatePromise, timeoutPromise])
-      const { error } = result
+        .timeout(8000)
 
       if (error) {
         if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
@@ -148,6 +140,7 @@ async function updatePresence(status) {
       // Network errors, fetch failures, timeouts - silently skip
       // Presence is non-critical functionality
       // Covers: TypeError: Failed to fetch, CORS errors, connection timeouts, etc.
+      // No console output - this is expected and non-blocking
     }
   } catch (err) {
     // Network errors, fetch failures, table might not exist, or other issues - silently ignore
