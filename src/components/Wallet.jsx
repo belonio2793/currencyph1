@@ -4,6 +4,7 @@ import { formatNumber } from '../lib/currency'
 import WalletDisplayCustomizer from './WalletDisplayCustomizer'
 import { getWalletDisplayPreferences } from '../lib/walletPreferences'
 import TransactionsList from './Wallets/TransactionsList'
+import { currencyAPI } from '../lib/payments'
 
 export default function Wallet({ userId, globalCurrency = 'PHP' }) {
   const [wallets, setWallets] = useState([])
