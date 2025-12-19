@@ -95,28 +95,47 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Load wallets
+      // Load wallets with currency type info
       const { data: walletsData, error: walletsError } = await supabase
         .from('wallets')
-        .select('id, user_id, currency_code, balance, created_at')
+        .select(`
+          id,
+          user_id,
+          currency_code,
+          balance,
+          created_at,
+          currencies!inner(code, name, type, symbol)
+        `)
         .eq('user_id', userId)
 
       if (walletsError) throw walletsError
-      setWallets(walletsData || [])
+
+      // Enrich wallets with currency type
+      const enrichedWallets = walletsData?.map(w => ({
+        ...w,
+        currency_type: w.currencies?.type
+      })) || []
+
+      setWallets(enrichedWallets)
 
       // Set first wallet as default
-      if (walletsData && walletsData.length > 0) {
-        setSelectedWallet(walletsData[0].id)
+      if (enrichedWallets && enrichedWallets.length > 0) {
+        setSelectedWallet(enrichedWallets[0].id)
       }
 
-      // Load currencies
+      // Load all currencies for reference
       const { data: allCurrencies, error: currenciesError } = await supabase
         .from('currencies')
         .select('code, name, type, symbol')
         .eq('active', true)
 
       if (currenciesError) throw currenciesError
-      setCurrencies(allCurrencies || [])
+
+      // Filter currencies to only show those where user has a wallet
+      const userWalletCurrencyCodes = new Set(enrichedWallets.map(w => w.currency_code))
+      const availableCurrencies = allCurrencies?.filter(c => userWalletCurrencyCodes.has(c.code)) || []
+
+      setCurrencies(availableCurrencies)
 
       // Load user's deposits
       const { data: depositsData, error: depositsError } = await supabase
