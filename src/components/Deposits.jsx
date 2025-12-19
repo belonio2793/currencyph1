@@ -1,25 +1,18 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react'
-import { currencyAPI as paymentsAPI } from '../lib/payments'
-import { currencyAPI } from '../lib/currencyAPI'
-import { apiCache } from '../lib/apiCache'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabaseClient'
 
-// Currency symbol mapping
+// Currency symbols
 const CURRENCY_SYMBOLS = {
   USD: '$',
   EUR: '€',
   GBP: '£',
   JPY: '¥',
-  CNY: '¥',
+  PHP: '₱',
   INR: '₹',
-  CAD: 'C$',
   AUD: 'A$',
-  CHF: 'Fr',
-  SEK: 'kr',
-  NZD: 'NZ$',
+  CAD: 'C$',
   SGD: 'S$',
   HKD: 'HK$',
-  PHP: '₱',
   IDR: 'Rp',
   MYR: 'RM',
   THB: '฿',
@@ -33,34 +26,29 @@ const CURRENCY_SYMBOLS = {
   AED: 'د.إ'
 }
 
-// Helper function to format currency with symbol
-const formatCurrency = (amount, currencyCode, showSymbol = true) => {
-  const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode
-  const numAmount = parseFloat(amount) || 0
-  const formatted = numAmount.toFixed(2)
-
-  if (showSymbol) {
-    if (['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'SGD', 'HKD', 'NZD'].includes(currencyCode)) {
-      return `${symbol}${formatted}`
-    }
-    return `${formatted} ${symbol}`
-  }
-  return formatted
-}
-
-// Payment Methods Configuration
-const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
-
-const PAYMENT_METHODS = {
+const DEPOSIT_METHODS = {
+  gcash: {
+    id: 'gcash',
+    name: 'GCash',
+    icon: '📱',
+    description: 'Instant mobile payment (Philippines)',
+    instructions: [
+      'Open your GCash app',
+      'Go to Send Money or Payment option',
+      'Enter the merchant details provided below',
+      'Confirm the amount and complete the transaction',
+      'Your balance will be updated within 1-5 minutes'
+    ]
+  },
   solana: {
+    id: 'solana',
     name: 'Solana',
     icon: '◎',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
-    borderColor: 'border-purple-200',
-    address: SOLANA_ADDRESS,
+    description: 'Cryptocurrency transfer',
     instructions: [
-      'Scan the QR code with your Solana wallet app',
+      'Open your Solana wallet app',
+      'Scan the QR code or copy the address below',
+      'Enter the amount in SOL',
       'Verify the recipient address and amount',
       'Confirm the transaction',
       'Your balance will be updated within 1-2 minutes'
@@ -68,239 +56,177 @@ const PAYMENT_METHODS = {
   }
 }
 
-// Main Deposits Component
+const SOLANA_ADDRESS = 'CbcWb97K3TEFJZJYLZRqdsMSdVXTFaMaUcF6yPQgY9yS'
+
 function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
-  const [exchangeRates, setExchangeRates] = useState({})
+  // Form state
+  const [amount, setAmount] = useState('')
+  const [selectedCurrency, setSelectedCurrency] = useState(globalCurrency)
+  const [selectedMethod, setSelectedMethod] = useState(null)
+  const [selectedWallet, setSelectedWallet] = useState(null)
+  const [showWalletModal, setShowWalletModal] = useState(false)
+  const [newWalletCurrency, setNewWalletCurrency] = useState(selectedCurrency)
+
+  // Data state
   const [wallets, setWallets] = useState([])
+  const [currencies, setCurrencies] = useState([])
+  const [deposits, setDeposits] = useState([])
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+
+  // UI state
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
-  const [lastUpdate, setLastUpdate] = useState(null)
-  const [syncStatus, setSyncStatus] = useState('synced')
-
-  const fetchWithRetries = async (url, options = {}, retries = 1, backoff = 500) => {
-    if (!url) return null
-    try {
-      new URL(url)
-    } catch (e) {
-      if (typeof url !== 'string' || !url.startsWith('/')) return null
-    }
-
-    let lastErr = null
-    for (let i = 0; i <= retries; i++) {
-      let controller = null
-      let timeoutId = null
-      try {
-        controller = new AbortController()
-        const timeoutDuration = 15000 + (i * 5000)
-        timeoutId = setTimeout(() => {
-          try {
-            controller.abort()
-          } catch (e) {}
-        }, timeoutDuration)
-
-        try {
-          const resp = await fetch(url, { ...options, signal: controller.signal })
-          if (timeoutId) clearTimeout(timeoutId)
-
-          if (!resp.ok) {
-            let bodyText = null
-            try { bodyText = await resp.text() } catch (e) { bodyText = null }
-            throw new Error(`HTTP ${resp.status}${bodyText ? ` - ${bodyText}` : ''}`)
-          }
-
-          const text = await resp.text()
-          try {
-            return text ? JSON.parse(text) : null
-          } catch (parseErr) {
-            return text
-          }
-        } finally {
-          if (timeoutId) clearTimeout(timeoutId)
-        }
-      } catch (err) {
-        if (timeoutId) clearTimeout(timeoutId)
-        lastErr = err
-        if (i < retries && !err.message?.includes('HTTP')) {
-          await new Promise(r => setTimeout(r, backoff * (i + 1)))
-        }
-      }
-    }
-    return null
-  }
+  const [step, setStep] = useState('amount') // amount -> method -> confirm
 
   useEffect(() => {
     loadInitialData()
-    const channel = supabase
-      .channel('public:currency_rates')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'currency_rates' }, payload => {
-        try {
-          setExchangeRates(prev => ({
-            ...prev,
-            [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
-          }))
-        } catch (e) {
-          console.warn('currency_rates INSERT handler error:', e)
-        }
-      })
-      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'currency_rates' }, payload => {
-        try {
-          setExchangeRates(prev => ({
-            ...prev,
-            [`${payload.new.from_currency}_${payload.new.to_currency}`]: payload.new.rate
-          }))
-        } catch (e) {
-          console.warn('currency_rates UPDATE handler error:', e)
-        }
-      })
-      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'currency_rates' }, payload => {
-        try {
-          setExchangeRates(prev => {
-            const copy = { ...prev }
-            const key = `${payload.old.from_currency}_${payload.old.to_currency}`
-            delete copy[key]
-            return copy
-          })
-        } catch (e) {
-          console.warn('currency_rates DELETE handler error:', e)
-        }
-      })
-
-    try {
-      const sub = channel.subscribe()
-      if (sub && typeof sub.then === 'function') {
-        sub.catch(err => console.warn('supabase channel subscribe rejected:', err))
-      }
-    } catch (e) {
-      console.warn('Failed to subscribe to supabase channel:', e)
-    }
-
-    const unhandledRejectionHandler = (evt) => {
-      try {
-        const reason = evt && (evt.reason || evt.detail || null)
-        const msg = (reason && (reason.message || reason.toString && reason.toString())) || ''
-        if (typeof msg === 'string' && /abort|aborted|AbortError/i.test(msg)) {
-          evt.preventDefault && evt.preventDefault()
-          console.debug('Ignored aborted promise:', msg)
-        }
-      } catch (e) {
-        // ignore
-      }
-    }
-    try { window.addEventListener('unhandledrejection', unhandledRejectionHandler) } catch (e) {}
-
-    return () => {
-      try {
-        channel.unsubscribe()
-      } catch (e) {}
-      try { window.removeEventListener('unhandledrejection', unhandledRejectionHandler) } catch (e) {}
-    }
   }, [userId])
 
   const loadInitialData = async () => {
     try {
-      if (userId && !userId.includes('guest-local') && userId !== 'null' && userId !== 'undefined') {
-        paymentsAPI.ensureUserWallets(userId).catch(err => {
-          console.debug('Failed to ensure user wallets, continuing:', err)
-        })
-      }
+      setLoading(true)
+      setError('')
 
-      await Promise.all([
-        loadWallets().catch(err => {
-          console.debug('Wallet loading failed, continuing with defaults:', err)
-        }),
-        loadExchangeRates().catch(err => {
-          console.debug('Exchange rates loading failed, continuing with defaults:', err)
-        })
-      ])
-      setLoading(false)
-      setLastUpdate(new Date())
-    } catch (err) {
-      console.error('Error loading data:', err)
-      setError('Failed to load data')
-      setLoading(false)
-    }
-  }
-
-  const loadWallets = async () => {
-    try {
-      if (!userId || userId.includes('guest-local') || userId === 'null' || userId === 'undefined') {
-        setWallets([])
+      if (!userId || userId.includes('guest')) {
+        setLoading(false)
         return
       }
-      setSyncStatus('syncing')
-      const data = await paymentsAPI.getWallets(userId)
-      setWallets(data)
-      setSyncStatus('synced')
-    } catch (err) {
-      setWallets([])
-      setSyncStatus('error')
-    }
-  }
 
-  const loadExchangeRates = async () => {
-    try {
-      const rates = await paymentsAPI.getAllExchangeRates()
-      const ratesMap = {}
-      if (rates && rates.length > 0) {
-        rates.forEach(r => {
-          ratesMap[`${r.from_currency}_${r.to_currency}`] = r.rate
-        })
-        setExchangeRates(ratesMap)
-      } else {
-        try {
-          const globalRates = await currencyAPI.getGlobalRates()
-          if (!globalRates || typeof globalRates !== 'object') {
-            console.debug('Invalid rates format, using empty rates')
-            setExchangeRates(ratesMap)
-            return
-          }
-          const codes = Object.keys(globalRates)
-          codes.forEach(code => {
-            const rateObj = globalRates[code]
-            const rate = rateObj?.rate || 0
-            if (rate > 0) {
-              ratesMap[`USD_${code}`] = rate
-            }
-          })
-          codes.forEach(from => {
-            codes.forEach(to => {
-              if (from === to) return
-              const rateFrom = globalRates[from]?.rate || 0
-              const rateTo = globalRates[to]?.rate || 0
-              if (rateFrom > 0 && rateTo > 0) {
-                ratesMap[`${from}_${to}`] = rateTo / rateFrom
-              }
-            })
-          })
-          setExchangeRates(ratesMap)
-        } catch (apiErr) {
-          console.debug('External currency API unavailable, using empty rates:', apiErr)
-          setExchangeRates(ratesMap)
-        }
+      // Load wallets
+      const { data: walletsData, error: walletsError } = await supabase
+        .from('wallets')
+        .select('id, user_id, currency_code, balance, created_at')
+        .eq('user_id', userId)
+
+      if (walletsError) throw walletsError
+      setWallets(walletsData || [])
+
+      // Set first wallet as default
+      if (walletsData && walletsData.length > 0) {
+        setSelectedWallet(walletsData[0].id)
       }
+
+      // Load currencies
+      const { data: currenciesData, error: currenciesError } = await supabase
+        .from('currencies')
+        .select('code, name, type, symbol')
+        .eq('active', true)
+
+      if (currenciesError) throw currenciesError
+      setCurrencies(currenciesData || [])
+
+      // Load user's deposits
+      const { data: depositsData, error: depositsError } = await supabase
+        .from('deposits')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+        .limit(10)
+
+      if (depositsError) throw depositsError
+      setDeposits(depositsData || [])
+
+      setLoading(false)
     } catch (err) {
-      console.debug('Error loading exchange rates, continuing with fallback:', err?.message || String(err))
-      setExchangeRates({})
+      console.error('Error loading data:', err)
+      setError('Failed to load wallet data')
+      setLoading(false)
     }
   }
 
-  const refreshWallets = async () => {
-    setSyncStatus('syncing')
-    await loadWallets()
-    setLastUpdate(new Date())
+  const handleCreateWallet = async () => {
+    try {
+      setSubmitting(true)
+      setError('')
+
+      const { data, error: err } = await supabase
+        .from('wallets')
+        .insert([{
+          user_id: userId,
+          currency_code: newWalletCurrency,
+          balance: 0
+        }])
+        .select()
+        .single()
+
+      if (err) throw err
+
+      setWallets([...wallets, data])
+      setSelectedWallet(data.id)
+      setShowWalletModal(false)
+      setSuccess(`${newWalletCurrency} wallet created successfully`)
+      setTimeout(() => setSuccess(''), 2000)
+    } catch (err) {
+      console.error('Error creating wallet:', err)
+      setError(err.message || 'Failed to create wallet')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
+  const handleInitiateDeposit = async () => {
+    try {
+      setSubmitting(true)
+      setError('')
 
-  const getTotalBalance = useMemo(() => {
-    let total = 0
-    wallets.forEach(wallet => {
-      const rate = exchangeRates[`${wallet.currency_code}_${globalCurrency}`] || 1
-      total += parseFloat(wallet.balance || 0) * rate
-    })
-    return total.toFixed(2)
-  }, [wallets, exchangeRates, globalCurrency])
+      if (!amount || parseFloat(amount) <= 0) {
+        setError('Please enter a valid amount')
+        setSubmitting(false)
+        return
+      }
 
+      if (!selectedWallet) {
+        setError('Please select a wallet')
+        setSubmitting(false)
+        return
+      }
+
+      // Create pending deposit record
+      const { data: deposit, error: err } = await supabase
+        .from('deposits')
+        .insert([{
+          user_id: userId,
+          wallet_id: selectedWallet,
+          amount: parseFloat(amount),
+          currency_code: selectedCurrency,
+          deposit_method: selectedMethod,
+          status: 'pending',
+          description: `${DEPOSIT_METHODS[selectedMethod].name} deposit of ${amount} ${selectedCurrency}`
+        }])
+        .select()
+        .single()
+
+      if (err) throw err
+
+      // Add to deposits list
+      setDeposits([deposit, ...deposits])
+      setSuccess('Deposit initiated. Awaiting payment...')
+      
+      // Move to confirmation step
+      setStep('confirm')
+    } catch (err) {
+      console.error('Error creating deposit:', err)
+      setError(err.message || 'Failed to initiate deposit')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleStartNewDeposit = () => {
+    setAmount('')
+    setSelectedCurrency(globalCurrency)
+    setSelectedMethod(null)
+    setStep('amount')
+    setSuccess('')
+    setError('')
+  }
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+    setSuccess('Copied to clipboard')
+    setTimeout(() => setSuccess(''), 2000)
+  }
 
   if (loading) {
     return (
@@ -313,106 +239,321 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
     )
   }
 
+  if (!userId || userId.includes('guest')) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center px-4">
+        <div className="text-center">
+          <p className="text-slate-600 mb-4">Please sign in to make a deposit</p>
+        </div>
+      </div>
+    )
+  }
+
+  const selectedWalletData = wallets.find(w => w.id === selectedWallet)
+  const selectedMethodData = DEPOSIT_METHODS[selectedMethod]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-slate-900">Add Funds</h1>
+          <p className="text-slate-600 mt-2">Deposit money into your wallet using GCash or Solana</p>
+        </div>
+
+        {/* Error Message */}
         {error && (
-          <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
             {error}
           </div>
         )}
+
+        {/* Success Message */}
         {success && (
-          <div className="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 rounded-lg text-sm">
+          <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-sm">
             {success}
           </div>
         )}
 
-        {/* Deposit Solana */}
-        <div className="bg-white rounded-2xl shadow-lg border border-slate-200 mb-8 overflow-hidden">
-          <div className="p-8">
+        {/* Step 1: Enter Amount */}
+        {step === 'amount' && (
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">How much would you like to deposit?</h2>
+
             <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-slate-900">Deposit Solana</h2>
-
-              <p className="text-slate-600">
-                Send Solana directly to the address below to add funds to your wallet. Transactions are processed automatically once confirmed on the blockchain.
-              </p>
-
-              {/* Consolidated Balance Display */}
-              {wallets && wallets.length > 0 && (
-                <div className="bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg p-8 border border-slate-700 text-white">
-                  <div className="flex items-center justify-between mb-6">
-                    <h4 className="text-sm font-semibold text-slate-300 uppercase tracking-wider">Your Total Balances</h4>
-                    <button
-                      onClick={refreshWallets}
-                      disabled={syncStatus === 'syncing'}
-                      className={`text-xs font-medium transition-colors ${
-                        syncStatus === 'syncing'
-                          ? 'text-slate-500 cursor-not-allowed'
-                          : 'text-blue-300 hover:text-blue-200'
-                      }`}
-                    >
-                      {syncStatus === 'syncing' ? '↻ Syncing...' : '↻ Refresh'}
-                    </button>
-                  </div>
-                  <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20">
-                    <p className="text-sm text-slate-300 mb-2">Total Balance</p>
-                    <p className="text-4xl font-light text-white">
-                      {formatCurrency(getTotalBalance, globalCurrency)}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-6">
-                <div className="text-center p-6 bg-purple-50 rounded-lg border border-purple-200">
-                  <div className="flex justify-center mb-4">
-                    <div className="bg-white p-4 rounded-lg border-2 border-purple-200">
-                      <svg width="150" height="150" viewBox="0 0 150 150">
-                        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="12" fill="#1e1b4b">
-                          [QR Code: solana:{SOLANA_ADDRESS}]
-                        </text>
-                      </svg>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">Solana Wallet Address:</p>
-                  <p className="font-mono text-xs text-gray-900 break-all select-all">{SOLANA_ADDRESS}</p>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(SOLANA_ADDRESS)
-                      setSuccess('Address copied to clipboard')
-                      setTimeout(() => setSuccess(''), 2000)
-                    }}
-                    className="mt-3 text-xs text-purple-600 hover:text-purple-700 font-medium"
+              {/* Amount Input */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Amount</label>
+                <div className="flex gap-3">
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <select
+                    value={selectedCurrency}
+                    onChange={(e) => setSelectedCurrency(e.target.value)}
+                    className="px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                   >
-                    Copy Address
+                    {currencies.map(c => (
+                      <option key={c.code} value={c.code}>
+                        {c.code} {CURRENCY_SYMBOLS[c.code] || ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Wallet Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-slate-700">Deposit to Wallet</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowWalletModal(true)}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Create Wallet
                   </button>
                 </div>
+                <select
+                  value={selectedWallet || ''}
+                  onChange={(e) => setSelectedWallet(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                  <option value="">Select a wallet</option>
+                  {wallets.map(w => (
+                    <option key={w.id} value={w.id}>
+                      {w.currency_code} Wallet ({CURRENCY_SYMBOLS[w.currency_code] || ''}{w.balance.toFixed(2)})
+                    </option>
+                  ))}
+                </select>
+                {!selectedWallet && (
+                  <p className="text-xs text-slate-500 mt-1">Create a wallet if you don't have one for this currency</p>
+                )}
+              </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-blue-900">
-                  <p className="font-semibold mb-2">💡 How to Deposit:</p>
-                  <ol className="list-decimal list-inside space-y-1">
-                    <li>Scan the QR code with your Solana wallet or copy the address above</li>
-                    <li>Send any amount of Solana to this address</li>
-                    <li>Verify the recipient address and amount in your wallet</li>
-                    <li>Confirm the transaction</li>
-                    <li>Your balance will be updated within 1-2 minutes</li>
-                  </ol>
-                </div>
-
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-800">
-                  <p className="font-semibold mb-2">⚠️ Important:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                    <li>Make sure to send only Solana (SOL) to this address</li>
-                    <li>Do not send other tokens or NFTs to this address</li>
-                    <li>Transactions on the Solana blockchain cannot be reversed</li>
-                    <li>Keep the transaction hash for your records</li>
-                  </ul>
+              {/* Select Deposit Method */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-3">Payment Method</label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {Object.values(DEPOSIT_METHODS).map(method => (
+                    <button
+                      key={method.id}
+                      onClick={() => {
+                        setSelectedMethod(method.id)
+                        setStep('confirm')
+                      }}
+                      className={`p-4 border-2 rounded-lg text-left transition-all ${
+                        selectedMethod === method.id
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-slate-200 hover:border-slate-300'
+                      }`}
+                    >
+                      <div className="text-2xl mb-2">{method.icon}</div>
+                      <div className="font-semibold text-slate-900">{method.name}</div>
+                      <div className="text-sm text-slate-600">{method.description}</div>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Step 2: Payment Instructions */}
+        {step === 'confirm' && selectedMethodData && selectedWalletData && (
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 mb-6">
+            <h2 className="text-2xl font-semibold text-slate-900 mb-6">
+              {amount} {selectedCurrency} via {selectedMethodData.name}
+            </h2>
+
+            {/* Deposit Summary */}
+            <div className="bg-slate-50 rounded-lg p-6 mb-6">
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide">Amount</p>
+                  <p className="text-xl font-semibold text-slate-900">{amount} {selectedCurrency}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide">Method</p>
+                  <p className="text-lg font-semibold text-slate-900">{selectedMethodData.name}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-slate-600 uppercase tracking-wide">Wallet</p>
+                  <p className="text-lg font-semibold text-slate-900">{selectedWalletData.currency_code}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Payment Instructions */}
+            <div className="mb-8">
+              <h3 className="font-semibold text-slate-900 mb-4">📋 Payment Instructions:</h3>
+              <ol className="space-y-3">
+                {selectedMethodData.instructions.map((instruction, idx) => (
+                  <li key={idx} className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-sm font-semibold flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <span className="text-slate-700">{instruction}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Solana Address QR */}
+            {selectedMethod === 'solana' && (
+              <div className="mb-8 p-6 bg-purple-50 border border-purple-200 rounded-lg">
+                <p className="text-sm text-slate-600 mb-3 font-medium">Send Solana to this address:</p>
+                <div className="flex gap-4 items-center">
+                  <div className="flex-shrink-0">
+                    <svg width="120" height="120" viewBox="0 0 120 120">
+                      <rect width="120" height="120" fill="white" rx="8" />
+                      <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fontSize="10" fill="#1e1b4b">
+                        [QR Code]
+                      </text>
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-mono text-xs bg-white p-3 rounded border border-slate-300 break-all text-slate-800">
+                      {SOLANA_ADDRESS}
+                    </p>
+                    <button
+                      onClick={() => copyToClipboard(SOLANA_ADDRESS)}
+                      className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                    >
+                      Copy Address
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Important Notes */}
+            <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="font-semibold text-yellow-900 mb-2">⚠️ Important:</p>
+              <ul className="text-sm text-yellow-800 space-y-1">
+                {selectedMethod === 'solana' && (
+                  <>
+                    <li>• Only send Solana (SOL) to this address</li>
+                    <li>• Do not send other tokens or NFTs</li>
+                    <li>• Transactions cannot be reversed</li>
+                    <li>• Keep the transaction hash for your records</li>
+                  </>
+                )}
+                {selectedMethod === 'gcash' && (
+                  <>
+                    <li>• Ensure you have sufficient balance in GCash</li>
+                    <li>• Double-check the amount before confirming</li>
+                    <li>• Transaction may take 1-5 minutes to process</li>
+                  </>
+                )}
+              </ul>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-4">
+              <button
+                onClick={handleStartNewDeposit}
+                className="flex-1 px-6 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+              >
+                Back
+              </button>
+              <button
+                onClick={handleStartNewDeposit}
+                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Deposits */}
+        {deposits.length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8">
+            <h3 className="text-xl font-semibold text-slate-900 mb-4">Recent Deposits</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-200">
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Amount</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Method</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Status</th>
+                    <th className="text-left py-3 px-4 text-slate-600 font-medium">Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deposits.slice(0, 5).map(deposit => (
+                    <tr key={deposit.id} className="border-b border-slate-100">
+                      <td className="py-3 px-4 font-semibold text-slate-900">
+                        {deposit.amount} {deposit.currency_code}
+                      </td>
+                      <td className="py-3 px-4 text-slate-700">
+                        {DEPOSIT_METHODS[deposit.deposit_method]?.name || deposit.deposit_method}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                          deposit.status === 'approved' ? 'bg-emerald-100 text-emerald-700' :
+                          deposit.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {deposit.status.charAt(0).toUpperCase() + deposit.status.slice(1)}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-slate-600 text-xs">
+                        {new Date(deposit.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Create Wallet Modal */}
+      {showWalletModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+            <h3 className="text-xl font-semibold text-slate-900 mb-4">Create New Wallet</h3>
+            <p className="text-slate-600 text-sm mb-4">Select a currency for your new wallet</p>
+
+            <select
+              value={newWalletCurrency}
+              onChange={(e) => setNewWalletCurrency(e.target.value)}
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-6"
+            >
+              {currencies.map(c => (
+                <option key={c.code} value={c.code}>
+                  {c.code} - {c.name}
+                </option>
+              ))}
+            </select>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowWalletModal(false)}
+                className="flex-1 px-4 py-3 border border-slate-300 rounded-lg text-slate-900 font-medium hover:bg-slate-50 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateWallet}
+                disabled={submitting}
+                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition disabled:opacity-50"
+              >
+                {submitting ? 'Creating...' : 'Create Wallet'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
