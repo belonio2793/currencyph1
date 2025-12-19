@@ -293,8 +293,8 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
             <h1 className="text-3xl font-bold text-slate-900">Add Funds</h1>
             <p className="text-slate-600 mt-2">Deposit money into your wallet using GCash or Solana</p>
           </div>
-          {(fiatCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
-            <FiatCryptoToggle active={activeType} onChange={setActiveType} />
+          {(currencyCurrencies.length > 0 || cryptoCurrencies.length > 0) && (
+            <CurrencyCryptoToggle active={activeType} onChange={setActiveType} />
           )}
         </div>
 
