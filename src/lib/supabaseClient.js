@@ -103,6 +103,23 @@ if (typeof window !== 'undefined') {
       return true
     }
   }, { capture: true, passive: false })
+
+  // Wrap fetch to suppress network errors before they bubble up
+  const originalFetch = window.fetch
+  window.fetch = function(...args) {
+    return originalFetch.apply(this, args).catch(err => {
+      // Silently fail on fetch errors instead of throwing
+      if (err?.message?.includes('Failed to fetch')) {
+        console.debug('[fetch] Network request failed, returning empty response')
+        return new Response(JSON.stringify({ error: 'Network unavailable' }), {
+          status: 503,
+          statusText: 'Service Unavailable',
+          headers: { 'Content-Type': 'application/json' }
+        })
+      }
+      throw err
+    })
+  }
 }
 
 const SUPABASE_URL = getEnv('VITE_PROJECT_URL') || getEnv('VITE_SUPABASE_URL') || getEnv('PROJECT_URL') || getEnv('SUPABASE_URL') || ''
