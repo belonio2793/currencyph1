@@ -79,6 +79,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [step, setStep] = useState('amount') // amount -> method -> confirm
+  const [activeType, setActiveType] = useState('fiat') // 'fiat' or 'crypto'
 
   useEffect(() => {
     loadInitialData()
