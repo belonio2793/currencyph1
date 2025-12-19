@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { paymentsService } from '../../lib/paymentsService'
+import { currencyAPI } from '../../lib/payments'
 
 export default function GuestCheckoutFlow({
   paymentLink,
