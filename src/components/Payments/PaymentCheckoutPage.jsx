@@ -120,6 +120,19 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
           {merchant?.description && <p className="text-slate-500 text-sm mt-1">{merchant.description}</p>}
         </div>
 
+        {/* Product Info */}
+        {product && (
+          <div className="mb-8 bg-slate-50 rounded-lg p-6 border border-slate-200">
+            {product.image_url && (
+              <img src={product.image_url} alt={product.name} className="w-full h-48 object-cover rounded-lg mb-4" />
+            )}
+            <h2 className="text-2xl font-light text-slate-900 mb-2">{product.name}</h2>
+            {product.description && (
+              <p className="text-slate-600 text-sm">{product.description}</p>
+            )}
+          </div>
+        )}
+
         {/* Checkout Card */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="p-8">
