@@ -223,6 +223,17 @@ export default function App() {
       setShowAuth(false)
     }
 
+    // Handle payment checkout routes
+    if (path.startsWith('/payment/')) {
+      setActiveTab('checkout')
+      setShowAuth(false)
+    }
+
+    if (path.startsWith('/invoice/')) {
+      setActiveTab('checkout')
+      setShowAuth(false)
+    }
+
     // Handle listing detail routes via hash
     if (hash.startsWith('#/listing/')) {
       const slug = hash.replace('#/listing/', '')
