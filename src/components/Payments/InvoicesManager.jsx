@@ -317,6 +317,12 @@ export default function InvoicesManager({ merchant, userEmail, globalCurrency })
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex gap-2">
+                        <button
+                          onClick={() => window.open(`/invoice/${invoice.id}`, '_blank')}
+                          className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors"
+                        >
+                          View
+                        </button>
                         {invoice.status === 'draft' && (
                           <button
                             onClick={() => handleSendInvoice(invoice.id)}
