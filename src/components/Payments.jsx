@@ -195,6 +195,14 @@ export default function Payments({ userId, userEmail, globalCurrency = 'PHP' }) 
               />
             )}
 
+            {activeTab === 'history' && (
+              <PaymentHistory
+                merchant={selectedMerchant}
+                userId={userId}
+                globalCurrency={globalCurrency}
+              />
+            )}
+
             {activeTab === 'products' && (
               <ProductsManager
                 merchant={selectedMerchant}
