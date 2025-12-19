@@ -87,7 +87,7 @@ export function stopPresence() {
     clearInterval(presenceIntervalId)
   }
   if (currentUserId && isSupabaseHealthy()) {
-    updatePresence('offline').catch(() => {})
+    safeUpdatePresence('offline')
   }
 }
 
