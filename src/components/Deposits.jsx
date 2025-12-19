@@ -363,11 +363,30 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                 >
                   <option value="">Select a wallet</option>
-                  {displayedWallets.map(w => (
-                    <option key={w.id} value={w.id}>
-                      {w.currency_code} Wallet ({CURRENCY_SYMBOLS[w.currency_code] || ''}{w.balance.toFixed(2)})
-                    </option>
-                  ))}
+                  {fiatWallets.length > 0 && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
+                        ━━━ FIAT CURRENCIES ━━━
+                      </option>
+                      {fiatWallets.map(w => (
+                        <option key={w.id} value={w.id}>
+                          {w.currency_code} Wallet ({CURRENCY_SYMBOLS[w.currency_code] || ''}{w.balance.toFixed(2)})
+                        </option>
+                      ))}
+                    </>
+                  )}
+                  {cryptoWallets.length > 0 && (
+                    <>
+                      <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
+                        ━━━ CRYPTOCURRENCIES ━━━
+                      </option>
+                      {cryptoWallets.map(w => (
+                        <option key={w.id} value={w.id}>
+                          {w.currency_code} Wallet ({CURRENCY_SYMBOLS[w.currency_code] || ''}{w.balance.toFixed(2)})
+                        </option>
+                      ))}
+                    </>
+                  )}
                 </select>
                 {!selectedWallet && (
                   <p className="text-xs text-slate-500 mt-1">Create a wallet if you don't have one for this currency</p>
