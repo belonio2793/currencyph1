@@ -44,6 +44,7 @@ export default function SendMoney({ userId }) {
       setBeneficiaries(beneficiariesData)
       if (walletsData.length > 0) {
         setSelectedSender(walletsData[0].currency_code)
+        setRecipientCurrency(walletsData[0].currency_code)
       }
     } catch (err) {
       setError('Failed to load data')
