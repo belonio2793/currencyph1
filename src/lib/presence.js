@@ -27,12 +27,12 @@ export function initializePresence(userId) {
   }
 
   // Fire-and-forget; silently ignore all errors since presence is non-critical
-  updatePresence('online').catch(() => {})
+  Promise.resolve(updatePresence('online')).catch(() => {})
 
   presenceIntervalId = setInterval(() => {
     // Skip updates if Supabase is not healthy or if offline
     if (isSupabaseHealthy() && navigator.onLine) {
-      updatePresence('online').catch(() => {})
+      Promise.resolve(updatePresence('online')).catch(() => {})
     }
   }, PRESENCE_UPDATE_INTERVAL)
 
