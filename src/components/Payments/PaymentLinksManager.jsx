@@ -249,7 +249,7 @@ export default function PaymentLinksManager({ merchant, globalCurrency }) {
                               : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
                           }`}
                         >
-                          {copiedLinkId === link.id ? '✓ Copied' : 'Copy'}
+                          {copiedLinkId === link.id ? 'Copied' : 'Copy'}
                         </button>
                       </div>
                     </div>
