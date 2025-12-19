@@ -140,7 +140,7 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
               <GuestCheckoutFlow
                 paymentLink={paymentLink}
                 invoice={invoice}
-                onSuccess={() => setSuccess(true)}
+                onSuccess={handlePaymentSuccess}
                 onCancel={() => window.history.back()}
                 userId={userId}
                 globalCurrency={globalCurrency}
