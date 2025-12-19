@@ -131,9 +131,10 @@ export const currencyAPI = {
   // Get Bitcoin and Ethereum prices in USD and other currencies
   async getCryptoPrices() {
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-rates', {
-        method: 'GET'
-      })
+      const { data, error } = await Promise.race([
+        supabase.functions.invoke('fetch-rates', { method: 'GET' }),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Crypto prices fetch timeout')), 7000))
+      ])
 
       if (error || !data || !data.cryptoPrices) {
         console.warn('Error fetching crypto prices:', error?.message)
