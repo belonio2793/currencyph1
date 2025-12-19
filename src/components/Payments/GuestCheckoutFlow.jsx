@@ -149,6 +149,21 @@ export default function GuestCheckoutFlow({
   if (step === 'guest-info') {
     return (
       <div className="space-y-6">
+        {product && (
+          <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
+            {product.image_url && (
+              <img
+                src={product.image_url}
+                alt={product.name}
+                className="w-full h-48 object-cover rounded-lg mb-4"
+              />
+            )}
+            <h4 className="text-lg font-semibold text-slate-900">{product.name}</h4>
+            {product.description && (
+              <p className="text-slate-600 text-sm mt-2">{product.description}</p>
+            )}
+          </div>
+        )}
         <div>
           <h3 className="text-2xl font-light text-slate-900 mb-2">Guest Checkout</h3>
           <p className="text-slate-600">
