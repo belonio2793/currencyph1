@@ -33,6 +33,7 @@ const Profile = lazy(() => import('./components/Profile'))
 const Nearby = lazy(() => import('./components/Nearby'))
 const Business = lazy(() => import('./components/Business'))
 const MyBusiness = lazy(() => import('./components/MyBusiness'))
+const Payments = lazy(() => import('./components/Payments'))
 const Jobs = lazy(() => import('./components/Jobs'))
 const ListingDetail = lazy(() => import('./components/ListingDetail'))
 const Network = lazy(() => import('./components/Network'))
@@ -657,6 +658,7 @@ export default function App() {
                         {activeTab === 'bills' && <BillPayments userId={userId} />}
                         {activeTab === 'transactions' && <TransactionHistoryNew userId={userId} />}
                         {activeTab === 'profile' && <Profile userId={userId} onSignOut={handleSignOut} />}
+                        {activeTab === 'payments' && <Payments userId={userId} userEmail={userEmail} globalCurrency={globalCurrency} />}
                         {activeTab === 'nearby' && <Nearby userId={userId} setActiveTab={setActiveTab} setCurrentBusinessId={setCurrentBusinessId} setCurrentListingSlug={setCurrentListingSlug} /> }
                         {activeTab === 'jobs' && <Jobs userId={userId} />}
                         {activeTab === 'my-business' && <MyBusiness userId={userId} />}
