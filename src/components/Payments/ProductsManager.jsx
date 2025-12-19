@@ -25,13 +25,26 @@ export default function ProductsManager({ merchant, onRefresh }) {
       setLoading(true)
       const data = await paymentsService.getProductsByMerchant(merchant.id)
 
-      // Fetch prices for each product
-      const productsWithPrices = await Promise.all((data || []).map(async (p) => {
+      // Fetch prices and payment links for each product
+      const productsWithData = await Promise.all((data || []).map(async (p) => {
         const prices = await paymentsService.getPricesByProduct(p.id)
-        return { ...p, prices }
+
+        // Try to load existing payment links for this product
+        let payment_link = null
+        try {
+          const allLinks = await paymentsService.getPaymentLinksByMerchant(merchant.id)
+          const productLink = allLinks.find(link => link.product_id === p.id)
+          if (productLink) {
+            payment_link = productLink
+          }
+        } catch (err) {
+          console.error('Error loading payment links for product:', err)
+        }
+
+        return { ...p, prices, payment_link }
       }))
 
-      setProducts(productsWithPrices)
+      setProducts(productsWithData)
     } catch (err) {
       console.error('Error loading products:', err)
     } finally {
