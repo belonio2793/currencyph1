@@ -95,19 +95,34 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         return
       }
 
-      // Load wallets with currency type info
-      const { data: walletsData, error: walletsError } = await supabase
-        .from('wallets')
-        .select('id, user_id, currency_code, balance, created_at, currencies(code, name, type, symbol)')
-        .eq('user_id', userId)
+      // Load wallets and currencies separately
+      const [walletsResult, currenciesResult] = await Promise.all([
+        supabase
+          .from('wallets')
+          .select('id, user_id, currency_code, balance, created_at')
+          .eq('user_id', userId),
+        supabase
+          .from('currencies')
+          .select('code, name, type, symbol')
+          .eq('active', true)
+      ])
 
-      if (walletsError) throw walletsError
+      if (walletsResult.error) throw walletsResult.error
+      if (currenciesResult.error) throw currenciesResult.error
 
-      // Enrich wallets with currency type
-      const enrichedWallets = walletsData?.map(w => ({
+      const walletsData = walletsResult.data || []
+      const allCurrencies = currenciesResult.data || []
+
+      // Create a map of currencies for quick lookup
+      const currencyMap = Object.fromEntries(
+        allCurrencies.map(c => [c.code, c])
+      )
+
+      // Enrich wallets with currency type info
+      const enrichedWallets = walletsData.map(w => ({
         ...w,
-        currency_type: w.currencies?.type
-      })) || []
+        currency_type: currencyMap[w.currency_code]?.type || 'unknown'
+      }))
 
       setWallets(enrichedWallets)
 
@@ -116,17 +131,9 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
         setSelectedWallet(enrichedWallets[0].id)
       }
 
-      // Load all currencies for reference
-      const { data: allCurrencies, error: currenciesError } = await supabase
-        .from('currencies')
-        .select('code, name, type, symbol')
-        .eq('active', true)
-
-      if (currenciesError) throw currenciesError
-
       // Filter currencies to only show those where user has a wallet
       const userWalletCurrencyCodes = new Set(enrichedWallets.map(w => w.currency_code))
-      const availableCurrencies = allCurrencies?.filter(c => userWalletCurrencyCodes.has(c.code)) || []
+      const availableCurrencies = allCurrencies.filter(c => userWalletCurrencyCodes.has(c.code))
 
       setCurrencies(availableCurrencies)
 
