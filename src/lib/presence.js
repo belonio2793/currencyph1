@@ -127,7 +127,6 @@ async function updatePresence(status) {
       const { error } = await supabase
         .from('user_presence')
         .upsert([updateData])
-        .timeout(8000)
 
       if (error) {
         if (error.code === 'PGRST116' || error.code === '404' || error.code === '42P01') {
@@ -137,10 +136,9 @@ async function updatePresence(status) {
         // Silently skip other errors as presence is non-critical
       }
     } catch (innerErr) {
-      // Network errors, fetch failures, timeouts - silently skip
+      // Network errors, fetch failures - silently skip
       // Presence is non-critical functionality
       // Covers: TypeError: Failed to fetch, CORS errors, connection timeouts, etc.
-      // No console output - this is expected and non-blocking
     }
   } catch (err) {
     // Network errors, fetch failures, table might not exist, or other issues - silently ignore
