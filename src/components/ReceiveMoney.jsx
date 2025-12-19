@@ -54,10 +54,16 @@ export default function ReceiveMoney({ userId }) {
     }
   }
 
-  const copyToClipboard = (text, label) => {
-    navigator.clipboard.writeText(text)
-    setCopyFeedback(label)
-    setTimeout(() => setCopyFeedback(''), 2000)
+  const copyToClipboard = async (text, label) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      setCopyFeedback(label)
+      setTimeout(() => setCopyFeedback(''), 2000)
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err)
+      setError('Failed to copy to clipboard')
+      setTimeout(() => setError(''), 2000)
+    }
   }
 
   if (loading) {
