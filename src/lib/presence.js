@@ -161,7 +161,7 @@ export function updatePresenceLocation(location) {
   setCurrentLocation(location)
   // Update immediately if online
   if (currentUserId) {
-    updatePresence('online').catch(() => {})
+    safeUpdatePresence('online')
   }
 }
 
