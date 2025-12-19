@@ -249,7 +249,7 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
                 )}
 
                 {/* Crypto Currencies Section */}
-                {cryptoWallets.length > 0 && (
+                {activeType === 'crypto' && cryptoWallets.length > 0 && (
                   <div>
                     <div className="mb-6 flex items-center gap-3">
                       <h2 className="text-2xl font-semibold text-slate-900">Cryptocurrencies</h2>
