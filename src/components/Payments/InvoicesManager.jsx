@@ -6,6 +6,8 @@ export default function InvoicesManager({ merchant, userEmail, globalCurrency })
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('all')
+  const [products, setProducts] = useState([])
+  const [selectedProduct, setSelectedProduct] = useState('')
   const [formData, setFormData] = useState({
     customer_name: '',
     customer_email: '',
@@ -18,8 +20,37 @@ export default function InvoicesManager({ merchant, userEmail, globalCurrency })
   useEffect(() => {
     if (merchant) {
       loadInvoices()
+      loadProducts()
     }
   }, [merchant])
+
+  const loadProducts = async () => {
+    try {
+      const data = await paymentsService.getProductsByMerchant(merchant.id)
+      const productsWithPrices = await Promise.all((data || []).map(async (p) => {
+        const prices = await paymentsService.getPricesByProduct(p.id)
+        return { ...p, prices }
+      }))
+      setProducts(productsWithPrices)
+    } catch (err) {
+      console.error('Error loading products:', err)
+    }
+  }
+
+  const handleProductSelect = (productId) => {
+    setSelectedProduct(productId)
+    if (!productId) return
+
+    const product = products.find(p => p.id === productId)
+    if (product) {
+      setFormData(prev => ({
+        ...prev,
+        description: product.description || `Invoice for ${product.name}`,
+        amount_due: product.prices?.[0]?.amount.toString() || prev.amount_due,
+        currency: product.prices?.[0]?.currency || prev.currency
+      }))
+    }
+  }
 
   const loadInvoices = async () => {
     try {
@@ -116,6 +147,22 @@ export default function InvoicesManager({ merchant, userEmail, globalCurrency })
         <div className="bg-white rounded-lg border border-slate-200 p-6">
           <h4 className="text-lg font-semibold text-slate-900 mb-4">Create New Invoice</h4>
           <form onSubmit={handleCreate} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Select Product or Service (Optional)</label>
+              <select
+                value={selectedProduct}
+                onChange={(e) => handleProductSelect(e.target.value)}
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              >
+                <option value="">Custom Invoice (No product)</option>
+                {products.map(p => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} {p.prices?.[0] ? `(${p.prices[0].currency} ${p.prices[0].amount})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Customer Name</label>

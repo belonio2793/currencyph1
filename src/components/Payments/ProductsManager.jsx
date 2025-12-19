@@ -9,7 +9,9 @@ export default function ProductsManager({ merchant, onRefresh }) {
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    image_url: ''
+    image_url: '',
+    initial_price: '',
+    currency: 'PHP'
   })
 
   useEffect(() => {
@@ -22,7 +24,14 @@ export default function ProductsManager({ merchant, onRefresh }) {
     try {
       setLoading(true)
       const data = await paymentsService.getProductsByMerchant(merchant.id)
-      setProducts(data || [])
+
+      // Fetch prices for each product
+      const productsWithPrices = await Promise.all((data || []).map(async (p) => {
+        const prices = await paymentsService.getPricesByProduct(p.id)
+        return { ...p, prices }
+      }))
+
+      setProducts(productsWithPrices)
     } catch (err) {
       console.error('Error loading products:', err)
     } finally {
@@ -33,10 +42,26 @@ export default function ProductsManager({ merchant, onRefresh }) {
   const handleCreate = async (e) => {
     e.preventDefault()
     try {
-      const newProduct = await paymentsService.createProduct(merchant.id, formData)
-      setProducts([newProduct, ...products])
-      setFormData({ name: '', description: '', image_url: '' })
+      const newProduct = await paymentsService.createProduct(merchant.id, {
+        name: formData.name,
+        description: formData.description,
+        image_url: formData.image_url
+      })
+
+      let initialPrice = null
+      if (formData.initial_price) {
+        initialPrice = await paymentsService.createPrice(merchant.id, {
+          product_id: newProduct.id,
+          amount: parseFloat(formData.initial_price),
+          currency: formData.currency,
+          type: 'one_time'
+        })
+      }
+
+      setProducts([{ ...newProduct, prices: initialPrice ? [initialPrice] : [] }, ...products])
+      setFormData({ name: '', description: '', image_url: '', initial_price: '', currency: 'PHP' })
       setShowCreateForm(false)
+      onRefresh && onRefresh()
     } catch (err) {
       console.error('Error creating product:', err)
       alert('Failed to create product')
@@ -46,10 +71,14 @@ export default function ProductsManager({ merchant, onRefresh }) {
   const handleUpdate = async (e) => {
     e.preventDefault()
     try {
-      const updated = await paymentsService.updateProduct(editingProduct.id, formData)
-      setProducts(products.map(p => p.id === updated.id ? updated : p))
+      const updated = await paymentsService.updateProduct(editingProduct.id, {
+        name: formData.name,
+        description: formData.description,
+        image_url: formData.image_url
+      })
+      setProducts(products.map(p => p.id === updated.id ? { ...updated, prices: p.prices } : p))
       setEditingProduct(null)
-      setFormData({ name: '', description: '', image_url: '' })
+      setFormData({ name: '', description: '', image_url: '', initial_price: '', currency: 'PHP' })
     } catch (err) {
       console.error('Error updating product:', err)
       alert('Failed to update product')
@@ -119,13 +148,13 @@ export default function ProductsManager({ merchant, onRefresh }) {
           </h4>
           <form onSubmit={editingProduct ? handleUpdate : handleCreate} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Product Name</label>
+              <label className="block text-sm font-medium text-slate-700 mb-1">Product or Service Name</label>
               <input
                 type="text"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="e.g., Consulting Services"
+                placeholder="e.g., Premium Subscription or Consulting Hour"
                 required
               />
             </div>
@@ -136,10 +165,38 @@ export default function ProductsManager({ merchant, onRefresh }) {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-                placeholder="Describe what this product is"
-                rows="3"
+                placeholder="Describe what this product or service is"
+                rows="2"
               />
             </div>
+
+            {!editingProduct && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Initial Price (Optional)</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.initial_price}
+                    onChange={(e) => setFormData({ ...formData, initial_price: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Currency</label>
+                  <select
+                    value={formData.currency}
+                    onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  >
+                    <option value="PHP">PHP</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                  </select>
+                </div>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Image URL</label>
@@ -197,6 +254,18 @@ export default function ProductsManager({ merchant, onRefresh }) {
                   />
                 )}
                 <h4 className="text-lg font-semibold text-slate-900">{product.name}</h4>
+                {product.prices && product.prices.length > 0 ? (
+                  <div className="mt-2 space-y-1">
+                    {product.prices.map(price => (
+                      <p key={price.id} className="text-emerald-700 font-medium">
+                        {price.currency} {price.amount.toFixed(2)}
+                        <span className="text-xs text-slate-500 ml-2 font-normal">({price.type})</span>
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-slate-400 text-sm mt-2 italic">No prices set</p>
+                )}
                 {product.description && (
                   <p className="text-slate-600 text-sm mt-2">{product.description}</p>
                 )}
