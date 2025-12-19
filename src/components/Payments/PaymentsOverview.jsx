@@ -40,9 +40,7 @@ export default function PaymentsOverview({ merchant, userId, globalCurrency }) {
   })
 
   useEffect(() => {
-    if (merchant) {
-      loadStats()
-    }
+    loadStats()
   }, [merchant])
 
   useEffect(() => {
