@@ -26,6 +26,9 @@ export default function GuestCheckoutFlow({
   const amount = invoice?.amount_due || paymentLink?.amount || 0
   const currency = invoice?.currency || paymentLink?.currency || globalCurrency
 
+  // Calculate fees based on payment method
+  const feeData = paymentsService.calculateFee(amount, selectedPaymentMethod)
+
   useEffect(() => {
     if (userId) {
       loadUserWallets()
@@ -69,42 +72,91 @@ export default function GuestCheckoutFlow({
       setLoading(true)
       setError(null)
 
-      // Merge guest data and custom fields into intent metadata
+      // Validate amount
+      if (!amount || amount <= 0) {
+        throw new Error('Invalid payment amount')
+      }
+
+      // For wallet payments, verify balance before proceeding
+      if (selectedPaymentMethod === 'wallet_balance') {
+        const wallet = userWallets.find(w => w.currency_code === currency)
+        if (!wallet) {
+          throw new Error(`You don't have a ${currency} wallet`)
+        }
+        if (wallet.balance < amount) {
+          throw new Error(`Insufficient balance. Your balance: ${currency} ${wallet.balance.toFixed(2)}`)
+        }
+
+        // Process wallet payment directly
+        const withdrawResult = await currencyAPI.withdrawFunds(userId, currency, amount, {
+          description: `Payment for ${product?.name || paymentLink?.name || 'Order'}`,
+          reference_id: invoice?.id || paymentLink?.id,
+          metadata: {
+            payment_method: 'wallet_balance',
+            source: 'payment_link',
+            ...(paymentLink?.metadata || {})
+          }
+        })
+
+        if (!withdrawResult) {
+          throw new Error('Failed to process wallet payment')
+        }
+
+        // Update invoice status if applicable
+        if (invoice?.id) {
+          try {
+            await paymentsService.markInvoicePaid(invoice.id)
+          } catch (err) {
+            console.warn('Error marking invoice as paid:', err)
+          }
+        }
+
+        // Create payment record for ledger
+        try {
+          await paymentsService.createPayment({
+            merchant_id: invoice?.merchant_id || paymentLink?.merchant_id,
+            customer_id: userId,
+            payment_intent_id: null,
+            invoice_id: invoice?.id || null,
+            payment_link_id: paymentLink?.id || null,
+            product_id: paymentLink?.product_id || null,
+            amount: amount,
+            currency: currency,
+            fee_amount: 0,
+            net_amount: amount,
+            status: 'succeeded',
+            payment_type: 'payment',
+            payment_method: 'wallet_balance',
+            metadata: {
+              source: 'payment_link',
+              ...(paymentLink?.metadata || {})
+            }
+          })
+        } catch (err) {
+          console.warn('Error creating payment record:', err)
+        }
+
+        setStep('success')
+        if (onSuccess) {
+          onSuccess()
+        }
+        return
+      }
+
+      // For non-wallet payment methods
       const intentMetadata = {
         payment_method: selectedPaymentMethod,
         fee_amount: feeData?.feeAmount || 0,
         net_amount: feeData?.netAmount || amount,
         fee_breakdown: feeData?.breakdown || {},
+        guest_email: guestData.email,
+        guest_name: guestData.fullName,
+        guest_phone: guestData.phone,
         ...customFieldValues,
         ...(paymentLink?.metadata || {})
       }
 
-      if (selectedPaymentMethod === 'wallet_balance') {
-        const wallet = userWallets.find(w => w.currency_code === currency)
-        if (!wallet || wallet.balance < amount) {
-          throw new Error(`Insufficient balance in your ${currency} wallet`)
-        }
-
-        // Process wallet payment (no fees for wallet)
-        await currencyAPI.withdrawFunds(userId, currency, amount, {
-          description: `Payment for ${product?.name || paymentLink?.name || 'Order'}`,
-          reference_id: invoice?.id || paymentLink?.id,
-          metadata: intentMetadata
-        })
-
-        // Update invoice or record transaction
-        if (invoice) {
-          await paymentsService.markInvoicePaid(invoice.id)
-        }
-
-        setStep('success')
-        return
-      }
-
-      // Calculate fees for the selected payment method
-      const feeData = paymentsService.calculateFee(amount, selectedPaymentMethod)
-
-      // Create payment intent for other methods
+      // Create payment intent
       const paymentIntent = await paymentsService.createPaymentIntent(
         invoice?.merchant_id || paymentLink?.merchant_id,
         {
@@ -122,8 +174,12 @@ export default function GuestCheckoutFlow({
         }
       )
 
-      if (selectedPaymentMethod !== 'wallet_balance') {
-        // Create deposit intent
+      if (!paymentIntent) {
+        throw new Error('Failed to create payment intent')
+      }
+
+      // Create deposit intent for external payment methods
+      try {
         await paymentsService.createDepositIntent(
           userId || null,
           {
@@ -133,10 +189,14 @@ export default function GuestCheckoutFlow({
             linked_payment_intent_id: paymentIntent.id,
             metadata: {
               fee_amount: feeData.feeAmount,
-              net_amount: feeData.netAmount
+              net_amount: feeData.netAmount,
+              guest_email: guestData.email,
+              guest_name: guestData.fullName
             }
           }
         )
+      } catch (err) {
+        console.warn('Error creating deposit intent:', err)
       }
 
       setStep('deposit')
@@ -359,6 +419,28 @@ export default function GuestCheckoutFlow({
           </div>
         )}
 
+        {/* Fee Display for non-wallet methods */}
+        {selectedPaymentMethod !== 'wallet_balance' && (
+          <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium text-blue-900">Subtotal:</span>
+              <span className="text-blue-900">{currency} {amount.toFixed(2)}</span>
+            </div>
+            {feeData.feeAmount > 0 && (
+              <>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-blue-900">Fee:</span>
+                  <span className="text-blue-900">{currency} {feeData.feeAmount.toFixed(2)}</span>
+                </div>
+                <div className="border-t border-blue-200 pt-2 flex justify-between items-center">
+                  <span className="text-sm font-semibold text-blue-900">Total:</span>
+                  <span className="text-lg font-semibold text-blue-900">{currency} {(amount + feeData.feeAmount).toFixed(2)}</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="flex gap-2">
           <button
             onClick={handleConfirmPayment}
@@ -499,7 +581,7 @@ export default function GuestCheckoutFlow({
           </div>
           <h3 className="text-2xl font-light text-slate-900 mb-2">Payment Received!</h3>
           <p className="text-slate-600">
-            Thank you for your payment. A confirmation email has been sent to {guestData.email}
+            Thank you for your payment. {guestData.email && `A confirmation email has been sent to ${guestData.email}`}
           </p>
         </div>
 
@@ -511,10 +593,12 @@ export default function GuestCheckoutFlow({
                 {currency} {typeof amount === 'number' ? amount.toFixed(2) : '0.00'}
               </dd>
             </div>
-            <div className="flex justify-between">
-              <dt className="text-slate-600">Payer:</dt>
-              <dd className="font-medium text-slate-900">{guestData.fullName}</dd>
-            </div>
+            {guestData.fullName && (
+              <div className="flex justify-between">
+                <dt className="text-slate-600">Payer:</dt>
+                <dd className="font-medium text-slate-900">{guestData.fullName}</dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt className="text-slate-600">Date:</dt>
               <dd className="text-slate-900">{new Date().toLocaleDateString()}</dd>
@@ -523,10 +607,13 @@ export default function GuestCheckoutFlow({
         </div>
 
         <button
-          onClick={onCancel}
+          onClick={() => {
+            onCancel()
+            window.location.href = '/'
+          }}
           className="w-full px-4 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors font-medium"
         >
-          Close
+          Return Home
         </button>
       </div>
     )
