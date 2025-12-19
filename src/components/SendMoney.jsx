@@ -13,7 +13,7 @@ export default function SendMoney({ userId }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState([])
   const [searching, setSearching] = useState(false)
-  const [recipientCurrency, setRecipientCurrency] = useState('PHP')
+  const [recipientCurrency, setRecipientCurrency] = useState('')
   const [amount, setAmount] = useState('')
   const [exchangeRate, setExchangeRate] = useState(1)
   const [receiverAmount, setReceiverAmount] = useState('0')
