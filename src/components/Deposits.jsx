@@ -547,7 +547,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               onChange={(e) => setNewWalletCurrency(e.target.value)}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white mb-6"
             >
-              {currencies.map(c => (
+              {displayedCurrencies.map(c => (
                 <option key={c.code} value={c.code}>
                   {c.code} - {c.name}
                 </option>
