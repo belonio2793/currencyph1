@@ -6,6 +6,7 @@ export default function ProductsManager({ merchant, onRefresh }) {
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [editingProduct, setEditingProduct] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [copiedId, setCopiedId] = useState(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -19,6 +20,29 @@ export default function ProductsManager({ merchant, onRefresh }) {
       loadProducts()
     }
   }, [merchant])
+
+  const copyToClipboard = async (text, id) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        const textArea = document.createElement("textarea")
+        textArea.value = text
+        textArea.style.position = "fixed"
+        textArea.style.left = "-999999px"
+        textArea.style.top = "-999999px"
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        textArea.remove()
+      }
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy text: ', err)
+    }
+  }
 
   const loadProducts = async () => {
     try {
@@ -264,11 +288,13 @@ export default function ProductsManager({ merchant, onRefresh }) {
                   <code className="text-sm text-slate-700 break-all">{getPaymentLinkUrl(editingProduct.payment_link.url_slug)}</code>
                   <button
                     type="button"
-                    onClick={() => navigator.clipboard.writeText(getPaymentLinkUrl(editingProduct.payment_link.url_slug))}
-                    className="ml-2 px-2 py-1 text-xs bg-slate-200 hover:bg-slate-300 rounded transition-colors flex-shrink-0"
+                    onClick={() => copyToClipboard(getPaymentLinkUrl(editingProduct.payment_link.url_slug), 'edit-link')}
+                    className={`ml-2 px-2 py-1 text-xs rounded transition-colors flex-shrink-0 ${
+                      copiedId === 'edit-link' ? 'bg-emerald-600 text-white' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'
+                    }`}
                     title="Copy link"
                   >
-                    Copy
+                    {copiedId === 'edit-link' ? 'Copied' : 'Copy'}
                   </button>
                 </div>
               </div>
@@ -346,11 +372,13 @@ export default function ProductsManager({ merchant, onRefresh }) {
                       <code className="text-xs text-emerald-700 break-all font-mono">{getPaymentLinkUrl(product.payment_link.url_slug)}</code>
                     </div>
                     <button
-                      onClick={() => navigator.clipboard.writeText(getPaymentLinkUrl(product.payment_link.url_slug))}
-                      className="w-full px-3 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white rounded transition-colors font-medium"
+                      onClick={() => copyToClipboard(getPaymentLinkUrl(product.payment_link.url_slug), product.id)}
+                      className={`w-full px-3 py-2 text-sm rounded transition-colors font-medium ${
+                        copiedId === product.id ? 'bg-emerald-700 text-white' : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      }`}
                       title="Copy link"
                     >
-                      Copy Payment Link
+                      {copiedId === product.id ? 'Copied to Clipboard!' : 'Copy Payment Link'}
                     </button>
                   </div>
                 )}
