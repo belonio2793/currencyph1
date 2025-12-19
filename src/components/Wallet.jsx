@@ -405,6 +405,9 @@ export default function Wallet({ userId, globalCurrency = 'PHP' }) {
           </div>
         )}
 
+        {/* Transactions List */}
+        <TransactionsList userId={userId} />
+
         {/* Customizer Modal */}
         {showCustomizer && (
           <div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center z-50 p-4">
