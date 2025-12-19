@@ -159,20 +159,42 @@ export default function PaymentCheckoutPage({ userId, globalCurrency = 'PHP' }) 
   if (error) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+        <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full">
           <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h2 className="text-2xl font-semibold text-slate-900 mb-2">Checkout Error</h2>
-          <p className="text-slate-600 mb-6">{error}</p>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            Return Home
-          </button>
+          <h2 className="text-2xl font-semibold text-slate-900 mb-2 text-center">Payment Link Error</h2>
+          <p className="text-slate-600 mb-6 text-center">{error}</p>
+
+          <div className="bg-slate-50 rounded-lg p-4 mb-6 border border-slate-200">
+            <p className="text-xs text-slate-500 mb-2 font-medium">URL Information:</p>
+            <p className="text-xs text-slate-600 break-all font-mono">
+              {window.location.href}
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <button
+              onClick={() => window.location.href = '/'}
+              className="w-full px-6 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors font-medium"
+            >
+              Return Home
+            </button>
+            <button
+              onClick={() => window.history.back()}
+              className="w-full px-6 py-2 bg-slate-200 text-slate-900 rounded-lg hover:bg-slate-300 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <p className="text-xs text-slate-500 text-center">
+              If you believe this is a mistake, please contact the merchant or try copying the payment link again.
+            </p>
+          </div>
         </div>
       </div>
     )
