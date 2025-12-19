@@ -1,10 +1,31 @@
 import { useState, useEffect } from 'react'
 import { paymentsService } from '../../lib/paymentsService'
+import { currencyAPI } from '../../lib/payments'
+
+const SUPPORTED_CURRENCIES = [
+  { code: 'PHP', name: 'Philippine Peso', symbol: '₱' },
+  { code: 'USD', name: 'US Dollar', symbol: '$' },
+  { code: 'EUR', name: 'Euro', symbol: '€' },
+  { code: 'GBP', name: 'British Pound', symbol: '£' },
+  { code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
+  { code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
+  { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
+  { code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
+  { code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
+  { code: 'INR', name: 'Indian Rupee', symbol: '₹' },
+  { code: 'MXN', name: 'Mexican Peso', symbol: '$' },
+  { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$' },
+  { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$' },
+  { code: 'NZD', name: 'New Zealand Dollar', symbol: 'NZ$' },
+  { code: 'SEK', name: 'Swedish Krona', symbol: 'kr' }
+]
 
 export default function PaymentsSettings({
   merchant,
   merchants,
   userId,
+  globalCurrency = 'PHP',
+  setGlobalCurrency,
   onCreateMerchant,
   onUpdateMerchant,
   onMerchantsUpdated
@@ -12,6 +33,10 @@ export default function PaymentsSettings({
   const [showCreateMerchant, setShowCreateMerchant] = useState(false)
   const [editingMerchant, setEditingMerchant] = useState(null)
   const [userBusinesses, setUserBusinesses] = useState([])
+  const [exchangeRates, setExchangeRates] = useState({})
+  const [loadingRates, setLoadingRates] = useState(false)
+  const [ratesError, setRatesError] = useState(null)
+  const [lastRatesUpdate, setLastRatesUpdate] = useState(null)
   const [formData, setFormData] = useState({
     merchant_name: '',
     description: '',
@@ -24,8 +49,27 @@ export default function PaymentsSettings({
   useEffect(() => {
     if (userId) {
       loadUserBusinesses()
+      loadExchangeRates()
+      // Refresh rates every 5 minutes
+      const ratesInterval = setInterval(loadExchangeRates, 5 * 60 * 1000)
+      return () => clearInterval(ratesInterval)
     }
   }, [userId])
+
+  const loadExchangeRates = async () => {
+    try {
+      setLoadingRates(true)
+      setRatesError(null)
+      const rates = await currencyAPI.getAllExchangeRates()
+      setExchangeRates(rates || {})
+      setLastRatesUpdate(new Date())
+    } catch (err) {
+      console.error('Error loading exchange rates:', err)
+      setRatesError('Failed to load real-time exchange rates')
+    } finally {
+      setLoadingRates(false)
+    }
+  }
 
   const loadUserBusinesses = async () => {
     try {
@@ -322,15 +366,110 @@ export default function PaymentsSettings({
         </p>
       </div>
 
+      {/* Currency Settings */}
+      <div className="bg-white rounded-lg border border-slate-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h4 className="text-lg font-semibold text-slate-900">Currency Settings</h4>
+          <button
+            onClick={loadExchangeRates}
+            disabled={loadingRates}
+            className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded hover:bg-blue-200 disabled:opacity-50 transition-colors"
+          >
+            {loadingRates ? 'Updating...' : 'Refresh Rates'}
+          </button>
+        </div>
+
+        {/* Global Currency Selection */}
+        <div className="mb-6 pb-6 border-b border-slate-200">
+          <label className="block text-sm font-medium text-slate-700 mb-2">Default Display Currency</label>
+          <select
+            value={globalCurrency}
+            onChange={(e) => setGlobalCurrency && setGlobalCurrency(e.target.value)}
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            {SUPPORTED_CURRENCIES.map(currency => (
+              <option key={currency.code} value={currency.code}>
+                {currency.symbol} {currency.code} - {currency.name}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-slate-500 mt-1">This currency will be used for all payment displays</p>
+        </div>
+
+        {/* Exchange Rates */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <h5 className="font-semibold text-slate-900">Real-Time Exchange Rates</h5>
+            {lastRatesUpdate && (
+              <p className="text-xs text-slate-500">
+                Updated: {lastRatesUpdate.toLocaleTimeString()}
+              </p>
+            )}
+          </div>
+
+          {ratesError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-red-700">{ratesError}</p>
+            </div>
+          )}
+
+          {loadingRates && (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+
+          {!loadingRates && Object.keys(exchangeRates).length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {SUPPORTED_CURRENCIES.map(currency => {
+                const rate = exchangeRates[currency.code]
+                return (
+                  <div key={currency.code} className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <h6 className="font-semibold text-slate-900">{currency.code}</h6>
+                      <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                        {currency.symbol}
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-600 mb-2">{currency.name}</p>
+                    {rate ? (
+                      <div className="bg-white rounded p-2 border border-slate-200">
+                        <p className="text-sm font-mono text-slate-900">
+                          1 {globalCurrency} = {typeof rate === 'number' ? rate.toFixed(4) : rate} {currency.code}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-xs text-slate-500 italic">Rate not available</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
+
+          {!loadingRates && Object.keys(exchangeRates).length === 0 && !ratesError && (
+            <div className="bg-slate-50 rounded-lg p-8 text-center border border-slate-200">
+              <p className="text-slate-600 mb-3">No exchange rates loaded yet</p>
+              <button
+                onClick={loadExchangeRates}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Load Exchange Rates
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Security Info */}
       <div className="bg-amber-50 rounded-lg border border-amber-200 p-6">
         <h4 className="text-lg font-semibold text-amber-900 mb-3">Security & Compliance</h4>
         <ul className="text-sm text-amber-800 space-y-2">
-          <li>✓ All transactions are encrypted with SSL/TLS</li>
-          <li>✓ PCI DSS compliant payment processing</li>
-          <li>✓ Real-time fraud detection and prevention</li>
-          <li>✓ Regular security audits and penetration testing</li>
-          <li>✓ GDPR compliant data handling</li>
+          <li>All transactions are encrypted with SSL/TLS</li>
+          <li>PCI DSS compliant payment processing</li>
+          <li>Real-time fraud detection and prevention</li>
+          <li>Regular security audits and penetration testing</li>
+          <li>GDPR compliant data handling</li>
         </ul>
       </div>
     </div>
