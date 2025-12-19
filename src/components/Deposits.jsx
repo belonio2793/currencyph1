@@ -337,7 +337,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     {fiatCurrencies.length > 0 && (
                       <>
                         <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                          ━━━ FIAT ━━━
+                          ━━━ CURRENCIES ━━━
                         </option>
                         {fiatCurrencies.map(c => (
                           <option key={c.code} value={c.code}>
@@ -349,7 +349,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                     {cryptoCurrencies.length > 0 && (
                       <>
                         <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                          ━━━ CRYPTO ━━━
+                          ━━━ CRYPTOCURRENCIES ━━━
                         </option>
                         {cryptoCurrencies.map(c => (
                           <option key={c.code} value={c.code}>
@@ -383,7 +383,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
                   {fiatWallets.length > 0 && (
                     <>
                       <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                        ━━━ FIAT CURRENCIES ━━━
+                        ━━━ CURRENCIES ━━━
                       </option>
                       {fiatWallets.map(w => (
                         <option key={w.id} value={w.id}>
@@ -606,7 +606,7 @@ function DepositsComponent({ userId, globalCurrency = 'PHP' }) {
               {fiatCurrencies.length > 0 && (
                 <>
                   <option disabled style={{ fontWeight: 'bold', backgroundColor: '#f3f4f6' }}>
-                    ━━━ FIAT CURRENCIES ━━━
+                    ━━━ CURRENCIES ━━━
                   </option>
                   {fiatCurrencies.map(c => (
                     <option key={c.code} value={c.code}>
