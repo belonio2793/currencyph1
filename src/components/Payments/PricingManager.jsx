@@ -117,9 +117,10 @@ export default function PricingManager({ merchant, globalCurrency }) {
     })
   }
 
-  const getProductName = (productId) => {
-    if (!productId) return 'Standalone Price'
-    const product = products.find(p => p.id === productId)
+  const getProductName = (price) => {
+    if (price.product?.name) return price.product.name
+    if (!price.product_id) return 'Standalone Price'
+    const product = products.find(p => p.id === price.product_id)
     return product?.name || 'Unknown Product'
   }
 
@@ -303,7 +304,7 @@ export default function PricingManager({ merchant, globalCurrency }) {
                 {filteredPrices.map(price => (
                   <tr key={price.id} className="border-b border-slate-100 hover:bg-slate-50">
                     <td className="py-3 px-4 font-medium text-slate-900">
-                      {getProductName(price.product_id)}
+                      {getProductName(price)}
                     </td>
                     <td className="py-3 px-4 text-slate-900">
                       {price.currency} {price.amount.toFixed(2)}
